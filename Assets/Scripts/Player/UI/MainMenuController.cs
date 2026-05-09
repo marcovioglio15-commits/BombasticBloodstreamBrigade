@@ -1,12 +1,11 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
 /// Handles the simple front-end scene flow for the authored main menu.
-/// None.
-/// returns None.
+/// /params None.
+/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class MainMenuController : MonoBehaviour
@@ -20,10 +19,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     [Tooltip("Button that closes the application.")]
     [SerializeField] private Button quitButton;
-
-    [Header("Scene Flow")]
-    [Tooltip("Gameplay scene loaded when Play is selected.")]
-    [SerializeField] private string gameplaySceneName = "SCN_PlayerControllerTesting";
 
     [Header("Navigation")]
     [Tooltip("Optional EventSystem override used to select the default menu button.")]
@@ -39,11 +34,21 @@ public sealed class MainMenuController : MonoBehaviour
     #region Methods
 
     #region Unity Methods
+    /// <summary>
+    /// Caches optional local menu selection helpers before UI binding.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
     private void Awake()
     {
         selectionController = GetComponent<MenuSelectionController>();
     }
 
+    /// <summary>
+    /// Registers menu callbacks and restores menu cursor state.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
     private void OnEnable()
     {
         RegisterButtons();
@@ -53,6 +58,11 @@ public sealed class MainMenuController : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+    /// <summary>
+    /// Removes menu callbacks when the controller leaves the active scene.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
     private void OnDisable()
     {
         UnregisterButtons();
@@ -62,8 +72,8 @@ public sealed class MainMenuController : MonoBehaviour
     #region Wiring
     /// <summary>
     /// Registers click handlers for the authored menu buttons.
-    /// None.
-    /// returns None.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private void RegisterButtons()
     {
@@ -76,8 +86,8 @@ public sealed class MainMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes click handlers from the authored menu buttons.
-    /// None.
-    /// returns None.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private void UnregisterButtons()
     {
@@ -91,24 +101,24 @@ public sealed class MainMenuController : MonoBehaviour
 
     #region Callbacks
     /// <summary>
-    /// Loads the configured gameplay scene.
-    /// None.
-    /// returns None.
+    /// Requests the configured default gameplay scene through the ECS Scene Manager.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private void HandlePlayPressed()
     {
         Time.timeScale = 1f;
 
-        if (string.IsNullOrWhiteSpace(gameplaySceneName))
+        if (GameSceneTransitionRequestUtility.EnqueueLoadDefaultGameplay())
             return;
 
-        SceneManager.LoadScene(gameplaySceneName, LoadSceneMode.Single);
+        Debug.LogWarning("[MainMenuController] Unable to enqueue gameplay loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
     }
 
     /// <summary>
     /// Requests application shutdown through the shared helper.
-    /// None.
-    /// returns None.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private void HandleQuitPressed()
     {
@@ -119,8 +129,8 @@ public sealed class MainMenuController : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Selects the first non-null authored menu button so keyboard and controller navigation work immediately.
-    /// None.
-    /// returns None.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private void SelectDefaultButton()
     {

@@ -109,6 +109,31 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates, registers and assigns a new Scene Manager preset to the selected master preset.
+    /// /params panel Owning panel with selected master preset context.
+    /// /returns None.
+    /// </summary>
+    public static void CreateSceneManagerPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameSceneManagerPreset newPreset = GameSceneManagerPresetLibraryUtility.CreatePresetAsset("GameSceneManagerPreset");
+
+        if (newPreset == null)
+            return;
+
+        GameSceneManagerPresetLibrary sceneLibrary = GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create Scene Manager Preset");
+        Undo.RecordObject(sceneLibrary, "Add Scene Manager Preset");
+        sceneLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(sceneLibrary);
+
+        AssignSubPreset(panel, "sceneManagerPreset", newPreset);
+        panel.OpenSidePanel(GameManagementWindow.PanelType.SceneManager);
+    }
+
+    /// <summary>
     /// Assigns one sub-preset reference to the selected master preset.
     /// /params panel Owning panel with serialized master preset.
     /// /params propertyName Serialized property receiving the object reference.
@@ -168,39 +193,24 @@ internal static class GameMasterPresetsPanelSectionsUtility
     private static void BuildSubPresetsSection(GameMasterPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Sub Presets");
-        SerializedProperty audioProperty = panel.PresetSerializedObject.FindProperty("audioManagerPreset");
-
-        if (audioProperty == null)
-            return;
-
-        ObjectField audioField = new ObjectField("Audio Manager Preset");
-        audioField.objectType = typeof(GameAudioManagerPreset);
-        audioField.tooltip = "Audio Manager preset used for FMOD gameplay event bindings.";
-        audioField.BindProperty(audioProperty);
-        audioField.RegisterValueChangedCallback(evt =>
-        {
-            GameManagementDraftSession.MarkDirty();
-            GameMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
-        });
-        section.Add(audioField);
-
-        VisualElement row = new VisualElement();
-        row.style.flexDirection = FlexDirection.Row;
-        row.style.flexWrap = Wrap.Wrap;
-
-        Button openButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.AudioManager));
-        openButton.text = "Open Section";
-        openButton.tooltip = "Open the Audio Manager section.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(openButton, 108f);
-        row.Add(openButton);
-
-        Button newButton = new Button(panel.CreateAudioManagerPreset);
-        newButton.text = "New";
-        newButton.tooltip = "Create and assign a new Audio Manager preset.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(newButton, 48f);
-        newButton.style.marginLeft = 4f;
-        row.Add(newButton);
-        section.Add(row);
+        AddSubPresetControl(panel,
+                            section,
+                            "Audio Manager Preset",
+                            "audioManagerPreset",
+                            typeof(GameAudioManagerPreset),
+                            "Audio Manager preset used for FMOD gameplay event bindings.",
+                            GameManagementWindow.PanelType.AudioManager,
+                            "Audio Manager",
+                            panel.CreateAudioManagerPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Scene Manager Preset",
+                            "sceneManagerPreset",
+                            typeof(GameSceneManagerPreset),
+                            "Scene Manager preset used for scene loading, transitions, fade and trigger defaults.",
+                            GameManagementWindow.PanelType.SceneManager,
+                            "Scene Manager",
+                            panel.CreateSceneManagerPreset);
     }
 
     /// <summary>
@@ -210,7 +220,7 @@ internal static class GameMasterPresetsPanelSectionsUtility
     /// </summary>
     private static void BuildActiveAuthoringSection(GameMasterPresetsPanel panel)
     {
-        VisualElement section = CreateSection(panel, "Active on Game Audio Authoring");
+        VisualElement section = CreateSection(panel, "Active Authoring");
 
         ObjectField audioPrefabField = new ObjectField("Audio Manager Prefab");
         audioPrefabField.objectType = typeof(GameObject);
@@ -247,6 +257,42 @@ internal static class GameMasterPresetsPanelSectionsUtility
         activeStatusLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
         panel.ActiveStatusLabel = activeStatusLabel;
         section.Add(activeStatusLabel);
+
+        ObjectField scenePrefabField = new ObjectField("Scene Manager Prefab");
+        scenePrefabField.objectType = typeof(GameObject);
+        scenePrefabField.tooltip = "Prefab containing GameSceneManagerAuthoring to receive this Game Master preset.";
+        scenePrefabField.SetValueWithoutNotify(panel.SelectedScenePrefab);
+        scenePrefabField.RegisterValueChangedCallback(evt =>
+        {
+            panel.SelectedScenePrefab = evt.newValue as GameObject;
+            GameMasterPresetsPanelSidePanelUtility.SaveSelectedScenePrefabState(panel);
+            panel.RefreshActiveStatus();
+        });
+        panel.ScenePrefabField = scenePrefabField;
+        section.Add(scenePrefabField);
+
+        VisualElement sceneRow = new VisualElement();
+        sceneRow.style.flexDirection = FlexDirection.Row;
+        sceneRow.style.flexWrap = Wrap.Wrap;
+
+        Button findSceneButton = new Button(panel.FindSceneManagerPrefab);
+        findSceneButton.text = "Find";
+        findSceneButton.tooltip = "Find a prefab with GameSceneManagerAuthoring.";
+        GameManagementPanelLayoutUtility.ConfigureToolbarButton(findSceneButton, 48f);
+        sceneRow.Add(findSceneButton);
+
+        Button assignSceneButton = new Button(panel.AssignPresetToSceneAuthoringPrefab);
+        assignSceneButton.text = "Set Active Preset";
+        assignSceneButton.tooltip = "Assign this game master preset to the selected Scene Manager authoring prefab.";
+        GameManagementPanelLayoutUtility.ConfigureToolbarButton(assignSceneButton, 128f);
+        assignSceneButton.style.marginLeft = 4f;
+        sceneRow.Add(assignSceneButton);
+        section.Add(sceneRow);
+
+        Label sceneActiveStatusLabel = new Label();
+        sceneActiveStatusLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
+        panel.SceneActiveStatusLabel = sceneActiveStatusLabel;
+        section.Add(sceneActiveStatusLabel);
         panel.RefreshActiveStatus();
     }
 
@@ -264,10 +310,76 @@ internal static class GameMasterPresetsPanelSectionsUtility
         audioButton.style.flexShrink = 0f;
         audioButton.style.minWidth = 144f;
         section.Add(audioButton);
+
+        Button sceneButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.SceneManager));
+        sceneButton.text = "Open Scene Manager";
+        sceneButton.tooltip = "Open the Scene Manager preset panel.";
+        sceneButton.style.flexShrink = 0f;
+        sceneButton.style.minWidth = 148f;
+        sceneButton.style.marginTop = 4f;
+        section.Add(sceneButton);
     }
     #endregion
 
     #region Detail Helpers
+    /// <summary>
+    /// Adds one master sub-preset object field with section open and asset create actions.
+    /// /params panel Owning panel with serialized master preset context.
+    /// /params section Parent section.
+    /// /params label Object field label.
+    /// /params propertyName Serialized object reference property.
+    /// /params objectType Accepted preset asset type.
+    /// /params tooltip Object field tooltip.
+    /// /params panelType Side panel opened by the row.
+    /// /params sectionName Human-readable section name.
+    /// /params createCallback Callback used to create and assign a new preset.
+    /// /returns None.
+    /// </summary>
+    private static void AddSubPresetControl(GameMasterPresetsPanel panel,
+                                            VisualElement section,
+                                            string label,
+                                            string propertyName,
+                                            System.Type objectType,
+                                            string tooltip,
+                                            GameManagementWindow.PanelType panelType,
+                                            string sectionName,
+                                            System.Action createCallback)
+    {
+        SerializedProperty property = panel.PresetSerializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return;
+
+        ObjectField objectField = new ObjectField(label);
+        objectField.objectType = objectType;
+        objectField.tooltip = tooltip;
+        objectField.BindProperty(property);
+        objectField.RegisterValueChangedCallback(evt =>
+        {
+            GameManagementDraftSession.MarkDirty();
+            GameMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
+        });
+        section.Add(objectField);
+
+        VisualElement row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.flexWrap = Wrap.Wrap;
+
+        Button openButton = new Button(() => panel.OpenSidePanel(panelType));
+        openButton.text = "Open Section";
+        openButton.tooltip = "Open the " + sectionName + " section.";
+        GameManagementPanelLayoutUtility.ConfigureToolbarButton(openButton, 108f);
+        row.Add(openButton);
+
+        Button newButton = new Button(createCallback);
+        newButton.text = "New";
+        newButton.tooltip = "Create and assign a new " + sectionName + " preset.";
+        GameManagementPanelLayoutUtility.ConfigureToolbarButton(newButton, 48f);
+        newButton.style.marginLeft = 4f;
+        row.Add(newButton);
+        section.Add(row);
+    }
+
     /// <summary>
     /// Builds detail section selector buttons.
     /// /params panel Owning panel that stores the active section state.

@@ -289,7 +289,10 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameMasterPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameAudioManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameAudioManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameSceneManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameSceneManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
+        AddSceneManagerPrefabPaths(uniquePaths);
 
         List<string> paths = new List<string>(uniquePaths);
         paths.Sort(StringComparer.Ordinal);
@@ -333,6 +336,7 @@ public static class GameManagementDraftSession
         GameManagementAssetUtility.EnsureFolder(TrackedGameAssetsRoot);
         GameMasterPresetLibraryUtility.GetOrCreateLibrary();
         GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
+        GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
     }
 
     /// <summary>
@@ -342,7 +346,27 @@ public static class GameManagementDraftSession
     /// </summary>
     private static void AddAudioManagerPrefabPaths(HashSet<string> uniquePaths)
     {
-        List<GameObject> prefabs = ManagementToolPrefabUtility.FindPrefabsWithComponentInHierarchy<GameAudioManagerAuthoring>(new string[] { TrackedProjectRoot });
+        AddPrefabPathsWithComponent<GameAudioManagerAuthoring>(uniquePaths);
+    }
+
+    /// <summary>
+    /// Adds prefab assets that contain a GameSceneManagerAuthoring component.
+    /// /params uniquePaths Output set receiving project-relative paths.
+    /// /returns None.
+    /// </summary>
+    private static void AddSceneManagerPrefabPaths(HashSet<string> uniquePaths)
+    {
+        AddPrefabPathsWithComponent<GameSceneManagerAuthoring>(uniquePaths);
+    }
+
+    /// <summary>
+    /// Adds prefab assets that contain one component type to the tracked path set.
+    /// /params uniquePaths Output set receiving project-relative paths.
+    /// /returns None.
+    /// </summary>
+    private static void AddPrefabPathsWithComponent<TComponent>(HashSet<string> uniquePaths) where TComponent : Component
+    {
+        List<GameObject> prefabs = ManagementToolPrefabUtility.FindPrefabsWithComponentInHierarchy<TComponent>(new string[] { TrackedProjectRoot });
 
         for (int index = 0; index < prefabs.Count; index++)
         {
@@ -457,7 +481,9 @@ public static class GameManagementDraftSession
     /// </summary>
     private static bool IsRenamablePresetAsset(UnityEngine.Object assetObject)
     {
-        return assetObject is GameMasterPreset || assetObject is GameAudioManagerPreset;
+        return assetObject is GameMasterPreset ||
+               assetObject is GameAudioManagerPreset ||
+               assetObject is GameSceneManagerPreset;
     }
 
     /// <summary>
@@ -590,7 +616,12 @@ public static class GameManagementDraftSession
             return true;
 
         GameAudioManagerPresetLibrary audioLibrary = GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
-        return LibraryContainsPath(audioLibrary.Presets, assetPath);
+
+        if (LibraryContainsPath(audioLibrary.Presets, assetPath))
+            return true;
+
+        GameSceneManagerPresetLibrary sceneLibrary = GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
+        return LibraryContainsPath(sceneLibrary.Presets, assetPath);
     }
 
     /// <summary>

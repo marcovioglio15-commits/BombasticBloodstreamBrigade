@@ -63,6 +63,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private EntityManager entityManager;
     private EntityQuery bossQuery;
     private Entity cachedBossEntity = Entity.Null;
+    private Canvas rootCanvas;
+    private RectTransform indicatorParentRect;
     private Camera cachedCamera;
     private float nextBossResolveTime;
     private float nextCameraResolveTime;
@@ -347,7 +349,12 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         float indicatorHalfSizePixels = Mathf.Max(0f, hudConfig.OffscreenIndicatorSizePixels) * 0.5f;
         Vector2 edgePosition = EnemyBossHudPresentationUtility.ResolveEdgePosition(viewportPosition,
                                                                                    Mathf.Max(0f, hudConfig.EdgePaddingPixels) + indicatorHalfSizePixels);
-        offscreenIndicatorRoot.position = edgePosition;
+        if (!TryApplyOffscreenIndicatorPosition(edgePosition, camera))
+        {
+            SetOffscreenIndicatorVisible(false);
+            return;
+        }
+
         ApplyIndicatorRotation(edgePosition);
         SetOffscreenIndicatorVisible(true);
     }
@@ -394,6 +401,9 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         if (offscreenIndicatorRoot == null)
             offscreenIndicatorRoot = transform.Find("OffscreenIndicator") as RectTransform;
+
+        indicatorParentRect = offscreenIndicatorRoot != null ? offscreenIndicatorRoot.parent as RectTransform : null;
+        rootCanvas = offscreenIndicatorRoot != null ? offscreenIndicatorRoot.GetComponentInParent<Canvas>() : GetComponentInParent<Canvas>();
 
         if (offscreenIndicatorImage == null && offscreenIndicatorRoot != null)
             offscreenIndicatorImage = offscreenIndicatorRoot.GetComponentInChildren<Image>(true);
@@ -538,6 +548,114 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     }
 
     /// <summary>
+    /// Applies the screen-edge position in the correct coordinate space for overlay, camera-space and world-space canvases.
+    /// /params screenPosition Screen-space indicator position in pixels.
+    /// /params projectionCamera Camera used to project the boss into viewport space.
+    /// /returns True when the indicator position could be applied.
+    /// </summary>
+    private bool TryApplyOffscreenIndicatorPosition(Vector2 screenPosition, Camera projectionCamera)
+    {
+        if (offscreenIndicatorRoot == null)
+            return false;
+
+        RectTransform parentRect = ResolveIndicatorParentRect();
+
+        if (parentRect == null)
+        {
+            offscreenIndicatorRoot.position = screenPosition;
+            return true;
+        }
+
+        Camera eventCamera = ResolveCanvasEventCamera(projectionCamera);
+
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPosition, eventCamera, out Vector2 localPoint))
+            return false;
+
+        offscreenIndicatorRoot.anchoredPosition = ResolveAnchoredPosition(parentRect, localPoint);
+        return true;
+    }
+
+    /// <summary>
+    /// Converts a parent-local screen point into the anchored position expected by the indicator RectTransform.
+    /// /params parentRect Parent rect used as the coordinate frame.
+    /// /params localPoint Local point returned by RectTransformUtility.
+    /// /returns Anchored position corrected for the indicator anchor reference.
+    /// </summary>
+    private Vector2 ResolveAnchoredPosition(RectTransform parentRect, Vector2 localPoint)
+    {
+        Vector2 anchorCenter = (offscreenIndicatorRoot.anchorMin + offscreenIndicatorRoot.anchorMax) * 0.5f;
+        Vector2 anchorReference = new Vector2(Mathf.Lerp(parentRect.rect.xMin, parentRect.rect.xMax, anchorCenter.x),
+                                              Mathf.Lerp(parentRect.rect.yMin, parentRect.rect.yMax, anchorCenter.y));
+        return localPoint - anchorReference;
+    }
+
+    /// <summary>
+    /// Resolves and caches the parent RectTransform used as the indicator coordinate space.
+    /// /params None.
+    /// /returns Parent RectTransform when available.
+    /// </summary>
+    private RectTransform ResolveIndicatorParentRect()
+    {
+        if (indicatorParentRect != null)
+            return indicatorParentRect;
+
+        if (offscreenIndicatorRoot == null || offscreenIndicatorRoot.parent == null)
+            return null;
+
+        indicatorParentRect = offscreenIndicatorRoot.parent as RectTransform;
+        return indicatorParentRect;
+    }
+
+    /// <summary>
+    /// Resolves the event camera required by RectTransformUtility for the active canvas render mode.
+    /// /params projectionCamera Camera used as a fallback when the canvas has no explicit world camera.
+    /// /returns Null for overlay canvas, otherwise the canvas world camera or projection fallback.
+    /// </summary>
+    private Camera ResolveCanvasEventCamera(Camera projectionCamera)
+    {
+        Canvas canvas = ResolveRootCanvas();
+
+        if (canvas == null)
+            return projectionCamera;
+
+        switch (canvas.renderMode)
+        {
+            case RenderMode.ScreenSpaceOverlay:
+                return null;
+            case RenderMode.ScreenSpaceCamera:
+            case RenderMode.WorldSpace:
+                if (canvas.worldCamera != null)
+                    return canvas.worldCamera;
+
+                return projectionCamera;
+            default:
+                return projectionCamera;
+        }
+    }
+
+    /// <summary>
+    /// Resolves and caches the root canvas that owns the boss HUD presentation.
+    /// /params None.
+    /// /returns Canvas owning this presenter, or null when unavailable.
+    /// </summary>
+    private Canvas ResolveRootCanvas()
+    {
+        if (rootCanvas != null)
+            return rootCanvas;
+
+        if (offscreenIndicatorRoot != null)
+        {
+            rootCanvas = offscreenIndicatorRoot.GetComponentInParent<Canvas>();
+
+            if (rootCanvas != null)
+                return rootCanvas;
+        }
+
+        rootCanvas = GetComponentInParent<Canvas>();
+        return rootCanvas;
+    }
+
+    /// <summary>
     /// Rotates the offscreen indicator toward the clamped edge direction.
     /// /params edgePosition Current indicator screen position.
     /// /returns None.
@@ -551,7 +669,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             return;
 
         float angleDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-        offscreenIndicatorRoot.rotation = Quaternion.Euler(0f, 0f, angleDegrees);
+        offscreenIndicatorRoot.localRotation = Quaternion.Euler(0f, 0f, angleDegrees);
     }
 
     /// <summary>

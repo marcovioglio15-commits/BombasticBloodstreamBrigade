@@ -14,6 +14,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     private const string ActivePanelStateKey = "NashCore.GameManagement.Master.ActivePanel";
     private const string ActiveDetailsSectionStateKey = "NashCore.GameManagement.Master.ActiveDetailsSection";
     private const string SelectedAudioPrefabPathStateKey = "NashCore.GameManagement.Master.SelectedAudioPrefabPath";
+    private const string SelectedScenePrefabPathStateKey = "NashCore.GameManagement.Master.SelectedScenePrefabPath";
     private static readonly Color ActiveTabColor = new Color(0.18f, 0.18f, 0.18f, 0.6f);
     #endregion
 
@@ -33,6 +34,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         panel.ActivePanel = ManagementToolStateUtility.LoadEnumValue(ActivePanelStateKey, GameManagementWindow.PanelType.GameMasterPresets);
         panel.ActiveDetailsSection = ManagementToolStateUtility.LoadEnumValue(ActiveDetailsSectionStateKey, GameMasterPresetsPanel.DetailsSectionType.Metadata);
         panel.SelectedAudioPrefab = ManagementToolStateUtility.LoadGameObjectAsset(SelectedAudioPrefabPathStateKey);
+        panel.SelectedScenePrefab = ManagementToolStateUtility.LoadGameObjectAsset(SelectedScenePrefabPathStateKey);
     }
 
     /// <summary>
@@ -64,10 +66,13 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         panel.Root.Add(contentHost);
 
         panel.SuppressStateWrite = true;
-        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null);
+        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null);
 
         if (panel.ActivePanel == GameManagementWindow.PanelType.AudioManager)
             OpenSidePanel(panel, GameManagementWindow.PanelType.AudioManager);
+
+        if (panel.ActivePanel == GameManagementWindow.PanelType.SceneManager)
+            OpenSidePanel(panel, GameManagementWindow.PanelType.SceneManager);
 
         if (!panel.SidePanels.ContainsKey(panel.ActivePanel))
             panel.ActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
@@ -95,12 +100,18 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             return;
         }
 
-        if (panelType != GameManagementWindow.PanelType.AudioManager)
-            return;
+        switch (panelType)
+        {
+            case GameManagementWindow.PanelType.AudioManager:
+                OpenAudioManagerPanel(panel, panelType);
+                break;
+            case GameManagementWindow.PanelType.SceneManager:
+                OpenSceneManagerPanel(panel, panelType);
+                break;
+            default:
+                return;
+        }
 
-        GameAudioManagerPresetsPanel audioPanel = new GameAudioManagerPresetsPanel();
-        VisualElement panelRoot = BuildSidePanelRoot(panel, "Audio Manager", audioPanel.Root, panelType);
-        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel);
         SetActivePanel(panel, panelType);
         SyncSidePanelSelection(panel, panelType, panel.SidePanels[panelType]);
     }
@@ -119,10 +130,14 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         {
             GameMasterPresetsPanel.SidePanelEntry entry = panelEntry.Value;
 
-            if (entry == null || entry.AudioPanel == null)
+            if (entry == null)
                 continue;
 
-            entry.AudioPanel.RefreshFromSessionChange();
+            if (entry.AudioPanel != null)
+                entry.AudioPanel.RefreshFromSessionChange();
+
+            if (entry.ScenePanel != null)
+                entry.ScenePanel.RefreshFromSessionChange();
         }
 
         SyncOpenSidePanels(panel);
@@ -167,9 +182,48 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
         ManagementToolStateUtility.SaveAssetPath(SelectedAudioPrefabPathStateKey, panel.SelectedAudioPrefab);
     }
+
+    /// <summary>
+    /// Persists the selected scene manager prefab reference.
+    /// /params panel Owning panel that stores selected prefab state.
+    /// /returns None.
+    /// </summary>
+    public static void SaveSelectedScenePrefabState(GameMasterPresetsPanel panel)
+    {
+        if (panel == null)
+            return;
+
+        ManagementToolStateUtility.SaveAssetPath(SelectedScenePrefabPathStateKey, panel.SelectedScenePrefab);
+    }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Creates and registers the Audio Manager side panel.
+    /// /params panel Owning panel with tab state.
+    /// /params panelType Side panel type.
+    /// /returns None.
+    /// </summary>
+    private static void OpenAudioManagerPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
+    {
+        GameAudioManagerPresetsPanel audioPanel = new GameAudioManagerPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel, "Audio Manager", audioPanel.Root, panelType);
+        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel, null);
+    }
+
+    /// <summary>
+    /// Creates and registers the Scene Manager side panel.
+    /// /params panel Owning panel with tab state.
+    /// /params panelType Side panel type.
+    /// /returns None.
+    /// </summary>
+    private static void OpenSceneManagerPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
+    {
+        GameSceneManagerPresetsPanel scenePanel = new GameSceneManagerPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel, "Scene Manager", scenePanel.Root, panelType);
+        AddTab(panel, panelType, "Scene Manager", panelRoot, null, scenePanel);
+    }
+
     /// <summary>
     /// Creates the side-panel root with a title and close button.
     /// /params panel Owning panel used by the close callback.
@@ -214,13 +268,15 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     /// /params label Tab label.
     /// /params content Content shown when active.
     /// /params audioPanel Optional Audio Manager panel controller.
+    /// /params scenePanel Optional Scene Manager panel controller.
     /// /returns None.
     /// </summary>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
                                VisualElement content,
-                               GameAudioManagerPresetsPanel audioPanel)
+                               GameAudioManagerPresetsPanel audioPanel,
+                               GameSceneManagerPresetsPanel scenePanel)
     {
         VisualElement tabContainer = new VisualElement();
         tabContainer.style.flexDirection = FlexDirection.Row;
@@ -239,7 +295,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             TabContainer = tabContainer,
             TabButton = tabButton,
             Content = content,
-            AudioPanel = audioPanel
+            AudioPanel = audioPanel,
+            ScenePanel = scenePanel
         };
     }
 
@@ -307,6 +364,14 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             panel.SelectedPreset.AudioManagerPreset != null)
         {
             entry.AudioPanel.SelectPresetFromExternal(panel.SelectedPreset.AudioManagerPreset);
+            return;
+        }
+
+        if (panelType == GameManagementWindow.PanelType.SceneManager &&
+            entry.ScenePanel != null &&
+            panel.SelectedPreset.SceneManagerPreset != null)
+        {
+            entry.ScenePanel.SelectPresetFromExternal(panel.SelectedPreset.SceneManagerPreset);
         }
     }
 

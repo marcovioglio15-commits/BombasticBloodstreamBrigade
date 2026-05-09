@@ -17,3 +17,4 @@ MonoBehaviour:
   description: 
   version: 1.0.0
   audioManagerPreset: {fileID: 11400000, guid: 4762fb1f960c08e40b031f534d613690, type: 2}
+  sceneManagerPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}

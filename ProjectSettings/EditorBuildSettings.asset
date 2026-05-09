@@ -6,11 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Testing/Main Scenes/UI/SCN_MainMenu.unity
-    guid: 38e3563928683cd45a4636eecc880a51
-  - enabled: 1
-    path: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/Testing/Main Scenes/Bootstrap/SCN_Bootstrap.unity
+    guid: eaa05388c9ccd2e4b874f92129d89639
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 8257142b1fbf1654aba0a79b4902d210, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

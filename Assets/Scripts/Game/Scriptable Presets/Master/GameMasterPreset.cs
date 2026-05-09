@@ -28,6 +28,9 @@ public sealed class GameMasterPreset : ScriptableObject
     [Header("Sub Presets")]
     [Tooltip("Audio manager preset used to configure FMOD gameplay event bindings.")]
     [SerializeField] private GameAudioManagerPreset audioManagerPreset;
+
+    [Tooltip("Scene manager preset used to configure scene loading, transitions, fade and scene trigger defaults.")]
+    [SerializeField] private GameSceneManagerPreset sceneManagerPreset;
     #endregion
 
     #endregion
@@ -70,6 +73,14 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return audioManagerPreset;
+        }
+    }
+
+    public GameSceneManagerPreset SceneManagerPreset
+    {
+        get
+        {
+            return sceneManagerPreset;
         }
     }
     #endregion

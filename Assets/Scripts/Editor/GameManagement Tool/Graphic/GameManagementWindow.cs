@@ -382,7 +382,8 @@ public sealed class GameManagementWindow : EditorWindow
     public enum PanelType
     {
         GameMasterPresets = 0,
-        AudioManager = 1
+        AudioManager = 1,
+        SceneManager = 2
     }
     #endregion
 }

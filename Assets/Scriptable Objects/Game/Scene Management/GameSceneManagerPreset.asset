@@ -1,0 +1,112 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05a34bed49f01443a2386dc4d57d3de, type: 3}
+  m_Name: GameSceneManagerPreset
+  m_EditorClassIdentifier: Assembly-CSharp::GameSceneManagerPreset
+  presetId: b55305b657d54942881eca3450781149
+  presetName: GameSceneManagerPreset
+  description: 
+  version: 1.0.0
+  bootstrapSceneId: SCN_Bootstrap
+  initialSceneId: SCN_MainMenu
+  mainMenuSceneId: SCN_MainMenu
+  defaultGameplaySceneId: SCN_PlayerControllerTesting
+  autoLoadInitialScene: 1
+  loadBackend: 1
+  logTransitions: 1
+  fadeSettings:
+    fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    fadeOutSeconds: 0.35
+    holdBlackSeconds: 0.08
+    fadeInSeconds: 0.35
+    lockGameplayInput: 1
+    setTimeScaleDuringTransition: 1
+  triggerSettings:
+    transitionLayerName: SceneTransition
+    defaultCooldownSeconds: 0.75
+    requirePlayer: 1
+    oneShotByDefault: 1
+    gizmoColor: {r: 0.1, g: 0.55, b: 1, a: 0.28}
+  sceneDefinitions:
+  - sceneId: SCN_Bootstrap
+    sceneName: SCN_Bootstrap
+    scenePath: Assets/Scenes/Testing/Main Scenes/Bootstrap/SCN_Bootstrap.unity
+    sceneGuid: eaa05388c9ccd2e4b874f92129d89639
+    buildIndex: 0
+    sceneKind: 0
+    unloadPolicy: 1
+    companionUiSceneId: 
+    roomTags: 
+    addressableKey: 
+    sceneAsset: {fileID: 102900000, guid: eaa05388c9ccd2e4b874f92129d89639, type: 3}
+  - sceneId: SCN_MainMenu
+    sceneName: SCN_MainMenu
+    scenePath: Assets/Scenes/Testing/Main Scenes/UI/SCN_MainMenu.unity
+    sceneGuid: 38e3563928683cd45a4636eecc880a51
+    buildIndex: -1
+    sceneKind: 1
+    unloadPolicy: 0
+    companionUiSceneId: 
+    roomTags: 
+    addressableKey: SCN_MainMenu
+    sceneAsset: {fileID: 102900000, guid: 38e3563928683cd45a4636eecc880a51, type: 3}
+  - sceneId: SCN_PlayerControllerTesting
+    sceneName: SCN_PlayerControllerTesting
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity
+    sceneGuid: 99c9720ab356a0642a771bea13969a05
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_PlayerControllerTesting_UI
+    roomTags: 
+    addressableKey: SCN_PlayerControllerTesting
+    sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+  - sceneId: SCN_PlayerControllerTesting_UI
+    sceneName: SCN_PlayerControllerTesting_UI
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting_UI.unity
+    sceneGuid: 03a9f2c16e797964292116c73c929762
+    buildIndex: -1
+    sceneKind: 3
+    unloadPolicy: 0
+    companionUiSceneId: 
+    roomTags: 
+    addressableKey: SCN_PlayerControllerTesting_UI
+    sceneAsset: {fileID: 102900000, guid: 03a9f2c16e797964292116c73c929762, type: 3}
+  transitionDefinitions:
+  - transitionId: TRN_MainMenu_To_Gameplay
+    fromSceneId: SCN_MainMenu
+    toSceneId: SCN_PlayerControllerTesting
+    priority: 0
+    transitionMode: 0
+    triggerId: 
+    triggerCooldownOverrideSeconds: -1
+    oneShotTrigger: 1
+    overrideFadeSettings: 0
+    fadeOutSeconds: 0.35
+    holdBlackSeconds: 0.08
+    fadeInSeconds: 0.35
+    allowDuringPause: 1
+    allowWhenRunFinalized: 1
+  - transitionId: TRN_Gameplay_To_MainMenu
+    fromSceneId: SCN_PlayerControllerTesting
+    toSceneId: SCN_MainMenu
+    priority: 0
+    transitionMode: 0
+    triggerId: 
+    triggerCooldownOverrideSeconds: -1
+    oneShotTrigger: 1
+    overrideFadeSettings: 0
+    fadeOutSeconds: 0.35
+    holdBlackSeconds: 0.08
+    fadeInSeconds: 0.35
+    allowDuringPause: 1
+    allowWhenRunFinalized: 1

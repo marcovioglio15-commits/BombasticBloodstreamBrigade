@@ -34,8 +34,11 @@ public sealed class GameMasterPresetsPanel
     private GameMasterPreset selectedPreset;
     private SerializedObject presetSerializedObject;
     private GameObject selectedAudioPrefab;
+    private GameObject selectedScenePrefab;
     private ObjectField audioPrefabField;
+    private ObjectField scenePrefabField;
     private Label activeStatusLabel;
+    private Label sceneActiveStatusLabel;
     private bool suppressStateWrite;
     #endregion
 
@@ -228,6 +231,18 @@ public sealed class GameMasterPresetsPanel
         }
     }
 
+    internal GameObject SelectedScenePrefab
+    {
+        get
+        {
+            return selectedScenePrefab;
+        }
+        set
+        {
+            selectedScenePrefab = value;
+        }
+    }
+
     internal ObjectField AudioPrefabField
     {
         get
@@ -240,6 +255,18 @@ public sealed class GameMasterPresetsPanel
         }
     }
 
+    internal ObjectField ScenePrefabField
+    {
+        get
+        {
+            return scenePrefabField;
+        }
+        set
+        {
+            scenePrefabField = value;
+        }
+    }
+
     internal Label ActiveStatusLabel
     {
         get
@@ -249,6 +276,18 @@ public sealed class GameMasterPresetsPanel
         set
         {
             activeStatusLabel = value;
+        }
+    }
+
+    internal Label SceneActiveStatusLabel
+    {
+        get
+        {
+            return sceneActiveStatusLabel;
+        }
+        set
+        {
+            sceneActiveStatusLabel = value;
         }
     }
 
@@ -407,6 +446,16 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new Scene Manager preset and assigns it to the selected master preset.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    internal void CreateSceneManagerPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateSceneManagerPreset(this);
+    }
+
+    /// <summary>
     /// Opens or activates one side panel.
     /// /params panelType Target panel type.
     /// /returns None.
@@ -429,6 +478,16 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Finds a prefab containing GameSceneManagerAuthoring and selects it.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    internal void FindSceneManagerPrefab()
+    {
+        GameMasterPresetsPanelAuthoringUtility.FindSceneManagerPrefab(this);
+    }
+
+    /// <summary>
     /// Assigns the selected master preset to the selected GameAudioManagerAuthoring prefab.
     /// /params None.
     /// /returns None.
@@ -436,6 +495,16 @@ public sealed class GameMasterPresetsPanel
     internal void AssignPresetToAuthoringPrefab()
     {
         GameMasterPresetsPanelAuthoringUtility.AssignPresetToAuthoringPrefab(this);
+    }
+
+    /// <summary>
+    /// Assigns the selected master preset to the selected GameSceneManagerAuthoring prefab.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    internal void AssignPresetToSceneAuthoringPrefab()
+    {
+        GameMasterPresetsPanelAuthoringUtility.AssignPresetToSceneAuthoringPrefab(this);
     }
 
     /// <summary>
@@ -506,6 +575,7 @@ public sealed class GameMasterPresetsPanel
         public Button TabButton;
         public VisualElement Content;
         public GameAudioManagerPresetsPanel AudioPanel;
+        public GameSceneManagerPresetsPanel ScenePanel;
     }
     #endregion
 }

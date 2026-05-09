@@ -27,6 +27,8 @@ MonoBehaviour:
   - Assets/Scenes/Testing/Main Scenes/SCN_UITesting
   - Assets/Scenes/Testing/Main Scenes/SCN_UITesting/SCN_UITesting
   - Assets/Scenes/Testing/Main Scenes/UI
+  - Assets/Scenes/Final/Bootstrap
+  - Assets/Scenes/Testing/Main Scenes/Bootstrap
   folderColors:
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
@@ -42,5 +44,7 @@ MonoBehaviour:
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
-  folderApplyModes: 0100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  folderApplyModes: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
   autoInheritColors: 1

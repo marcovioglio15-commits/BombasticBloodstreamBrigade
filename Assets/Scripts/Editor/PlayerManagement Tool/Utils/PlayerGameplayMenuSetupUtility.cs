@@ -9,11 +9,12 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static PlayerGameplayMenuSetupSharedUtility;
 
 /// <summary>
-/// Builds the authored gameplay-menu prefab, injects it into the gameplay scene, creates the main-menu scene, and refreshes build settings.
-/// None.
-/// returns None.
+/// Builds the authored menu prefab, refreshes the menu scenes, and keeps gameplay UI in its additive companion scene.
+/// /params None.
+/// /returns None.
 /// </summary>
 public static class PlayerGameplayMenuSetupUtility
 {
@@ -21,8 +22,8 @@ public static class PlayerGameplayMenuSetupUtility
     private const string GameplayMenusPrefabPath = "Assets/Prefabs/UI/PF_GameplayMenus.prefab";
     private const string MainMenuScenePath = "Assets/Scenes/Testing/Main Scenes/UI/SCN_MainMenu.unity";
     private const string GameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity";
-    private const string MainMenuSceneName = "SCN_MainMenu";
-    private const string GameplaySceneName = "SCN_PlayerControllerTesting";
+    private const string BootstrapScenePath = GameSceneManagementProjectSetupUtility.BootstrapScenePath;
+    private const string GameplayUiScenePath = GameSceneManagementProjectSetupUtility.GameplayUiScenePath;
     private static readonly Color BackgroundColor = new Color(0.06f, 0.08f, 0.11f, 1f);
     private static readonly Color OverlayColor = new Color(0.03f, 0.05f, 0.07f, 0.78f);
     private static readonly Color PanelColor = new Color(0.1f, 0.14f, 0.18f, 0.96f);
@@ -36,15 +37,16 @@ public static class PlayerGameplayMenuSetupUtility
 
     #region Public Methods
     /// <summary>
-    /// Runs the full authored UI setup for menus and gameplay-scene integration.
-    /// None.
-    /// returns None.
+    /// Runs the full authored UI setup and applies the project Scene Manager defaults it depends on.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     public static void ExecuteSetup()
     {
         GameObject gameplayMenusPrefab = EnsureGameplayMenusPrefab();
-        EnsureGameplayScene(gameplayMenusPrefab);
         EnsureMainMenuScene();
+        GameSceneManagementProjectSetupUtility.ApplyDefaultProjectSetup(false);
+        EnsureGameplayUiScene(gameplayMenusPrefab);
         EnsureBuildSettings();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -53,9 +55,9 @@ public static class PlayerGameplayMenuSetupUtility
 
     #region Prefab Setup
     /// <summary>
-    /// Creates or refreshes the authored gameplay-menu prefab used directly inside the gameplay scene.
-    /// None.
-    /// returns Gameplay menu prefab asset.
+    /// Creates or refreshes the authored gameplay-menu prefab used by the additive gameplay UI scene.
+    /// /params None.
+    /// /returns Gameplay menu prefab asset.
     /// </summary>
     private static GameObject EnsureGameplayMenusPrefab()
     {
@@ -112,7 +114,6 @@ public static class PlayerGameplayMenuSetupUtility
             serializedController.FindProperty("endingPlayAgainButton").objectReferenceValue = playAgainButton;
             serializedController.FindProperty("endingMainMenuButton").objectReferenceValue = endingMainMenuButton;
             serializedController.FindProperty("endingQuitButton").objectReferenceValue = endingQuitButton;
-            serializedController.FindProperty("mainMenuSceneName").stringValue = MainMenuSceneName;
             serializedController.FindProperty("victoryMessage").stringValue = "Victory";
             serializedController.FindProperty("defeatMessage").stringValue = "Defeat";
             serializedController.ApplyModifiedPropertiesWithoutUndo();
@@ -143,46 +144,51 @@ public static class PlayerGameplayMenuSetupUtility
 
     #region Scene Setup
     /// <summary>
-    /// Injects the authored gameplay-menu prefab into the gameplay root scene and ensures UI input is ready there.
-    /// gameplayMenusPrefab: Prefab asset instantiated under the gameplay canvas.
-    /// returns None.
+    /// Injects the authored gameplay-menu prefab into the additive gameplay UI scene and ensures UI input is ready there.
+    /// /params gameplayMenusPrefab Prefab asset instantiated under the gameplay UI canvas.
+    /// /returns None.
     /// </summary>
-    private static void EnsureGameplayScene(GameObject gameplayMenusPrefab)
+    private static void EnsureGameplayUiScene(GameObject gameplayMenusPrefab)
     {
-        Scene gameplayScene = EditorSceneManager.OpenScene(GameplayScenePath, OpenSceneMode.Single);
-        HUDManager hudManager = FindComponentInScene<HUDManager>(gameplayScene);
+        SceneAsset gameplayUiSceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(GameplayUiScenePath);
+
+        if (gameplayUiSceneAsset == null)
+            throw new InvalidOperationException("Gameplay UI scene was not created by the Scene Manager project setup.");
+
+        Scene gameplayUiScene = EditorSceneManager.OpenScene(GameplayUiScenePath, OpenSceneMode.Single);
+        HUDManager hudManager = FindComponentInScene<HUDManager>(gameplayUiScene);
 
         if (hudManager == null)
-            throw new InvalidOperationException("HUDManager not found in gameplay scene. Unable to resolve the gameplay canvas.");
+            throw new InvalidOperationException("HUDManager not found in gameplay UI scene. Unable to resolve the gameplay canvas.");
 
         Canvas targetCanvas = hudManager.GetComponentInParent<Canvas>();
 
         if (targetCanvas == null)
-            targetCanvas = ResolveGameplayCanvas(gameplayScene);
+            targetCanvas = ResolveGameplayCanvas(gameplayUiScene);
 
         if (targetCanvas == null)
-            throw new InvalidOperationException("Gameplay canvas not found in gameplay scene.");
+            throw new InvalidOperationException("Gameplay canvas not found in gameplay UI scene.");
 
-        EnsureSceneEventSystem(gameplayScene);
-        RemoveExistingGameplayMenuControllers(gameplayScene);
+        EnsureSceneEventSystem(gameplayUiScene);
+        RemoveExistingGameplayMenuControllers(gameplayUiScene);
 
-        GameObject instantiatedMenus = PrefabUtility.InstantiatePrefab(gameplayMenusPrefab, gameplayScene) as GameObject;
+        GameObject instantiatedMenus = PrefabUtility.InstantiatePrefab(gameplayMenusPrefab, gameplayUiScene) as GameObject;
 
         if (instantiatedMenus == null)
-            throw new InvalidOperationException("Unable to instantiate gameplay menus prefab into gameplay scene.");
+            throw new InvalidOperationException("Unable to instantiate gameplay menus prefab into gameplay UI scene.");
 
         RectTransform instantiatedRect = instantiatedMenus.GetComponent<RectTransform>();
         instantiatedRect.SetParent(targetCanvas.transform, false);
         StretchToParent(instantiatedRect);
         instantiatedRect.SetAsLastSibling();
-        EditorSceneManager.MarkSceneDirty(gameplayScene);
-        EditorSceneManager.SaveScene(gameplayScene);
+        EditorSceneManager.MarkSceneDirty(gameplayUiScene);
+        EditorSceneManager.SaveScene(gameplayUiScene, GameplayUiScenePath);
     }
 
     /// <summary>
     /// Creates or refreshes the authored standalone main-menu scene.
-    /// None.
-    /// returns None.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private static void EnsureMainMenuScene()
     {
@@ -216,7 +222,6 @@ public static class PlayerGameplayMenuSetupUtility
         serializedController.Update();
         serializedController.FindProperty("playButton").objectReferenceValue = playButton;
         serializedController.FindProperty("quitButton").objectReferenceValue = quitButton;
-        serializedController.FindProperty("gameplaySceneName").stringValue = GameplaySceneName;
         serializedController.FindProperty("eventSystemOverride").objectReferenceValue = eventSystem;
         serializedController.ApplyModifiedPropertiesWithoutUndo();
 
@@ -232,25 +237,33 @@ public static class PlayerGameplayMenuSetupUtility
     }
 
     /// <summary>
-    /// Ensures build settings start from the main menu, keep gameplay available, and preserve any extra existing scenes afterward.
-    /// None.
-    /// returns None.
+    /// Ensures build settings start from bootstrap, keep menu/gameplay/UI scenes available, and preserve extra entries.
+    /// /params None.
+    /// /returns None.
     /// </summary>
     private static void EnsureBuildSettings()
     {
         List<EditorBuildSettingsScene> updatedScenes = new List<EditorBuildSettingsScene>();
+        AddSceneIfMissing(updatedScenes, BootstrapScenePath);
         AddSceneIfMissing(updatedScenes, MainMenuScenePath);
         AddSceneIfMissing(updatedScenes, GameplayScenePath);
+        AddSceneIfMissing(updatedScenes, GameplayUiScenePath);
         EditorBuildSettingsScene[] existingScenes = EditorBuildSettings.scenes;
 
         for (int sceneIndex = 0; sceneIndex < existingScenes.Length; sceneIndex++)
         {
             string scenePath = existingScenes[sceneIndex].path;
 
+            if (string.Equals(scenePath, BootstrapScenePath, StringComparison.Ordinal))
+                continue;
+
             if (string.Equals(scenePath, MainMenuScenePath, StringComparison.Ordinal))
                 continue;
 
             if (string.Equals(scenePath, GameplayScenePath, StringComparison.Ordinal))
+                continue;
+
+            if (string.Equals(scenePath, GameplayUiScenePath, StringComparison.Ordinal))
                 continue;
 
             AddSceneIfMissing(updatedScenes, scenePath);
@@ -263,9 +276,9 @@ public static class PlayerGameplayMenuSetupUtility
     #region UI Creation
     /// <summary>
     /// Creates one full-screen overlay root used by authored gameplay menus.
-    /// objectName: Name assigned to the created overlay object.
-    /// parent: Parent transform that receives the overlay root.
-    /// returns Created overlay GameObject.
+    /// /params objectName Name assigned to the created overlay object.
+    /// /params parent Parent transform that receives the overlay root.
+    /// /returns Created overlay GameObject.
     /// </summary>
     private static GameObject CreateOverlayRoot(string objectName, Transform parent)
     {
@@ -277,10 +290,10 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one centered panel object used by the main menu and gameplay overlays.
-    /// objectName: Name assigned to the created panel object.
-    /// parent: Parent transform that receives the panel.
-    /// size: Fixed panel size in pixels.
-    /// returns Created panel GameObject.
+    /// /params objectName Name assigned to the created panel object.
+    /// /params parent Parent transform that receives the panel.
+    /// /params size Fixed panel size in pixels.
+    /// /returns Created panel GameObject.
     /// </summary>
     private static GameObject CreatePanel(string objectName, Transform parent, Vector2 size)
     {
@@ -296,10 +309,10 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one title text element under the given parent using the shared menu style.
-    /// objectName: Name assigned to the created text object.
-    /// text: Displayed label.
-    /// parent: Parent transform that receives the text.
-    /// returns Created TMP text component.
+    /// /params objectName Name assigned to the created text object.
+    /// /params text Displayed label.
+    /// /params parent Parent transform that receives the text.
+    /// /returns Created TMP text component.
     /// </summary>
     private static TMP_Text CreateTitleText(string objectName, string text, Transform parent)
     {
@@ -308,11 +321,11 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one body text element under the given parent using the shared menu style.
-    /// objectName: Name assigned to the created text object.
-    /// text: Displayed label.
-    /// parent: Parent transform that receives the text.
-    /// fontSize: Point size used for the created label.
-    /// returns Created TMP text component.
+    /// /params objectName Name assigned to the created text object.
+    /// /params text Displayed label.
+    /// /params parent Parent transform that receives the text.
+    /// /params fontSize Point size used for the created label.
+    /// /returns Created TMP text component.
     /// </summary>
     private static TMP_Text CreateBodyText(string objectName, string text, Transform parent, float fontSize)
     {
@@ -321,13 +334,13 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one TMP text element with the requested visual settings.
-    /// objectName: Name assigned to the created text object.
-    /// text: Displayed label.
-    /// parent: Parent transform that receives the text.
-    /// fontSize: Point size used for the created label.
-    /// fontStyle: Font style used by the created label.
-    /// alignment: Alignment used by the created label.
-    /// returns Created TMP text component.
+    /// /params objectName Name assigned to the created text object.
+    /// /params text Displayed label.
+    /// /params parent Parent transform that receives the text.
+    /// /params fontSize Point size used for the created label.
+    /// /params fontStyle Font style used by the created label.
+    /// /params alignment Alignment used by the created label.
+    /// /returns Created TMP text component.
     /// </summary>
     private static TMP_Text CreateText(string objectName,
                                        string text,
@@ -357,10 +370,10 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one gameplay-menu button with a centered TMP label and shared navigation styling.
-    /// objectName: Name assigned to the created button object.
-    /// label: Displayed button label.
-    /// parent: Parent transform that receives the button.
-    /// returns Created Button component.
+    /// /params objectName Name assigned to the created button object.
+    /// /params label Displayed button label.
+    /// /params parent Parent transform that receives the button.
+    /// /returns Created Button component.
     /// </summary>
     private static Button CreateMenuButton(string objectName, string label, Transform parent)
     {
@@ -397,10 +410,10 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one image object with RectTransform and Image already configured.
-    /// objectName: Name assigned to the created object.
-    /// parent: Parent transform that receives the object.
-    /// color: Image color assigned to the new object.
-    /// returns Created GameObject.
+    /// /params objectName Name assigned to the created object.
+    /// /params parent Parent transform that receives the object.
+    /// /params color Image color assigned to the new object.
+    /// /returns Created GameObject.
     /// </summary>
     private static GameObject CreateImageObject(string objectName, Transform parent, Color color)
     {
@@ -417,8 +430,8 @@ public static class PlayerGameplayMenuSetupUtility
     #region Scene Helpers
     /// <summary>
     /// Creates the main-menu camera used by the standalone front-end scene.
-    /// scene: Scene that receives the created camera object.
-    /// returns None.
+    /// /params scene Scene that receives the created camera object.
+    /// /returns None.
     /// </summary>
     private static void CreateMainMenuCamera(Scene scene)
     {
@@ -433,8 +446,8 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one screen-space overlay canvas with scaler and raycaster configured for authored UI.
-    /// objectName: Name assigned to the canvas root.
-    /// returns Created Canvas component.
+    /// /params objectName Name assigned to the canvas root.
+    /// /returns Created Canvas component.
     /// </summary>
     private static Canvas CreateCanvasRoot(string objectName)
     {
@@ -450,33 +463,39 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Creates one EventSystem configured for Input System UI navigation.
-    /// objectName: Name assigned to the EventSystem object.
-    /// returns Created EventSystem component.
+    /// /params objectName Name assigned to the EventSystem object.
+    /// /returns Created EventSystem component.
     /// </summary>
     private static EventSystem CreateEventSystem(string objectName)
     {
-        GameObject eventSystemObject = new GameObject(objectName, typeof(EventSystem), typeof(InputSystemUIInputModule));
+        GameObject eventSystemObject = new GameObject(objectName, typeof(EventSystem), typeof(InputSystemUIInputModule), typeof(GameSceneEventSystemCoordinator));
         InputSystemUIInputModule inputModule = eventSystemObject.GetComponent<InputSystemUIInputModule>();
         inputModule.AssignDefaultActions();
-        return eventSystemObject.GetComponent<EventSystem>();
+        EventSystem eventSystem = eventSystemObject.GetComponent<EventSystem>();
+        GameSceneEventSystemCoordinator coordinator = eventSystemObject.GetComponent<GameSceneEventSystemCoordinator>();
+        SerializedObject serializedCoordinator = new SerializedObject(coordinator);
+        serializedCoordinator.Update();
+        serializedCoordinator.FindProperty("eventSystem").objectReferenceValue = eventSystem;
+        serializedCoordinator.ApplyModifiedPropertiesWithoutUndo();
+        return eventSystem;
     }
 
     /// <summary>
-    /// Ensures the gameplay scene has one EventSystem with Input System UI module ready for authored menus.
-    /// scene: Gameplay scene whose EventSystem should be validated.
-    /// returns None.
+    /// Ensures the gameplay UI scene has one EventSystem with Input System UI module ready for authored menus.
+    /// /params scene Gameplay UI scene whose EventSystem should be validated.
+    /// /returns None.
     /// </summary>
     private static void EnsureSceneEventSystem(Scene scene)
     {
         EventSystem eventSystem = FindComponentInScene<EventSystem>(scene);
 
         if (eventSystem == null)
-            throw new InvalidOperationException("EventSystem not found in gameplay scene.");
+            throw new InvalidOperationException("EventSystem not found in gameplay UI scene.");
 
         InputSystemUIInputModule inputModule = eventSystem.GetComponent<InputSystemUIInputModule>();
 
         if (inputModule == null)
-            throw new InvalidOperationException("Gameplay EventSystem is missing InputSystemUIInputModule.");
+            throw new InvalidOperationException("Gameplay UI EventSystem is missing InputSystemUIInputModule.");
 
         if (inputModule.actionsAsset != null)
             return;
@@ -486,9 +505,9 @@ public static class PlayerGameplayMenuSetupUtility
     }
 
     /// <summary>
-    /// Resolves the most appropriate gameplay canvas when the HUD manager is not parented directly under it.
-    /// scene: Gameplay scene searched for a valid screen-space UI canvas.
-    /// returns Resolved gameplay canvas or null when none is available.
+    /// Resolves the most appropriate gameplay UI canvas when the HUD manager is not parented directly under it.
+    /// /params scene Gameplay UI scene searched for a valid screen-space UI canvas.
+    /// /returns Resolved gameplay canvas or null when none is available.
     /// </summary>
     private static Canvas ResolveGameplayCanvas(Scene scene)
     {
@@ -514,9 +533,9 @@ public static class PlayerGameplayMenuSetupUtility
     }
 
     /// <summary>
-    /// Removes any pre-existing GameplayMenuController roots from the gameplay scene before the generated prefab is re-instantiated.
-    /// scene: Gameplay scene being refreshed.
-    /// returns None.
+    /// Removes any pre-existing GameplayMenuController roots from the gameplay UI scene before prefab re-instantiation.
+    /// /params scene Gameplay UI scene being refreshed.
+    /// /returns None.
     /// </summary>
     private static void RemoveExistingGameplayMenuControllers(Scene scene)
     {
@@ -535,8 +554,8 @@ public static class PlayerGameplayMenuSetupUtility
 
     /// <summary>
     /// Configures one vertical loop of explicit menu navigation for the provided buttons.
-    /// buttons: Ordered button list that should navigate up and down consistently.
-    /// returns None.
+    /// /params buttons Ordered button list that should navigate up and down consistently.
+    /// /returns None.
     /// </summary>
     private static void ConfigureVerticalNavigation(params Button[] buttons)
     {
@@ -555,242 +574,6 @@ public static class PlayerGameplayMenuSetupUtility
             navigation.selectOnRight = null;
             button.navigation = navigation;
         }
-    }
-    #endregion
-
-    #region Generic Helpers
-    /// <summary>
-    /// Recursively creates a folder chain inside the Unity project when one or more path segments are missing.
-    /// folderPath: Project-relative folder path that must exist.
-    /// returns None.
-    /// </summary>
-    private static void EnsureFolder(string folderPath)
-    {
-        if (string.IsNullOrWhiteSpace(folderPath) || AssetDatabase.IsValidFolder(folderPath))
-            return;
-
-        string normalizedFolderPath = folderPath.Replace("\\", "/");
-        string[] segments = normalizedFolderPath.Split('/');
-        string currentPath = segments[0];
-
-        for (int segmentIndex = 1; segmentIndex < segments.Length; segmentIndex++)
-        {
-            string nextPath = currentPath + "/" + segments[segmentIndex];
-
-            if (!AssetDatabase.IsValidFolder(nextPath))
-                AssetDatabase.CreateFolder(currentPath, segments[segmentIndex]);
-
-            currentPath = nextPath;
-        }
-    }
-
-    /// <summary>
-    /// Adds one enabled scene entry only when it is not already present in the target list.
-    /// scenes: Mutable build-settings scene list.
-    /// scenePath: Scene path that should be present.
-    /// returns None.
-    /// </summary>
-    private static void AddSceneIfMissing(List<EditorBuildSettingsScene> scenes, string scenePath)
-    {
-        for (int sceneIndex = 0; sceneIndex < scenes.Count; sceneIndex++)
-        {
-            if (string.Equals(scenes[sceneIndex].path, scenePath, StringComparison.Ordinal))
-                return;
-        }
-
-        scenes.Add(new EditorBuildSettingsScene(scenePath, true));
-    }
-
-    /// <summary>
-    /// Returns the existing component on one GameObject or adds it when missing.
-    /// targetObject: GameObject receiving the requested component.
-    /// returns Existing or newly added component instance.
-    /// </summary>
-    private static TComponent GetOrAddComponent<TComponent>(GameObject targetObject) where TComponent : Component
-    {
-        TComponent component = targetObject.GetComponent<TComponent>();
-
-        if (component != null)
-            return component;
-
-        return targetObject.AddComponent<TComponent>();
-    }
-
-    /// <summary>
-    /// Resolves the previous valid button in one cyclic navigation list.
-    /// buttons: Ordered button list used for navigation.
-    /// startIndex: Current button index.
-    /// returns Previous valid button or null when none is available.
-    /// </summary>
-    private static Selectable ResolvePreviousButton(Button[] buttons, int startIndex)
-    {
-        if (buttons == null || buttons.Length <= 1)
-            return null;
-
-        for (int offsetIndex = 1; offsetIndex < buttons.Length; offsetIndex++)
-        {
-            int candidateIndex = (startIndex - offsetIndex + buttons.Length) % buttons.Length;
-            Button candidateButton = buttons[candidateIndex];
-
-            if (candidateButton != null)
-                return candidateButton;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Resolves the next valid button in one cyclic navigation list.
-    /// buttons: Ordered button list used for navigation.
-    /// startIndex: Current button index.
-    /// returns Next valid button or null when none is available.
-    /// </summary>
-    private static Selectable ResolveNextButton(Button[] buttons, int startIndex)
-    {
-        if (buttons == null || buttons.Length <= 1)
-            return null;
-
-        for (int offsetIndex = 1; offsetIndex < buttons.Length; offsetIndex++)
-        {
-            int candidateIndex = (startIndex + offsetIndex) % buttons.Length;
-            Button candidateButton = buttons[candidateIndex];
-
-            if (candidateButton != null)
-                return candidateButton;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Finds the first component of the requested type inside one opened scene.
-    /// scene: Scene searched for the requested component.
-    /// returns First matching component or null when not found.
-    /// </summary>
-    private static TComponent FindComponentInScene<TComponent>(Scene scene) where TComponent : Component
-    {
-        List<TComponent> components = FindComponentsInScene<TComponent>(scene);
-        return components.Count > 0 ? components[0] : null;
-    }
-
-    /// <summary>
-    /// Finds all components of the requested type inside one opened scene.
-    /// scene: Scene searched for the requested component type.
-    /// returns List of matching components.
-    /// </summary>
-    private static List<TComponent> FindComponentsInScene<TComponent>(Scene scene) where TComponent : Component
-    {
-        List<TComponent> resolvedComponents = new List<TComponent>();
-        GameObject[] rootObjects = scene.GetRootGameObjects();
-
-        for (int rootIndex = 0; rootIndex < rootObjects.Length; rootIndex++)
-        {
-            TComponent[] components = rootObjects[rootIndex].GetComponentsInChildren<TComponent>(true);
-
-            for (int componentIndex = 0; componentIndex < components.Length; componentIndex++)
-                resolvedComponents.Add(components[componentIndex]);
-        }
-
-        return resolvedComponents;
-    }
-
-    /// <summary>
-    /// Resolves the TMP font asset used by generated menu text elements.
-    /// None.
-    /// returns TMP font asset or null when no font asset exists in the project.
-    /// </summary>
-    private static TMP_FontAsset ResolveFontAsset()
-    {
-        if (TMP_Settings.defaultFontAsset != null)
-            return TMP_Settings.defaultFontAsset;
-
-        string[] fontGuids = AssetDatabase.FindAssets("t:TMP_FontAsset");
-
-        for (int guidIndex = 0; guidIndex < fontGuids.Length; guidIndex++)
-        {
-            string fontPath = AssetDatabase.GUIDToAssetPath(fontGuids[guidIndex]);
-            TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontPath);
-
-            if (fontAsset != null)
-                return fontAsset;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Ensures one transform uses a centered vertical-layout stack for menu content.
-    /// parent: Menu panel transform that should host vertically stacked children.
-    /// returns None.
-    /// </summary>
-    private static void EnsureLayout(Transform parent)
-    {
-        VerticalLayoutGroup layoutGroup = GetOrAddComponent<VerticalLayoutGroup>(parent.gameObject);
-        layoutGroup.childAlignment = TextAnchor.MiddleCenter;
-        layoutGroup.childControlWidth = false;
-        layoutGroup.childControlHeight = false;
-        layoutGroup.childForceExpandWidth = false;
-        layoutGroup.childForceExpandHeight = false;
-        layoutGroup.spacing = 14f;
-        layoutGroup.padding = new RectOffset(28, 28, 30, 30);
-
-        ContentSizeFitter contentSizeFitter = GetOrAddComponent<ContentSizeFitter>(parent.gameObject);
-        contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
-        contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
-    }
-
-    /// <summary>
-    /// Ensures one UI object exposes a preferred-height layout element used by the menu vertical layout.
-    /// targetObject: UI object that should receive the preferred height.
-    /// preferredHeight: Preferred layout height for the object.
-    /// returns None.
-    /// </summary>
-    private static void EnsureLayoutElement(GameObject targetObject, float preferredHeight)
-    {
-        LayoutElement layoutElement = GetOrAddComponent<LayoutElement>(targetObject);
-        layoutElement.preferredHeight = preferredHeight;
-    }
-
-    /// <summary>
-    /// Ensures one GameObject has a RectTransform and returns it.
-    /// targetObject: GameObject that should expose a RectTransform.
-    /// returns Existing or newly added RectTransform.
-    /// </summary>
-    private static RectTransform EnsureRectTransform(GameObject targetObject)
-    {
-        RectTransform rectTransform = targetObject.GetComponent<RectTransform>();
-
-        if (rectTransform != null)
-            return rectTransform;
-
-        return targetObject.AddComponent<RectTransform>();
-    }
-
-    /// <summary>
-    /// Stretches one RectTransform to the full extent of its parent.
-    /// rectTransform: RectTransform that should occupy the full parent area.
-    /// returns None.
-    /// </summary>
-    private static void StretchToParent(RectTransform rectTransform)
-    {
-        rectTransform.anchorMin = Vector2.zero;
-        rectTransform.anchorMax = Vector2.one;
-        rectTransform.pivot = new Vector2(0.5f, 0.5f);
-        rectTransform.offsetMin = Vector2.zero;
-        rectTransform.offsetMax = Vector2.zero;
-        rectTransform.localScale = Vector3.one;
-        rectTransform.localPosition = Vector3.zero;
-    }
-
-    /// <summary>
-    /// Removes all direct children under one transform.
-    /// parent: Parent transform whose full child list should be cleared.
-    /// returns None.
-    /// </summary>
-    private static void DestroyAllChildren(Transform parent)
-    {
-        for (int childIndex = parent.childCount - 1; childIndex >= 0; childIndex--)
-            UnityEngine.Object.DestroyImmediate(parent.GetChild(childIndex).gameObject);
     }
     #endregion
 
