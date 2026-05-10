@@ -40,7 +40,7 @@ public static class GameSceneManagementPlayModeSceneGuard
     /// /params None.
     /// /returns None.
     /// </summary>
-    [MenuItem(MenuPath)]
+    //[MenuItem(MenuPath)]
     private static void ToggleForcedBootstrapPlayMode()
     {
         SetEnabled(!IsEnabled());
@@ -51,7 +51,7 @@ public static class GameSceneManagementPlayModeSceneGuard
     /// /params None.
     /// /returns True because the menu item is always available in editor.
     /// </summary>
-    [MenuItem(MenuPath, true)]
+    //[MenuItem(MenuPath, true)]
     private static bool ValidateForcedBootstrapPlayMode()
     {
         Menu.SetChecked(MenuPath, IsEnabled());

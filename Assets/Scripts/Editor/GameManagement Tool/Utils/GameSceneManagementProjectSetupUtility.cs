@@ -60,7 +60,7 @@ public static class GameSceneManagementProjectSetupUtility
     /// /params None.
     /// /returns None.
     /// </summary>
-    [MenuItem("Tools/Game/Scene Manager/Apply Default Setup")]
+    //[MenuItem("Tools/Game/Scene Manager/Apply Default Setup")]
     public static void ExecuteSetupFromMenu()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())

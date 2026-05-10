@@ -577,7 +577,7 @@ MonoBehaviour:
   hideEnergyBarsWhenPlayerMissing: 1
   hideEnergyBarsWhenModuleMissing: 1
   primaryChargeFillImage: {fileID: 1318305080}
-  secondaryChargeFillImage: {fileID: 6983523507331880925}
+  secondaryChargeFillImage: {fileID: 9019244804411732314}
   chargeBarSmoothingSeconds: 0.05
   hideChargeBarsWhenPlayerMissing: 1
   hideChargeBarsWhenModuleMissing: 1
@@ -4771,7 +4771,7 @@ GameObject:
   - component: {fileID: 1887871557964718755}
   - component: {fileID: 9019244804411732314}
   m_Layer: 5
-  m_Name: Primary Charge
+  m_Name: Secondary Charge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4912,7 +4912,7 @@ GameObject:
   - component: {fileID: 6387241186382055981}
   - component: {fileID: 6983523507331880925}
   m_Layer: 5
-  m_Name: Primary Energy
+  m_Name: Secondary Energy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
