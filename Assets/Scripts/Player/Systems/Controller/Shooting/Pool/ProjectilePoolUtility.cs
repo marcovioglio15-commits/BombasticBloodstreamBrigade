@@ -150,6 +150,14 @@ public static class ProjectilePoolUtility
         LocalTransform parkedTransform = entityManager.GetComponentData<LocalTransform>(projectileEntity);
         parkedTransform.Position = ParkedPosition;
         entityManager.SetComponentData(projectileEntity, parkedTransform);
+
+        if (entityManager.HasComponent<LocalToWorld>(projectileEntity))
+        {
+            entityManager.SetComponentData(projectileEntity, new LocalToWorld
+            {
+                Value = parkedTransform.ToMatrix()
+            });
+        }
     }
 
     /// <summary>

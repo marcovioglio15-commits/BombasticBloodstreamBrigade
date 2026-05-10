@@ -116,6 +116,12 @@ public partial struct PlayerInputBridgeSystem : ISystem
 
                 if (isGameplayPaused)
                 {
+                    inputState.ValueRW.Move = float2.zero;
+                    inputState.ValueRW.Look = float2.zero;
+                    inputState.ValueRW.Shoot = 0f;
+                    inputState.ValueRW.PowerUpPrimary = 0f;
+                    inputState.ValueRW.PowerUpSecondary = 0f;
+                    inputState.ValueRW.SwapPowerUpSlots = 0f;
                     assignedLocalInput = true;
                     continue;
                 }

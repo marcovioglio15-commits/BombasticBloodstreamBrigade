@@ -51,6 +51,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
+
+        if (playerQuery.CalculateEntityCount() != 1)
+            return;
+
         Entity playerEntity = playerQuery.GetSingletonEntity();
         PlayerRunOutcomeState runOutcomeState = entityManager.GetComponentData<PlayerRunOutcomeState>(playerEntity);
 

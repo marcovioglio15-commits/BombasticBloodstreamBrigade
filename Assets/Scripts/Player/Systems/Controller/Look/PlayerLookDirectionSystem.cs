@@ -38,12 +38,11 @@ public partial struct PlayerLookDirectionSystem : ISystem
         Camera camera = null;
         float2 mouseScreenPosition = float2.zero;
 
-        if (useMousePointerLook)
+        if (useMousePointerLook && !isGameplayPaused)
         {
-            camera = Camera.main;
             Mouse mouse = Mouse.current;
 
-            if (camera != null && mouse != null)
+            if (PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out camera) && mouse != null)
             {
                 Vector2 mousePosition = mouse.position.ReadValue();
                 mouseScreenPosition = new float2(mousePosition.x, mousePosition.y);
@@ -263,7 +262,7 @@ public partial struct PlayerLookDirectionSystem : ISystem
 
         float angle = math.atan2(local.x, local.y);
 
-        if (TryClampToCones(angle, ref lookConfig, out float clampedAngle) == false)
+        if (!TryClampToCones(angle, ref lookConfig, out float clampedAngle))
             return planar;
 
         float3 clampedLocal = PlayerControllerMath.DirectionFromAngle(clampedAngle);
@@ -327,7 +326,7 @@ public partial struct PlayerLookDirectionSystem : ISystem
 
     private static void EvaluateCone(float angle, ref ConeConfig cone, float centerDegrees, ref bool anyEnabled, ref bool insideCone, ref float bestBoundary, ref float bestBoundaryDelta)
     {
-        if (cone.Enabled == false)
+        if (!cone.Enabled)
             return;
 
         anyEnabled = true;

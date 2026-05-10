@@ -50,6 +50,7 @@ public partial struct EnemySpawnSystem : ISystem
     {
         EntityManager entityManager = state.EntityManager;
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
+        entityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         NativeArray<Entity> spawnerEntities = spawnerQuery.ToEntityArray(state.WorldUpdateAllocator);
 
         for (int spawnerIndex = 0; spawnerIndex < spawnerEntities.Length; spawnerIndex++)

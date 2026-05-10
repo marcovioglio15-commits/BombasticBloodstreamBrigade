@@ -31,6 +31,9 @@ public partial struct ProjectileWallCollisionSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+            return;
+
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
 
@@ -82,7 +85,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                                                    out float3 allowedDisplacement,
                                                                                    out float3 wallNormal);
 
-            if (hitWall == false)
+            if (!hitWall)
                 continue;
 
             float3 resolvedPosition = startPosition + allowedDisplacement;
@@ -144,7 +147,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                    in ProjectileOwner owner,
                                                    in ComponentLookup<PlayerMovementState> movementStateLookup)
     {
-        if (movementStateLookup.HasComponent(owner.ShooterEntity) == false)
+        if (!movementStateLookup.HasComponent(owner.ShooterEntity))
             return float3.zero;
 
         float3 inheritedVelocity = movementStateLookup[owner.ShooterEntity].Velocity;
@@ -193,7 +196,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                        float currentScale,
                                                        in ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup)
     {
-        if (projectileBaseScaleLookup.HasComponent(projectileEntity) == false)
+        if (!projectileBaseScaleLookup.HasComponent(projectileEntity))
             return math.max(0.01f, currentScale);
 
         float baseScale = math.max(0.0001f, projectileBaseScaleLookup[projectileEntity].Value);

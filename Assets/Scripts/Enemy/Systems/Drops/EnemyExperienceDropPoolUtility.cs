@@ -99,6 +99,15 @@ public static class EnemyExperienceDropPoolUtility
     /// <returns>True when one drop entity is acquired, otherwise false.<returns>
     public static bool TryAcquireDrop(EntityManager entityManager, Entity poolEntity, out Entity dropEntity)
     {
+        int unrestrictedRuntimeExpandBudget = int.MaxValue;
+        return TryAcquireDrop(entityManager, poolEntity, out dropEntity, ref unrestrictedRuntimeExpandBudget);
+    }
+
+    public static bool TryAcquireDrop(EntityManager entityManager,
+                                      Entity poolEntity,
+                                      out Entity dropEntity,
+                                      ref int runtimeExpandBudget)
+    {
         dropEntity = Entity.Null;
 
         if (poolEntity == Entity.Null)
@@ -118,8 +127,12 @@ public static class EnemyExperienceDropPoolUtility
 
         if (poolElements.Length <= 0)
         {
-            int expandCount = math.max(1, poolState.ExpandBatch);
+            if (runtimeExpandBudget <= 0)
+                return false;
+
+            int expandCount = math.min(math.max(1, poolState.ExpandBatch), runtimeExpandBudget);
             ExpandPool(entityManager, poolEntity, poolState.PrefabEntity, expandCount);
+            runtimeExpandBudget -= expandCount;
             poolElements = entityManager.GetBuffer<EnemyExperienceDropPoolElement>(poolEntity);
         }
 
@@ -195,6 +208,14 @@ public static class EnemyExperienceDropPoolUtility
         LocalTransform transform = entityManager.GetComponentData<LocalTransform>(dropEntity);
         transform.Position = ParkingPosition;
         entityManager.SetComponentData(dropEntity, transform);
+
+        if (entityManager.HasComponent<LocalToWorld>(dropEntity))
+        {
+            entityManager.SetComponentData(dropEntity, new LocalToWorld
+            {
+                Value = transform.ToMatrix()
+            });
+        }
     }
 
     /// <summary>

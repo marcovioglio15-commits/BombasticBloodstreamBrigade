@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 /// /params None.
 /// /returns None.
 /// </summary>
+[DefaultExecutionOrder(-32000)]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(EventSystem))]
 public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
@@ -24,24 +25,47 @@ public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
 
     #region Unity Methods
     /// <summary>
+    /// Resolves the local EventSystem early enough to silence UGUI's duplicate-owner warning during additive scene activation.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void Awake()
+    {
+        ResolveEventSystem();
+
+        if (eventSystem != null)
+            DisableOtherEventSystems(eventSystem);
+    }
+
+    /// <summary>
     /// Claims EventSystem ownership for this UI scene when it is enabled.
     /// /params None.
     /// /returns None.
     /// </summary>
     private void OnEnable()
     {
-        if (eventSystem == null)
-            eventSystem = GetComponent<EventSystem>();
+        ResolveEventSystem();
 
         if (eventSystem == null)
             return;
 
-        eventSystem.enabled = true;
         DisableOtherEventSystems(eventSystem);
+        eventSystem.enabled = true;
     }
     #endregion
 
     #region Coordination
+    /// <summary>
+    /// Resolves the controlled EventSystem from the authored reference or local component.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void ResolveEventSystem()
+    {
+        if (eventSystem == null)
+            eventSystem = GetComponent<EventSystem>();
+    }
+
     /// <summary>
     /// Disables every other enabled EventSystem so Unity's UGUI runtime sees a single active owner.
     /// /params activeEventSystem EventSystem that should remain enabled.

@@ -48,6 +48,9 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// </summary>
     public void OnUpdate(ref SystemState state)
     {
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+            return;
+
         float deltaTime = SystemAPI.Time.DeltaTime;
         float globalTime = (float)SystemAPI.Time.ElapsedTime;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
@@ -63,6 +66,9 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         CollisionFilter wallsCollisionFilter = wallsEnabled
             ? WorldWallCollisionUtility.BuildWallsCollisionFilter(wallsLayerMask)
             : default;
+
+        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
+
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
         ComponentLookup<PlayerLookState> lookStateLookup = SystemAPI.GetComponentLookup<PlayerLookState>(true);

@@ -60,7 +60,7 @@ public static class GameSceneManagementBuildSettingsUtility
 
             int buildIndex = ResolveBuildIndex(sceneDefinition.ScenePath);
 
-            if (sceneDefinition.SceneKind == GameSceneKind.SubScene)
+            if (ShouldSkipBuildSettings(sceneDefinition))
                 continue;
 
             if (ShouldSkipBuildSettingsForAddressables(preset, sceneDefinition))
@@ -96,7 +96,7 @@ public static class GameSceneManagementBuildSettingsUtility
             if (sceneDefinition == null)
                 continue;
 
-            if (sceneDefinition.SceneKind == GameSceneKind.SubScene)
+            if (ShouldSkipBuildSettings(sceneDefinition))
                 continue;
 
             if (ShouldSkipBuildSettingsForAddressables(preset, sceneDefinition))
@@ -132,6 +132,23 @@ public static class GameSceneManagementBuildSettingsUtility
             return false;
 
         return !string.IsNullOrWhiteSpace(sceneDefinition.AddressableKey);
+    }
+
+    /// <summary>
+    /// Resolves whether one scene definition is not loaded by Unity Build Settings.
+    /// /params sceneDefinition Scene definition being inspected.
+    /// /returns True when Build Settings should ignore the entry.
+    /// </summary>
+    private static bool ShouldSkipBuildSettings(GameSceneDefinition sceneDefinition)
+    {
+        switch (sceneDefinition.SceneKind)
+        {
+            case GameSceneKind.SubScene:
+            case GameSceneKind.PersistentPlayer:
+                return true;
+            default:
+                return false;
+        }
     }
     #endregion
 

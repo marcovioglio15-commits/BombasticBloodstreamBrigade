@@ -8,6 +8,11 @@ using Unity.Collections;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyDespawnSystem))]
+[UpdateAfter(typeof(EnemyBossMinionLifecycleSystem))]
+[UpdateAfter(typeof(PlayerPassiveExplosionResolveSystem))]
+[UpdateAfter(typeof(PlayerLaserBeamDamageSystem))]
+[UpdateAfter(typeof(PlayerElementalTrailResolveSystem))]
+[UpdateAfter(typeof(EnemyElementalEffectsSystem))]
 [UpdateBefore(typeof(EnemyKillCounterSystem))]
 [UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
 public partial struct EnemyKilledEventsSystem : ISystem

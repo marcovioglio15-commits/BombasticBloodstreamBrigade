@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
+#if NASHCORE_FMOD
+using FMODUnity;
+#endif
 
 /// <summary>
 /// Keeps the bootstrap fallback camera from rendering over managed additive scenes.
@@ -27,6 +30,12 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 
     [Tooltip("Depth assigned to the fallback camera so authored gameplay cameras render after it if both are temporarily enabled.")]
     [SerializeField] private float fallbackCameraDepth = -1000f;
+    #endregion
+
+    #region Runtime
+#if NASHCORE_FMOD
+    private StudioListener bootstrapStudioListener;
+#endif
     #endregion
 
     #endregion
@@ -107,21 +116,36 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
         if (bootstrapCamera == null)
             return;
 
-        bool shouldEnableFallback = !disableWhenManagedCameraExists || !HasExternalRenderableBaseCamera();
+        bool hasExternalCamera = TryResolveExternalRenderableBaseCamera(out Camera externalCamera);
+        bool shouldEnableFallback = !disableWhenManagedCameraExists || !hasExternalCamera;
         bootstrapCamera.enabled = shouldEnableFallback;
 
         if (bootstrapAudioListener != null)
             bootstrapAudioListener.enabled = shouldEnableFallback;
+
+#if NASHCORE_FMOD
+        RefreshFmodListenerState(externalCamera);
+#endif
     }
 
     /// <summary>
-    /// Resolves whether any loaded scene other than the bootstrap scene owns a renderable base camera.
+    /// Resolves the preferred renderable base camera from any loaded scene other than the bootstrap scene.
     /// /params None.
+    /// /params externalCamera Preferred external render camera when found.
     /// /returns True when another scene should own rendering and Camera.main lookup.
     /// </summary>
-    private bool HasExternalRenderableBaseCamera()
+    private bool TryResolveExternalRenderableBaseCamera(out Camera externalCamera)
     {
+        externalCamera = null;
         Scene bootstrapScene = gameObject.scene;
+        Scene activeScene = SceneManager.GetActiveScene();
+
+        if (ShouldInspectScene(activeScene, bootstrapScene) &&
+            TryResolveSceneRenderableBaseCamera(activeScene, out externalCamera))
+        {
+            return true;
+        }
+
         int loadedSceneCount = SceneManager.sceneCount;
 
         for (int sceneIndex = 0; sceneIndex < loadedSceneCount; sceneIndex++)
@@ -131,7 +155,10 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
             if (!ShouldInspectScene(candidateScene, bootstrapScene))
                 continue;
 
-            if (SceneHasRenderableBaseCamera(candidateScene))
+            if (candidateScene == activeScene)
+                continue;
+
+            if (TryResolveSceneRenderableBaseCamera(candidateScene, out externalCamera))
                 return true;
         }
 
@@ -153,12 +180,14 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks one scene hierarchy for a renderable non-overlay camera.
+    /// Resolves one scene hierarchy's first renderable non-overlay camera.
     /// /params scene Loaded scene being inspected.
+    /// /params resolvedCamera Renderable camera when found.
     /// /returns True when the scene owns a camera that should replace the bootstrap fallback camera.
     /// </summary>
-    private bool SceneHasRenderableBaseCamera(Scene scene)
+    private bool TryResolveSceneRenderableBaseCamera(Scene scene, out Camera resolvedCamera)
     {
+        resolvedCamera = null;
         GameObject[] rootObjects = scene.GetRootGameObjects();
 
         for (int rootIndex = 0; rootIndex < rootObjects.Length; rootIndex++)
@@ -167,8 +196,13 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 
             for (int cameraIndex = 0; cameraIndex < sceneCameras.Length; cameraIndex++)
             {
-                if (IsRenderableBaseCamera(sceneCameras[cameraIndex]))
+                Camera candidateCamera = sceneCameras[cameraIndex];
+
+                if (IsRenderableBaseCamera(candidateCamera))
+                {
+                    resolvedCamera = candidateCamera;
                     return true;
+                }
             }
         }
 
@@ -198,6 +232,53 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 
         return cameraData.renderType == CameraRenderType.Base;
     }
+
+#if NASHCORE_FMOD
+    /// <summary>
+    /// Keeps an FMOD listener on the active render camera, falling back to the bootstrap camera while loading.
+    /// /params externalCamera Preferred managed-scene camera when available.
+    /// /returns None.
+    /// </summary>
+    private void RefreshFmodListenerState(Camera externalCamera)
+    {
+        if (bootstrapCamera == null)
+            return;
+
+        if (bootstrapStudioListener == null)
+            bootstrapStudioListener = EnsureStudioListener(bootstrapCamera);
+
+        bool useBootstrapListener = externalCamera == null;
+
+        if (bootstrapStudioListener != null)
+            bootstrapStudioListener.enabled = useBootstrapListener;
+
+        if (externalCamera == null)
+            return;
+
+        StudioListener externalStudioListener = EnsureStudioListener(externalCamera);
+
+        if (externalStudioListener != null)
+            externalStudioListener.enabled = true;
+    }
+
+    /// <summary>
+    /// Ensures the provided camera owns an FMOD Studio Listener component.
+    /// /params targetCamera Camera that should report 3D listener position to FMOD.
+    /// /returns Existing or newly added listener component.
+    /// </summary>
+    private static StudioListener EnsureStudioListener(Camera targetCamera)
+    {
+        if (targetCamera == null)
+            return null;
+
+        StudioListener studioListener = targetCamera.GetComponent<StudioListener>();
+
+        if (studioListener != null)
+            return studioListener;
+
+        return targetCamera.gameObject.AddComponent<StudioListener>();
+    }
+#endif
     #endregion
 
     #region Setup

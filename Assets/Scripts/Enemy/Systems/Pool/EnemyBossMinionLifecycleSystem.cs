@@ -8,6 +8,10 @@ using Unity.Entities;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyDespawnSystem))]
+[UpdateAfter(typeof(PlayerPassiveExplosionResolveSystem))]
+[UpdateAfter(typeof(PlayerLaserBeamDamageSystem))]
+[UpdateAfter(typeof(PlayerElementalTrailResolveSystem))]
+[UpdateAfter(typeof(EnemyElementalEffectsSystem))]
 [UpdateBefore(typeof(EnemyKilledEventsSystem))]
 public partial struct EnemyBossMinionLifecycleSystem : ISystem
 {

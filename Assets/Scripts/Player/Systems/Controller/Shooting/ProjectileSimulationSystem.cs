@@ -40,6 +40,8 @@ public partial struct ProjectileSimulationSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
+
         // Create the projectile simulation job,
         // passing in delta time and component lookups.
         ProjectileSimulationJob simulationJob = new ProjectileSimulationJob

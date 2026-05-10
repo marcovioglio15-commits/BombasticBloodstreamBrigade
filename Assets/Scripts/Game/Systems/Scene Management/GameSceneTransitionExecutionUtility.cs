@@ -53,7 +53,13 @@ internal static class GameSceneTransitionExecutionUtility
         }
 
         if (GameSceneLoadBackendUtility.TryFindScene(scenes, targetId, out sceneDefinition))
-            return true;
+        {
+            if (sceneDefinition.SceneKind != GameSceneKind.PersistentPlayer)
+                return true;
+
+            Debug.LogWarning("[GameSceneManager] Persistent player scenes are loaded automatically by gameplay transitions and cannot be targeted directly: " + targetId.ToString() + ".");
+            return false;
+        }
 
         Debug.LogWarning("[GameSceneManager] Target scene is not defined: " + targetId.ToString() + ".");
         return false;

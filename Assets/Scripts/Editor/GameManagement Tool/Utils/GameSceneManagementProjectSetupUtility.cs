@@ -21,10 +21,12 @@ public static class GameSceneManagementProjectSetupUtility
     public const string MainMenuSceneId = "SCN_MainMenu";
     public const string GameplaySceneId = "SCN_PlayerControllerTesting";
     public const string GameplayUiSceneId = "SCN_PlayerControllerTesting_UI";
+    public const string PersistentPlayerSceneId = "SCN_PlayerPersistent";
     public const string BootstrapScenePath = "Assets/Scenes/Testing/Main Scenes/Bootstrap/SCN_Bootstrap.unity";
     public const string MainMenuScenePath = "Assets/Scenes/Testing/Main Scenes/UI/SCN_MainMenu.unity";
     public const string GameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity";
     public const string GameplayUiScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting_UI.unity";
+    public const string PersistentPlayerScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SUB_Player.unity";
 
     private const string DefaultMasterPresetPath = "Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset";
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
@@ -39,7 +41,8 @@ public static class GameSceneManagementProjectSetupUtility
         new GameSceneDefinitionSetup(BootstrapSceneId, BootstrapSceneId, BootstrapScenePath, GameSceneKind.Bootstrap, GameSceneUnloadPolicy.Persistent, string.Empty),
         new GameSceneDefinitionSetup(MainMenuSceneId, MainMenuSceneId, MainMenuScenePath, GameSceneKind.MainMenu, GameSceneUnloadPolicy.UnloadOnTransition, string.Empty),
         new GameSceneDefinitionSetup(GameplaySceneId, GameplaySceneId, GameplayScenePath, GameSceneKind.Gameplay, GameSceneUnloadPolicy.UnloadOnTransition, GameplayUiSceneId),
-        new GameSceneDefinitionSetup(GameplayUiSceneId, GameplayUiSceneId, GameplayUiScenePath, GameSceneKind.PersistentUi, GameSceneUnloadPolicy.UnloadOnTransition, string.Empty)
+        new GameSceneDefinitionSetup(GameplayUiSceneId, GameplayUiSceneId, GameplayUiScenePath, GameSceneKind.PersistentUi, GameSceneUnloadPolicy.UnloadOnTransition, string.Empty),
+        new GameSceneDefinitionSetup(PersistentPlayerSceneId, "SUB_Player", PersistentPlayerScenePath, GameSceneKind.PersistentPlayer, GameSceneUnloadPolicy.Persistent, string.Empty)
     };
 
     private static readonly GameSceneTransitionDefinitionSetup[] DefaultTransitionDefinitions =
@@ -196,7 +199,7 @@ public static class GameSceneManagementProjectSetupUtility
 
         SetColor(fadeSettingsProperty, "fadeColor", Color.black);
         SetFloat(fadeSettingsProperty, "fadeOutSeconds", 0.35f);
-        SetFloat(fadeSettingsProperty, "holdBlackSeconds", 0.08f);
+        SetFloat(fadeSettingsProperty, "postLoadReadyExtraSeconds", 0.08f);
         SetFloat(fadeSettingsProperty, "fadeInSeconds", 0.35f);
         SetBool(fadeSettingsProperty, "lockGameplayInput", true);
         SetBool(fadeSettingsProperty, "setTimeScaleDuringTransition", true);
@@ -282,7 +285,7 @@ public static class GameSceneManagementProjectSetupUtility
             SetBool(transitionProperty, "oneShotTrigger", true);
             SetBool(transitionProperty, "overrideFadeSettings", false);
             SetFloat(transitionProperty, "fadeOutSeconds", 0.35f);
-            SetFloat(transitionProperty, "holdBlackSeconds", 0.08f);
+            SetFloat(transitionProperty, "postLoadReadyExtraSeconds", 0.08f);
             SetFloat(transitionProperty, "fadeInSeconds", 0.35f);
             SetBool(transitionProperty, "allowDuringPause", true);
             SetBool(transitionProperty, "allowWhenRunFinalized", true);
@@ -347,6 +350,9 @@ public static class GameSceneManagementProjectSetupUtility
             return string.Empty;
 
         if (setup.SceneKind == GameSceneKind.SubScene)
+            return string.Empty;
+
+        if (setup.SceneKind == GameSceneKind.PersistentPlayer)
             return string.Empty;
 
         return setup.SceneId;

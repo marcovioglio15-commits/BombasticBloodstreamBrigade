@@ -6,6 +6,7 @@ using Unity.Mathematics;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyDespawnSystem))]
+[UpdateAfter(typeof(EnemyKilledEventsSystem))]
 [UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
 public partial struct EnemyWaveProgressSystem : ISystem
 {

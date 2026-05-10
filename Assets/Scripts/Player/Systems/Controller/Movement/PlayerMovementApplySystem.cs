@@ -22,6 +22,9 @@ public partial struct PlayerMovementApplySystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+            return;
+
         float deltaTime = SystemAPI.Time.DeltaTime;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();

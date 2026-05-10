@@ -323,16 +323,15 @@ public sealed class PlayerDroppedPowerUpContainerView : MonoBehaviour
     /// </summary>
     private static Transform ResolveCameraTransform()
     {
-        if (cachedMainCameraTransform != null)
+        if (cachedMainCamera != null && cachedMainCamera.isActiveAndEnabled && cachedMainCameraTransform != null)
             return cachedMainCameraTransform;
 
         if (Time.unscaledTime < nextCameraResolveTime)
             return null;
 
         nextCameraResolveTime = Time.unscaledTime + CameraResolveRetryIntervalSeconds;
-        cachedMainCamera = Camera.main;
 
-        if (cachedMainCamera == null)
+        if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out cachedMainCamera))
         {
             cachedMainCameraTransform = null;
             return null;

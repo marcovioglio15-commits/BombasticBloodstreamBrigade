@@ -228,6 +228,9 @@ public static class GameSceneAddressablesEditorUtility
         if (sceneDefinition.SceneKind == GameSceneKind.SubScene)
             return false;
 
+        if (sceneDefinition.SceneKind == GameSceneKind.PersistentPlayer)
+            return false;
+
         return !string.IsNullOrWhiteSpace(sceneDefinition.AddressableKey);
     }
 

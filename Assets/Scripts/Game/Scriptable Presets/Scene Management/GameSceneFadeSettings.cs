@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores transition fade timing and presentation values authored by the Scene Manager preset.
@@ -18,8 +19,9 @@ public sealed class GameSceneFadeSettings
     [Tooltip("Seconds used to fade from transparent to fully opaque before loading or unloading scenes.")]
     [SerializeField] private float fadeOutSeconds = 0.35f;
 
-    [Tooltip("Seconds spent at full opacity after fade out, before fade in starts.")]
-    [SerializeField] private float holdBlackSeconds = 0.08f;
+    [Tooltip("Extra seconds spent at full opacity after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
+    [FormerlySerializedAs("holdBlackSeconds")]
+    [SerializeField] private float postLoadReadyExtraSeconds = 0.08f;
 
     [Tooltip("Seconds used to fade from fully opaque back to transparent after scene activation.")]
     [SerializeField] private float fadeInSeconds = 0.35f;
@@ -50,11 +52,11 @@ public sealed class GameSceneFadeSettings
         }
     }
 
-    public float HoldBlackSeconds
+    public float PostLoadReadyExtraSeconds
     {
         get
         {
-            return holdBlackSeconds;
+            return postLoadReadyExtraSeconds;
         }
     }
 

@@ -5,7 +5,8 @@ using Unity.Mathematics;
 /// <summary>
 /// Initializes enemy pools for wave-based spawners by creating one pool per referenced prefab.
 /// </summary>
-[UpdateInGroup(typeof(EnemySystemGroup), OrderFirst = true)]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateBefore(typeof(EnemySystemGroup))]
 public partial struct EnemyPoolInitializeSystem : ISystem
 {
     #region Constants

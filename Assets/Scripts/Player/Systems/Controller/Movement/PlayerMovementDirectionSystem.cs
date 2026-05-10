@@ -51,8 +51,15 @@ public partial struct PlayerMovementDirectionSystem : ISystem
     /// <param name="state"></param>
     public void OnUpdate(ref SystemState state)
     {
-        Camera camera = Camera.main;
-        bool hasCamera = camera != null;
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        {
+            foreach (RefRW<PlayerMovementState> movementState in SystemAPI.Query<RefRW<PlayerMovementState>>())
+                movementState.ValueRW.DesiredDirection = float3.zero;
+
+            return;
+        }
+
+        bool hasCamera = PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera);
         float3 cameraForward = hasCamera ? (float3)camera.transform.forward : new float3(0f, 0f, 1f);
 
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
@@ -103,7 +110,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
 
                     if (digitalLike)
                     {
-                        if (PlayerControllerMath.TryGetAlignedDiscreteAngle(angle, step, offset, DigitalAngleEpsilon, out float alignedAngle) == false)
+                        if (!PlayerControllerMath.TryGetAlignedDiscreteAngle(angle, step, offset, DigitalAngleEpsilon, out float alignedAngle))
                         {
                             movementState.ValueRW.DesiredDirection = float3.zero;
                             continue;

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// Defines a directed transition between two managed scenes.
@@ -44,8 +45,9 @@ public sealed class GameSceneTransitionDefinition
     [Tooltip("Override fade-out duration in seconds when Override Fade Settings is enabled.")]
     [SerializeField] private float fadeOutSeconds = 0.35f;
 
-    [Tooltip("Override black-hold duration in seconds when Override Fade Settings is enabled.")]
-    [SerializeField] private float holdBlackSeconds = 0.08f;
+    [Tooltip("Override extra black duration after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
+    [FormerlySerializedAs("holdBlackSeconds")]
+    [SerializeField] private float postLoadReadyExtraSeconds = 0.08f;
 
     [Tooltip("Override fade-in duration in seconds when Override Fade Settings is enabled.")]
     [SerializeField] private float fadeInSeconds = 0.35f;
@@ -141,11 +143,11 @@ public sealed class GameSceneTransitionDefinition
         }
     }
 
-    public float HoldBlackSeconds
+    public float PostLoadReadyExtraSeconds
     {
         get
         {
-            return holdBlackSeconds;
+            return postLoadReadyExtraSeconds;
         }
     }
 

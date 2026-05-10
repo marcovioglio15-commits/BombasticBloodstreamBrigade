@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Entities;
+using Unity.Mathematics;
 
 /// <summary>
 /// Authored full-screen fade overlay view controlled by the Game Scene Manager presentation system.
@@ -29,6 +31,7 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
     #region Static
     private static GameSceneFadeCanvasView activeView;
+    private static int activeViewVersion;
     #endregion
 
     #endregion
@@ -51,6 +54,19 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
         activeView.Apply(alpha, visible, color);
         return true;
     }
+
+    /// <summary>
+    /// Version number incremented whenever a fade view registers, allowing ECS presentation to reapply unchanged state.
+    /// /params None.
+    /// /returns Active view version.
+    /// </summary>
+    public static int ActiveViewVersion
+    {
+        get
+        {
+            return activeViewVersion;
+        }
+    }
     #endregion
 
     #region Unity Methods
@@ -72,7 +88,10 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
         ConfigureCanvas();
         activeView = this;
-        Apply(0f, false, Color.black);
+        activeViewVersion++;
+
+        if (!TryApplyCurrentRuntimeState())
+            Apply(0f, false, Color.black);
     }
 
     /// <summary>
@@ -111,6 +130,38 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
             canvasGroup.blocksRaycasts = visible && clampedAlpha > 0.001f;
             canvasGroup.interactable = false;
         }
+    }
+
+    /// <summary>
+    /// Reads the current ECS fade singleton so enabling the view during a transition never resets it to transparent.
+    /// /params None.
+    /// /returns True when an ECS fade state was applied.
+    /// </summary>
+    private bool TryApplyCurrentRuntimeState()
+    {
+        World world = World.DefaultGameObjectInjectionWorld;
+
+        if (world == null || !world.IsCreated)
+            return false;
+
+        EntityManager entityManager = world.EntityManager;
+        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameSceneFadePresentationState>());
+        int entityCount = query.CalculateEntityCount();
+
+        if (entityCount != 1)
+        {
+            query.Dispose();
+            return false;
+        }
+
+        Entity entity = query.GetSingletonEntity();
+        GameSceneFadePresentationState fadeState = entityManager.GetComponentData<GameSceneFadePresentationState>(entity);
+        float4 fadeColor = fadeState.Color;
+        query.Dispose();
+        Apply(fadeState.Alpha,
+              fadeState.Visible != 0,
+              new Color(fadeColor.x, fadeColor.y, fadeColor.z, fadeColor.w));
+        return true;
     }
 
     /// <summary>

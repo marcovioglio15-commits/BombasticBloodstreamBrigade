@@ -6,6 +6,9 @@ using Unity.Entities;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyWaveProgressSystem))]
+[UpdateAfter(typeof(EnemyKillCounterSystem))]
+[UpdateAfter(typeof(EnemyKilledEventsSystem))]
+[UpdateBefore(typeof(EnemyExperienceDropSpawnSystem))]
 public partial struct EnemyFinalizeDespawnSystem : ISystem
 {
     #region Methods

@@ -7,14 +7,16 @@ using Unity.Transforms;
 /// Spawns pooled experience drops for enemies killed in the current frame.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
-[UpdateAfter(typeof(EnemyKilledEventsSystem))]
-[UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
+[UpdateAfter(typeof(EnemyFinalizeDespawnSystem))]
+[UpdateBefore(typeof(EnemyExperienceDropCollectSystem))]
 public partial struct EnemyExperienceDropSpawnSystem : ISystem
 {
     #region Constants
     private const float PrecisionEpsilon = 0.0001f;
     private const float TwoPi = 6.283185307179586f;
     private const int MaxSpawnStepsPerEnemy = 4096;
+    private const int MaxDropSpawnInstancesPerFrame = 512;
+    private const int MaxRuntimeDropPoolExpansionPerFrame = 256;
     #endregion
 
     #region Fields
@@ -66,6 +68,9 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         if (killedEventsBuffer.Length <= 0)
             return;
 
+        if (playerProgressionQuery.CalculateEntityCount() != 1)
+            return;
+
         Entity playerEntity = playerProgressionQuery.GetSingletonEntity();
         PlayerRunOutcomeState runOutcomeState = entityManager.GetComponentData<PlayerRunOutcomeState>(playerEntity);
 
@@ -84,7 +89,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         if (remainingExperienceCapacity <= PrecisionEpsilon)
             return;
 
-        float activeWorldDropExperience = ResolveActiveWorldDropExperience(ref state);
+        float activeWorldDropExperience = ResolveActiveWorldDropExperience(ref state, remainingExperienceCapacity);
         float remainingSpawnBudget = math.max(0f, remainingExperienceCapacity - activeWorldDropExperience);
 
         if (remainingSpawnBudget <= PrecisionEpsilon)
@@ -95,10 +100,12 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         // Snapshot buffers to keep iteration stable even if pool expansion performs structural changes.
         NativeArray<EnemyExperienceDropPoolMapElement> poolMapSnapshot = CollectionHelper.CreateNativeArray(poolMap.AsNativeArray(), frameAllocator);
         NativeArray<EnemyKilledEventElement> killedEventsSnapshot = CollectionHelper.CreateNativeArray(killedEventsBuffer.AsNativeArray(), frameAllocator);
+        int remainingFrameDropSpawnBudget = MaxDropSpawnInstancesPerFrame;
+        int remainingRuntimeDropPoolExpansionBudget = MaxRuntimeDropPoolExpansionPerFrame;
 
         for (int killedIndex = 0; killedIndex < killedEventsSnapshot.Length; killedIndex++)
         {
-            if (remainingSpawnBudget <= PrecisionEpsilon)
+            if (remainingSpawnBudget <= PrecisionEpsilon || remainingFrameDropSpawnBudget <= 0)
                 break;
 
             remainingSpawnBudget -= SpawnDropsForKilledEnemy(entityManager,
@@ -106,15 +113,18 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                                                              killedEventsSnapshot[killedIndex],
                                                              killedIndex,
                                                              remainingSpawnBudget,
-                                                             frameAllocator);
+                                                             frameAllocator,
+                                                             ref remainingFrameDropSpawnBudget,
+                                                             ref remainingRuntimeDropPoolExpansionBudget);
         }
     }
     #endregion
 
     #region Spawn
-    private float ResolveActiveWorldDropExperience(ref SystemState state)
+    private float ResolveActiveWorldDropExperience(ref SystemState state, float stopAtExperience)
     {
         float totalActiveWorldDropExperience = 0f;
+        float sanitizedStopAtExperience = math.max(0f, stopAtExperience);
 
         foreach ((RefRO<EnemyExperienceDrop> dropData, EnabledRefRO<EnemyExperienceDropActive> dropActive)
                  in SystemAPI.Query<RefRO<EnemyExperienceDrop>, EnabledRefRO<EnemyExperienceDropActive>>()
@@ -124,6 +134,9 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                 continue;
 
             totalActiveWorldDropExperience += math.max(0f, dropData.ValueRO.ExperienceAmount);
+
+            if (sanitizedStopAtExperience > PrecisionEpsilon && totalActiveWorldDropExperience >= sanitizedStopAtExperience)
+                break;
         }
 
         return totalActiveWorldDropExperience;
@@ -134,8 +147,13 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                                                   EnemyKilledEventElement killedEvent,
                                                   int killEventIndex,
                                                   float remainingSpawnBudget,
-                                                  Allocator frameAllocator)
+                                                  Allocator frameAllocator,
+                                                  ref int remainingFrameDropSpawnBudget,
+                                                  ref int remainingRuntimeDropPoolExpansionBudget)
     {
+        if (remainingFrameDropSpawnBudget <= 0)
+            return 0f;
+
         Entity enemyEntity = killedEvent.EnemyEntity;
 
         if (enemyEntity == Entity.Null || entityManager.Exists(enemyEntity) == false)
@@ -174,7 +192,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         {
             float remainingModuleSpawnBudget = math.max(0f, remainingSpawnBudget - spawnedExperience);
 
-            if (remainingModuleSpawnBudget <= PrecisionEpsilon)
+            if (remainingModuleSpawnBudget <= PrecisionEpsilon || remainingFrameDropSpawnBudget <= 0)
                 break;
 
             spawnedExperience += SpawnDropsForExperienceModule(entityManager,
@@ -185,7 +203,9 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                                                                experienceModules[moduleIndex],
                                                                definitions,
                                                                rewardMultiplier,
-                                                               remainingModuleSpawnBudget);
+                                                               remainingModuleSpawnBudget,
+                                                               ref remainingFrameDropSpawnBudget,
+                                                               ref remainingRuntimeDropPoolExpansionBudget);
         }
 
         return spawnedExperience;
@@ -199,8 +219,13 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                                                        EnemyExperienceDropModuleElement experienceModule,
                                                        NativeArray<EnemyExperienceDropDefinitionElement> definitions,
                                                        float rewardMultiplier,
-                                                       float remainingSpawnBudget)
+                                                       float remainingSpawnBudget,
+                                                       ref int remainingFrameDropSpawnBudget,
+                                                       ref int remainingRuntimeDropPoolExpansionBudget)
     {
+        if (remainingFrameDropSpawnBudget <= 0)
+            return 0f;
+
         int definitionCount = math.max(0, experienceModule.DefinitionCount);
 
         if (definitionCount <= 0)
@@ -212,7 +237,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         maximumTotalExperienceDrop = math.min(maximumTotalExperienceDrop, math.max(0f, remainingSpawnBudget));
         minimumTotalExperienceDrop = math.min(minimumTotalExperienceDrop, maximumTotalExperienceDrop);
 
-        if (maximumTotalExperienceDrop <= 0f)
+        if (maximumTotalExperienceDrop <= 0f || !IsFinite(maximumTotalExperienceDrop))
             return 0f;
 
         uint randomSeed = ResolveDropTotalRandomSeed(killedEvent.EnemyEntity, killEventIndex, moduleIndex);
@@ -231,6 +256,10 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
         }
 
         float remainingExperience = resolvedTotalExperienceDrop;
+
+        if (remainingExperience <= PrecisionEpsilon || !IsFinite(remainingExperience))
+            return 0f;
+
         float spawnedExperience = 0f;
         float dropRadius = math.max(0f, experienceModule.DropRadius);
         float attractionSpeed = math.max(0f, experienceModule.AttractionSpeed);
@@ -241,7 +270,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
 
         for (int stepIndex = 0; stepIndex < MaxSpawnStepsPerEnemy; stepIndex++)
         {
-            if (remainingExperience <= PrecisionEpsilon)
+            if (remainingExperience <= PrecisionEpsilon || remainingFrameDropSpawnBudget <= 0)
                 break;
 
             int definitionIndex;
@@ -260,7 +289,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                 break;
             }
 
-            if (definitionIndex < 0 || definitionAmount <= 0f)
+            if (definitionIndex < 0 || definitionAmount <= 0f || !IsFinite(definitionAmount))
                 break;
 
             EnemyExperienceDropDefinitionElement definition = definitions[definitionIndex];
@@ -271,7 +300,10 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
 
             Entity dropEntity;
 
-            if (!EnemyExperienceDropPoolUtility.TryAcquireDrop(entityManager, poolEntity, out dropEntity))
+            if (!EnemyExperienceDropPoolUtility.TryAcquireDrop(entityManager,
+                                                               poolEntity,
+                                                               out dropEntity,
+                                                               ref remainingRuntimeDropPoolExpansionBudget))
                 break;
 
             float3 spawnCenterPosition = killedEvent.Position;
@@ -299,6 +331,7 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
             entityManager.SetComponentData(dropEntity, dropData);
             entityManager.SetComponentEnabled<EnemyExperienceDropActive>(dropEntity, true);
             spawnedExperience += definitionAmount;
+            remainingFrameDropSpawnBudget--;
 
             if (!fitsRemaining)
                 break;
@@ -324,6 +357,11 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
 
         EnemyDropRewardMultiplier rewardMultiplier = entityManager.GetComponentData<EnemyDropRewardMultiplier>(enemyEntity);
         return math.max(0f, rewardMultiplier.ExperienceMultiplier);
+    }
+
+    private static bool IsFinite(float value)
+    {
+        return !float.IsNaN(value) && !float.IsInfinity(value);
     }
 
     private static uint ResolveDropTotalRandomSeed(Entity enemyEntity, int killEventIndex, int moduleIndex)

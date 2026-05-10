@@ -19,7 +19,7 @@ public struct GameSceneManagerConfig : IComponentData
     public byte LockGameplayInput;
     public byte SetTimeScaleDuringTransition;
     public float FadeOutSeconds;
-    public float HoldBlackSeconds;
+    public float PostLoadReadyExtraSeconds;
     public float FadeInSeconds;
     public float4 FadeColor;
     public FixedString64Bytes TransitionLayerName;
@@ -66,7 +66,7 @@ public struct GameSceneTransitionElement : IBufferElementData
     public byte AllowWhenRunFinalized;
     public float TriggerCooldownOverrideSeconds;
     public float FadeOutSeconds;
-    public float HoldBlackSeconds;
+    public float PostLoadReadyExtraSeconds;
     public float FadeInSeconds;
 }
 

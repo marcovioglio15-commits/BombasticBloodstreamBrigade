@@ -98,7 +98,10 @@ public sealed class GameplayMenuController : MonoBehaviour
         RegisterButtons();
         RegisterRuntimeEvents();
         RefreshPauseActionBinding();
-        Time.timeScale = 1f;
+
+        if (!GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning())
+            Time.timeScale = 1f;
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -113,7 +116,10 @@ public sealed class GameplayMenuController : MonoBehaviour
         UnregisterRuntimeEvents();
         UnregisterPauseActionBinding();
         UnregisterButtons();
-        Time.timeScale = 1f;
+
+        if (!GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning())
+            Time.timeScale = 1f;
+
         pauseMenuVisible = false;
         endingMenuVisible = false;
     }
@@ -574,8 +580,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void ReloadActiveScene()
     {
-        Time.timeScale = 1f;
-
         if (GameSceneTransitionRequestUtility.EnqueueRestartActiveScene())
             return;
 
@@ -589,8 +593,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void LoadMainMenuScene()
     {
-        Time.timeScale = 1f;
-
         if (GameSceneTransitionRequestUtility.EnqueueLoadMainMenu())
             return;
 

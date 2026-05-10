@@ -93,8 +93,8 @@ public static class GameSceneManagerPresetValidationUtility
         if (fadeSettings.FadeOutSeconds < 0f)
             warnings.Add("Fade Out Seconds is negative.");
 
-        if (fadeSettings.HoldBlackSeconds < 0f)
-            warnings.Add("Hold Black Seconds is negative.");
+        if (fadeSettings.PostLoadReadyExtraSeconds < 0f)
+            warnings.Add("Post Load Ready Extra Seconds is negative.");
 
         if (fadeSettings.FadeInSeconds < 0f)
             warnings.Add("Fade In Seconds is negative.");
@@ -188,23 +188,48 @@ public static class GameSceneManagerPresetValidationUtility
         if (string.IsNullOrWhiteSpace(sceneDefinition.SceneName))
             warnings.Add(label + " has an empty Scene Name.");
 
-        if (string.IsNullOrWhiteSpace(sceneDefinition.ScenePath) && backend == GameSceneLoadBackend.BuildSettings)
+        bool requiresUnitySceneLoad = sceneDefinition.SceneKind != GameSceneKind.PersistentPlayer;
+
+        if (string.IsNullOrWhiteSpace(sceneDefinition.ScenePath) && backend == GameSceneLoadBackend.BuildSettings && requiresUnitySceneLoad)
             warnings.Add(label + " has an empty Scene Path for Build Settings loading.");
 
         if (backend == GameSceneLoadBackend.Addressables &&
             sceneDefinition.SceneKind != GameSceneKind.Bootstrap &&
+            sceneDefinition.SceneKind != GameSceneKind.PersistentPlayer &&
             string.IsNullOrWhiteSpace(sceneDefinition.AddressableKey))
         {
             warnings.Add(label + " has no Addressables key.");
         }
 
-        if (sceneDefinition.BuildIndex < 0 && backend == GameSceneLoadBackend.BuildSettings)
+        if (sceneDefinition.BuildIndex < 0 && backend == GameSceneLoadBackend.BuildSettings && requiresUnitySceneLoad)
             warnings.Add(label + " is not assigned to a valid Build Settings index.");
 
         if (sceneDefinition.SceneKind == GameSceneKind.SubScene)
             warnings.Add(label + " is marked as SubScene. SubScenes should normally be streamed by their owning top-level gameplay scene.");
 
+        if (sceneDefinition.SceneKind == GameSceneKind.PersistentPlayer)
+            ValidatePersistentPlayerScene(sceneDefinition, label, warnings);
+
         ValidateCompanionUiScene(preset, sceneDefinition, label, warnings);
+    }
+
+    /// <summary>
+    /// Validates the direct DOTS player scene metadata used by gameplay transitions.
+    /// /params sceneDefinition Persistent player scene definition to inspect.
+    /// /params label Warning label for the scene definition.
+    /// /params warnings Mutable warning output list.
+    /// /returns None.
+    /// </summary>
+    private static void ValidatePersistentPlayerScene(GameSceneDefinition sceneDefinition, string label, List<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(sceneDefinition.SceneGuid))
+            warnings.Add(label + " is PersistentPlayer but has no Scene Guid for SceneSystem loading.");
+
+        if (sceneDefinition.UnloadPolicy != GameSceneUnloadPolicy.Persistent)
+            warnings.Add(label + " is PersistentPlayer and should use Persistent unload policy.");
+
+        if (!string.IsNullOrWhiteSpace(sceneDefinition.AddressableKey))
+            warnings.Add(label + " is PersistentPlayer and should leave Addressable Key empty because it is loaded through SceneSystem.");
     }
 
     /// <summary>
@@ -362,8 +387,8 @@ public static class GameSceneManagerPresetValidationUtility
         if (transitionDefinition.FadeOutSeconds < 0f)
             warnings.Add(label + " override Fade Out Seconds is negative.");
 
-        if (transitionDefinition.HoldBlackSeconds < 0f)
-            warnings.Add(label + " override Hold Black Seconds is negative.");
+        if (transitionDefinition.PostLoadReadyExtraSeconds < 0f)
+            warnings.Add(label + " override Post Load Ready Extra Seconds is negative.");
 
         if (transitionDefinition.FadeInSeconds < 0f)
             warnings.Add(label + " override Fade In Seconds is negative.");

@@ -16,6 +16,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private bool hasChildOffset;
     private float3 childLocalOffset;
     private CameraBehavior lastBehavior;
+    private int lastCameraInstanceId;
     #endregion
 
     #region Lifecycle
@@ -42,12 +43,24 @@ public partial struct PlayerCameraFollowSystem : ISystem
     /// <param name="state"></param>
     public void OnUpdate(ref SystemState state)
     {
-        Camera camera = Camera.main;
-        if (camera == null)
+        bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+
+        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
             return;
 
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera))
+            return;
+
+        float deltaTime = ResolvePresentationDeltaTime(SystemAPI.Time.DeltaTime, isSceneTransitioning);
+        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        int cameraInstanceId = camera.GetInstanceID();
+
+        if (cameraInstanceId != lastCameraInstanceId)
+        {
+            ResetCachedOffsets();
+            lastCameraInstanceId = cameraInstanceId;
+        }
 
         // Only support one player camera config at a time, so breaks after the first iteration.
         foreach ((RefRO<LocalTransform> localTransform,
@@ -65,8 +78,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
             if (cameraConfig.Behavior != lastBehavior)
             {
-                hasAutoOffset = false;
-                hasChildOffset = false;
+                ResetCachedOffsets();
                 lastBehavior = cameraConfig.Behavior;
             }
 
@@ -77,7 +89,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
             switch (cameraConfig.Behavior)
             {
                 case CameraBehavior.FollowWithAutoOffset:
-                    if (hasAutoOffset == false)
+                    if (!hasAutoOffset)
                     {
                         autoOffset = (float3)camera.transform.position - playerPosition;
                         hasAutoOffset = true;
@@ -86,7 +98,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     offset = autoOffset;
                     break;
                 case CameraBehavior.ChildOfPlayer:
-                    if (hasChildOffset == false)
+                    if (!hasChildOffset)
                     {
                         float3 worldOffset = (float3)camera.transform.position - playerPosition;
                         quaternion inverseRotation = math.inverse(localTransform.ValueRO.Rotation);
@@ -116,6 +128,31 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
             break;
         }
+    }
+
+    /// <summary>
+    /// Clears camera offset caches when camera ownership or behavior changes.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void ResetCachedOffsets()
+    {
+        hasAutoOffset = false;
+        hasChildOffset = false;
+    }
+
+    /// <summary>
+    /// Resolves a camera presentation delta that can settle during transition-owned time-scale pauses.
+    /// /params scaledDeltaTime DOTS scaled delta time for the current frame.
+    /// /params isSceneTransitioning True while the scene manager is loading or fading between scenes.
+    /// /returns Delta time suitable for presentation-only camera smoothing.
+    /// </summary>
+    private static float ResolvePresentationDeltaTime(float scaledDeltaTime, bool isSceneTransitioning)
+    {
+        if (!isSceneTransitioning || scaledDeltaTime > 0f)
+            return scaledDeltaTime;
+
+        return Time.unscaledDeltaTime;
     }
     #endregion
 

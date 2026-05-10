@@ -42,6 +42,14 @@ public partial struct PlayerMovementSpeedSystem : ISystem
     /// <param name="state"></param>
     public void OnUpdate(ref SystemState state)
     {
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        {
+            foreach (RefRW<PlayerMovementState> movementState in SystemAPI.Query<RefRW<PlayerMovementState>>())
+                movementState.ValueRW.Velocity = float3.zero;
+
+            return;
+        }
+
         float deltaTime = SystemAPI.Time.DeltaTime;
         ComponentLookup<PlayerElementalRuntimeState> elementalRuntimeLookup = SystemAPI.GetComponentLookup<PlayerElementalRuntimeState>(true);
 

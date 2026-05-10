@@ -6,7 +6,8 @@ using Unity.Mathematics;
 /// <summary>
 /// Builds and initializes experience drop pools from enemy drop configurations.
 /// </summary>
-[UpdateInGroup(typeof(EnemySystemGroup), OrderFirst = true)]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateBefore(typeof(EnemySystemGroup))]
 public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
 {
     #region Constants

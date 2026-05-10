@@ -16,11 +16,16 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        Camera camera = Camera.main;
-        if (camera == null)
+        bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+
+        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
             return;
 
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera))
+            return;
+
+        float deltaTime = ResolvePresentationDeltaTime(SystemAPI.Time.DeltaTime, isSceneTransitioning);
+        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
 
@@ -38,7 +43,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
 
             Entity anchorEntity = cameraAnchor.ValueRO.AnchorEntity;
 
-            if (state.EntityManager.Exists(anchorEntity) == false)
+            if (!state.EntityManager.Exists(anchorEntity))
                 continue;
 
             float3 anchorPosition;
@@ -56,6 +61,16 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         }
     }
 
+    #endregion
+
+    #region Helpers
+    private static float ResolvePresentationDeltaTime(float scaledDeltaTime, bool isSceneTransitioning)
+    {
+        if (!isSceneTransitioning || scaledDeltaTime > 0f)
+            return scaledDeltaTime;
+
+        return Time.unscaledDeltaTime;
+    }
     #endregion
 
 }

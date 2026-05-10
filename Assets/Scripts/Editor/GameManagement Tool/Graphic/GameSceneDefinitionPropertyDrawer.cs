@@ -34,7 +34,7 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
         AddProperty(root, property, "sceneKind", true);
         AddProperty(root, property, "unloadPolicy", true);
         AddCompanionUiProperty(root, property);
-        AddProperty(root, property, "addressableKey", true);
+        AddAddressableKeyProperty(root, property);
         AddProperty(root, property, "roomTags", true);
         AddProperty(root, property, "sceneName", false);
         AddProperty(root, property, "scenePath", false);
@@ -88,6 +88,31 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
     }
 
     /// <summary>
+    /// Adds the Addressables key field only for Unity scenes loaded through the Addressables backend.
+    /// /params root Parent visual element.
+    /// /params parentProperty Serialized GameSceneDefinition property.
+    /// /returns None.
+    /// </summary>
+    private static void AddAddressableKeyProperty(VisualElement root, SerializedProperty parentProperty)
+    {
+        SerializedProperty addressableKeyProperty = parentProperty.FindPropertyRelative("addressableKey");
+
+        if (addressableKeyProperty == null)
+            return;
+
+        SerializedProperty sceneKindProperty = parentProperty.FindPropertyRelative("sceneKind");
+        PropertyField field = new PropertyField(addressableKeyProperty, "Addressable Key");
+        field.tooltip = "Addressables key used by Unity scene loading. Hidden for Bootstrap, SubScene and PersistentPlayer entries.";
+        field.BindProperty(addressableKeyProperty);
+        RefreshAddressableKeyFieldVisibility(field, sceneKindProperty);
+
+        if (sceneKindProperty != null)
+            root.TrackPropertyValue(sceneKindProperty, changedProperty => RefreshAddressableKeyFieldVisibility(field, changedProperty));
+
+        root.Add(field);
+    }
+
+    /// <summary>
     /// Applies contextual display state to the companion UI field from the current scene kind.
     /// /params field Companion UI scene field visual element.
     /// /params sceneKindProperty Serialized enum property driving visibility.
@@ -96,6 +121,19 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
     private static void RefreshCompanionUiFieldVisibility(VisualElement field, SerializedProperty sceneKindProperty)
     {
         field.style.display = ShouldShowCompanionUiField(sceneKindProperty)
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Applies contextual display state to the Addressables key field from the current scene kind.
+    /// /params field Addressables key field visual element.
+    /// /params sceneKindProperty Serialized enum property driving visibility.
+    /// /returns None.
+    /// </summary>
+    private static void RefreshAddressableKeyFieldVisibility(VisualElement field, SerializedProperty sceneKindProperty)
+    {
+        field.style.display = ShouldShowAddressableKeyField(sceneKindProperty)
             ? DisplayStyle.Flex
             : DisplayStyle.None;
     }
@@ -119,6 +157,29 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
                 return true;
             default:
                 return false;
+        }
+    }
+
+    /// <summary>
+    /// Resolves whether Addressables key editing is useful for the current scene kind.
+    /// /params sceneKindProperty Serialized scene kind enum property.
+    /// /returns True when Addressables key should be visible.
+    /// </summary>
+    private static bool ShouldShowAddressableKeyField(SerializedProperty sceneKindProperty)
+    {
+        if (sceneKindProperty == null)
+            return true;
+
+        GameSceneKind sceneKind = (GameSceneKind)sceneKindProperty.enumValueIndex;
+
+        switch (sceneKind)
+        {
+            case GameSceneKind.Bootstrap:
+            case GameSceneKind.SubScene:
+            case GameSceneKind.PersistentPlayer:
+                return false;
+            default:
+                return true;
         }
     }
 

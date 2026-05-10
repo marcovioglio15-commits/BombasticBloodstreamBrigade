@@ -5,6 +5,7 @@ using Unity.Entities;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyDespawnSystem))]
+[UpdateAfter(typeof(EnemyKilledEventsSystem))]
 [UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
 public partial struct EnemyKillCounterSystem : ISystem
 {

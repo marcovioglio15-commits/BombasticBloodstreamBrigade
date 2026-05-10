@@ -11,7 +11,8 @@ public enum GameSceneKind : byte
     PersistentUi = 3,
     Loading = 4,
     Test = 5,
-    SubScene = 6
+    SubScene = 6,
+    PersistentPlayer = 7
 }
 
 /// <summary>

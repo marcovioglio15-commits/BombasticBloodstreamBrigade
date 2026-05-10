@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +14,12 @@ using UnityEngine.SceneManagement;
 [UpdateAfter(typeof(GameSceneTransitionTriggerSystem))]
 public partial class GameSceneTransitionExecutionSystem : SystemBase
 {
+    #region Constants
+    private const int MinimumReadyWarmupFrames = 3;
+    private const float MinimumReadyWarmupSeconds = 0.05f;
+    private const float MaximumFadeStepSeconds = 1f / 30f;
+    #endregion
+
     #region Fields
     private EntityQuery managerQuery;
     private GameSceneSceneOperationState activeOperation;
@@ -25,9 +33,17 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     private GameSceneTransitionPhase activePhase;
     private float phaseTimer;
     private float fadeOutSeconds;
-    private float holdBlackSeconds;
+    private float postLoadReadyExtraSeconds;
     private float fadeInSeconds;
     private float previousTimeScale = 1f;
+    private readonly List<GameSceneDefinitionElement> persistentPlayerPreLoadUnloadScenes = new List<GameSceneDefinitionElement>(2);
+    private readonly List<GameSceneDefinitionElement> persistentPlayerLoadScenes = new List<GameSceneDefinitionElement>(2);
+    private readonly List<GameSceneDefinitionElement> persistentPlayerPostLoadUnloadScenes = new List<GameSceneDefinitionElement>(2);
+    private int persistentPlayerPreLoadUnloadIndex;
+    private int persistentPlayerLoadIndex;
+    private int persistentPlayerPostLoadUnloadIndex;
+    private int readinessWarmupFrames;
+    private float readinessWarmupSeconds;
     private bool hasSourceScene;
     private bool hasSourceCompanionScene;
     private bool hasBootstrapScene;
@@ -39,6 +55,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     private bool sourceCompanionSceneUnloadComplete;
     private bool timeScaleChanged;
     private bool loggedManagerCountWarning;
+    private bool preLoadRuntimeCleanupComplete;
     #endregion
 
     #region Methods
@@ -66,7 +83,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     /// </summary>
     protected override void OnDestroy()
     {
-        RestoreTimeScale();
+        GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
     }
 
     /// <summary>
@@ -233,8 +250,14 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         hasTargetCompanionScene = GameSceneLoadBackendUtility.TryFindCompanionScene(scenes, targetScene, out targetCompanionScene);
         reloadActiveScene = isRestart || sourceSceneId.Equals(targetSceneId);
         ResetOperationProgress();
+        GameScenePersistentPlayerSceneUtility.CollectOperations(scenes,
+                                                                targetScene,
+                                                                isRestart && GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene),
+                                                                persistentPlayerPreLoadUnloadScenes,
+                                                                persistentPlayerLoadScenes,
+                                                                persistentPlayerPostLoadUnloadScenes);
         ResolveFadeTimings(config, transition);
-        BeginTimeScaleLock(config);
+        GameSceneTransitionTimeScaleUtility.Begin(config, ref timeScaleChanged, ref previousTimeScale);
         transitionState.SourceSceneId = sourceSceneId;
         transitionState.TargetSceneId = targetSceneId;
         transitionState.IsTransitioning = 1;
@@ -272,7 +295,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                       ref GameSceneTransitionState transitionState,
                                       ref GameSceneFadePresentationState fadeState)
     {
-        float deltaTime = UnityEngine.Time.unscaledDeltaTime;
+        float deltaTime = ResolveFadeStepDeltaTime(UnityEngine.Time.unscaledDeltaTime);
 
         switch (activePhase)
         {
@@ -368,6 +391,14 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                              ref GameSceneFadePresentationState fadeState,
                              GameSceneManagerConfig config)
     {
+        if (GameScenePersistentPlayerSceneUtility.TickUnloadSteps(persistentPlayerPreLoadUnloadScenes, ref persistentPlayerPreLoadUnloadIndex))
+            return;
+
+        RunPreLoadRuntimeCleanupIfNeeded();
+
+        if (GameScenePersistentPlayerSceneUtility.TickLoadSteps(persistentPlayerLoadScenes, ref persistentPlayerLoadIndex))
+            return;
+
         if (!targetSceneLoaded &&
             GameSceneTransitionSceneOperationUtility.TickLoadStep(targetScene,
                                                                  config,
@@ -387,11 +418,27 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                  ref targetCompanionSceneLoaded))
             return;
 
-        if (ShouldRunPostUnload())
+        bool shouldUnloadSourceScene = GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceAfterLoad(hasSourceScene,
+                                                                                                        reloadActiveScene,
+                                                                                                        sourceSceneId,
+                                                                                                        targetSceneId,
+                                                                                                        sourceScene);
+        bool shouldUnloadSourceCompanionScene = GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceCompanionAfterLoad(hasSourceCompanionScene,
+                                                                                                                          reloadActiveScene,
+                                                                                                                          hasTargetCompanionScene,
+                                                                                                                          sourceCompanionScene,
+                                                                                                                          targetCompanionScene);
+
+        if (GameSceneTransitionUnloadPolicyUtility.ShouldRunPostUnload(shouldUnloadSourceScene,
+                                                                       shouldUnloadSourceCompanionScene,
+                                                                       persistentPlayerPostLoadUnloadScenes.Count))
         {
             BeginPhase(GameSceneTransitionPhase.PostUnload, ref transitionState, ref fadeState, config);
             return;
         }
+
+        if (!TryCompleteReadinessWarmup())
+            return;
 
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, config);
     }
@@ -407,7 +454,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                 ref GameSceneFadePresentationState fadeState,
                                 GameSceneManagerConfig config)
     {
-        if (ShouldUnloadSourceAfterLoad() &&
+        if (GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceAfterLoad(hasSourceScene,
+                                                                              reloadActiveScene,
+                                                                              sourceSceneId,
+                                                                              targetSceneId,
+                                                                              sourceScene) &&
             GameSceneTransitionSceneOperationUtility.TickUnloadStep(sourceScene,
                                                                    hasBootstrapScene,
                                                                    bootstrapScene,
@@ -417,7 +468,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                    ref sourceSceneUnloadComplete))
             return;
 
-        if (ShouldUnloadSourceCompanionAfterLoad() &&
+        if (GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceCompanionAfterLoad(hasSourceCompanionScene,
+                                                                                      reloadActiveScene,
+                                                                                      hasTargetCompanionScene,
+                                                                                      sourceCompanionScene,
+                                                                                      targetCompanionScene) &&
             GameSceneTransitionSceneOperationUtility.TickUnloadStep(sourceCompanionScene,
                                                                    hasBootstrapScene,
                                                                    bootstrapScene,
@@ -427,11 +482,17 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                    ref sourceCompanionSceneUnloadComplete))
             return;
 
+        if (GameScenePersistentPlayerSceneUtility.TickUnloadSteps(persistentPlayerPostLoadUnloadScenes, ref persistentPlayerPostLoadUnloadIndex))
+            return;
+
+        if (!TryCompleteReadinessWarmup())
+            return;
+
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, config);
     }
 
     /// <summary>
-    /// Holds the fade overlay fully opaque before fade-in.
+    /// Holds the fade overlay fully opaque for the configured post-readiness bonus before fade-in.
     /// /params transitionState Mutable transition state component.
     /// /params fadeState Mutable fade presentation component.
     /// /params config Scene manager runtime config.
@@ -446,7 +507,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         GameSceneTransitionExecutionUtility.SetFade(ref fadeState, 1f, true, config);
         phaseTimer += deltaTime;
 
-        if (phaseTimer < holdBlackSeconds)
+        if (phaseTimer < postLoadReadyExtraSeconds)
             return;
 
         BeginPhase(GameSceneTransitionPhase.FadeIn, ref transitionState, ref fadeState, config);
@@ -492,13 +553,13 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         if (transition.OverrideFadeSettings != 0)
         {
             fadeOutSeconds = Mathf.Max(0f, transition.FadeOutSeconds);
-            holdBlackSeconds = Mathf.Max(0f, transition.HoldBlackSeconds);
+            postLoadReadyExtraSeconds = Mathf.Max(0f, transition.PostLoadReadyExtraSeconds);
             fadeInSeconds = Mathf.Max(0f, transition.FadeInSeconds);
             return;
         }
 
         fadeOutSeconds = Mathf.Max(0f, config.FadeOutSeconds);
-        holdBlackSeconds = Mathf.Max(0f, config.HoldBlackSeconds);
+        postLoadReadyExtraSeconds = Mathf.Max(0f, config.PostLoadReadyExtraSeconds);
         fadeInSeconds = Mathf.Max(0f, config.FadeInSeconds);
     }
 
@@ -513,6 +574,80 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         targetCompanionSceneLoaded = false;
         sourceSceneUnloadComplete = false;
         sourceCompanionSceneUnloadComplete = false;
+        persistentPlayerPreLoadUnloadIndex = 0;
+        persistentPlayerLoadIndex = 0;
+        persistentPlayerPostLoadUnloadIndex = 0;
+        preLoadRuntimeCleanupComplete = false;
+        ResetReadinessWarmup();
+    }
+
+    /// <summary>
+    /// Clears transient gameplay entities that are not owned by scene streaming before a restart loads the new instance.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void RunPreLoadRuntimeCleanupIfNeeded()
+    {
+        if (preLoadRuntimeCleanupComplete)
+            return;
+
+        preLoadRuntimeCleanupComplete = true;
+
+        if (!reloadActiveScene)
+            return;
+
+        if (!GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene))
+            return;
+
+        GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(EntityManager);
+    }
+
+    /// <summary>
+    /// Waits until loaded scenes, gameplay runtime and a short hidden warm-up have completed before fade-in.
+    /// /params None.
+    /// /returns True when the transition can reveal the target scene.
+    /// </summary>
+    private bool TryCompleteReadinessWarmup()
+    {
+        EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
+
+        if (!GameSceneTransitionReadinessUtility.AreTransitionScenesReady(targetScene,
+                                                                         hasTargetCompanionScene,
+                                                                         targetCompanionScene,
+                                                                         persistentPlayerLoadScenes))
+        {
+            ResetReadinessWarmup();
+            return false;
+        }
+
+        readinessWarmupFrames++;
+        readinessWarmupSeconds += Mathf.Max(0f, UnityEngine.Time.unscaledDeltaTime);
+
+        if (readinessWarmupFrames < MinimumReadyWarmupFrames)
+            return false;
+
+        return readinessWarmupSeconds >= MinimumReadyWarmupSeconds;
+    }
+
+    /// <summary>
+    /// Clears hidden warm-up progress when a new transition starts or readiness drops.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void ResetReadinessWarmup()
+    {
+        readinessWarmupFrames = 0;
+        readinessWarmupSeconds = 0f;
+    }
+
+    /// <summary>
+    /// Caps visual transition steps so a loading hitch cannot consume an entire fade-in in one frame.
+    /// /params unscaledDeltaTime Raw Unity unscaled frame delta.
+    /// /returns Clamped presentation delta for fade phases.
+    /// </summary>
+    private static float ResolveFadeStepDeltaTime(float unscaledDeltaTime)
+    {
+        return Mathf.Min(Mathf.Max(0f, unscaledDeltaTime), MaximumFadeStepSeconds);
     }
 
     /// <summary>
@@ -546,7 +681,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                    ref GameSceneFadePresentationState fadeState,
                                    GameSceneManagerConfig config)
     {
-        if (holdBlackSeconds > 0f)
+        if (postLoadReadyExtraSeconds > 0f)
         {
             BeginPhase(GameSceneTransitionPhase.HoldBlack, ref transitionState, ref fadeState, config);
             return;
@@ -575,6 +710,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         phaseTimer = 0f;
         transitionState.Phase = phase;
 
+        if (phase == GameSceneTransitionPhase.FadeIn)
+            GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
+
         if (phase != GameSceneTransitionPhase.FadeIn)
             GameSceneTransitionExecutionUtility.SetFade(ref fadeState, fadeState.Alpha, true, config);
     }
@@ -600,93 +738,13 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         transitionState.Initialized = 1;
         fadeState.Alpha = 0f;
         fadeState.Visible = 0;
-        RestoreTimeScale();
+        GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
 
         if (managerEntity != Entity.Null && EntityManager.Exists(managerEntity))
         {
             EntityManager.SetComponentData(managerEntity, transitionState);
             EntityManager.SetComponentData(managerEntity, fadeState);
         }
-    }
-
-    /// <summary>
-    /// Resolves whether the source scene should unload after the target scene has loaded.
-    /// /params None.
-    /// /returns True when the source scene can be unloaded after load.
-    /// </summary>
-    private bool ShouldUnloadSourceAfterLoad()
-    {
-        if (!hasSourceScene)
-            return false;
-
-        if (reloadActiveScene)
-            return false;
-
-        if (sourceSceneId.Equals(targetSceneId))
-            return false;
-
-        return sourceScene.UnloadPolicy == GameSceneUnloadPolicy.UnloadOnTransition;
-    }
-
-    /// <summary>
-    /// Resolves whether any source scene must unload after target scene loading completes.
-    /// /params None.
-    /// /returns True when post-load unload work is required.
-    /// </summary>
-    private bool ShouldRunPostUnload()
-    {
-        return ShouldUnloadSourceAfterLoad() || ShouldUnloadSourceCompanionAfterLoad();
-    }
-
-    /// <summary>
-    /// Resolves whether the source companion UI scene should unload after the target scene has loaded.
-    /// /params None.
-    /// /returns True when the source companion UI scene can be unloaded after load.
-    /// </summary>
-    private bool ShouldUnloadSourceCompanionAfterLoad()
-    {
-        if (!hasSourceCompanionScene)
-            return false;
-
-        if (reloadActiveScene)
-            return false;
-
-        if (hasTargetCompanionScene && sourceCompanionScene.SceneId.Equals(targetCompanionScene.SceneId))
-            return false;
-
-        return sourceCompanionScene.UnloadPolicy == GameSceneUnloadPolicy.UnloadOnTransition;
-    }
-
-    /// <summary>
-    /// Locks Unity time scale during transitions when configured.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
-    /// </summary>
-    private void BeginTimeScaleLock(GameSceneManagerConfig config)
-    {
-        if (config.SetTimeScaleDuringTransition == 0 && config.LockGameplayInput == 0)
-            return;
-
-        if (timeScaleChanged)
-            return;
-
-        previousTimeScale = UnityEngine.Time.timeScale;
-        UnityEngine.Time.timeScale = 0f;
-        timeScaleChanged = true;
-    }
-
-    /// <summary>
-    /// Restores Unity time scale after a transition-owned lock.
-    /// /params None.
-    /// /returns None.
-    /// </summary>
-    private void RestoreTimeScale()
-    {
-        if (!timeScaleChanged)
-            return;
-
-        UnityEngine.Time.timeScale = previousTimeScale;
-        timeScaleChanged = false;
     }
 
     /// <summary>

@@ -21,6 +21,16 @@ internal static class PlayerGameplayPauseUtility
     /// </summary>
     public static bool IsHardGameplayPauseActive()
     {
+        return IsTimeScaleHardPaused() || GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldGameplay();
+    }
+
+    /// <summary>
+    /// Resolves whether Unity's scaled time is paused, without treating scene transitions as a pause by itself.
+    /// /params None.
+    /// /returns True when Time.timeScale is effectively zero.
+    /// </summary>
+    public static bool IsTimeScaleHardPaused()
+    {
         return Time.timeScale <= HardPauseTimeScaleThreshold;
     }
     #endregion

@@ -25,9 +25,9 @@ MonoBehaviour:
   logTransitions: 1
   fadeSettings:
     fadeColor: {r: 0, g: 0, b: 0, a: 1}
-    fadeOutSeconds: 0.35
-    holdBlackSeconds: 0.08
-    fadeInSeconds: 0.35
+    fadeOutSeconds: 0.2
+    postLoadReadyExtraSeconds: 0.08
+    fadeInSeconds: 0.2
     lockGameplayInput: 1
     setTimeScaleDuringTransition: 1
   triggerSettings:
@@ -81,6 +81,17 @@ MonoBehaviour:
     roomTags: 
     addressableKey: SCN_PlayerControllerTesting_UI
     sceneAsset: {fileID: 102900000, guid: 03a9f2c16e797964292116c73c929762, type: 3}
+  - sceneId: SCN_PlayerPersistent
+    sceneName: SUB_Player
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SUB_Player.unity
+    sceneGuid: da7ade6fe92d5ba4cba3257fa8bbb3b8
+    buildIndex: -1
+    sceneKind: 7
+    unloadPolicy: 1
+    companionUiSceneId: 
+    roomTags: 
+    addressableKey: 
+    sceneAsset: {fileID: 102900000, guid: da7ade6fe92d5ba4cba3257fa8bbb3b8, type: 3}
   transitionDefinitions:
   - transitionId: TRN_MainMenu_To_Gameplay
     fromSceneId: SCN_MainMenu
@@ -92,7 +103,7 @@ MonoBehaviour:
     oneShotTrigger: 1
     overrideFadeSettings: 0
     fadeOutSeconds: 0.35
-    holdBlackSeconds: 0.08
+    postLoadReadyExtraSeconds: 0.08
     fadeInSeconds: 0.35
     allowDuringPause: 1
     allowWhenRunFinalized: 1
@@ -106,7 +117,7 @@ MonoBehaviour:
     oneShotTrigger: 1
     overrideFadeSettings: 0
     fadeOutSeconds: 0.35
-    holdBlackSeconds: 0.08
+    postLoadReadyExtraSeconds: 0.08
     fadeInSeconds: 0.35
     allowDuringPause: 1
     allowWhenRunFinalized: 1

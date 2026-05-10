@@ -15,6 +15,7 @@ public partial class GameSceneFadePresentationSystem : SystemBase
     private float lastAlpha = -1f;
     private float4 lastColor = new float4(-1f, -1f, -1f, -1f);
     private byte lastVisible = byte.MaxValue;
+    private int lastAppliedViewVersion = -1;
     #endregion
 
     #region Methods
@@ -48,7 +49,8 @@ public partial class GameSceneFadePresentationSystem : SystemBase
 
         if (math.abs(fadeState.Alpha - lastAlpha) <= 0.0001f &&
             fadeState.Visible == lastVisible &&
-            math.lengthsq(fadeState.Color - lastColor) <= 0.000001f)
+            math.lengthsq(fadeState.Color - lastColor) <= 0.000001f &&
+            GameSceneFadeCanvasView.ActiveViewVersion == lastAppliedViewVersion)
         {
             return;
         }
@@ -58,6 +60,7 @@ public partial class GameSceneFadePresentationSystem : SystemBase
         lastAlpha = fadeState.Alpha;
         lastVisible = fadeState.Visible;
         lastColor = fadeState.Color;
+        lastAppliedViewVersion = GameSceneFadeCanvasView.ActiveViewVersion;
     }
     #endregion
 

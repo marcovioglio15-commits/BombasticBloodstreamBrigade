@@ -333,6 +333,14 @@ public static class EnemyPoolUtility
         LocalTransform parkedTransform = entityManager.GetComponentData<LocalTransform>(enemyEntity);
         parkedTransform.Position = ParkingPosition;
         entityManager.SetComponentData(enemyEntity, parkedTransform);
+
+        if (entityManager.HasComponent<LocalToWorld>(enemyEntity))
+        {
+            entityManager.SetComponentData(enemyEntity, new LocalToWorld
+            {
+                Value = parkedTransform.ToMatrix()
+            });
+        }
     }
 
     /// <summary>

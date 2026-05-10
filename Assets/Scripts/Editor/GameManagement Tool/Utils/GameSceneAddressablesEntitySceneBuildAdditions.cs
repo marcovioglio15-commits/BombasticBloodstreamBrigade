@@ -4,7 +4,7 @@ using UnityEditor;
 using Hash128 = Unity.Entities.Hash128;
 
 /// <summary>
-/// Registers DOTS SubScenes referenced by Addressables-managed root scenes so Entities deploys their baked data in player builds.
+/// Registers DOTS scenes referenced by Scene Manager presets so Entities deploys their baked data in player builds.
 /// /params None.
 /// /returns None.
 /// </summary>
@@ -18,7 +18,7 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     #region Build Additions
     /// <summary>
-    /// Collects SubScene GUIDs from Addressables Scene Manager presets during the Unity player build pipeline.
+    /// Collects direct DOTS scene GUIDs and Addressables root SubScene GUIDs during the Unity player build pipeline.
     /// /params None.
     /// /returns Set of DOTS SubScene GUIDs that must be baked and deployed with the player.
     /// </summary>
@@ -44,16 +44,13 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     #region Preset Scan
     /// <summary>
-    /// Resolves whether a Scene Manager preset can reference Addressables-managed root scenes that own DOTS SubScenes.
+    /// Resolves whether a Scene Manager preset has scene definitions that can reference DOTS scene data.
     /// /params preset Preset discovered through AssetDatabase.
-    /// /returns True when the preset should be scanned for root scene SubScenes.
+    /// /returns True when the preset should be scanned for direct DOTS scenes and optional root SubScenes.
     /// </summary>
     private static bool ShouldScanPreset(GameSceneManagerPreset preset)
     {
         if (preset == null)
-            return false;
-
-        if (preset.LoadBackend != GameSceneLoadBackend.Addressables)
             return false;
 
         return preset.SceneDefinitions != null;
@@ -71,11 +68,36 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
         {
             GameSceneDefinition sceneDefinition = preset.SceneDefinitions[index];
 
+            if (ShouldRegisterDirectEntityScene(sceneDefinition))
+            {
+                RegisterDirectEntityScene(sceneDefinition, subSceneGuids);
+                continue;
+            }
+
+            if (preset.LoadBackend != GameSceneLoadBackend.Addressables)
+                continue;
+
             if (!ShouldScanRootScene(sceneDefinition))
                 continue;
 
             RegisterRootSceneSubScenes(sceneDefinition.ScenePath, subSceneGuids);
         }
+    }
+
+    /// <summary>
+    /// Resolves whether one scene definition points directly at a DOTS scene loaded through SceneSystem.
+    /// /params sceneDefinition Scene definition being inspected.
+    /// /returns True when the scene GUID should be included directly in player builds.
+    /// </summary>
+    private static bool ShouldRegisterDirectEntityScene(GameSceneDefinition sceneDefinition)
+    {
+        if (sceneDefinition == null)
+            return false;
+
+        if (sceneDefinition.SceneKind != GameSceneKind.PersistentPlayer)
+            return false;
+
+        return !string.IsNullOrWhiteSpace(sceneDefinition.SceneGuid);
     }
 
     /// <summary>
@@ -92,6 +114,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
             return false;
 
         if (sceneDefinition.SceneKind == GameSceneKind.SubScene)
+            return false;
+
+        if (sceneDefinition.SceneKind == GameSceneKind.PersistentPlayer)
             return false;
 
         if (string.IsNullOrWhiteSpace(sceneDefinition.AddressableKey))
@@ -119,6 +144,20 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
         for (int index = 0; index < rootSubSceneGuids.Length; index++)
             subSceneGuids.Add(rootSubSceneGuids[index]);
+    }
+
+    /// <summary>
+    /// Adds one direct DOTS scene GUID authored in the Scene Manager preset.
+    /// /params sceneDefinition Direct entity scene definition.
+    /// /params subSceneGuids Mutable output set receiving DOTS scene GUIDs.
+    /// /returns None.
+    /// </summary>
+    private static void RegisterDirectEntityScene(GameSceneDefinition sceneDefinition, HashSet<Hash128> subSceneGuids)
+    {
+        Hash128 sceneGuid = new Hash128(sceneDefinition.SceneGuid);
+
+        if (sceneGuid.IsValid)
+            subSceneGuids.Add(sceneGuid);
     }
     #endregion
 

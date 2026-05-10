@@ -35,7 +35,7 @@ public static class GameSceneManagementBakeUtility
             LockGameplayInput = fadeSettings != null && fadeSettings.LockGameplayInput ? (byte)1 : (byte)0,
             SetTimeScaleDuringTransition = fadeSettings != null && fadeSettings.SetTimeScaleDuringTransition ? (byte)1 : (byte)0,
             FadeOutSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeOutSeconds) : 0.35f,
-            HoldBlackSeconds = fadeSettings != null ? math.max(0f, fadeSettings.HoldBlackSeconds) : 0.08f,
+            PostLoadReadyExtraSeconds = fadeSettings != null ? math.max(0f, fadeSettings.PostLoadReadyExtraSeconds) : 0.08f,
             FadeInSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeInSeconds) : 0.35f,
             FadeColor = new float4(fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a),
             TransitionLayerName = triggerSettings != null ? new Unity.Collections.FixedString64Bytes(triggerSettings.TransitionLayerName ?? string.Empty) : default,
@@ -115,7 +115,7 @@ public static class GameSceneManagementBakeUtility
                 AllowWhenRunFinalized = transitionDefinition.AllowWhenRunFinalized ? (byte)1 : (byte)0,
                 TriggerCooldownOverrideSeconds = transitionDefinition.TriggerCooldownOverrideSeconds,
                 FadeOutSeconds = math.max(0f, transitionDefinition.FadeOutSeconds),
-                HoldBlackSeconds = math.max(0f, transitionDefinition.HoldBlackSeconds),
+                PostLoadReadyExtraSeconds = math.max(0f, transitionDefinition.PostLoadReadyExtraSeconds),
                 FadeInSeconds = math.max(0f, transitionDefinition.FadeInSeconds)
             });
         }

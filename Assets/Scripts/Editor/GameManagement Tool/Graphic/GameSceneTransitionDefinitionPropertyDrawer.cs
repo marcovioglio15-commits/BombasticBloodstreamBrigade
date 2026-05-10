@@ -94,7 +94,7 @@ public sealed class GameSceneTransitionDefinitionPropertyDrawer : PropertyDrawer
     {
         VisualElement container = new VisualElement();
         AddProperty(container, property, "fadeOutSeconds");
-        AddProperty(container, property, "holdBlackSeconds");
+        AddProperty(container, property, "postLoadReadyExtraSeconds");
         AddProperty(container, property, "fadeInSeconds");
         return container;
     }
