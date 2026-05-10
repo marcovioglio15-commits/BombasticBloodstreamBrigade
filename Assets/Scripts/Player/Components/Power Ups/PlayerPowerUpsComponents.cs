@@ -566,6 +566,16 @@ public struct PlayerPowerUpVfxPooled : IComponentData
 }
 
 /// <summary>
+/// Maps baked power-up VFX prefab entities back to their source prefab assets for managed runtime spawning.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerPowerUpVfxPrefabBindingElement : IBufferElementData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> Prefab;
+}
+
+/// <summary>
 /// Runtime-safe Unity object reference to the source prefab used by the Elemental Trail attached VFX fallback.
 /// </summary>
 public struct PlayerElementalTrailAttachedVfxPrefabReference : IComponentData

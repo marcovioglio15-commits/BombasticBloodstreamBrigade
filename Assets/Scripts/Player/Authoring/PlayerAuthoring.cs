@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
@@ -666,9 +667,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
         if (powerUpsPreset != null)
         {
+            DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> powerUpVfxPrefabBindingsBuffer = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+            Func<GameObject, Entity> resolveDynamicPowerUpVfxPrefabEntity = (GameObject prefab) =>
+                ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
             PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpActiveBakeUtility.BuildPowerUpsConfig(authoring,
                                                                                                      powerUpsPreset,
-                                                                                                     ResolveDynamicPrefabEntity);
+                                                                                                     resolveDynamicPowerUpVfxPrefabEntity);
             AddComponent(entity, powerUpsConfig);
             AddComponent(entity, new PlayerChargeCharacterTuningState());
             AddBuffer<PlayerChargeCharacterTuningBaseStatElement>(entity);
@@ -678,7 +682,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                                                                                                   powerUpsPreset);
             PlayerElementalVfxConfig elementalVfxConfig = PlayerPowerUpBakeSharedUtility.BuildElementalVfxConfig(authoring,
                                                                                                                  elementalEnemyVfxAssignments,
-                                                                                                                 ResolveDynamicPrefabEntity);
+                                                                                                                 resolveDynamicPowerUpVfxPrefabEntity);
             AddComponent(entity, elementalVfxConfig);
 
             if (authoring.BakeElementalTrailAttachedVfxReference && authoring.ElementalTrailAttachedVfxPrefab != null)
@@ -700,7 +704,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer = AddBuffer<EquippedPassiveToolElement>(entity);
             PlayerPowerUpCatalogBakeUtility.PopulateEquippedPassiveToolsBuffer(authoring,
                                                                                powerUpsPreset,
-                                                                               ResolveDynamicPrefabEntity,
+                                                                               resolveDynamicPowerUpVfxPrefabEntity,
                                                                                equippedPassiveToolsBuffer);
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> powerUpUnlockCatalogBuffer = AddBuffer<PlayerPowerUpUnlockCatalogElement>(entity);
             DynamicBuffer<PlayerPowerUpTierDefinitionElement> powerUpTierDefinitionsBuffer = AddBuffer<PlayerPowerUpTierDefinitionElement>(entity);
@@ -711,7 +715,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             PlayerPowerUpCatalogBakeUtility.PopulatePowerUpUnlockTierBuffers(authoring,
                                                                              powerUpsPreset,
                                                                              sourcePowerUpsPreset,
-                                                                             ResolveDynamicPrefabEntity,
+                                                                             resolveDynamicPowerUpVfxPrefabEntity,
                                                                              powerUpUnlockCatalogBuffer,
                                                                              characterTuningFormulaBuffer,
                                                                              powerUpTierDefinitionsBuffer,
@@ -719,7 +723,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                              powerUpTierEntryScalingBuffer);
             PlayerRuntimeScalingBakeUtility.PopulatePowerUpBaseConfigs(authoring,
                                                                        sourcePowerUpsPreset,
-                                                                       ResolveDynamicPrefabEntity,
+                                                                       resolveDynamicPowerUpVfxPrefabEntity,
                                                                        powerUpBaseConfigBuffer);
 #if UNITY_EDITOR
             PlayerRuntimeScalingBakeUtility.PopulatePowerUpScalingMetadata(sourcePowerUpsPreset, powerUpScalingBuffer);
@@ -727,7 +731,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntriesBuffer = AddBuffer<PlayerPowerUpCheatPresetEntry>(entity);
             DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassivesBuffer = AddBuffer<PlayerPowerUpCheatPresetPassiveElement>(entity);
             PlayerPowerUpCatalogBakeUtility.PopulatePowerUpCheatPresetBuffers(authoring,
-                                                                              ResolveDynamicPrefabEntity,
+                                                                              resolveDynamicPowerUpVfxPrefabEntity,
                                                                               cheatPresetEntriesBuffer,
                                                                               cheatPresetPassivesBuffer);
         }
@@ -871,6 +875,36 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             return Entity.Null;
 
         return GetEntity(prefab, TransformUsageFlags.Dynamic);
+    }
+
+    /// <summary>
+    /// Resolves one power-up VFX prefab and stores the source prefab reference beside the baked entity reference.
+    /// /params prefab Prefab asset to resolve.
+    /// /params bindingsBuffer Player-owned buffer receiving the prefab-to-entity VFX binding.
+    /// /returns ECS prefab entity or Entity.Null when the prefab is missing.
+    /// </summary>
+    private Entity ResolveDynamicPowerUpVfxPrefabEntity(GameObject prefab,
+                                                        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> bindingsBuffer)
+    {
+        Entity prefabEntity = ResolveDynamicPrefabEntity(prefab);
+
+        if (prefab == null || prefabEntity == Entity.Null)
+            return prefabEntity;
+
+        for (int bindingIndex = 0; bindingIndex < bindingsBuffer.Length; bindingIndex++)
+        {
+            PlayerPowerUpVfxPrefabBindingElement binding = bindingsBuffer[bindingIndex];
+
+            if (binding.PrefabEntity == prefabEntity)
+                return prefabEntity;
+        }
+
+        bindingsBuffer.Add(new PlayerPowerUpVfxPrefabBindingElement
+        {
+            PrefabEntity = prefabEntity,
+            Prefab = prefab
+        });
+        return prefabEntity;
     }
     #endregion
 

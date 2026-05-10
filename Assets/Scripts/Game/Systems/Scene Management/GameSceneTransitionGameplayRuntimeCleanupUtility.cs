@@ -17,6 +17,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     /// </summary>
     public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
     {
+        PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);
@@ -48,7 +49,8 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
             None = new ComponentType[]
             {
                 ComponentType.ReadOnly<Prefab>()
-            }
+            },
+            Options = EntityQueryOptions.IncludeDisabledEntities
         });
 
         DestroyQuery(entityManager, query);
@@ -62,7 +64,14 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     private static void DestroyEntitiesWith<TComponent>(EntityManager entityManager)
         where TComponent : unmanaged, IComponentData
     {
-        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<TComponent>());
+        EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadOnly<TComponent>()
+            },
+            Options = EntityQueryOptions.IncludeDisabledEntities
+        });
         DestroyQuery(entityManager, query);
     }
 

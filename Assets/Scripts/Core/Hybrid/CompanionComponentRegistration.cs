@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [assembly: RegisterUnityEngineComponentType(typeof(TrailRenderer))]
+[assembly: RegisterUnityEngineComponentType(typeof(ParticleSystem))]
+[assembly: RegisterUnityEngineComponentType(typeof(ParticleSystemRenderer))]
 [assembly: RegisterUnityEngineComponentType(typeof(Animator))]
 [assembly: RegisterUnityEngineComponentType(typeof(SkinnedMeshRenderer))]
 [assembly: RegisterUnityEngineComponentType(typeof(EnemyWorldSpaceStatusBarsView))]

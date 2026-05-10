@@ -7,7 +7,6 @@ using Unity.Transforms;
 /// Consumes baked wave events and activates pooled enemies when their scheduled time becomes due.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
-[UpdateAfter(typeof(EnemyPoolInitializeSystem))]
 public partial struct EnemySpawnSystem : ISystem
 {
     #region Constants

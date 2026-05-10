@@ -25,6 +25,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingExplosionRequestBufferQuery;
     private EntityQuery missingPowerUpVfxRequestBufferQuery;
     private EntityQuery missingPowerUpVfxPoolBufferQuery;
+    private EntityQuery missingPowerUpVfxPrefabBindingBufferQuery;
     private EntityQuery missingPowerUpVfxCapConfigQuery;
     private EntityQuery missingPowerUpCheatBufferQuery;
     private EntityQuery missingPowerUpCheatPresetEntryBufferQuery;
@@ -137,6 +138,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             .WithNone<PlayerPowerUpVfxPoolElement>()
             .Build();
 
+        missingPowerUpVfxPrefabBindingBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfig>()
+            .WithNone<PlayerPowerUpVfxPrefabBindingElement>()
+            .Build();
+
         missingPowerUpVfxCapConfigQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfig>()
             .WithNone<PlayerPowerUpVfxCapConfig>()
@@ -228,6 +234,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingExplosionRequestBufferQuery,
             in missingPowerUpVfxRequestBufferQuery,
             in missingPowerUpVfxPoolBufferQuery,
+            in missingPowerUpVfxPrefabBindingBufferQuery,
             in missingPowerUpVfxCapConfigQuery,
             in missingPowerUpCheatBufferQuery,
             in missingPowerUpCheatPresetEntryBufferQuery,
@@ -340,6 +347,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxPoolBuffers(ref commandBuffer, in missingPowerUpVfxPoolBufferQuery);
         }
 
+        if (missingFlags.HasMissingPowerUpVfxPrefabBindingBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxPrefabBindingBuffers(ref commandBuffer, in missingPowerUpVfxPrefabBindingBufferQuery);
+        }
+
         if (missingFlags.HasMissingPowerUpVfxCapConfig)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxCapConfig(ref commandBuffer, in missingPowerUpVfxCapConfigQuery);
@@ -428,6 +440,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingExplosionRequestBufferQuery,
             in missingPowerUpVfxRequestBufferQuery,
             in missingPowerUpVfxPoolBufferQuery,
+            in missingPowerUpVfxPrefabBindingBufferQuery,
             in missingPowerUpVfxCapConfigQuery,
             in missingPowerUpCheatBufferQuery,
             in missingPowerUpCheatPresetEntryBufferQuery,

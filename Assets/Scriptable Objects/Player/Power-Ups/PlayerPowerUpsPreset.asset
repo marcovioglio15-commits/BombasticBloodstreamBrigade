@@ -15421,7 +15421,8 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveEnemiesExplodeOnDeath
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
