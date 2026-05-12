@@ -17,6 +17,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private float3 childLocalOffset;
     private CameraBehavior lastBehavior;
     private int lastCameraInstanceId;
+    private EntityQuery runOutcomeQuery;
     #endregion
 
     #region Lifecycle
@@ -29,6 +30,8 @@ public partial struct PlayerCameraFollowSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerRuntimeCameraConfig>();
+        runOutcomeQuery = state.GetEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
+                                               ComponentType.ReadOnly<PlayerRunOutcomeState>());
     }
 
     /// <summary>
@@ -44,6 +47,9 @@ public partial struct PlayerCameraFollowSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+
+        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
+            return;
 
         if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
             return;

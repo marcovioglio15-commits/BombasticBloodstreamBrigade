@@ -392,7 +392,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             displayName = visualPreset.PresetName;
 
         Color healthFillColor = bossUi != null ? bossUi.HealthFillColor : new Color(0.9f, 0.12f, 0.08f, 1f);
-        Color healthBackgroundColor = bossUi != null ? bossUi.HealthBackgroundColor : new Color(0f, 0f, 0f, 0.7f);
+        Color healthBackgroundColor = bossUi != null ? bossUi.HealthBackgroundColor : Color.white;
+        Color shieldFillColor = bossUi != null ? bossUi.ShieldFillColor : new Color(0.2f, 0.85f, 1f, 1f);
+        Color shieldBackgroundColor = bossUi != null ? bossUi.ShieldBackgroundColor : Color.white;
         Color offscreenIndicatorColor = bossUi != null ? bossUi.OffscreenIndicatorColor : new Color(1f, 0.2f, 0.1f, 0.95f);
 
         return new EnemyBossHudConfig
@@ -401,10 +403,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             DisplayName = new Unity.Collections.FixedString64Bytes(displayName),
             HealthFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthFillColor),
             HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthBackgroundColor),
+            ShieldFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(shieldFillColor),
+            ShieldBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(shieldBackgroundColor),
             OffscreenIndicatorColor = DamageFlashRuntimeUtility.ToLinearFloat4(offscreenIndicatorColor),
-            BottomOffsetPixels = bossUi != null ? math.max(0f, bossUi.BottomOffsetPixels) : 42f,
-            WidthPixels = bossUi != null ? math.max(1f, bossUi.WidthPixels) : 560f,
-            HeightPixels = bossUi != null ? math.max(1f, bossUi.HeightPixels) : 22f,
             OffscreenIndicatorSizePixels = bossUi != null ? math.max(1f, bossUi.OffscreenIndicatorSizePixels) : 56f,
             EdgePaddingPixels = bossUi != null ? math.max(0f, bossUi.EdgePaddingPixels) : 30f
         };

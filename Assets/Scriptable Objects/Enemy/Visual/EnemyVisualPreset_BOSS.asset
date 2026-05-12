@@ -68,11 +68,10 @@ MonoBehaviour:
     enabled: 1
     bossDisplayName: BOSS
     healthFillColor: {r: 0.9, g: 0.12, b: 0.08, a: 1}
-    healthBackgroundColor: {r: 0, g: 0, b: 0, a: 0.7}
+    healthBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    shieldFillColor: {r: 0.2, g: 0.85, b: 1, a: 1}
+    shieldBackgroundColor: {r: 1, g: 1, b: 1, a: 1}
     offscreenIndicatorSprite: {fileID: 21300000, guid: 53d6eb3725de4164185265b18768cfdf, type: 3}
     offscreenIndicatorColor: {r: 0.02114594, g: 1, b: 0, a: 0.95}
     offscreenIndicatorSizePixels: 100
-    bottomOffsetPixels: 42
-    widthPixels: 560
-    heightPixels: 36
     edgePaddingPixels: 30

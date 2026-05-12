@@ -7,16 +7,25 @@ using UnityEngine;
 [UpdateAfter(typeof(PlayerCameraFollowSystem))]
 public partial struct PlayerCameraRoomAnchorSystem : ISystem
 {
+    #region Fields
+    private EntityQuery runOutcomeQuery;
+    #endregion
+
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerCameraAnchor>();
         state.RequireForUpdate<PlayerRuntimeCameraConfig>();
+        runOutcomeQuery = state.GetEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
+                                               ComponentType.ReadOnly<PlayerRunOutcomeState>());
     }
 
     public void OnUpdate(ref SystemState state)
     {
         bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+
+        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
+            return;
 
         if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
             return;

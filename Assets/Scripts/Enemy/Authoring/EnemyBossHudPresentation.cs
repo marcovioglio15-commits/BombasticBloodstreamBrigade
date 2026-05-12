@@ -27,7 +27,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     [Tooltip("UI content root toggled when a valid boss is available. If this is the presenter object, the panel root is toggled instead so runtime updates keep running.")]
     [SerializeField] private GameObject visibilityRoot;
 
-    [Tooltip("Rect transform containing boss name and health bar.")]
+    [Tooltip("Rect transform containing the mirrored top-right boss name, health bar and shield bar.")]
     [SerializeField] private RectTransform panelRoot;
 
     [Tooltip("Text label that displays the active boss name.")]
@@ -38,6 +38,19 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     [Tooltip("Background image behind the boss health fill.")]
     [SerializeField] private Image healthBackgroundImage;
+
+    [Tooltip("Fill image used for the active boss shield percentage.")]
+    [SerializeField] private Image shieldFillImage;
+
+    [Tooltip("Background image behind the boss shield fill.")]
+    [SerializeField] private Image shieldBackgroundImage;
+
+    [Header("Bar Presentation")]
+    [Tooltip("Liquid shader and piston behavior used by the mirrored boss health syringe bar.")]
+    [SerializeField] private HUDLiquidBarPresentationSettings healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
+
+    [Tooltip("Liquid shader and piston behavior used by the mirrored boss shield syringe bar.")]
+    [SerializeField] private HUDLiquidBarPresentationSettings shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
 
     [Tooltip("Rect transform moved along screen borders when the boss is outside camera view.")]
     [SerializeField] private RectTransform offscreenIndicatorRoot;
@@ -69,6 +82,9 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private float nextBossResolveTime;
     private float nextCameraResolveTime;
     private float displayedHealthNormalized = 1f;
+    private float displayedShieldNormalized;
+    private HUDLiquidBarRuntime healthBarRuntime;
+    private HUDLiquidBarRuntime shieldBarRuntime;
     private bool ecsInitialized;
     private bool visibilityInitialized;
     private string displayedBossName;
@@ -85,8 +101,19 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
+        EnsureBossBarVisualsInitialized();
         ApplyVisibility(!hideWhenNoBoss);
-        ApplyHealthFill(1f);
+        ApplyInitialBarVisualState();
+    }
+
+    /// <summary>
+    /// Releases runtime material instances created by the liquid boss bars.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void OnDestroy()
+    {
+        DisposeBossBarVisuals();
     }
 
     /// <summary>
@@ -97,6 +124,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void OnValidate()
     {
         ValidateReferences();
+        EnsureBossBarPresentationSettings();
 
         if (healthSmoothingSeconds < 0f)
             healthSmoothingSeconds = 0f;
@@ -112,6 +140,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        EnsureBossBarVisualsInitialized();
+
         if (!TryInitializeEcsBindings())
         {
             HandleMissingBoss();
@@ -252,7 +282,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     #region Presentation
     /// <summary>
-    /// Synchronizes health, text, colors, dimensions and offscreen indicator for the active boss.
+    /// Synchronizes health, text, colors and offscreen indicator for the active boss.
     /// /params bossEntity Active boss entity.
     /// /params deltaTime Unscaled frame delta used for smoothing.
     /// /returns None.
@@ -269,7 +299,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         ApplyVisibility(true);
         SyncConfig(in hudConfig, bossEntity);
-        SyncHealth(bossEntity, deltaTime);
+        SyncBars(bossEntity, deltaTime);
         SyncOffscreenIndicator(bossEntity, in hudConfig);
     }
 
@@ -284,32 +314,44 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         SyncBossName(hudConfig.DisplayName.ToString());
         EnemyBossHudPresentationUtility.ApplyImageColor(healthFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthFillColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(healthBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthBackgroundColor));
-        ApplyPanelLayout(hudConfig.WidthPixels, hudConfig.HeightPixels, hudConfig.BottomOffsetPixels);
+        EnemyBossHudPresentationUtility.ApplyImageColor(shieldFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldFillColor));
+        EnemyBossHudPresentationUtility.ApplyImageColor(shieldBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldBackgroundColor));
         ApplyOffscreenIndicatorConfig(bossEntity,
                                       EnemyBossHudPresentationUtility.ToColor(hudConfig.OffscreenIndicatorColor),
                                       hudConfig.OffscreenIndicatorSizePixels);
     }
 
     /// <summary>
-    /// Updates the current health fill value from ECS health data.
+    /// Updates the current health and shield fill values from ECS health data.
     /// /params bossEntity Active boss entity.
     /// /params deltaTime Unscaled frame delta used for smoothing.
     /// /returns None.
     /// </summary>
-    private void SyncHealth(Entity bossEntity, float deltaTime)
+    private void SyncBars(Entity bossEntity, float deltaTime)
     {
         EnemyHealth health = entityManager.GetComponentData<EnemyHealth>(bossEntity);
         float targetHealthNormalized = 0f;
+        float targetShieldNormalized = 0f;
 
         if (health.Max > 0f)
             targetHealthNormalized = Mathf.Clamp01(health.Current / health.Max);
 
-        if (healthSmoothingSeconds <= 0f || deltaTime <= 0f)
-            displayedHealthNormalized = targetHealthNormalized;
-        else
-            displayedHealthNormalized = Mathf.MoveTowards(displayedHealthNormalized, targetHealthNormalized, deltaTime / Mathf.Max(Epsilon, healthSmoothingSeconds));
+        if (health.MaxShield > 0f)
+            targetShieldNormalized = Mathf.Clamp01(health.CurrentShield / health.MaxShield);
 
-        ApplyHealthFill(displayedHealthNormalized);
+        if (healthSmoothingSeconds <= 0f || deltaTime <= 0f)
+        {
+            displayedHealthNormalized = targetHealthNormalized;
+            displayedShieldNormalized = targetShieldNormalized;
+        }
+        else
+        {
+            displayedHealthNormalized = Mathf.MoveTowards(displayedHealthNormalized, targetHealthNormalized, deltaTime / Mathf.Max(Epsilon, healthSmoothingSeconds));
+            displayedShieldNormalized = Mathf.MoveTowards(displayedShieldNormalized, targetShieldNormalized, deltaTime / Mathf.Max(Epsilon, healthSmoothingSeconds));
+        }
+
+        ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, targetHealthNormalized);
+        ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, targetShieldNormalized);
     }
 
     /// <summary>
@@ -399,6 +441,12 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         if (healthBackgroundImage == null)
             healthBackgroundImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "HealthBackground");
 
+        if (shieldFillImage == null)
+            shieldFillImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "ShieldFill");
+
+        if (shieldBackgroundImage == null)
+            shieldBackgroundImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "ShieldBackground");
+
         if (offscreenIndicatorRoot == null)
             offscreenIndicatorRoot = transform.Find("OffscreenIndicator") as RectTransform;
 
@@ -409,6 +457,64 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             offscreenIndicatorImage = offscreenIndicatorRoot.GetComponentInChildren<Image>(true);
 
         EnemyBossHudPresentationUtility.ConfigureFillImage(healthFillImage);
+        EnemyBossHudPresentationUtility.ConfigureFillImage(shieldFillImage);
+    }
+
+    /// <summary>
+    /// Ensures boss bar presentation settings exist on scenes authored before this HUD mirrored the player bars.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void EnsureBossBarPresentationSettings()
+    {
+        if (healthBarPresentation == null)
+            healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
+
+        if (shieldBarPresentation == null)
+            shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
+    }
+
+    /// <summary>
+    /// Builds reusable liquid-bar runtimes once the prefab image bindings are available.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void EnsureBossBarVisualsInitialized()
+    {
+        EnsureBossBarPresentationSettings();
+
+        if (healthBarRuntime == null && healthFillImage != null)
+            healthBarRuntime = HUDLiquidBarRuntime.CreateHealth(healthFillImage, healthBarPresentation);
+
+        if (shieldBarRuntime == null && shieldFillImage != null)
+            shieldBarRuntime = HUDLiquidBarRuntime.CreateShield(shieldFillImage, shieldBarPresentation);
+    }
+
+    /// <summary>
+    /// Applies the authored initial bar states before ECS data is available.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void ApplyInitialBarVisualState()
+    {
+        displayedHealthNormalized = 1f;
+        displayedShieldNormalized = 0f;
+        ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, displayedHealthNormalized);
+        ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, displayedShieldNormalized);
+    }
+
+    /// <summary>
+    /// Releases runtime liquid materials created for boss health and shield bars.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private void DisposeBossBarVisuals()
+    {
+        if (healthBarRuntime != null)
+            healthBarRuntime.Dispose();
+
+        if (shieldBarRuntime != null)
+            shieldBarRuntime.Dispose();
     }
 
     /// <summary>
@@ -428,28 +534,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         displayedBossName = resolvedName;
         bossNameText.text = resolvedName;
-    }
-
-    /// <summary>
-    /// Applies health panel dimensions and bottom placement.
-    /// /params widthPixels Target health bar width.
-    /// /params heightPixels Target health bar height.
-    /// /params bottomOffsetPixels Bottom viewport offset.
-    /// /returns None.
-    /// </summary>
-    private void ApplyPanelLayout(float widthPixels, float heightPixels, float bottomOffsetPixels)
-    {
-        if (panelRoot == null)
-            return;
-
-        Vector2 size = panelRoot.sizeDelta;
-        float resolvedWidth = widthPixels > 0f ? widthPixels : size.x;
-        float resolvedHeight = heightPixels > 0f ? heightPixels : size.y;
-        panelRoot.anchorMin = new Vector2(0.5f, 0f);
-        panelRoot.anchorMax = new Vector2(0.5f, 0f);
-        panelRoot.pivot = new Vector2(0.5f, 0f);
-        panelRoot.sizeDelta = new Vector2(resolvedWidth, resolvedHeight);
-        panelRoot.anchoredPosition = new Vector2(0f, Mathf.Max(0f, bottomOffsetPixels));
     }
 
     /// <summary>
@@ -673,16 +757,28 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies health fill value to the configured image.
-    /// /params normalizedValue Normalized health value.
+    /// Applies one boss bar value through the liquid runtime when available, falling back to a direct fill amount.
+    /// /params barRuntime Optional liquid-bar runtime that drives shader and piston state.
+    /// /params fallbackFillImage Fill image used when the runtime has not been created yet.
+    /// /params displayedNormalizedValue Smoothed normalized value shown by the bar.
+    /// /params targetNormalizedValue Raw normalized target used for liquid delta motion.
     /// /returns None.
     /// </summary>
-    private void ApplyHealthFill(float normalizedValue)
+    private void ApplyBarFill(HUDLiquidBarRuntime barRuntime,
+                              Image fallbackFillImage,
+                              float displayedNormalizedValue,
+                              float targetNormalizedValue)
     {
-        if (healthFillImage == null)
+        if (barRuntime != null && barRuntime.IsBound)
+        {
+            barRuntime.Apply(displayedNormalizedValue, targetNormalizedValue);
+            return;
+        }
+
+        if (fallbackFillImage == null)
             return;
 
-        healthFillImage.fillAmount = Mathf.Clamp01(normalizedValue);
+        fallbackFillImage.fillAmount = Mathf.Clamp01(displayedNormalizedValue);
     }
 
     /// <summary>

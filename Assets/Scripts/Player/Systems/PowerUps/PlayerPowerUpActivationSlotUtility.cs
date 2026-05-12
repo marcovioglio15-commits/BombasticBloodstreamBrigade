@@ -68,6 +68,8 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 deltaTime,
                                                                                 in localTransform,
                                                                                 in lookState,
+                                                                                in movementState,
+                                                                                in runtimeMovementConfig,
                                                                                 in runtimeShootingConfig,
                                                                                 appliedElementSlots,
                                                                                 in passiveToolsState,
@@ -98,6 +100,8 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 ref shieldChanged,
                                                                                 ref dashState,
                                                                                 ref bulletTimeState,
+                                                                                moveInput,
+                                                                                lastValidMovementDirection,
                                                                                 audioRequests,
                                                                                 canEnqueueAudioRequests);
             return;
@@ -154,6 +158,7 @@ public static class PlayerPowerUpActivationSlotUtility
                             in dashState,
                             in bulletTimeState,
                             in healOverTimeState,
+                            in lookState,
                             in movementState,
                             in runtimeMovementConfig,
                             in runtimeShootingConfig,
@@ -244,6 +249,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                        in PlayerDashState dashState,
                                        in PlayerBulletTimeState bulletTimeState,
                                        in PlayerHealOverTimeState healOverTimeState,
+                                       in PlayerLookState lookState,
                                        in PlayerMovementState movementState,
                                        in PlayerRuntimeMovementConfig runtimeMovementConfig,
                                        in PlayerRuntimeShootingConfig runtimeShootingConfig,
@@ -269,7 +275,9 @@ public static class PlayerPowerUpActivationSlotUtility
                 if (slotConfig.Dash.Distance <= 0f)
                     return false;
 
-                if (!PlayerPowerUpActivationExecutionUtility.TryResolveDashActivationDirection(in movementState,
+                if (!PlayerPowerUpActivationExecutionUtility.TryResolveDashActivationDirection(slotConfig.Dash.DirectionMode,
+                                                                                               in lookState,
+                                                                                               in movementState,
                                                                                                in runtimeMovementConfig,
                                                                                                in localTransform,
                                                                                                moveInput,

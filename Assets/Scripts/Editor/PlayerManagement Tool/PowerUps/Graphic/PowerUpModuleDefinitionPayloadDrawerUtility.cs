@@ -7,6 +7,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds module payload forms that are primarily field-driven and delegates chart-heavy payloads to visualization utilities.
+/// /params None.
+/// /returns None.
 /// </summary>
 public static class PowerUpModuleDefinitionPayloadDrawerUtility
 {
@@ -51,6 +53,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 return;
             case PowerUpModuleKind.SpawnObject:
                 BuildSpawnObjectPayloadUi(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.Dash:
+                PowerUpDashPayloadDrawerUtility.BuildDashPayloadUi(payloadContainer, payloadProperty);
                 return;
             case PowerUpModuleKind.Heal:
                 BuildHealPayloadUi(payloadContainer, payloadProperty);
@@ -158,6 +163,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty passiveChargeGainWhileReleasedProperty = holdChargePayloadProperty.FindPropertyRelative("passiveChargeGainWhileReleased");
         SerializedProperty passiveChargeGainPercentPerSecondProperty = holdChargePayloadProperty.FindPropertyRelative("passiveChargeGainPercentPerSecond");
         SerializedProperty laserDurationSecondsProperty = holdChargePayloadProperty.FindPropertyRelative("laserDurationSeconds");
+        SerializedProperty useChargedLaserBeamProperty = holdChargePayloadProperty.FindPropertyRelative("useChargedLaserBeam");
+        SerializedProperty chargedLaserDurationSecondsProperty = holdChargePayloadProperty.FindPropertyRelative("chargedLaserDurationSeconds");
+        SerializedProperty chargedLaserBeamProperty = holdChargePayloadProperty.FindPropertyRelative("chargedLaserBeam");
         SerializedProperty slowPlayerWhileChargingProperty = holdChargePayloadProperty.FindPropertyRelative("slowPlayerWhileCharging");
         SerializedProperty maximumPlayerSlowPercentProperty = holdChargePayloadProperty.FindPropertyRelative("maximumPlayerSlowPercent");
         SerializedProperty playerSlowCurveProperty = holdChargePayloadProperty.FindPropertyRelative("playerSlowCurve");
@@ -170,6 +178,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             passiveChargeGainWhileReleasedProperty == null ||
             passiveChargeGainPercentPerSecondProperty == null ||
             laserDurationSecondsProperty == null ||
+            useChargedLaserBeamProperty == null ||
+            chargedLaserDurationSecondsProperty == null ||
+            chargedLaserBeamProperty == null ||
             slowPlayerWhileChargingProperty == null ||
             maximumPlayerSlowPercentProperty == null ||
             playerSlowCurveProperty == null)
@@ -196,6 +207,16 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         payloadContainer.Add(passiveGainContainer);
         AddField(passiveGainContainer, passiveChargeGainPercentPerSecondProperty, "Passive Gain Percent Per Second");
         AddField(payloadContainer, laserDurationSecondsProperty, "Laser Duration Seconds");
+        AddField(payloadContainer, useChargedLaserBeamProperty, "Use Charged Laser Beam");
+
+        VisualElement chargedLaserContainer = new VisualElement();
+        chargedLaserContainer.style.marginLeft = 12f;
+        payloadContainer.Add(chargedLaserContainer);
+        AddField(chargedLaserContainer, chargedLaserDurationSecondsProperty, "Charged Laser Duration Seconds");
+        BuildLaserBeamPayloadUi(chargedLaserContainer,
+                                chargedLaserBeamProperty,
+                                "A fully charged release fires this standalone Laser Beam once. It uses only this Trigger Hold Charge payload and ignores passive tools or other power-up hooks.");
+
         AddField(payloadContainer, slowPlayerWhileChargingProperty, "Slow Player While Charging");
 
         VisualElement playerSlowContainer = new VisualElement();
@@ -209,6 +230,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         UpdateBooleanContainerVisibility(decayAfterReleaseProperty, decayContainer);
         UpdateBooleanContainerVisibility(passiveChargeGainWhileReleasedProperty, passiveGainContainer);
+        UpdateBooleanContainerVisibility(useChargedLaserBeamProperty, chargedLaserContainer);
         UpdateBooleanContainerVisibility(slowPlayerWhileChargingProperty, playerSlowContainer);
         Action refreshWarnings = () =>
         {
@@ -220,6 +242,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                       passiveChargeGainWhileReleasedProperty,
                                       passiveChargeGainPercentPerSecondProperty,
                                       laserDurationSecondsProperty,
+                                      useChargedLaserBeamProperty,
+                                      chargedLaserDurationSecondsProperty,
                                       slowPlayerWhileChargingProperty,
                                       maximumPlayerSlowPercentProperty,
                                       playerSlowCurveProperty,
@@ -238,6 +262,11 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             UpdateBooleanContainerVisibility(changedProperty, passiveGainContainer);
             refreshWarnings();
         });
+        payloadContainer.TrackPropertyValue(useChargedLaserBeamProperty, changedProperty =>
+        {
+            UpdateBooleanContainerVisibility(changedProperty, chargedLaserContainer);
+            refreshWarnings();
+        });
         payloadContainer.TrackPropertyValue(slowPlayerWhileChargingProperty, changedProperty =>
         {
             UpdateBooleanContainerVisibility(changedProperty, playerSlowContainer);
@@ -251,6 +280,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                          decayAfterReleasePercentPerSecondProperty,
                                          passiveChargeGainPercentPerSecondProperty,
                                          laserDurationSecondsProperty,
+                                         chargedLaserDurationSecondsProperty,
                                          maximumPlayerSlowPercentProperty,
                                          playerSlowCurveProperty);
     }
@@ -648,7 +678,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         });
     }
 
-    private static void BuildLaserBeamPayloadUi(VisualElement payloadContainer, SerializedProperty laserBeamPayloadProperty)
+    private static void BuildLaserBeamPayloadUi(VisualElement payloadContainer,
+                                                SerializedProperty laserBeamPayloadProperty,
+                                                string infoText = null)
     {
         if (payloadContainer == null || laserBeamPayloadProperty == null)
             return;
@@ -736,7 +768,10 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             return;
         }
 
-        HelpBox infoBox = new HelpBox("Laser Beam overrides base projectile spawning while the Shoot input is held. It always behaves as hold-to-fire, even if the current controller shooting trigger mode uses single-shot or toggle semantics.", HelpBoxMessageType.Info);
+        string resolvedInfoText = string.IsNullOrWhiteSpace(infoText)
+            ? "Laser Beam overrides base projectile spawning while the Shoot input is held. It always behaves as hold-to-fire, even if the current controller shooting trigger mode uses single-shot or toggle semantics."
+            : infoText;
+        HelpBox infoBox = new HelpBox(resolvedInfoText, HelpBoxMessageType.Info);
         payloadContainer.Add(infoBox);
 
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
@@ -1032,6 +1067,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="passiveChargeGainWhileReleasedProperty">Serialized Passive Gain While Released toggle.</param>
     /// <param name="passiveChargeGainPercentPerSecondProperty">Serialized released-state passive gain percentage field.</param>
     /// <param name="laserDurationSecondsProperty">Serialized Laser Duration Seconds field.</param>
+    /// <param name="useChargedLaserBeamProperty">Serialized standalone charged Laser Beam toggle.</param>
+    /// <param name="chargedLaserDurationSecondsProperty">Serialized standalone charged Laser Beam duration field.</param>
     /// <param name="slowPlayerWhileChargingProperty">Serialized movement slow toggle.</param>
     /// <param name="maximumPlayerSlowPercentProperty">Serialized maximum movement slow percentage.</param>
     /// <param name="playerSlowCurveProperty">Serialized normalized movement slow curve.</param>
@@ -1044,6 +1081,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                                   SerializedProperty passiveChargeGainWhileReleasedProperty,
                                                   SerializedProperty passiveChargeGainPercentPerSecondProperty,
                                                   SerializedProperty laserDurationSecondsProperty,
+                                                  SerializedProperty useChargedLaserBeamProperty,
+                                                  SerializedProperty chargedLaserDurationSecondsProperty,
                                                   SerializedProperty slowPlayerWhileChargingProperty,
                                                   SerializedProperty maximumPlayerSlowPercentProperty,
                                                   SerializedProperty playerSlowCurveProperty,
@@ -1065,6 +1104,14 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         if (laserDurationSecondsProperty != null && laserDurationSecondsProperty.floatValue < 0f)
             warningLines.Add("Laser Duration Seconds should be >= 0.");
+
+        if (useChargedLaserBeamProperty != null &&
+            useChargedLaserBeamProperty.boolValue &&
+            chargedLaserDurationSecondsProperty != null &&
+            chargedLaserDurationSecondsProperty.floatValue <= 0f)
+        {
+            warningLines.Add("Charged Laser Duration Seconds should be > 0 when Use Charged Laser Beam is enabled.");
+        }
 
         if (decayAfterReleaseProperty != null &&
             decayAfterReleaseProperty.boolValue &&

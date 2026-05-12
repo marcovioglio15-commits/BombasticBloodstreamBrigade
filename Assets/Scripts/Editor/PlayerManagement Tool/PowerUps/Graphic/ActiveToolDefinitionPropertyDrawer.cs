@@ -243,3 +243,30 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
     }
     #endregion
 }
+
+/// <summary>
+/// Draws DashToolData with the same scaling-aware controls and warnings used by modular Dash payloads.
+/// /params None.
+/// /returns None.
+/// </summary>
+[CustomPropertyDrawer(typeof(DashToolData))]
+public sealed class DashToolDataPropertyDrawer : PropertyDrawer
+{
+    #region Methods
+
+    #region UI
+    /// <summary>
+    /// Builds the inspector UI for one DashToolData payload.
+    /// /params property Serialized DashToolData payload.
+    /// /returns Root visual element for the inspector drawer.
+    /// </summary>
+    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    {
+        VisualElement root = new VisualElement();
+        PowerUpDashPayloadDrawerUtility.BuildDashPayloadUi(root, property);
+        return root;
+    }
+    #endregion
+
+    #endregion
+}

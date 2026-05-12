@@ -68,15 +68,20 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
         PlayerDashState initialState = new PlayerDashState
         {
             IsDashing = 0,
+            ClearVelocityAfterApply = 0,
             Phase = 0,
             PhaseRemaining = 0f,
             HoldDuration = 0f,
             RemainingInvulnerability = 0f,
+            Duration = 0f,
+            Distance = 0f,
+            ElapsedDuration = 0f,
             Direction = float3.zero,
             EntryVelocity = float3.zero,
             Speed = 0f,
             TransitionInDuration = 0f,
-            TransitionOutDuration = 0f
+            TransitionOutDuration = 0f,
+            WallBounceIntensity = 0f
         };
 
         AddComponentForEntities(ref commandBuffer, in missingDashQuery, initialState);

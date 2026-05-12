@@ -257,15 +257,20 @@ public struct PlayerPassiveToolsState : IComponentData
 public struct PlayerDashState : IComponentData
 {
     public byte IsDashing;
+    public byte ClearVelocityAfterApply;
     public byte Phase;
     public float PhaseRemaining;
     public float HoldDuration;
     public float RemainingInvulnerability;
+    public float Duration;
+    public float Distance;
+    public float ElapsedDuration;
     public float3 Direction;
     public float3 EntryVelocity;
     public float Speed;
     public float TransitionInDuration;
     public float TransitionOutDuration;
+    public float WallBounceIntensity;
 }
 
 /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -6,6 +7,11 @@ using Unity.Mathematics;
 /// </summary>
 internal static class PlayerRuntimePowerUpScalingPathUtility
 {
+    #region Constants
+    private const string PassiveLaserBeamPayloadPrefix = "laserBeam.";
+    private const string HoldChargeChargedLaserBeamPayloadPrefix = "holdCharge.chargedLaserBeam.";
+    #endregion
+
     #region Methods
 
     #region Public Methods
@@ -84,6 +90,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                          float resolvedValue,
                                          ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (TryApplyLaserBeamValue(payloadPath,
+                                   HoldChargeChargedLaserBeamPayloadPrefix,
+                                   resolvedValue,
+                                   ref activeSlotConfig.ChargeShot.ChargedLaserBeam))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -138,6 +150,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "holdCharge.laserDurationSeconds":
                 activeSlotConfig.ChargeShot.LaserDurationSeconds = math.max(0f, resolvedValue);
                 return;
+            case "holdCharge.chargedLaserDurationSeconds":
+                activeSlotConfig.ChargeShot.ChargedLaserDurationSeconds = math.max(0f, resolvedValue);
+                return;
             case "holdCharge.maximumPlayerSlowPercent":
                 activeSlotConfig.ChargeShot.MaximumPlayerSlowPercent = math.clamp(resolvedValue, 0f, 100f);
                 return;
@@ -191,6 +206,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "dash.distance":
                 activeSlotConfig.Dash.Distance = math.max(0f, resolvedValue);
                 return;
+            case "dash.directionMode":
+                activeSlotConfig.Dash.DirectionMode = PlayerRuntimeScalingEnumUtility.ResolveDashDirectionMode(resolvedValue);
+                return;
             case "dash.duration":
                 activeSlotConfig.Dash.Duration = math.max(0.01f, resolvedValue);
                 return;
@@ -199,6 +217,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "dash.speedTransitionOutSeconds":
                 activeSlotConfig.Dash.SpeedTransitionOutSeconds = math.max(0f, resolvedValue);
+                return;
+            case "dash.wallBounceIntensity":
+                activeSlotConfig.Dash.WallBounceIntensity = math.clamp(resolvedValue, 0f, 1f);
                 return;
             case "dash.invulnerabilityExtraTime":
                 activeSlotConfig.Dash.InvulnerabilityExtraTime = math.max(0f, resolvedValue);
@@ -321,6 +342,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                           float resolvedValue,
                                           ref PlayerPassiveToolConfig passiveToolConfig)
     {
+        if (TryApplyLaserBeamValue(payloadPath,
+                                   PassiveLaserBeamPayloadPrefix,
+                                   resolvedValue,
+                                   ref passiveToolConfig.LaserBeam))
+            return;
+
         switch (payloadPath)
         {
             case "projectileOrbitOverride.pathMode":
@@ -365,120 +392,6 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "elementalAreaTick.applyIntervalSeconds":
                 passiveToolConfig.ElementalTrail.ApplyIntervalSeconds = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.damageMultiplier":
-                passiveToolConfig.LaserBeam.DamageMultiplier = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.continuousDamagePerSecondMultiplier":
-                passiveToolConfig.LaserBeam.ContinuousDamagePerSecondMultiplier = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.virtualProjectileSpeedMultiplier":
-                passiveToolConfig.LaserBeam.VirtualProjectileSpeedMultiplier = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.damageTickIntervalSeconds":
-                passiveToolConfig.LaserBeam.DamageTickIntervalSeconds = math.max(0.0001f, resolvedValue);
-                return;
-            case "laserBeam.maximumContinuousActiveSeconds":
-                passiveToolConfig.LaserBeam.MaximumContinuousActiveSeconds = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.cooldownSeconds":
-                passiveToolConfig.LaserBeam.CooldownSeconds = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.maximumBounceSegments":
-                passiveToolConfig.LaserBeam.MaximumBounceSegments = math.max(0, (int)resolvedValue);
-                return;
-            case "laserBeam.visualPresetId":
-                passiveToolConfig.LaserBeam.VisualPresetId = math.max(0, (int)math.round(resolvedValue));
-                return;
-            case "laserBeam.bodyProfile":
-                passiveToolConfig.LaserBeam.BodyProfile = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamBodyProfile(resolvedValue);
-                return;
-            case "laserBeam.sourceShape":
-                passiveToolConfig.LaserBeam.SourceShape = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamCapShape(resolvedValue);
-                return;
-            case "laserBeam.terminalCapShape":
-                passiveToolConfig.LaserBeam.TerminalCapShape = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamCapShape(resolvedValue);
-                return;
-            case "laserBeam.bodyWidthMultiplier":
-                passiveToolConfig.LaserBeam.BodyWidthMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.collisionWidthMultiplier":
-                passiveToolConfig.LaserBeam.CollisionWidthMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.sourceScaleMultiplier":
-                passiveToolConfig.LaserBeam.SourceScaleMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.terminalCapScaleMultiplier":
-                passiveToolConfig.LaserBeam.TerminalCapScaleMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.contactFlareScaleMultiplier":
-                passiveToolConfig.LaserBeam.ContactFlareScaleMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.bodyOpacity":
-                passiveToolConfig.LaserBeam.BodyOpacity = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.coreWidthMultiplier":
-                passiveToolConfig.LaserBeam.CoreWidthMultiplier = math.max(0.05f, resolvedValue);
-                return;
-            case "laserBeam.coreBrightness":
-                passiveToolConfig.LaserBeam.CoreBrightness = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.rimBrightness":
-                passiveToolConfig.LaserBeam.RimBrightness = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.flowScrollSpeed":
-                passiveToolConfig.LaserBeam.FlowScrollSpeed = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.flowPulseFrequency":
-                passiveToolConfig.LaserBeam.FlowPulseFrequency = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormTwistSpeed":
-                passiveToolConfig.LaserBeam.StormTwistSpeed = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormTickPostTravelHoldSeconds":
-                passiveToolConfig.LaserBeam.StormTickPostTravelHoldSeconds = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormIdleIntensity":
-                passiveToolConfig.LaserBeam.StormIdleIntensity = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormBurstIntensity":
-                passiveToolConfig.LaserBeam.StormBurstIntensity = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.sourceOffset":
-                passiveToolConfig.LaserBeam.SourceOffset = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.sourceDischargeIntensity":
-                passiveToolConfig.LaserBeam.SourceDischargeIntensity = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormShellWidthMultiplier":
-                passiveToolConfig.LaserBeam.StormShellWidthMultiplier = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.stormShellSeparation":
-                passiveToolConfig.LaserBeam.StormShellSeparation = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormRingFrequency":
-                passiveToolConfig.LaserBeam.StormRingFrequency = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormRingThickness":
-                passiveToolConfig.LaserBeam.StormRingThickness = math.max(0.01f, resolvedValue);
-                return;
-            case "laserBeam.stormTickTravelSpeed":
-                passiveToolConfig.LaserBeam.StormTickTravelSpeed = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.stormTickDamageLengthTolerance":
-                passiveToolConfig.LaserBeam.StormTickDamageLengthTolerance = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.terminalCapIntensity":
-                passiveToolConfig.LaserBeam.TerminalCapIntensity = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.contactFlareIntensity":
-                passiveToolConfig.LaserBeam.ContactFlareIntensity = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.wobbleAmplitude":
-                passiveToolConfig.LaserBeam.WobbleAmplitude = math.max(0f, resolvedValue);
-                return;
-            case "laserBeam.bubbleDriftSpeed":
-                passiveToolConfig.LaserBeam.BubbleDriftSpeed = math.max(0f, resolvedValue);
                 return;
             case "deathExplosion.cooldownSeconds":
                 passiveToolConfig.Explosion.CooldownSeconds = math.max(0f, resolvedValue);
@@ -595,6 +508,149 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
+    /// Applies a resolved Add Scaling value to a Laser Beam config using a payload-prefix namespace.
+    /// This is shared by passive Laser Beam payloads and the standalone charged-shot beam payload.
+    /// payloadPath: Full modular payload path carried by the scaling rule.
+    /// prefix: Path prefix that identifies the owning payload namespace.
+    /// resolvedValue: Formula result already evaluated against scalable-stat runtime values.
+    /// laserBeamConfig: Mutable Laser Beam config being rebuilt from immutable baseline data.
+    /// returns True when the path matched a Laser Beam field and was applied.
+    /// </summary>
+    private static bool TryApplyLaserBeamValue(string payloadPath,
+                                               string prefix,
+                                               float resolvedValue,
+                                               ref LaserBeamPassiveConfig laserBeamConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
+            return false;
+
+        if (!payloadPath.StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+
+        string laserBeamFieldPath = payloadPath.Substring(prefix.Length);
+
+        switch (laserBeamFieldPath)
+        {
+            case "damageMultiplier":
+                laserBeamConfig.DamageMultiplier = math.max(0f, resolvedValue);
+                return true;
+            case "continuousDamagePerSecondMultiplier":
+                laserBeamConfig.ContinuousDamagePerSecondMultiplier = math.max(0f, resolvedValue);
+                return true;
+            case "virtualProjectileSpeedMultiplier":
+                laserBeamConfig.VirtualProjectileSpeedMultiplier = math.max(0f, resolvedValue);
+                return true;
+            case "damageTickIntervalSeconds":
+                laserBeamConfig.DamageTickIntervalSeconds = math.max(0.0001f, resolvedValue);
+                return true;
+            case "maximumContinuousActiveSeconds":
+                laserBeamConfig.MaximumContinuousActiveSeconds = math.max(0f, resolvedValue);
+                return true;
+            case "cooldownSeconds":
+                laserBeamConfig.CooldownSeconds = math.max(0f, resolvedValue);
+                return true;
+            case "maximumBounceSegments":
+                laserBeamConfig.MaximumBounceSegments = math.max(0, (int)resolvedValue);
+                return true;
+            case "visualPresetId":
+                laserBeamConfig.VisualPresetId = math.max(0, (int)math.round(resolvedValue));
+                return true;
+            case "bodyProfile":
+                laserBeamConfig.BodyProfile = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamBodyProfile(resolvedValue);
+                return true;
+            case "sourceShape":
+                laserBeamConfig.SourceShape = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamCapShape(resolvedValue);
+                return true;
+            case "terminalCapShape":
+                laserBeamConfig.TerminalCapShape = PlayerRuntimeScalingEnumUtility.ResolveLaserBeamCapShape(resolvedValue);
+                return true;
+            case "bodyWidthMultiplier":
+                laserBeamConfig.BodyWidthMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "collisionWidthMultiplier":
+                laserBeamConfig.CollisionWidthMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "sourceScaleMultiplier":
+                laserBeamConfig.SourceScaleMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "terminalCapScaleMultiplier":
+                laserBeamConfig.TerminalCapScaleMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "contactFlareScaleMultiplier":
+                laserBeamConfig.ContactFlareScaleMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "bodyOpacity":
+                laserBeamConfig.BodyOpacity = math.max(0.01f, resolvedValue);
+                return true;
+            case "coreWidthMultiplier":
+                laserBeamConfig.CoreWidthMultiplier = math.max(0.05f, resolvedValue);
+                return true;
+            case "coreBrightness":
+                laserBeamConfig.CoreBrightness = math.max(0f, resolvedValue);
+                return true;
+            case "rimBrightness":
+                laserBeamConfig.RimBrightness = math.max(0f, resolvedValue);
+                return true;
+            case "flowScrollSpeed":
+                laserBeamConfig.FlowScrollSpeed = math.max(0f, resolvedValue);
+                return true;
+            case "flowPulseFrequency":
+                laserBeamConfig.FlowPulseFrequency = math.max(0f, resolvedValue);
+                return true;
+            case "stormTwistSpeed":
+                laserBeamConfig.StormTwistSpeed = math.max(0f, resolvedValue);
+                return true;
+            case "stormTickPostTravelHoldSeconds":
+                laserBeamConfig.StormTickPostTravelHoldSeconds = math.max(0f, resolvedValue);
+                return true;
+            case "stormIdleIntensity":
+                laserBeamConfig.StormIdleIntensity = math.max(0f, resolvedValue);
+                return true;
+            case "stormBurstIntensity":
+                laserBeamConfig.StormBurstIntensity = math.max(0f, resolvedValue);
+                return true;
+            case "sourceOffset":
+                laserBeamConfig.SourceOffset = math.max(0f, resolvedValue);
+                return true;
+            case "sourceDischargeIntensity":
+                laserBeamConfig.SourceDischargeIntensity = math.max(0f, resolvedValue);
+                return true;
+            case "stormShellWidthMultiplier":
+                laserBeamConfig.StormShellWidthMultiplier = math.max(0.01f, resolvedValue);
+                return true;
+            case "stormShellSeparation":
+                laserBeamConfig.StormShellSeparation = math.max(0f, resolvedValue);
+                return true;
+            case "stormRingFrequency":
+                laserBeamConfig.StormRingFrequency = math.max(0f, resolvedValue);
+                return true;
+            case "stormRingThickness":
+                laserBeamConfig.StormRingThickness = math.max(0.01f, resolvedValue);
+                return true;
+            case "stormTickTravelSpeed":
+                laserBeamConfig.StormTickTravelSpeed = math.max(0f, resolvedValue);
+                return true;
+            case "stormTickDamageLengthTolerance":
+                laserBeamConfig.StormTickDamageLengthTolerance = math.max(0f, resolvedValue);
+                return true;
+            case "terminalCapIntensity":
+                laserBeamConfig.TerminalCapIntensity = math.max(0f, resolvedValue);
+                return true;
+            case "contactFlareIntensity":
+                laserBeamConfig.ContactFlareIntensity = math.max(0f, resolvedValue);
+                return true;
+            case "wobbleAmplitude":
+                laserBeamConfig.WobbleAmplitude = math.max(0f, resolvedValue);
+                return true;
+            case "bubbleDriftSpeed":
+                laserBeamConfig.BubbleDriftSpeed = math.max(0f, resolvedValue);
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Applies one resolved boolean Add Scaling value to an active-slot runtime config field.
     /// payloadPath: Modular payload path extracted from the scaling rule stat key.
     /// resolvedValue: Formula result already evaluated against scalable-stat runtime values.
@@ -619,6 +675,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "holdCharge.passiveChargeGainWhileReleased":
                 activeSlotConfig.ChargeShot.PassiveChargeGainWhileReleased = resolvedValue ? (byte)1 : (byte)0;
                 return;
+            case "holdCharge.useChargedLaserBeam":
+                activeSlotConfig.ChargeShot.UseChargedLaserBeam = resolvedValue ? (byte)1 : (byte)0;
+                return;
             case "holdCharge.slowPlayerWhileCharging":
                 activeSlotConfig.ChargeShot.SlowPlayerWhileCharging = resolvedValue ? (byte)1 : (byte)0;
                 return;
@@ -630,6 +689,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "bomb.scaleVfxToRadius":
                 activeSlotConfig.Bomb.ScaleVfxToRadius = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "dash.grantsInvulnerability":
+                activeSlotConfig.Dash.GrantsInvulnerability = resolvedValue ? (byte)1 : (byte)0;
                 return;
             case "suppressShooting.suppressBaseShootingWhileActive":
                 activeSlotConfig.SuppressBaseShootingWhileActive = resolvedValue ? (byte)1 : (byte)0;
