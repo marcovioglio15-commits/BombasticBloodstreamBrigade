@@ -19,7 +19,7 @@ MonoBehaviour:
   movement:
     moveSpeed: 12
     maxSpeed: 18
-    acceleration: 20
+    acceleration: 40
     deceleration: 20
     inactivityTime: 0.08
     rotationSpeedDegreesPerSecond: 0

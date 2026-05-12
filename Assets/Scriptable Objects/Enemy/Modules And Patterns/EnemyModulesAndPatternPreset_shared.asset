@@ -4805,7 +4805,7 @@ MonoBehaviour:
     unreplaceable: 0
     coreMovement:
       binding:
-        moduleId: Module_Wanderer
+        moduleId: Module_Grunt
         isEnabled: 1
         useOverridePayload: 1
         overridePayload:
@@ -4990,7 +4990,7 @@ MonoBehaviour:
               conditions: []
     shortRangeInteraction:
       isEnabled: 1
-      activationRange: 6
+      activationRange: 8
       releaseDistanceBuffer: 1.5
       displayBehaviourEngagementTrigger: 0
       useEngagementFeedbackOverride: 0
@@ -5044,23 +5044,23 @@ MonoBehaviour:
             detectionRadius: 8
             releaseDistanceBuffer: 1.5
             searchRadius: 10
-            minimumRetreatDistance: 2.5
-            maximumRetreatDistance: 8.5
+            minimumRetreatDistance: 1
+            maximumRetreatDistance: 2.5
             arrivalTolerance: 0.35
             candidateSampleCount: 12
             useInfiniteDirectionSampling: 1
             infiniteDirectionStepDegrees: 8
-            minimumEnemyClearance: 0.25
+            minimumEnemyClearance: 0.15
             trajectoryPredictionTime: 0.35
             freeTrajectoryPreference: 0.85
-            retreatDirectionPreference: 0.65
+            retreatDirectionPreference: 1
             openSpacePreference: 0.55
             navigationRetreatPreference: 0.6
             patrolRadius: 3.5
             patrolWaitSeconds: 0.55
             patrolSpeedMultiplier: 0.82
             retreatSpeedMultiplierFar: 1
-            retreatSpeedMultiplierNear: 1.4
+            retreatSpeedMultiplierNear: 2
             blockedPathRetryDelay: 0.2
           shortRangeDash:
             aim:

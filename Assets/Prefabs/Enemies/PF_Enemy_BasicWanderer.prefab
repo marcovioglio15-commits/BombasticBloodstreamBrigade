@@ -657,6 +657,7 @@ MonoBehaviour:
   masterPreset: {fileID: 11400000, guid: 11c7c9887851de14697a987a8d644a56, type: 2}
   visualPreset: {fileID: 11400000, guid: 1ea0c014fe20466a88a3ba177cb37289, type: 2}
   advancedPatternPreset: {fileID: 11400000, guid: dc685c0758c6c0949b9ab458b91c206f, type: 2}
+  bossPatternPreset: {fileID: 0}
   billboardToCamera: 1
   billboardYawOnly: 0
 --- !u!1001 &3160809182988441972
