@@ -38,6 +38,7 @@ public static class PlayerPowerUpActivationExecutionUtility
                 return;
             case ActiveToolKind.Dash:
                 ExecuteDash(in slotConfig,
+                            in lookState,
                             in movementState,
                             in runtimeMovementConfig,
                             in localTransform,
@@ -278,15 +279,30 @@ public static class PlayerPowerUpActivationExecutionUtility
         });
     }
 
-    private static void ExecuteDash(in PlayerPowerUpSlotConfig slotConfig,
-                                    in PlayerMovementState movementState,
-                                    in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                    in LocalTransform localTransform,
-                                    float2 moveInput,
-                                    float3 lastValidMovementDirection,
-                                    ref PlayerDashState dashState)
+    /// <summary>
+    /// Starts a fixed-distance dash using the configured direction source and speed profile.
+    /// /params slotConfig Active slot that owns the dash payload.
+    /// /params lookState Current player look direction state.
+    /// /params movementState Current player movement state.
+    /// /params runtimeMovementConfig Movement config used when resolving movement-input dash directions.
+    /// /params localTransform Player transform used as fallback direction basis.
+    /// /params moveInput Raw movement input used as final movement-direction fallback.
+    /// /params lastValidMovementDirection Cached movement direction from previous frames.
+    /// /params dashState Mutable dash runtime state receiving the started dash.
+    /// /returns None.
+    /// </summary>
+    public static void ExecuteDash(in PlayerPowerUpSlotConfig slotConfig,
+                                   in PlayerLookState lookState,
+                                   in PlayerMovementState movementState,
+                                   in PlayerRuntimeMovementConfig runtimeMovementConfig,
+                                   in LocalTransform localTransform,
+                                   float2 moveInput,
+                                   float3 lastValidMovementDirection,
+                                   ref PlayerDashState dashState)
     {
-        if (!TryResolveDashActivationDirection(in movementState,
+        if (!TryResolveDashActivationDirection(slotConfig.Dash.DirectionMode,
+                                               in lookState,
+                                               in movementState,
                                                in runtimeMovementConfig,
                                                in localTransform,
                                                moveInput,
@@ -300,15 +316,20 @@ public static class PlayerPowerUpActivationExecutionUtility
         float dashRemainingDuration = dashDuration - dashTransitionIn;
         float dashTransitionOut = math.clamp(math.max(0f, slotConfig.Dash.SpeedTransitionOutSeconds), 0f, dashRemainingDuration);
         float dashHoldDuration = dashDuration - dashTransitionIn - dashTransitionOut;
-        float dashSpeed = dashDistance / dashDuration;
+        float dashProfileDuration = ResolveDashProfileDuration(dashTransitionIn, dashHoldDuration, dashTransitionOut);
+        float dashSpeed = dashProfileDuration > 0f ? dashDistance / dashProfileDuration : 0f;
 
         dashState.IsDashing = 1;
+        dashState.ClearVelocityAfterApply = 0;
         dashState.Direction = dashDirection;
-        float entrySpeedAlongDash = math.max(0f, math.dot(movementState.Velocity, dashDirection));
-        dashState.EntryVelocity = dashDirection * entrySpeedAlongDash;
+        dashState.EntryVelocity = float3.zero;
         dashState.Speed = dashSpeed;
+        dashState.Duration = dashDuration;
+        dashState.Distance = dashDistance;
+        dashState.ElapsedDuration = 0f;
         dashState.TransitionInDuration = dashTransitionIn;
         dashState.TransitionOutDuration = dashTransitionOut;
+        dashState.WallBounceIntensity = math.clamp(slotConfig.Dash.WallBounceIntensity, 0f, 1f);
         dashState.HoldDuration = dashHoldDuration;
 
         if (dashTransitionIn > 0f)
@@ -508,12 +529,64 @@ public static class PlayerPowerUpActivationExecutionUtility
         return math.normalizesafe(backwardDirection, new float3(0f, 0f, -1f));
     }
 
-    public static bool TryResolveDashActivationDirection(in PlayerMovementState movementState,
+    /// <summary>
+    /// Resolves the dash direction requested by the slot config, including movement/look inversion modes.
+    /// /params directionMode Designer-selected source and sign for dash direction.
+    /// /params lookState Current player look direction state.
+    /// /params movementState Current player movement state.
+    /// /params runtimeMovementConfig Movement config used when resolving movement-input directions.
+    /// /params localTransform Player transform used as fallback direction basis.
+    /// /params moveInput Raw movement input used as final movement-direction fallback.
+    /// /params lastValidMovementDirection Cached movement direction from previous frames.
+    /// /params dashDirection Resolved normalized planar dash direction.
+    /// /returns True when a valid direction was resolved.
+    /// </summary>
+    public static bool TryResolveDashActivationDirection(DashDirectionMode directionMode,
+                                                         in PlayerLookState lookState,
+                                                         in PlayerMovementState movementState,
                                                          in PlayerRuntimeMovementConfig runtimeMovementConfig,
                                                          in LocalTransform localTransform,
                                                          float2 moveInput,
                                                          float3 lastValidMovementDirection,
                                                          out float3 dashDirection)
+    {
+        switch (directionMode)
+        {
+            case DashDirectionMode.OppositePlayerMovement:
+                if (!TryResolveMovementDashDirection(in movementState,
+                                                     in runtimeMovementConfig,
+                                                     in localTransform,
+                                                     moveInput,
+                                                     lastValidMovementDirection,
+                                                     out dashDirection))
+                    return false;
+
+                dashDirection = -dashDirection;
+                return true;
+            case DashDirectionMode.PlayerLook:
+                return TryResolveLookDashDirection(in lookState, in localTransform, out dashDirection);
+            case DashDirectionMode.OppositePlayerLook:
+                if (!TryResolveLookDashDirection(in lookState, in localTransform, out dashDirection))
+                    return false;
+
+                dashDirection = -dashDirection;
+                return true;
+            default:
+                return TryResolveMovementDashDirection(in movementState,
+                                                       in runtimeMovementConfig,
+                                                       in localTransform,
+                                                       moveInput,
+                                                       lastValidMovementDirection,
+                                                       out dashDirection);
+        }
+    }
+
+    private static bool TryResolveMovementDashDirection(in PlayerMovementState movementState,
+                                                        in PlayerRuntimeMovementConfig runtimeMovementConfig,
+                                                        in LocalTransform localTransform,
+                                                        float2 moveInput,
+                                                        float3 lastValidMovementDirection,
+                                                        out float3 dashDirection)
     {
         if (TryResolveDashDirectionFromReleaseMask(in movementState,
                                                    in runtimeMovementConfig,
@@ -545,6 +618,42 @@ public static class PlayerPowerUpActivationExecutionUtility
         }
 
         return TryResolveDashDirectionFromInput(moveInput, in runtimeMovementConfig, in localTransform, out dashDirection);
+    }
+
+    private static bool TryResolveLookDashDirection(in PlayerLookState lookState,
+                                                    in LocalTransform localTransform,
+                                                    out float3 dashDirection)
+    {
+        float3 lookDirection = lookState.DesiredDirection;
+        lookDirection.y = 0f;
+
+        if (math.lengthsq(lookDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
+        {
+            dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
+            return true;
+        }
+
+        lookDirection = lookState.CurrentDirection;
+        lookDirection.y = 0f;
+
+        if (math.lengthsq(lookDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
+        {
+            dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
+            return true;
+        }
+
+        lookDirection = math.forward(localTransform.Rotation);
+        lookDirection.y = 0f;
+        dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
+        return math.lengthsq(dashDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon;
+    }
+
+    private static float ResolveDashProfileDuration(float transitionInDuration,
+                                                    float holdDuration,
+                                                    float transitionOutDuration)
+    {
+        float transitionArea = (math.max(0f, transitionInDuration) + math.max(0f, transitionOutDuration)) * 0.5f;
+        return math.max(0.0001f, transitionArea + math.max(0f, holdDuration));
     }
 
     private static bool TryResolveDashDirectionFromReleaseMask(in PlayerMovementState movementState,

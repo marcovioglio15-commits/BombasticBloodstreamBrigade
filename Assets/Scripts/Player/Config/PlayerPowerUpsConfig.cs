@@ -85,9 +85,11 @@ public struct BombPowerUpConfig
 public struct DashPowerUpConfig
 {
     public float Distance;
+    public DashDirectionMode DirectionMode;
     public float Duration;
     public float SpeedTransitionInSeconds;
     public float SpeedTransitionOutSeconds;
+    public float WallBounceIntensity;
     public byte GrantsInvulnerability;
     public float InvulnerabilityExtraTime;
 }

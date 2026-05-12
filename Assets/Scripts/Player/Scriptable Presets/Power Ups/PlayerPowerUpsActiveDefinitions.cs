@@ -237,6 +237,11 @@ public sealed class BombToolData
     #endregion
 }
 
+/// <summary>
+/// Stores authoring data for Dash active modules and legacy Dash tools.
+/// /params None.
+/// /returns None.
+/// </summary>
 [Serializable]
 public sealed class DashToolData
 {
@@ -247,14 +252,20 @@ public sealed class DashToolData
     [Tooltip("Distance covered by the dash movement.")]
     [SerializeField] private float distance = 6f;
 
+    [Tooltip("Reference direction used when the dash starts.")]
+    [SerializeField] private DashDirectionMode directionMode = DashDirectionMode.PlayerMovement;
+
     [Tooltip("Duration in seconds used to complete the dash movement.")]
     [SerializeField] private float duration = 0.18f;
 
-    [Tooltip("Seconds used to blend from current movement speed to dash speed.")]
+    [Tooltip("Seconds used to blend from zero dash speed to peak dash speed while preserving the authored travel distance.")]
     [SerializeField] private float speedTransitionInSeconds = 0.06f;
 
-    [Tooltip("Seconds used to blend from dash speed back to current movement speed.")]
+    [Tooltip("Seconds used to blend from peak dash speed back to zero dash speed while preserving the authored travel distance.")]
     [SerializeField] private float speedTransitionOutSeconds = 0.08f;
+
+    [Tooltip("Wall bounce intensity applied when the dash hits walls. 0 stops into the wall, 1 preserves the reflected dash speed.")]
+    [SerializeField] private float wallBounceIntensity = 0.65f;
 
     [Tooltip("When enabled, the player ignores damage during the dash.")]
     [SerializeField] private bool grantsInvulnerability = true;
@@ -282,6 +293,14 @@ public sealed class DashToolData
         }
     }
 
+    public DashDirectionMode DirectionMode
+    {
+        get
+        {
+            return directionMode;
+        }
+    }
+
     public bool GrantsInvulnerability
     {
         get
@@ -303,6 +322,14 @@ public sealed class DashToolData
         get
         {
             return speedTransitionOutSeconds;
+        }
+    }
+
+    public float WallBounceIntensity
+    {
+        get
+        {
+            return wallBounceIntensity;
         }
     }
 

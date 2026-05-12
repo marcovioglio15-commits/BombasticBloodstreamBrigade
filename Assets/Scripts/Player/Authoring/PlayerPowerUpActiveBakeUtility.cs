@@ -162,9 +162,11 @@ public static class PlayerPowerUpActiveBakeUtility
         float bombVfxScaleMultiplier = 1f;
         bool hasDash = false;
         float dashDistance = 0f;
+        DashDirectionMode dashDirectionMode = DashDirectionMode.PlayerMovement;
         float dashDuration = 0.01f;
         float dashSpeedTransitionInSeconds = 0f;
         float dashSpeedTransitionOutSeconds = 0f;
+        float dashWallBounceIntensity = 0f;
         bool dashGrantsInvulnerability = false;
         float dashInvulnerabilityExtraTime = 0f;
         bool hasBulletTime = false;
@@ -348,11 +350,13 @@ public static class PlayerPowerUpActiveBakeUtility
 
                     hasDash = true;
                     dashDistance = math.max(dashDistance, math.max(0f, dashModuleData.Distance));
+                    dashDirectionMode = dashModuleData.DirectionMode;
                     dashDuration = math.max(dashDuration, math.max(0.01f, dashModuleData.Duration));
                     dashSpeedTransitionInSeconds = math.min(dashSpeedTransitionInSeconds <= 0f ? float.MaxValue : dashSpeedTransitionInSeconds,
                                                             math.max(0f, dashModuleData.SpeedTransitionInSeconds));
                     dashSpeedTransitionOutSeconds = math.min(dashSpeedTransitionOutSeconds <= 0f ? float.MaxValue : dashSpeedTransitionOutSeconds,
                                                              math.max(0f, dashModuleData.SpeedTransitionOutSeconds));
+                    dashWallBounceIntensity = math.max(dashWallBounceIntensity, math.max(0f, dashModuleData.WallBounceIntensity));
                     dashGrantsInvulnerability = dashGrantsInvulnerability || dashModuleData.GrantsInvulnerability;
                     dashInvulnerabilityExtraTime = math.max(dashInvulnerabilityExtraTime, math.max(0f, dashModuleData.InvulnerabilityExtraTime));
                     break;
@@ -500,9 +504,11 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                               bombScaleVfxToRadius,
                                                                               bombVfxScaleMultiplier,
                                                                               dashDistance,
+                                                                              dashDirectionMode,
                                                                               dashDuration,
                                                                               dashSpeedTransitionInSeconds,
                                                                               dashSpeedTransitionOutSeconds,
+                                                                              dashWallBounceIntensity,
                                                                               dashGrantsInvulnerability,
                                                                               dashInvulnerabilityExtraTime,
                                                                               bulletTimeDuration,
@@ -634,9 +640,11 @@ public static class PlayerPowerUpActiveBakeUtility
             Dash = new DashPowerUpConfig
             {
                 Distance = dashData != null ? math.max(0f, dashData.Distance) : 0f,
+                DirectionMode = dashData != null ? dashData.DirectionMode : DashDirectionMode.PlayerMovement,
                 Duration = dashData != null ? math.max(0.01f, dashData.Duration) : 0.01f,
                 SpeedTransitionInSeconds = dashData != null ? math.max(0f, dashData.SpeedTransitionInSeconds) : 0f,
                 SpeedTransitionOutSeconds = dashData != null ? math.max(0f, dashData.SpeedTransitionOutSeconds) : 0f,
+                WallBounceIntensity = dashData != null ? math.clamp(dashData.WallBounceIntensity, 0f, 1f) : 0f,
                 GrantsInvulnerability = dashData != null && dashData.GrantsInvulnerability ? (byte)1 : (byte)0,
                 InvulnerabilityExtraTime = dashData != null ? math.max(0f, dashData.InvulnerabilityExtraTime) : 0f
             },

@@ -212,9 +212,11 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                                  bool bombScaleVfxToRadius,
                                                                  float bombVfxScaleMultiplier,
                                                                  float dashDistance,
+                                                                 DashDirectionMode dashDirectionMode,
                                                                  float dashDuration,
                                                                  float dashSpeedTransitionInSeconds,
                                                                  float dashSpeedTransitionOutSeconds,
+                                                                 float dashWallBounceIntensity,
                                                                  bool dashGrantsInvulnerability,
                                                                  float dashInvulnerabilityExtraTime,
                                                                  float bulletTimeDuration,
@@ -322,9 +324,11 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             Dash = new DashPowerUpConfig
             {
                 Distance = math.max(0f, dashDistance),
+                DirectionMode = dashDirectionMode,
                 Duration = math.max(0.01f, dashDuration),
                 SpeedTransitionInSeconds = math.max(0f, dashSpeedTransitionInSeconds == float.MaxValue ? 0f : dashSpeedTransitionInSeconds),
                 SpeedTransitionOutSeconds = math.max(0f, dashSpeedTransitionOutSeconds == float.MaxValue ? 0f : dashSpeedTransitionOutSeconds),
+                WallBounceIntensity = math.clamp(dashWallBounceIntensity, 0f, 1f),
                 GrantsInvulnerability = dashGrantsInvulnerability ? (byte)1 : (byte)0,
                 InvulnerabilityExtraTime = math.max(0f, dashInvulnerabilityExtraTime)
             },

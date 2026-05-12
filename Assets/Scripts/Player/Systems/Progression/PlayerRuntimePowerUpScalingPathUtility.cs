@@ -206,6 +206,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "dash.distance":
                 activeSlotConfig.Dash.Distance = math.max(0f, resolvedValue);
                 return;
+            case "dash.directionMode":
+                activeSlotConfig.Dash.DirectionMode = PlayerRuntimeScalingEnumUtility.ResolveDashDirectionMode(resolvedValue);
+                return;
             case "dash.duration":
                 activeSlotConfig.Dash.Duration = math.max(0.01f, resolvedValue);
                 return;
@@ -214,6 +217,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "dash.speedTransitionOutSeconds":
                 activeSlotConfig.Dash.SpeedTransitionOutSeconds = math.max(0f, resolvedValue);
+                return;
+            case "dash.wallBounceIntensity":
+                activeSlotConfig.Dash.WallBounceIntensity = math.clamp(resolvedValue, 0f, 1f);
                 return;
             case "dash.invulnerabilityExtraTime":
                 activeSlotConfig.Dash.InvulnerabilityExtraTime = math.max(0f, resolvedValue);
@@ -683,6 +689,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "bomb.scaleVfxToRadius":
                 activeSlotConfig.Bomb.ScaleVfxToRadius = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "dash.grantsInvulnerability":
+                activeSlotConfig.Dash.GrantsInvulnerability = resolvedValue ? (byte)1 : (byte)0;
                 return;
             case "suppressShooting.suppressBaseShootingWhileActive":
                 activeSlotConfig.SuppressBaseShootingWhileActive = resolvedValue ? (byte)1 : (byte)0;

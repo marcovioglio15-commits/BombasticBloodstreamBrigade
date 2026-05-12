@@ -179,6 +179,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe DashDirectionMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.<returns>
+    public static DashDirectionMode ResolveDashDirectionMode(float value)
+    {
+        return (DashDirectionMode)ResolveEnumIndex(value, 3);
+    }
+
+    /// <summary>
     /// Resolves a safe SpawnOffsetOrientationMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

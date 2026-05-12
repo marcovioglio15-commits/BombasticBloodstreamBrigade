@@ -50,6 +50,19 @@ public enum PowerUpChargeType
     DamageTaken = 5
 }
 
+/// <summary>
+/// Selects the runtime direction source used when a Dash active module starts.
+/// /params None.
+/// /returns None.
+/// </summary>
+public enum DashDirectionMode
+{
+    PlayerMovement = 0,
+    OppositePlayerMovement = 1,
+    PlayerLook = 2,
+    OppositePlayerLook = 3
+}
+
 public enum PassiveToolKind
 {
     ProjectileSize = 0,

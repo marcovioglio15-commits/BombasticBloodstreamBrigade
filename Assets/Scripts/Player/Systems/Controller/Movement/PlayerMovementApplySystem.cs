@@ -3,15 +3,28 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
 
+/// <summary>
+/// Applies resolved player movement velocity to the transform while enforcing wall collision and dash-specific wall bounce response.
+/// /params None.
+/// /returns None.
+/// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMovementSpeedSystem))]
 public partial struct PlayerMovementApplySystem : ISystem
 {
     #region Constants
     private const float PlayerCollisionRadius = 0.35f;
+    private const float DashBounceDirectionEpsilon = 1e-6f;
     #endregion
 
+    #region Methods
+
     #region Lifecycle
+    /// <summary>
+    /// Declares movement, transform, runtime movement config and physics world requirements for player movement application.
+    /// /params state Current ECS system state.
+    /// /returns None.
+    /// </summary>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerMovementState>();
@@ -20,6 +33,11 @@ public partial struct PlayerMovementApplySystem : ISystem
         state.RequireForUpdate<PhysicsWorldSingleton>();
     }
 
+    /// <summary>
+    /// Applies velocity-driven displacement, resolves wall blocking, and redirects active dash motion after wall hits.
+    /// /params state Current ECS system state.
+    /// /returns None.
+    /// </summary>
     public void OnUpdate(ref SystemState state)
     {
         if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
@@ -27,16 +45,22 @@ public partial struct PlayerMovementApplySystem : ISystem
 
         float deltaTime = SystemAPI.Time.DeltaTime;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        ComponentLookup<PlayerDashState> dashLookup = SystemAPI.GetComponentLookup<PlayerDashState>(false);
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
 
-        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) && worldLayersConfig.WallsLayerMask != 0)
+        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
+            worldLayersConfig.WallsLayerMask != 0)
             wallsLayerMask = worldLayersConfig.WallsLayerMask;
 
         bool wallsEnabled = wallsLayerMask != 0;
 
         foreach ((RefRW<LocalTransform> localTransform,
                   RefRW<PlayerMovementState> movementState,
-                  RefRO<PlayerRuntimeMovementConfig> runtimeMovementConfig) in SystemAPI.Query<RefRW<LocalTransform>, RefRW<PlayerMovementState>, RefRO<PlayerRuntimeMovementConfig>>())
+                  RefRO<PlayerRuntimeMovementConfig> runtimeMovementConfig,
+                  Entity entity) in SystemAPI.Query<RefRW<LocalTransform>,
+                                                    RefRW<PlayerMovementState>,
+                                                    RefRO<PlayerRuntimeMovementConfig>>()
+                                                .WithEntityAccess())
         {
             float wallCollisionSkinWidth = math.max(0f, runtimeMovementConfig.ValueRO.Values.WallCollisionSkinWidth);
             float3 currentPosition = localTransform.ValueRO.Position;
@@ -61,8 +85,14 @@ public partial struct PlayerMovementApplySystem : ISystem
 
                     if (hitWall)
                     {
-                        float wallBounceCoefficient = runtimeMovementConfig.ValueRO.Values.WallBounceCoefficient;
-                        resolvedVelocity = WorldWallCollisionUtility.ComputeBounceVelocity(resolvedVelocity, hitNormal, wallBounceCoefficient);
+                        if (!TryApplyDashWallBounce(entity,
+                                                    hitNormal,
+                                                    ref resolvedVelocity,
+                                                    ref dashLookup))
+                        {
+                            float wallBounceCoefficient = runtimeMovementConfig.ValueRO.Values.WallBounceCoefficient;
+                            resolvedVelocity = WorldWallCollisionUtility.ComputeBounceVelocity(resolvedVelocity, hitNormal, wallBounceCoefficient);
+                        }
                     }
                 }
 
@@ -96,5 +126,73 @@ public partial struct PlayerMovementApplySystem : ISystem
     }
     #endregion
 
+    #region Helpers
+    /// <summary>
+    /// Applies dash-specific wall bounce and redirects the active dash for following frames.
+    /// /params entity Player entity that may own a dash state.
+    /// /params hitNormal Wall surface normal returned by the sweep collision.
+    /// /params resolvedVelocity Mutable velocity after collision response.
+    /// /params dashLookup Mutable lookup used to read and write PlayerDashState.
+    /// /returns True when an active dash consumed the wall collision response.
+    /// </summary>
+    private static bool TryApplyDashWallBounce(Entity entity,
+                                               float3 hitNormal,
+                                               ref float3 resolvedVelocity,
+                                               ref ComponentLookup<PlayerDashState> dashLookup)
+    {
+        if (!dashLookup.HasComponent(entity))
+            return false;
+
+        PlayerDashState dashState = dashLookup[entity];
+
+        if (dashState.IsDashing == 0)
+            return false;
+
+        float bounceIntensity = math.clamp(dashState.WallBounceIntensity, 0f, 1f);
+        float3 bouncedVelocity = WorldWallCollisionUtility.ComputeBounceVelocity(resolvedVelocity,
+                                                                                 hitNormal,
+                                                                                 bounceIntensity);
+        float3 bouncedPlanarVelocity = bouncedVelocity;
+        bouncedPlanarVelocity.y = 0f;
+
+        if (math.lengthsq(bouncedPlanarVelocity) <= DashBounceDirectionEpsilon)
+        {
+            resolvedVelocity = float3.zero;
+            StopDashAfterWallImpact(ref dashState);
+            dashLookup[entity] = dashState;
+            return true;
+        }
+
+        dashState.Direction = math.normalizesafe(bouncedPlanarVelocity, dashState.Direction);
+        dashLookup[entity] = dashState;
+        resolvedVelocity = bouncedVelocity;
+        return true;
+    }
+
+    /// <summary>
+    /// Stops dash motion after a non-bouncing wall impact while preserving already-authored invulnerability timers.
+    /// /params dashState Mutable dash state to stop.
+    /// /returns None.
+    /// </summary>
+    private static void StopDashAfterWallImpact(ref PlayerDashState dashState)
+    {
+        dashState.IsDashing = 0;
+        dashState.ClearVelocityAfterApply = 1;
+        dashState.Phase = 0;
+        dashState.PhaseRemaining = 0f;
+        dashState.HoldDuration = 0f;
+        dashState.Duration = 0f;
+        dashState.Distance = 0f;
+        dashState.ElapsedDuration = 0f;
+        dashState.Direction = float3.zero;
+        dashState.EntryVelocity = float3.zero;
+        dashState.Speed = 0f;
+        dashState.TransitionInDuration = 0f;
+        dashState.TransitionOutDuration = 0f;
+        dashState.WallBounceIntensity = 0f;
+    }
+    #endregion
+
+    #endregion
 
 }

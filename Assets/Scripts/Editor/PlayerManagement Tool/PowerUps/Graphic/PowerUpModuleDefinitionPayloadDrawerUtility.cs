@@ -7,6 +7,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds module payload forms that are primarily field-driven and delegates chart-heavy payloads to visualization utilities.
+/// /params None.
+/// /returns None.
 /// </summary>
 public static class PowerUpModuleDefinitionPayloadDrawerUtility
 {
@@ -51,6 +53,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 return;
             case PowerUpModuleKind.SpawnObject:
                 BuildSpawnObjectPayloadUi(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.Dash:
+                PowerUpDashPayloadDrawerUtility.BuildDashPayloadUi(payloadContainer, payloadProperty);
                 return;
             case PowerUpModuleKind.Heal:
                 BuildHealPayloadUi(payloadContainer, payloadProperty);

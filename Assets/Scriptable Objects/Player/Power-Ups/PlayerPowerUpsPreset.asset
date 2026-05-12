@@ -306,9 +306,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -558,9 +560,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -810,9 +814,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -1062,9 +1068,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -1314,9 +1322,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -1566,9 +1576,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -1818,9 +1830,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -2070,9 +2084,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -2322,9 +2338,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 2
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -2574,9 +2592,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 3
+        directionMode: 2
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -2826,9 +2846,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -3078,9 +3100,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -3330,9 +3354,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -3582,9 +3608,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -3834,9 +3862,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -4086,9 +4116,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -4338,9 +4370,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -4590,9 +4624,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -4842,9 +4878,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -5094,9 +5132,11 @@ MonoBehaviour:
         vfxScaleMultiplier: 1
       dash:
         distance: 6
+        directionMode: 0
         duration: 0.18
         speedTransitionInSeconds: 0.06
         speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
         grantsInvulnerability: 1
         invulnerabilityExtraTime: 0.1
       bulletTime:
@@ -5359,9 +5399,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -5611,9 +5653,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -5863,9 +5907,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -6128,9 +6174,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -6269,7 +6317,7 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.75
-          useChargedLaserBeam: 1
+          useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.7
           chargedLaserBeam:
             damageMultiplier: 5
@@ -6380,9 +6428,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -6632,9 +6682,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -6884,9 +6936,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -7140,9 +7194,269 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 1
+          invulnerabilityExtraTime: 0.1
+        bulletTime:
+          duration: 3
+          enemySlowPercent: 40
+          transitionTimeSeconds: 0.2
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 30
+          durationSeconds: 2
+          tickIntervalSeconds: 0.2
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 2
+          radius: 4
+          damage: 20
+          affectAllEnemiesInRadius: 1
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 12
+          orbitalSpeed: 8
+          orbitRadiusMin: 4
+          orbitRadiusMax: 6
+          orbitPulseFrequency: 0.7
+          orbitEntryRatio: 0.9
+          orbitBlendDuration: 0.3
+          heightOffset: 0
+          goldenAngleDegrees: 137.5
+          spiralStartRadius: 2.5
+          spiralMaximumRadius: 8
+          spiralAngularSpeedDegreesPerSecond: 240
+          spiralGrowthMultiplier: 1
+          spiralTurnsBeforeDespawn: 1.25
+          spiralClockwise: 0
+        projectileBounceOnWalls:
+          maxBounces: 2
+          speedPercentChangePerBounce: -5
+          minimumSpeedMultiplierAfterBounce: 0.1
+          maximumSpeedMultiplierAfterBounce: 3
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 2
+          splitOffsetDegrees: 0
+          customAnglesDegrees:
+          - -20
+          - 20
+          splitDamagePercentFromOriginal: 50
+          splitSizePercentFromOriginal: 75
+          splitSpeedPercentFromOriginal: 85
+          splitLifetimePercentFromOriginal: 65
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 2
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 0.4
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.05
+          bubbleDriftSpeed: 1.4
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 1.5
+          trailSpawnDistance: 0.6
+          trailSpawnIntervalSeconds: 0.1
+          trailRadius: 1.2
+          maxActiveSegmentsPerPlayer: 30
+          trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 5
+            maximumStacks: 20
+            stackDecayPerSecond: 1
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 4
+            dotTickInterval: 0.5
+            dotDurationSeconds: 2
+            impedimentSlowPercentPerStack: 10
+            impedimentProcSlowPercent: 50
+            impedimentMaxSlowPercent: 100
+            impedimentDurationSeconds: 2
+          stacksPerTick: 1
+          applyIntervalSeconds: 0.2
+        stackable:
+          maxAcquisitions: 2
+    - bindingId: e5c253db676f44d79b1f81b2e878de01
+      moduleId: Module_Dash
+      stage: 4
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 500
+          maximumCharge: 500
+          chargeRatePerSecond: 125
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 25
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 10
+          laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 1
+          maximumEnergy: 100
+          activationCost: 100
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 100
+          cooldownSeconds: 1
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 1
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 1
+        projectilePatternCone:
+          projectileCount: 6
+          coneAngleDegrees: 45
+          laserDurationSeconds: 0.35
+        characterTuning:
+          formulas:
+          - formula: '[InfinitePenetration]=true'
+          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
+          - formula: '[ShotRange]=[ShotRange]+999'
+          - formula: '[LaserWidth]=[LaserWidth_Big]'
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 1.2}
+          spawnOffsetOrientation: 0
+          deploySpeed: 4.5
+          collisionRadius: 0.18
+          bounceOnWalls: 1
+          bounceDamping: 0.65
+          linearDampingPerSecond: 1.2
+          fuseSeconds: 1.25
+          radius: 7
+          enableDamagePayload: 1
+          damage: 120
+          affectAllEnemiesInRadius: 1
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        dash:
+          distance: 1
+          directionMode: 3
+          duration: 0.18
+          speedTransitionInSeconds: 0.06
+          speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -7405,9 +7719,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -7657,9 +7973,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -7909,9 +8227,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -8174,9 +8494,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -8426,9 +8748,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -8678,9 +9002,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 3
+          directionMode: 2
           duration: 0.1
           speedTransitionInSeconds: 0.01
           speedTransitionOutSeconds: 0.01
+          wallBounceIntensity: 0.12
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -8943,9 +9269,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -9195,9 +9523,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -9447,9 +9777,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -9712,9 +10044,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -9964,9 +10298,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -10216,9 +10552,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -10478,9 +10816,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -10730,9 +11070,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -10983,9 +11325,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -11246,9 +11590,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -11496,9 +11842,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -11760,9 +12108,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -12012,9 +12362,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -12277,9 +12629,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -12542,9 +12896,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -12795,9 +13151,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -13060,9 +13418,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -13325,9 +13685,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 1
         dash:
           distance: 6
+          directionMode: 0
           duration: 0.18
           speedTransitionInSeconds: 0.06
           speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 1
           invulnerabilityExtraTime: 0.1
         bulletTime:
@@ -13590,9 +13952,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -13851,9 +14215,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -14102,9 +14468,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -14363,9 +14731,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -14614,9 +14984,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -14865,9 +15237,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -15126,9 +15500,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -15377,9 +15753,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -15638,9 +16016,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -15889,9 +16269,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -16150,9 +16532,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -16401,9 +16785,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -16662,9 +17048,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -16913,9 +17301,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -17174,9 +17564,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -17425,9 +17817,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -17687,9 +18081,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -17949,9 +18345,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -18210,9 +18608,11 @@ MonoBehaviour:
           vfxScaleMultiplier: 0.01
         dash:
           distance: 0
+          directionMode: 0
           duration: 0.01
           speedTransitionInSeconds: 0
           speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
           grantsInvulnerability: 0
           invulnerabilityExtraTime: 0
         bulletTime:
@@ -18336,7 +18736,7 @@ MonoBehaviour:
           maxAcquisitions: 2
     unreplaceable: 0
   primaryActivePowerUpId: ActiveChargeShot
-  secondaryActivePowerUpId: 
+  secondaryActivePowerUpId: ActiveBasicDash
   equippedPassivePowerUpIds:
   - PassiveEnemiesExplodeOnDeath
   passiveTools:
@@ -19224,9 +19624,11 @@ MonoBehaviour:
       vfxScaleMultiplier: 1
     dashData:
       distance: 6
+      directionMode: 0
       duration: 0.3
       speedTransitionInSeconds: 0.1
       speedTransitionOutSeconds: 0.12
+      wallBounceIntensity: 0.65
       grantsInvulnerability: 1
       invulnerabilityExtraTime: 0.05
     bulletTimeData:
@@ -19271,9 +19673,11 @@ MonoBehaviour:
       vfxScaleMultiplier: 1
     dashData:
       distance: 0
+      directionMode: 0
       duration: 0.01
       speedTransitionInSeconds: 0.06
       speedTransitionOutSeconds: 0.08
+      wallBounceIntensity: 0.65
       grantsInvulnerability: 0
       invulnerabilityExtraTime: 0
     bulletTimeData:
@@ -19318,9 +19722,11 @@ MonoBehaviour:
       vfxScaleMultiplier: 1
     dashData:
       distance: 0
+      directionMode: 0
       duration: 0.01
       speedTransitionInSeconds: 0.06
       speedTransitionOutSeconds: 0.08
+      wallBounceIntensity: 0.65
       grantsInvulnerability: 0
       invulnerabilityExtraTime: 0
     bulletTimeData:

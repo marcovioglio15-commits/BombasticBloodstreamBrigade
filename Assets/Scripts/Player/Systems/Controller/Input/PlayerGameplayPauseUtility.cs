@@ -1,3 +1,5 @@
+using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
@@ -32,6 +34,37 @@ internal static class PlayerGameplayPauseUtility
     public static bool IsTimeScaleHardPaused()
     {
         return Time.timeScale <= HardPauseTimeScaleThreshold;
+    }
+
+    /// <summary>
+    /// Resolves whether a finalized run outcome should freeze presentation systems that would otherwise move during transition fade-out.
+    /// /params runOutcomeQuery Query selecting local player run outcome state.
+    /// /returns True when at least one player run outcome is finalized.
+    /// </summary>
+    public static bool IsFinalizedRunOutcomeActive(EntityQuery runOutcomeQuery)
+    {
+        if (runOutcomeQuery.IsEmptyIgnoreFilter)
+            return false;
+
+        NativeArray<PlayerRunOutcomeState> runOutcomeStates = runOutcomeQuery.ToComponentDataArray<PlayerRunOutcomeState>(Allocator.Temp);
+
+        try
+        {
+            for (int index = 0; index < runOutcomeStates.Length; index++)
+            {
+                if (runOutcomeStates[index].IsFinalized == 0)
+                    continue;
+
+                return true;
+            }
+        }
+        finally
+        {
+            if (runOutcomeStates.IsCreated)
+                runOutcomeStates.Dispose();
+        }
+
+        return false;
     }
     #endregion
 
