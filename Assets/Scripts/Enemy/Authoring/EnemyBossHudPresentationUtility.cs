@@ -48,19 +48,19 @@ internal static class EnemyBossHudPresentationUtility
     }
 
     /// <summary>
-    /// Configures a health image for horizontal fill display.
-    /// /params healthFillImage Image to configure.
+    /// Configures one boss HUD image for horizontal fill display.
+    /// /params fillImage Image to configure.
     /// /returns None.
     /// </summary>
-    public static void ConfigureFillImage(Image healthFillImage)
+    public static void ConfigureFillImage(Image fillImage)
     {
-        if (healthFillImage == null)
+        if (fillImage == null)
             return;
 
-        healthFillImage.type = Image.Type.Filled;
-        healthFillImage.fillMethod = Image.FillMethod.Horizontal;
-        healthFillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
-        healthFillImage.fillClockwise = true;
+        fillImage.type = Image.Type.Filled;
+        fillImage.fillMethod = Image.FillMethod.Horizontal;
+        fillImage.fillOrigin = (int)Image.OriginHorizontal.Left;
+        fillImage.fillClockwise = true;
     }
 
     /// <summary>

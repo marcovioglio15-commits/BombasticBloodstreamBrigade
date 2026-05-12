@@ -48,6 +48,55 @@ public static class PlayerPassiveToolsAggregationUtility
     }
 
     /// <summary>
+    /// Builds the neutral passive state used when gameplay needs projectile math without equipped passive effects.
+    /// </summary>
+    /// <returns>Passive state with projectile multipliers initialized to 1 and all hooks disabled.<returns>
+    public static PlayerPassiveToolsState CreateDefaultState()
+    {
+        return new PlayerPassiveToolsState
+        {
+            ProjectileSizeMultiplier = 1f,
+            ProjectileDamageMultiplier = 1f,
+            ProjectileSpeedMultiplier = 1f,
+            ProjectileLifetimeSecondsMultiplier = 1f,
+            ProjectileLifetimeRangeMultiplier = 1f,
+            HasShotgun = 0,
+            Shotgun = default,
+            HasElementalProjectiles = 0,
+            ElementalProjectiles = default,
+            HasPerfectCircle = 0,
+            PerfectCircle = default,
+            HasBouncingProjectiles = 0,
+            BouncingProjectiles = default,
+            HasSplittingProjectiles = 0,
+            SplittingProjectiles = default,
+            HasExplosion = 0,
+            Explosion = default,
+            HasElementalTrail = 0,
+            ElementalTrail = default,
+            HasHeal = 0,
+            Heal = default,
+            HasBulletTime = 0,
+            BulletTime = default,
+            HasLaserBeam = 0,
+            LaserBeam = default
+        };
+    }
+
+    /// <summary>
+    /// Builds a neutral passive snapshot that exposes only one Laser Beam config.
+    /// laserBeamConfig: Standalone Laser Beam settings to expose to beam simulation and presentation.
+    /// returns Passive state with only HasLaserBeam enabled.
+    /// </summary>
+    public static PlayerPassiveToolsState CreateStandaloneLaserBeamState(in LaserBeamPassiveConfig laserBeamConfig)
+    {
+        PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
+        passiveToolsState.HasLaserBeam = 1;
+        passiveToolsState.LaserBeam = laserBeamConfig;
+        return passiveToolsState;
+    }
+
+    /// <summary>
     /// Merges one passive-tool payload into an aggregated passive runtime snapshot.
     /// </summary>
     /// <param name="passiveToolsState">Aggregated passive state updated in place.</param>
@@ -347,40 +396,6 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.LaserBeam.BodyProfile = passiveToolConfig.LaserBeam.BodyProfile;
         passiveToolsState.LaserBeam.SourceShape = passiveToolConfig.LaserBeam.SourceShape;
         passiveToolsState.LaserBeam.TerminalCapShape = passiveToolConfig.LaserBeam.TerminalCapShape;
-    }
-    #endregion
-
-    #region Private Methods
-    private static PlayerPassiveToolsState CreateDefaultState()
-    {
-        return new PlayerPassiveToolsState
-        {
-            ProjectileSizeMultiplier = 1f,
-            ProjectileDamageMultiplier = 1f,
-            ProjectileSpeedMultiplier = 1f,
-            ProjectileLifetimeSecondsMultiplier = 1f,
-            ProjectileLifetimeRangeMultiplier = 1f,
-            HasShotgun = 0,
-            Shotgun = default,
-            HasElementalProjectiles = 0,
-            ElementalProjectiles = default,
-            HasPerfectCircle = 0,
-            PerfectCircle = default,
-            HasBouncingProjectiles = 0,
-            BouncingProjectiles = default,
-            HasSplittingProjectiles = 0,
-            SplittingProjectiles = default,
-            HasExplosion = 0,
-            Explosion = default,
-            HasElementalTrail = 0,
-            ElementalTrail = default,
-            HasHeal = 0,
-            Heal = default,
-            HasBulletTime = 0,
-            BulletTime = default,
-            HasLaserBeam = 0,
-            LaserBeam = default
-        };
     }
     #endregion
 

@@ -133,6 +133,9 @@ public struct ChargeShotPowerUpConfig
     public float MaximumCharge;
     public float ChargeRatePerSecond;
     public float LaserDurationSeconds;
+    public byte UseChargedLaserBeam;
+    public float ChargedLaserDurationSeconds;
+    public LaserBeamPassiveConfig ChargedLaserBeam;
     public byte DecayAfterRelease;
     public float DecayAfterReleasePercentPerSecond;
     public byte PassiveChargeGainWhileReleased;

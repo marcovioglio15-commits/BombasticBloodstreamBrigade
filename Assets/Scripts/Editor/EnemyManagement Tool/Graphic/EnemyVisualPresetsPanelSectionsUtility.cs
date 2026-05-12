@@ -438,13 +438,12 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
             return container;
         }
 
-        AddSectionLabel(container, "Health Bar");
-        AddPropertyField(panel, container, bossUiProperty, "bossDisplayName", "Boss Display Name", "Optional boss name shown above the bottom health bar. Empty falls back to the visual preset name.");
-        AddPropertyField(panel, container, bossUiProperty, "healthFillColor", "Health Fill Color", "Screen-space health fill color used by the bottom boss bar.");
-        AddPropertyField(panel, container, bossUiProperty, "healthBackgroundColor", "Health Background Color", "Screen-space background color used behind the bottom boss bar.");
-        AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("bottomOffsetPixels"), "Health Bar Bottom Offset", 0f, 220f, "Bottom offset in pixels for the boss health bar root.");
-        AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("widthPixels"), "Health Bar Width", 180f, 1200f, "Target width in pixels for the boss health bar.");
-        AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("heightPixels"), "Health Bar Height", 8f, 72f, "Target height in pixels for the boss health bar fill.");
+        AddSectionLabel(container, "Mirrored Boss Bars");
+        AddPropertyField(panel, container, bossUiProperty, "bossDisplayName", "Boss Display Name", "Optional boss name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.");
+        AddPropertyField(panel, container, bossUiProperty, "healthFillColor", "Health Fill Color", "Screen-space health fill color used by the mirrored boss health syringe bar.");
+        AddPropertyField(panel, container, bossUiProperty, "healthBackgroundColor", "Health Background Tint", "Sprite tint used behind the mirrored boss health syringe bar. Keep white to preserve the player bar background silhouette.");
+        AddPropertyField(panel, container, bossUiProperty, "shieldFillColor", "Shield Fill Color", "Screen-space shield fill color used by the mirrored boss shield syringe bar.");
+        AddPropertyField(panel, container, bossUiProperty, "shieldBackgroundColor", "Shield Background Tint", "Sprite tint used behind the mirrored boss shield syringe bar. Keep white to preserve the player bar background silhouette.");
 
         AddSectionLabel(container, "Offscreen Indicator");
         AddPropertyField(panel, container, bossUiProperty, "offscreenIndicatorSprite", "Offscreen Indicator Sprite", "Sprite used by the off-screen indicator that slides along screen edges.");

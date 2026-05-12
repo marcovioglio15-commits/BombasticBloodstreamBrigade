@@ -92,6 +92,11 @@ MonoBehaviour:
     formula: switch([Luck],1:80,2:60,3:40,4:20)
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
+    addScaling: 1
+    formula: '[LaserWidth]'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
@@ -190,6 +195,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -401,6 +447,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -612,6 +699,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 1
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -823,6 +951,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -1034,6 +1203,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -1245,6 +1455,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -1456,6 +1707,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -1667,6 +1959,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -1878,6 +2211,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -2089,6 +2463,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -2300,6 +2715,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -2511,6 +2967,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -2722,6 +3219,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -2933,6 +3471,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -3144,6 +3723,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -3355,6 +3975,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -3566,6 +4227,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -3777,6 +4479,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -3988,6 +4731,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -4199,6 +4983,47 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
         slowPlayerWhileCharging: 0
         maximumPlayerSlowPercent: 35
         playerSlowCurve:
@@ -4423,6 +5248,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -4634,6 +5500,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -4845,6 +5752,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -5069,6 +6017,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -5280,6 +6269,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.75
+          useChargedLaserBeam: 1
+          chargedLaserDurationSeconds: 0.7
+          chargedLaserBeam:
+            damageMultiplier: 5
+            continuousDamagePerSecondMultiplier: 0.1
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.5
+            maximumContinuousActiveSeconds: 2.75
+            cooldownSeconds: 0.15
+            maximumBounceSegments: 2
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 5
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 2
+            terminalCapScaleMultiplier: 2
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 1
+            coreWidthMultiplier: 0.5
+            coreBrightness: 1.52
+            rimBrightness: 1
+            flowScrollSpeed: 14
+            flowPulseFrequency: 6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.25
+            stormIdleIntensity: 0
+            stormBurstIntensity: 1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.05
+            stormRingFrequency: 1
+            stormRingThickness: 0.1
+            stormTickTravelSpeed: 1.5
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 1
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 1
           maximumPlayerSlowPercent: 100
           playerSlowCurve:
@@ -5491,6 +6521,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -5702,6 +6773,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -5913,6 +7025,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -6141,6 +7294,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -6352,6 +7546,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -6563,6 +7798,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -6787,6 +8063,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -6998,6 +8315,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -7209,6 +8567,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -7433,6 +8832,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -7644,6 +9084,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -7855,6 +9336,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -8079,6 +9601,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -8290,6 +9853,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -8501,6 +10105,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -8722,6 +10367,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -8933,6 +10619,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -9144,6 +10871,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -9367,6 +11135,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -9576,6 +11385,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -9799,6 +11649,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -10010,6 +11901,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -10234,6 +12166,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -10458,6 +12431,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -10669,6 +12683,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -10894,6 +12949,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -11118,6 +13214,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -11339,6 +13476,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -11561,6 +13739,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -11771,6 +13990,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -11991,6 +14251,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -12201,6 +14502,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -12411,6 +14753,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -12631,6 +15014,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -12841,6 +15265,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -13061,6 +15526,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -13271,6 +15777,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -13491,6 +16038,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -13701,6 +16289,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -13921,6 +16550,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -14131,6 +16801,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -14351,6 +17062,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -14561,6 +17313,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -14782,6 +17575,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -15003,6 +17837,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -15224,6 +18099,47 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
           slowPlayerWhileCharging: 0
           maximumPlayerSlowPercent: 35
           playerSlowCurve:
@@ -15419,7 +18335,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveChargeShot
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
   - PassiveEnemiesExplodeOnDeath

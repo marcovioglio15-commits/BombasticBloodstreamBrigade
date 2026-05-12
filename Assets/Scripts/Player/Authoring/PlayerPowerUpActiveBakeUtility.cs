@@ -137,6 +137,9 @@ public static class PlayerPowerUpActiveBakeUtility
         float decayAfterReleasePercentPerSecond = 0f;
         bool passiveChargeGainWhileReleased = false;
         float passiveChargeGainPercentPerSecond = 0f;
+        bool useChargedLaserBeam = false;
+        float chargedLaserDurationSeconds = 0f;
+        LaserBeamPassiveConfig chargedLaserBeamConfig = default;
         bool slowPlayerWhileCharging = false;
         float maximumPlayerSlowPercent = 0f;
         FixedList128Bytes<float> playerSlowCurveSamples = default;
@@ -254,6 +257,15 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                  math.max(0f, holdChargeData.PassiveChargeGainPercentPerSecond));
                     chargeShotLaserDurationSeconds = math.max(chargeShotLaserDurationSeconds,
                                                               math.max(0f, holdChargeData.LaserDurationSeconds));
+                    useChargedLaserBeam = useChargedLaserBeam || holdChargeData.UseChargedLaserBeam;
+
+                    if (holdChargeData.UseChargedLaserBeam)
+                    {
+                        chargedLaserDurationSeconds = math.max(chargedLaserDurationSeconds,
+                                                               math.max(0f, holdChargeData.ChargedLaserDurationSeconds));
+                        chargedLaserBeamConfig = PlayerPowerUpPassiveConfigBuildUtility.BuildLaserBeamPassiveConfig(holdChargeData.ChargedLaserBeam);
+                    }
+
                     slowPlayerWhileCharging = slowPlayerWhileCharging || holdChargeData.SlowPlayerWhileCharging;
                     maximumPlayerSlowPercent = math.max(maximumPlayerSlowPercent,
                                                         math.max(0f, holdChargeData.MaximumPlayerSlowPercent));
@@ -506,6 +518,9 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                               decayAfterReleasePercentPerSecond,
                                                                               passiveChargeGainWhileReleased,
                                                                               passiveChargeGainPercentPerSecond,
+                                                                              useChargedLaserBeam,
+                                                                              chargedLaserDurationSeconds,
+                                                                              in chargedLaserBeamConfig,
                                                                               slowPlayerWhileCharging,
                                                                               maximumPlayerSlowPercent,
                                                                               in playerSlowCurveSamples,

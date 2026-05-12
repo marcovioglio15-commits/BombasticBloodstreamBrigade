@@ -15,14 +15,20 @@ public sealed class EnemyBossVisualUiSettings
     [Tooltip("Enables the dedicated boss HUD for enemies using a Boss Pattern Preset.")]
     [SerializeField] private bool enabled = true;
 
-    [Tooltip("Optional boss display name shown above the bottom health bar. Empty falls back to the visual preset name.")]
+    [Tooltip("Optional boss display name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.")]
     [SerializeField] private string bossDisplayName;
 
-    [Tooltip("Screen-space health fill color used by the bottom boss bar.")]
+    [Tooltip("Screen-space health fill color used by the mirrored boss health syringe bar.")]
     [SerializeField] private Color healthFillColor = new Color(0.9f, 0.12f, 0.08f, 1f);
 
-    [Tooltip("Screen-space background color used behind the bottom boss bar.")]
-    [SerializeField] private Color healthBackgroundColor = new Color(0f, 0f, 0f, 0.7f);
+    [Tooltip("Sprite tint used behind the mirrored boss health syringe bar. Keep white to preserve the player bar background silhouette.")]
+    [SerializeField] private Color healthBackgroundColor = Color.white;
+
+    [Tooltip("Screen-space shield fill color used by the mirrored boss shield syringe bar.")]
+    [SerializeField] private Color shieldFillColor = new Color(0.2f, 0.85f, 1f, 1f);
+
+    [Tooltip("Sprite tint used behind the mirrored boss shield syringe bar. Keep white to preserve the player bar background silhouette.")]
+    [SerializeField] private Color shieldBackgroundColor = Color.white;
 
     [Tooltip("Sprite used by the off-screen indicator that slides along screen edges.")]
     [SerializeField] private Sprite offscreenIndicatorSprite;
@@ -33,18 +39,6 @@ public sealed class EnemyBossVisualUiSettings
     [Tooltip("Square size in pixels used by the off-screen boss indicator image.")]
     [Range(16f, 192f)]
     [SerializeField] private float offscreenIndicatorSizePixels = 56f;
-
-    [Tooltip("Bottom offset in pixels for the boss health bar root.")]
-    [Range(0f, 220f)]
-    [SerializeField] private float bottomOffsetPixels = 42f;
-
-    [Tooltip("Target width in pixels for the boss health bar.")]
-    [Range(180f, 1200f)]
-    [SerializeField] private float widthPixels = 560f;
-
-    [Tooltip("Target height in pixels for the boss health bar fill.")]
-    [Range(8f, 72f)]
-    [SerializeField] private float heightPixels = 22f;
 
     [Tooltip("Extra screen-edge margin in pixels kept outside the off-screen indicator half size.")]
     [Range(0f, 160f)]
@@ -86,6 +80,22 @@ public sealed class EnemyBossVisualUiSettings
         }
     }
 
+    public Color ShieldFillColor
+    {
+        get
+        {
+            return shieldFillColor;
+        }
+    }
+
+    public Color ShieldBackgroundColor
+    {
+        get
+        {
+            return shieldBackgroundColor;
+        }
+    }
+
     public Sprite OffscreenIndicatorSprite
     {
         get
@@ -102,35 +112,11 @@ public sealed class EnemyBossVisualUiSettings
         }
     }
 
-    public float BottomOffsetPixels
-    {
-        get
-        {
-            return bottomOffsetPixels;
-        }
-    }
-
     public float OffscreenIndicatorSizePixels
     {
         get
         {
             return offscreenIndicatorSizePixels;
-        }
-    }
-
-    public float WidthPixels
-    {
-        get
-        {
-            return widthPixels;
-        }
-    }
-
-    public float HeightPixels
-    {
-        get
-        {
-            return heightPixels;
         }
     }
 
@@ -147,7 +133,7 @@ public sealed class EnemyBossVisualUiSettings
 
     #region Public Methods
     /// <summary>
-    /// Validates color alpha channels while leaving authored layout values untouched for tool warnings.
+    /// Validates color alpha channels while leaving prefab-authored boss bar layout untouched.
     /// /params None.
     /// /returns None.
     /// </summary>
@@ -155,6 +141,8 @@ public sealed class EnemyBossVisualUiSettings
     {
         healthFillColor.a = Mathf.Clamp01(healthFillColor.a);
         healthBackgroundColor.a = Mathf.Clamp01(healthBackgroundColor.a);
+        shieldFillColor.a = Mathf.Clamp01(shieldFillColor.a);
+        shieldBackgroundColor.a = Mathf.Clamp01(shieldBackgroundColor.a);
         offscreenIndicatorColor.a = Mathf.Clamp01(offscreenIndicatorColor.a);
     }
     #endregion

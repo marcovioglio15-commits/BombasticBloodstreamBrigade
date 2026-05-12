@@ -32,6 +32,16 @@ public sealed class PowerUpHoldChargeModuleData
     [Tooltip("Seconds for which a Laser Beam triggered by this active charge-shot remains active after release.")]
     [SerializeField] private float laserDurationSeconds = 0.45f;
 
+    [Header("Charged Laser Beam")]
+    [Tooltip("When enabled, a fully charged release fires a standalone Laser Beam instead of projectile requests. This beam ignores passive tools and other power-up hooks.")]
+    [SerializeField] private bool useChargedLaserBeam;
+
+    [Tooltip("Seconds for which the standalone charged Laser Beam remains active after a fully charged release.")]
+    [SerializeField] private float chargedLaserDurationSeconds = 0.45f;
+
+    [Tooltip("Standalone Laser Beam settings used only by this hold-charge release when Use Charged Laser Beam is enabled.")]
+    [SerializeField] private PowerUpLaserBeamModuleData chargedLaserBeam = new PowerUpLaserBeamModuleData();
+
     [Tooltip("When enabled, the player's movement is slowed progressively while this charge trigger is held.")]
     [SerializeField] private bool slowPlayerWhileCharging;
 
@@ -109,6 +119,30 @@ public sealed class PowerUpHoldChargeModuleData
         }
     }
 
+    public bool UseChargedLaserBeam
+    {
+        get
+        {
+            return useChargedLaserBeam;
+        }
+    }
+
+    public float ChargedLaserDurationSeconds
+    {
+        get
+        {
+            return chargedLaserDurationSeconds;
+        }
+    }
+
+    public PowerUpLaserBeamModuleData ChargedLaserBeam
+    {
+        get
+        {
+            return chargedLaserBeam;
+        }
+    }
+
     public bool SlowPlayerWhileCharging
     {
         get
@@ -170,6 +204,9 @@ public sealed class PowerUpHoldChargeModuleData
                   passiveChargeGainPercentPerSecondValue,
                   laserDurationSecondsValue,
                   false,
+                  0.45f,
+                  null,
+                  false,
                   35f,
                   CreateDefaultSlowCurve());
     }
@@ -186,6 +223,37 @@ public sealed class PowerUpHoldChargeModuleData
                           float maximumPlayerSlowPercentValue,
                           AnimationCurve playerSlowCurveValue)
     {
+        Configure(requiredChargeValue,
+                  maximumChargeValue,
+                  chargeRatePerSecondValue,
+                  decayAfterReleaseValue,
+                  decayAfterReleasePercentPerSecondValue,
+                  passiveChargeGainWhileReleasedValue,
+                  passiveChargeGainPercentPerSecondValue,
+                  laserDurationSecondsValue,
+                  false,
+                  0.45f,
+                  null,
+                  slowPlayerWhileChargingValue,
+                  maximumPlayerSlowPercentValue,
+                  playerSlowCurveValue);
+    }
+
+    public void Configure(float requiredChargeValue,
+                          float maximumChargeValue,
+                          float chargeRatePerSecondValue,
+                          bool decayAfterReleaseValue,
+                          float decayAfterReleasePercentPerSecondValue,
+                          bool passiveChargeGainWhileReleasedValue,
+                          float passiveChargeGainPercentPerSecondValue,
+                          float laserDurationSecondsValue,
+                          bool useChargedLaserBeamValue,
+                          float chargedLaserDurationSecondsValue,
+                          PowerUpLaserBeamModuleData chargedLaserBeamValue,
+                          bool slowPlayerWhileChargingValue,
+                          float maximumPlayerSlowPercentValue,
+                          AnimationCurve playerSlowCurveValue)
+    {
         requiredCharge = requiredChargeValue;
         maximumCharge = maximumChargeValue;
         chargeRatePerSecond = chargeRatePerSecondValue;
@@ -194,6 +262,9 @@ public sealed class PowerUpHoldChargeModuleData
         passiveChargeGainWhileReleased = passiveChargeGainWhileReleasedValue;
         passiveChargeGainPercentPerSecond = passiveChargeGainPercentPerSecondValue;
         laserDurationSeconds = laserDurationSecondsValue;
+        useChargedLaserBeam = useChargedLaserBeamValue;
+        chargedLaserDurationSeconds = chargedLaserDurationSecondsValue;
+        chargedLaserBeam = chargedLaserBeamValue != null ? chargedLaserBeamValue : new PowerUpLaserBeamModuleData();
         slowPlayerWhileCharging = slowPlayerWhileChargingValue;
         maximumPlayerSlowPercent = maximumPlayerSlowPercentValue;
         playerSlowCurve = playerSlowCurveValue != null ? playerSlowCurveValue : CreateDefaultSlowCurve();
@@ -217,6 +288,11 @@ public sealed class PowerUpHoldChargeModuleData
 
         if (passiveChargeGainPercentPerSecond < 0f)
             passiveChargeGainPercentPerSecond = 0f;
+
+        if (chargedLaserBeam == null)
+            chargedLaserBeam = new PowerUpLaserBeamModuleData();
+
+        chargedLaserBeam.Validate();
     }
     #endregion
 

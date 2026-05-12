@@ -90,6 +90,20 @@ public static class PlayerPowerUpActivationExecutionUtility
         float resolvedRangeMultiplier = ResolveChargeScaledMultiplier(slotConfig.ChargeShot.RangeMultiplier, chargeFactor);
         float resolvedLifetimeMultiplier = ResolveChargeScaledMultiplier(slotConfig.ChargeShot.LifetimeMultiplier, chargeFactor);
 
+        if (slotConfig.ChargeShot.UseChargedLaserBeam != 0)
+        {
+            ExecuteIndependentChargedLaser(in slotConfig,
+                                           in runtimeShootingConfig,
+                                           appliedElementSlots,
+                                           ref laserBeamState,
+                                           resolvedSizeMultiplier,
+                                           resolvedDamageMultiplier,
+                                           resolvedSpeedMultiplier,
+                                           resolvedRangeMultiplier,
+                                           resolvedLifetimeMultiplier);
+            return;
+        }
+
         if (TryResolveTriggeredLaserPassiveToolsState(in slotConfig,
                                                       in passiveToolsState,
                                                       out PlayerPassiveToolsState triggeredPassiveToolsState))
@@ -157,6 +171,58 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                          penetrationMode,
                                                          maxPenetrations,
                                                          0);
+    }
+
+    /// <summary>
+    /// Fires the hold-charge-owned Laser Beam using a neutral passive snapshot so equipped passives and other power-up hooks do not leak into the shot.
+    /// /params slotConfig Active slot that owns the charge-shot payload.
+    /// /params runtimeShootingConfig Current shooting config used as the base projectile template source.
+    /// /params appliedElementSlots Runtime default elemental slots used only when the charge shot has no override payload.
+    /// /params laserBeamState Mutable Laser Beam state receiving the timed active snapshot.
+    /// /params resolvedSizeMultiplier Charge-scaled size multiplier.
+    /// /params resolvedDamageMultiplier Charge-scaled damage multiplier.
+    /// /params resolvedSpeedMultiplier Charge-scaled speed multiplier.
+    /// /params resolvedRangeMultiplier Charge-scaled range multiplier.
+    /// /params resolvedLifetimeMultiplier Charge-scaled lifetime multiplier.
+    /// /returns None.
+    /// </summary>
+    private static void ExecuteIndependentChargedLaser(in PlayerPowerUpSlotConfig slotConfig,
+                                                       in PlayerRuntimeShootingConfig runtimeShootingConfig,
+                                                       DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
+                                                       ref PlayerLaserBeamState laserBeamState,
+                                                       float resolvedSizeMultiplier,
+                                                       float resolvedDamageMultiplier,
+                                                       float resolvedSpeedMultiplier,
+                                                       float resolvedRangeMultiplier,
+                                                       float resolvedLifetimeMultiplier)
+    {
+        PlayerPassiveToolsState chargedLaserPassiveToolsState =
+            PlayerPassiveToolsAggregationUtility.CreateStandaloneLaserBeamState(in slotConfig.ChargeShot.ChargedLaserBeam);
+
+        ResolvePenetrationSettings(in runtimeShootingConfig.Values,
+                                   slotConfig.ChargeShot.PenetrationMode,
+                                   slotConfig.ChargeShot.MaxPenetrations,
+                                   out ProjectilePenetrationMode laserPenetrationMode,
+                                   out int laserMaxPenetrations);
+
+        PlayerProjectileRequestTemplate chargedLaserTemplate = PlayerProjectileRequestUtility.BuildProjectileTemplate(in runtimeShootingConfig,
+                                                                                                                       appliedElementSlots,
+                                                                                                                       in chargedLaserPassiveToolsState,
+                                                                                                                       resolvedSizeMultiplier,
+                                                                                                                       resolvedDamageMultiplier,
+                                                                                                                       resolvedSpeedMultiplier,
+                                                                                                                       resolvedRangeMultiplier,
+                                                                                                                       resolvedLifetimeMultiplier,
+                                                                                                                       slotConfig.ChargeShot.HasElementalPayload != 0,
+                                                                                                                       in slotConfig.ChargeShot.ElementalEffect,
+                                                                                                                       slotConfig.ChargeShot.ElementalStacksPerHit);
+
+        PlayerLaserBeamStateUtility.ActivateTriggeredActiveLaser(ref laserBeamState,
+                                                                 slotConfig.ChargeShot.ChargedLaserDurationSeconds,
+                                                                 laserPenetrationMode,
+                                                                 laserMaxPenetrations,
+                                                                 in chargedLaserTemplate,
+                                                                 in chargedLaserPassiveToolsState);
     }
 
     /// <summary>
