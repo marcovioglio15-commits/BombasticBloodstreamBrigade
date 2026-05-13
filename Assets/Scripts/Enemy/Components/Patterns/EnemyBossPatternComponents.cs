@@ -152,6 +152,20 @@ public struct EnemyBossMinionSpawnElement : IBufferElementData
 }
 
 /// <summary>
+/// Stores one boss minion reserved during its spawn warning window and activated once the ring completes.
+/// /params None.
+/// /returns None.
+/// </summary>
+public struct EnemyBossPendingMinionSpawnElement : IBufferElementData
+{
+    public Entity MinionEntity;
+    public Entity PoolEntity;
+    public int RuleIndex;
+    public float3 SpawnPosition;
+    public float ActivationTime;
+}
+
+/// <summary>
 /// Marks minions spawned by a boss and stores the source rule for alive-count throttling.
 /// /params None.
 /// /returns None.

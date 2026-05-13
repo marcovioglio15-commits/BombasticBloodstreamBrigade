@@ -10,6 +10,9 @@ public sealed class EnemyShooterProjectilePayload
     #region Fields
 
     #region Serialized Fields
+    [Tooltip("Projectile distribution used by this shooter activation. Forward Spread aims toward the target, while Radial Burst emits an even full-circle ring.")]
+    [SerializeField] private EnemyShooterShotPattern shotPattern = EnemyShooterShotPattern.ForwardSpread;
+
     [Tooltip("Projectile count emitted each time this shooter module fires.")]
     [SerializeField] private int projectilesPerShot = 1;
 
@@ -47,6 +50,14 @@ public sealed class EnemyShooterProjectilePayload
     #endregion
 
     #region Properties
+    public EnemyShooterShotPattern ShotPattern
+    {
+        get
+        {
+            return shotPattern;
+        }
+    }
+
     public int ProjectilesPerShot
     {
         get
@@ -313,6 +324,12 @@ public sealed class EnemyShooterModuleData
     [Tooltip("Extra aim windup in seconds applied before the first shot of each burst. 0 fires immediately.")]
     [SerializeField] private float aimWindupSeconds = 0.25f;
 
+    [Tooltip("Minimum seconds this enemy must remain stopped before the first shot when Movement Policy is Stop While Aiming.")]
+    [SerializeField] private float preFireStopSeconds = 0.25f;
+
+    [Tooltip("Minimum seconds this enemy remains stopped after the final shot when Movement Policy is Stop While Aiming.")]
+    [SerializeField] private float postFireStopSeconds;
+
     [Tooltip("Seconds between shots inside the same burst.")]
     [SerializeField] private float intraBurstDelay = 0.08f;
 
@@ -378,6 +395,22 @@ public sealed class EnemyShooterModuleData
         get
         {
             return aimWindupSeconds;
+        }
+    }
+
+    public float PreFireStopSeconds
+    {
+        get
+        {
+            return preFireStopSeconds;
+        }
+    }
+
+    public float PostFireStopSeconds
+    {
+        get
+        {
+            return postFireStopSeconds;
         }
     }
 

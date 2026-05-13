@@ -40,16 +40,42 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
         public EnemyBossMinionSpawnElement Rule;
     }
 
+    /// <summary>
+    /// Stores one pending minion activation collected before structural changes are applied.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private struct PendingMinionActivationRequest
+    {
+        public Entity BossEntity;
+        public EnemyBossPendingMinionSpawnElement PendingSpawn;
+    }
+
+    /// <summary>
+    /// Identifies one boss minion rule for active and warning-pending count throttling.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
     private struct BossMinionRuleKey : System.IEquatable<BossMinionRuleKey>
     {
         public Entity BossEntity;
         public int RuleIndex;
 
+        /// <summary>
+        /// Compares two boss rule keys using their owning boss entity and rule index.
+        /// /params other Key to compare against.
+        /// /returns True when both keys address the same boss rule.
+        /// </summary>
         public bool Equals(BossMinionRuleKey other)
         {
             return BossEntity == other.BossEntity && RuleIndex == other.RuleIndex;
         }
 
+        /// <summary>
+        /// Builds a stable hash for use in native hash maps during the current frame.
+        /// /params None.
+        /// /returns Hash code derived from entity identity and rule index.
+        /// </summary>
         public override int GetHashCode()
         {
             return (int)math.hash(new int3(BossEntity.Index, BossEntity.Version, RuleIndex));
@@ -89,13 +115,16 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
         Allocator frameAllocator = state.WorldUpdateAllocator;
         NativeList<RuleInitializationRequest> initializationRequests = new NativeList<RuleInitializationRequest>(frameAllocator);
         NativeList<MinionSpawnRequest> spawnRequests = new NativeList<MinionSpawnRequest>(frameAllocator);
-        NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts = new NativeParallelHashMap<BossMinionRuleKey, int>(math.max(1, activeMinionQuery.CalculateEntityCount()), frameAllocator);
         NativeArray<EnemyNavigationCellElement> navigationCellSnapshot = default;
         PhysicsWorldSingleton physicsWorldSingleton = default;
         bool hasPhysicsWorld = SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out physicsWorldSingleton);
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
         EnemyNavigationGridState navigationGridState = default;
         bool navigationReady = false;
+
+        ProcessPendingMinionActivations(ref state, elapsedTime);
+        int aliveMinionCountCapacity = ResolveAliveMinionCountCapacity(ref state);
+        NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts = new NativeParallelHashMap<BossMinionRuleKey, int>(aliveMinionCountCapacity, frameAllocator);
 
         if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
             worldLayersConfig.WallsLayerMask != 0)
@@ -170,6 +199,7 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
         ProcessMinionSpawnRequests(entityManager,
                                    spawnRequests,
                                    in aliveMinionCounts,
+                                   elapsedTime,
                                    hasPhysicsWorld,
                                    in physicsWorldSingleton,
                                    wallsLayerMask,
@@ -180,6 +210,76 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Activates reserved minions whose warning lead time has completed, or recycles them if the source boss is no longer valid.
+    /// /params state Mutable system state used to query pending buffers.
+    /// /params elapsedTime Current world elapsed time.
+    /// /returns None.
+    /// </summary>
+    private void ProcessPendingMinionActivations(ref SystemState state, float elapsedTime)
+    {
+        EntityManager entityManager = state.EntityManager;
+        NativeList<PendingMinionActivationRequest> activationRequests = new NativeList<PendingMinionActivationRequest>(state.WorldUpdateAllocator);
+
+        // Collect expired pending entries first so entity structural changes do not invalidate the queried buffers.
+        foreach ((DynamicBuffer<EnemyBossPendingMinionSpawnElement> pendingSpawns,
+                  Entity bossEntity) in SystemAPI.Query<DynamicBuffer<EnemyBossPendingMinionSpawnElement>>()
+                                                 .WithEntityAccess())
+        {
+            for (int pendingIndex = pendingSpawns.Length - 1; pendingIndex >= 0; pendingIndex--)
+            {
+                EnemyBossPendingMinionSpawnElement pendingSpawn = pendingSpawns[pendingIndex];
+
+                if (elapsedTime < pendingSpawn.ActivationTime)
+                    continue;
+
+                pendingSpawns.RemoveAt(pendingIndex);
+                activationRequests.Add(new PendingMinionActivationRequest
+                {
+                    BossEntity = bossEntity,
+                    PendingSpawn = pendingSpawn
+                });
+            }
+        }
+
+        // Apply activations after all buffers have been released.
+        for (int requestIndex = 0; requestIndex < activationRequests.Length; requestIndex++)
+        {
+            PendingMinionActivationRequest request = activationRequests[requestIndex];
+
+            if (!EnemyBossMinionPendingSpawnUtility.CanActivatePendingSpawn(entityManager, request.BossEntity, in request.PendingSpawn))
+            {
+                EnemyBossMinionPendingSpawnUtility.RecyclePendingSpawn(entityManager, in request.PendingSpawn);
+                continue;
+            }
+
+            EnemyPoolUtility.ActivateReservedEnemy(entityManager,
+                                                   request.PendingSpawn.MinionEntity,
+                                                   request.PendingSpawn.SpawnPosition);
+        }
+    }
+
+    /// <summary>
+    /// Resolves a safe hash-map capacity that can hold active and warning-pending minion rule counters.
+    /// /params state Mutable system state required by SystemAPI query generation.
+    /// /returns Capacity used by the per-rule minion count map.
+    /// </summary>
+    private int ResolveAliveMinionCountCapacity(ref SystemState state)
+    {
+        int capacity = math.max(1, activeMinionQuery.CalculateEntityCount());
+
+        foreach (DynamicBuffer<EnemyBossPendingMinionSpawnElement> pendingSpawns in SystemAPI.Query<DynamicBuffer<EnemyBossPendingMinionSpawnElement>>())
+            capacity += pendingSpawns.Length;
+
+        return math.max(1, capacity);
+    }
+
+    /// <summary>
+    /// Builds the current per-rule minion counts from active minions and still-pending spawn reservations.
+    /// /params state Mutable system state required by SystemAPI query generation.
+    /// /params aliveMinionCounts Mutable count map filled during the current frame.
+    /// /returns None.
+    /// </summary>
     private void BuildAliveMinionCounts(ref SystemState state,
                                         ref NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts)
     {
@@ -197,16 +297,51 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                 RuleIndex = owner.ValueRO.RuleIndex
             };
 
-            if (aliveMinionCounts.TryGetValue(key, out int count))
-            {
-                aliveMinionCounts[key] = count + 1;
-                continue;
-            }
+            IncrementAliveMinionCount(ref aliveMinionCounts, in key);
+        }
 
-            aliveMinionCounts.Add(key, 1);
+        foreach ((DynamicBuffer<EnemyBossPendingMinionSpawnElement> pendingSpawns,
+                  Entity bossEntity) in SystemAPI.Query<DynamicBuffer<EnemyBossPendingMinionSpawnElement>>()
+                                                 .WithEntityAccess())
+        {
+            for (int pendingIndex = 0; pendingIndex < pendingSpawns.Length; pendingIndex++)
+            {
+                BossMinionRuleKey key = new BossMinionRuleKey
+                {
+                    BossEntity = bossEntity,
+                    RuleIndex = pendingSpawns[pendingIndex].RuleIndex
+                };
+
+                IncrementAliveMinionCount(ref aliveMinionCounts, in key);
+            }
         }
     }
 
+    /// <summary>
+    /// Adds one active or pending minion to the per-rule count map.
+    /// /params aliveMinionCounts Mutable count map.
+    /// /params key Boss and rule key to increment.
+    /// /returns None.
+    /// </summary>
+    private static void IncrementAliveMinionCount(ref NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
+                                                 in BossMinionRuleKey key)
+    {
+        if (aliveMinionCounts.TryGetValue(key, out int count))
+        {
+            aliveMinionCounts[key] = count + 1;
+            return;
+        }
+
+        aliveMinionCounts.Add(key, 1);
+    }
+
+    /// <summary>
+    /// Reads the current active-or-pending minion count for one boss rule.
+    /// /params aliveMinionCounts Count map built for the current frame.
+    /// /params bossEntity Boss that owns the rule.
+    /// /params ruleIndex Rule index to inspect.
+    /// /returns Current minion count, or zero when no entry exists.
+    /// </summary>
     private static int ResolveAliveMinionCount(in NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
                                                Entity bossEntity,
                                                int ruleIndex)
@@ -295,7 +430,7 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
             EnemyBossMinionSpawnElement rule = request.Rule;
 
             if (rule.PrefabEntity != Entity.Null && entityManager.Exists(rule.PrefabEntity))
-                rule.PoolEntity = CreateAndPrewarmRulePool(entityManager, in rule);
+                rule.PoolEntity = EnemyBossMinionPoolUtility.CreateAndPrewarmRulePool(entityManager, in rule);
 
             DynamicBuffer<EnemyBossMinionSpawnElement> minionRules = entityManager.GetBuffer<EnemyBossMinionSpawnElement>(request.BossEntity);
 
@@ -307,46 +442,11 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     }
 
     /// <summary>
-    /// Creates and prewarms the pool entity required by one boss minion rule.
-    /// /params entityManager Entity manager used for structural changes.
-    /// /params rule Rule that owns pool sizing and prefab data.
-    /// /returns Created pool entity, or Entity.Null when no valid prefab exists.
-    /// </summary>
-    private static Entity CreateAndPrewarmRulePool(EntityManager entityManager,
-                                                   in EnemyBossMinionSpawnElement rule)
-    {
-        if (rule.PrefabEntity == Entity.Null || !entityManager.Exists(rule.PrefabEntity))
-            return Entity.Null;
-
-        Entity poolEntity = entityManager.CreateEntity();
-        entityManager.AddComponentData(poolEntity, new EnemyPoolState
-        {
-            PrefabEntity = rule.PrefabEntity,
-            InitialCapacity = math.max(0, rule.AutomaticPoolSize),
-            ExpandBatch = math.max(1, rule.PoolExpandBatch),
-            Initialized = 1
-        });
-        entityManager.AddComponentData(poolEntity, new EnemySpawner
-        {
-            InitialPoolCapacityPerPrefab = math.max(0, rule.AutomaticPoolSize),
-            ExpandBatchPerPrefab = math.max(1, rule.PoolExpandBatch),
-            DespawnDistance = math.max(0f, rule.DespawnDistance),
-            MaximumSpawnDistanceFromCenter = 0f,
-            TotalPlannedEnemyCount = 0
-        });
-        entityManager.AddBuffer<EnemyPoolElement>(poolEntity);
-        EnemyPoolUtility.ExpandPool(entityManager,
-                                    poolEntity,
-                                    poolEntity,
-                                    rule.PrefabEntity,
-                                    math.max(0, rule.AutomaticPoolSize));
-        return poolEntity;
-    }
-
-    /// <summary>
-    /// Performs queued minion activations after boss entity iteration has completed.
+    /// Performs queued minion reservations after boss entity iteration has completed.
     /// /params entityManager Entity manager used to mutate pooled minions.
     /// /params spawnRequests Requests collected during the simulation pass.
+    /// /params aliveMinionCounts Current per-rule alive counts captured before spawning.
+    /// /params elapsedTime Current world elapsed time used for spawn feedback.
     /// /params hasPhysicsWorld True when wall queries can be evaluated.
     /// /params physicsWorldSingleton Physics world used for spawn safety checks.
     /// /params wallsLayerMask Wall layer mask used by spawn safety checks.
@@ -358,6 +458,7 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     private static void ProcessMinionSpawnRequests(EntityManager entityManager,
                                                    NativeList<MinionSpawnRequest> spawnRequests,
                                                    in NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
+                                                   float elapsedTime,
                                                    bool hasPhysicsWorld,
                                                    in PhysicsWorldSingleton physicsWorldSingleton,
                                                    int wallsLayerMask,
@@ -385,18 +486,19 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
             int aliveMinionCount = ResolveAliveMinionCount(in aliveMinionCounts, request.BossEntity, request.RuleIndex);
 
-            SpawnMinions(entityManager,
-                         request.BossEntity,
-                         request.RuleIndex,
-                         request.BossPosition,
-                         ref rule,
-                         aliveMinionCount,
-                         hasPhysicsWorld,
-                         in physicsWorldSingleton,
-                         wallsLayerMask,
-                         navigationReady,
-                         in navigationGridState,
-                         navigationCells);
+            ReserveMinionsForSpawn(entityManager,
+                                   request.BossEntity,
+                                   request.RuleIndex,
+                                   request.BossPosition,
+                                   ref rule,
+                                   aliveMinionCount,
+                                   elapsedTime,
+                                   hasPhysicsWorld,
+                                   in physicsWorldSingleton,
+                                   wallsLayerMask,
+                                   navigationReady,
+                                   in navigationGridState,
+                                   navigationCells);
 
             WriteCurrentRule(entityManager, request.BossEntity, request.RuleIndex, in rule);
         }
@@ -451,12 +553,14 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     }
 
     /// <summary>
-    /// Activates up to the configured spawn count from the rule pool.
+    /// Reserves up to the configured spawn count from the rule pool and arms warning rings before activation.
     /// /params entityManager Entity manager used to mutate pooled minions.
     /// /params bossEntity Boss that owns the minions.
     /// /params ruleIndex Rule index being spawned.
     /// /params bossPosition Current boss position.
     /// /params rule Mutable rule runtime data.
+    /// /params aliveMinionCount Current count for active and pending minions owned by this rule.
+    /// /params elapsedTime Current world elapsed time used to arm spawn feedback.
     /// /params hasPhysicsWorld True when wall queries can be evaluated.
     /// /params physicsWorldSingleton Physics world used for spawn safety checks.
     /// /params wallsLayerMask Wall layer mask used by spawn safety checks.
@@ -465,27 +569,29 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
     /// /returns None.
     /// </summary>
-    private static void SpawnMinions(EntityManager entityManager,
-                                     Entity bossEntity,
-                                     int ruleIndex,
-                                     float3 bossPosition,
-                                     ref EnemyBossMinionSpawnElement rule,
-                                     int aliveMinionCount,
-                                     bool hasPhysicsWorld,
-                                     in PhysicsWorldSingleton physicsWorldSingleton,
-                                     int wallsLayerMask,
-                                     bool navigationReady,
-                                     in EnemyNavigationGridState navigationGridState,
-                                     NativeArray<EnemyNavigationCellElement> navigationCells)
+    private static void ReserveMinionsForSpawn(EntityManager entityManager,
+                                               Entity bossEntity,
+                                               int ruleIndex,
+                                               float3 bossPosition,
+                                               ref EnemyBossMinionSpawnElement rule,
+                                               int aliveMinionCount,
+                                               float elapsedTime,
+                                               bool hasPhysicsWorld,
+                                               in PhysicsWorldSingleton physicsWorldSingleton,
+                                               int wallsLayerMask,
+                                               bool navigationReady,
+                                               in EnemyNavigationGridState navigationGridState,
+                                               NativeArray<EnemyNavigationCellElement> navigationCells)
     {
         int availableSlots = rule.MaxAliveMinions > 0
             ? math.max(0, rule.MaxAliveMinions - aliveMinionCount)
             : rule.SpawnCount;
         int spawnCount = math.min(math.max(0, rule.SpawnCount), availableSlots);
+        EnemySpawnWarningConfig spawnWarningConfig = EnemyBossMinionPendingSpawnUtility.BuildSpawnWarningConfig();
 
         for (int spawnIndex = 0; spawnIndex < spawnCount; spawnIndex++)
         {
-            if (!TryAcquireMinion(entityManager, rule.PoolEntity, rule.PrefabEntity, out Entity minionEntity))
+            if (!EnemyBossMinionPoolUtility.TryAcquireMinion(entityManager, rule.PoolEntity, rule.PrefabEntity, out Entity minionEntity))
                 return;
 
             EnemyData minionData = entityManager.HasComponent<EnemyData>(minionEntity)
@@ -503,103 +609,40 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                                                                             navigationReady,
                                                                                             in navigationGridState,
                                                                                             navigationCells);
-            EnemyPoolUtility.ActivateEnemy(entityManager,
-                                           minionEntity,
-                                           rule.PoolEntity,
-                                           rule.PoolEntity,
-                                           -1,
-                                           spawnPosition);
-            ApplyMinionMetadata(entityManager, minionEntity, bossEntity, ruleIndex, in rule);
+            float activationTime = elapsedTime + EnemySpawnWarningConfigUtility.ResolveEffectiveLeadTimeSeconds(in spawnWarningConfig);
+            EnemySpawnWarningState warningState = EnemyBossMinionPoolUtility.CreateSpawnWarningState(entityManager,
+                                                                                                     rule.PrefabEntity,
+                                                                                                     spawnPosition,
+                                                                                                     activationTime,
+                                                                                                     in spawnWarningConfig);
+            EnemyPoolUtility.ReserveEnemyForSpawn(entityManager,
+                                                  minionEntity,
+                                                  rule.PoolEntity,
+                                                  rule.PoolEntity,
+                                                  -1,
+                                                  spawnPosition,
+                                                  warningState);
+            EnemyBossMinionPoolUtility.ApplyMinionMetadata(entityManager,
+                                                           minionEntity,
+                                                           bossEntity,
+                                                           ruleIndex,
+                                                           in rule);
+
+            EnemyBossPendingMinionSpawnElement pendingSpawn = new EnemyBossPendingMinionSpawnElement
+            {
+                MinionEntity = minionEntity,
+                PoolEntity = rule.PoolEntity,
+                RuleIndex = ruleIndex,
+                SpawnPosition = spawnPosition,
+                ActivationTime = activationTime
+            };
+
+            if (EnemyBossMinionPendingSpawnUtility.TryAppendPendingSpawn(entityManager, bossEntity, in pendingSpawn))
+                continue;
+
+            EnemyBossMinionPendingSpawnUtility.RecyclePendingSpawn(entityManager, in pendingSpawn);
+            return;
         }
-    }
-
-    /// <summary>
-    /// Acquires one inactive minion from a rule pool, expanding the pool when empty.
-    /// /params entityManager Entity manager used to access the pool.
-    /// /params poolEntity Pool entity.
-    /// /params prefabEntity Enemy prefab entity.
-    /// /params minionEntity Output acquired minion.
-    /// /returns True when a minion was acquired.
-    /// </summary>
-    private static bool TryAcquireMinion(EntityManager entityManager,
-                                         Entity poolEntity,
-                                         Entity prefabEntity,
-                                         out Entity minionEntity)
-    {
-        minionEntity = Entity.Null;
-
-        if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
-            return false;
-
-        if (!entityManager.HasBuffer<EnemyPoolElement>(poolEntity))
-            return false;
-
-        DynamicBuffer<EnemyPoolElement> poolBuffer = entityManager.GetBuffer<EnemyPoolElement>(poolEntity);
-
-        if (poolBuffer.Length <= 0 && entityManager.HasComponent<EnemyPoolState>(poolEntity))
-        {
-            EnemyPoolState poolState = entityManager.GetComponentData<EnemyPoolState>(poolEntity);
-            EnemyPoolUtility.ExpandPool(entityManager,
-                                        poolEntity,
-                                        poolEntity,
-                                        prefabEntity,
-                                        math.max(1, poolState.ExpandBatch));
-            poolBuffer = entityManager.GetBuffer<EnemyPoolElement>(poolEntity);
-        }
-
-        while (poolBuffer.Length > 0)
-        {
-            int lastIndex = poolBuffer.Length - 1;
-            minionEntity = poolBuffer[lastIndex].EnemyEntity;
-            poolBuffer.RemoveAt(lastIndex);
-
-            if (entityManager.Exists(minionEntity))
-                return true;
-        }
-
-        minionEntity = Entity.Null;
-        return false;
-    }
-
-    /// <summary>
-    /// Writes boss ownership and reward multipliers onto one activated minion.
-    /// /params entityManager Entity manager used to mutate the minion.
-    /// /params minionEntity Activated minion.
-    /// /params bossEntity Boss that owns the minion.
-    /// /params ruleIndex Source rule index.
-    /// /params rule Rule data supplying reward multipliers.
-    /// /returns None.
-    /// </summary>
-    private static void ApplyMinionMetadata(EntityManager entityManager,
-                                            Entity minionEntity,
-                                            Entity bossEntity,
-                                            int ruleIndex,
-                                            in EnemyBossMinionSpawnElement rule)
-    {
-        EnemyBossMinionOwner owner = new EnemyBossMinionOwner
-        {
-            BossEntity = bossEntity,
-            RuleIndex = ruleIndex,
-            KillOnBossDeath = rule.KillMinionsOnBossDeath,
-            BlocksRunCompletion = rule.RequireMinionsKilledForRunCompletion
-        };
-
-        if (entityManager.HasComponent<EnemyBossMinionOwner>(minionEntity))
-            entityManager.SetComponentData(minionEntity, owner);
-        else
-            entityManager.AddComponentData(minionEntity, owner);
-
-        EnemyDropRewardMultiplier rewardMultiplier = new EnemyDropRewardMultiplier
-        {
-            ExperienceMultiplier = math.max(0f, rule.ExperienceDropMultiplier),
-            ExtraComboPointsMultiplier = math.max(0f, rule.ExtraComboPointsMultiplier),
-            FutureDropsMultiplier = math.max(0f, rule.FutureDropsMultiplier)
-        };
-
-        if (entityManager.HasComponent<EnemyDropRewardMultiplier>(minionEntity))
-            entityManager.SetComponentData(minionEntity, rewardMultiplier);
-        else
-            entityManager.AddComponentData(minionEntity, rewardMultiplier);
     }
 
     #endregion

@@ -282,6 +282,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public bool DisablePlayerKnockback
+    {
+        get
+        {
+            EnemyBrainMovementSettings settings = ResolveMovementSettings();
+
+            if (settings == null)
+                return false;
+
+            return settings.DisablePlayerKnockback;
+        }
+    }
+
     public float SeparationRadius
     {
         get

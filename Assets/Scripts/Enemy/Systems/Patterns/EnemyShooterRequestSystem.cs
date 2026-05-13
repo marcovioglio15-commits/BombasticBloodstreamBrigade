@@ -121,6 +121,7 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
                 runtime.NextBurstTimer = math.max(0f, runtime.NextBurstTimer - deltaTime);
                 runtime.NextShotInBurstTimer = math.max(0f, runtime.NextShotInBurstTimer - deltaTime);
+                runtime.PostFireStopTimer = math.max(0f, runtime.PostFireStopTimer - deltaTime);
                 runtime.IsPlayerInRange = IsInRange(playerDistance,
                                                     in shooterConfig,
                                                     in enemyRuntimeState.ValueRO,
@@ -132,16 +133,19 @@ public partial struct EnemyShooterRequestSystem : ISystem
                     runtime.ShotsFiredInCurrentBurst = 0;
                     runtime.BurstWindupDurationSeconds = 0f;
                     runtime.NextShotInBurstTimer = 0f;
+                    runtime.PostFireStopTimer = 0f;
                     runtime.HasLockedAimDirection = 0;
                     mutableShooterRuntime[shooterIndex] = runtime;
                     continue;
                 }
 
-                if (runtime.RemainingBurstShots <= 0 && runtime.NextBurstTimer <= 0f)
+                if (runtime.RemainingBurstShots <= 0 &&
+                    runtime.NextBurstTimer <= 0f &&
+                    runtime.PostFireStopTimer <= 0f)
                 {
                     runtime.RemainingBurstShots = math.max(1, shooterConfig.BurstCount);
                     runtime.ShotsFiredInCurrentBurst = 0;
-                    runtime.BurstWindupDurationSeconds = math.max(0f, shooterConfig.AimWindupSeconds);
+                    runtime.BurstWindupDurationSeconds = ResolveBurstWindupDuration(in shooterConfig);
                     runtime.NextShotInBurstTimer = runtime.BurstWindupDurationSeconds;
                     runtime.NextBurstTimer = math.max(0.01f, shooterConfig.FireInterval);
 
@@ -152,8 +156,7 @@ public partial struct EnemyShooterRequestSystem : ISystem
                     }
                 }
 
-                if (runtime.RemainingBurstShots > 0 &&
-                    shooterConfig.MovementPolicy == EnemyShooterMovementPolicy.StopWhileAiming)
+                if (ShouldLockShooterMovement(in shooterConfig, in runtime))
                 {
                     movementLocked = true;
                 }
@@ -214,6 +217,7 @@ public partial struct EnemyShooterRequestSystem : ISystem
                         runtime.NextShotInBurstTimer = 0f;
                         runtime.ShotsFiredInCurrentBurst = 0;
                         runtime.BurstWindupDurationSeconds = 0f;
+                        runtime.PostFireStopTimer = ResolvePostFireStopDuration(in shooterConfig);
                         runtime.HasLockedAimDirection = 0;
                     }
                 }
@@ -242,6 +246,7 @@ public partial struct EnemyShooterRequestSystem : ISystem
             {
                 NextBurstTimer = 0f,
                 NextShotInBurstTimer = 0f,
+                PostFireStopTimer = 0f,
                 RemainingBurstShots = 0,
                 ShotsFiredInCurrentBurst = 0,
                 BurstWindupDurationSeconds = 0f,
@@ -267,6 +272,49 @@ public partial struct EnemyShooterRequestSystem : ISystem
             return false;
 
         return true;
+    }
+
+    /// <summary>
+    /// Resolves whether one Shooter module currently requires movement to remain stopped.
+    /// /params shooterConfig Shooter configuration that declares the movement policy.
+    /// /params runtime Mutable Shooter timing state for active and post-fire phases.
+    /// /returns True when the enemy should hold position for this module.
+    /// </summary>
+    private static bool ShouldLockShooterMovement(in EnemyShooterConfigElement shooterConfig,
+                                                  in EnemyShooterRuntimeElement runtime)
+    {
+        if (shooterConfig.MovementPolicy != EnemyShooterMovementPolicy.StopWhileAiming)
+            return false;
+
+        return runtime.RemainingBurstShots > 0 || runtime.PostFireStopTimer > 0f;
+    }
+
+    /// <summary>
+    /// Resolves the first-shot delay for a burst, including stop-before-fire timing only when movement locking is enabled.
+    /// /params shooterConfig Shooter config containing windup and stop timing values.
+    /// /returns Seconds to wait before the first shot in the burst.
+    /// </summary>
+    private static float ResolveBurstWindupDuration(in EnemyShooterConfigElement shooterConfig)
+    {
+        float aimWindupSeconds = math.max(0f, shooterConfig.AimWindupSeconds);
+
+        if (shooterConfig.MovementPolicy != EnemyShooterMovementPolicy.StopWhileAiming)
+            return aimWindupSeconds;
+
+        return math.max(aimWindupSeconds, math.max(0f, shooterConfig.PreFireStopSeconds));
+    }
+
+    /// <summary>
+    /// Resolves post-fire stop timing only for Shooter modules that explicitly lock movement while aiming.
+    /// /params shooterConfig Shooter config containing movement policy and post-fire stop timing.
+    /// /returns Seconds to keep movement locked after the final shot.
+    /// </summary>
+    private static float ResolvePostFireStopDuration(in EnemyShooterConfigElement shooterConfig)
+    {
+        if (shooterConfig.MovementPolicy != EnemyShooterMovementPolicy.StopWhileAiming)
+            return 0f;
+
+        return math.max(0f, shooterConfig.PostFireStopSeconds);
     }
 
     /// <summary>
@@ -374,6 +422,37 @@ public partial struct EnemyShooterRequestSystem : ISystem
                                             float3 baseDirection,
                                             in EnemyShooterConfigElement shooterConfig)
     {
+        switch (shooterConfig.ShotPattern)
+        {
+            case EnemyShooterShotPattern.RadialBurst:
+                EnqueueRadialBurstRequests(shootRequests,
+                                           shooterPosition,
+                                           baseDirection,
+                                           in shooterConfig);
+                return;
+
+            default:
+                EnqueueForwardSpreadRequests(shootRequests,
+                                             shooterPosition,
+                                             baseDirection,
+                                             in shooterConfig);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Enqueues the default target-facing spread shot pattern.
+    /// /params shootRequests Buffer receiving projectile spawn requests.
+    /// /params shooterPosition World position of the shooter.
+    /// /params baseDirection Target-facing aim direction.
+    /// /params shooterConfig Shooter projectile payload.
+    /// /returns None.
+    /// </summary>
+    private static void EnqueueForwardSpreadRequests(DynamicBuffer<ShootRequest> shootRequests,
+                                                     float3 shooterPosition,
+                                                     float3 baseDirection,
+                                                     in EnemyShooterConfigElement shooterConfig)
+    {
         int projectilesPerShot = math.max(1, shooterConfig.ProjectilesPerShot);
 
         if (projectilesPerShot <= 1)
@@ -393,6 +472,32 @@ public partial struct EnemyShooterRequestSystem : ISystem
         {
             float angleOffset = startOffset + step * projectileIndex;
             float3 direction = RotateDirectionByDegrees(baseDirection, angleOffset);
+            AddShootRequest(shootRequests,
+                            shooterPosition,
+                            direction,
+                            in shooterConfig);
+        }
+    }
+
+    /// <summary>
+    /// Enqueues a full-circle projectile burst evenly distributed around the shooter.
+    /// /params shootRequests Buffer receiving projectile spawn requests.
+    /// /params shooterPosition World position of the shooter.
+    /// /params baseDirection First projectile direction, usually aimed at the player.
+    /// /params shooterConfig Shooter projectile payload.
+    /// /returns None.
+    /// </summary>
+    private static void EnqueueRadialBurstRequests(DynamicBuffer<ShootRequest> shootRequests,
+                                                   float3 shooterPosition,
+                                                   float3 baseDirection,
+                                                   in EnemyShooterConfigElement shooterConfig)
+    {
+        int projectilesPerShot = math.max(1, shooterConfig.ProjectilesPerShot);
+        float angleStep = 360f / projectilesPerShot;
+
+        for (int projectileIndex = 0; projectileIndex < projectilesPerShot; projectileIndex++)
+        {
+            float3 direction = RotateDirectionByDegrees(baseDirection, angleStep * projectileIndex);
             AddShootRequest(shootRequests,
                             shooterPosition,
                             direction,

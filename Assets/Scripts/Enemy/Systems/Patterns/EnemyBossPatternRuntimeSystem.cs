@@ -421,6 +421,7 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
         {
             NextBurstTimer = 0f,
             NextShotInBurstTimer = 0f,
+            PostFireStopTimer = 0f,
             RemainingBurstShots = 0,
             ShotsFiredInCurrentBurst = 0,
             BurstWindupDurationSeconds = 0f,

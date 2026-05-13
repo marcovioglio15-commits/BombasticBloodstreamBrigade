@@ -42,6 +42,17 @@ public enum EnemyShooterMovementPolicy
 }
 
 /// <summary>
+/// Declares how one Shooter activation distributes its projectile group.
+/// /params None.
+/// /returns None.
+/// </summary>
+public enum EnemyShooterShotPattern
+{
+    ForwardSpread = 0,
+    RadialBurst = 1
+}
+
+/// <summary>
 /// Declares runtime-resolved movement pattern kind used by ECS systems.
 /// </summary>
 public enum EnemyCompiledMovementPatternKind : byte

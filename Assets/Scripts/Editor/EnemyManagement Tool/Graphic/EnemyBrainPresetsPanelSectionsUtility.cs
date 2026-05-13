@@ -357,6 +357,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
         AddPropertyField(panel, container, movementProperty, "priorityTier", "Priority Tier", "General enemy priority tier used by steering and visual overlap rules. Higher values keep right-of-way over lower tiers.");
         AddPropertyField(panel, container, movementProperty, "steeringAggressiveness", "Steering Aggressiveness", "Scales steering and clearance reactivity. Higher values produce stronger side-step and avoidance corrections.");
         AddPropertyField(panel, container, movementProperty, "minimumWallDistance", "Minimum Wall Distance", "Extra distance in meters kept from static wall colliders by standard steering-driven enemies.");
+        AddPropertyField(panel, container, movementProperty, "disablePlayerKnockback", "Disable Player Knockback", "When enabled, player projectile knockback is ignored regardless of player stats or projectile payloads.");
         return container;
     }
 

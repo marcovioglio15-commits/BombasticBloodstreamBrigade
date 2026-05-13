@@ -593,6 +593,8 @@ public static class EnemyPoolUtility
     /// </summary>
     private static void ResetBossMinionRuntime(EntityManager entityManager, Entity enemyEntity)
     {
+        EnemyBossMinionPendingSpawnUtility.RecycleAndClearPendingSpawns(entityManager, enemyEntity);
+
         DynamicBuffer<EnemyBossMinionSpawnElement> minionSpawns = entityManager.GetBuffer<EnemyBossMinionSpawnElement>(enemyEntity);
 
         for (int index = 0; index < minionSpawns.Length; index++)
@@ -628,6 +630,7 @@ public static class EnemyPoolUtility
             {
                 NextBurstTimer = 0f,
                 NextShotInBurstTimer = 0f,
+                PostFireStopTimer = 0f,
                 RemainingBurstShots = 0,
                 ShotsFiredInCurrentBurst = 0,
                 BurstWindupDurationSeconds = 0f,

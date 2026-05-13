@@ -196,6 +196,7 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     /// /params projectedEnemyHealth Mutable projected enemy health buffer.
     /// /params enemyPositions Cached world positions of projected enemies.
     /// /params enemyRuntimeArray Cached runtime states of projected enemies.
+    /// /params enemyDataArray Cached immutable data of projected enemies.
     /// /params projectedEnemyKnockback Mutable projected knockback buffer.
     /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
     /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
@@ -222,6 +223,7 @@ internal static class PlayerLaserBeamDamageResolutionUtility
                                        ref NativeArray<EnemyHealth> projectedEnemyHealth,
                                        in NativeArray<float3> enemyPositions,
                                        in NativeArray<EnemyRuntimeState> enemyRuntimeArray,
+                                       in NativeArray<EnemyData> enemyDataArray,
                                        ref NativeArray<EnemyKnockbackState> projectedEnemyKnockback,
                                        ref NativeArray<byte> enemyDirtyFlags,
                                        ref NativeArray<byte> enemyFlashDirtyFlags,
@@ -248,6 +250,7 @@ internal static class PlayerLaserBeamDamageResolutionUtility
                                                               ref projectedEnemyHealth,
                                                               in enemyPositions,
                                                               in enemyRuntimeArray,
+                                                              in enemyDataArray,
                                                               ref projectedEnemyKnockback,
                                                               ref enemyDirtyFlags,
                                                               ref enemyFlashDirtyFlags,

@@ -563,17 +563,18 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Builds the warning payload stored on a reserved enemy and later consumed by presentation.
-    /// entityManager: Entity manager used to inspect prefab data for body-aware sizing.
-    /// prefabEntity: Enemy prefab baked on the staged event.
-    /// spawnTime: Absolute world time when the reserved enemy becomes active.
-    /// warningConfig: Immutable warning tuning baked from spawner authoring.
-    /// returns Resolved warning payload for one reserved enemy.
+    /// /params entityManager Entity manager used to inspect prefab data for body-aware sizing.
+    /// /params prefabEntity Enemy prefab baked on the staged event.
+    /// /params worldPosition Final world position presented by the warning ring.
+    /// /params spawnTime Absolute world time when the reserved enemy becomes active.
+    /// /params warningConfig Immutable warning tuning baked from spawner authoring.
+    /// /returns Resolved warning payload for one reserved enemy.
     /// </summary>
-    private static EnemySpawnWarningState CreateWarningState(EntityManager entityManager,
-                                                            Entity prefabEntity,
-                                                            float3 worldPosition,
-                                                            float spawnTime,
-                                                            EnemySpawnWarningConfig warningConfig)
+    internal static EnemySpawnWarningState CreateWarningState(EntityManager entityManager,
+                                                             Entity prefabEntity,
+                                                             float3 worldPosition,
+                                                             float spawnTime,
+                                                             EnemySpawnWarningConfig warningConfig)
     {
         bool warningEnabled = warningConfig.Enabled != 0;
         float leadTimeSeconds = EnemySpawnWarningConfigUtility.ResolveEffectiveLeadTimeSeconds(in warningConfig);

@@ -38,6 +38,9 @@ public sealed class EnemyBrainMovementSettings
 
     [Tooltip("Extra distance in meters kept from static wall colliders by standard steering-driven enemies.")]
     [SerializeField] private float minimumWallDistance = 0.25f;
+
+    [Tooltip("When enabled, player projectile knockback is ignored by this enemy regardless of player stats or projectile payloads.")]
+    [SerializeField] private bool disablePlayerKnockback;
     #endregion
 
     #endregion
@@ -112,6 +115,14 @@ public sealed class EnemyBrainMovementSettings
         get
         {
             return minimumWallDistance;
+        }
+    }
+
+    public bool DisablePlayerKnockback
+    {
+        get
+        {
+            return disablePlayerKnockback;
         }
     }
     #endregion

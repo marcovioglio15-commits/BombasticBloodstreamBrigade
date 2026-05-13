@@ -349,9 +349,12 @@ public static class EnemyAdvancedPatternBakeUtility
         {
             AimPolicy = ResolveShooterAimPolicy(shooterData.AimPolicy),
             MovementPolicy = ResolveShooterMovementPolicy(shooterData.MovementPolicy),
+            ShotPattern = ResolveShooterShotPattern(projectilePayload.ShotPattern),
             FireInterval = math.max(0.01f, shooterData.FireInterval),
             BurstCount = math.clamp(math.max(1, shooterData.BurstCount), 1, 64),
             AimWindupSeconds = math.max(0f, shooterData.AimWindupSeconds),
+            PreFireStopSeconds = math.max(0f, shooterData.PreFireStopSeconds),
+            PostFireStopSeconds = math.max(0f, shooterData.PostFireStopSeconds),
             IntraBurstDelay = math.max(0f, shooterData.IntraBurstDelay),
             UseMinimumRange = shooterData.UseMinimumRange ? (byte)1 : (byte)0,
             MinimumRange = minimumRange,
@@ -466,6 +469,24 @@ public static class EnemyAdvancedPatternBakeUtility
 
             default:
                 return EnemyShooterMovementPolicy.KeepMoving;
+        }
+    }
+
+    /// <summary>
+    /// Resolves authored Shooter projectile distribution to a supported runtime value.
+    /// /params shotPattern Authored projectile distribution mode.
+    /// /returns Valid Shooter shot pattern.
+    /// </summary>
+    internal static EnemyShooterShotPattern ResolveShooterShotPattern(EnemyShooterShotPattern shotPattern)
+    {
+        switch (shotPattern)
+        {
+            case EnemyShooterShotPattern.ForwardSpread:
+            case EnemyShooterShotPattern.RadialBurst:
+                return shotPattern;
+
+            default:
+                return EnemyShooterShotPattern.ForwardSpread;
         }
     }
 

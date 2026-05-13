@@ -427,6 +427,8 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         SerializedProperty fireIntervalProperty = shooterProperty.FindPropertyRelative("fireInterval");
         SerializedProperty burstCountProperty = shooterProperty.FindPropertyRelative("burstCount");
         SerializedProperty aimWindupSecondsProperty = shooterProperty.FindPropertyRelative("aimWindupSeconds");
+        SerializedProperty preFireStopSecondsProperty = shooterProperty.FindPropertyRelative("preFireStopSeconds");
+        SerializedProperty postFireStopSecondsProperty = shooterProperty.FindPropertyRelative("postFireStopSeconds");
         SerializedProperty intraBurstDelayProperty = shooterProperty.FindPropertyRelative("intraBurstDelay");
         SerializedProperty useMinimumRangeProperty = shooterProperty.FindPropertyRelative("useMinimumRange");
         SerializedProperty minimumRangeProperty = shooterProperty.FindPropertyRelative("minimumRange");
@@ -435,12 +437,17 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         SerializedProperty projectileProperty = shooterProperty.FindPropertyRelative("projectile");
         SerializedProperty runtimeProjectileProperty = shooterProperty.FindPropertyRelative("runtimeProjectile");
         SerializedProperty elementalProperty = shooterProperty.FindPropertyRelative("elemental");
+        SerializedProperty shotPatternProperty = projectileProperty != null ? projectileProperty.FindPropertyRelative("shotPattern") : null;
+        SerializedProperty projectilesPerShotProperty = projectileProperty != null ? projectileProperty.FindPropertyRelative("projectilesPerShot") : null;
+        SerializedProperty spreadAngleDegreesProperty = projectileProperty != null ? projectileProperty.FindPropertyRelative("spreadAngleDegrees") : null;
 
         if (aimPolicyProperty == null ||
             movementPolicyProperty == null ||
             fireIntervalProperty == null ||
             burstCountProperty == null ||
             aimWindupSecondsProperty == null ||
+            preFireStopSecondsProperty == null ||
+            postFireStopSecondsProperty == null ||
             intraBurstDelayProperty == null ||
             useMinimumRangeProperty == null ||
             minimumRangeProperty == null ||
@@ -448,7 +455,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             maximumRangeProperty == null ||
             projectileProperty == null ||
             runtimeProjectileProperty == null ||
-            elementalProperty == null)
+            elementalProperty == null ||
+            shotPatternProperty == null ||
+            projectilesPerShotProperty == null ||
+            spreadAngleDegreesProperty == null)
         {
             HelpBox missingFieldsBox = new HelpBox("Shooter payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(missingFieldsBox);
@@ -465,7 +475,17 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, fireIntervalProperty, "Fire Interval");
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, burstCountProperty, "Burst Count");
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, aimWindupSecondsProperty, "Aim Windup Seconds");
+        VisualElement stopTimingContainer = new VisualElement();
+        stopTimingContainer.style.marginLeft = 12f;
+        firingFoldout.Add(stopTimingContainer);
+        EnemyAdvancedPatternDrawerUtility.AddField(stopTimingContainer, preFireStopSecondsProperty, "Minimum Stop Before Fire Seconds");
+        EnemyAdvancedPatternDrawerUtility.AddField(stopTimingContainer, postFireStopSecondsProperty, "Minimum Stop After Fire Seconds");
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, intraBurstDelayProperty, "Intra Burst Delay");
+        UpdateShooterStopTimingVisibility(movementPolicyProperty, stopTimingContainer);
+        firingFoldout.TrackPropertyValue(movementPolicyProperty, changedProperty =>
+        {
+            UpdateShooterStopTimingVisibility(changedProperty, stopTimingContainer);
+        });
 
         if (includeRangeSettings)
         {
@@ -505,8 +525,12 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         projectileFoldout.value = true;
         payloadContainer.Add(projectileFoldout);
 
-        EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("projectilesPerShot"), "Projectiles Per Shot");
-        EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("spreadAngleDegrees"), "Spread Angle Degrees");
+        EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, shotPatternProperty, "Shot Pattern");
+        EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectilesPerShotProperty, "Projectiles Per Shot");
+        VisualElement spreadContainer = new VisualElement();
+        spreadContainer.style.marginLeft = 12f;
+        projectileFoldout.Add(spreadContainer);
+        EnemyAdvancedPatternDrawerUtility.AddField(spreadContainer, spreadAngleDegreesProperty, "Spread Angle Degrees");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("projectileSpeed"), "Projectile Speed");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("projectileDamage"), "Projectile Damage");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("projectileRange"), "Projectile Range");
@@ -516,6 +540,15 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("penetrationMode"), "Penetration Mode");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("maxPenetrations"), "Max Penetrations");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("inheritShooterSpeed"), "Inherit Shooter Speed");
+        UpdateShooterSpreadVisibility(shotPatternProperty, projectilesPerShotProperty, spreadContainer);
+        projectileFoldout.TrackPropertyValue(shotPatternProperty, changedProperty =>
+        {
+            UpdateShooterSpreadVisibility(changedProperty, projectilesPerShotProperty, spreadContainer);
+        });
+        projectileFoldout.TrackPropertyValue(projectilesPerShotProperty, changedProperty =>
+        {
+            UpdateShooterSpreadVisibility(shotPatternProperty, changedProperty, spreadContainer);
+        });
 
         Foldout runtimeProjectileFoldout = new Foldout();
         runtimeProjectileFoldout.text = "Runtime Projectile";
@@ -623,6 +656,84 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         if (dvdFoldout != null)
             dvdFoldout.style.display = mode == EnemyWandererMode.Dvd ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Updates visibility for Shooter stop timing fields that only affect Stop While Aiming movement.
+    /// /params movementPolicyProperty Serialized Shooter movement policy field.
+    /// /params stopTimingContainer Container that owns the stop timing fields.
+    /// /returns None.
+    /// </summary>
+    private static void UpdateShooterStopTimingVisibility(SerializedProperty movementPolicyProperty,
+                                                          VisualElement stopTimingContainer)
+    {
+        if (stopTimingContainer == null)
+            return;
+
+        EnemyShooterMovementPolicy movementPolicy = ResolveShooterMovementPolicy(movementPolicyProperty);
+        stopTimingContainer.style.display = movementPolicy == EnemyShooterMovementPolicy.StopWhileAiming
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Updates visibility for forward-spread angle controls based on shot pattern and projectile count.
+    /// /params shotPatternProperty Serialized Shooter shot pattern field.
+    /// /params projectilesPerShotProperty Serialized projectile count field.
+    /// /params spreadContainer Container that owns the spread angle field.
+    /// /returns None.
+    /// </summary>
+    private static void UpdateShooterSpreadVisibility(SerializedProperty shotPatternProperty,
+                                                      SerializedProperty projectilesPerShotProperty,
+                                                      VisualElement spreadContainer)
+    {
+        if (spreadContainer == null)
+            return;
+
+        EnemyShooterShotPattern shotPattern = ResolveShooterShotPattern(shotPatternProperty);
+        int projectilesPerShot = projectilesPerShotProperty != null ? projectilesPerShotProperty.intValue : 1;
+        bool showSpread = shotPattern == EnemyShooterShotPattern.ForwardSpread && projectilesPerShot > 1;
+        spreadContainer.style.display = showSpread ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Resolves a serialized Shooter movement policy for editor-only visibility decisions.
+    /// /params movementPolicyProperty Serialized enum field.
+    /// /returns Valid movement policy value.
+    /// </summary>
+    private static EnemyShooterMovementPolicy ResolveShooterMovementPolicy(SerializedProperty movementPolicyProperty)
+    {
+        if (movementPolicyProperty == null || movementPolicyProperty.propertyType != SerializedPropertyType.Enum)
+            return EnemyShooterMovementPolicy.KeepMoving;
+
+        switch (movementPolicyProperty.enumValueIndex)
+        {
+            case (int)EnemyShooterMovementPolicy.StopWhileAiming:
+                return EnemyShooterMovementPolicy.StopWhileAiming;
+
+            default:
+                return EnemyShooterMovementPolicy.KeepMoving;
+        }
+    }
+
+    /// <summary>
+    /// Resolves a serialized Shooter shot pattern for editor-only visibility decisions.
+    /// /params shotPatternProperty Serialized enum field.
+    /// /returns Valid shot pattern value.
+    /// </summary>
+    private static EnemyShooterShotPattern ResolveShooterShotPattern(SerializedProperty shotPatternProperty)
+    {
+        if (shotPatternProperty == null || shotPatternProperty.propertyType != SerializedPropertyType.Enum)
+            return EnemyShooterShotPattern.ForwardSpread;
+
+        switch (shotPatternProperty.enumValueIndex)
+        {
+            case (int)EnemyShooterShotPattern.RadialBurst:
+                return EnemyShooterShotPattern.RadialBurst;
+
+            default:
+                return EnemyShooterShotPattern.ForwardSpread;
+        }
     }
 
     /// <summary>

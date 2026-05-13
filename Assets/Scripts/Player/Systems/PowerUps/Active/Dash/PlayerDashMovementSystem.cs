@@ -114,7 +114,7 @@ public partial struct PlayerDashMovementSystem : ISystem
         if (transitionInDuration > 0f)
         {
             float transitionInTime = math.min(clampedElapsed, transitionInDuration);
-            area += (transitionInTime * transitionInTime) / (2f * transitionInDuration);
+            area += ResolveSmoothTransitionInArea(transitionInTime, transitionInDuration);
             clampedElapsed -= transitionInTime;
         }
 
@@ -132,8 +132,38 @@ public partial struct PlayerDashMovementSystem : ISystem
             return area;
 
         float transitionOutTime = math.min(clampedElapsed, transitionOutDuration);
-        area += transitionOutTime - (transitionOutTime * transitionOutTime) / (2f * transitionOutDuration);
+        area += ResolveSmoothTransitionOutArea(transitionOutTime, transitionOutDuration);
         return area;
+    }
+
+    /// <summary>
+    /// Integrates the smoothstep ramp-up profile while keeping the same total area as a linear ramp.
+    /// /params transitionTime Elapsed time inside the transition.
+    /// /params transitionDuration Full transition duration.
+    /// /returns Integrated area contributed by the ramp-up.
+    /// </summary>
+    private static float ResolveSmoothTransitionInArea(float transitionTime, float transitionDuration)
+    {
+        float safeDuration = math.max(MinimumProfileDuration, transitionDuration);
+        float normalizedTime = math.saturate(transitionTime / safeDuration);
+        float normalizedTimeSquared = normalizedTime * normalizedTime;
+        float normalizedTimeCubed = normalizedTimeSquared * normalizedTime;
+        return safeDuration * (normalizedTimeCubed - 0.5f * normalizedTimeCubed * normalizedTime);
+    }
+
+    /// <summary>
+    /// Integrates the smoothstep ramp-down profile while keeping the same total area as a linear ramp.
+    /// /params transitionTime Elapsed time inside the transition.
+    /// /params transitionDuration Full transition duration.
+    /// /returns Integrated area contributed by the ramp-down.
+    /// </summary>
+    private static float ResolveSmoothTransitionOutArea(float transitionTime, float transitionDuration)
+    {
+        float safeDuration = math.max(MinimumProfileDuration, transitionDuration);
+        float normalizedTime = math.saturate(transitionTime / safeDuration);
+        float normalizedTimeSquared = normalizedTime * normalizedTime;
+        float normalizedTimeCubed = normalizedTimeSquared * normalizedTime;
+        return safeDuration * (normalizedTime - normalizedTimeCubed + 0.5f * normalizedTimeCubed * normalizedTime);
     }
 
     /// <summary>

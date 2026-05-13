@@ -15,6 +15,7 @@ public partial struct PlayerMovementApplySystem : ISystem
     #region Constants
     private const float PlayerCollisionRadius = 0.35f;
     private const float DashBounceDirectionEpsilon = 1e-6f;
+    private const float DashMaximumSoftBounceCoefficient = 0.82f;
     #endregion
 
     #region Methods
@@ -149,9 +150,10 @@ public partial struct PlayerMovementApplySystem : ISystem
             return false;
 
         float bounceIntensity = math.clamp(dashState.WallBounceIntensity, 0f, 1f);
+        float softenedBounceCoefficient = ResolveSoftenedDashBounceCoefficient(bounceIntensity);
         float3 bouncedVelocity = WorldWallCollisionUtility.ComputeBounceVelocity(resolvedVelocity,
                                                                                  hitNormal,
-                                                                                 bounceIntensity);
+                                                                                 softenedBounceCoefficient);
         float3 bouncedPlanarVelocity = bouncedVelocity;
         bouncedPlanarVelocity.y = 0f;
 
@@ -167,6 +169,18 @@ public partial struct PlayerMovementApplySystem : ISystem
         dashLookup[entity] = dashState;
         resolvedVelocity = bouncedVelocity;
         return true;
+    }
+
+    /// <summary>
+    /// Converts the authored dash bounce intensity into a softer physical response for wall impacts.
+    /// /params bounceIntensity Authored intensity in the normalized [0..1] range.
+    /// /returns Smoothed bounce coefficient consumed by the shared wall utility.
+    /// </summary>
+    private static float ResolveSoftenedDashBounceCoefficient(float bounceIntensity)
+    {
+        float clampedIntensity = math.saturate(bounceIntensity);
+        float smoothedIntensity = clampedIntensity * clampedIntensity * (3f - 2f * clampedIntensity);
+        return smoothedIntensity * DashMaximumSoftBounceCoefficient;
     }
 
     /// <summary>

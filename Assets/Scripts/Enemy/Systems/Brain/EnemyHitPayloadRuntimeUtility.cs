@@ -24,6 +24,7 @@ public static class EnemyHitPayloadRuntimeUtility
     /// /params enemyEntities Enemy entity array indexed by the enemy query order.
     /// /params enemyPositions Enemy world positions indexed by the enemy query order.
     /// /params enemyRuntimeArray Enemy runtime state array indexed by the enemy query order.
+    /// /params enemyDataArray Enemy immutable data array indexed by the enemy query order.
     /// /params projectedEnemyKnockback Mutable projected knockback state array.
     /// /params elementalVfxConfigLookup Lookup used to resolve shooter-authored elemental VFX presets.
     /// /params elementalVfxAnchorLookup Lookup used to resolve optional enemy follow anchors for elemental VFX.
@@ -43,6 +44,7 @@ public static class EnemyHitPayloadRuntimeUtility
                                              NativeArray<Entity> enemyEntities,
                                              NativeArray<float3> enemyPositions,
                                              NativeArray<EnemyRuntimeState> enemyRuntimeArray,
+                                             NativeArray<EnemyData> enemyDataArray,
                                              ref NativeArray<EnemyKnockbackState> projectedEnemyKnockback,
                                              in ComponentLookup<PlayerElementalVfxConfig> elementalVfxConfigLookup,
                                              in ComponentLookup<EnemyElementalVfxAnchor> elementalVfxAnchorLookup,
@@ -55,7 +57,8 @@ public static class EnemyHitPayloadRuntimeUtility
         if (enemyIndex < 0 ||
             enemyIndex >= enemyEntities.Length ||
             enemyIndex >= enemyPositions.Length ||
-            enemyIndex >= enemyRuntimeArray.Length)
+            enemyIndex >= enemyRuntimeArray.Length ||
+            enemyIndex >= enemyDataArray.Length)
         {
             return false;
         }
@@ -63,6 +66,7 @@ public static class EnemyHitPayloadRuntimeUtility
         Entity enemyEntity = enemyEntities[enemyIndex];
         float3 enemyPosition = enemyPositions[enemyIndex];
         EnemyRuntimeState enemyRuntimeState = enemyRuntimeArray[enemyIndex];
+        EnemyData enemyData = enemyDataArray[enemyIndex];
         TryApplyElementalPayloads(enemyEntity,
                                   impactPosition,
                                   shooterEntity,
@@ -78,6 +82,7 @@ public static class EnemyHitPayloadRuntimeUtility
                                                          enemyPosition,
                                                          in projectileData,
                                                          in projectileTransform,
+                                                         in enemyData,
                                                          ref projectedEnemyKnockback,
                                                          in spawnInactivityLockLookup);
         TryEnqueueEnemyHitVfx(enemyEntity,
@@ -185,6 +190,7 @@ public static class EnemyHitPayloadRuntimeUtility
     /// /params enemyPosition Enemy world position used by the knockback solver.
     /// /params projectileData Projectile payload data used by the knockback solver.
     /// /params projectileTransform Projectile transform used by the knockback solver.
+    /// /params enemyData Immutable target enemy data used to inspect knockback immunity.
     /// /params projectedEnemyKnockback Mutable projected knockback state array.
     /// /params spawnInactivityLockLookup Lookup used to block knockback while enemies are spawn-locked.
     /// /returns True when the projected knockback state changed, otherwise false.
@@ -194,10 +200,14 @@ public static class EnemyHitPayloadRuntimeUtility
                                                  float3 enemyPosition,
                                                  in Projectile projectileData,
                                                  in LocalTransform projectileTransform,
+                                                 in EnemyData enemyData,
                                                  ref NativeArray<EnemyKnockbackState> projectedEnemyKnockback,
                                                  in ComponentLookup<EnemySpawnInactivityLock> spawnInactivityLockLookup)
     {
         if (enemyIndex < 0 || enemyIndex >= projectedEnemyKnockback.Length)
+            return false;
+
+        if (enemyData.DisablePlayerKnockback != 0)
             return false;
 
         if (spawnInactivityLockLookup.HasComponent(enemyEntity) &&

@@ -33,6 +33,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             MinimumWallDistance = math.max(0f, authoring.MinimumWallDistance),
             PriorityTier = math.clamp(authoring.PriorityTier, -128, 128),
             SteeringAggressiveness = math.clamp(authoring.SteeringAggressiveness, 0f, 2.5f),
+            DisablePlayerKnockback = authoring.DisablePlayerKnockback ? (byte)1 : (byte)0,
             ContactDamageEnabled = authoring.ContactDamageEnabled ? (byte)1 : (byte)0,
             ContactRadius = math.max(0f, authoring.ContactRadius),
             ContactAmountPerTick = math.max(0f, authoring.ContactAmountPerTick),
@@ -113,6 +114,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             {
                 NextBurstTimer = 0f,
                 NextShotInBurstTimer = 0f,
+                PostFireStopTimer = 0f,
                 RemainingBurstShots = 0,
                 ShotsFiredInCurrentBurst = 0,
                 BurstWindupDurationSeconds = 0f,
@@ -367,6 +369,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         }
 
         DynamicBuffer<EnemyBossMinionSpawnElement> minionSpawnBuffer = AddBuffer<EnemyBossMinionSpawnElement>(entity);
+        AddBuffer<EnemyBossPendingMinionSpawnElement>(entity);
 
         for (int minionIndex = 0; minionIndex < compiledBossPattern.MinionSpawns.Count; minionIndex++)
             minionSpawnBuffer.Add(compiledBossPattern.MinionSpawns[minionIndex]);

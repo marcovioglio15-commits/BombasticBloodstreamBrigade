@@ -19,6 +19,7 @@ public struct EnemyData : IComponentData
     public float MinimumWallDistance;
     public int PriorityTier;
     public float SteeringAggressiveness;
+    public byte DisablePlayerKnockback;
     public byte ContactDamageEnabled;
     public float ContactRadius;
     public float ContactAmountPerTick;

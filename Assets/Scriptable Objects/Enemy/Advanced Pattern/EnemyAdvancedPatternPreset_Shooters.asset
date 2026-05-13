@@ -147,12 +147,15 @@ MonoBehaviour:
         fireInterval: 1
         burstCount: 1
         aimWindupSeconds: 0.25
+        preFireStopSeconds: 0.25
+        postFireStopSeconds: 0
         intraBurstDelay: 0.08
         useMinimumRange: 0
         minimumRange: 2
         useMaximumRange: 0
         maximumRange: 20
         projectile:
+          shotPattern: 0
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 14
@@ -331,12 +334,15 @@ MonoBehaviour:
         fireInterval: 1
         burstCount: 1
         aimWindupSeconds: 0.25
+        preFireStopSeconds: 0.25
+        postFireStopSeconds: 0
         intraBurstDelay: 0.08
         useMinimumRange: 0
         minimumRange: 2
         useMaximumRange: 0
         maximumRange: 20
         projectile:
+          shotPattern: 0
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 14
@@ -515,12 +521,15 @@ MonoBehaviour:
         fireInterval: 1
         burstCount: 1
         aimWindupSeconds: 0.25
+        preFireStopSeconds: 0.25
+        postFireStopSeconds: 0
         intraBurstDelay: 0.08
         useMinimumRange: 0
         minimumRange: 2
         useMaximumRange: 0
         maximumRange: 20
         projectile:
+          shotPattern: 0
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 14
@@ -699,12 +708,15 @@ MonoBehaviour:
         fireInterval: 1.5
         burstCount: 2
         aimWindupSeconds: 0.25
+        preFireStopSeconds: 0.25
+        postFireStopSeconds: 0
         intraBurstDelay: 0.3
         useMinimumRange: 1
         minimumRange: 2
         useMaximumRange: 1
         maximumRange: 15
         projectile:
+          shotPattern: 0
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 8
@@ -883,12 +895,15 @@ MonoBehaviour:
         fireInterval: 1
         burstCount: 1
         aimWindupSeconds: 0.25
+        preFireStopSeconds: 0.25
+        postFireStopSeconds: 0
         intraBurstDelay: 0.08
         useMinimumRange: 0
         minimumRange: 2
         useMaximumRange: 0
         maximumRange: 20
         projectile:
+          shotPattern: 0
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 14
@@ -1079,12 +1094,15 @@ MonoBehaviour:
           fireInterval: 1
           burstCount: 1
           aimWindupSeconds: 0.25
+          preFireStopSeconds: 0.25
+          postFireStopSeconds: 0
           intraBurstDelay: 0.08
           useMinimumRange: 0
           minimumRange: 2
           useMaximumRange: 0
           maximumRange: 20
           projectile:
+            shotPattern: 0
             projectilesPerShot: 1
             spreadAngleDegrees: 0
             projectileSpeed: 14
@@ -1262,12 +1280,15 @@ MonoBehaviour:
           fireInterval: 1
           burstCount: 1
           aimWindupSeconds: 0.25
+          preFireStopSeconds: 0.25
+          postFireStopSeconds: 0
           intraBurstDelay: 0.08
           useMinimumRange: 0
           minimumRange: 2
           useMaximumRange: 0
           maximumRange: 20
           projectile:
+            shotPattern: 0
             projectilesPerShot: 1
             spreadAngleDegrees: 0
             projectileSpeed: 14
@@ -1445,12 +1466,15 @@ MonoBehaviour:
           fireInterval: 1
           burstCount: 1
           aimWindupSeconds: 0.25
+          preFireStopSeconds: 0.25
+          postFireStopSeconds: 0
           intraBurstDelay: 0.08
           useMinimumRange: 0
           minimumRange: 2
           useMaximumRange: 0
           maximumRange: 20
           projectile:
+            shotPattern: 0
             projectilesPerShot: 1
             spreadAngleDegrees: 0
             projectileSpeed: 14
