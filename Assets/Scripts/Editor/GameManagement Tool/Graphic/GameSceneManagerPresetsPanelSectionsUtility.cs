@@ -92,6 +92,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
             case GameSceneManagerPresetsPanel.DetailsSectionType.Fade:
                 BuildPropertySection(panel, "Fade", "fadeSettings", "Default fade timing and visual settings for scene transitions.");
                 break;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress:
+                BuildPropertySection(panel, "Loading Progress", "loadingProgressSettings", "Circular loading-progress indicator shown during black-screen transition loading.");
+                break;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Triggers:
                 BuildTriggerSection(panel);
                 break;
@@ -314,6 +317,7 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.SceneTable, "Scene Table");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Transitions, "Transitions");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Fade, "Fade");
+        AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress, "Loading Progress");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Triggers, "Triggers");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Validation, "Validation");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Addressables, "Addressables");
@@ -361,6 +365,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
                 return 96f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Addressables:
                 return 112f;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress:
+                return 136f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Transitions:
                 return 96f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Validation:

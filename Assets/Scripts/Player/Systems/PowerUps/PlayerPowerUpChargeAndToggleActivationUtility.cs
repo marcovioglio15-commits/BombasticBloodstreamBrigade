@@ -197,14 +197,14 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                                           normalizedCharge,
                                                                           shootRequests);
 
-                ExecuteReleaseDashIfConfigured(in slotConfig,
-                                               in lookState,
-                                               in movementState,
-                                               in runtimeMovementConfig,
-                                               in localTransform,
-                                               moveInput,
-                                               lastValidMovementDirection,
-                                               ref dashState);
+                PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
+                                                                            in lookState,
+                                                                            in movementState,
+                                                                            in runtimeMovementConfig,
+                                                                            in localTransform,
+                                                                            moveInput,
+                                                                            lastValidMovementDirection,
+                                                                            ref dashState);
 
                 if (canEnqueueAudioRequests)
                 {
@@ -249,6 +249,12 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// shieldLookup: Shield lookup used when the activation resource is Shield.
     /// updatedShield: Cached mutable shield state reused by the caller.
     /// shieldChanged: True when updatedShield already contains a fetched runtime value.
+    /// lookState: Player look state used by optional Dash payloads.
+    /// movementState: Player movement state used by optional Dash payloads.
+    /// runtimeMovementConfig: Runtime movement config used by optional Dash payloads.
+    /// localTransform: Player transform used by optional Dash payloads.
+    /// moveInput: Raw movement input used by optional Dash payloads.
+    /// lastValidMovementDirection: Cached movement direction used by optional Dash payloads.
     /// dashState: Mutable dash state interrupted by hard slot interruption rules.
     /// bulletTimeState: Mutable bullet-time state interrupted by hard slot interruption rules.
     /// returns void.
@@ -273,6 +279,12 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                 ref ComponentLookup<PlayerShield> shieldLookup,
                                                 ref PlayerShield updatedShield,
                                                 ref bool shieldChanged,
+                                                in PlayerLookState lookState,
+                                                in PlayerMovementState movementState,
+                                                in PlayerRuntimeMovementConfig runtimeMovementConfig,
+                                                in LocalTransform localTransform,
+                                                float2 moveInput,
+                                                float3 lastValidMovementDirection,
                                                 ref PlayerDashState dashState,
                                                 ref PlayerBulletTimeState bulletTimeState)
     {
@@ -329,6 +341,14 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         isActive = 1;
         maintenanceTickTimer = 0f;
         cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
+        PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
+                                                                    in lookState,
+                                                                    in movementState,
+                                                                    in runtimeMovementConfig,
+                                                                    in localTransform,
+                                                                    moveInput,
+                                                                    lastValidMovementDirection,
+                                                                    ref dashState);
 
         if (slotConfig.SuppressBaseShootingWhileActive != 0)
             isShootingSuppressed = 1;
@@ -384,46 +404,6 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     #endregion
 
     #region Private Methods
-    /// <summary>
-    /// Executes the optional Dash module chained to a successful hold-charge release.
-    /// /params slotConfig Active slot containing charge-shot and optional dash payloads.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used for movement-relative dash directions.
-    /// /params localTransform Player transform used for fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashState Mutable dash state receiving the chained release dash.
-    /// /returns None.
-    /// </summary>
-    private static void ExecuteReleaseDashIfConfigured(in PlayerPowerUpSlotConfig slotConfig,
-                                                       in PlayerLookState lookState,
-                                                       in PlayerMovementState movementState,
-                                                       in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                                       in LocalTransform localTransform,
-                                                       float2 moveInput,
-                                                       float3 lastValidMovementDirection,
-                                                       ref PlayerDashState dashState)
-    {
-        if (slotConfig.Dash.Distance <= 0f)
-            return;
-
-        if (slotConfig.Dash.Duration <= 0f)
-            return;
-
-        if (dashState.IsDashing != 0)
-            return;
-
-        PlayerPowerUpActivationExecutionUtility.ExecuteDash(in slotConfig,
-                                                            in lookState,
-                                                            in movementState,
-                                                            in runtimeMovementConfig,
-                                                            in localTransform,
-                                                            moveInput,
-                                                            lastValidMovementDirection,
-                                                            ref dashState);
-    }
-
     /// <summary>
     /// Resolves the normalized charge fraction above the minimum release threshold.
     /// slotCharge: Stored charge sampled at release time.

@@ -1,16 +1,40 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 /// <summary>
 /// Contains execution helpers for active power-up runtime effects such as projectiles, bombs, dash and bullet time.
+/// /params None.
+/// /returns None.
 /// </summary>
 public static class PlayerPowerUpActivationExecutionUtility
 {
     #region Methods
 
     #region Execute
+    /// <summary>
+    /// Executes one active slot's primary tool and any non-primary Dash payload chained to the same activation.
+    /// /params slotConfig Runtime active slot configuration.
+    /// /params localTransform Player transform used by projectiles, bombs and dash fallback direction.
+    /// /params lookState Player look state used by projectile and dash direction resolution.
+    /// /params movementState Player movement state used by dash and bomb direction resolution.
+    /// /params runtimeMovementConfig Runtime movement config used by movement-relative dash direction resolution.
+    /// /params runtimeShootingConfig Runtime shooting config used by projectile request creation.
+    /// /params appliedElementSlots Runtime elemental slots applied to emitted projectiles.
+    /// /params passiveToolsState Aggregated passive tool state applied to projectile-style tools.
+    /// /params muzzleLookup Shooter muzzle lookup used to resolve projectile spawn positions.
+    /// /params transformLookup Transform lookup used to resolve projectile spawn positions.
+    /// /params localToWorldLookup LocalToWorld lookup used to resolve projectile spawn positions.
+    /// /params moveInput Raw movement input used as dash direction fallback.
+    /// /params lastValidMovementDirection Cached movement direction used as dash direction fallback.
+    /// /params playerEntity Player entity that owns spawned requests.
+    /// /params laserBeamState Mutable laser-beam state for triggered active beams.
+    /// /params dashState Mutable dash state for primary or chained dash execution.
+    /// /params bulletTimeState Mutable bullet-time state for timed slow effects.
+    /// /params bombRequests Output bomb-spawn request buffer.
+    /// /params shootRequests Output projectile-spawn request buffer.
+    /// /returns None.
+    /// </summary>
     public static void ExecuteTool(in PlayerPowerUpSlotConfig slotConfig,
                                    in LocalTransform localTransform,
                                    in PlayerLookState lookState,
@@ -31,24 +55,27 @@ public static class PlayerPowerUpActivationExecutionUtility
                                    DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
                                    DynamicBuffer<ShootRequest> shootRequests)
     {
+        bool executeDashAfterPrimaryTool = slotConfig.ToolKind != ActiveToolKind.Dash &&
+                                           PlayerPowerUpDashActivationUtility.HasDashPayload(in slotConfig);
+
         switch (slotConfig.ToolKind)
         {
             case ActiveToolKind.Bomb:
                 ExecuteBomb(in slotConfig, in localTransform, in lookState, in movementState, playerEntity, bombRequests);
-                return;
+                break;
             case ActiveToolKind.Dash:
-                ExecuteDash(in slotConfig,
-                            in lookState,
-                            in movementState,
-                            in runtimeMovementConfig,
-                            in localTransform,
-                            moveInput,
-                            lastValidMovementDirection,
-                            ref dashState);
+                PlayerPowerUpDashActivationUtility.ExecuteDash(in slotConfig,
+                                                                in lookState,
+                                                                in movementState,
+                                                                in runtimeMovementConfig,
+                                                                in localTransform,
+                                                                moveInput,
+                                                                lastValidMovementDirection,
+                                                                ref dashState);
                 return;
             case ActiveToolKind.BulletTime:
                 ExecuteBulletTime(in slotConfig, ref bulletTimeState);
-                return;
+                break;
             case ActiveToolKind.Shotgun:
                 ExecuteShotgun(in slotConfig,
                                in localTransform,
@@ -62,14 +89,45 @@ public static class PlayerPowerUpActivationExecutionUtility
                                in localToWorldLookup,
                                ref laserBeamState,
                                shootRequests);
-                return;
+                break;
             case ActiveToolKind.PortableHealthPack:
-                return;
+                break;
             case ActiveToolKind.PassiveToggle:
                 return;
+            default:
+                return;
         }
+
+        if (!executeDashAfterPrimaryTool)
+            return;
+
+        PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
+                                                                    in lookState,
+                                                                    in movementState,
+                                                                    in runtimeMovementConfig,
+                                                                    in localTransform,
+                                                                    moveInput,
+                                                                    lastValidMovementDirection,
+                                                                    ref dashState);
     }
 
+    /// <summary>
+    /// Executes a charged shot after a valid charge release, including charged lasers and projectile bursts.
+    /// /params slotConfig Runtime active slot configuration.
+    /// /params localTransform Player transform used for projectile direction fallback.
+    /// /params lookState Player look state used to resolve firing direction.
+    /// /params runtimeShootingConfig Runtime shooting config used by projectile request creation.
+    /// /params appliedElementSlots Runtime elemental slots applied to emitted projectiles.
+    /// /params passiveToolsState Aggregated passive tool state applied to projectile-style tools.
+    /// /params playerEntity Player entity that owns spawned requests.
+    /// /params muzzleLookup Shooter muzzle lookup used to resolve projectile spawn positions.
+    /// /params transformLookup Transform lookup used to resolve projectile spawn positions.
+    /// /params localToWorldLookup LocalToWorld lookup used to resolve projectile spawn positions.
+    /// /params laserBeamState Mutable laser-beam state for charged active beams.
+    /// /params normalizedCharge Charge amount normalized above the required release threshold.
+    /// /params shootRequests Output projectile-spawn request buffer.
+    /// /returns None.
+    /// </summary>
     public static void ExecuteChargeShot(in PlayerPowerUpSlotConfig slotConfig,
                                          in LocalTransform localTransform,
                                          in PlayerLookState lookState,
@@ -279,82 +337,6 @@ public static class PlayerPowerUpActivationExecutionUtility
         });
     }
 
-    /// <summary>
-    /// Starts a fixed-distance dash using the configured direction source and speed profile.
-    /// /params slotConfig Active slot that owns the dash payload.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used when resolving movement-input dash directions.
-    /// /params localTransform Player transform used as fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashState Mutable dash runtime state receiving the started dash.
-    /// /returns None.
-    /// </summary>
-    public static void ExecuteDash(in PlayerPowerUpSlotConfig slotConfig,
-                                   in PlayerLookState lookState,
-                                   in PlayerMovementState movementState,
-                                   in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                   in LocalTransform localTransform,
-                                   float2 moveInput,
-                                   float3 lastValidMovementDirection,
-                                   ref PlayerDashState dashState)
-    {
-        if (!TryResolveDashActivationDirection(slotConfig.Dash.DirectionMode,
-                                               in lookState,
-                                               in movementState,
-                                               in runtimeMovementConfig,
-                                               in localTransform,
-                                               moveInput,
-                                               lastValidMovementDirection,
-                                               out float3 dashDirection))
-            return;
-
-        float dashDuration = math.max(0.01f, slotConfig.Dash.Duration);
-        float dashDistance = math.max(0f, slotConfig.Dash.Distance);
-        float dashTransitionIn = math.clamp(math.max(0f, slotConfig.Dash.SpeedTransitionInSeconds), 0f, dashDuration);
-        float dashRemainingDuration = dashDuration - dashTransitionIn;
-        float dashTransitionOut = math.clamp(math.max(0f, slotConfig.Dash.SpeedTransitionOutSeconds), 0f, dashRemainingDuration);
-        float dashHoldDuration = dashDuration - dashTransitionIn - dashTransitionOut;
-        float dashProfileDuration = ResolveDashProfileDuration(dashTransitionIn, dashHoldDuration, dashTransitionOut);
-        float dashSpeed = dashProfileDuration > 0f ? dashDistance / dashProfileDuration : 0f;
-
-        dashState.IsDashing = 1;
-        dashState.ClearVelocityAfterApply = 0;
-        dashState.Direction = dashDirection;
-        dashState.EntryVelocity = float3.zero;
-        dashState.Speed = dashSpeed;
-        dashState.Duration = dashDuration;
-        dashState.Distance = dashDistance;
-        dashState.ElapsedDuration = 0f;
-        dashState.TransitionInDuration = dashTransitionIn;
-        dashState.TransitionOutDuration = dashTransitionOut;
-        dashState.WallBounceIntensity = math.clamp(slotConfig.Dash.WallBounceIntensity, 0f, 1f);
-        dashState.HoldDuration = dashHoldDuration;
-
-        if (dashTransitionIn > 0f)
-        {
-            dashState.Phase = 1;
-            dashState.PhaseRemaining = dashTransitionIn;
-        }
-        else if (dashHoldDuration > 0f)
-        {
-            dashState.Phase = 2;
-            dashState.PhaseRemaining = dashHoldDuration;
-        }
-        else
-        {
-            dashState.Phase = 3;
-            dashState.PhaseRemaining = dashTransitionOut;
-        }
-
-        if (slotConfig.Dash.GrantsInvulnerability != 0)
-        {
-            float invulnerabilityDuration = dashDuration + math.max(0f, slotConfig.Dash.InvulnerabilityExtraTime);
-            dashState.RemainingInvulnerability = invulnerabilityDuration;
-        }
-    }
-
     private static void ExecuteBulletTime(in PlayerPowerUpSlotConfig slotConfig, ref PlayerBulletTimeState bulletTimeState)
     {
         PlayerBulletTimeRuntimeUtility.ActivateTimedEffect(ref bulletTimeState,
@@ -529,211 +511,6 @@ public static class PlayerPowerUpActivationExecutionUtility
         return math.normalizesafe(backwardDirection, new float3(0f, 0f, -1f));
     }
 
-    /// <summary>
-    /// Resolves the dash direction requested by the slot config, including movement/look inversion modes.
-    /// /params directionMode Designer-selected source and sign for dash direction.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used when resolving movement-input directions.
-    /// /params localTransform Player transform used as fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when a valid direction was resolved.
-    /// </summary>
-    public static bool TryResolveDashActivationDirection(DashDirectionMode directionMode,
-                                                         in PlayerLookState lookState,
-                                                         in PlayerMovementState movementState,
-                                                         in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                                         in LocalTransform localTransform,
-                                                         float2 moveInput,
-                                                         float3 lastValidMovementDirection,
-                                                         out float3 dashDirection)
-    {
-        switch (directionMode)
-        {
-            case DashDirectionMode.OppositePlayerMovement:
-                if (!TryResolveMovementDashDirection(in movementState,
-                                                     in runtimeMovementConfig,
-                                                     in localTransform,
-                                                     moveInput,
-                                                     lastValidMovementDirection,
-                                                     out dashDirection))
-                    return false;
-
-                dashDirection = -dashDirection;
-                return true;
-            case DashDirectionMode.PlayerLook:
-                return TryResolveLookDashDirection(in lookState, in localTransform, out dashDirection);
-            case DashDirectionMode.OppositePlayerLook:
-                if (!TryResolveLookDashDirection(in lookState, in localTransform, out dashDirection))
-                    return false;
-
-                dashDirection = -dashDirection;
-                return true;
-            default:
-                return TryResolveMovementDashDirection(in movementState,
-                                                       in runtimeMovementConfig,
-                                                       in localTransform,
-                                                       moveInput,
-                                                       lastValidMovementDirection,
-                                                       out dashDirection);
-        }
-    }
-
-    private static bool TryResolveMovementDashDirection(in PlayerMovementState movementState,
-                                                        in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                                        in LocalTransform localTransform,
-                                                        float2 moveInput,
-                                                        float3 lastValidMovementDirection,
-                                                        out float3 dashDirection)
-    {
-        if (TryResolveDashDirectionFromReleaseMask(in movementState,
-                                                   in runtimeMovementConfig,
-                                                   in localTransform,
-                                                   out dashDirection))
-            return true;
-
-        float3 desiredDirection = movementState.DesiredDirection;
-
-        if (math.lengthsq(desiredDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = math.normalizesafe(desiredDirection, new float3(0f, 0f, 1f));
-            return true;
-        }
-
-        float3 velocityDirection = movementState.Velocity;
-        velocityDirection.y = 0f;
-
-        if (math.lengthsq(velocityDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = math.normalizesafe(velocityDirection, new float3(0f, 0f, 1f));
-            return true;
-        }
-
-        if (math.lengthsq(lastValidMovementDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = math.normalizesafe(lastValidMovementDirection, new float3(0f, 0f, 1f));
-            return true;
-        }
-
-        return TryResolveDashDirectionFromInput(moveInput, in runtimeMovementConfig, in localTransform, out dashDirection);
-    }
-
-    private static bool TryResolveLookDashDirection(in PlayerLookState lookState,
-                                                    in LocalTransform localTransform,
-                                                    out float3 dashDirection)
-    {
-        float3 lookDirection = lookState.DesiredDirection;
-        lookDirection.y = 0f;
-
-        if (math.lengthsq(lookDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
-            return true;
-        }
-
-        lookDirection = lookState.CurrentDirection;
-        lookDirection.y = 0f;
-
-        if (math.lengthsq(lookDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
-            return true;
-        }
-
-        lookDirection = math.forward(localTransform.Rotation);
-        lookDirection.y = 0f;
-        dashDirection = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
-        return math.lengthsq(dashDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon;
-    }
-
-    private static float ResolveDashProfileDuration(float transitionInDuration,
-                                                    float holdDuration,
-                                                    float transitionOutDuration)
-    {
-        float transitionArea = (math.max(0f, transitionInDuration) + math.max(0f, transitionOutDuration)) * 0.5f;
-        return math.max(0.0001f, transitionArea + math.max(0f, holdDuration));
-    }
-
-    private static bool TryResolveDashDirectionFromReleaseMask(in PlayerMovementState movementState,
-                                                               in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                                               in LocalTransform localTransform,
-                                                               out float3 dashDirection)
-    {
-        byte previousMask = movementState.PrevMoveMask;
-        byte currentMask = movementState.CurrMoveMask;
-
-        if (!PlayerControllerMath.IsDiagonalMask(previousMask))
-        {
-            dashDirection = float3.zero;
-            return false;
-        }
-
-        if (!PlayerControllerMath.IsSingleAxisMask(currentMask))
-        {
-            dashDirection = float3.zero;
-            return false;
-        }
-
-        if (!PlayerControllerMath.IsReleaseOnly(previousMask, currentMask))
-        {
-            dashDirection = float3.zero;
-            return false;
-        }
-
-        float2 preservedInput = PlayerControllerMath.ResolveDigitalMask(previousMask, movementState.MovePressTimes);
-
-        return TryResolveDashDirectionFromInput(preservedInput,
-                                                in runtimeMovementConfig,
-                                                in localTransform,
-                                                out dashDirection);
-    }
-
-    private static bool TryResolveDashDirectionFromInput(float2 input,
-                                                         in PlayerRuntimeMovementConfig runtimeMovementConfig,
-                                                         in LocalTransform localTransform,
-                                                         out float3 dashDirection)
-    {
-        PlayerRuntimeMovementConfig movementConfig = runtimeMovementConfig;
-        float deadZone = movementConfig.Values.InputDeadZone;
-
-        if (math.lengthsq(input) <= deadZone * deadZone)
-        {
-            dashDirection = float3.zero;
-            return false;
-        }
-
-        bool hasCamera = PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera);
-        float3 cameraForward = hasCamera ? (float3)camera.transform.forward : new float3(0f, 0f, 1f);
-        float3 playerForward = PlayerControllerMath.NormalizePlanar(math.forward(localTransform.Rotation), new float3(0f, 0f, 1f));
-        PlayerControllerMath.GetReferenceBasis(movementConfig.MovementReference, playerForward, cameraForward, hasCamera, out float3 forward, out float3 right);
-        float2 inputDirection = PlayerControllerMath.NormalizeSafe(input);
-
-        if (math.lengthsq(inputDirection) <= PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-        {
-            dashDirection = float3.zero;
-            return false;
-        }
-
-        switch (movementConfig.DirectionsMode)
-        {
-            case MovementDirectionsMode.DiscreteCount:
-                int count = math.max(1, movementConfig.DiscreteDirectionCount);
-                float step = (math.PI * 2f) / count;
-                float offset = math.radians(movementConfig.DirectionOffsetDegrees);
-                float inputAngle = math.atan2(inputDirection.x, inputDirection.y);
-                float snappedAngle = PlayerControllerMath.QuantizeAngle(inputAngle, step, offset);
-                float3 snappedLocalDirection = PlayerControllerMath.DirectionFromAngle(snappedAngle);
-                float3 snappedWorldDirection = right * snappedLocalDirection.x + forward * snappedLocalDirection.z;
-                dashDirection = math.normalizesafe(snappedWorldDirection, forward);
-                return math.lengthsq(dashDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon;
-            default:
-                float3 freeDirection = right * inputDirection.x + forward * inputDirection.y;
-                dashDirection = math.normalizesafe(freeDirection, forward);
-                return math.lengthsq(dashDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon;
-        }
-    }
     #endregion
 
     #endregion

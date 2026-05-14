@@ -30,6 +30,21 @@ MonoBehaviour:
     fadeInSeconds: 0.2
     lockGameplayInput: 1
     setTimeScaleDuringTransition: 1
+  loadingProgressSettings:
+    showLoadingProgress: 1
+    showPercentage: 1
+    showStatusText: 1
+    loadingStatusPrefix: Loading
+    unloadingStatusPrefix: Unloading
+    readinessStatusText: Preparing scene
+    readyStatusText: Ready
+    ringColor: {r: 0.55, g: 0.82, b: 1, a: 1}
+    trackColor: {r: 1, g: 1, b: 1, a: 0.18}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    ringSegmentCount: 32
+    ringSegmentGapDegrees: 3
+    ringThickness: 12
+    spinnerRotationDegreesPerSecond: 180
   triggerSettings:
     transitionLayerName: SceneTransition
     defaultCooldownSeconds: 0.75

@@ -31,6 +31,7 @@ public static class GameSceneManagerPresetValidationUtility
 
         ValidateStartup(preset, warnings);
         ValidateFade(preset, warnings);
+        ValidateLoadingProgress(preset, warnings);
         ValidateTriggerSettings(preset, warnings);
         ValidateSceneDefinitions(preset, warnings);
         ValidateTransitions(preset, warnings);
@@ -98,6 +99,62 @@ public static class GameSceneManagerPresetValidationUtility
 
         if (fadeSettings.FadeInSeconds < 0f)
             warnings.Add("Fade In Seconds is negative.");
+    }
+
+    /// <summary>
+    /// Validates loading-progress presentation values without mutating authored data.
+    /// /params preset Preset being inspected.
+    /// /params warnings Mutable warning output list.
+    /// /returns None.
+    /// </summary>
+    private static void ValidateLoadingProgress(GameSceneManagerPreset preset, List<string> warnings)
+    {
+        GameSceneLoadingProgressSettings loadingProgressSettings = preset.LoadingProgressSettings;
+
+        if (loadingProgressSettings == null)
+        {
+            warnings.Add("Loading Progress settings are missing.");
+            return;
+        }
+
+        if (!loadingProgressSettings.ShowLoadingProgress)
+            return;
+
+        if (loadingProgressSettings.ShowStatusText)
+            ValidateLoadingProgressStatusText(loadingProgressSettings, warnings);
+
+        if (loadingProgressSettings.RingSegmentCount < 3)
+            warnings.Add("Loading Progress Ring Segment Count is lower than 3.");
+
+        if (loadingProgressSettings.RingSegmentGapDegrees < 0f)
+            warnings.Add("Loading Progress Ring Segment Gap Degrees is negative.");
+
+        if (loadingProgressSettings.RingThickness <= 0f)
+            warnings.Add("Loading Progress Ring Thickness must be greater than zero.");
+
+        if (loadingProgressSettings.SpinnerRotationDegreesPerSecond < 0f)
+            warnings.Add("Loading Progress Spinner Rotation Degrees Per Second is negative.");
+    }
+
+    /// <summary>
+    /// Validates loading-progress status text fields that are only used when status text is visible.
+    /// /params loadingProgressSettings Loading-progress settings being inspected.
+    /// /params warnings Mutable warning output list.
+    /// /returns None.
+    /// </summary>
+    private static void ValidateLoadingProgressStatusText(GameSceneLoadingProgressSettings loadingProgressSettings, List<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(loadingProgressSettings.LoadingStatusPrefix))
+            warnings.Add("Loading Progress Loading Status Prefix is empty while status text is enabled.");
+
+        if (string.IsNullOrWhiteSpace(loadingProgressSettings.UnloadingStatusPrefix))
+            warnings.Add("Loading Progress Unloading Status Prefix is empty while status text is enabled.");
+
+        if (string.IsNullOrWhiteSpace(loadingProgressSettings.ReadinessStatusText))
+            warnings.Add("Loading Progress Readiness Status Text is empty while status text is enabled.");
+
+        if (string.IsNullOrWhiteSpace(loadingProgressSettings.ReadyStatusText))
+            warnings.Add("Loading Progress Ready Status Text is empty while status text is enabled.");
     }
 
     /// <summary>

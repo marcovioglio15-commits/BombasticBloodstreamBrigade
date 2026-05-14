@@ -20,8 +20,12 @@ public static class GameSceneManagementBakeUtility
     public static GameSceneManagerConfig BuildConfig(GameSceneManagerPreset preset)
     {
         GameSceneFadeSettings fadeSettings = preset != null ? preset.FadeSettings : null;
+        GameSceneLoadingProgressSettings loadingProgressSettings = preset != null ? preset.LoadingProgressSettings : null;
         GameSceneTriggerSettings triggerSettings = preset != null ? preset.TriggerSettings : null;
         Color fadeColor = fadeSettings != null ? fadeSettings.FadeColor : Color.black;
+        Color loadingProgressRingColor = loadingProgressSettings != null ? loadingProgressSettings.RingColor : new Color(0.55f, 0.82f, 1f, 1f);
+        Color loadingProgressTrackColor = loadingProgressSettings != null ? loadingProgressSettings.TrackColor : new Color(1f, 1f, 1f, 0.18f);
+        Color loadingProgressTextColor = loadingProgressSettings != null ? loadingProgressSettings.TextColor : Color.white;
 
         return new GameSceneManagerConfig
         {
@@ -38,10 +42,48 @@ public static class GameSceneManagementBakeUtility
             PostLoadReadyExtraSeconds = fadeSettings != null ? math.max(0f, fadeSettings.PostLoadReadyExtraSeconds) : 0.08f,
             FadeInSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeInSeconds) : 0.35f,
             FadeColor = new float4(fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a),
+            ShowLoadingProgress = loadingProgressSettings != null && loadingProgressSettings.ShowLoadingProgress ? (byte)1 : (byte)0,
+            ShowLoadingProgressPercentage = loadingProgressSettings == null || loadingProgressSettings.ShowPercentage ? (byte)1 : (byte)0,
+            ShowLoadingProgressStatusText = loadingProgressSettings == null || loadingProgressSettings.ShowStatusText ? (byte)1 : (byte)0,
+            LoadingProgressSpinnerRotationDegreesPerSecond = loadingProgressSettings != null ? math.max(0f, loadingProgressSettings.SpinnerRotationDegreesPerSecond) : GameSceneLoadingProgressSettings.DefaultSpinnerRotationDegreesPerSecond,
+            LoadingProgressRingColor = new float4(loadingProgressRingColor.r, loadingProgressRingColor.g, loadingProgressRingColor.b, loadingProgressRingColor.a),
+            LoadingProgressTrackColor = new float4(loadingProgressTrackColor.r, loadingProgressTrackColor.g, loadingProgressTrackColor.b, loadingProgressTrackColor.a),
+            LoadingProgressTextColor = new float4(loadingProgressTextColor.r, loadingProgressTextColor.g, loadingProgressTextColor.b, loadingProgressTextColor.a),
+            LoadingProgressRingSegmentCount = loadingProgressSettings != null ? math.max(3, loadingProgressSettings.RingSegmentCount) : GameSceneLoadingProgressSettings.DefaultSegmentCount,
+            LoadingProgressRingSegmentGapDegrees = loadingProgressSettings != null ? math.max(0f, loadingProgressSettings.RingSegmentGapDegrees) : GameSceneLoadingProgressSettings.DefaultSegmentGapDegrees,
+            LoadingProgressRingThickness = loadingProgressSettings != null ? math.max(1f, loadingProgressSettings.RingThickness) : GameSceneLoadingProgressSettings.DefaultRingThickness,
+            LoadingProgressLoadingStatusPrefix = loadingProgressSettings != null ? new Unity.Collections.FixedString64Bytes(loadingProgressSettings.LoadingStatusPrefix ?? string.Empty) : new Unity.Collections.FixedString64Bytes("Loading"),
+            LoadingProgressUnloadingStatusPrefix = loadingProgressSettings != null ? new Unity.Collections.FixedString64Bytes(loadingProgressSettings.UnloadingStatusPrefix ?? string.Empty) : new Unity.Collections.FixedString64Bytes("Unloading"),
+            LoadingProgressReadinessStatusText = loadingProgressSettings != null ? new Unity.Collections.FixedString128Bytes(loadingProgressSettings.ReadinessStatusText ?? string.Empty) : new Unity.Collections.FixedString128Bytes("Preparing scene"),
+            LoadingProgressReadyStatusText = loadingProgressSettings != null ? new Unity.Collections.FixedString128Bytes(loadingProgressSettings.ReadyStatusText ?? string.Empty) : new Unity.Collections.FixedString128Bytes("Ready"),
             TransitionLayerName = triggerSettings != null ? new Unity.Collections.FixedString64Bytes(triggerSettings.TransitionLayerName ?? string.Empty) : default,
             DefaultTriggerCooldownSeconds = triggerSettings != null ? math.max(0f, triggerSettings.DefaultCooldownSeconds) : 0.75f,
             TriggerRequirePlayer = triggerSettings == null || triggerSettings.RequirePlayer ? (byte)1 : (byte)0,
             TriggerOneShotByDefault = triggerSettings == null || triggerSettings.OneShotByDefault ? (byte)1 : (byte)0
+        };
+    }
+
+    /// <summary>
+    /// Builds the initial hidden loading-progress presentation state from baked config values.
+    /// /params config Runtime scene manager config.
+    /// /returns Hidden loading-progress presentation state.
+    /// </summary>
+    public static GameSceneLoadingProgressPresentationState BuildLoadingProgressPresentationState(GameSceneManagerConfig config)
+    {
+        return new GameSceneLoadingProgressPresentationState
+        {
+            StatusText = default,
+            ProgressNormalized = 0f,
+            SpinnerRotationDegreesPerSecond = config.LoadingProgressSpinnerRotationDegreesPerSecond,
+            RingColor = config.LoadingProgressRingColor,
+            TrackColor = config.LoadingProgressTrackColor,
+            TextColor = config.LoadingProgressTextColor,
+            RingSegmentCount = config.LoadingProgressRingSegmentCount,
+            RingSegmentGapDegrees = config.LoadingProgressRingSegmentGapDegrees,
+            RingThickness = config.LoadingProgressRingThickness,
+            Visible = 0,
+            ShowPercentage = config.ShowLoadingProgressPercentage,
+            ShowStatusText = config.ShowLoadingProgressStatusText
         };
     }
 

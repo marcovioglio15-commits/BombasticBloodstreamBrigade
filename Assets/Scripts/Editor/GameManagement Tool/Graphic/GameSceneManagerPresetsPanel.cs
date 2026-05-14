@@ -342,7 +342,8 @@ public sealed class GameSceneManagerPresetsPanel
         Fade = 4,
         Triggers = 5,
         Validation = 6,
-        Addressables = 7
+        Addressables = 7,
+        LoadingProgress = 8
     }
     #endregion
 }

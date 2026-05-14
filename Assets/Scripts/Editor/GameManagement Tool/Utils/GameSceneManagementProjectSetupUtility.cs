@@ -178,6 +178,7 @@ public static class GameSceneManagementProjectSetupUtility
         SetInt(serializedPreset, "loadBackend", (int)GameSceneLoadBackend.Addressables);
         SetBool(serializedPreset, "logTransitions", true);
         SynchronizeFadeSettings(serializedPreset);
+        GameSceneManagementProjectSetupLoadingProgressUtility.SynchronizeLoadingProgressSettings(serializedPreset);
         SynchronizeTriggerSettings(serializedPreset);
         SynchronizeSceneDefinitions(serializedPreset);
         SynchronizeTransitionDefinitions(serializedPreset);
@@ -535,6 +536,7 @@ public static class GameSceneManagementProjectSetupUtility
         SetObjectReference(serializedView, "canvasGroup", canvasGroup);
         SetObjectReference(serializedView, "fadeImage", fadeImage);
         serializedView.ApplyModifiedPropertiesWithoutUndo();
+        GameSceneManagementProjectSetupLoadingProgressUtility.EnsureLoadingProgressView(view.gameObject);
         EditorUtility.SetDirty(view);
     }
 

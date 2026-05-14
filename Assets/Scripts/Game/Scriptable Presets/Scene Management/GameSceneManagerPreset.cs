@@ -53,6 +53,10 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     [Tooltip("Default fade presentation and timing applied to transitions without overrides.")]
     [SerializeField] private GameSceneFadeSettings fadeSettings = new GameSceneFadeSettings();
 
+    [Header("Loading Progress")]
+    [Tooltip("Circular loading-progress indicator settings displayed over the fade overlay during scene transitions.")]
+    [SerializeField] private GameSceneLoadingProgressSettings loadingProgressSettings = new GameSceneLoadingProgressSettings();
+
     [Header("Triggers")]
     [Tooltip("Shared defaults for scene transition trigger authoring and validation.")]
     [SerializeField] private GameSceneTriggerSettings triggerSettings = new GameSceneTriggerSettings();
@@ -165,6 +169,14 @@ public sealed class GameSceneManagerPreset : ScriptableObject
         }
     }
 
+    public GameSceneLoadingProgressSettings LoadingProgressSettings
+    {
+        get
+        {
+            return loadingProgressSettings;
+        }
+    }
+
     public GameSceneTriggerSettings TriggerSettings
     {
         get
@@ -205,6 +217,9 @@ public sealed class GameSceneManagerPreset : ScriptableObject
 
         if (fadeSettings == null)
             fadeSettings = new GameSceneFadeSettings();
+
+        if (loadingProgressSettings == null)
+            loadingProgressSettings = new GameSceneLoadingProgressSettings();
 
         if (triggerSettings == null)
             triggerSettings = new GameSceneTriggerSettings();

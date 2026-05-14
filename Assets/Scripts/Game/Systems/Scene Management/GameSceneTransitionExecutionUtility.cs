@@ -99,6 +99,38 @@ internal static class GameSceneTransitionExecutionUtility
 
     #region Startup
     /// <summary>
+    /// Initializes active scene tracking from the loaded Unity active scene when possible.
+    /// /params config Scene manager runtime config.
+    /// /params scenes Runtime scene definitions.
+    /// /params transitionState Mutable transition state component.
+    /// /returns None.
+    /// </summary>
+    public static void InitializeStateFromLoadedScene(GameSceneManagerConfig config,
+                                                      DynamicBuffer<GameSceneDefinitionElement> scenes,
+                                                      ref GameSceneTransitionState transitionState)
+    {
+        Scene activeUnityScene = SceneManager.GetActiveScene();
+        transitionState.Initialized = 1;
+
+        if (!activeUnityScene.IsValid())
+            return;
+
+        for (int index = 0; index < scenes.Length; index++)
+        {
+            GameSceneDefinitionElement sceneDefinition = scenes[index];
+
+            if (MatchesUnityScene(sceneDefinition, activeUnityScene))
+            {
+                transitionState.ActiveSceneId = sceneDefinition.SceneId;
+                return;
+            }
+        }
+
+        if (config.BootstrapSceneId.Length > 0)
+            transitionState.ActiveSceneId = config.BootstrapSceneId;
+    }
+
+    /// <summary>
     /// Resolves whether the startup transition should run from the current active scene state.
     /// /params config Scene manager runtime config.
     /// /params transitionState Current transition state.
@@ -136,6 +168,30 @@ internal static class GameSceneTransitionExecutionUtility
             return false;
 
         return ShouldRunInitialTransition(config, transitionState);
+    }
+    #endregion
+
+    #region Runtime Cleanup
+    /// <summary>
+    /// Clears transient gameplay entities that are not owned by scene streaming before a restart loads the new instance.
+    /// /params entityManager EntityManager that owns transient gameplay runtime entities.
+    /// /params cleanupComplete True when this transition has already run the cleanup check.
+    /// /params reloadActiveScene True when the active scene is being restarted.
+    /// /params targetScene Target scene definition for the active transition.
+    /// /returns True once the cleanup gate has been consumed for this transition.
+    /// </summary>
+    public static bool RunPreLoadRuntimeCleanupIfNeeded(EntityManager entityManager,
+                                                        bool cleanupComplete,
+                                                        bool reloadActiveScene,
+                                                        GameSceneDefinitionElement targetScene)
+    {
+        if (cleanupComplete)
+            return true;
+
+        if (reloadActiveScene && GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene))
+            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
+
+        return true;
     }
     #endregion
 
@@ -248,6 +304,25 @@ internal static class GameSceneTransitionExecutionUtility
 
         string sceneName = sceneDefinition.SceneName.ToString();
         return !string.IsNullOrWhiteSpace(sceneName) && string.Equals(sceneName, scene.name, System.StringComparison.Ordinal);
+    }
+    #endregion
+
+    #region Logging
+    /// <summary>
+    /// Logs singleton count problems once until the manager count becomes valid again.
+    /// /params managerCount Current number of manager entities.
+    /// /params alreadyLogged True when the current invalid count has already been reported.
+    /// /returns True after an invalid manager count has been handled.
+    /// </summary>
+    public static bool LogManagerCountWarning(int managerCount, bool alreadyLogged)
+    {
+        if (alreadyLogged)
+            return true;
+
+        if (managerCount > 1)
+            Debug.LogWarning("[GameSceneManager] Expected one scene manager singleton, found " + managerCount + ".");
+
+        return true;
     }
     #endregion
 

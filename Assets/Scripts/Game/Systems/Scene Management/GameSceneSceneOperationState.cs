@@ -55,6 +55,23 @@ internal struct GameSceneSceneOperationState
             }
         }
     }
+
+    public float Progress
+    {
+        get
+        {
+            switch (OperationKind)
+            {
+                case GameSceneSceneOperationKind.SceneManager:
+                    return SceneManagerOperation != null ? Mathf.Clamp01(SceneManagerOperation.progress) : 1f;
+                case GameSceneSceneOperationKind.AddressablesLoad:
+                case GameSceneSceneOperationKind.AddressablesUnload:
+                    return AddressablesOperation.IsValid() ? Mathf.Clamp01(AddressablesOperation.PercentComplete) : 1f;
+                default:
+                    return 1f;
+            }
+        }
+    }
     #endregion
 
     #region Methods

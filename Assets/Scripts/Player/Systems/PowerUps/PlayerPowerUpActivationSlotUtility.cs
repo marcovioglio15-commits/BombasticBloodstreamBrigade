@@ -129,6 +129,12 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                    ref shieldLookup,
                                                                                    ref updatedShield,
                                                                                    ref shieldChanged,
+                                                                                   in lookState,
+                                                                                   in movementState,
+                                                                                   in runtimeMovementConfig,
+                                                                                   in localTransform,
+                                                                                   moveInput,
+                                                                                   lastValidMovementDirection,
                                                                                    ref dashState,
                                                                                    ref bulletTimeState);
             return;
@@ -275,14 +281,14 @@ public static class PlayerPowerUpActivationSlotUtility
                 if (slotConfig.Dash.Distance <= 0f)
                     return false;
 
-                if (!PlayerPowerUpActivationExecutionUtility.TryResolveDashActivationDirection(slotConfig.Dash.DirectionMode,
-                                                                                               in lookState,
-                                                                                               in movementState,
-                                                                                               in runtimeMovementConfig,
-                                                                                               in localTransform,
-                                                                                               moveInput,
-                                                                                               lastValidMovementDirection,
-                                                                                               out float3 _))
+                if (!PlayerPowerUpDashActivationUtility.TryResolveDashActivationDirection(slotConfig.Dash.DirectionMode,
+                                                                                          in lookState,
+                                                                                          in movementState,
+                                                                                          in runtimeMovementConfig,
+                                                                                          in localTransform,
+                                                                                          moveInput,
+                                                                                          lastValidMovementDirection,
+                                                                                          out float3 _))
                     return false;
 
                 return true;

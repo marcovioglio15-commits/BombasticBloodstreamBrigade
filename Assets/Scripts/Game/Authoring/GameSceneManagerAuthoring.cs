@@ -130,7 +130,8 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         GameSceneManagerConfig config = GameSceneManagementBakeUtility.BuildConfig(resolvedPreset);
         Entity entity = entityManager.CreateEntity(typeof(GameSceneManagerConfig),
                                                    typeof(GameSceneTransitionState),
-                                                   typeof(GameSceneFadePresentationState));
+                                                   typeof(GameSceneFadePresentationState),
+                                                   typeof(GameSceneLoadingProgressPresentationState));
 
         // Add every buffer before retrieving DynamicBuffer handles, because AddBuffer is a structural change.
         entityManager.AddBuffer<GameSceneDefinitionElement>(entity);
@@ -151,6 +152,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             Color = config.FadeColor,
             Visible = 0
         });
+        entityManager.SetComponentData(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
         return true;
     }
     #endregion
@@ -194,6 +196,7 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
             Color = config.FadeColor,
             Visible = 0
         });
+        AddComponent(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
         DynamicBuffer<GameSceneDefinitionElement> sceneBuffer = AddBuffer<GameSceneDefinitionElement>(entity);
         DynamicBuffer<GameSceneTransitionElement> transitionBuffer = AddBuffer<GameSceneTransitionElement>(entity);
         DynamicBuffer<GameSceneTransitionRequest> requestBuffer = AddBuffer<GameSceneTransitionRequest>(entity);

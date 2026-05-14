@@ -22,6 +22,20 @@ public struct GameSceneManagerConfig : IComponentData
     public float PostLoadReadyExtraSeconds;
     public float FadeInSeconds;
     public float4 FadeColor;
+    public byte ShowLoadingProgress;
+    public byte ShowLoadingProgressPercentage;
+    public byte ShowLoadingProgressStatusText;
+    public float LoadingProgressSpinnerRotationDegreesPerSecond;
+    public float4 LoadingProgressRingColor;
+    public float4 LoadingProgressTrackColor;
+    public float4 LoadingProgressTextColor;
+    public int LoadingProgressRingSegmentCount;
+    public float LoadingProgressRingSegmentGapDegrees;
+    public float LoadingProgressRingThickness;
+    public FixedString64Bytes LoadingProgressLoadingStatusPrefix;
+    public FixedString64Bytes LoadingProgressUnloadingStatusPrefix;
+    public FixedString128Bytes LoadingProgressReadinessStatusText;
+    public FixedString128Bytes LoadingProgressReadyStatusText;
     public FixedString64Bytes TransitionLayerName;
     public float DefaultTriggerCooldownSeconds;
     public byte TriggerRequirePlayer;
@@ -107,6 +121,27 @@ public struct GameSceneFadePresentationState : IComponentData
     public float Alpha;
     public float4 Color;
     public byte Visible;
+}
+
+/// <summary>
+/// Stores loading-progress overlay state consumed by the managed presentation bridge.
+/// /params None.
+/// /returns None.
+/// </summary>
+public struct GameSceneLoadingProgressPresentationState : IComponentData
+{
+    public FixedString128Bytes StatusText;
+    public float ProgressNormalized;
+    public float SpinnerRotationDegreesPerSecond;
+    public float4 RingColor;
+    public float4 TrackColor;
+    public float4 TextColor;
+    public int RingSegmentCount;
+    public float RingSegmentGapDegrees;
+    public float RingThickness;
+    public byte Visible;
+    public byte ShowPercentage;
+    public byte ShowStatusText;
 }
 
 /// <summary>
