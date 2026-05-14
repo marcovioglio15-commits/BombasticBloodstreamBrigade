@@ -22,7 +22,7 @@ MonoBehaviour:
     acceleration: 8
     deceleration: 8
     inactivityTime: 0
-    rotationSpeedDegreesPerSecond: 0
+    rotationSpeedDegreesPerSecond: 360
     priorityTier: 2
     steeringAggressiveness: 1
     minimumWallDistance: 0.25
