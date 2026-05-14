@@ -444,7 +444,7 @@ MonoBehaviour:
       binding:
         moduleId: Module_Shooter
         isEnabled: 1
-        useOverridePayload: 1
+        useOverridePayload: 0
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -576,7 +576,7 @@ MonoBehaviour:
               shotPattern: 1
               projectilesPerShot: 10
               spreadAngleDegrees: 0
-              projectileSpeed: 28
+              projectileSpeed: 20
               projectileDamage: 1
               projectileRange: 28
               projectileLifetime: 4
