@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5934649017800652527}
   - component: {fileID: 3591182812379710046}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: PF_Decal_PlasticCup_C
   m_TagString: Untagged
   m_Icon: {fileID: 0}

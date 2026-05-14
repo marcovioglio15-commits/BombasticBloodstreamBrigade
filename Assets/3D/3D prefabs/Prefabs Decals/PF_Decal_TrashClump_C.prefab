@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5516697680574072892}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: PF_Decal_TrashClump_C
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -53,6 +53,10 @@ PrefabInstance:
       value: PF_Railway_Rails_B
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 52f9fa0245ee74d479366b1ceb095641, type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 52f9fa0245ee74d479366b1ceb095641, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4
       objectReference: {fileID: 0}

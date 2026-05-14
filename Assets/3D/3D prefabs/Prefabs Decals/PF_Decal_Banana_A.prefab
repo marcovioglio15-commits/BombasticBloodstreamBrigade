@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1084577274223030967}
   - component: {fileID: 5474834900090814691}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: PF_Decal_Banana_A
   m_TagString: Untagged
   m_Icon: {fileID: 0}

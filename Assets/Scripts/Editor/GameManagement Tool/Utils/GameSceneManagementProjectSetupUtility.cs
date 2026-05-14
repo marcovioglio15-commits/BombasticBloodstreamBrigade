@@ -92,6 +92,7 @@ public static class GameSceneManagementProjectSetupUtility
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
         GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset);
         GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
+        GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
         SynchronizeSceneManagerPreset(scenePreset);
         ApplyDefaultBuildSettings();
         SynchronizeSceneManagerPreset(scenePreset);

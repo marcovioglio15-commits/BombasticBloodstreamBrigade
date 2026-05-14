@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 222601785671202687}
   - component: {fileID: 5147309834442109274}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: PF_Decal_Paper_C
   m_TagString: Untagged
   m_Icon: {fileID: 0}

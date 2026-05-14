@@ -53,6 +53,10 @@ PrefabInstance:
       value: PF_Column
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 6976884ce5586ed4a8430ca9763771dc, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 6976884ce5586ed4a8430ca9763771dc, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4
       objectReference: {fileID: 0}
