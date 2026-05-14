@@ -136,6 +136,7 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
         cachedViewsByEnemy.Clear();
         fallbackReleaseCandidates.Clear();
         fallbackTemplateView = null;
+        EnemyOffensiveEngagementBillboardMaterialUtility.DestroySharedRuntimeMaterial();
     }
     #endregion
 

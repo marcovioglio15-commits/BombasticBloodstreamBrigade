@@ -15,6 +15,20 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     private const float MinimumFadeDurationSeconds = 0.0001f;
     private const float MinimumLeadDurationSeconds = 0.0001f;
     private const float MinimumRingWidth = 0.01f;
+    private const string UrpParticlesUnlitShaderName = "Universal Render Pipeline/Particles/Unlit";
+    private const string UrpUnlitShaderName = "Universal Render Pipeline/Unlit";
+    private const string LegacySpritesDefaultShaderName = "Sprites/Default";
+    private const string InternalColoredShaderName = "Hidden/Internal-Colored";
+    private static readonly int SurfacePropertyId = Shader.PropertyToID("_Surface");
+    private static readonly int BlendPropertyId = Shader.PropertyToID("_Blend");
+    private static readonly int AlphaClipPropertyId = Shader.PropertyToID("_AlphaClip");
+    private static readonly int SrcBlendPropertyId = Shader.PropertyToID("_SrcBlend");
+    private static readonly int DstBlendPropertyId = Shader.PropertyToID("_DstBlend");
+    private static readonly int CullPropertyId = Shader.PropertyToID("_Cull");
+    private static readonly int ZWritePropertyId = Shader.PropertyToID("_ZWrite");
+    private static readonly int ZTestPropertyId = Shader.PropertyToID("_ZTest");
+    private static readonly int BaseColorPropertyId = Shader.PropertyToID("_BaseColor");
+    private static readonly int ColorPropertyId = Shader.PropertyToID("_Color");
     #endregion
 
     #region Fields
@@ -25,6 +39,7 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     private static GameObject runtimeRootObject;
     private static Material sharedWarningMaterial;
+    private static bool missingMaterialWarningIssued;
     #endregion
 
     #region Methods
@@ -103,6 +118,16 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     /// returns None.
     /// </summary>
     public void OnDestroy(ref SystemState state)
+    {
+        DestroyRuntimeState();
+    }
+
+    /// <summary>
+    /// Destroys every runtime warning-ring object and material owned by the static presentation pool.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    public static void DestroyRuntimeState()
     {
         DestroyAllViews();
         DestroySharedMaterial();
@@ -228,6 +253,11 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     /// </summary>
     private static EnemySpawnWarningRingView AcquireView()
     {
+        Material warningMaterial = ResolveSharedWarningMaterial();
+
+        if (warningMaterial == null)
+            return null;
+
         while (pooledViews.Count > 0)
         {
             EnemySpawnWarningRingView pooledView = pooledViews.Pop();
@@ -240,7 +270,7 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
             if (pooledView.transform.parent != runtimeRootTransform)
                 pooledView.transform.SetParent(runtimeRootTransform, false);
 
-            pooledView.Initialize(ResolveSharedWarningMaterial());
+            pooledView.Initialize(warningMaterial);
             return pooledView;
         }
 
@@ -252,7 +282,7 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
             viewObject.transform.SetParent(createdRootTransform, false);
 
         EnemySpawnWarningRingView createdView = viewObject.AddComponent<EnemySpawnWarningRingView>();
-        createdView.Initialize(ResolveSharedWarningMaterial());
+        createdView.Initialize(warningMaterial);
         createdView.Deactivate();
         return createdView;
     }
@@ -324,24 +354,108 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
         if (sharedWarningMaterial != null)
             return sharedWarningMaterial;
 
-        Shader lineShader = Shader.Find("Hidden/Internal-Colored");
+        Shader lineShader = ResolveFallbackLineShader();
 
         if (lineShader == null)
-            lineShader = Shader.Find("Sprites/Default");
-
-        if (lineShader == null)
+        {
+            LogMissingLineShaderWarning();
             return null;
+        }
 
         sharedWarningMaterial = new Material(lineShader);
-        sharedWarningMaterial.hideFlags = HideFlags.HideAndDontSave;
-        sharedWarningMaterial.name = "EnemySpawnWarningRing_Runtime";
-        sharedWarningMaterial.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-        sharedWarningMaterial.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-        sharedWarningMaterial.SetInt("_Cull", (int)CullMode.Off);
-        sharedWarningMaterial.SetInt("_ZWrite", 0);
-        sharedWarningMaterial.SetInt("_ZTest", (int)CompareFunction.Always);
-        sharedWarningMaterial.renderQueue = (int)RenderQueue.Transparent + 120;
+        ConfigureWarningMaterial(sharedWarningMaterial);
         return sharedWarningMaterial;
+    }
+
+    /// <summary>
+    /// Resolves a build-safe shader fallback when the built-in sprite material cannot be loaded.
+    /// /params None.
+    /// /returns First supported line-renderer shader found in the current project.
+    /// </summary>
+    private static Shader ResolveFallbackLineShader()
+    {
+        Shader lineShader = Shader.Find(UrpParticlesUnlitShaderName);
+
+        if (lineShader != null)
+            return lineShader;
+
+        lineShader = Shader.Find(UrpUnlitShaderName);
+
+        if (lineShader != null)
+            return lineShader;
+
+        lineShader = Shader.Find(LegacySpritesDefaultShaderName);
+
+        if (lineShader != null)
+            return lineShader;
+
+        return Shader.Find(InternalColoredShaderName);
+    }
+
+    /// <summary>
+    /// Applies transparent line-renderer settings to the shared warning material.
+    /// /params warningMaterial Runtime material used by pooled warning rings.
+    /// /returns None.
+    /// </summary>
+    private static void ConfigureWarningMaterial(Material warningMaterial)
+    {
+        warningMaterial.hideFlags = HideFlags.HideAndDontSave;
+        warningMaterial.name = "EnemySpawnWarningRing_Runtime";
+        SetFloatIfPresent(warningMaterial, SurfacePropertyId, 1f);
+        SetFloatIfPresent(warningMaterial, BlendPropertyId, 0f);
+        SetFloatIfPresent(warningMaterial, AlphaClipPropertyId, 0f);
+        SetFloatIfPresent(warningMaterial, SrcBlendPropertyId, (float)BlendMode.SrcAlpha);
+        SetFloatIfPresent(warningMaterial, DstBlendPropertyId, (float)BlendMode.OneMinusSrcAlpha);
+        SetFloatIfPresent(warningMaterial, CullPropertyId, (float)CullMode.Off);
+        SetFloatIfPresent(warningMaterial, ZWritePropertyId, 0f);
+        SetFloatIfPresent(warningMaterial, ZTestPropertyId, (float)CompareFunction.Always);
+        SetColorIfPresent(warningMaterial, BaseColorPropertyId, Color.white);
+        SetColorIfPresent(warningMaterial, ColorPropertyId, Color.white);
+        warningMaterial.renderQueue = (int)RenderQueue.Transparent + 120;
+    }
+
+    /// <summary>
+    /// Sets one material float only when the active shader exposes the requested property.
+    /// /params material Runtime material being configured.
+    /// /params propertyId Shader property id.
+    /// /params value Float value to assign.
+    /// /returns None.
+    /// </summary>
+    private static void SetFloatIfPresent(Material material, int propertyId, float value)
+    {
+        if (!material.HasProperty(propertyId))
+            return;
+
+        material.SetFloat(propertyId, value);
+    }
+
+    /// <summary>
+    /// Sets one material color only when the active shader exposes the requested property.
+    /// /params material Runtime material being configured.
+    /// /params propertyId Shader property id.
+    /// /params value Color value to assign.
+    /// /returns None.
+    /// </summary>
+    private static void SetColorIfPresent(Material material, int propertyId, Color value)
+    {
+        if (!material.HasProperty(propertyId))
+            return;
+
+        material.SetColor(propertyId, value);
+    }
+
+    /// <summary>
+    /// Logs one warning when no supported runtime shader can be found for spawn-warning rings.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private static void LogMissingLineShaderWarning()
+    {
+        if (missingMaterialWarningIssued)
+            return;
+
+        missingMaterialWarningIssued = true;
+        Debug.LogWarning("[EnemySpawnWarningPresentationSystem] No supported line-renderer shader was found. Spawn warning rings will stay hidden until a URP Unlit, URP Particles Unlit, Sprites/Default, or Hidden/Internal-Colored shader is available.");
     }
 
     /// <summary>

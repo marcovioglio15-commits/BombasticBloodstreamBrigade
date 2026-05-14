@@ -15,21 +15,15 @@ public static class RuntimeEntityGizmoRenderUtility
     private const float DirectionMagnitudeEpsilon = 0.0001f;
     private const float PlayerDirectionLength = 1.55f;
     private const float BombVelocityLength = 1.2f;
-    private const float ProjectileVelocityLength = 0.85f;
     private const float PlayerMarkerRadius = 0.12f;
     private const float WanderTargetMarkerRadius = 0.1f;
-    private const float ProjectileRangeMarkerRadius = 0.08f;
     private const float EnemyDrawDistance = 60f;
     private const float SpawnerDrawDistance = 140f;
     private const float BombDrawDistance = 40f;
-    private const float ProjectileDrawDistance = 48f;
-    private const float BaseProjectileHitRadius = 0.05f;
     private const int MaxEnemyDrawCount = 160;
     private const int MaxSpawnerDrawCount = 32;
     private const int MaxBombDrawCount = 32;
-    private const int MaxProjectileDrawCount = 96;
     private const int MaxEnemyLabelCount = 12;
-    private const int MaxProjectileLabelCount = 16;
 
     private static readonly Color PlayerPickupRadiusColor = new Color(0.1f, 0.92f, 0.68f, 0.96f);
     private static readonly Color PlayerMoveVectorColor = new Color(0.24f, 0.82f, 1f, 0.96f);
@@ -44,12 +38,6 @@ public static class RuntimeEntityGizmoRenderUtility
     private static readonly Color SpawnerDespawnRadiusColor = new Color(1f, 0.66f, 0.24f, 0.94f);
     private static readonly Color BombRadiusColor = new Color(1f, 0.4f, 0.12f, 0.94f);
     private static readonly Color BombVelocityColor = new Color(1f, 0.86f, 0.28f, 0.94f);
-    private static readonly Color PlayerProjectileImpactRadiusColor = new Color(0.22f, 0.9f, 1f, 0.94f);
-    private static readonly Color PlayerProjectileVelocityColor = new Color(0.2f, 1f, 0.8f, 0.94f);
-    private static readonly Color PlayerProjectileRemainingRangeColor = new Color(0.48f, 0.72f, 1f, 0.94f);
-    private static readonly Color EnemyProjectileImpactRadiusColor = new Color(1f, 0.42f, 0.2f, 0.94f);
-    private static readonly Color EnemyProjectileVelocityColor = new Color(1f, 0.84f, 0.28f, 0.94f);
-    private static readonly Color EnemyProjectileRemainingRangeColor = new Color(1f, 0.6f, 0.32f, 0.94f);
     #endregion
 
     #region Fields
@@ -98,7 +86,10 @@ public static class RuntimeEntityGizmoRenderUtility
         DrawEnemyGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
         DrawSpawnerGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
         DrawBombGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
-        DrawProjectileGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
+        RuntimeEntityProjectileGizmoUtility.DrawProjectileGizmos(primitiveDrawer,
+                                                                 cachedEntityManager,
+                                                                 projectileQuery,
+                                                                 playerTransform.Position);
         return true;
     }
 
@@ -523,219 +514,7 @@ public static class RuntimeEntityGizmoRenderUtility
     }
     #endregion
 
-    #region Projectiles
-    /// <summary>
-    /// Draws live projectile combat envelopes and travel hints near the player while respecting strict debug caps.
-    /// primitiveDrawer: Active rendering backend receiving primitive calls.
-    /// entityManager: Runtime entity manager used to fetch projectile components.
-    /// playerPosition: Runtime player position used for distance filtering.
-    /// returns void.
-    /// </summary>
-    private static void DrawProjectileGizmos(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
-                                             EntityManager entityManager,
-                                             float3 playerPosition)
-    {
-        if (!AnyProjectileGizmoEnabled())
-            return;
-
-        if (cachedWorld == null || !cachedWorld.IsCreated)
-            return;
-
-        if (projectileQuery.IsEmptyIgnoreFilter)
-            return;
-
-        NativeArray<Entity> projectileEntities = projectileQuery.ToEntityArray(Allocator.Temp);
-        int drawnCount = 0;
-        int labeledCount = 0;
-
-        try
-        {
-            // Keep projectile debug usable in bullet-heavy rooms by capping both distance and count.
-            for (int projectileIndex = 0; projectileIndex < projectileEntities.Length; projectileIndex++)
-            {
-                if (drawnCount >= MaxProjectileDrawCount)
-                    break;
-
-                Entity projectileEntity = projectileEntities[projectileIndex];
-                LocalTransform projectileTransform = entityManager.GetComponentData<LocalTransform>(projectileEntity);
-                float planarDistance = math.distance(playerPosition.xz, projectileTransform.Position.xz);
-
-                if (planarDistance > ProjectileDrawDistance)
-                    continue;
-
-                Projectile projectile = entityManager.GetComponentData<Projectile>(projectileEntity);
-                ProjectileRuntimeState projectileRuntimeState = entityManager.GetComponentData<ProjectileRuntimeState>(projectileEntity);
-                ProjectileOwner projectileOwner = entityManager.GetComponentData<ProjectileOwner>(projectileEntity);
-                Vector3 projectilePosition = ToVector3(projectileTransform.Position);
-                bool isPlayerOwned = entityManager.HasComponent<PlayerControllerConfig>(projectileOwner.ShooterEntity);
-                bool drewProjectileGizmo = false;
-
-                if (RuntimeGizmoDebugState.ProjectileImpactRadiusEnabled)
-                {
-                    float impactRadius = ResolveProjectileImpactRadius(projectile, projectileTransform);
-
-                    if (impactRadius > 0f)
-                    {
-                        primitiveDrawer.DrawWireDisc(projectilePosition,
-                                                     impactRadius,
-                                                     isPlayerOwned ? PlayerProjectileImpactRadiusColor : EnemyProjectileImpactRadiusColor);
-                        drewProjectileGizmo = true;
-                    }
-                }
-
-                if (RuntimeGizmoDebugState.ProjectileVelocityEnabled &&
-                    TryResolveProjectileTravelVelocity(entityManager, projectileEntity, projectile, projectileOwner, out float3 projectileVelocity))
-                {
-                    primitiveDrawer.DrawDirection(projectilePosition,
-                                                  ToVector3(projectileVelocity),
-                                                  ProjectileVelocityLength,
-                                                  isPlayerOwned ? PlayerProjectileVelocityColor : EnemyProjectileVelocityColor);
-                    drewProjectileGizmo = true;
-                }
-
-                if (RuntimeGizmoDebugState.ProjectileRemainingRangeEnabled &&
-                    TryResolveProjectileTravelEnd(entityManager,
-                                                 projectileEntity,
-                                                 projectile,
-                                                 projectileRuntimeState,
-                                                 projectileTransform,
-                                                 projectileOwner,
-                                                 out float3 projectileTravelEnd))
-                {
-                    Vector3 travelEndPosition = ToVector3(projectileTravelEnd);
-                    Color travelColor = isPlayerOwned ? PlayerProjectileRemainingRangeColor : EnemyProjectileRemainingRangeColor;
-                    primitiveDrawer.DrawLink(projectilePosition, travelEndPosition, travelColor);
-                    primitiveDrawer.DrawMarker(travelEndPosition, ProjectileRangeMarkerRadius, travelColor);
-                    drewProjectileGizmo = true;
-                }
-
-                if (!drewProjectileGizmo)
-                    continue;
-
-                if (RuntimeGizmoDebugState.ShowLabels && labeledCount < MaxProjectileLabelCount)
-                {
-                    primitiveDrawer.DrawLabel(projectilePosition, isPlayerOwned ? "Player Projectile" : "Enemy Projectile");
-                    labeledCount++;
-                }
-
-                drawnCount++;
-            }
-        }
-        finally
-        {
-            if (projectileEntities.IsCreated)
-                projectileEntities.Dispose();
-        }
-    }
-    #endregion
-
     #region Helpers
-    private static bool AnyProjectileGizmoEnabled()
-    {
-        if (RuntimeGizmoDebugState.ProjectileImpactRadiusEnabled ||
-            RuntimeGizmoDebugState.ProjectileVelocityEnabled ||
-            RuntimeGizmoDebugState.ProjectileRemainingRangeEnabled)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    private static float ResolveProjectileImpactRadius(Projectile projectile, in LocalTransform projectileTransform)
-    {
-        float projectileScale = math.max(0.01f, projectileTransform.Scale);
-        float explosionRadius = math.max(0f, projectile.ExplosionRadius);
-        return math.max(0.005f, BaseProjectileHitRadius * projectileScale + explosionRadius);
-    }
-
-    private static bool TryResolveProjectileTravelVelocity(EntityManager entityManager,
-                                                           Entity projectileEntity,
-                                                           Projectile projectile,
-                                                           ProjectileOwner projectileOwner,
-                                                           out float3 projectileVelocity)
-    {
-        projectileVelocity = projectile.Velocity;
-
-        if (entityManager.HasComponent<ProjectilePerfectCircleState>(projectileEntity))
-        {
-            ProjectilePerfectCircleState perfectCircleState = entityManager.GetComponentData<ProjectilePerfectCircleState>(projectileEntity);
-
-            if (perfectCircleState.Enabled != 0)
-                return math.lengthsq(projectileVelocity) > DirectionMagnitudeEpsilon;
-        }
-
-        if (projectile.InheritPlayerSpeed != 0 &&
-            entityManager.HasComponent<PlayerMovementState>(projectileOwner.ShooterEntity))
-        {
-            projectileVelocity += ResolveInheritedVelocity(projectile, projectileOwner, entityManager);
-        }
-
-        return math.lengthsq(projectileVelocity) > DirectionMagnitudeEpsilon;
-    }
-
-    private static bool TryResolveProjectileTravelEnd(EntityManager entityManager,
-                                                      Entity projectileEntity,
-                                                      Projectile projectile,
-                                                      ProjectileRuntimeState projectileRuntimeState,
-                                                      in LocalTransform projectileTransform,
-                                                      ProjectileOwner projectileOwner,
-                                                      out float3 projectileTravelEnd)
-    {
-        projectileTravelEnd = default;
-
-        if (!TryResolveProjectileTravelVelocity(entityManager,
-                                               projectileEntity,
-                                               projectile,
-                                               projectileOwner,
-                                               out float3 projectileVelocity))
-        {
-            return false;
-        }
-
-        float remainingRangeDistance = projectile.MaxRange > 0f
-            ? math.max(0f, projectile.MaxRange - projectileRuntimeState.TraveledDistance)
-            : float.PositiveInfinity;
-        float speed = math.length(projectileVelocity);
-
-        if (speed <= DirectionMagnitudeEpsilon)
-            return false;
-
-        float remainingLifetimeDistance = projectile.MaxLifetime > 0f
-            ? math.max(0f, projectile.MaxLifetime - projectileRuntimeState.ElapsedLifetime) * speed
-            : float.PositiveInfinity;
-        float remainingTravelDistance = math.min(remainingRangeDistance, remainingLifetimeDistance);
-
-        if (float.IsInfinity(remainingTravelDistance) || remainingTravelDistance <= 0f)
-            return false;
-
-        float3 normalizedVelocity = math.normalizesafe(projectileVelocity);
-
-        if (math.lengthsq(normalizedVelocity) <= DirectionMagnitudeEpsilon)
-            return false;
-
-        projectileTravelEnd = projectileTransform.Position + normalizedVelocity * remainingTravelDistance;
-        return true;
-    }
-
-    private static float3 ResolveInheritedVelocity(Projectile projectile,
-                                                   ProjectileOwner projectileOwner,
-                                                   EntityManager entityManager)
-    {
-        if (!entityManager.HasComponent<PlayerMovementState>(projectileOwner.ShooterEntity))
-            return float3.zero;
-
-        float3 inheritedVelocity = entityManager.GetComponentData<PlayerMovementState>(projectileOwner.ShooterEntity).Velocity;
-        float speedSquared = math.lengthsq(projectile.Velocity);
-
-        if (speedSquared <= DirectionMagnitudeEpsilon)
-            return inheritedVelocity;
-
-        float projectionScale = math.dot(inheritedVelocity, projectile.Velocity) / speedSquared;
-        inheritedVelocity -= projectile.Velocity * projectionScale;
-        return inheritedVelocity;
-    }
-
     private static Vector3 ToVector3(float3 value)
     {
         return new Vector3(value.x, value.y, value.z);

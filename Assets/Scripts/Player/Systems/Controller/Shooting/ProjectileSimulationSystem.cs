@@ -99,18 +99,14 @@ public partial struct ProjectileSimulationSystem : ISystem
                 return;
             }
 
-            float3 velocity = projectile.Velocity;
-
-            // If the projectile is set to inherit player speed,
-            // calculate the inherited velocity and add it to the projectile's velocity.
-            if (projectile.InheritPlayerSpeed != 0)
-                velocity += ResolveInheritedVelocity(projectile, owner);
-
             // Calculate the displacement based on the velocity and delta time,
             // then update the projectile's position.
-            float3 displacement = velocity * DeltaTime;
+            float3 displacement = ProjectileKinematicsUtility.ResolveLinearDisplacement(in projectile,
+                                                                                        in owner,
+                                                                                        in MovementStateLookup,
+                                                                                        DeltaTime);
             projectileTransform.Position += displacement;
-            runtimeState.TraveledDistance += math.length(displacement);
+            runtimeState.TraveledDistance += ProjectileKinematicsUtility.ResolveLinearRangeStepDistance(in projectile, DeltaTime);
             runtimeState.ElapsedLifetime += DeltaTime;
         }
         #endregion
@@ -189,42 +185,13 @@ public partial struct ProjectileSimulationSystem : ISystem
 
         #region Inherited Velocity
         /// <summary>
-        /// Calculates the Velocity inherited by a projectile from its shooter, excluding any component in the direction
-        /// of the projectile's own velocity.
+        /// Resolves the full shooter velocity used by non-linear projectile trajectories.
+        /// /params owner Projectile owner containing the shooter entity reference.
+        /// /returns Shooter velocity, or zero when the shooter has no movement state.
         /// </summary>
-        /// <param name="projectile">The projectile whose inherited velocity is being resolved.</param>
-        /// <param name="owner">The owner of the projectile (shooter entity).</param>
-        /// <returns>The inherited velocity vector for the projectile.<returns>
-        private float3 ResolveInheritedVelocity(in Projectile projectile, in ProjectileOwner owner)
-        {
-            // If the shooter entity does not have a PlayerMovementState component, return zero velocity.
-            if (MovementStateLookup.HasComponent(owner.ShooterEntity) == false)
-                return float3.zero;
-
-            // Get the shooter's full movement velocity (including vertical component).
-            float3 inheritedVelocity = MovementStateLookup[owner.ShooterEntity].Velocity;
-
-            // Remove any component of the inherited velocity that is in the direction
-            // of the projectile's own velocity.
-            float speedSquared = math.lengthsq(projectile.Velocity); // Calculate the squared speed of the projectile to use for projection.
-            // Only perform the projection if the projectile has a non-negligible speed to avoid division by zero.
-            if (speedSquared > 1e-6f)
-            {
-                // Calculate the projection of the inherited velocity onto the projectile's velocity and subtract it from the inherited velocity.
-                float projectionScale = math.dot(inheritedVelocity, projectile.Velocity) / speedSquared;
-                inheritedVelocity -= projectile.Velocity * projectionScale;
-            }
-
-            return inheritedVelocity; // Return the final inherited velocity after removing the component in the direction of the projectile's velocity.
-        }
-
         private float3 ResolveFullInheritedVelocity(in ProjectileOwner owner)
         {
-            // If the shooter entity does not have a PlayerMovementState component, return zero velocity.
-            if (MovementStateLookup.HasComponent(owner.ShooterEntity) == false)
-                return float3.zero;
-
-            return MovementStateLookup[owner.ShooterEntity].Velocity;
+            return ProjectileKinematicsUtility.ResolveInheritedVelocity(owner.ShooterEntity, in MovementStateLookup);
         }
         #endregion
         #endregion

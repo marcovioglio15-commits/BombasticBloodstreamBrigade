@@ -18,6 +18,10 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
     {
         PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
+        EnemySpawnWarningPresentationSystem.DestroyRuntimeState();
+        EnemyOffensiveEngagementBillboardRuntimeUtility.Shutdown();
+        EnemyWorldSpaceStatusBarsSyncSystem.DestroyRuntimeState();
+        PlayerDroppedPowerUpContainerViewRuntimeUtility.Shutdown();
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);

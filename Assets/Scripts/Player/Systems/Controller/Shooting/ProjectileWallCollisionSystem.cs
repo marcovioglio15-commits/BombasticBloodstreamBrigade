@@ -63,12 +63,12 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                        .WithEntityAccess())
         {
             Projectile projectileData = projectile.ValueRO;
-            float3 velocity = projectileData.Velocity;
-
-            if (perfectCircleState.ValueRO.Enabled == 0 && projectileData.InheritPlayerSpeed != 0)
-                velocity += ResolveInheritedVelocity(in projectileData, in owner.ValueRO, in movementStateLookup);
-
-            float3 displacement = velocity * deltaTime;
+            float3 displacement = perfectCircleState.ValueRO.Enabled != 0
+                ? projectileData.Velocity * deltaTime
+                : ProjectileKinematicsUtility.ResolveLinearDisplacement(in projectileData,
+                                                                        in owner.ValueRO,
+                                                                        in movementStateLookup,
+                                                                        deltaTime);
 
             if (math.lengthsq(displacement) <= MovementEpsilon)
                 continue;
@@ -143,24 +143,6 @@ public partial struct ProjectileWallCollisionSystem : ISystem
     #endregion
 
     #region Helpers
-    private static float3 ResolveInheritedVelocity(in Projectile projectile,
-                                                   in ProjectileOwner owner,
-                                                   in ComponentLookup<PlayerMovementState> movementStateLookup)
-    {
-        if (!movementStateLookup.HasComponent(owner.ShooterEntity))
-            return float3.zero;
-
-        float3 inheritedVelocity = movementStateLookup[owner.ShooterEntity].Velocity;
-        float speedSquared = math.lengthsq(projectile.Velocity);
-
-        if (speedSquared <= 1e-6f)
-            return inheritedVelocity;
-
-        float projectionScale = math.dot(inheritedVelocity, projectile.Velocity) / speedSquared;
-        inheritedVelocity -= projectile.Velocity * projectionScale;
-        return inheritedVelocity;
-    }
-
     private static bool TryApplyBounce(ref Projectile projectile, ref ProjectileBounceState bounceState, float3 wallNormal)
     {
         if (bounceState.RemainingBounces <= 0)

@@ -67,6 +67,21 @@ public partial struct EnemyWorldSpaceStatusBarsSyncSystem : ISystem
 
     public void OnDestroy(ref SystemState state)
     {
+        DestroyRuntimeState();
+    }
+
+    /// <summary>
+    /// Clears cached scene references and destroys fallback status-bar clones owned by the static runtime pool.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    public static void DestroyRuntimeState()
+    {
+        cachedMainCamera = null;
+        cachedMainCameraTransform = null;
+        cachedMainCameraInstanceId = 0;
+        nextCameraResolveTime = 0f;
+
         if (cachedViewsByEntity != null)
             cachedViewsByEntity.Clear();
 

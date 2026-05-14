@@ -235,6 +235,8 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
         {
             visibilityRoot = gameObject;
         }
+
+        EnemyOffensiveEngagementBillboardMaterialUtility.EnsureSpriteRendererMaterial(spriteRenderer);
     }
 
     /// <summary>
