@@ -249,6 +249,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
         if (uiCamera == null)
             return;
 
+        ConfigureGameplayUiCamera(uiCamera);
+
         GameSceneUiCameraStackBridge bridge = EnsureComponent<GameSceneUiCameraStackBridge>(uiCamera.gameObject);
         SerializedObject serializedBridge = new SerializedObject(bridge);
         serializedBridge.Update();
@@ -257,6 +259,27 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
         SetBool(serializedBridge, "removeFromStackOnDisable", true);
         serializedBridge.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(bridge);
+    }
+
+    /// <summary>
+    /// Configures the additive UI camera as a post-process-free URP overlay camera.
+    /// /params uiCamera Camera owned by the gameplay UI scene.
+    /// /returns None.
+    /// </summary>
+    private static void ConfigureGameplayUiCamera(Camera uiCamera)
+    {
+        // UI cameras must be overlays and must not contribute post-processing to the base stack.
+        UniversalAdditionalCameraData uiCameraData = EnsureComponent<UniversalAdditionalCameraData>(uiCamera.gameObject);
+        uiCameraData.renderType = CameraRenderType.Overlay;
+        uiCameraData.renderPostProcessing = false;
+
+        // Keep the setup aligned with the shared camera layer contract when the UI layer exists.
+        if (GameSceneCameraLayerUtility.TryResolveLayerMask(GameSceneCameraLayerUtility.UiLayerName, out int uiLayerMask))
+            uiCamera.cullingMask = uiLayerMask;
+
+        // Persist both camera and URP metadata changes in the edited scene.
+        EditorUtility.SetDirty(uiCamera);
+        EditorUtility.SetDirty(uiCameraData);
     }
 
     /// <summary>

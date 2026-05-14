@@ -540,9 +540,7 @@ public static class GameSceneEnvironmentPostProcessSetupUtility
     /// </summary>
     private static void InsertGameplayCamera(UniversalAdditionalCameraData baseCameraData, Camera gameplayCamera)
     {
-        System.Collections.Generic.List<Camera> cameraStack = baseCameraData.cameraStack;
-        cameraStack.Remove(gameplayCamera);
-        cameraStack.Insert(0, gameplayCamera);
+        GameSceneUrpCameraStackUtility.InsertOverlayCamera(baseCameraData, gameplayCamera, 0);
         EditorUtility.SetDirty(baseCameraData);
     }
     #endregion

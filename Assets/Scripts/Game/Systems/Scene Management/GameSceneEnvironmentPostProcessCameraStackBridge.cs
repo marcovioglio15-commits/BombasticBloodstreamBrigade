@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -362,9 +361,7 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     /// </summary>
     private static void InsertGameplayCamera(UniversalAdditionalCameraData baseCameraData, Camera resolvedGameplayCamera)
     {
-        List<Camera> cameraStack = baseCameraData.cameraStack;
-        cameraStack.Remove(resolvedGameplayCamera);
-        cameraStack.Insert(0, resolvedGameplayCamera);
+        GameSceneUrpCameraStackUtility.InsertOverlayCamera(baseCameraData, resolvedGameplayCamera, 0);
     }
 
     /// <summary>
@@ -374,15 +371,10 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     /// </summary>
     private void RemoveGameplayCameraFromStack()
     {
-        if (currentBaseCamera == null || currentGameplayCamera == null)
+        if (currentGameplayCamera == null)
             return;
 
-        UniversalAdditionalCameraData baseCameraData = currentBaseCamera.GetComponent<UniversalAdditionalCameraData>();
-
-        if (baseCameraData == null)
-            return;
-
-        baseCameraData.cameraStack.Remove(currentGameplayCamera);
+        GameSceneUrpCameraStackUtility.RemoveOverlayCameraFromLoadedBaseStacks(currentGameplayCamera);
         currentBaseCamera = null;
         currentGameplayCamera = null;
     }

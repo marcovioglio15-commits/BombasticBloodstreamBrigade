@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -112,10 +111,8 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
             return;
 
         uiCameraData.renderType = CameraRenderType.Overlay;
-        List<Camera> cameraStack = baseCameraData.cameraStack;
-
-        if (!cameraStack.Contains(uiCamera))
-            cameraStack.Add(uiCamera);
+        uiCameraData.renderPostProcessing = false;
+        GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, uiCamera);
 
         currentBaseCamera = baseCamera;
     }
@@ -127,15 +124,10 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     /// </summary>
     private void RemoveCameraStack()
     {
-        if (uiCamera == null || currentBaseCamera == null)
+        if (uiCamera == null)
             return;
 
-        UniversalAdditionalCameraData baseCameraData = currentBaseCamera.GetComponent<UniversalAdditionalCameraData>();
-
-        if (baseCameraData == null)
-            return;
-
-        baseCameraData.cameraStack.Remove(uiCamera);
+        GameSceneUrpCameraStackUtility.RemoveOverlayCameraFromLoadedBaseStacks(uiCamera);
         currentBaseCamera = null;
     }
     #endregion
