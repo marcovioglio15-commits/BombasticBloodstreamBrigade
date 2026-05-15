@@ -121,6 +121,15 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
         EnemyNavigationGridState navigationGridState = default;
         bool navigationReady = false;
+        bool hasReferenceSpawnPlaneHeight = false;
+        float referenceSpawnPlaneHeight = 0f;
+
+        if (SystemAPI.TryGetSingletonEntity<PlayerControllerConfig>(out Entity playerEntity) &&
+            entityManager.HasComponent<LocalTransform>(playerEntity))
+        {
+            referenceSpawnPlaneHeight = entityManager.GetComponentData<LocalTransform>(playerEntity).Position.y;
+            hasReferenceSpawnPlaneHeight = true;
+        }
 
         ProcessPendingMinionActivations(ref state, elapsedTime);
         int aliveMinionCountCapacity = ResolveAliveMinionCountCapacity(ref state);
@@ -205,7 +214,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                    wallsLayerMask,
                                    navigationReady,
                                    in navigationGridState,
-                                   navigationCellSnapshot);
+                                   navigationCellSnapshot,
+                                   hasReferenceSpawnPlaneHeight,
+                                   referenceSpawnPlaneHeight);
     }
     #endregion
 
@@ -453,6 +464,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     /// /params navigationReady True when the shared navigation grid can project spawn positions.
     /// /params navigationGridState Shared navigation grid state.
     /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
+    /// /params hasReferenceSpawnPlaneHeight True when the player supplied a reliable room height.
+    /// /params referenceSpawnPlaneHeight Player-derived world-space Y coordinate used for minion placement.
     /// /returns None.
     /// </summary>
     private static void ProcessMinionSpawnRequests(EntityManager entityManager,
@@ -464,7 +477,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                                    int wallsLayerMask,
                                                    bool navigationReady,
                                                    in EnemyNavigationGridState navigationGridState,
-                                                   NativeArray<EnemyNavigationCellElement> navigationCells)
+                                                   NativeArray<EnemyNavigationCellElement> navigationCells,
+                                                   bool hasReferenceSpawnPlaneHeight,
+                                                   float referenceSpawnPlaneHeight)
     {
         for (int requestIndex = 0; requestIndex < spawnRequests.Length; requestIndex++)
         {
@@ -498,7 +513,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                    wallsLayerMask,
                                    navigationReady,
                                    in navigationGridState,
-                                   navigationCells);
+                                   navigationCells,
+                                   hasReferenceSpawnPlaneHeight,
+                                   referenceSpawnPlaneHeight);
 
             WriteCurrentRule(entityManager, request.BossEntity, request.RuleIndex, in rule);
         }
@@ -567,6 +584,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     /// /params navigationReady True when the shared navigation grid can project spawn positions.
     /// /params navigationGridState Shared navigation grid state.
     /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
+    /// /params hasReferenceSpawnPlaneHeight True when the player supplied a reliable room height.
+    /// /params referenceSpawnPlaneHeight Player-derived world-space Y coordinate used for minion placement.
     /// /returns None.
     /// </summary>
     private static void ReserveMinionsForSpawn(EntityManager entityManager,
@@ -581,7 +600,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                                int wallsLayerMask,
                                                bool navigationReady,
                                                in EnemyNavigationGridState navigationGridState,
-                                               NativeArray<EnemyNavigationCellElement> navigationCells)
+                                               NativeArray<EnemyNavigationCellElement> navigationCells,
+                                               bool hasReferenceSpawnPlaneHeight,
+                                               float referenceSpawnPlaneHeight)
     {
         int availableSlots = rule.MaxAliveMinions > 0
             ? math.max(0, rule.MaxAliveMinions - aliveMinionCount)
@@ -597,7 +618,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
             EnemyData minionData = entityManager.HasComponent<EnemyData>(minionEntity)
                 ? entityManager.GetComponentData<EnemyData>(minionEntity)
                 : default;
+            float spawnPlaneHeight = hasReferenceSpawnPlaneHeight ? referenceSpawnPlaneHeight : bossPosition.y;
             float3 spawnPosition = EnemyBossMinionSpawnPositionUtility.ResolveSpawnPosition(bossPosition,
+                                                                                            spawnPlaneHeight,
                                                                                             rule.SpawnRadius,
                                                                                             bossEntity,
                                                                                             ruleIndex,

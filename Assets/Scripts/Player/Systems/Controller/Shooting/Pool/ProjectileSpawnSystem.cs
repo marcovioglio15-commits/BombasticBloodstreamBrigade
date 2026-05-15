@@ -455,13 +455,15 @@ public partial struct ProjectileSpawnSystem : ISystem
             Enabled = 1,
             HasEnteredOrbit = 0,
             CompletedFullOrbit = 0,
+            HasOrbitPlaneHeight = 0,
             EntryOrigin = spawnPosition,
             OrbitAngle = angleRadians,
             OrbitBlendProgress = 0f,
             CurrentRadius = 0f,
             AccumulatedOrbitRadians = 0f,
             RadialDirection = radialDirection,
-            EntryVelocity = entryVelocity
+            EntryVelocity = entryVelocity,
+            OrbitPlaneHeight = 0f
         };
     }
 

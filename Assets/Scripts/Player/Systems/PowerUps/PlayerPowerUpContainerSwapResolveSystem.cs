@@ -1,5 +1,6 @@
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 /// <summary>
 /// Consumes authoritative swap commands issued by HUD or world-space prompts for dropped power-up containers.
@@ -13,7 +14,12 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 {
     #region Methods
 
+    #region constants
+    private const float DefaultInteractionLockDuration = 0.25f;
+    #endregion
+
     #region Lifecycle
+
     /// <summary>
     /// Registers the runtime components required to resolve dropped-container swap commands.
     /// state: Current ECS system state.
@@ -36,6 +42,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
     {
         ComponentLookup<PlayerDroppedPowerUpContainerContent> droppedContainerContentLookup = SystemAPI.GetComponentLookup<PlayerDroppedPowerUpContainerContent>(false);
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> interactionConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
+        ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionLock>(false);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         foreach ((DynamicBuffer<PlayerPowerUpContainerSwapCommand> swapCommands,
@@ -55,7 +62,9 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 continue;
             }
 
-            PlayerPowerUpContainerStoredStateMode storedStateMode = interactionConfigLookup[playerEntity].StoredStateMode;
+            PlayerPowerUpContainerInteractionConfig interactionConfig = interactionConfigLookup[playerEntity];
+            PlayerPowerUpContainerStoredStateMode storedStateMode = interactionConfig.StoredStateMode;
+            float interactionLockDuration = DefaultInteractionLockDuration;
 
             for (int commandIndex = 0; commandIndex < swapCommands.Length; commandIndex++)
             {
@@ -85,9 +94,16 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                     droppedContainerContentLookup[swapCommand.ContainerEntity] = containerContent;
                 }
 
+                ApplyInteractionLock(playerEntity,
+                                     swapCommand.ContainerEntity,
+                                     storedPowerUpConsumed,
+                                     interactionLockDuration,
+                                     ref interactionLockLookup);
+
                 powerUpsState.ValueRW.IsShootingSuppressed = 0;
                 powerUpsState.ValueRW.PreviousPrimaryPressed = 0;
                 powerUpsState.ValueRW.PreviousSecondaryPressed = 0;
+
                 break;
             }
 
@@ -97,6 +113,36 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         commandBuffer.Playback(state.EntityManager);
         commandBuffer.Dispose();
     }
+
+    #endregion
+
+    #region Helpers
+
+    /// <summary>
+    /// Stores the post-swap container lock so held or repeated inputs cannot immediately swap the same container again.
+    /// /params playerEntity Player entity that consumed the swap command.
+    /// /params containerEntity Dropped container involved in the swap.
+    /// /params containerDestroyed True when the container was consumed because the destination slot was empty.
+    /// /params interactionLockDuration Duration of the temporary interaction lock in seconds.
+    /// /params interactionLockLookup Mutable lookup used to write the player lock component.
+    /// /returns None.
+    /// </summary>
+    private static void ApplyInteractionLock(Entity playerEntity,
+                                             Entity containerEntity,
+                                             bool containerDestroyed,
+                                             float interactionLockDuration,
+                                             ref ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup)
+    {
+        if (!interactionLockLookup.HasComponent(playerEntity))
+            return;
+
+        interactionLockLookup[playerEntity] = new PlayerPowerUpContainerInteractionLock
+        {
+            LockedContainerEntity = containerDestroyed ? Entity.Null : containerEntity,
+            RemainingLockTime = containerDestroyed ? 0f : interactionLockDuration
+        };
+    }
+
     #endregion
 
     #endregion

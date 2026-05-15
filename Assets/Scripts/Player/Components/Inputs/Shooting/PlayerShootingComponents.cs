@@ -154,6 +154,7 @@ public struct ProjectilePerfectCircleState : IComponentData
     public byte Enabled;
     public byte HasEnteredOrbit;
     public byte CompletedFullOrbit;
+    public byte HasOrbitPlaneHeight;
     public float3 EntryOrigin;
     public float OrbitAngle;
     public float OrbitBlendProgress;
@@ -161,6 +162,7 @@ public struct ProjectilePerfectCircleState : IComponentData
     public float AccumulatedOrbitRadians;
     public float3 RadialDirection;
     public float3 EntryVelocity;
+    public float OrbitPlaneHeight;
 }
 
 /// <summary>

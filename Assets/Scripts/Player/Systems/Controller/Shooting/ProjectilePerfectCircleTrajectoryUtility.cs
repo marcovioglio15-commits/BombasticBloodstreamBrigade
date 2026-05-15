@@ -141,6 +141,11 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
         if (perfectCircleState.Enabled == 0 || deltaTime <= 0f)
             return fallbackPosition;
 
+        EnsureOrbitPlaneHeight(ref perfectCircleState,
+                               shooterPosition,
+                               fallbackPosition,
+                               in perfectCircleConfig);
+
         float3 entryDirection = ResolveEntryDirection(ref perfectCircleState, fallbackPosition);
         bool justEnteredOrbit = false;
 
@@ -233,7 +238,7 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
         perfectCircleState.RadialDirection = entryDirection;
 
         float3 entryPosition = perfectCircleState.EntryOrigin + entryDirection * perfectCircleState.CurrentRadius;
-        entryPosition.y = perfectCircleState.EntryOrigin.y + perfectCircleConfig.HeightOffset;
+        entryPosition.y = perfectCircleState.OrbitPlaneHeight;
         reachedOrbitEntry = perfectCircleState.CurrentRadius >= orbitEntryThreshold;
         return entryPosition;
     }
@@ -347,7 +352,7 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
         float sine = math.sin(perfectCircleState.OrbitAngle);
         float3 orbitOffset = new float3(cosine * orbitRadius, 0f, sine * orbitRadius);
         float3 orbitPosition = shooterPosition + orbitOffset;
-        orbitPosition.y = shooterPosition.y + perfectCircleConfig.HeightOffset;
+        orbitPosition.y = perfectCircleState.OrbitPlaneHeight;
         return orbitPosition;
     }
 
@@ -404,8 +409,31 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
         float sine = math.sin(perfectCircleState.OrbitAngle);
         float3 orbitOffset = new float3(cosine * orbitRadius, 0f, sine * orbitRadius);
         float3 orbitPosition = shooterPosition + orbitOffset;
-        orbitPosition.y = shooterPosition.y + perfectCircleConfig.HeightOffset;
+        orbitPosition.y = perfectCircleState.OrbitPlaneHeight;
         return orbitPosition;
+    }
+
+    /// <summary>
+    /// Captures the vertical plane used by one orbital projectile before radial entry or orbit blending begins.
+    /// /params perfectCircleState Mutable trajectory state receiving the resolved plane height.
+    /// /params shooterPosition Current shooter position used when an explicit height offset is authored.
+    /// /params fallbackPosition Current projectile position used to preserve muzzle height when the offset is zero.
+    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
+    /// /returns None.
+    /// </summary>
+    private static void EnsureOrbitPlaneHeight(ref ProjectilePerfectCircleState perfectCircleState,
+                                               float3 shooterPosition,
+                                               float3 fallbackPosition,
+                                               in PerfectCirclePassiveConfig perfectCircleConfig)
+    {
+        if (perfectCircleState.HasOrbitPlaneHeight != 0)
+            return;
+
+        float configuredPlaneHeight = shooterPosition.y + perfectCircleConfig.HeightOffset;
+        perfectCircleState.OrbitPlaneHeight = math.abs(perfectCircleConfig.HeightOffset) > DirectionEpsilon
+            ? configuredPlaneHeight
+            : math.max(configuredPlaneHeight, fallbackPosition.y);
+        perfectCircleState.HasOrbitPlaneHeight = 1;
     }
 
     /// <summary>

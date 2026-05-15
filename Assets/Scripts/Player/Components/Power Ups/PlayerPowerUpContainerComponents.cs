@@ -13,6 +13,7 @@ public struct PlayerPowerUpContainerInteractionConfig : IComponentData
     public float ContainerGroundClearanceOffset;
     public PlayerPowerUpContainerInteractionMode InteractionMode;
     public PlayerPowerUpContainerStoredStateMode StoredStateMode;
+    public float InteractionLockDuration;
 }
 
 /// <summary>
@@ -59,4 +60,15 @@ public struct PlayerPowerUpContainerProximityState : IComponentData
     public Entity NearestContainerEntity;
     public float NearestDistanceSquared;
     public byte HasContainerInRange;
+}
+
+/// <summary>
+/// Stores a temporary interaction lock against a specific dropped power-up container.
+/// </summary>
+public struct PlayerPowerUpContainerInteractionLock : IComponentData
+{
+    // The dropped container temporarily ignored by the player.
+    public Entity LockedContainerEntity;
+    // Remaining lock duration in seconds.
+    public float RemainingLockTime;
 }

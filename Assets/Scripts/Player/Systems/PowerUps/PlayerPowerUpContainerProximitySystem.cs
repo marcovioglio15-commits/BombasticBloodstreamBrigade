@@ -14,6 +14,7 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
     #region Methods
 
     #region Lifecycle
+
     /// <summary>
     /// Registers the runtime components required to track dropped-container proximity.
     /// state: Current ECS system state.
@@ -23,6 +24,7 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
     {
         state.RequireForUpdate<PlayerPowerUpContainerInteractionConfig>();
         state.RequireForUpdate<PlayerPowerUpContainerProximityState>();
+        state.RequireForUpdate<PlayerPowerUpContainerInteractionLock>();
         state.RequireForUpdate<LocalTransform>();
     }
 
@@ -33,18 +35,34 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
     /// </summary>
     public void OnUpdate(ref SystemState state)
     {
+        float deltaTime = SystemAPI.Time.DeltaTime;
+
         foreach ((RefRO<PlayerPowerUpContainerInteractionConfig> interactionConfig,
                   RefRO<LocalTransform> playerTransform,
-                  RefRW<PlayerPowerUpContainerProximityState> proximityState)
+                  RefRW<PlayerPowerUpContainerProximityState> proximityState,
+                  RefRW<PlayerPowerUpContainerInteractionLock> interactionLock)
                  in SystemAPI.Query<RefRO<PlayerPowerUpContainerInteractionConfig>,
                                     RefRO<LocalTransform>,
-                                    RefRW<PlayerPowerUpContainerProximityState>>()
+                                    RefRW<PlayerPowerUpContainerProximityState>,
+                                    RefRW<PlayerPowerUpContainerInteractionLock>>()
                              .WithAll<PlayerControllerConfig>())
         {
+            if (interactionLock.ValueRO.LockedContainerEntity != Entity.Null)
+            {
+                interactionLock.ValueRW.RemainingLockTime -= deltaTime;
+
+                if (interactionLock.ValueRO.RemainingLockTime <= 0f)
+                {
+                    interactionLock.ValueRW.LockedContainerEntity = Entity.Null;
+                    interactionLock.ValueRW.RemainingLockTime = 0f;
+                }
+            }
+
             float interactionRadius = math.max(0f, interactionConfig.ValueRO.InteractionRadius);
             float interactionRadiusSquared = interactionRadius * interactionRadius;
             Entity nearestContainerEntity = Entity.Null;
             float nearestDistanceSquared = float.MaxValue;
+            Entity lockedContainerEntity = interactionLock.ValueRO.LockedContainerEntity;
 
             if (interactionRadiusSquared > 0f)
             {
@@ -57,6 +75,9 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
                                             RefRO<LocalTransform>>().WithEntityAccess())
                 {
                     if (droppedContainerContent.ValueRO.StoredPowerUp.SlotConfig.IsDefined == 0)
+                        continue;
+
+                    if (containerEntity == lockedContainerEntity)
                         continue;
 
                     float distanceSquared = math.distancesq(playerPosition, containerTransform.ValueRO.Position);
@@ -80,6 +101,7 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
             };
         }
     }
+
     #endregion
 
     #endregion

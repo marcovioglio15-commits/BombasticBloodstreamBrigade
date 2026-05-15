@@ -662,6 +662,10 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                 NearestDistanceSquared = 0f,
                 HasContainerInRange = 0
             });
+            AddComponent(entity, new PlayerPowerUpContainerInteractionLock
+            {
+                LockedContainerEntity = Entity.Null
+            });
             AddBuffer<PlayerPowerUpContainerSwapCommand>(entity);
         }
 

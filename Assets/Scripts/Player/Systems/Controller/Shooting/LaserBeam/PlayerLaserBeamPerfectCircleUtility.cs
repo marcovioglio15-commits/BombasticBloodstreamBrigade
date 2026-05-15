@@ -325,13 +325,15 @@ internal static class PlayerLaserBeamPerfectCircleUtility
             Enabled = 1,
             HasEnteredOrbit = 0,
             CompletedFullOrbit = 0,
+            HasOrbitPlaneHeight = 0,
             EntryOrigin = startPoint,
             OrbitAngle = angleRadians,
             OrbitBlendProgress = 0f,
             CurrentRadius = 0f,
             AccumulatedOrbitRadians = 0f,
             RadialDirection = radialDirection,
-            EntryVelocity = radialDirection * radialEntrySpeed
+            EntryVelocity = radialDirection * radialEntrySpeed,
+            OrbitPlaneHeight = 0f
         };
     }
 

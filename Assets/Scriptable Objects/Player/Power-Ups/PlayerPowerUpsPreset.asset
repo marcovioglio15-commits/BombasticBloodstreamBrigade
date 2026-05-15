@@ -18992,7 +18992,9 @@ MonoBehaviour:
   primaryActivePowerUpId: ActiveChargeShot
   secondaryActivePowerUpId: Active_Shotgun
   equippedPassivePowerUpIds:
-  - PassiveEnemiesExplodeOnDeath
+  - Passive_ElementalBullets_Fire
+  - Passive_AdditionalBarrel
+  - Passive_DamageIncrease
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
