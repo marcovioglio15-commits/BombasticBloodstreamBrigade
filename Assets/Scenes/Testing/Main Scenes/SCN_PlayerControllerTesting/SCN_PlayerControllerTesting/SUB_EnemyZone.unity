@@ -137,7 +137,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7138884707296774502, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.53
+      value: -1.18
       objectReference: {fileID: 0}
     - target: {fileID: 7138884707296774502, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -169,16 +169,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: gridSizeX
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: gridSizeZ
-      value: 12
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: 0db12efcad31baa4a9ec4fe01e13483f, type: 2}
+      objectReference: {fileID: 11400000, guid: 11ca40a59ecdcfe4283ce9ff966796f5, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: waves.Array.size
       value: 1
@@ -848,7 +848,7 @@ Transform:
   m_GameObject: {fileID: 256395659}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.8844595, y: 0.13279986, z: -14.11}
+  m_LocalPosition: {x: -13.8844595, y: 0.13279986, z: -14.44}
   m_LocalScale: {x: 32, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2889,7 +2889,7 @@ Transform:
   m_GameObject: {fileID: 994544604}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.884459, y: 0.13279986, z: 19.765368}
+  m_LocalPosition: {x: -13.884459, y: 0.13279986, z: 20.12}
   m_LocalScale: {x: 30, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4472,7 +4472,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7138884707296774502, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.53
+      value: -1.18
       objectReference: {fileID: 0}
     - target: {fileID: 7138884707296774502, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4504,16 +4504,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: gridSizeX
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: gridSizeZ
-      value: 12
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: 8dbc3c3fa5c3e1d479efcbc752ca897c, type: 2}
+      objectReference: {fileID: 11400000, guid: 511ecd7c84f31f54ab0c9c3e326a2f28, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: waves.Array.size
       value: 1
