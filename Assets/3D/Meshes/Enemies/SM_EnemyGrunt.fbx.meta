@@ -3,12 +3,22 @@ guid: a35c77863fb5ded44b1ccd3ac5ff388f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_Enemies
+    second: {fileID: 2100000, guid: 90d89ab96ab960e4d85cf8863355a677, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_EnemiesFaces
+    second: {fileID: 2100000, guid: 541a99ed213d9f44eb65092cb3ce3315, type: 2}
   materials:
-    materialImportMode: 1
+    materialImportMode: 2
     materialName: 1
     materialSearch: 1
-    materialLocation: 0
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0

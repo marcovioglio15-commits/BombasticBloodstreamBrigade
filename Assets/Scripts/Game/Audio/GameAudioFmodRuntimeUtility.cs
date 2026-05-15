@@ -14,6 +14,12 @@ using FMODUnity;
 /// </summary>
 public static class GameAudioFmodRuntimeUtility
 {
+    #region Constants
+#if NASHCORE_FMOD
+    private const float BackgroundMusicListenerResolveRetryIntervalSeconds = 0.5f;
+#endif
+    #endregion
+
     #region Fields
 #if NASHCORE_FMOD
     private static EventInstance backgroundMusicInstance;
@@ -21,6 +27,8 @@ public static class GameAudioFmodRuntimeUtility
     private static bool backgroundMusicBankLoaded;
     private static string loadedBackgroundMusicBankName;
     private static string lastBackgroundMusicDiagnosticKey;
+    private static Transform cachedBackgroundMusicListenerTransform;
+    private static float nextBackgroundMusicListenerResolveTime;
 #endif
     private static string backgroundMusicEventPath;
     private static string backgroundMusicBankName;
@@ -117,7 +125,10 @@ public static class GameAudioFmodRuntimeUtility
         if (!backgroundMusicInstanceValid)
             StartBackgroundMusic(eventPath, bankName, volume, logMissingEventPath);
         else
+        {
             backgroundMusicInstance.setVolume(Mathf.Max(0f, volume));
+            SyncBackgroundMusicListenerAnchor(eventPath, logMissingEventPath);
+        }
 #else
         LogFmodDisabledMusic(eventPath, logMissingEventPath);
 #endif
@@ -142,6 +153,8 @@ public static class GameAudioFmodRuntimeUtility
         backgroundMusicInstance.release();
         backgroundMusicInstance = default;
         backgroundMusicInstanceValid = false;
+        cachedBackgroundMusicListenerTransform = null;
+        nextBackgroundMusicListenerResolveTime = 0f;
 #endif
         backgroundMusicEventPath = string.Empty;
         backgroundMusicBankName = string.Empty;
@@ -220,6 +233,8 @@ public static class GameAudioFmodRuntimeUtility
         if (volumeResult != RESULT.OK)
             LogMusicFmodResultWarning("set volume", eventPath, volumeResult, logMissingEventPath);
 
+        SyncBackgroundMusicListenerAnchor(eventPath, logMissingEventPath);
+
         RESULT startResult = backgroundMusicInstance.start();
 
         if (startResult != RESULT.OK)
@@ -267,6 +282,77 @@ public static class GameAudioFmodRuntimeUtility
         backgroundMusicBankLoaded = true;
         loadedBackgroundMusicBankName = bankName;
         return true;
+    }
+
+    /// <summary>
+    /// Keeps background music centered on the active FMOD listener so authored 3D music events behave like global music.
+    /// /params eventPath FMOD event path used for diagnostics.
+    /// /params shouldLog True when diagnostic logs are enabled.
+    /// /returns None.
+    /// </summary>
+    private static void SyncBackgroundMusicListenerAnchor(string eventPath, bool shouldLog)
+    {
+        if (!backgroundMusicInstance.isValid())
+            return;
+
+        Transform listenerTransform = ResolveBackgroundMusicListenerTransform(Time.unscaledTime);
+        Vector3 listenerPosition = listenerTransform != null
+            ? listenerTransform.position
+            : Vector3.zero;
+        ATTRIBUTES_3D attributes = RuntimeUtils.To3DAttributes(listenerPosition);
+        RESULT result = backgroundMusicInstance.set3DAttributes(attributes);
+
+        if (result != RESULT.OK)
+            LogMusicFmodResultWarning("sync listener anchor", eventPath, result, shouldLog);
+    }
+
+    /// <summary>
+    /// Resolves and caches the transform currently acting as FMOD listener for music anchoring.
+    /// /params elapsedTime Current unscaled Unity time used to rate-limit scene scans.
+    /// /returns Active listener or camera transform, or null when none is available yet.
+    /// </summary>
+    private static Transform ResolveBackgroundMusicListenerTransform(float elapsedTime)
+    {
+        if (cachedBackgroundMusicListenerTransform != null)
+            return cachedBackgroundMusicListenerTransform;
+
+        if (elapsedTime < nextBackgroundMusicListenerResolveTime)
+            return null;
+
+        nextBackgroundMusicListenerResolveTime = elapsedTime + BackgroundMusicListenerResolveRetryIntervalSeconds;
+        StudioListener studioListener = Object.FindFirstObjectByType<StudioListener>(FindObjectsInactive.Exclude);
+
+        if (studioListener != null)
+        {
+            cachedBackgroundMusicListenerTransform = studioListener.transform;
+            return cachedBackgroundMusicListenerTransform;
+        }
+
+        Camera mainCamera = Camera.main;
+
+        if (mainCamera != null)
+        {
+            cachedBackgroundMusicListenerTransform = mainCamera.transform;
+            return cachedBackgroundMusicListenerTransform;
+        }
+
+        Camera[] allCameras = Camera.allCameras;
+
+        for (int cameraIndex = 0; cameraIndex < allCameras.Length; cameraIndex++)
+        {
+            Camera candidateCamera = allCameras[cameraIndex];
+
+            if (candidateCamera == null)
+                continue;
+
+            if (!candidateCamera.isActiveAndEnabled)
+                continue;
+
+            cachedBackgroundMusicListenerTransform = candidateCamera.transform;
+            return cachedBackgroundMusicListenerTransform;
+        }
+
+        return null;
     }
 
     /// <summary>

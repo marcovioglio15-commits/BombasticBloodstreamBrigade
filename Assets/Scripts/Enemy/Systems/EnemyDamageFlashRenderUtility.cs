@@ -118,11 +118,13 @@ public static class EnemyDamageFlashRenderUtility
         if (entityManager.HasBuffer<DamageFlashRenderTargetElement>(enemyEntity))
         {
             DynamicBuffer<DamageFlashRenderTargetElement> renderTargets = entityManager.GetBuffer<DamageFlashRenderTargetElement>(enemyEntity);
+            bool appliedAnyTarget = false;
 
             for (int targetIndex = 0; targetIndex < renderTargets.Length; targetIndex++)
-                ApplyGpuFlashToEntity(entityManager, renderTargets[targetIndex].Value, flashColor, targetBlend);
+                appliedAnyTarget |= ApplyGpuFlashToEntity(entityManager, renderTargets[targetIndex].Value, flashColor, targetBlend);
 
-            return;
+            if (appliedAnyTarget)
+                return;
         }
 
         ApplyGpuFlashToEntity(entityManager, enemyEntity, flashColor, targetBlend);
@@ -142,11 +144,13 @@ public static class EnemyDamageFlashRenderUtility
         if (entityManager.HasBuffer<DamageFlashRenderTargetElement>(enemyEntity))
         {
             DynamicBuffer<DamageFlashRenderTargetElement> renderTargets = entityManager.GetBuffer<DamageFlashRenderTargetElement>(enemyEntity);
+            bool resetAnyTarget = false;
 
             for (int targetIndex = 0; targetIndex < renderTargets.Length; targetIndex++)
-                ResetGpuFlashOnEntity(entityManager, renderTargets[targetIndex].Value);
+                resetAnyTarget |= ResetGpuFlashOnEntity(entityManager, renderTargets[targetIndex].Value);
 
-            return;
+            if (resetAnyTarget)
+                return;
         }
 
         ResetGpuFlashOnEntity(entityManager, enemyEntity);
@@ -171,11 +175,13 @@ public static class EnemyDamageFlashRenderUtility
         if (entityManager.HasBuffer<DamageFlashRenderTargetElement>(enemyEntity))
         {
             DynamicBuffer<DamageFlashRenderTargetElement> renderTargets = entityManager.GetBuffer<DamageFlashRenderTargetElement>(enemyEntity);
+            bool appliedAnyTarget = false;
 
             for (int targetIndex = 0; targetIndex < renderTargets.Length; targetIndex++)
-                ApplyGpuOutlineToEntity(entityManager, renderTargets[targetIndex].Value, outlineColor, outlineThickness);
+                appliedAnyTarget |= ApplyGpuOutlineToEntity(entityManager, renderTargets[targetIndex].Value, outlineColor, outlineThickness);
 
-            return;
+            if (appliedAnyTarget)
+                return;
         }
 
         ApplyGpuOutlineToEntity(entityManager, enemyEntity, outlineColor, outlineThickness);
@@ -189,15 +195,17 @@ public static class EnemyDamageFlashRenderUtility
     /// renderEntity: Concrete renderer entity to update.
     /// flashColor: Linear-space overlay tint selected for the current frame.
     /// targetBlend: Flash blend to write this frame.
-    /// returns None.
+    /// returns True when at least one material override component was written.
     /// </summary>
-    private static void ApplyGpuFlashToEntity(EntityManager entityManager,
+    private static bool ApplyGpuFlashToEntity(EntityManager entityManager,
                                               Entity renderEntity,
                                               float4 flashColor,
                                               float targetBlend)
     {
         if (!entityManager.Exists(renderEntity))
-            return;
+            return false;
+
+        bool appliedAnyProperty = false;
 
         if (entityManager.HasComponent<DamageFlashBaseColor>(renderEntity))
         {
@@ -212,6 +220,7 @@ public static class EnemyDamageFlashRenderUtility
                 {
                     Value = blendedBaseColor
                 });
+                appliedAnyProperty = true;
             }
 
             if (entityManager.HasComponent<MaterialColor>(renderEntity))
@@ -220,6 +229,7 @@ public static class EnemyDamageFlashRenderUtility
                 {
                     Value = blendedBaseColor
                 });
+                appliedAnyProperty = true;
             }
         }
 
@@ -229,6 +239,7 @@ public static class EnemyDamageFlashRenderUtility
             {
                 Value = flashColor
             });
+            appliedAnyProperty = true;
         }
 
         if (entityManager.HasComponent<MaterialHitFlashBlend>(renderEntity))
@@ -237,19 +248,24 @@ public static class EnemyDamageFlashRenderUtility
             {
                 Value = targetBlend
             });
+            appliedAnyProperty = true;
         }
+
+        return appliedAnyProperty;
     }
 
     /// <summary>
     /// Restores one concrete render entity to its baked base color and zero flash blend.
     /// entityManager: Entity manager used to write component data.
     /// renderEntity: Concrete renderer entity to reset.
-    /// returns None.
+    /// returns True when at least one material override component was restored.
     /// </summary>
-    private static void ResetGpuFlashOnEntity(EntityManager entityManager, Entity renderEntity)
+    private static bool ResetGpuFlashOnEntity(EntityManager entityManager, Entity renderEntity)
     {
         if (!entityManager.Exists(renderEntity))
-            return;
+            return false;
+
+        bool resetAnyProperty = false;
 
         if (entityManager.HasComponent<DamageFlashBaseColor>(renderEntity))
         {
@@ -261,6 +277,7 @@ public static class EnemyDamageFlashRenderUtility
                 {
                     Value = baseColor
                 });
+                resetAnyProperty = true;
             }
 
             if (entityManager.HasComponent<MaterialColor>(renderEntity))
@@ -269,6 +286,7 @@ public static class EnemyDamageFlashRenderUtility
                 {
                     Value = baseColor
                 });
+                resetAnyProperty = true;
             }
         }
 
@@ -278,7 +296,10 @@ public static class EnemyDamageFlashRenderUtility
             {
                 Value = 0f
             });
+            resetAnyProperty = true;
         }
+
+        return resetAnyProperty;
     }
 
     /// <summary>
@@ -287,15 +308,17 @@ public static class EnemyDamageFlashRenderUtility
     /// renderEntity: Concrete renderer entity to update.
     /// outlineColor: Linear-space outline color selected for the current state.
     /// outlineThickness: Outline thickness selected for the current state.
-    /// returns None.
+    /// returns True when at least one outline material override component was written.
     /// </summary>
-    private static void ApplyGpuOutlineToEntity(EntityManager entityManager,
+    private static bool ApplyGpuOutlineToEntity(EntityManager entityManager,
                                                 Entity renderEntity,
                                                 float4 outlineColor,
                                                 float outlineThickness)
     {
         if (!entityManager.Exists(renderEntity))
-            return;
+            return false;
+
+        bool appliedAnyProperty = false;
 
         if (entityManager.HasComponent<MaterialOutlineColor>(renderEntity))
         {
@@ -303,6 +326,7 @@ public static class EnemyDamageFlashRenderUtility
             {
                 Value = outlineColor
             });
+            appliedAnyProperty = true;
         }
 
         if (entityManager.HasComponent<MaterialOutlineThickness>(renderEntity))
@@ -311,7 +335,10 @@ public static class EnemyDamageFlashRenderUtility
             {
                 Value = outlineThickness
             });
+            appliedAnyProperty = true;
         }
+
+        return appliedAnyProperty;
     }
 
     /// <summary>
