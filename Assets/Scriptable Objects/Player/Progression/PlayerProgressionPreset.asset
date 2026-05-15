@@ -375,7 +375,7 @@ MonoBehaviour:
       pointsDecayPerSecond: 0
       progressiveBoostPercent: 0
       rankVisuals:
-        badgeSprite: {fileID: -715656042, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
+        badgeSprite: {fileID: 21300000, guid: 3db0b99557ecb974aa8ca90843c8e01b, type: 3}
         badgeTint: {r: 1, g: 1, b: 1, a: 1}
         rankTextColor: {r: 1, g: 1, b: 1, a: 1}
         comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
@@ -390,7 +390,7 @@ MonoBehaviour:
       pointsDecayPerSecond: 0
       progressiveBoostPercent: 0
       rankVisuals:
-        badgeSprite: {fileID: 1984434061, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
+        badgeSprite: {fileID: 21300000, guid: 62bad9c41e3f4f1489d55d6796073472, type: 3}
         badgeTint: {r: 1, g: 1, b: 1, a: 1}
         rankTextColor: {r: 1, g: 1, b: 1, a: 1}
         comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
@@ -405,7 +405,7 @@ MonoBehaviour:
       pointsDecayPerSecond: 1
       progressiveBoostPercent: 0
       rankVisuals:
-        badgeSprite: {fileID: 139036563, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
+        badgeSprite: {fileID: 21300000, guid: 9ec9dadfd7a7b374d8bce46c1ecf2ab6, type: 3}
         badgeTint: {r: 1, g: 1, b: 1, a: 1}
         rankTextColor: {r: 1, g: 1, b: 1, a: 1}
         comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
@@ -420,7 +420,7 @@ MonoBehaviour:
       pointsDecayPerSecond: 2
       progressiveBoostPercent: 0
       rankVisuals:
-        badgeSprite: {fileID: -158078774, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
+        badgeSprite: {fileID: 21300000, guid: 83885801007554f42a819aa0c716ed0f, type: 3}
         badgeTint: {r: 1, g: 1, b: 1, a: 1}
         rankTextColor: {r: 1, g: 1, b: 1, a: 1}
         comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
@@ -435,7 +435,7 @@ MonoBehaviour:
       pointsDecayPerSecond: 5
       progressiveBoostPercent: 0
       rankVisuals:
-        badgeSprite: {fileID: 547062901, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
+        badgeSprite: {fileID: 21300000, guid: d991446632b496047ab28173c93bd55b, type: 3}
         badgeTint: {r: 1, g: 1, b: 1, a: 1}
         rankTextColor: {r: 1, g: 1, b: 1, a: 1}
         comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
