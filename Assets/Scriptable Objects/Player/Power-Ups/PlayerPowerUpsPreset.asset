@@ -18991,7 +18991,8 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveElementalTrail
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
