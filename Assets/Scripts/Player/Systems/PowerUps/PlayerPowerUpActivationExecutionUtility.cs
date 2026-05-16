@@ -291,7 +291,7 @@ public static class PlayerPowerUpActivationExecutionUtility
     }
 
     /// <summary>
-    /// Queues one bomb spawn request using a single authored orientation for spawn offset, initial velocity and visual rotation.
+    /// Queues one bomb spawn request using authored spawn orientation and a selectable velocity direction.
     /// </summary>
     /// <param name="slotConfig">Runtime active slot configuration that contains Bomb payload values.</param>
     /// <param name="localTransform">Current player transform used as the spawn origin and forward fallback.</param>
@@ -309,7 +309,9 @@ public static class PlayerPowerUpActivationExecutionUtility
         float3 worldSpawnOffset = math.rotate(spawnOffsetRotation, slotConfig.Bomb.SpawnOffset);
         float3 spawnPosition = localTransform.Position + worldSpawnOffset;
         float deploySpeed = math.max(0f, slotConfig.Bomb.DeploySpeed);
-        float3 initialVelocity = bombDirection * deploySpeed;
+        float3 velocityDirection = ResolveBombVelocityDirection(in slotConfig.Bomb, worldSpawnOffset, bombDirection);
+        float3 initialVelocity = velocityDirection * deploySpeed;
+        float3 rotationDirection = deploySpeed > 0f ? velocityDirection : bombDirection;
         byte enableDamagePayload = slotConfig.Bomb.EnableDamagePayload;
         float radius = enableDamagePayload != 0 ? math.max(0.1f, slotConfig.Bomb.Radius) : 0f;
         float damage = enableDamagePayload != 0 ? math.max(0f, slotConfig.Bomb.Damage) : 0f;
@@ -323,7 +325,7 @@ public static class PlayerPowerUpActivationExecutionUtility
             OwnerEntity = playerEntity,
             BombPrefabEntity = slotConfig.BombPrefabEntity,
             Position = spawnPosition,
-            Rotation = quaternion.LookRotationSafe(bombDirection, new float3(0f, 1f, 0f)),
+            Rotation = quaternion.LookRotationSafe(rotationDirection, new float3(0f, 1f, 0f)),
             Velocity = initialVelocity,
             CollisionRadius = math.max(0.01f, slotConfig.Bomb.CollisionRadius),
             BounceOnWalls = slotConfig.Bomb.BounceOnWalls,
@@ -471,7 +473,7 @@ public static class PlayerPowerUpActivationExecutionUtility
 
     #region Movement Helpers
     /// <summary>
-    /// Resolves the planar direction used by Bomb spawn offset rotation, deployment velocity and initial bomb rotation.
+    /// Resolves the planar direction used by Bomb spawn offset placement and fallback orientation.
     /// </summary>
     /// <param name="bombConfig">Runtime Bomb payload that selects the orientation reference.</param>
     /// <param name="localTransform">Current player transform used for PlayerForward and fallback orientation.</param>
@@ -491,6 +493,30 @@ public static class PlayerPowerUpActivationExecutionUtility
                 float3 forwardDirection = math.forward(localTransform.Rotation);
                 forwardDirection.y = 0f;
                 return math.normalizesafe(forwardDirection, new float3(0f, 0f, 1f));
+        }
+    }
+
+    /// <summary>
+    /// Resolves the planar deployment velocity direction from the actual player-to-bomb spawn vector.
+    /// </summary>
+    /// <param name="bombConfig">Runtime Bomb payload that selects velocity polarity.</param>
+    /// <param name="worldSpawnOffset">World-space offset from the player origin to the spawned bomb.</param>
+    /// <param name="fallbackDirection">Normalized activation direction used when the spawn offset has no planar length.</param>
+    /// <returns>Normalized planar velocity direction applied to Deploy Speed.</returns>
+    private static float3 ResolveBombVelocityDirection(in BombPowerUpConfig bombConfig,
+                                                       float3 worldSpawnOffset,
+                                                       float3 fallbackDirection)
+    {
+        float3 planarSpawnOffset = new float3(worldSpawnOffset.x, 0f, worldSpawnOffset.z);
+        float3 normalizedFallbackDirection = math.normalizesafe(fallbackDirection, new float3(0f, 0f, 1f));
+        float3 awayFromPlayerDirection = math.normalizesafe(planarSpawnOffset, normalizedFallbackDirection);
+
+        switch (bombConfig.VelocityDirection)
+        {
+            case BombVelocityDirectionMode.TowardPlayer:
+                return -awayFromPlayerDirection;
+            default:
+                return awayFromPlayerDirection;
         }
     }
 

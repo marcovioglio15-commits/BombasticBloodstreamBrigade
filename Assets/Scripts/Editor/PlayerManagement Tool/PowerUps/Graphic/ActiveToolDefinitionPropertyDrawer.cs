@@ -231,7 +231,10 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
         switch (selectedKind)
         {
             case ActiveToolKind.Bomb:
-                AddField(container, bombDataProperty, "Bomb Settings");
+                PowerUpBombPayloadDrawerUtility.BuildBombPayloadUi(container,
+                                                                    bombDataProperty,
+                                                                    "Bomb Settings",
+                                                                    "ActiveBombSettings");
                 return;
             case ActiveToolKind.Dash:
                 AddField(container, dashDataProperty, "Dash Settings");
@@ -241,6 +244,34 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
                 return;
         }
     }
+    #endregion
+}
+
+/// <summary>
+/// Draws BombToolData with the same scaling-aware controls and warnings used by modular Bomb payloads.
+/// </summary>
+[CustomPropertyDrawer(typeof(BombToolData))]
+public sealed class BombToolDataPropertyDrawer : PropertyDrawer
+{
+    #region Methods
+
+    #region UI
+    /// <summary>
+    /// Builds the inspector UI for one BombToolData payload.
+    /// </summary>
+    /// <param name="property">Serialized BombToolData payload.</param>
+    /// <returns>Root visual element for the inspector drawer.</returns>
+    public override VisualElement CreatePropertyGUI(SerializedProperty property)
+    {
+        VisualElement root = new VisualElement();
+        PowerUpBombPayloadDrawerUtility.BuildBombPayloadUi(root,
+                                                           property,
+                                                           "Bomb",
+                                                           "BombToolData");
+        return root;
+    }
+    #endregion
+
     #endregion
 }
 

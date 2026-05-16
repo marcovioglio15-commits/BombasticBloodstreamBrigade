@@ -65,6 +65,7 @@ public struct BombPowerUpConfig
     public float3 SpawnOffset;
     public SpawnOffsetOrientationMode SpawnOffsetOrientation;
     public float DeploySpeed;
+    public BombVelocityDirectionMode VelocityDirection;
     public float CollisionRadius;
     public byte BounceOnWalls;
     public float BounceDamping;

@@ -92,6 +92,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
     /// <param name="bombSpawnOffset">Accumulated bomb spawn offset.</param>
     /// <param name="bombSpawnOffsetOrientation">Accumulated spawn-offset orientation mode.</param>
     /// <param name="bombDeploySpeed">Accumulated bomb deploy speed.</param>
+    /// <param name="bombVelocityDirection">Accumulated bomb velocity direction mode.</param>
     /// <param name="bombCollisionRadius">Accumulated bomb collision radius.</param>
     /// <param name="bombBounceOnWalls">Accumulated wall-bounce flag.</param>
     /// <param name="bombBounceDamping">Accumulated bounce damping.</param>
@@ -110,6 +111,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                           ref float3 bombSpawnOffset,
                                           ref SpawnOffsetOrientationMode bombSpawnOffsetOrientation,
                                           ref float bombDeploySpeed,
+                                          ref BombVelocityDirectionMode bombVelocityDirection,
                                           ref float bombCollisionRadius,
                                           ref bool bombBounceOnWalls,
                                           ref float bombBounceDamping,
@@ -130,6 +132,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                            ref bombSpawnOffset,
                            ref bombSpawnOffsetOrientation,
                            ref bombDeploySpeed,
+                           ref bombVelocityDirection,
                            ref bombCollisionRadius,
                            ref bombBounceOnWalls,
                            ref bombBounceDamping,
@@ -154,6 +157,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
     /// <param name="bombSpawnOffset">Accumulated bomb spawn offset.</param>
     /// <param name="bombSpawnOffsetOrientation">Accumulated spawn-offset orientation mode.</param>
     /// <param name="bombDeploySpeed">Accumulated bomb deploy speed.</param>
+    /// <param name="bombVelocityDirection">Accumulated bomb velocity direction mode.</param>
     /// <param name="bombCollisionRadius">Accumulated bomb collision radius.</param>
     /// <param name="bombBounceOnWalls">Accumulated wall-bounce flag.</param>
     /// <param name="bombBounceDamping">Accumulated bounce damping.</param>
@@ -173,6 +177,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                           ref float3 bombSpawnOffset,
                                           ref SpawnOffsetOrientationMode bombSpawnOffsetOrientation,
                                           ref float bombDeploySpeed,
+                                          ref BombVelocityDirectionMode bombVelocityDirection,
                                           ref float bombCollisionRadius,
                                           ref bool bombBounceOnWalls,
                                           ref float bombBounceDamping,
@@ -204,6 +209,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
         bombSpawnOffsetOrientation = resolvedBombModuleData.SpawnOffsetOrientation;
         bombDeploySpeed = math.max(bombDeploySpeed, math.max(0f, resolvedBombModuleData.DeploySpeed));
+        bombVelocityDirection = resolvedBombModuleData.VelocityDirection;
         bombCollisionRadius = math.max(bombCollisionRadius, math.max(0.01f, resolvedBombModuleData.CollisionRadius));
         bombBounceOnWalls = bombBounceOnWalls || resolvedBombModuleData.BounceOnWalls;
         bombBounceDamping = math.max(bombBounceDamping, math.clamp(resolvedBombModuleData.BounceDamping, 0f, 1f));
@@ -290,6 +296,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                                  float3 bombSpawnOffset,
                                                                  SpawnOffsetOrientationMode bombSpawnOffsetOrientation,
                                                                  float bombDeploySpeed,
+                                                                 BombVelocityDirectionMode bombVelocityDirection,
                                                                  float bombCollisionRadius,
                                                                  bool bombBounceOnWalls,
                                                                  float bombBounceDamping,
@@ -399,6 +406,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 SpawnOffset = bombSpawnOffset,
                 SpawnOffsetOrientation = bombSpawnOffsetOrientation,
                 DeploySpeed = math.max(0f, bombDeploySpeed),
+                VelocityDirection = bombVelocityDirection,
                 CollisionRadius = math.max(0.01f, bombCollisionRadius),
                 BounceOnWalls = bombBounceOnWalls ? (byte)1 : (byte)0,
                 BounceDamping = math.clamp(bombBounceDamping, 0f, 1f),

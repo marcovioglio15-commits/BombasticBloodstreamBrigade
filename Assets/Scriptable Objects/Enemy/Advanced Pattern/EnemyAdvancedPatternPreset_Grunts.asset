@@ -729,7 +729,7 @@ MonoBehaviour:
           maxPenetrations: 0
           inheritShooterSpeed: 0
         runtimeProjectile:
-          projectilePrefab: {fileID: 3091458169621715366, guid: 16675f8e9bd6c9e40a04fa43790c3c21, type: 3}
+          projectilePrefab: {fileID: 8239258266037394063, guid: 40b60835986c39c4c90b16009cf728fc, type: 3}
           poolInitialCapacity: 24
           poolExpandBatch: 8
         elemental:
@@ -916,7 +916,7 @@ MonoBehaviour:
           maxPenetrations: 0
           inheritShooterSpeed: 0
         runtimeProjectile:
-          projectilePrefab: {fileID: 8239258266037394063, guid: 40b60835986c39c4c90b16009cf728fc, type: 3}
+          projectilePrefab: {fileID: 3091458169621715366, guid: 16675f8e9bd6c9e40a04fa43790c3c21, type: 3}
           poolInitialCapacity: 24
           poolExpandBatch: 8
         elemental:

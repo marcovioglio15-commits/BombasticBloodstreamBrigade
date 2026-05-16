@@ -199,6 +199,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe BombVelocityDirectionMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static BombVelocityDirectionMode ResolveBombVelocityDirectionMode(float value)
+    {
+        return (BombVelocityDirectionMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe PowerUpHealApplicationMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

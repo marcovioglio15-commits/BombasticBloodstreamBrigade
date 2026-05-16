@@ -292,6 +292,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -546,6 +547,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -800,6 +802,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -1054,6 +1057,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -1308,6 +1312,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -1562,6 +1567,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -1816,6 +1822,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -2070,6 +2077,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -2324,6 +2332,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -2578,6 +2587,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -2832,6 +2842,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -3086,6 +3097,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -3340,6 +3352,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -3594,6 +3607,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -3848,6 +3862,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -4102,6 +4117,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -4356,6 +4372,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -4610,6 +4627,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -4864,6 +4882,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -5118,6 +5137,7 @@ MonoBehaviour:
         spawnOffset: {x: 0, y: 0, z: 1.2}
         spawnOffsetOrientation: 0
         deploySpeed: 4.5
+        velocityDirection: 0
         collisionRadius: 0.18
         bounceOnWalls: 1
         bounceDamping: 0.65
@@ -5385,6 +5405,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -5639,6 +5660,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -5893,6 +5915,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -6147,6 +6170,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -6402,6 +6426,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -6669,6 +6694,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -6923,6 +6949,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -7177,6 +7204,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -7431,6 +7459,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -7689,6 +7718,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -7947,6 +7977,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -8214,6 +8245,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -8468,6 +8500,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -8719,9 +8752,10 @@ MonoBehaviour:
           formulas: []
         bomb:
           bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
-          spawnOffset: {x: 0, y: 0, z: -1.2}
+          spawnOffset: {x: 0, y: 1, z: -1.2}
           spawnOffsetOrientation: 0
-          deploySpeed: 1.5
+          deploySpeed: 5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -8989,6 +9023,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -9243,6 +9278,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -9497,6 +9533,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -9764,6 +9801,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -10018,6 +10056,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -10272,6 +10311,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -10539,6 +10579,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -10793,6 +10834,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -11047,6 +11089,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -11311,6 +11354,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -11565,6 +11609,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -11820,6 +11865,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -12085,6 +12131,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -12337,6 +12384,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -12603,6 +12651,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -12857,6 +12906,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -13124,6 +13174,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -13391,6 +13442,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -13646,6 +13698,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -13913,6 +13966,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -14180,6 +14234,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
+          velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
@@ -14447,6 +14502,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -14710,6 +14766,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -14963,6 +15020,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -15226,6 +15284,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -15479,6 +15538,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -15732,6 +15792,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -15995,6 +16056,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -16248,6 +16310,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -16511,6 +16574,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -16764,6 +16828,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -17027,6 +17092,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -17280,6 +17346,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -17543,6 +17610,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -17796,6 +17864,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -18059,6 +18128,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -18312,6 +18382,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -18576,6 +18647,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -18840,6 +18912,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -19103,6 +19176,7 @@ MonoBehaviour:
           spawnOffset: {x: 0, y: 0, z: 0}
           spawnOffsetOrientation: 0
           deploySpeed: 0
+          velocityDirection: 0
           collisionRadius: 0.01
           bounceOnWalls: 0
           bounceDamping: 0
@@ -20118,6 +20192,7 @@ MonoBehaviour:
       spawnOffset: {x: 0, y: 0, z: 1.2}
       spawnOffsetOrientation: 0
       deploySpeed: 4.5
+      velocityDirection: 0
       collisionRadius: 0.18
       bounceOnWalls: 1
       bounceDamping: 0.65
@@ -20167,6 +20242,7 @@ MonoBehaviour:
       spawnOffset: {x: 0, y: 0, z: 0}
       spawnOffsetOrientation: 0
       deploySpeed: 8
+      velocityDirection: 0
       collisionRadius: 0.18
       bounceOnWalls: 1
       bounceDamping: 0.65
@@ -20216,6 +20292,7 @@ MonoBehaviour:
       spawnOffset: {x: 0, y: 0, z: 0}
       spawnOffsetOrientation: 0
       deploySpeed: 8
+      velocityDirection: 0
       collisionRadius: 0.18
       bounceOnWalls: 1
       bounceDamping: 0.65

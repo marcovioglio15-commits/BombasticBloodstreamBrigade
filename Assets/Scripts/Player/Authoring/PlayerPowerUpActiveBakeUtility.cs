@@ -148,6 +148,7 @@ public static class PlayerPowerUpActiveBakeUtility
         float3 bombSpawnOffset = float3.zero;
         SpawnOffsetOrientationMode bombSpawnOffsetOrientation = SpawnOffsetOrientationMode.PlayerForward;
         float bombDeploySpeed = 0f;
+        BombVelocityDirectionMode bombVelocityDirection = BombVelocityDirectionMode.AwayFromPlayer;
         float bombCollisionRadius = 0.1f;
         bool bombBounceOnWalls = false;
         float bombBounceDamping = 0f;
@@ -320,6 +321,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                ref bombSpawnOffset,
                                                                                ref bombSpawnOffsetOrientation,
                                                                                ref bombDeploySpeed,
+                                                                               ref bombVelocityDirection,
                                                                                ref bombCollisionRadius,
                                                                                ref bombBounceOnWalls,
                                                                                ref bombBounceDamping,
@@ -493,6 +495,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                               bombSpawnOffset,
                                                                               bombSpawnOffsetOrientation,
                                                                               bombDeploySpeed,
+                                                                              bombVelocityDirection,
                                                                               bombCollisionRadius,
                                                                               bombBounceOnWalls,
                                                                               bombBounceDamping,
@@ -626,6 +629,7 @@ public static class PlayerPowerUpActiveBakeUtility
                 SpawnOffset = bombData != null ? new float3(bombData.SpawnOffset.x, bombData.SpawnOffset.y, bombData.SpawnOffset.z) : float3.zero,
                 SpawnOffsetOrientation = bombData != null ? bombData.SpawnOffsetOrientation : SpawnOffsetOrientationMode.PlayerForward,
                 DeploySpeed = bombData != null ? math.max(0f, bombData.DeploySpeed) : 0f,
+                VelocityDirection = bombData != null ? bombData.VelocityDirection : BombVelocityDirectionMode.AwayFromPlayer,
                 CollisionRadius = bombData != null ? math.max(0.01f, bombData.CollisionRadius) : 0.1f,
                 BounceOnWalls = bombData != null && bombData.BounceOnWalls ? (byte)1 : (byte)0,
                 BounceDamping = bombData != null ? math.clamp(bombData.BounceDamping, 0f, 1f) : 0f,

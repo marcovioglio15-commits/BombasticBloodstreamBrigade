@@ -599,10 +599,6 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return;
         }
 
-#if UNITY_EDITOR
-        EnemyProjectileVisualOrderValidationUtility.ValidateProjectilePrefab(projectilePrefabObject, authoring);
-#endif
-
         Entity projectilePrefabEntity = GetEntity(projectilePrefabObject, TransformUsageFlags.Dynamic);
         AddComponent(entity, new ShooterProjectilePrefab
         {

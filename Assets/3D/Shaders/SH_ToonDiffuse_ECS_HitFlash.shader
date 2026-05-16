@@ -14,8 +14,6 @@ Shader "Cel Shader/Toon Diffuse ECS Hit Flash"
         _ShadowRangeMax("Shadow Range Max", Range(-2,2)) = -0.4
         _HitFlashColor("Hit Flash Color", Color) = (1,0.15,0.15,1)
         _HitFlashBlend("Hit Flash Blend", Range(0,1)) = 0
-        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("Depth Test", Float) = 4
-        [HideInInspector] _ZWrite("Depth Write", Float) = 1
         [HideInInspector] _ComputeMeshIndex("Compute Mesh Buffer Index Offset", Float) = 0
     }
 
@@ -39,8 +37,8 @@ Shader "Cel Shader/Toon Diffuse ECS Hit Flash"
             }
 
             Cull Back
-            ZWrite [_ZWrite]
-            ZTest [_ZTest]
+            ZWrite On
+            ZTest LEqual
 
             HLSLPROGRAM
             #pragma target 4.5

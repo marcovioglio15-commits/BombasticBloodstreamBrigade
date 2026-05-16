@@ -135,6 +135,15 @@ public enum SpawnOffsetOrientationMode
     WorldForward = 2
 }
 
+/// <summary>
+/// Selects whether a deployed bomb moves away from its actual spawned position relative to the player, or back toward the player after spawning.
+/// </summary>
+public enum BombVelocityDirectionMode
+{
+    AwayFromPlayer = 0,
+    TowardPlayer = 1
+}
+
 public enum PowerUpHealApplicationMode
 {
     Instant = 0,

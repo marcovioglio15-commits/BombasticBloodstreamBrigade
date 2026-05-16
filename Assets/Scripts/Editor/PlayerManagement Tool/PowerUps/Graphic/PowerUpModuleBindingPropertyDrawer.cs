@@ -14,6 +14,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         "spawnOffset",
         "spawnOffsetOrientation",
         "deploySpeed",
+        "velocityDirection",
         "collisionRadius",
         "bounceOnWalls",
         "bounceDamping",

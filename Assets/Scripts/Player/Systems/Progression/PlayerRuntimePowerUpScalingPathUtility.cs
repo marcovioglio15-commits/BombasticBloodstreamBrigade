@@ -93,6 +93,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                    ref activeSlotConfig.ChargeShot.ChargedLaserBeam))
             return;
 
+        if (PlayerRuntimePowerUpBombScalingApplyUtility.TryApplyValue(payloadPath, resolvedValue, ref activeSlotConfig.Bomb))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -161,44 +164,6 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "projectilePatternCone.laserDurationSeconds":
                 activeSlotConfig.Shotgun.LaserDurationSeconds = math.max(0f, resolvedValue);
-                return;
-            case "bomb.spawnOffset.x":
-                activeSlotConfig.Bomb.SpawnOffset.x = resolvedValue;
-                return;
-            case "bomb.spawnOffset.y":
-                activeSlotConfig.Bomb.SpawnOffset.y = resolvedValue;
-                return;
-            case "bomb.spawnOffset.z":
-                activeSlotConfig.Bomb.SpawnOffset.z = resolvedValue;
-                return;
-            case "bomb.spawnOffsetOrientation":
-                activeSlotConfig.Bomb.SpawnOffsetOrientation = PlayerRuntimeScalingEnumUtility.ResolveSpawnOffsetOrientationMode(resolvedValue);
-                return;
-            case "bomb.deploySpeed":
-                activeSlotConfig.Bomb.DeploySpeed = math.max(0f, resolvedValue);
-                return;
-            case "bomb.collisionRadius":
-                activeSlotConfig.Bomb.CollisionRadius = math.max(0.01f, resolvedValue);
-                return;
-            case "bomb.bounceDamping":
-                activeSlotConfig.Bomb.BounceDamping = math.clamp(resolvedValue, 0f, 1f);
-                return;
-            case "bomb.linearDampingPerSecond":
-                activeSlotConfig.Bomb.LinearDampingPerSecond = math.max(0f, resolvedValue);
-                return;
-            case "bomb.fuseSeconds":
-                activeSlotConfig.Bomb.FuseSeconds = math.max(0.05f, resolvedValue);
-                return;
-            case "bomb.radius":
-                activeSlotConfig.Bomb.Radius = math.max(0.1f, resolvedValue);
-                activeSlotConfig.Bomb.EnableDamagePayload = activeSlotConfig.Bomb.Radius > 0f || activeSlotConfig.Bomb.Damage > 0f ? (byte)1 : (byte)0;
-                return;
-            case "bomb.damage":
-                activeSlotConfig.Bomb.Damage = math.max(0f, resolvedValue);
-                activeSlotConfig.Bomb.EnableDamagePayload = activeSlotConfig.Bomb.Radius > 0f || activeSlotConfig.Bomb.Damage > 0f ? (byte)1 : (byte)0;
-                return;
-            case "bomb.vfxScaleMultiplier":
-                activeSlotConfig.Bomb.VfxScaleMultiplier = math.max(0.01f, resolvedValue);
                 return;
             case "dash.distance":
                 activeSlotConfig.Dash.Distance = math.max(0f, resolvedValue);
@@ -652,6 +617,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                                 bool resolvedValue,
                                                 ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (PlayerRuntimePowerUpBombScalingApplyUtility.TryApplyBooleanValue(payloadPath, resolvedValue, ref activeSlotConfig.Bomb))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.isToggleable":
@@ -671,15 +639,6 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "holdCharge.slowPlayerWhileCharging":
                 activeSlotConfig.ChargeShot.SlowPlayerWhileCharging = resolvedValue ? (byte)1 : (byte)0;
-                return;
-            case "bomb.bounceOnWalls":
-                activeSlotConfig.Bomb.BounceOnWalls = resolvedValue ? (byte)1 : (byte)0;
-                return;
-            case "bomb.affectAllEnemiesInRadius":
-                activeSlotConfig.Bomb.AffectAllEnemiesInRadius = resolvedValue ? (byte)1 : (byte)0;
-                return;
-            case "bomb.scaleVfxToRadius":
-                activeSlotConfig.Bomb.ScaleVfxToRadius = resolvedValue ? (byte)1 : (byte)0;
                 return;
             case "dash.grantsInvulnerability":
                 activeSlotConfig.Dash.GrantsInvulnerability = resolvedValue ? (byte)1 : (byte)0;

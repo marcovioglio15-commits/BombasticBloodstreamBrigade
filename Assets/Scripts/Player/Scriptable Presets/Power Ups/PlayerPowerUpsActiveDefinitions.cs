@@ -20,6 +20,9 @@ public sealed class BombToolData
     [Tooltip("Initial planar speed applied to the bomb when deployed.")]
     [SerializeField] private float deploySpeed = 4.5f;
 
+    [Tooltip("Direction applied to Deploy Speed after spawning. Away From Player follows the actual planar vector from the player to the spawned bomb; Toward Player inverts it.")]
+    [SerializeField] private BombVelocityDirectionMode velocityDirection = BombVelocityDirectionMode.AwayFromPlayer;
+
     [Tooltip("Collision radius used for bomb wall interaction.")]
     [SerializeField] private float collisionRadius = 0.18f;
 
@@ -90,6 +93,14 @@ public sealed class BombToolData
         get
         {
             return deploySpeed;
+        }
+    }
+
+    public BombVelocityDirectionMode VelocityDirection
+    {
+        get
+        {
+            return velocityDirection;
         }
     }
 

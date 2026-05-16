@@ -347,85 +347,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
     private static void BuildSpawnObjectPayloadUi(VisualElement payloadContainer, SerializedProperty spawnPayloadProperty)
     {
-        if (payloadContainer == null || spawnPayloadProperty == null)
-            return;
-
-        SerializedProperty prefabProperty = spawnPayloadProperty.FindPropertyRelative("bombPrefab");
-        SerializedProperty spawnOffsetProperty = spawnPayloadProperty.FindPropertyRelative("spawnOffset");
-        SerializedProperty spawnOffsetOrientationProperty = spawnPayloadProperty.FindPropertyRelative("spawnOffsetOrientation");
-        SerializedProperty deploySpeedProperty = spawnPayloadProperty.FindPropertyRelative("deploySpeed");
-        SerializedProperty collisionRadiusProperty = spawnPayloadProperty.FindPropertyRelative("collisionRadius");
-        SerializedProperty bounceOnWallsProperty = spawnPayloadProperty.FindPropertyRelative("bounceOnWalls");
-        SerializedProperty bounceDampingProperty = spawnPayloadProperty.FindPropertyRelative("bounceDamping");
-        SerializedProperty linearDampingPerSecondProperty = spawnPayloadProperty.FindPropertyRelative("linearDampingPerSecond");
-        SerializedProperty fuseSecondsProperty = spawnPayloadProperty.FindPropertyRelative("fuseSeconds");
-        SerializedProperty enableDamagePayloadProperty = spawnPayloadProperty.FindPropertyRelative("enableDamagePayload");
-        SerializedProperty radiusProperty = spawnPayloadProperty.FindPropertyRelative("radius");
-        SerializedProperty damageProperty = spawnPayloadProperty.FindPropertyRelative("damage");
-        SerializedProperty affectAllEnemiesInRadiusProperty = spawnPayloadProperty.FindPropertyRelative("affectAllEnemiesInRadius");
-        SerializedProperty explosionVfxPrefabProperty = spawnPayloadProperty.FindPropertyRelative("explosionVfxPrefab");
-        SerializedProperty scaleVfxToRadiusProperty = spawnPayloadProperty.FindPropertyRelative("scaleVfxToRadius");
-        SerializedProperty vfxScaleMultiplierProperty = spawnPayloadProperty.FindPropertyRelative("vfxScaleMultiplier");
-
-        if (prefabProperty == null ||
-            spawnOffsetProperty == null ||
-            spawnOffsetOrientationProperty == null ||
-            deploySpeedProperty == null ||
-            collisionRadiusProperty == null ||
-            bounceOnWallsProperty == null ||
-            bounceDampingProperty == null ||
-            linearDampingPerSecondProperty == null ||
-            fuseSecondsProperty == null ||
-            enableDamagePayloadProperty == null ||
-            radiusProperty == null ||
-            damageProperty == null ||
-            affectAllEnemiesInRadiusProperty == null ||
-            explosionVfxPrefabProperty == null ||
-            scaleVfxToRadiusProperty == null ||
-            vfxScaleMultiplierProperty == null)
-        {
-            HelpBox errorBox = new HelpBox("Spawn object payload fields are missing.", HelpBoxMessageType.Warning);
-            payloadContainer.Add(errorBox);
-            return;
-        }
-
-        Foldout spawnFoldout = PlayerManagementFoldoutStateUtility.CreatePropertyFoldout(spawnPayloadProperty,
-                                                                                         "Spawn",
-                                                                                         "SpawnPayload",
-                                                                                         true);
-        payloadContainer.Add(spawnFoldout);
-        AddField(spawnFoldout, prefabProperty, "Spawn Prefab");
-        AddField(spawnFoldout, spawnOffsetProperty, "Spawn Offset");
-        AddField(spawnFoldout, spawnOffsetOrientationProperty, "Spawn Offset Orientation");
-        AddField(spawnFoldout, deploySpeedProperty, "Deploy Speed");
-        AddField(spawnFoldout, collisionRadiusProperty, "Collision Radius");
-        AddField(spawnFoldout, bounceOnWallsProperty, "Bounce On Walls");
-        AddField(spawnFoldout, bounceDampingProperty, "Bounce Damping");
-        AddField(spawnFoldout, linearDampingPerSecondProperty, "Linear Damping Per Second");
-        AddField(spawnFoldout, fuseSecondsProperty, "Fuse Seconds");
-
-        Foldout damageFoldout = PlayerManagementFoldoutStateUtility.CreatePropertyFoldout(spawnPayloadProperty,
-                                                                                          "Damage (Optional)",
-                                                                                          "SpawnPayloadDamage",
-                                                                                          true);
-        spawnFoldout.Add(damageFoldout);
-        AddField(damageFoldout, enableDamagePayloadProperty, "Enable Damage Payload");
-
-        VisualElement damageContainer = new VisualElement();
-        damageContainer.style.marginLeft = 12f;
-        damageFoldout.Add(damageContainer);
-        AddField(damageContainer, radiusProperty, "Radius");
-        AddField(damageContainer, damageProperty, "Damage");
-        AddField(damageContainer, affectAllEnemiesInRadiusProperty, "Affect All Enemies In Radius");
-        AddField(damageContainer, explosionVfxPrefabProperty, "Explosion VFX Prefab");
-        AddField(damageContainer, scaleVfxToRadiusProperty, "Scale VFX To Radius");
-        AddField(damageContainer, vfxScaleMultiplierProperty, "VFX Scale Multiplier");
-
-        UpdateDamageContainerVisibility(enableDamagePayloadProperty, damageContainer);
-        payloadContainer.TrackPropertyValue(enableDamagePayloadProperty, changedProperty =>
-        {
-            UpdateDamageContainerVisibility(changedProperty, damageContainer);
-        });
+        PowerUpBombPayloadDrawerUtility.BuildBombPayloadUi(payloadContainer, spawnPayloadProperty);
     }
 
     private static void BuildHealPayloadUi(VisualElement payloadContainer, SerializedProperty healPayloadProperty)
@@ -978,20 +900,6 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         }
 
         container.style.display = toggleProperty.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    private static void UpdateDamageContainerVisibility(SerializedProperty enableDamagePayloadProperty, VisualElement damageContainer)
-    {
-        if (damageContainer == null)
-            return;
-
-        if (enableDamagePayloadProperty == null)
-        {
-            damageContainer.style.display = DisplayStyle.None;
-            return;
-        }
-
-        damageContainer.style.display = enableDamagePayloadProperty.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private static void UpdateHealOverTimeContainerVisibility(SerializedProperty applyModeProperty, VisualElement overTimeContainer)
