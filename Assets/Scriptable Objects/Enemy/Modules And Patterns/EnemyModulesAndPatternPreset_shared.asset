@@ -1465,7 +1465,7 @@ MonoBehaviour:
           projectilesPerShot: 1
           spreadAngleDegrees: 0
           projectileSpeed: 7
-          projectileDamage: 3
+          projectileDamage: 2
           projectileRange: 28
           projectileLifetime: 4
           projectileExplosionRadius: 0

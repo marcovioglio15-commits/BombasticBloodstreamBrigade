@@ -349,16 +349,16 @@ MonoBehaviour:
     sequence:
     - statName: FireRate
       applyMode: 0
-      value: 3
-    - statName: Health
+      value: 0.2
+    - statName: ShotRange
       applyMode: 0
-      value: 300
+      value: 0.02
     - statName: MovementSpeed
       applyMode: 0
-      value: 5
+      value: 0.5
     - statName: Damage
       applyMode: 0
-      value: 2
+      value: 0.3
     - statName: Luck
       applyMode: 0
       value: 1
