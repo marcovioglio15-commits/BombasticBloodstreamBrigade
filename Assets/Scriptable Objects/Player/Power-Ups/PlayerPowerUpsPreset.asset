@@ -98,15 +98,15 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
-  secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
+  secondaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
   dropPools:
   - poolId: Milestone
     tierRolls:
     - tierId: Milestone_Tier1-2-3
-      selectionPercentage: 80
+      selectionPercentage: 95
     - tierId: Milestone_Tier4-5
-      selectionPercentage: 20
+      selectionPercentage: 5
   tierLevels:
   - tierId: Milestone_Tier1-2-3
     entries:
@@ -159,13 +159,13 @@ MonoBehaviour:
     entries:
     - entryKind: 0
       powerUpId: ActiveChargeShot
-      selectionWeight: 15
+      selectionWeight: 20
     - entryKind: 0
       powerUpId: ActiveBulletTime
       selectionWeight: 15
     - entryKind: 1
       powerUpId: Passive_AdditionalBarrel
-      selectionWeight: 25
+      selectionWeight: 20
     - entryKind: 1
       powerUpId: PassiveElementalTrail
       selectionWeight: 15
@@ -18989,15 +18989,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveChargeShot
-  secondaryActivePowerUpId: Active_Shotgun
-  equippedPassivePowerUpIds:
-  - Passive_ElementalBullets_Fire
-  - Passive_AdditionalBarrel
-  - Passive_DamageIncrease
-  - Passive_LaserBeam
-  - PassiveSplittingProjectiles
-  - Passive_MovementSpeed
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
