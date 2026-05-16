@@ -8,9 +8,11 @@ using UnityEngine.InputSystem;
 /// </summary>
 internal struct HUDPowerUpContainerInteractionInputGate
 {
-    #region Fields
+#region Fields
     private bool waitingForInputRelease;
+    private bool wasHardGameplayPauseActive;
     private float inputBlockedUntilUnscaledTime;
+    private int inputBlockedUntilFrame;
     #endregion
 
     #region Methods
@@ -24,8 +26,30 @@ internal struct HUDPowerUpContainerInteractionInputGate
     public void Begin(float durationSeconds)
     {
         waitingForInputRelease = true;
+        inputBlockedUntilFrame = Mathf.Max(inputBlockedUntilFrame, Time.frameCount);
         inputBlockedUntilUnscaledTime = Mathf.Max(inputBlockedUntilUnscaledTime,
                                                   Time.unscaledTime + Mathf.Max(0f, durationSeconds));
+    }
+
+    /// <summary>
+    /// Synchronizes the gate with pause/menu ownership so resume input cannot leak into container prompts.
+    /// /params isHardGameplayPauseActive True while gameplay input is owned by pause or menu flows.
+    /// /returns void.
+    /// </summary>
+    public void SynchronizeHardPause(bool isHardGameplayPauseActive)
+    {
+        if (isHardGameplayPauseActive)
+        {
+            wasHardGameplayPauseActive = true;
+            Begin(0f);
+            return;
+        }
+
+        if (!wasHardGameplayPauseActive)
+            return;
+
+        wasHardGameplayPauseActive = false;
+        Begin(0f);
     }
 
     /// <summary>
@@ -36,7 +60,9 @@ internal struct HUDPowerUpContainerInteractionInputGate
     public void Clear()
     {
         waitingForInputRelease = false;
+        wasHardGameplayPauseActive = false;
         inputBlockedUntilUnscaledTime = 0f;
+        inputBlockedUntilFrame = -1;
     }
 
     /// <summary>
@@ -67,6 +93,9 @@ internal struct HUDPowerUpContainerInteractionInputGate
         if (waitingForInputRelease)
             return true;
 
+        if (Time.frameCount <= inputBlockedUntilFrame)
+            return true;
+
         return Time.unscaledTime < inputBlockedUntilUnscaledTime;
     }
 
@@ -87,6 +116,12 @@ internal struct HUDPowerUpContainerInteractionInputGate
             return false;
 
         if (IsActionPressed(PlayerInputRuntime.UISubmitAction))
+            return false;
+
+        if (IsActionPressed(PlayerInputRuntime.UICancelAction))
+            return false;
+
+        if (IsActionPressed(PlayerInputRuntime.PauseAction))
             return false;
 
         return true;

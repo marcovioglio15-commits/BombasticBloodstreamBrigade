@@ -70,6 +70,7 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// </summary>
     public void Initialize()
     {
+        interactionInputGate.Clear();
         CacheButtonTexts();
         RegisterButtons();
         HideOverlayImmediate();
@@ -141,6 +142,8 @@ public sealed class HUDPowerUpContainerInteractionSection
                                                          ref resumeDurationSeconds,
                                                          ref resumeElapsedSeconds,
                                                          milestoneSelectionActive);
+        bool hardGameplayPauseActive = PlayerGameplayPauseUtility.IsHardGameplayPauseActive();
+        interactionInputGate.SynchronizeHardPause(hardGameplayPauseActive);
         interactionInputGate.Refresh();
 
         if (!entityManager.Exists(playerEntity) ||
@@ -171,7 +174,7 @@ public sealed class HUDPowerUpContainerInteractionSection
             return;
         }
 
-        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        if (hardGameplayPauseActive)
         {
             HideTrackedPromptView();
             promptContainerEntity = Entity.Null;
