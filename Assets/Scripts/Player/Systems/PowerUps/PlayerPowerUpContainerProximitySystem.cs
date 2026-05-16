@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEngine;
 
 /// <summary>
 /// Resolves the nearest dropped power-up container within interaction range for each player.
@@ -35,7 +36,7 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
     /// </summary>
     public void OnUpdate(ref SystemState state)
     {
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        float deltaTime = math.max(0f, Time.unscaledDeltaTime);
 
         foreach ((RefRO<PlayerPowerUpContainerInteractionConfig> interactionConfig,
                   RefRO<LocalTransform> playerTransform,

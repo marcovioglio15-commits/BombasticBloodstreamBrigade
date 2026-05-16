@@ -26,6 +26,18 @@ internal static class PlayerPowerUpContainerBakeUtility
             : null;
         Entity containerPrefabEntity = Entity.Null;
         float containerGroundClearanceOffset = 0f;
+        float baseInteractionLockDuration = settings != null
+            ? settings.InteractionLockDuration
+            : PlayerPowerUpContainerInteractionSettings.DefaultInteractionLockDurationSeconds;
+        string interactionLockDurationFormula = string.Empty;
+
+        if (PlayerRuntimeScalingBakeMetadataUtility.TryResolvePowerUpContainerInteractionLockDurationScalingData(progressionPreset,
+                                                                                                                 out float resolvedBaseInteractionLockDuration,
+                                                                                                                 out string resolvedInteractionLockDurationFormula))
+        {
+            baseInteractionLockDuration = resolvedBaseInteractionLockDuration;
+            interactionLockDurationFormula = resolvedInteractionLockDurationFormula;
+        }
 
         if (settings != null &&
             settings.ContainerPrefab != null &&
@@ -42,7 +54,10 @@ internal static class PlayerPowerUpContainerBakeUtility
             OverlayPanelTimeScaleResumeDurationSeconds = settings != null ? math.max(0f, settings.OverlayPanelTimeScaleResumeDurationSeconds) : 0f,
             ContainerGroundClearanceOffset = math.max(0f, containerGroundClearanceOffset),
             InteractionMode = settings != null ? settings.InteractionMode : PlayerPowerUpContainerInteractionMode.OverlayPanel,
-            StoredStateMode = settings != null ? settings.StoredStateMode : PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown
+            StoredStateMode = settings != null ? settings.StoredStateMode : PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown,
+            InteractionLockDuration = settings != null ? math.max(0f, settings.InteractionLockDuration) : PlayerPowerUpContainerInteractionSettings.DefaultInteractionLockDurationSeconds,
+            BaseInteractionLockDuration = math.max(0f, baseInteractionLockDuration),
+            InteractionLockDurationScalingFormula = new Unity.Collections.FixedString512Bytes(interactionLockDurationFormula)
         };
     }
     #endregion

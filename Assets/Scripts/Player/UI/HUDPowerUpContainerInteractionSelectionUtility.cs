@@ -69,6 +69,22 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
 
         eventSystem.SetSelectedGameObject(null);
     }
+
+    /// <summary>
+    /// Applies the interactable state to both overlay replacement buttons.
+    /// /params primaryButton Primary-slot replacement button.
+    /// /params secondaryButton Secondary-slot replacement button.
+    /// /params isInteractable True when UI submit should be able to confirm a slot replacement.
+    /// /returns void.
+    /// </summary>
+    public static void SetOverlayButtonsInteractable(Button primaryButton, Button secondaryButton, bool isInteractable)
+    {
+        if (primaryButton != null)
+            primaryButton.interactable = isInteractable;
+
+        if (secondaryButton != null)
+            secondaryButton.interactable = isInteractable;
+    }
     #endregion
 
     #region Private Methods

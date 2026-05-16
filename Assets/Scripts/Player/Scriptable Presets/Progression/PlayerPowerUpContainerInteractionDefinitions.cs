@@ -27,6 +27,10 @@ public sealed class PlayerPowerUpContainerInteractionSettings
 {
     #region Fields
 
+    #region Constants
+    public const float DefaultInteractionLockDurationSeconds = 0.25f;
+    #endregion
+
     #region Serialized Fields
     [Header("Container")]
     [Tooltip("Prefab spawned on the ground when a milestone selection replaces one equipped active power up.")]
@@ -40,6 +44,9 @@ public sealed class PlayerPowerUpContainerInteractionSettings
 
     [Tooltip("Determines whether dropped containers preserve the current slot energy/cooldown or reset them before storage and re-equip.")]
     [SerializeField] private PlayerPowerUpContainerStoredStateMode storedStateMode = PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown;
+
+    [Tooltip("Seconds that must pass after a container swap before the same dropped container can be interacted with again.")]
+    [SerializeField] private float interactionLockDuration = DefaultInteractionLockDurationSeconds;
 
     [Header("Overlay Panel")]
     [Tooltip("Seconds used to restore Time.timeScale after the overlay panel closes following a confirmed swap.")]
@@ -99,6 +106,14 @@ public sealed class PlayerPowerUpContainerInteractionSettings
         }
     }
 
+    public float InteractionLockDuration
+    {
+        get
+        {
+            return interactionLockDuration;
+        }
+    }
+
     public string InteractActionId
     {
         get
@@ -134,12 +149,6 @@ public sealed class PlayerPowerUpContainerInteractionSettings
     /// </summary>
     public void Validate()
     {
-        if (interactionRadius < 0f)
-            interactionRadius = 0f;
-
-        if (overlayPanelTimeScaleResumeDurationSeconds < 0f)
-            overlayPanelTimeScaleResumeDurationSeconds = 0f;
-
         interactActionId = SanitizeActionId(interactActionId);
         replacePrimaryActionId = SanitizeActionId(replacePrimaryActionId);
         replaceSecondaryActionId = SanitizeActionId(replaceSecondaryActionId);

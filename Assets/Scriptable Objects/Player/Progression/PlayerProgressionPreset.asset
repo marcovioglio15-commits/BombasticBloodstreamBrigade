@@ -454,6 +454,7 @@ MonoBehaviour:
     interactionRadius: 2.25
     interactionMode: 0
     storedStateMode: 0
+    interactionLockDuration: 0.25
     overlayPanelTimeScaleResumeDurationSeconds: 0.2
     interactActionId: 8b2a0df2-6707-41c3-9c21-fbdf36800b13
     replacePrimaryActionId: 64d6faaa-5741-466a-80a4-e2f292e14c6a

@@ -197,6 +197,33 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
         formula = ResolveFormula(sourcePreset, "experiencePickupRadius");
         return true;
     }
+
+    /// <summary>
+    /// Resolves raw dropped-container interaction lock scaling metadata from the source progression preset.
+    /// /params sourcePreset Unscaled source progression preset.
+    /// /params baseValue Raw interaction lock duration stored on the source preset.
+    /// /params formula Enabled Add Scaling formula when present.
+    /// /returns True when metadata was resolved from the source preset; otherwise false.
+    /// </summary>
+    public static bool TryResolvePowerUpContainerInteractionLockDurationScalingData(PlayerProgressionPreset sourcePreset,
+                                                                                   out float baseValue,
+                                                                                   out string formula)
+    {
+        baseValue = 0f;
+        formula = string.Empty;
+
+        if (sourcePreset == null)
+            return false;
+
+        PlayerPowerUpContainerInteractionSettings settings = sourcePreset.PowerUpContainerSettings;
+
+        if (settings == null)
+            return false;
+
+        baseValue = settings.InteractionLockDuration;
+        formula = ResolveFormula(sourcePreset, "powerUpContainerSettings.interactionLockDuration");
+        return true;
+    }
     #endregion
 
     #region Private Methods

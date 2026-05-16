@@ -136,6 +136,7 @@ public sealed class HUDManager : MonoBehaviour
     private HUDLiquidBarRuntime healthBarRuntime;
     private HUDLiquidBarRuntime shieldBarRuntime;
     private HUDLiquidBarRuntime experienceBarRuntime;
+    private GameObject shieldBarRootObject;
     #endregion
 
     #region Methods
@@ -321,10 +322,19 @@ public sealed class HUDManager : MonoBehaviour
         }
 
         PlayerShield playerShield = entityManager.GetComponentData<PlayerShield>(playerEntity);
+
+        if (playerShield.Max <= 0f)
+        {
+            displayedShieldNormalized = 0f;
+            HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
+            shieldBarRuntime.HandleMissing(true, displayedShieldNormalized);
+            return;
+        }
+
+        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, true);
         float targetNormalizedValue = 0f;
 
-        if (playerShield.Max > 0f)
-            targetNormalizedValue = Mathf.Clamp01(playerShield.Current / playerShield.Max);
+        targetNormalizedValue = Mathf.Clamp01(playerShield.Current / playerShield.Max);
 
         UpdateManagedBar(shieldBarRuntime,
                          ref displayedShieldNormalized,
@@ -472,6 +482,7 @@ public sealed class HUDManager : MonoBehaviour
         if (shieldBarRuntime == null)
             return;
 
+        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, !hideShieldBarWhenPlayerMissing);
         shieldBarRuntime.HandleMissing(hideShieldBarWhenPlayerMissing, displayedShieldNormalized);
     }
 
@@ -592,7 +603,10 @@ public sealed class HUDManager : MonoBehaviour
             healthBarRuntime = HUDLiquidBarRuntime.CreateHealth(playerHealthFillImage, healthBarPresentation);
 
         if (shieldBarRuntime == null && TryResolveShieldFillImage(out Image shieldFillImage))
+        {
+            shieldBarRootObject = HUDBarVisibilityUtility.ResolveRootObject(shieldFillImage);
             shieldBarRuntime = HUDLiquidBarRuntime.CreateShield(shieldFillImage, shieldBarPresentation);
+        }
 
         if (experienceBarRuntime == null && playerExperienceFillImage != null)
             experienceBarRuntime = HUDLiquidBarRuntime.CreateExperience(playerExperienceFillImage, experienceBarPresentation);

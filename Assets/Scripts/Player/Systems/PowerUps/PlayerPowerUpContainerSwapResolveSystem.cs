@@ -14,10 +14,6 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 {
     #region Methods
 
-    #region constants
-    private const float DefaultInteractionLockDuration = 0.25f;
-    #endregion
-
     #region Lifecycle
 
     /// <summary>
@@ -43,6 +39,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         ComponentLookup<PlayerDroppedPowerUpContainerContent> droppedContainerContentLookup = SystemAPI.GetComponentLookup<PlayerDroppedPowerUpContainerContent>(false);
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> interactionConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionLock>(false);
+        BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         foreach ((DynamicBuffer<PlayerPowerUpContainerSwapCommand> swapCommands,
@@ -64,7 +61,11 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
             PlayerPowerUpContainerInteractionConfig interactionConfig = interactionConfigLookup[playerEntity];
             PlayerPowerUpContainerStoredStateMode storedStateMode = interactionConfig.StoredStateMode;
-            float interactionLockDuration = DefaultInteractionLockDuration;
+            DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup.HasBuffer(playerEntity)
+                ? scalableStatsLookup[playerEntity]
+                : default;
+            float interactionLockDuration = PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(in interactionConfig,
+                                                                                                                            scalableStats);
 
             for (int commandIndex = 0; commandIndex < swapCommands.Length; commandIndex++)
             {

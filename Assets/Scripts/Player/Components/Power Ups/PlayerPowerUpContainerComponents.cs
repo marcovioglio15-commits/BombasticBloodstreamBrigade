@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 
 /// <summary>
@@ -14,6 +15,8 @@ public struct PlayerPowerUpContainerInteractionConfig : IComponentData
     public PlayerPowerUpContainerInteractionMode InteractionMode;
     public PlayerPowerUpContainerStoredStateMode StoredStateMode;
     public float InteractionLockDuration;
+    public float BaseInteractionLockDuration;
+    public FixedString512Bytes InteractionLockDurationScalingFormula;
 }
 
 /// <summary>

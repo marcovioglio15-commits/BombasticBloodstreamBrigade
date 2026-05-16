@@ -28,15 +28,18 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
         SerializedProperty interactionRadiusProperty = property.FindPropertyRelative("interactionRadius");
         SerializedProperty interactionModeProperty = property.FindPropertyRelative("interactionMode");
         SerializedProperty storedStateModeProperty = property.FindPropertyRelative("storedStateMode");
+        SerializedProperty interactionLockDurationProperty = property.FindPropertyRelative("interactionLockDuration");
         SerializedProperty overlayResumeDurationProperty = property.FindPropertyRelative("overlayPanelTimeScaleResumeDurationSeconds");
         SerializedProperty interactActionIdProperty = property.FindPropertyRelative("interactActionId");
         SerializedProperty replacePrimaryActionIdProperty = property.FindPropertyRelative("replacePrimaryActionId");
         SerializedProperty replaceSecondaryActionIdProperty = property.FindPropertyRelative("replaceSecondaryActionId");
+        SerializedProperty scalingRulesProperty = property.serializedObject.FindProperty("scalingRules");
 
         if (containerPrefabProperty == null ||
             interactionRadiusProperty == null ||
             interactionModeProperty == null ||
             storedStateModeProperty == null ||
+            interactionLockDurationProperty == null ||
             overlayResumeDurationProperty == null ||
             interactActionIdProperty == null ||
             replacePrimaryActionIdProperty == null ||
@@ -49,11 +52,14 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
         InputActionAsset inputAsset = PlayerInputActionsAssetUtility.LoadOrCreateAsset();
         PropertyField containerPrefabField = CreateBoundPropertyField(containerPrefabProperty, "Power-up Container");
-        PropertyField interactionRadiusField = CreateBoundPropertyField(interactionRadiusProperty, "Interaction Radius");
+        VisualElement interactionRadiusField = CreateScalingField(interactionRadiusProperty, scalingRulesProperty, "Interaction Radius");
         PropertyField interactionModeField = CreateBoundPropertyField(interactionModeProperty, "Interaction Mode");
         PropertyField storedStateModeField = CreateBoundPropertyField(storedStateModeProperty, "Stored State");
+        VisualElement interactionLockDurationField = CreateScalingField(interactionLockDurationProperty, scalingRulesProperty, "Interaction Cooldown");
+        VisualElement warningsRoot = new VisualElement();
         VisualElement overlayFieldsRoot = CreateOverlayFields(property.serializedObject,
                                                               inputAsset,
+                                                              scalingRulesProperty,
                                                               overlayResumeDurationProperty,
                                                               interactActionIdProperty);
         VisualElement promptFieldsRoot = CreatePromptFields(property.serializedObject,
@@ -65,6 +71,8 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
         containerFoldout.Add(interactionRadiusField);
         containerFoldout.Add(interactionModeField);
         containerFoldout.Add(storedStateModeField);
+        containerFoldout.Add(interactionLockDurationField);
+        containerFoldout.Add(warningsRoot);
         containerFoldout.Add(overlayFieldsRoot);
         containerFoldout.Add(promptFieldsRoot);
         root.Add(containerFoldout);
@@ -75,6 +83,12 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
             RefreshModeVisibility();
         });
 
+        containerFoldout.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            RefreshWarnings();
+        });
+
+        RefreshWarnings();
         RefreshModeVisibility();
         return root;
 
@@ -87,6 +101,27 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
             promptFieldsRoot.style.display = interactionMode == PlayerPowerUpContainerInteractionMode.Prompt3D
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
+        }
+
+        void RefreshWarnings()
+        {
+            warningsRoot.Clear();
+            AddNonNegativeWarning(warningsRoot,
+                                  interactionRadiusProperty,
+                                  "Interaction Radius",
+                                  "Negative values are clamped to zero during bake/runtime resolution.");
+            AddNonNegativeWarning(warningsRoot,
+                                  interactionLockDurationProperty,
+                                  "Interaction Cooldown",
+                                  "Negative values are clamped to zero during bake/runtime resolution.");
+
+            if ((PlayerPowerUpContainerInteractionMode)interactionModeProperty.enumValueIndex != PlayerPowerUpContainerInteractionMode.OverlayPanel)
+                return;
+
+            AddNonNegativeWarning(warningsRoot,
+                                  overlayResumeDurationProperty,
+                                  "Resume Time Scale In",
+                                  "Negative values are clamped to zero during bake/runtime resolution.");
         }
     }
     #endregion
@@ -107,6 +142,46 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
             PlayerManagementDraftSession.MarkDirty();
         });
         return field;
+    }
+
+    /// <summary>
+    /// Creates a scaling-aware numeric field for container settings.
+    /// /params property Serialized numeric property backing the field.
+    /// /params scalingRulesProperty Progression preset scaling rules used by Add Scaling.
+    /// /params label Label shown in the tool.
+    /// /returns Visual element bound to the property and its optional scaling rule.
+    /// </summary>
+    private static VisualElement CreateScalingField(SerializedProperty property,
+                                                    SerializedProperty scalingRulesProperty,
+                                                    string label)
+    {
+        return PlayerScalingFieldElementFactory.CreateField(property,
+                                                            scalingRulesProperty,
+                                                            label);
+    }
+
+    /// <summary>
+    /// Adds one non-mutating warning for settings that must remain non-negative at runtime.
+    /// /params warningsRoot UI container receiving warning boxes.
+    /// /params property Serialized float property inspected.
+    /// /params label Human-readable field label.
+    /// /params message Warning text describing runtime handling.
+    /// /returns void.
+    /// </summary>
+    private static void AddNonNegativeWarning(VisualElement warningsRoot,
+                                              SerializedProperty property,
+                                              string label,
+                                              string message)
+    {
+        if (warningsRoot == null || property == null)
+            return;
+
+        if (property.floatValue >= 0f)
+            return;
+
+        HelpBox warningBox = new HelpBox(string.Format("{0}: {1}", label, message), HelpBoxMessageType.Warning);
+        warningBox.style.marginBottom = 2f;
+        warningsRoot.Add(warningBox);
     }
 
     /// <summary>
@@ -134,11 +209,12 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
     /// </summary>
     private static VisualElement CreateOverlayFields(SerializedObject serializedObject,
                                                      InputActionAsset inputAsset,
+                                                     SerializedProperty scalingRulesProperty,
                                                      SerializedProperty overlayResumeDurationProperty,
                                                      SerializedProperty interactActionIdProperty)
     {
         VisualElement root = CreateModeSectionRoot("Overlay Panel");
-        root.Add(CreateBoundPropertyField(overlayResumeDurationProperty, "Resume Time Scale In"));
+        root.Add(CreateScalingField(overlayResumeDurationProperty, scalingRulesProperty, "Resume Time Scale In"));
         root.Add(CreateBindingPicker(inputAsset,
                                      serializedObject,
                                      interactActionIdProperty,

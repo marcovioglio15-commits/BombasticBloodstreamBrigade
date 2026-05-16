@@ -30,6 +30,9 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+            return;
+
         InputAction cheatPresetDigitAction = PlayerInputRuntime.CheatPresetDigitAction;
         InputAction cheatModifierControlAction = PlayerInputRuntime.CheatModifierControlAction;
         InputAction cheatModifierShiftAction = PlayerInputRuntime.CheatModifierShiftAction;

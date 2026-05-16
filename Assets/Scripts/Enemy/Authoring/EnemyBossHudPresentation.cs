@@ -1,7 +1,5 @@
 using TMPro;
-using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +14,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 {
     #region Constants
     private const float DefaultResolveIntervalSeconds = 0.25f;
-    private const float CameraResolveIntervalSeconds = 0.5f;
     private const float Epsilon = 0.0001f;
     #endregion
 
@@ -85,9 +82,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private float displayedShieldNormalized;
     private HUDLiquidBarRuntime healthBarRuntime;
     private HUDLiquidBarRuntime shieldBarRuntime;
+    private GameObject shieldBarRootObject;
     private bool ecsInitialized;
     private bool visibilityInitialized;
     private string displayedBossName;
+    private EnemyBossHudAggregateBaseline aggregateBaseline;
     #endregion
 
     #region Methods
@@ -148,13 +147,19 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             return;
         }
 
-        if (!TryResolveBossEntity(Time.unscaledTime, out Entity bossEntity))
+        if (!EnemyBossHudSnapshotUtility.TryResolveSnapshot(entityManager,
+                                                            bossQuery,
+                                                            ref cachedBossEntity,
+                                                            ref nextBossResolveTime,
+                                                            Time.unscaledTime,
+                                                            bossResolveIntervalSeconds,
+                                                            out EnemyBossHudSnapshot bossSnapshot))
         {
             HandleMissingBoss();
             return;
         }
 
-        SyncBossHud(bossEntity, Time.unscaledDeltaTime);
+        SyncBossHud(in bossSnapshot, Time.unscaledDeltaTime);
     }
     #endregion
 
@@ -202,71 +207,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves the active boss entity, reusing a cached entity while it stays valid.
-    /// /params currentTime Current unscaled time used to throttle lookup attempts.
-    /// /params bossEntity Resolved boss entity.
-    /// /returns True when a valid boss entity is available.
-    /// </summary>
-    private bool TryResolveBossEntity(float currentTime, out Entity bossEntity)
-    {
-        if (cachedBossEntity != Entity.Null &&
-            entityManager.Exists(cachedBossEntity) &&
-            entityManager.HasComponent<EnemyBossTag>(cachedBossEntity) &&
-            entityManager.HasComponent<EnemyActive>(cachedBossEntity) &&
-            entityManager.IsComponentEnabled<EnemyActive>(cachedBossEntity))
-        {
-            bossEntity = cachedBossEntity;
-            return true;
-        }
-
-        cachedBossEntity = Entity.Null;
-
-        if (currentTime < nextBossResolveTime)
-        {
-            bossEntity = Entity.Null;
-            return false;
-        }
-
-        nextBossResolveTime = currentTime + bossResolveIntervalSeconds;
-
-        if (bossQuery.IsEmptyIgnoreFilter)
-        {
-            bossEntity = Entity.Null;
-            return false;
-        }
-
-        NativeArray<Entity> bossEntities = bossQuery.ToEntityArray(Allocator.Temp);
-        Entity resolvedBoss = Entity.Null;
-
-        for (int index = 0; index < bossEntities.Length; index++)
-        {
-            Entity candidateEntity = bossEntities[index];
-
-            if (!entityManager.Exists(candidateEntity))
-                continue;
-
-            if (!entityManager.HasComponent<EnemyActive>(candidateEntity))
-                continue;
-
-            if (!entityManager.IsComponentEnabled<EnemyActive>(candidateEntity))
-                continue;
-
-            EnemyBossHudConfig hudConfig = entityManager.GetComponentData<EnemyBossHudConfig>(candidateEntity);
-
-            if (hudConfig.Enabled == 0)
-                continue;
-
-            resolvedBoss = candidateEntity;
-            break;
-        }
-
-        bossEntities.Dispose();
-        cachedBossEntity = resolvedBoss;
-        bossEntity = resolvedBoss;
-        return bossEntity != Entity.Null;
-    }
-
-    /// <summary>
     /// Clears cached ECS references after the default world becomes unavailable.
     /// /params None.
     /// /returns None.
@@ -282,14 +222,14 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     #region Presentation
     /// <summary>
-    /// Synchronizes health, text, colors and offscreen indicator for the active boss.
-    /// /params bossEntity Active boss entity.
+    /// Synchronizes health, text, colors and offscreen indicator for the current boss aggregate.
+    /// /params bossSnapshot Aggregated active boss HUD snapshot.
     /// /params deltaTime Unscaled frame delta used for smoothing.
     /// /returns None.
     /// </summary>
-    private void SyncBossHud(Entity bossEntity, float deltaTime)
+    private void SyncBossHud(in EnemyBossHudSnapshot bossSnapshot, float deltaTime)
     {
-        EnemyBossHudConfig hudConfig = entityManager.GetComponentData<EnemyBossHudConfig>(bossEntity);
+        EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
 
         if (hudConfig.Enabled == 0)
         {
@@ -298,46 +238,59 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         }
 
         ApplyVisibility(true);
-        SyncConfig(in hudConfig, bossEntity);
-        SyncBars(bossEntity, deltaTime);
-        SyncOffscreenIndicator(bossEntity, in hudConfig);
+        SyncConfig(in bossSnapshot);
+        SyncBars(in bossSnapshot, deltaTime);
+        EnemyBossHudOffscreenIndicatorUtility.Sync(entityManager,
+                                                   bossSnapshot.PrimaryEntity,
+                                                   in hudConfig,
+                                                   targetCamera,
+                                                   offscreenIndicatorRoot,
+                                                   ref cachedCamera,
+                                                   ref nextCameraResolveTime,
+                                                   ref indicatorParentRect,
+                                                   ref rootCanvas);
     }
 
     /// <summary>
     /// Applies boss HUD configuration baked from the selected visual preset.
-    /// /params hudConfig Baked boss HUD config.
-    /// /params bossEntity Active boss entity used to resolve managed sprite data.
+    /// /params bossSnapshot Aggregated snapshot whose primary boss supplies labels, colors and managed sprite data.
     /// /returns None.
     /// </summary>
-    private void SyncConfig(in EnemyBossHudConfig hudConfig, Entity bossEntity)
+    private void SyncConfig(in EnemyBossHudSnapshot bossSnapshot)
     {
-        SyncBossName(hudConfig.DisplayName.ToString());
+        EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
+        SyncBossName(ResolveBossDisplayName(in bossSnapshot));
         EnemyBossHudPresentationUtility.ApplyImageColor(healthFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthFillColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(healthBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthBackgroundColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(shieldFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldFillColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(shieldBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldBackgroundColor));
-        ApplyOffscreenIndicatorConfig(bossEntity,
-                                      EnemyBossHudPresentationUtility.ToColor(hudConfig.OffscreenIndicatorColor),
-                                      hudConfig.OffscreenIndicatorSizePixels);
+        EnemyBossHudOffscreenIndicatorUtility.ApplyConfig(entityManager,
+                                                          bossSnapshot.PrimaryEntity,
+                                                          offscreenIndicatorRoot,
+                                                          offscreenIndicatorImage,
+                                                          EnemyBossHudPresentationUtility.ToColor(hudConfig.OffscreenIndicatorColor),
+                                                          hudConfig.OffscreenIndicatorSizePixels);
     }
 
     /// <summary>
-    /// Updates the current health and shield fill values from ECS health data.
-    /// /params bossEntity Active boss entity.
+    /// Updates the health and shield fill values from summed active boss ECS health data.
+    /// /params bossSnapshot Aggregated boss health and shield values.
     /// /params deltaTime Unscaled frame delta used for smoothing.
     /// /returns None.
     /// </summary>
-    private void SyncBars(Entity bossEntity, float deltaTime)
+    private void SyncBars(in EnemyBossHudSnapshot bossSnapshot, float deltaTime)
     {
-        EnemyHealth health = entityManager.GetComponentData<EnemyHealth>(bossEntity);
         float targetHealthNormalized = 0f;
         float targetShieldNormalized = 0f;
+        float stableMaxHealth = aggregateBaseline.ResolveHealthMax(bossSnapshot.MaxHealth);
+        float stableMaxShield = aggregateBaseline.ResolveShieldMax(bossSnapshot.MaxShield);
+        bool hasShield = bossSnapshot.MaxShield > Epsilon && stableMaxShield > Epsilon;
 
-        if (health.Max > 0f)
-            targetHealthNormalized = Mathf.Clamp01(health.Current / health.Max);
+        if (stableMaxHealth > Epsilon)
+            targetHealthNormalized = Mathf.Clamp01(bossSnapshot.CurrentHealth / stableMaxHealth);
 
-        if (health.MaxShield > 0f)
-            targetShieldNormalized = Mathf.Clamp01(health.CurrentShield / health.MaxShield);
+        if (hasShield)
+            targetShieldNormalized = Mathf.Clamp01(bossSnapshot.CurrentShield / stableMaxShield);
 
         if (healthSmoothingSeconds <= 0f || deltaTime <= 0f)
         {
@@ -351,54 +304,12 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         }
 
         ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, targetHealthNormalized);
-        ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, targetShieldNormalized);
-    }
+        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, hasShield);
 
-    /// <summary>
-    /// Updates the offscreen indicator placement and visibility.
-    /// /params bossEntity Active boss entity.
-    /// /params hudConfig Baked HUD config containing edge padding.
-    /// /returns None.
-    /// </summary>
-    private void SyncOffscreenIndicator(Entity bossEntity, in EnemyBossHudConfig hudConfig)
-    {
-        if (offscreenIndicatorRoot == null)
-            return;
-
-        Camera camera = ResolveCamera(Time.unscaledTime);
-
-        if (camera == null)
-        {
-            SetOffscreenIndicatorVisible(false);
-            return;
-        }
-
-        LocalTransform bossTransform = entityManager.GetComponentData<LocalTransform>(bossEntity);
-        Vector3 bossPosition = new Vector3(bossTransform.Position.x, bossTransform.Position.y, bossTransform.Position.z);
-        Vector3 viewportPosition = camera.WorldToViewportPoint(bossPosition);
-        bool bossIsVisible = viewportPosition.z > 0f &&
-                             viewportPosition.x >= 0f &&
-                             viewportPosition.x <= 1f &&
-                             viewportPosition.y >= 0f &&
-                             viewportPosition.y <= 1f;
-
-        if (bossIsVisible)
-        {
-            SetOffscreenIndicatorVisible(false);
-            return;
-        }
-
-        float indicatorHalfSizePixels = Mathf.Max(0f, hudConfig.OffscreenIndicatorSizePixels) * 0.5f;
-        Vector2 edgePosition = EnemyBossHudPresentationUtility.ResolveEdgePosition(viewportPosition,
-                                                                                   Mathf.Max(0f, hudConfig.EdgePaddingPixels) + indicatorHalfSizePixels);
-        if (!TryApplyOffscreenIndicatorPosition(edgePosition, camera))
-        {
-            SetOffscreenIndicatorVisible(false);
-            return;
-        }
-
-        ApplyIndicatorRotation(edgePosition);
-        SetOffscreenIndicatorVisible(true);
+        if (hasShield)
+            ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, targetShieldNormalized);
+        else
+            ApplyBarFill(shieldBarRuntime, shieldFillImage, 0f, 0f);
     }
 
     /// <summary>
@@ -409,11 +320,13 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void HandleMissingBoss()
     {
         cachedBossEntity = Entity.Null;
+        aggregateBaseline.Reset();
+        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
 
         if (hideWhenNoBoss)
         {
             ApplyVisibility(false);
-            SetOffscreenIndicatorVisible(false);
+            EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
         }
     }
     #endregion
@@ -447,14 +360,12 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         if (shieldBackgroundImage == null)
             shieldBackgroundImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "ShieldBackground");
 
-        if (offscreenIndicatorRoot == null)
-            offscreenIndicatorRoot = transform.Find("OffscreenIndicator") as RectTransform;
-
-        indicatorParentRect = offscreenIndicatorRoot != null ? offscreenIndicatorRoot.parent as RectTransform : null;
-        rootCanvas = offscreenIndicatorRoot != null ? offscreenIndicatorRoot.GetComponentInParent<Canvas>() : GetComponentInParent<Canvas>();
-
-        if (offscreenIndicatorImage == null && offscreenIndicatorRoot != null)
-            offscreenIndicatorImage = offscreenIndicatorRoot.GetComponentInChildren<Image>(true);
+        shieldBarRootObject = HUDBarVisibilityUtility.ResolveRootObject(shieldBackgroundImage, shieldFillImage);
+        EnemyBossHudOffscreenIndicatorUtility.ResolveReferences(transform,
+                                                               ref offscreenIndicatorRoot,
+                                                               ref offscreenIndicatorImage,
+                                                               ref indicatorParentRect,
+                                                               ref rootCanvas);
 
         EnemyBossHudPresentationUtility.ConfigureFillImage(healthFillImage);
         EnemyBossHudPresentationUtility.ConfigureFillImage(shieldFillImage);
@@ -499,6 +410,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     {
         displayedHealthNormalized = 1f;
         displayedShieldNormalized = 0f;
+        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
         ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, displayedHealthNormalized);
         ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, displayedShieldNormalized);
     }
@@ -537,223 +449,19 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies sprite and tint for the offscreen indicator.
-    /// /params bossEntity Active boss entity.
-    /// /params indicatorColor Color resolved from visual preset.
-    /// /params sizePixels Square indicator size in screen pixels.
-    /// /returns None.
+    /// Resolves the label shown by the boss HUD, including a compact count suffix when multiple bosses contribute to the bars.
+    /// /params bossSnapshot Aggregated boss HUD snapshot.
+    /// /returns Display name for the active boss aggregate.
     /// </summary>
-    private void ApplyOffscreenIndicatorConfig(Entity bossEntity, Color indicatorColor, float sizePixels)
+    private static string ResolveBossDisplayName(in EnemyBossHudSnapshot bossSnapshot)
     {
-        if (offscreenIndicatorImage == null)
-            return;
+        string primaryName = bossSnapshot.PrimaryConfig.DisplayName.ToString();
+        string resolvedName = string.IsNullOrWhiteSpace(primaryName) ? "Boss" : primaryName;
 
-        EnemyBossHudPresentationUtility.ApplyImageColor(offscreenIndicatorImage, indicatorColor);
-        ApplyOffscreenIndicatorSize(sizePixels);
+        if (bossSnapshot.BossCount <= 1)
+            return resolvedName;
 
-        if (!entityManager.HasComponent<EnemyBossHudManagedConfig>(bossEntity))
-            return;
-
-        EnemyBossHudManagedConfig managedConfig = entityManager.GetComponentObject<EnemyBossHudManagedConfig>(bossEntity);
-
-        if (managedConfig == null || managedConfig.OffscreenIndicatorSprite == null)
-            return;
-
-        if (offscreenIndicatorImage.sprite != managedConfig.OffscreenIndicatorSprite)
-            offscreenIndicatorImage.sprite = managedConfig.OffscreenIndicatorSprite;
-    }
-
-    /// <summary>
-    /// Applies square dimensions to the offscreen indicator root and image rect only when needed.
-    /// /params sizePixels Requested square indicator size in pixels.
-    /// /returns None.
-    /// </summary>
-    private void ApplyOffscreenIndicatorSize(float sizePixels)
-    {
-        float resolvedSize = Mathf.Max(1f, sizePixels);
-        Vector2 size = new Vector2(resolvedSize, resolvedSize);
-
-        if (offscreenIndicatorRoot != null &&
-            Vector2.SqrMagnitude(offscreenIndicatorRoot.sizeDelta - size) > Epsilon)
-        {
-            offscreenIndicatorRoot.sizeDelta = size;
-        }
-
-        if (offscreenIndicatorImage == null)
-            return;
-
-        RectTransform imageTransform = offscreenIndicatorImage.rectTransform;
-
-        if (imageTransform == null)
-            return;
-
-        if (Vector2.SqrMagnitude(imageTransform.sizeDelta - size) <= Epsilon)
-            return;
-
-        imageTransform.sizeDelta = size;
-    }
-
-    /// <summary>
-    /// Resolves a camera for boss projection without calling Camera.main every frame.
-    /// /params currentTime Current unscaled time used to throttle camera lookup.
-    /// /returns Active projection camera, or null when unavailable.
-    /// </summary>
-    private Camera ResolveCamera(float currentTime)
-    {
-        if (targetCamera != null && targetCamera.isActiveAndEnabled)
-            return targetCamera;
-
-        if (cachedCamera != null && cachedCamera.isActiveAndEnabled)
-            return cachedCamera;
-
-        if (currentTime < nextCameraResolveTime)
-            return null;
-
-        nextCameraResolveTime = currentTime + CameraResolveIntervalSeconds;
-        cachedCamera = Camera.main;
-
-        if (cachedCamera != null)
-            return cachedCamera;
-
-        Camera[] cameras = Camera.allCameras;
-
-        for (int index = 0; index < cameras.Length; index++)
-        {
-            Camera camera = cameras[index];
-
-            if (camera == null || !camera.isActiveAndEnabled)
-                continue;
-
-            cachedCamera = camera;
-            return cachedCamera;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Applies the screen-edge position in the correct coordinate space for overlay, camera-space and world-space canvases.
-    /// /params screenPosition Screen-space indicator position in pixels.
-    /// /params projectionCamera Camera used to project the boss into viewport space.
-    /// /returns True when the indicator position could be applied.
-    /// </summary>
-    private bool TryApplyOffscreenIndicatorPosition(Vector2 screenPosition, Camera projectionCamera)
-    {
-        if (offscreenIndicatorRoot == null)
-            return false;
-
-        RectTransform parentRect = ResolveIndicatorParentRect();
-
-        if (parentRect == null)
-        {
-            offscreenIndicatorRoot.position = screenPosition;
-            return true;
-        }
-
-        Camera eventCamera = ResolveCanvasEventCamera(projectionCamera);
-
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, screenPosition, eventCamera, out Vector2 localPoint))
-            return false;
-
-        offscreenIndicatorRoot.anchoredPosition = ResolveAnchoredPosition(parentRect, localPoint);
-        return true;
-    }
-
-    /// <summary>
-    /// Converts a parent-local screen point into the anchored position expected by the indicator RectTransform.
-    /// /params parentRect Parent rect used as the coordinate frame.
-    /// /params localPoint Local point returned by RectTransformUtility.
-    /// /returns Anchored position corrected for the indicator anchor reference.
-    /// </summary>
-    private Vector2 ResolveAnchoredPosition(RectTransform parentRect, Vector2 localPoint)
-    {
-        Vector2 anchorCenter = (offscreenIndicatorRoot.anchorMin + offscreenIndicatorRoot.anchorMax) * 0.5f;
-        Vector2 anchorReference = new Vector2(Mathf.Lerp(parentRect.rect.xMin, parentRect.rect.xMax, anchorCenter.x),
-                                              Mathf.Lerp(parentRect.rect.yMin, parentRect.rect.yMax, anchorCenter.y));
-        return localPoint - anchorReference;
-    }
-
-    /// <summary>
-    /// Resolves and caches the parent RectTransform used as the indicator coordinate space.
-    /// /params None.
-    /// /returns Parent RectTransform when available.
-    /// </summary>
-    private RectTransform ResolveIndicatorParentRect()
-    {
-        if (indicatorParentRect != null)
-            return indicatorParentRect;
-
-        if (offscreenIndicatorRoot == null || offscreenIndicatorRoot.parent == null)
-            return null;
-
-        indicatorParentRect = offscreenIndicatorRoot.parent as RectTransform;
-        return indicatorParentRect;
-    }
-
-    /// <summary>
-    /// Resolves the event camera required by RectTransformUtility for the active canvas render mode.
-    /// /params projectionCamera Camera used as a fallback when the canvas has no explicit world camera.
-    /// /returns Null for overlay canvas, otherwise the canvas world camera or projection fallback.
-    /// </summary>
-    private Camera ResolveCanvasEventCamera(Camera projectionCamera)
-    {
-        Canvas canvas = ResolveRootCanvas();
-
-        if (canvas == null)
-            return projectionCamera;
-
-        switch (canvas.renderMode)
-        {
-            case RenderMode.ScreenSpaceOverlay:
-                return null;
-            case RenderMode.ScreenSpaceCamera:
-            case RenderMode.WorldSpace:
-                if (canvas.worldCamera != null)
-                    return canvas.worldCamera;
-
-                return projectionCamera;
-            default:
-                return projectionCamera;
-        }
-    }
-
-    /// <summary>
-    /// Resolves and caches the root canvas that owns the boss HUD presentation.
-    /// /params None.
-    /// /returns Canvas owning this presenter, or null when unavailable.
-    /// </summary>
-    private Canvas ResolveRootCanvas()
-    {
-        if (rootCanvas != null)
-            return rootCanvas;
-
-        if (offscreenIndicatorRoot != null)
-        {
-            rootCanvas = offscreenIndicatorRoot.GetComponentInParent<Canvas>();
-
-            if (rootCanvas != null)
-                return rootCanvas;
-        }
-
-        rootCanvas = GetComponentInParent<Canvas>();
-        return rootCanvas;
-    }
-
-    /// <summary>
-    /// Rotates the offscreen indicator toward the clamped edge direction.
-    /// /params edgePosition Current indicator screen position.
-    /// /returns None.
-    /// </summary>
-    private void ApplyIndicatorRotation(Vector2 edgePosition)
-    {
-        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-        Vector2 direction = edgePosition - screenCenter;
-
-        if (direction.sqrMagnitude <= Epsilon)
-            return;
-
-        float angleDegrees = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-        offscreenIndicatorRoot.localRotation = Quaternion.Euler(0f, 0f, angleDegrees);
+        return string.Format("{0} x{1}", resolvedName, bossSnapshot.BossCount);
     }
 
     /// <summary>
@@ -868,24 +576,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
             return false;
         }
-    }
-
-    /// <summary>
-    /// Toggles the offscreen indicator root.
-    /// /params visible Desired indicator visibility.
-    /// /returns None.
-    /// </summary>
-    private void SetOffscreenIndicatorVisible(bool visible)
-    {
-        if (offscreenIndicatorRoot == null)
-            return;
-
-        GameObject indicatorObject = offscreenIndicatorRoot.gameObject;
-
-        if (indicatorObject.activeSelf == visible)
-            return;
-
-        indicatorObject.SetActive(visible);
     }
 
     #endregion

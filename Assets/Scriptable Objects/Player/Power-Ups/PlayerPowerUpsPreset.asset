@@ -18995,6 +18995,9 @@ MonoBehaviour:
   - Passive_ElementalBullets_Fire
   - Passive_AdditionalBarrel
   - Passive_DamageIncrease
+  - Passive_LaserBeam
+  - PassiveSplittingProjectiles
+  - Passive_MovementSpeed
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

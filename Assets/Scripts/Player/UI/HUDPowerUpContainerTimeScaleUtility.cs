@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Entities;
 
 /// <summary>
 /// Centralizes unscaled Time.timeScale resume state updates used by dropped-container overlays.
@@ -42,6 +43,47 @@ internal static class HUDPowerUpContainerTimeScaleUtility
         targetTimeScale = 1f;
         elapsedSeconds = 0f;
         isResuming = true;
+    }
+
+    /// <summary>
+    /// Starts the configured unscaled Time.timeScale resume by reading the player container-interaction config.
+    /// /params entityManager Entity manager used to read the runtime player config.
+    /// /params playerEntity Player entity that owns the dropped-container interaction config.
+    /// /params isResuming Mutable flag tracking whether a resume is currently active.
+    /// /params startTimeScale Mutable cached start Time.timeScale used for interpolation.
+    /// /params targetTimeScale Mutable cached target Time.timeScale used for interpolation.
+    /// /params durationSeconds Mutable total resume duration in seconds.
+    /// /params elapsedSeconds Mutable elapsed unscaled time since the resume started.
+    /// /returns void.
+    /// </summary>
+    public static void BeginResume(EntityManager entityManager,
+                                   Entity playerEntity,
+                                   ref bool isResuming,
+                                   ref float startTimeScale,
+                                   ref float targetTimeScale,
+                                   ref float durationSeconds,
+                                   ref float elapsedSeconds)
+    {
+        if (playerEntity == Entity.Null ||
+            !entityManager.Exists(playerEntity) ||
+            !entityManager.HasComponent<PlayerPowerUpContainerInteractionConfig>(playerEntity))
+        {
+            Time.timeScale = 1f;
+            StopResume(ref isResuming,
+                       ref startTimeScale,
+                       ref targetTimeScale,
+                       ref durationSeconds,
+                       ref elapsedSeconds);
+            return;
+        }
+
+        PlayerPowerUpContainerInteractionConfig interactionConfig = entityManager.GetComponentData<PlayerPowerUpContainerInteractionConfig>(playerEntity);
+        BeginResume(ref isResuming,
+                    ref startTimeScale,
+                    ref targetTimeScale,
+                    ref durationSeconds,
+                    ref elapsedSeconds,
+                    interactionConfig.OverlayPanelTimeScaleResumeDurationSeconds);
     }
 
     /// <summary>
@@ -89,6 +131,27 @@ internal static class HUDPowerUpContainerTimeScaleUtility
                    ref durationSeconds,
                    ref elapsedSeconds);
         return true;
+    }
+
+    /// <summary>
+    /// Cancels milestone-driven resume state so another overlay can keep gameplay paused until it closes.
+    /// /params entityManager Entity manager used to write the milestone resume component.
+    /// /params playerEntity Player entity that may own milestone resume state.
+    /// /returns void.
+    /// </summary>
+    public static void CancelMilestoneResume(EntityManager entityManager, Entity playerEntity)
+    {
+        if (playerEntity == Entity.Null)
+            return;
+
+        if (!entityManager.Exists(playerEntity))
+            return;
+
+        if (!entityManager.HasComponent<PlayerMilestoneTimeScaleResumeState>(playerEntity))
+            return;
+
+        entityManager.SetComponentData(playerEntity,
+                                       PlayerMilestoneSelectionOutcomeUtility.CreateInactiveResumeState());
     }
 
     /// <summary>

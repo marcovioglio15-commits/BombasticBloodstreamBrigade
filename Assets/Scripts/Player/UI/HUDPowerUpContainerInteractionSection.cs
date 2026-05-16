@@ -51,11 +51,13 @@ public sealed class HUDPowerUpContainerInteractionSection
     private Entity overlayContainerEntity;
     private PlayerDroppedPowerUpContainerView overlayContainerView;
     private bool overlayOpen;
+    private bool overlayButtonsArmed;
     private bool isTimeScaleResuming;
     private float resumeStartTimeScale;
     private float resumeTargetTimeScale = 1f;
     private float resumeDurationSeconds;
     private float resumeElapsedSeconds;
+    private HUDPowerUpContainerInteractionInputGate interactionInputGate;
     #endregion
 
     #region Methods
@@ -88,7 +90,13 @@ public sealed class HUDPowerUpContainerInteractionSection
         overlayContainerEntity = Entity.Null;
         overlayContainerView = null;
         overlayOpen = false;
-        StopTimeScaleResume();
+        overlayButtonsArmed = false;
+        interactionInputGate.Clear();
+        HUDPowerUpContainerTimeScaleUtility.StopResume(ref isTimeScaleResuming,
+                                                       ref resumeStartTimeScale,
+                                                       ref resumeTargetTimeScale,
+                                                       ref resumeDurationSeconds,
+                                                       ref resumeElapsedSeconds);
         Time.timeScale = 1f;
     }
 
@@ -104,7 +112,12 @@ public sealed class HUDPowerUpContainerInteractionSection
         promptContainerEntity = Entity.Null;
         promptContainerView = null;
         HideOverlayImmediate();
-        StopTimeScaleResume();
+        interactionInputGate.Clear();
+        HUDPowerUpContainerTimeScaleUtility.StopResume(ref isTimeScaleResuming,
+                                                       ref resumeStartTimeScale,
+                                                       ref resumeTargetTimeScale,
+                                                       ref resumeDurationSeconds,
+                                                       ref resumeElapsedSeconds);
         Time.timeScale = 1f;
     }
 
@@ -122,7 +135,13 @@ public sealed class HUDPowerUpContainerInteractionSection
         RegisterButtons();
 
         bool milestoneSelectionActive = IsMilestoneSelectionActive(playerEntity);
-        UpdateTimeScaleResume(milestoneSelectionActive);
+        HUDPowerUpContainerTimeScaleUtility.UpdateResume(ref isTimeScaleResuming,
+                                                         ref resumeStartTimeScale,
+                                                         ref resumeTargetTimeScale,
+                                                         ref resumeDurationSeconds,
+                                                         ref resumeElapsedSeconds,
+                                                         milestoneSelectionActive);
+        interactionInputGate.Refresh();
 
         if (!entityManager.Exists(playerEntity) ||
             !entityManager.HasComponent<PlayerPowerUpContainerInteractionConfig>(playerEntity) ||
@@ -145,6 +164,14 @@ public sealed class HUDPowerUpContainerInteractionSection
         }
 
         if (milestoneSelectionActive)
+        {
+            HideTrackedPromptView();
+            promptContainerEntity = Entity.Null;
+            promptContainerView = null;
+            return;
+        }
+
+        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
         {
             HideTrackedPromptView();
             promptContainerEntity = Entity.Null;
@@ -269,15 +296,19 @@ public sealed class HUDPowerUpContainerInteractionSection
     private void UpdateOverlayPrompt(Entity containerEntity, PlayerDroppedPowerUpContainerView containerView)
     {
         InputAction interactAction = PlayerInputRuntime.PowerUpContainerInteractAction;
-        string bindingDisplayString = ResolveBindingDisplayString(interactAction, "F");
+        string bindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(interactAction, "F");
         containerView.ShowSinglePrompt(string.Format("Press [{0}] to swap", bindingDisplayString));
 
         if (interactAction == null)
             return;
 
+        if (interactionInputGate.IsBlocked())
+            return;
+
         if (!interactAction.WasPressedThisFrame())
             return;
 
+        interactionInputGate.Begin(0f);
         OpenOverlay(containerEntity, containerView);
     }
 
@@ -292,20 +323,28 @@ public sealed class HUDPowerUpContainerInteractionSection
     {
         InputAction replacePrimaryAction = PlayerInputRuntime.PowerUpContainerReplacePrimaryAction;
         InputAction replaceSecondaryAction = PlayerInputRuntime.PowerUpContainerReplaceSecondaryAction;
-        string primaryBindingDisplayString = ResolveBindingDisplayString(replacePrimaryAction, "1");
-        string secondaryBindingDisplayString = ResolveBindingDisplayString(replaceSecondaryAction, "2");
+        string primaryBindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(replacePrimaryAction, "1");
+        string secondaryBindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(replaceSecondaryAction, "2");
 
         containerView.ShowSwapPrompt(string.Format("[{0}] Slot 1", primaryBindingDisplayString),
                                      string.Format("[{0}] Slot 2", secondaryBindingDisplayString));
 
+        if (interactionInputGate.IsBlocked())
+            return;
+
         if (replacePrimaryAction != null && replacePrimaryAction.WasPressedThisFrame())
         {
-            TryQueueSwapCommand(playerEntity, containerEntity, 0);
+            if (TryQueueSwapCommand(playerEntity, containerEntity, 0))
+                interactionInputGate.Begin(PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager, currentPlayerEntity));
+
             return;
         }
 
         if (replaceSecondaryAction != null && replaceSecondaryAction.WasPressedThisFrame())
-            TryQueueSwapCommand(playerEntity, containerEntity, 1);
+        {
+            if (TryQueueSwapCommand(playerEntity, containerEntity, 1))
+                interactionInputGate.Begin(PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager, currentPlayerEntity));
+        }
     }
 
     /// <summary>
@@ -325,7 +364,10 @@ public sealed class HUDPowerUpContainerInteractionSection
         }
 
         UpdateOverlayContent(overlayContainerEntity);
-        HUDPowerUpContainerInteractionSelectionUtility.EnsureOverlaySelection(replacePrimaryButton, replaceSecondaryButton);
+        TryArmOverlayButtons();
+
+        if (overlayButtonsArmed)
+            HUDPowerUpContainerInteractionSelectionUtility.EnsureOverlaySelection(replacePrimaryButton, replaceSecondaryButton);
 
         if (milestoneSelectionActive)
             return;
@@ -351,8 +393,13 @@ public sealed class HUDPowerUpContainerInteractionSection
         overlayContainerEntity = containerEntity;
         overlayContainerView = containerView;
         overlayOpen = true;
-        StopTimeScaleResume();
-        CancelMilestoneTimeScaleResume();
+        overlayButtonsArmed = false;
+        HUDPowerUpContainerTimeScaleUtility.StopResume(ref isTimeScaleResuming,
+                                                       ref resumeStartTimeScale,
+                                                       ref resumeTargetTimeScale,
+                                                       ref resumeDurationSeconds,
+                                                       ref resumeElapsedSeconds);
+        HUDPowerUpContainerTimeScaleUtility.CancelMilestoneResume(entityManager, currentPlayerEntity);
         UpdateOverlayContent(containerEntity);
 
         if (!overlayPanelRoot.activeSelf)
@@ -363,13 +410,8 @@ public sealed class HUDPowerUpContainerInteractionSection
         promptContainerEntity = containerEntity;
         promptContainerView = containerView;
 
-        if (replacePrimaryButton != null)
-            replacePrimaryButton.interactable = true;
-
-        if (replaceSecondaryButton != null)
-            replaceSecondaryButton.interactable = true;
-
-        HUDPowerUpContainerInteractionSelectionUtility.SelectFirstOverlayButton(replacePrimaryButton, replaceSecondaryButton);
+        HUDPowerUpContainerInteractionSelectionUtility.SetOverlayButtonsInteractable(replacePrimaryButton, replaceSecondaryButton, false);
+        HUDPowerUpContainerInteractionSelectionUtility.ClearOverlaySelection(replacePrimaryButton, replaceSecondaryButton);
     }
 
     /// <summary>
@@ -430,15 +472,23 @@ public sealed class HUDPowerUpContainerInteractionSection
         Entity containerEntity = overlayContainerEntity;
         PlayerDroppedPowerUpContainerView closedOverlayContainerView = overlayContainerView;
         overlayOpen = false;
+        overlayButtonsArmed = false;
         overlayContainerEntity = Entity.Null;
         overlayContainerView = null;
+        HUDPowerUpContainerInteractionSelectionUtility.SetOverlayButtonsInteractable(replacePrimaryButton, replaceSecondaryButton, false);
         HUDPowerUpContainerInteractionSelectionUtility.ClearOverlaySelection(replacePrimaryButton, replaceSecondaryButton);
 
         if (overlayPanelRoot != null && overlayPanelRoot.activeSelf)
             overlayPanelRoot.SetActive(false);
 
         if (resumeTimeScale)
-            BeginTimeScaleResume();
+            HUDPowerUpContainerTimeScaleUtility.BeginResume(entityManager,
+                                                           currentPlayerEntity,
+                                                           ref isTimeScaleResuming,
+                                                           ref resumeStartTimeScale,
+                                                           ref resumeTargetTimeScale,
+                                                           ref resumeDurationSeconds,
+                                                           ref resumeElapsedSeconds);
         else
             Time.timeScale = 1f;
 
@@ -457,7 +507,9 @@ public sealed class HUDPowerUpContainerInteractionSection
     private void HideOverlayImmediate()
     {
         overlayOpen = false;
+        overlayButtonsArmed = false;
         overlayContainerEntity = Entity.Null;
+        HUDPowerUpContainerInteractionSelectionUtility.SetOverlayButtonsInteractable(replacePrimaryButton, replaceSecondaryButton, false);
         HUDPowerUpContainerInteractionSelectionUtility.ClearOverlaySelection(replacePrimaryButton, replaceSecondaryButton);
 
         if (overlayContainerView != null)
@@ -502,12 +554,16 @@ public sealed class HUDPowerUpContainerInteractionSection
         if (!overlayOpen)
             return;
 
+        if (!overlayButtonsArmed)
+            return;
+
         if (currentPlayerEntity == Entity.Null)
             return;
 
         if (!TryQueueSwapCommand(currentPlayerEntity, overlayContainerEntity, targetSlotIndex))
             return;
 
+        interactionInputGate.Begin(PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager, currentPlayerEntity));
         CloseOverlay(true);
     }
 
@@ -539,80 +595,27 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     #endregion
 
+    #region Interaction Input Gate
+    /// <summary>
+    /// Enables overlay buttons only after the opening input is released, preventing one gamepad press from opening and confirming the overlay.
+    /// none.
+    /// returns void.
+    /// </summary>
+    private void TryArmOverlayButtons()
+    {
+        if (overlayButtonsArmed)
+            return;
+
+        if (!HUDPowerUpContainerInteractionInputGate.AreActionsReleased())
+            return;
+
+        overlayButtonsArmed = true;
+        HUDPowerUpContainerInteractionSelectionUtility.SetOverlayButtonsInteractable(replacePrimaryButton, replaceSecondaryButton, true);
+        HUDPowerUpContainerInteractionSelectionUtility.SelectFirstOverlayButton(replacePrimaryButton, replaceSecondaryButton);
+    }
+    #endregion
+
     #region Time Scale
-    /// <summary>
-    /// Starts the unscaled Time.timeScale resume configured on the current player interaction settings.
-    /// none.
-    /// returns void.
-    /// </summary>
-    private void BeginTimeScaleResume()
-    {
-        if (currentPlayerEntity == Entity.Null ||
-            !entityManager.Exists(currentPlayerEntity) ||
-            !entityManager.HasComponent<PlayerPowerUpContainerInteractionConfig>(currentPlayerEntity))
-        {
-            Time.timeScale = 1f;
-            StopTimeScaleResume();
-            return;
-        }
-
-        PlayerPowerUpContainerInteractionConfig interactionConfig = entityManager.GetComponentData<PlayerPowerUpContainerInteractionConfig>(currentPlayerEntity);
-        HUDPowerUpContainerTimeScaleUtility.BeginResume(ref isTimeScaleResuming,
-                                                        ref resumeStartTimeScale,
-                                                        ref resumeTargetTimeScale,
-                                                        ref resumeDurationSeconds,
-                                                        ref resumeElapsedSeconds,
-                                                        interactionConfig.OverlayPanelTimeScaleResumeDurationSeconds);
-    }
-
-    /// <summary>
-    /// Advances the unscaled Time.timeScale resume when no milestone selection currently needs a hard pause.
-    /// milestoneSelectionActive: True when milestone selection is currently forcing Time.timeScale to 0.
-    /// returns void.
-    /// </summary>
-    private void UpdateTimeScaleResume(bool milestoneSelectionActive)
-    {
-        HUDPowerUpContainerTimeScaleUtility.UpdateResume(ref isTimeScaleResuming,
-                                                         ref resumeStartTimeScale,
-                                                         ref resumeTargetTimeScale,
-                                                         ref resumeDurationSeconds,
-                                                         ref resumeElapsedSeconds,
-                                                         milestoneSelectionActive);
-    }
-
-    /// <summary>
-    /// Clears the in-progress Time.timeScale resume state.
-    /// none.
-    /// returns void.
-    /// </summary>
-    private void StopTimeScaleResume()
-    {
-        HUDPowerUpContainerTimeScaleUtility.StopResume(ref isTimeScaleResuming,
-                                                       ref resumeStartTimeScale,
-                                                       ref resumeTargetTimeScale,
-                                                       ref resumeDurationSeconds,
-                                                       ref resumeElapsedSeconds);
-    }
-
-    /// <summary>
-    /// Cancels the milestone-driven Time.timeScale resume so the container overlay can keep gameplay paused until the player confirms or cancels the swap.
-    /// none.
-    /// returns void.
-    /// </summary>
-    private void CancelMilestoneTimeScaleResume()
-    {
-        if (currentPlayerEntity == Entity.Null)
-            return;
-
-        if (!entityManager.Exists(currentPlayerEntity))
-            return;
-
-        if (!entityManager.HasComponent<PlayerMilestoneTimeScaleResumeState>(currentPlayerEntity))
-            return;
-
-        entityManager.SetComponentData(currentPlayerEntity,
-                                       PlayerMilestoneSelectionOutcomeUtility.CreateInactiveResumeState());
-    }
     #endregion
 
     #region Helpers
@@ -675,16 +678,6 @@ public sealed class HUDPowerUpContainerInteractionSection
             promptContainerView.HidePrompts();
     }
 
-    /// <summary>
-    /// Resolves one short display string for the first binding associated with the provided action.
-    /// action: Input action shown to the player.
-    /// fallback: Fallback string used when no action or binding is available.
-    /// returns Display string rendered inside prompts and overlay labels.
-    /// </summary>
-    private static string ResolveBindingDisplayString(InputAction action, string fallback)
-    {
-        return PlayerInputRuntime.ResolveBindingDisplayString(action, fallback);
-    }
     #endregion
 
     #endregion
