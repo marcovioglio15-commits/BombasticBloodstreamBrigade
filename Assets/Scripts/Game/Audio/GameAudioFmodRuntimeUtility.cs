@@ -142,26 +142,63 @@ public static class GameAudioFmodRuntimeUtility
     public static void StopBackgroundMusic()
     {
 #if NASHCORE_FMOD
+        StopBackgroundMusic(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+#else
+        ClearBackgroundMusicState();
+#endif
+    }
+
+    /// <summary>
+    /// Immediately stops the current background music instance when entering non-gameplay scenes.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    public static void StopBackgroundMusicImmediate()
+    {
+#if NASHCORE_FMOD
+        StopBackgroundMusic(FMOD.Studio.STOP_MODE.IMMEDIATE);
+#else
+        ClearBackgroundMusicState();
+#endif
+    }
+    #endregion
+
+    #region Private Methods
+#if NASHCORE_FMOD
+    /// <summary>
+    /// Stops the current background music instance with the requested FMOD stop mode.
+    /// /params stopMode FMOD stop behavior used for the active music instance.
+    /// /returns None.
+    /// </summary>
+    private static void StopBackgroundMusic(FMOD.Studio.STOP_MODE stopMode)
+    {
         if (!backgroundMusicInstanceValid)
         {
-            backgroundMusicEventPath = string.Empty;
-            backgroundMusicBankName = string.Empty;
+            ClearBackgroundMusicState();
             return;
         }
 
-        backgroundMusicInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+        backgroundMusicInstance.stop(stopMode);
         backgroundMusicInstance.release();
         backgroundMusicInstance = default;
         backgroundMusicInstanceValid = false;
         cachedBackgroundMusicListenerTransform = null;
         nextBackgroundMusicListenerResolveTime = 0f;
+        ClearBackgroundMusicState();
+    }
 #endif
+
+    /// <summary>
+    /// Clears managed background music identity state after a stop or disabled backend call.
+    /// /params None.
+    /// /returns None.
+    /// </summary>
+    private static void ClearBackgroundMusicState()
+    {
         backgroundMusicEventPath = string.Empty;
         backgroundMusicBankName = string.Empty;
     }
-    #endregion
 
-    #region Private Methods
     /// <summary>
     /// Logs an empty path warning only in contexts where runtime diagnostics are useful.
     /// /params shouldLog True when the current preset allows missing-path logs.

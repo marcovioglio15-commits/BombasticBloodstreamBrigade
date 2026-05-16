@@ -59,6 +59,9 @@ public partial struct GameAudioPlaybackSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         GameAudioRuntimeConfig runtimeConfig = entityManager.GetComponentData<GameAudioRuntimeConfig>(audioEntity);
         DynamicBuffer<GameAudioEventRequest> requests = entityManager.GetBuffer<GameAudioEventRequest>(audioEntity);
+        bool shouldStopBackgroundMusicForMainMenu = SystemAPI.TryGetSingleton<GameSceneManagerConfig>(out GameSceneManagerConfig sceneConfig) &&
+                                                    SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
+                                                    ShouldStopBackgroundMusicForMainMenu(in sceneConfig, in transitionState);
 
         if (runtimeConfig.Enabled == 0)
         {
@@ -67,10 +70,15 @@ public partial struct GameAudioPlaybackSystem : ISystem
             return;
         }
 
-        SyncBackgroundMusic(in runtimeConfig,
-                            runtimeConfig.BackgroundMusicEnabled != 0,
-                            runtimeConfig.BackgroundMusicAutoStart != 0,
-                            math.max(0f, runtimeConfig.MasterVolume) * math.max(0f, runtimeConfig.BackgroundMusicVolume));
+        if (shouldStopBackgroundMusicForMainMenu)
+            GameAudioFmodRuntimeUtility.StopBackgroundMusicImmediate();
+        else
+        {
+            SyncBackgroundMusic(in runtimeConfig,
+                                runtimeConfig.BackgroundMusicEnabled != 0,
+                                runtimeConfig.BackgroundMusicAutoStart != 0,
+                                math.max(0f, runtimeConfig.MasterVolume) * math.max(0f, runtimeConfig.BackgroundMusicVolume));
+        }
 
         if (requests.Length <= 0)
             return;
@@ -108,6 +116,25 @@ public partial struct GameAudioPlaybackSystem : ISystem
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Resolves whether background music should be stopped because the scene manager is entering or already in main menu.
+    /// /params sceneConfig Runtime scene manager configuration.
+    /// /params transitionState Current scene transition state.
+    /// /returns True when gameplay background music must not run.
+    /// </summary>
+    private static bool ShouldStopBackgroundMusicForMainMenu(in GameSceneManagerConfig sceneConfig,
+                                                             in GameSceneTransitionState transitionState)
+    {
+        if (sceneConfig.MainMenuSceneId.Length <= 0)
+            return false;
+
+        if (transitionState.IsTransitioning != 0 &&
+            transitionState.TargetSceneId.Equals(sceneConfig.MainMenuSceneId))
+            return true;
+
+        return transitionState.ActiveSceneId.Equals(sceneConfig.MainMenuSceneId);
+    }
+
     /// <summary>
     /// Forwards the baked background music config to the FMOD runtime bridge.
     /// /params runtimeConfig Current baked audio singleton config.
