@@ -21,19 +21,19 @@ MonoBehaviour:
     statType: 1
     defaultValue: 5
     minimumValue: 1
-    maximumValue: 26
+    maximumValue: 10
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: Shield
     statType: 1
-    defaultValue: 5
+    defaultValue: 0
     minimumValue: 0
-    maximumValue: 100
+    maximumValue: 10
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: MovementSpeed
     statType: 0
-    defaultValue: 2
+    defaultValue: 1.5
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: FireRate
     statType: 0
-    defaultValue: 4
+    defaultValue: 2.5
     minimumValue: 0.1
     maximumValue: 8
     defaultBooleanValue: 0
@@ -61,16 +61,16 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: GatheringRadius
     statType: 0
-    defaultValue: 6
+    defaultValue: 3
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: Luck
     statType: 0
-    defaultValue: 6
-    minimumValue: -1000000
-    maximumValue: 1000000
+    defaultValue: 0
+    minimumValue: 0
+    maximumValue: 100
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: BulletPenetration
