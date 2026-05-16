@@ -5,7 +5,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 /// <summary>
-/// Maintains one managed attached TrailRenderer VFX instance per player while Elemental Trail passive is enabled.
+/// Maintains one managed attached mesh ribbon VFX instance per player while Elemental Trail passive is enabled.
 /// /params None.
 /// /returns None.
 /// </summary>
@@ -19,13 +19,11 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     private const float MinimumRadius = 0.05f;
     private const float MinimumWidthMultiplier = 0.01f;
     private const float MinimumTrailWidth = 0.02f;
-    private const float WidthChangeEpsilon = 0.0001f;
     #endregion
 
     #region Fields
-    private static readonly Dictionary<Entity, ManagedTrailVfxInstance> managedInstances = new Dictionary<Entity, ManagedTrailVfxInstance>(4);
+    private static readonly Dictionary<Entity, PlayerElementalTrailRibbonInstance> managedInstances = new Dictionary<Entity, PlayerElementalTrailRibbonInstance>(4);
     private static readonly List<Entity> invalidOwnerEntities = new List<Entity>(8);
-    private static readonly Quaternion GroundAlignedTrailRotation = Quaternion.LookRotation(Vector3.down, Vector3.forward);
     #if UNITY_EDITOR
     private static readonly HashSet<int> missingTrailRendererLogCache = new HashSet<int>();
     #endif
@@ -57,10 +55,10 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
         if (managedInstances.Count <= 0)
             return;
 
-        Dictionary<Entity, ManagedTrailVfxInstance>.Enumerator enumerator = managedInstances.GetEnumerator();
+        Dictionary<Entity, PlayerElementalTrailRibbonInstance>.Enumerator enumerator = managedInstances.GetEnumerator();
 
         while (enumerator.MoveNext())
-            DestroyManagedInstance(enumerator.Current.Value);
+            PlayerElementalTrailRibbonMeshUtility.DestroyInstance(enumerator.Current.Value);
 
         enumerator.Dispose();
         managedInstances.Clear();
@@ -75,6 +73,7 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();
+        float deltaTime = SystemAPI.Time.DeltaTime;
         EntityManager entityManager = state.EntityManager;
         CleanupInvalidOwnerInstances(entityManager);
 
@@ -97,12 +96,12 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
             if (!shouldBeActive)
             {
-                SetManagedInstanceActive(playerEntity, false, float3.zero, 1f, MinimumTrailWidth);
+                SetManagedInstanceInactive(playerEntity);
                 trailAttachedVfxState.ValueRW = default;
                 continue;
             }
 
-            ManagedTrailVfxInstance managedInstance = GetOrCreateManagedInstance(playerEntity, trailPrefab);
+            PlayerElementalTrailRibbonInstance managedInstance = GetOrCreateManagedInstance(playerEntity, trailPrefab);
 
             if (managedInstance == null || managedInstance.InstanceObject == null)
             {
@@ -119,7 +118,11 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             planarVelocity.y = 0f;
             bool isMoving = math.lengthsq(planarVelocity) > MovementEpsilonSquared;
 
-            SetManagedInstanceActive(playerEntity, true, desiredPosition, 1f, isMoving ? desiredTrailWidth : 0f);
+            PlayerElementalTrailRibbonMeshUtility.UpdateInstance(managedInstance,
+                                                                 desiredPosition,
+                                                                 desiredTrailWidth,
+                                                                 isMoving,
+                                                                 deltaTime);
             trailAttachedVfxState.ValueRW = default;
         }
     }
@@ -147,9 +150,9 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     /// /params trailPrefab Prefab that should back the attached trail presentation.
     /// /returns Existing or newly instantiated managed trail instance, or null when creation fails.
     /// </summary>
-    private static ManagedTrailVfxInstance GetOrCreateManagedInstance(Entity playerEntity, GameObject trailPrefab)
+    private static PlayerElementalTrailRibbonInstance GetOrCreateManagedInstance(Entity playerEntity, GameObject trailPrefab)
     {
-        ManagedTrailVfxInstance managedInstance;
+        PlayerElementalTrailRibbonInstance managedInstance;
 
         if (managedInstances.TryGetValue(playerEntity, out managedInstance))
         {
@@ -160,205 +163,44 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             if (!requiresRebuild)
                 return managedInstance;
 
-            DestroyManagedInstance(managedInstance);
+            PlayerElementalTrailRibbonMeshUtility.DestroyInstance(managedInstance);
             managedInstances.Remove(playerEntity);
         }
 
         if (trailPrefab == null)
             return null;
 
-        GameObject instanceObject = Object.Instantiate(trailPrefab);
+        managedInstance = PlayerElementalTrailRibbonMeshUtility.CreateInstance(trailPrefab);
 
-        if (instanceObject == null)
+        if (managedInstance == null)
+        {
+        #if UNITY_EDITOR
+            if (missingTrailRendererLogCache.Add(playerEntity.Index))
+            {
+                Debug.LogWarning(string.Format("[ElementalTrailVfx] Prefab '{0}' could not provide a usable TrailRenderer template. Attached trail will be invisible.", trailPrefab.name));
+            }
+        #endif
             return null;
-
-        instanceObject.name = string.Format("{0}_ElementalTrail", trailPrefab.name);
-        Transform instanceTransform = instanceObject.transform;
-        instanceTransform.rotation = Quaternion.identity;
-        instanceTransform.localScale = Vector3.one;
-
-        TrailRenderer[] trailRenderers = instanceObject.GetComponentsInChildren<TrailRenderer>(true);
-        ConfigureTrailRenderersForGroundPlane(trailRenderers);
-
-        if (instanceObject.activeSelf)
-            instanceObject.SetActive(false);
-
-        managedInstance = new ManagedTrailVfxInstance
-        {
-            SourcePrefab = trailPrefab,
-            InstanceObject = instanceObject,
-            TrailRenderers = trailRenderers,
-            VisualCenterOffset = ResolveVisualCenterOffset(instanceTransform, trailRenderers)
-        };
-        managedInstances[playerEntity] = managedInstance;
-
-    #if UNITY_EDITOR
-        if ((trailRenderers == null || trailRenderers.Length <= 0) && missingTrailRendererLogCache.Add(playerEntity.Index))
-        {
-            Debug.LogWarning(string.Format("[ElementalTrailVfx] Prefab '{0}' has no TrailRenderer in children. Attached trail will be invisible.", trailPrefab.name));
         }
-    #endif
+
+        managedInstances[playerEntity] = managedInstance;
 
         return managedInstance;
     }
 
     /// <summary>
-    /// Forces attached trail renderers to use a camera-independent horizontal ribbon setup.
-    /// /params trailRenderers TrailRenderer components collected from the managed VFX prefab.
-    /// /returns None.
-    /// </summary>
-    private static void ConfigureTrailRenderersForGroundPlane(TrailRenderer[] trailRenderers)
-    {
-        if (trailRenderers == null || trailRenderers.Length <= 0)
-            return;
-
-        for (int rendererIndex = 0; rendererIndex < trailRenderers.Length; rendererIndex++)
-        {
-            TrailRenderer trailRenderer = trailRenderers[rendererIndex];
-
-            if (trailRenderer == null)
-                continue;
-
-            Transform trailTransform = trailRenderer.transform;
-
-            if (trailTransform != null)
-                trailTransform.rotation = GroundAlignedTrailRotation;
-
-            trailRenderer.alignment = LineAlignment.TransformZ;
-            trailRenderer.emitting = false;
-            trailRenderer.enabled = false;
-            trailRenderer.Clear();
-        }
-    }
-
-    /// <summary>
-    /// Applies activation, transform and renderer state for one cached managed trail instance.
+    /// Disables one cached managed ribbon instance and clears its currently visible samples.
     /// /params playerEntity Player entity used to resolve the cached managed instance.
-    /// /params isActive True while the passive and prefab reference are valid.
-    /// /params worldPosition Desired world position for the visual emission point.
-    /// /params uniformScale Uniform scale applied to the managed root.
-    /// /params desiredTrailWidth Runtime trail width, or zero to stop emission while preserving fading points.
     /// /returns None.
     /// </summary>
-    private static void SetManagedInstanceActive(Entity playerEntity,
-                                                 bool isActive,
-                                                 float3 worldPosition,
-                                                 float uniformScale,
-                                                 float desiredTrailWidth)
+    private static void SetManagedInstanceInactive(Entity playerEntity)
     {
-        ManagedTrailVfxInstance managedInstance;
+        PlayerElementalTrailRibbonInstance managedInstance;
 
         if (!managedInstances.TryGetValue(playerEntity, out managedInstance))
             return;
 
-        if (managedInstance == null || managedInstance.InstanceObject == null)
-            return;
-
-        if (!isActive)
-        {
-            ApplyTrailRenderersState(managedInstance, false, 0f, true);
-
-            if (managedInstance.InstanceObject.activeSelf)
-                managedInstance.InstanceObject.SetActive(false);
-
-            return;
-        }
-
-        Transform instanceTransform = managedInstance.InstanceObject.transform;
-        float3 visualCenterOffset = managedInstance.VisualCenterOffset;
-
-        instanceTransform.position = new Vector3(worldPosition.x - visualCenterOffset.x,
-                                                 worldPosition.y - visualCenterOffset.y,
-                                                 worldPosition.z - visualCenterOffset.z);
-        instanceTransform.rotation = Quaternion.identity;
-        instanceTransform.localScale = new Vector3(uniformScale, uniformScale, uniformScale);
-
-        if (!managedInstance.InstanceObject.activeSelf)
-            managedInstance.InstanceObject.SetActive(true);
-
-        bool shouldEmit = desiredTrailWidth > WidthChangeEpsilon;
-        ApplyTrailRenderersState(managedInstance, shouldEmit, desiredTrailWidth, false);
-    }
-
-    /// <summary>
-    /// Updates TrailRenderer emission and width without reallocating or rebuilding the managed VFX instance.
-    /// /params managedInstance Cached managed trail instance whose renderers should be updated.
-    /// /params isEmitting True when player movement should add new trail points.
-    /// /params desiredTrailWidth Width assigned while emitting.
-    /// /params clearWhenDisabled True when disabling should immediately clear previous trail points.
-    /// /returns None.
-    /// </summary>
-    private static void ApplyTrailRenderersState(ManagedTrailVfxInstance managedInstance,
-                                                 bool isEmitting,
-                                                 float desiredTrailWidth,
-                                                 bool clearWhenDisabled)
-    {
-        if (managedInstance == null || managedInstance.TrailRenderers == null || managedInstance.TrailRenderers.Length <= 0)
-            return;
-
-        for (int rendererIndex = 0; rendererIndex < managedInstance.TrailRenderers.Length; rendererIndex++)
-        {
-            TrailRenderer trailRenderer = managedInstance.TrailRenderers[rendererIndex];
-
-            if (trailRenderer == null)
-                continue;
-
-            bool wasEnabled = trailRenderer.enabled;
-            bool shouldBeEnabled = isEmitting || !clearWhenDisabled;
-
-            if (isEmitting && !wasEnabled)
-                trailRenderer.Clear();
-
-            if (trailRenderer.enabled != shouldBeEnabled)
-                trailRenderer.enabled = shouldBeEnabled;
-
-            if (trailRenderer.emitting != isEmitting)
-                trailRenderer.emitting = isEmitting;
-
-            if (isEmitting)
-            {
-                float clampedTrailWidth = math.max(MinimumTrailWidth, desiredTrailWidth);
-
-                if (math.abs(trailRenderer.widthMultiplier - clampedTrailWidth) > WidthChangeEpsilon)
-                    trailRenderer.widthMultiplier = clampedTrailWidth;
-            }
-            else if (clearWhenDisabled)
-            {
-                trailRenderer.Clear();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Computes the average local offset between the prefab root and its TrailRenderer emission transforms.
-    /// /params rootTransform Root transform of the instantiated managed VFX object.
-    /// /params trailRenderers TrailRenderer components used as visual emission anchors.
-    /// /returns Average root-local offset used to keep the visual center aligned with the player.
-    /// </summary>
-    private static float3 ResolveVisualCenterOffset(Transform rootTransform, TrailRenderer[] trailRenderers)
-    {
-        if (rootTransform == null || trailRenderers == null || trailRenderers.Length <= 0)
-            return float3.zero;
-
-        float3 accumulatedOffset = float3.zero;
-        int validRendererCount = 0;
-
-        for (int rendererIndex = 0; rendererIndex < trailRenderers.Length; rendererIndex++)
-        {
-            TrailRenderer trailRenderer = trailRenderers[rendererIndex];
-
-            if (trailRenderer == null)
-                continue;
-
-            Vector3 localPosition = rootTransform.InverseTransformPoint(trailRenderer.transform.position);
-            accumulatedOffset += new float3(localPosition.x, localPosition.y, localPosition.z);
-            validRendererCount++;
-        }
-
-        if (validRendererCount <= 0)
-            return float3.zero;
-
-        return accumulatedOffset / validRendererCount;
+        PlayerElementalTrailRibbonMeshUtility.SetInactive(managedInstance);
     }
 
     /// <summary>
@@ -372,7 +214,7 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             return;
 
         invalidOwnerEntities.Clear();
-        Dictionary<Entity, ManagedTrailVfxInstance>.Enumerator enumerator = managedInstances.GetEnumerator();
+        Dictionary<Entity, PlayerElementalTrailRibbonInstance>.Enumerator enumerator = managedInstances.GetEnumerator();
 
         while (enumerator.MoveNext())
         {
@@ -381,7 +223,7 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             if (IsValidEntity(entityManager, ownerEntity))
                 continue;
 
-            DestroyManagedInstance(enumerator.Current.Value);
+            PlayerElementalTrailRibbonMeshUtility.DestroyInstance(enumerator.Current.Value);
             invalidOwnerEntities.Add(ownerEntity);
         }
 
@@ -391,22 +233,6 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             managedInstances.Remove(invalidOwnerEntities[index]);
 
         invalidOwnerEntities.Clear();
-    }
-
-    /// <summary>
-    /// Destroys one managed trail GameObject and clears cached Unity component references.
-    /// /params managedInstance Managed VFX instance being released.
-    /// /returns None.
-    /// </summary>
-    private static void DestroyManagedInstance(ManagedTrailVfxInstance managedInstance)
-    {
-        if (managedInstance == null || managedInstance.InstanceObject == null)
-            return;
-
-        Object.Destroy(managedInstance.InstanceObject);
-        managedInstance.InstanceObject = null;
-        managedInstance.TrailRenderers = null;
-        managedInstance.SourcePrefab = null;
     }
 
     /// <summary>
@@ -451,21 +277,6 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
             return false;
 
         return true;
-    }
-    #endregion
-
-    #region Nested Types
-    /// <summary>
-    /// Stores cached Unity objects for one player-owned attached Elemental Trail VFX instance.
-    /// /params None.
-    /// /returns None.
-    /// </summary>
-    private sealed class ManagedTrailVfxInstance
-    {
-        public GameObject SourcePrefab;
-        public GameObject InstanceObject;
-        public TrailRenderer[] TrailRenderers;
-        public float3 VisualCenterOffset;
     }
     #endregion
 

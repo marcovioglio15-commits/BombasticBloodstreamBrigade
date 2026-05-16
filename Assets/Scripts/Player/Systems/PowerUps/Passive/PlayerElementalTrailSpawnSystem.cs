@@ -81,7 +81,8 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
 
             if (!isMoving)
             {
-                currentTrailState.SpawnTimer = nextSpawnTimer;
+                currentTrailState.LastSpawnPosition = playerPosition;
+                currentTrailState.SpawnTimer = 0f;
                 trailState.ValueRW = currentTrailState;
                 continue;
             }
