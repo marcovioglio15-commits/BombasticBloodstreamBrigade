@@ -6718,7 +6718,7 @@ MonoBehaviour:
       modules:
       - moduleId: Module_DropExperience
         isEnabled: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -6885,9 +6885,15 @@ MonoBehaviour:
           dropItems:
             dropPayloadKind: 0
             experience:
-              dropDefinitions: []
-              complessiveExperienceDropMinimum: 10
-              complessiveExperienceDropMaximum: 0
+              dropDefinitions:
+              - dropPrefab: {fileID: 6858454939034102764, guid: 03fe33be4f58a114daedf4c2e5b1d2fe, type: 3}
+                experienceAmount: 25
+              - dropPrefab: {fileID: 6858454939034102764, guid: 73d41295a6e76694c9da16f94b538973, type: 3}
+                experienceAmount: 35
+              - dropPrefab: {fileID: 6858454939034102764, guid: b4ca66a6a67765143825d976eb834132, type: 3}
+                experienceAmount: 45
+              complessiveExperienceDropMinimum: 25
+              complessiveExperienceDropMaximum: 45
               dropsDistribution: 0.5
               dropRadius: 0.6
               collectionMovement:
