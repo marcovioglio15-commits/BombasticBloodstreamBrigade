@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Applies runtime transforms, materials, and shader properties to pooled Laser Beam visuals.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 {
@@ -17,15 +15,14 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
     #region Public Methods
     /// <summary>
     /// Updates one body visual instance to match the requested lane metadata and body material properties.
-    /// /params visual Pooled body visual to update.
-    /// /params laneVisual Render-time lane metadata.
-    /// /params visualConfig Shared visual config.
-    /// /params laserBeamConfig Runtime passive config used for material properties.
-    /// /params laserBeamState Runtime state used to resolve the current storm response.
-    /// /params palette Resolved beam palette.
-    /// /params bodyMaterial Optional shared body material override.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled body visual to update.</param>
+    /// <param name="laneVisual">Render-time lane metadata.</param>
+    /// <param name="visualConfig">Shared visual config.</param>
+    /// <param name="laserBeamConfig">Runtime passive config used for material properties.</param>
+    /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="palette">Resolved beam palette.</param>
+    /// <param name="bodyMaterial">Optional shared body material override.</param>
     public static void ApplyBodyVisual(PlayerLaserBeamManagedBodyVisual visual,
                                        in PlayerLaserBeamLaneVisual laneVisual,
                                        in PlayerLaserBeamVisualConfig visualConfig,
@@ -107,17 +104,16 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 
     /// <summary>
     /// Updates one particle visual instance to match the requested lane endpoint and visual role.
-    /// /params visual Pooled particle visual to update.
-    /// /params endpoint Per-lane endpoint metadata.
-    /// /params visualConfig Shared visual config.
-    /// /params laserBeamConfig Runtime passive config used for scale and material properties.
-    /// /params laserBeamState Runtime state used to resolve the current storm response.
-    /// /params palette Resolved beam palette.
-    /// /params materialOverride Optional shared material override.
-    /// /params capShape Shape selector applied to the shader.
-    /// /params visualRole Endpoint visual role rendered by the pooled particle prefab.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to update.</param>
+    /// <param name="endpoint">Per-lane endpoint metadata.</param>
+    /// <param name="visualConfig">Shared visual config.</param>
+    /// <param name="laserBeamConfig">Runtime passive config used for scale and material properties.</param>
+    /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="palette">Resolved beam palette.</param>
+    /// <param name="materialOverride">Optional shared material override.</param>
+    /// <param name="capShape">Shape selector applied to the shader.</param>
+    /// <param name="visualRole">Endpoint visual role rendered by the pooled particle prefab.</param>
     public static void ApplyParticleVisual(PlayerLaserBeamManagedParticleVisual visual,
                                            in PlayerLaserBeamLaneEndpoint endpoint,
                                            in PlayerLaserBeamVisualConfig visualConfig,
@@ -170,10 +166,9 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
     #region Private Methods
     /// <summary>
     /// Applies the shared material override to all particle renderers of one pooled visual.
-    /// /params visual Pooled particle visual that owns the renderers.
-    /// /params materialOverride Shared material override to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual that owns the renderers.</param>
+    /// <param name="materialOverride">Shared material override to assign.</param>
     private static void ApplyParticleMaterials(PlayerLaserBeamManagedParticleVisual visual,
                                                Material materialOverride)
     {
@@ -194,16 +189,15 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 
     /// <summary>
     /// Pushes palette colors and electric-beam shader properties into one pooled particle visual.
-    /// /params visual Pooled particle visual to update.
-    /// /params palette Resolved beam palette.
-    /// /params laserBeamConfig Runtime passive config that drives the shader response.
-    /// /params laserBeamState Runtime state used to resolve the current storm response.
-    /// /params capShape Shape selector applied to the shader.
-    /// /params width Beam width at the endpoint.
-    /// /params terminalBlockedByWall True when the terminal point is a wall hit.
-    /// /params visualRole Endpoint visual role rendered by the pooled particle prefab.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to update.</param>
+    /// <param name="palette">Resolved beam palette.</param>
+    /// <param name="laserBeamConfig">Runtime passive config that drives the shader response.</param>
+    /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="capShape">Shape selector applied to the shader.</param>
+    /// <param name="width">Beam width at the endpoint.</param>
+    /// <param name="terminalBlockedByWall">True when the terminal point is a wall hit.</param>
+    /// <param name="visualRole">Endpoint visual role rendered by the pooled particle prefab.</param>
     private static void ApplyParticlePalette(PlayerLaserBeamManagedParticleVisual visual,
                                              in PlayerLaserBeamResolvedPalette palette,
                                              in LaserBeamPassiveConfig laserBeamConfig,
@@ -298,9 +292,8 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 
     /// <summary>
     /// Disables one pooled particle visual when its role is temporarily not visible.
-    /// /params visual Pooled particle visual to hide.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to hide.</param>
     private static void DisableParticleVisual(PlayerLaserBeamManagedParticleVisual visual)
     {
         if (visual == null || visual.InstanceObject == null)
@@ -312,9 +305,9 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 
     /// <summary>
     /// Converts one ECS float3 into a managed Unity Vector3.
-    /// /params value ECS float3 value.
-    /// /returns Managed Unity Vector3.
     /// </summary>
+    /// <param name="value">ECS float3 value.</param>
+    /// <returns>Managed Unity Vector3.</returns>
     private static Vector3 ToVector3(float3 value)
     {
         return new Vector3(value.x, value.y, value.z);
@@ -322,9 +315,9 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
 
     /// <summary>
     /// Converts one ECS quaternion into a managed Unity Quaternion.
-    /// /params value ECS quaternion value.
-    /// /returns Managed Unity Quaternion.
     /// </summary>
+    /// <param name="value">ECS quaternion value.</param>
+    /// <returns>Managed Unity Quaternion.</returns>
     private static Quaternion ToQuaternion(quaternion value)
     {
         return new Quaternion(value.value.x, value.value.y, value.value.z, value.value.w);

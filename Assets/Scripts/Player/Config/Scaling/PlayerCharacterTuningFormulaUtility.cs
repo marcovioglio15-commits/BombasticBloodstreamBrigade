@@ -10,12 +10,12 @@ public static class PlayerCharacterTuningFormulaUtility
     #region Public Methods
     /// <summary>
     /// Splits one Character Tuning assignment into its target scalable stat and right-hand expression.
-    /// formula Raw assignment string entered by designers.
-    /// targetStatName Parsed left-hand scalable stat name.
-    /// expression Parsed right-hand mathematical expression.
-    /// errorMessage Failure reason when parsing fails.
-    /// returns True when the assignment syntax is valid.
     /// </summary>
+    /// <param name="formula">Raw assignment string entered by designers.</param>
+    /// <param name="targetStatName">Parsed left-hand scalable stat name.</param>
+    /// <param name="expression">Parsed right-hand mathematical expression.</param>
+    /// <param name="errorMessage">Failure reason when parsing fails.</param>
+    /// <returns>True when the assignment syntax is valid.</returns>
     public static bool TryParseAssignmentFormula(string formula,
                                                  out string targetStatName,
                                                  out string expression,
@@ -52,11 +52,11 @@ public static class PlayerCharacterTuningFormulaUtility
 
     /// <summary>
     /// Parses one left-hand assignment token and validates that it targets a named scalable stat.
-    /// targetToken Raw left-hand text before '='.
-    /// targetStatName Parsed scalable stat name.
-    /// errorMessage Failure reason when parsing fails.
-    /// returns True when the target token is valid.
     /// </summary>
+    /// <param name="targetToken">Raw left-hand text before '='.</param>
+    /// <param name="targetStatName">Parsed scalable stat name.</param>
+    /// <param name="errorMessage">Failure reason when parsing fails.</param>
+    /// <returns>True when the target token is valid.</returns>
     public static bool TryParseAssignmentTarget(string targetToken,
                                                 out string targetStatName,
                                                 out string errorMessage)
@@ -114,11 +114,11 @@ public static class PlayerCharacterTuningFormulaUtility
     #region Private Methods
     /// <summary>
     /// Finds the assignment operator while ignoring comparison operators and quoted string content.
-    /// formula Raw Character Tuning assignment string.
-    /// assignmentIndex Zero-based index of the assignment operator.
-    /// errorMessage Failure reason when no valid assignment operator is found.
-    /// returns True when exactly one valid assignment operator exists.
     /// </summary>
+    /// <param name="formula">Raw Character Tuning assignment string.</param>
+    /// <param name="assignmentIndex">Zero-based index of the assignment operator.</param>
+    /// <param name="errorMessage">Failure reason when no valid assignment operator is found.</param>
+    /// <returns>True when exactly one valid assignment operator exists.</returns>
     private static bool TryFindAssignmentOperator(string formula, out int assignmentIndex, out string errorMessage)
     {
         assignmentIndex = -1;
@@ -179,10 +179,10 @@ public static class PlayerCharacterTuningFormulaUtility
 
     /// <summary>
     /// Resolves whether the current character is escaped by an odd number of backslashes.
-    /// text Source string being scanned.
-    /// characterIndex Character index to inspect.
-    /// returns True when the character is escaped.
     /// </summary>
+    /// <param name="text">Source string being scanned.</param>
+    /// <param name="characterIndex">Character index to inspect.</param>
+    /// <returns>True when the character is escaped.</returns>
     private static bool IsEscapedCharacter(string text, int characterIndex)
     {
         int backslashCount = 0;

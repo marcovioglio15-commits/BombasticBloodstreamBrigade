@@ -5,7 +5,6 @@ using UnityEngine;
 /// <summary>
 /// Describes how the combo reacts after a damage event configured to break it.
 /// none.
-/// returns none.
 /// </summary>
 public enum PlayerComboDamageBreakMode : byte
 {
@@ -16,7 +15,6 @@ public enum PlayerComboDamageBreakMode : byte
 /// <summary>
 /// Stores authored combo-counter rules used by progression presets to grant temporary rank-based bonuses.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboCounterDefinition
@@ -102,14 +100,13 @@ public sealed class PlayerComboCounterDefinition
     #region Setup
     /// <summary>
     /// Assigns the authored combo runtime rules and rank list.
-    /// /params isEnabledValue Enables or disables the combo system for the owning preset.
-    /// /params comboGainPerKillValue Amount added for every valid enemy kill.
-    /// /params damageBreakModeValue Controls whether damage resets the combo entirely or downgrades it to the previous rank.
-    /// /params shieldDamageBreaksComboValue True when shield-only damage should also interrupt the combo.
-    /// /params preventDecayIntoNonDecayingRanksValue True when point decay should preserve the current rank before falling into a no-decay lower rank.
-    /// /params rankDefinitionsValue Ordered rank list stored by this combo definition.
-    /// /returns void.
     /// </summary>
+    /// <param name="isEnabledValue">Enables or disables the combo system for the owning preset.</param>
+    /// <param name="comboGainPerKillValue">Amount added for every valid enemy kill.</param>
+    /// <param name="damageBreakModeValue">Controls whether damage resets the combo entirely or downgrades it to the previous rank.</param>
+    /// <param name="shieldDamageBreaksComboValue">True when shield-only damage should also interrupt the combo.</param>
+    /// <param name="preventDecayIntoNonDecayingRanksValue">True when point decay should preserve the current rank before falling into a no-decay lower rank.</param>
+    /// <param name="rankDefinitionsValue">Ordered rank list stored by this combo definition.</param>
     public void Configure(bool isEnabledValue,
                           int comboGainPerKillValue,
                           PlayerComboDamageBreakMode damageBreakModeValue,
@@ -127,13 +124,12 @@ public sealed class PlayerComboCounterDefinition
 
     /// <summary>
     /// Assigns the authored combo runtime rules and rank list while keeping decay-floor preservation disabled for older call sites.
-    /// /params isEnabledValue Enables or disables the combo system for the owning preset.
-    /// /params comboGainPerKillValue Amount added for every valid enemy kill.
-    /// /params damageBreakModeValue Controls whether damage resets the combo entirely or downgrades it to the previous rank.
-    /// /params shieldDamageBreaksComboValue True when shield-only damage should also interrupt the combo.
-    /// /params rankDefinitionsValue Ordered rank list stored by this combo definition.
-    /// /returns void.
     /// </summary>
+    /// <param name="isEnabledValue">Enables or disables the combo system for the owning preset.</param>
+    /// <param name="comboGainPerKillValue">Amount added for every valid enemy kill.</param>
+    /// <param name="damageBreakModeValue">Controls whether damage resets the combo entirely or downgrades it to the previous rank.</param>
+    /// <param name="shieldDamageBreaksComboValue">True when shield-only damage should also interrupt the combo.</param>
+    /// <param name="rankDefinitionsValue">Ordered rank list stored by this combo definition.</param>
     public void Configure(bool isEnabledValue,
                           int comboGainPerKillValue,
                           PlayerComboDamageBreakMode damageBreakModeValue,
@@ -152,8 +148,6 @@ public sealed class PlayerComboCounterDefinition
     #region Validation
     /// <summary>
     /// Ensures nested collections exist and normalizes nested combo ranks without snapping authored numeric values.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {
@@ -183,7 +177,6 @@ public sealed class PlayerComboCounterDefinition
 /// <summary>
 /// Stores one combo rank milestone with its display identifier and temporary Character Tuning bonus formulas.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboRankVisualDefinition
@@ -266,7 +259,6 @@ public sealed class PlayerComboRankVisualDefinition
 /// <summary>
 /// Stores one temporary passive power-up acquisition granted while its combo rank remains reached.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboPassivePowerUpUnlockDefinition
@@ -306,10 +298,9 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinition
     #region Setup
     /// <summary>
     /// Assigns the passive unlock entry data used by temporary combo rank rewards.
-    /// /params isEnabledValue True when the unlock should be processed while the owning rank is active.
-    /// /params passivePowerUpIdValue Passive PowerUpId resolved against the runtime unlock catalog.
-    /// /returns void.
     /// </summary>
+    /// <param name="isEnabledValue">True when the unlock should be processed while the owning rank is active.</param>
+    /// <param name="passivePowerUpIdValue">Passive PowerUpId resolved against the runtime unlock catalog.</param>
     public void Configure(bool isEnabledValue, string passivePowerUpIdValue)
     {
         isEnabled = isEnabledValue;
@@ -320,8 +311,6 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinition
     #region Validation
     /// <summary>
     /// Trims the authored passive PowerUpId while preserving designer-authored enablement.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {
@@ -340,7 +329,6 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinition
 /// <summary>
 /// Stores one combo rank milestone with its display identifier, HUD presentation overrides, time-based point decay, and temporary Character Tuning bonus formulas.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboRankDefinition
@@ -435,15 +423,14 @@ public sealed class PlayerComboRankDefinition
     #region Setup
     /// <summary>
     /// Assigns the authored combo-rank identity, milestone threshold, optional HUD visuals, point-decay rate, and temporary Character Tuning bonuses.
-    /// /params rankIdValue Stable rank identifier shown by the runtime combo label.
-    /// /params requiredComboValueValue Minimum combo value required by this rank.
-    /// /params pointsDecayPerSecondValue Combo points removed per second while this rank is active.
-    /// /params progressiveBoostPercentValue Percent of numeric rank bonus distributed before this rank is reached.
-    /// /params rankVisualsValue Optional HUD visuals resolved automatically while this rank is active.
-    /// /params rankBonusesValue Character Tuning formulas applied while the rank is active.
-    /// /params passivePowerUpUnlocksValue Passive power-ups granted while this rank remains reached.
-    /// /returns void.
     /// </summary>
+    /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
+    /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
+    /// <param name="pointsDecayPerSecondValue">Combo points removed per second while this rank is active.</param>
+    /// <param name="progressiveBoostPercentValue">Percent of numeric rank bonus distributed before this rank is reached.</param>
+    /// <param name="rankVisualsValue">Optional HUD visuals resolved automatically while this rank is active.</param>
+    /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
+    /// <param name="passivePowerUpUnlocksValue">Passive power-ups granted while this rank remains reached.</param>
     public void Configure(string rankIdValue,
                           int requiredComboValueValue,
                           float pointsDecayPerSecondValue,
@@ -463,13 +450,12 @@ public sealed class PlayerComboRankDefinition
 
     /// <summary>
     /// Assigns the authored combo-rank identity, milestone threshold, optional HUD visuals, point-decay rate, and temporary Character Tuning bonuses while preserving passive unlocks.
-    /// /params rankIdValue Stable rank identifier shown by the runtime combo label.
-    /// /params requiredComboValueValue Minimum combo value required by this rank.
-    /// /params pointsDecayPerSecondValue Combo points removed per second while this rank is active.
-    /// /params rankVisualsValue Optional HUD visuals resolved automatically while this rank is active.
-    /// /params rankBonusesValue Character Tuning formulas applied while the rank is active.
-    /// /returns void.
     /// </summary>
+    /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
+    /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
+    /// <param name="pointsDecayPerSecondValue">Combo points removed per second while this rank is active.</param>
+    /// <param name="rankVisualsValue">Optional HUD visuals resolved automatically while this rank is active.</param>
+    /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
     public void Configure(string rankIdValue,
                           int requiredComboValueValue,
                           float pointsDecayPerSecondValue,
@@ -487,12 +473,11 @@ public sealed class PlayerComboRankDefinition
 
     /// <summary>
     /// Assigns the authored combo-rank identity, milestone threshold, point-decay rate, and temporary Character Tuning bonuses while preserving current HUD visuals.
-    /// /params rankIdValue Stable rank identifier shown by the runtime combo label.
-    /// /params requiredComboValueValue Minimum combo value required by this rank.
-    /// /params pointsDecayPerSecondValue Combo points removed per second while this rank is active.
-    /// /params rankBonusesValue Character Tuning formulas applied while the rank is active.
-    /// /returns void.
     /// </summary>
+    /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
+    /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
+    /// <param name="pointsDecayPerSecondValue">Combo points removed per second while this rank is active.</param>
+    /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
     public void Configure(string rankIdValue,
                           int requiredComboValueValue,
                           float pointsDecayPerSecondValue,
@@ -509,11 +494,10 @@ public sealed class PlayerComboRankDefinition
 
     /// <summary>
     /// Assigns the authored combo-rank identity, milestone threshold, and temporary Character Tuning bonuses while preserving current HUD visuals and point-decay rate.
-    /// /params rankIdValue Stable rank identifier shown by the runtime combo label.
-    /// /params requiredComboValueValue Minimum combo value required by this rank.
-    /// /params rankBonusesValue Character Tuning formulas applied while the rank is active.
-    /// /returns void.
     /// </summary>
+    /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
+    /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
+    /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
     public void Configure(string rankIdValue, int requiredComboValueValue, PowerUpCharacterTuningModuleData rankBonusesValue)
     {
         Configure(rankIdValue,
@@ -527,8 +511,6 @@ public sealed class PlayerComboRankDefinition
     #region Validation
     /// <summary>
     /// Ensures nested Character Tuning payloads exist and trims identifier serialization noise without snapping numeric values.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {

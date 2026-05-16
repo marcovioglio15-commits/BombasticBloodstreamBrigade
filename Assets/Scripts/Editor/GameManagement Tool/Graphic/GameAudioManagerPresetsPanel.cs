@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Root orchestration panel for FMOD-backed Audio Manager presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameAudioManagerPresetsPanel
 {
@@ -167,8 +165,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Constructors
     /// <summary>
     /// Initializes the Audio Manager panel and restores its active details section.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public GameAudioManagerPresetsPanel()
     {
@@ -187,8 +183,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Public Methods
     /// <summary>
     /// Rebinds the panel from current Audio Manager assets after draft session changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void RefreshFromSessionChange()
     {
@@ -202,9 +196,8 @@ public sealed class GameAudioManagerPresetsPanel
 
     /// <summary>
     /// Selects a preset assigned by the parent Game Master panel.
-    /// /params preset Audio Manager preset to select.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Audio Manager preset to select.</param>
     public void SelectPresetFromExternal(GameAudioManagerPreset preset)
     {
         if (preset == null)
@@ -220,8 +213,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Layout
     /// <summary>
     /// Builds the split preset browser and details panel.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildUI()
     {
@@ -232,8 +223,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Preset List
     /// <summary>
     /// Refreshes visible Audio Manager presets from the current library and search filter.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RefreshPresetList()
     {
@@ -244,8 +233,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Preset Actions
     /// <summary>
     /// Creates and selects a new Audio Manager preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void CreatePreset()
     {
@@ -254,9 +241,8 @@ public sealed class GameAudioManagerPresetsPanel
 
     /// <summary>
     /// Duplicates one Audio Manager preset asset and registers it.
-    /// /params preset Source preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source preset to duplicate.</param>
     internal void DuplicatePreset(GameAudioManagerPreset preset)
     {
         GameAudioManagerPresetsPanelPresetUtility.DuplicatePreset(this, preset);
@@ -264,9 +250,8 @@ public sealed class GameAudioManagerPresetsPanel
 
     /// <summary>
     /// Stages one Audio Manager preset for deletion after confirmation.
-    /// /params preset Preset to delete.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to delete.</param>
     internal void DeletePreset(GameAudioManagerPreset preset)
     {
         GameAudioManagerPresetsPanelPresetUtility.DeletePreset(this, preset);
@@ -276,9 +261,8 @@ public sealed class GameAudioManagerPresetsPanel
     #region Details
     /// <summary>
     /// Selects one Audio Manager preset and rebuilds details.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     internal void SelectPreset(GameAudioManagerPreset preset)
     {
         GameAudioManagerPresetsPanelSectionsUtility.SelectPreset(this, preset);
@@ -286,8 +270,6 @@ public sealed class GameAudioManagerPresetsPanel
 
     /// <summary>
     /// Rebuilds the active Audio Manager details section.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void BuildActiveSection()
     {
@@ -296,8 +278,6 @@ public sealed class GameAudioManagerPresetsPanel
 
     /// <summary>
     /// Marks the selected Audio Manager preset dirty in the draft session.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void MarkSelectedPresetDirty()
     {
@@ -308,9 +288,9 @@ public sealed class GameAudioManagerPresetsPanel
     #region Helpers
     /// <summary>
     /// Resolves display text for one Audio Manager preset.
-    /// /params preset Preset to display.
-    /// /returns Display text for list rows.
     /// </summary>
+    /// <param name="preset">Preset to display.</param>
+    /// <returns>Display text for list rows.</returns>
     internal string GetPresetDisplayName(GameAudioManagerPreset preset)
     {
         if (preset == null)
@@ -330,8 +310,6 @@ public sealed class GameAudioManagerPresetsPanel
     #region Nested Types
     /// <summary>
     /// Detail sections shown for an Audio Manager preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal enum DetailsSectionType
     {

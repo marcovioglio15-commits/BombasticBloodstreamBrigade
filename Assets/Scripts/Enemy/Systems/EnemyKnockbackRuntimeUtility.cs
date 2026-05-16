@@ -17,12 +17,12 @@ public static class EnemyKnockbackRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Applies one projectile knockback payload onto the target enemy state.
-    /// /params projectile Projectile data carrying the authored knockback payload.
-    /// /params projectileTransform Current projectile transform used to derive hit direction when requested.
-    /// /params enemyPosition Current enemy position used to derive hit-to-target knockback direction.
-    /// /params knockbackState Mutable target knockback state.
-    /// /returns True when a valid knockback payload was applied.
     /// </summary>
+    /// <param name="projectile">Projectile data carrying the authored knockback payload.</param>
+    /// <param name="projectileTransform">Current projectile transform used to derive hit direction when requested.</param>
+    /// <param name="enemyPosition">Current enemy position used to derive hit-to-target knockback direction.</param>
+    /// <param name="knockbackState">Mutable target knockback state.</param>
+    /// <returns>True when a valid knockback payload was applied.</returns>
     public static bool TryApplyFromProjectile(in Projectile projectile,
                                               in LocalTransform projectileTransform,
                                               float3 enemyPosition,
@@ -70,15 +70,14 @@ public static class EnemyKnockbackRuntimeUtility
 
     /// <summary>
     /// Advances the active knockback state, resolves wall collisions and applies the resulting displacement.
-    /// /params knockbackState Mutable knockback state to decay and integrate.
-    /// /params position Mutable enemy position that receives the knockback displacement.
-    /// /params collisionRadius Effective enemy collision radius used for wall blocking checks.
-    /// /params physicsWorldSingleton Physics world used for wall collision resolution.
-    /// /params wallsLayerMask Resolved wall layer mask.
-    /// /params wallsEnabled True when wall blocking should be evaluated.
-    /// /params deltaTime Simulation delta time for the current frame.
-    /// /returns void.
     /// </summary>
+    /// <param name="knockbackState">Mutable knockback state to decay and integrate.</param>
+    /// <param name="position">Mutable enemy position that receives the knockback displacement.</param>
+    /// <param name="collisionRadius">Effective enemy collision radius used for wall blocking checks.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall collision resolution.</param>
+    /// <param name="wallsLayerMask">Resolved wall layer mask.</param>
+    /// <param name="wallsEnabled">True when wall blocking should be evaluated.</param>
+    /// <param name="deltaTime">Simulation delta time for the current frame.</param>
     public static void ApplyDisplacement(ref EnemyKnockbackState knockbackState,
                                          ref float3 position,
                                          float collisionRadius,
@@ -136,10 +135,10 @@ public static class EnemyKnockbackRuntimeUtility
 
     /// <summary>
     /// Combines authored movement velocity and current knockback velocity for look and occupancy calculations.
-    /// /params baseVelocity Current non-knockback enemy velocity.
-    /// /params knockbackState Current knockback state.
-    /// /returns Combined planar velocity.
     /// </summary>
+    /// <param name="baseVelocity">Current non-knockback enemy velocity.</param>
+    /// <param name="knockbackState">Current knockback state.</param>
+    /// <returns>Combined planar velocity.</returns>
     public static float3 ResolveCombinedVelocity(float3 baseVelocity, in EnemyKnockbackState knockbackState)
     {
         if (!IsActive(in knockbackState))
@@ -152,9 +151,9 @@ public static class EnemyKnockbackRuntimeUtility
 
     /// <summary>
     /// Resolves whether the current knockback state should still influence movement.
-    /// /params knockbackState Knockback state to inspect.
-    /// /returns True when the state still has time and meaningful planar velocity.
     /// </summary>
+    /// <param name="knockbackState">Knockback state to inspect.</param>
+    /// <returns>True when the state still has time and meaningful planar velocity.</returns>
     public static bool IsActive(in EnemyKnockbackState knockbackState)
     {
         return knockbackState.RemainingTime > MinimumRemainingTime &&
@@ -163,9 +162,8 @@ public static class EnemyKnockbackRuntimeUtility
 
     /// <summary>
     /// Clears the knockback state immediately.
-    /// /params knockbackState Mutable knockback state to reset.
-    /// /returns void.
     /// </summary>
+    /// <param name="knockbackState">Mutable knockback state to reset.</param>
     public static void Clear(ref EnemyKnockbackState knockbackState)
     {
         knockbackState.Velocity = float3.zero;

@@ -17,7 +17,7 @@ public sealed class PlayerLevelUpScheduleStepDefinitionPropertyDrawer : Property
     /// Builds one UI Toolkit inspector for one serialized schedule-step definition.
     /// </summary>
     /// <param name="property">Serialized schedule-step property.</param>
-    /// <returns>Generated root visual element for the property drawer.<returns>
+    /// <returns>Generated root visual element for the property drawer.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

@@ -5,7 +5,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Reconciles temporary passive power-ups granted by active combo ranks, including removal on derank or combo reset.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerRuntimeScalingSyncSystem))]
@@ -23,9 +22,8 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime buffers required to resolve combo rank passive unlock rewards.
-    /// /params state Current ECS system state.
-    /// /returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerComboCounterState>();
@@ -40,9 +38,8 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Reconciles combo-rank passive grants against the current active rank and removes grants when the player deranks or resets.
-    /// /params state Current ECS system state.
-    /// /returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerComboPassivePowerUpGrantElement> passiveGrantsLookup = SystemAPI.GetBufferLookup<PlayerComboPassivePowerUpGrantElement>(false);
@@ -105,15 +102,14 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
     #region Private Methods
     /// <summary>
     /// Reconciles desired active combo passive grants with the grants currently owned by combo rank rewards.
-    /// /params activeRankIndex Highest currently reached rank index.
-    /// /params runtimeRanks Current runtime combo-rank buffer.
-    /// /params runtimePassiveUnlocks Current runtime passive-unlock buffer.
-    /// /params passiveGrants Mutable combo passive grant buffer.
-    /// /params unlockCatalog Mutable runtime power-up unlock catalog.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregate passive state.
-    /// /returns void.
     /// </summary>
+    /// <param name="activeRankIndex">Highest currently reached rank index.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Current runtime passive-unlock buffer.</param>
+    /// <param name="passiveGrants">Mutable combo passive grant buffer.</param>
+    /// <param name="unlockCatalog">Mutable runtime power-up unlock catalog.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregate passive state.</param>
     private static void ReconcilePassiveGrants(int activeRankIndex,
                                                DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
                                                DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks,
@@ -140,15 +136,14 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Adds combo passive grants that are desired by the current active rank range but not already tracked.
-    /// /params activeRankIndex Highest currently reached rank index.
-    /// /params runtimeRanks Current runtime combo-rank buffer.
-    /// /params runtimePassiveUnlocks Current runtime passive-unlock buffer.
-    /// /params passiveGrants Mutable combo passive grant buffer.
-    /// /params unlockCatalog Mutable runtime power-up unlock catalog.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregate passive state.
-    /// /returns void.
     /// </summary>
+    /// <param name="activeRankIndex">Highest currently reached rank index.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Current runtime passive-unlock buffer.</param>
+    /// <param name="passiveGrants">Mutable combo passive grant buffer.</param>
+    /// <param name="unlockCatalog">Mutable runtime power-up unlock catalog.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregate passive state.</param>
     private static void AddMissingGrants(int activeRankIndex,
                                          DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
                                          DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks,
@@ -214,15 +209,14 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Removes tracked combo passive grants that no longer belong to the current active rank range or authored desired set.
-    /// /params activeRankIndex Highest currently reached rank index.
-    /// /params runtimeRanks Current runtime combo-rank buffer.
-    /// /params runtimePassiveUnlocks Current runtime passive-unlock buffer.
-    /// /params passiveGrants Mutable combo passive grant buffer.
-    /// /params unlockCatalog Mutable runtime power-up unlock catalog.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregate passive state.
-    /// /returns void.
     /// </summary>
+    /// <param name="activeRankIndex">Highest currently reached rank index.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Current runtime passive-unlock buffer.</param>
+    /// <param name="passiveGrants">Mutable combo passive grant buffer.</param>
+    /// <param name="unlockCatalog">Mutable runtime power-up unlock catalog.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregate passive state.</param>
     private static void RemoveObsoleteGrants(int activeRankIndex,
                                              DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
                                              DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks,
@@ -250,10 +244,10 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Converts the resolved active rank into the rank range allowed to own temporary combo passive grants.
-    /// /params comboValue Current combo numeric value after gain, decay, and break resolution.
-    /// /params activeRankIndex Highest active combo rank resolved from thresholds.
-    /// /returns Highest rank allowed to own passive grants, or -1 when combo reset should revoke all grants.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value after gain, decay, and break resolution.</param>
+    /// <param name="activeRankIndex">Highest active combo rank resolved from thresholds.</param>
+    /// <returns>Highest rank allowed to own passive grants, or -1 when combo reset should revoke all grants.</returns>
     private static int ResolvePassiveGrantActiveRankIndex(int comboValue, int activeRankIndex)
     {
         if (comboValue <= 0)
@@ -266,11 +260,11 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Builds a compact signature for the desired active combo passive unlock set.
-    /// /params activeRankIndex Highest currently reached rank index.
-    /// /params runtimeRanks Current runtime combo-rank buffer.
-    /// /params runtimePassiveUnlocks Current runtime passive-unlock buffer.
-    /// /returns Stable signature for the desired active grant set.
     /// </summary>
+    /// <param name="activeRankIndex">Highest currently reached rank index.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Current runtime passive-unlock buffer.</param>
+    /// <returns>Stable signature for the desired active grant set.</returns>
     private static uint BuildDesiredGrantSignature(int activeRankIndex,
                                                    DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
                                                    DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks)
@@ -310,12 +304,12 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Resolves whether one tracked grant is still desired by the current active rank range.
-    /// /params grant Tracked combo passive grant.
-    /// /params activeRankIndex Highest currently reached rank index.
-    /// /params runtimeRanks Current runtime combo-rank buffer.
-    /// /params runtimePassiveUnlocks Current runtime passive-unlock buffer.
-    /// /returns True when the grant should remain active.
     /// </summary>
+    /// <param name="grant">Tracked combo passive grant.</param>
+    /// <param name="activeRankIndex">Highest currently reached rank index.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Current runtime passive-unlock buffer.</param>
+    /// <returns>True when the grant should remain active.</returns>
     private static bool IsDesiredGrant(in PlayerComboPassivePowerUpGrantElement grant,
                                        int activeRankIndex,
                                        DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
@@ -352,11 +346,11 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
 
     /// <summary>
     /// Checks whether a combo grant with the same rank and passive PowerUpId is already tracked.
-    /// /params passiveGrants Current combo passive grant buffer.
-    /// /params rankIndex Rank index that owns the desired grant.
-    /// /params passivePowerUpId Passive PowerUpId to test.
-    /// /returns True when a matching tracked grant exists.
     /// </summary>
+    /// <param name="passiveGrants">Current combo passive grant buffer.</param>
+    /// <param name="rankIndex">Rank index that owns the desired grant.</param>
+    /// <param name="passivePowerUpId">Passive PowerUpId to test.</param>
+    /// <returns>True when a matching tracked grant exists.</returns>
     private static bool ContainsGrant(DynamicBuffer<PlayerComboPassivePowerUpGrantElement> passiveGrants,
                                       int rankIndex,
                                       FixedString64Bytes passivePowerUpId)

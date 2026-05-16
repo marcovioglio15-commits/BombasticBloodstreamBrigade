@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Applies dash kinematics and manages dash invulnerability timers.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMovementSpeedSystem))]
@@ -20,9 +18,8 @@ public partial struct PlayerDashMovementSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the dash and movement state required to execute active dash movement.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerDashState>();
@@ -31,9 +28,8 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Ticks dash invulnerability and applies the current frame of fixed-distance dash movement before transform movement is resolved.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
@@ -61,12 +57,11 @@ public partial struct PlayerDashMovementSystem : ISystem
     #region Helpers
     /// <summary>
     /// Advances dash movement by integrating the speed profile so authored distance remains independent from player movement speed.
-    /// /params dashState Mutable dash state storing profile timing and remaining movement.
-    /// /params movementState Mutable movement state that receives the frame velocity consumed by PlayerMovementApplySystem.
-    /// /params dashDirection Normalized planar dash direction.
-    /// /params deltaTime Current scaled frame delta.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state storing profile timing and remaining movement.</param>
+    /// <param name="movementState">Mutable movement state that receives the frame velocity consumed by PlayerMovementApplySystem.</param>
+    /// <param name="dashDirection">Normalized planar dash direction.</param>
+    /// <param name="deltaTime">Current scaled frame delta.</param>
     private static void ApplyFixedDistanceDash(ref PlayerDashState dashState,
                                                ref PlayerMovementState movementState,
                                                float3 dashDirection,
@@ -99,10 +94,10 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Integrates the dash speed multiplier profile from dash start to the requested elapsed time.
-    /// /params dashState Dash profile state containing transition and hold durations.
-    /// /params elapsedTime Elapsed dash time in seconds.
-    /// /returns Integrated profile area in seconds.
     /// </summary>
+    /// <param name="dashState">Dash profile state containing transition and hold durations.</param>
+    /// <param name="elapsedTime">Elapsed dash time in seconds.</param>
+    /// <returns>Integrated profile area in seconds.</returns>
     private static float ResolveProfileIntegral(in PlayerDashState dashState, float elapsedTime)
     {
         float transitionInDuration = math.max(0f, dashState.TransitionInDuration);
@@ -138,10 +133,10 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Integrates the smoothstep ramp-up profile while keeping the same total area as a linear ramp.
-    /// /params transitionTime Elapsed time inside the transition.
-    /// /params transitionDuration Full transition duration.
-    /// /returns Integrated area contributed by the ramp-up.
     /// </summary>
+    /// <param name="transitionTime">Elapsed time inside the transition.</param>
+    /// <param name="transitionDuration">Full transition duration.</param>
+    /// <returns>Integrated area contributed by the ramp-up.</returns>
     private static float ResolveSmoothTransitionInArea(float transitionTime, float transitionDuration)
     {
         float safeDuration = math.max(MinimumProfileDuration, transitionDuration);
@@ -153,10 +148,10 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Integrates the smoothstep ramp-down profile while keeping the same total area as a linear ramp.
-    /// /params transitionTime Elapsed time inside the transition.
-    /// /params transitionDuration Full transition duration.
-    /// /returns Integrated area contributed by the ramp-down.
     /// </summary>
+    /// <param name="transitionTime">Elapsed time inside the transition.</param>
+    /// <param name="transitionDuration">Full transition duration.</param>
+    /// <returns>Integrated area contributed by the ramp-down.</returns>
     private static float ResolveSmoothTransitionOutArea(float transitionTime, float transitionDuration)
     {
         float safeDuration = math.max(MinimumProfileDuration, transitionDuration);
@@ -168,10 +163,9 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Updates phase metadata for animation/debug consumers after the fixed-distance movement step.
-    /// /params dashState Mutable dash state to refresh.
-    /// /params elapsedTime Current elapsed dash time in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state to refresh.</param>
+    /// <param name="elapsedTime">Current elapsed dash time in seconds.</param>
     private static void RefreshPhaseFromElapsed(ref PlayerDashState dashState, float elapsedTime)
     {
         float transitionInDuration = math.max(0f, dashState.TransitionInDuration);
@@ -198,10 +192,9 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Decrements dash invulnerability while preserving pause behavior through the owning system update guard.
-    /// /params dashState Mutable dash state holding the remaining invulnerability timer.
-    /// /params deltaTime Current scaled frame delta.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state holding the remaining invulnerability timer.</param>
+    /// <param name="deltaTime">Current scaled frame delta.</param>
     private static void UpdateInvulnerability(ref PlayerDashState dashState, float deltaTime)
     {
         if (dashState.RemainingInvulnerability <= 0f)
@@ -217,9 +210,8 @@ public partial struct PlayerDashMovementSystem : ISystem
 
     /// <summary>
     /// Clears dash runtime data and marks movement velocity for post-apply cleanup.
-    /// /params dashState Mutable dash state that completed its profile.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state that completed its profile.</param>
     private static void EndDash(ref PlayerDashState dashState)
     {
         dashState.IsDashing = 0;

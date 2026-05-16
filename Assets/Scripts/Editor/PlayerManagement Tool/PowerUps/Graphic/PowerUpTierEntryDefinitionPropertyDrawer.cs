@@ -24,7 +24,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit inspector for one tier entry.
     /// </summary>
     /// <param name="property">Serialized tier-entry property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -201,7 +201,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// Formats the tier-entry category label shown inside the popup.
     /// </summary>
     /// <param name="entryKind">Category value to format.</param>
-    /// <returns>User-facing category label.<returns>
+    /// <returns>User-facing category label.</returns>
     private static string FormatEntryKind(PowerUpTierEntryKind entryKind)
     {
         switch (entryKind)
@@ -218,7 +218,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="serializedObject">Owning serialized object.</param>
     /// <param name="propertyPath">Serialized path of the tier entry.</param>
-    /// <returns>Resolved root property when still available; otherwise null.<returns>
+    /// <returns>Resolved root property when still available; otherwise null.</returns>
     private static SerializedProperty TryResolveRootProperty(SerializedObject serializedObject, string propertyPath)
     {
         if (serializedObject == null || string.IsNullOrWhiteSpace(propertyPath))
@@ -233,7 +233,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="options">Available dropdown options resolved from the owning power-ups preset.</param>
     /// <param name="currentPowerUpId">Serialized power-up ID currently stored by the tier entry.</param>
-    /// <returns>True when the current power-up ID is still selectable; otherwise false.<returns>
+    /// <returns>True when the current power-up ID is still selectable; otherwise false.</returns>
     private static bool ContainsPowerUpIdOption(List<string> options, string currentPowerUpId)
     {
         if (options == null || options.Count <= 0 || string.IsNullOrWhiteSpace(currentPowerUpId))
@@ -252,7 +252,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// Resolves one serialized tier-entry category while guarding against invalid enum payloads.
     /// </summary>
     /// <param name="entryKindProperty">Serialized enum property storing the tier-entry category.</param>
-    /// <returns>Resolved tier-entry category or Active when the payload is invalid.<returns>
+    /// <returns>Resolved tier-entry category or Active when the payload is invalid.</returns>
     private static PowerUpTierEntryKind ResolveEntryKind(SerializedProperty entryKindProperty)
     {
         if (entryKindProperty == null || entryKindProperty.propertyType != SerializedPropertyType.Enum)
@@ -271,7 +271,7 @@ public sealed class PowerUpTierEntryDefinitionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="options">Available power-up IDs resolved from the preset.</param>
     /// <param name="currentValue">Current serialized power-up ID.</param>
-    /// <returns>Selected power-up ID to display or persist.<returns>
+    /// <returns>Selected power-up ID to display or persist.</returns>
     private static string ResolveSelectedPowerUpId(List<string> options, string currentValue)
     {
         if (options == null || options.Count <= 0)

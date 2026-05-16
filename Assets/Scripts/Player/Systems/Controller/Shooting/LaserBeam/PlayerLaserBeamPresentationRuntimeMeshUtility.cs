@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Builds the volumetric 3D Laser Beam body mesh from authoritative lane samples.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 {
@@ -31,15 +29,14 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
     #region Public Methods
     /// <summary>
     /// Rebuilds one managed body visual as a volumetric prism-tube that follows the authoritative lane path.
-    /// /params visual Managed body visual that owns the dynamic mesh.
-    /// /params laneVisual Render-time lane metadata describing the point range.
-    /// /params ribbonPoints Shared point list containing all sampled lane points.
-    /// /params visualConfig Shared beam visual config used to shape the terminal closure.
-    /// /params laserBeamConfig Runtime passive config driving width and storm response.
-    /// /params laserBeamState Runtime state used to resolve the current storm-burst strength.
-    /// /params elapsedTimeSeconds Global elapsed time used by the body breathing animation.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Managed body visual that owns the dynamic mesh.</param>
+    /// <param name="laneVisual">Render-time lane metadata describing the point range.</param>
+    /// <param name="ribbonPoints">Shared point list containing all sampled lane points.</param>
+    /// <param name="visualConfig">Shared beam visual config used to shape the terminal closure.</param>
+    /// <param name="laserBeamConfig">Runtime passive config driving width and storm response.</param>
+    /// <param name="laserBeamState">Runtime state used to resolve the current storm-burst strength.</param>
+    /// <param name="elapsedTimeSeconds">Global elapsed time used by the body breathing animation.</param>
     public static void BuildBodyVolumeMesh(PlayerLaserBeamManagedBodyVisual visual,
                                            in PlayerLaserBeamLaneVisual laneVisual,
                                            List<PlayerLaserBeamRibbonPoint> ribbonPoints,
@@ -147,9 +144,9 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Compresses the raw gameplay width into a readable art width that remains stable in crowded rooms.
-    /// /params rawWidth Raw body width inherited from gameplay lane generation.
-    /// /returns Compressed art width used by the body mesh.
     /// </summary>
+    /// <param name="rawWidth">Raw body width inherited from gameplay lane generation.</param>
+    /// <returns>Compressed art width used by the body mesh.</returns>
     public static float ResolveBodyVisualWidth(float rawWidth)
     {
         float compressedWidth = 0.12f + 0.32f * math.pow(math.max(0.01f, rawWidth), 0.62f);
@@ -158,10 +155,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the normalized storm-burst amount currently active on the beam.
-    /// /params laserBeamConfig Runtime passive config that provides the authored burst duration.
-    /// /params laserBeamState Runtime state that stores the current burst countdown.
-    /// /returns Normalized burst strength in the 0-1 range.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config that provides the authored burst duration.</param>
+    /// <param name="laserBeamState">Runtime state that stores the current burst countdown.</param>
+    /// <returns>Normalized burst strength in the 0-1 range.</returns>
     public static float ResolveStormBurstNormalized(in LaserBeamPassiveConfig laserBeamConfig,
                                                     in PlayerLaserBeamState laserBeamState)
     {
@@ -177,17 +174,17 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
     #region Private Methods
     /// <summary>
     /// Adds one shaped cross-section ring to the shared body mesh buffers.
-    /// /params center Center of the ring.
-    /// /params tangent Forward direction at the current ring.
-    /// /params normal Vertical frame axis used by the current ring.
-    /// /params binormal Horizontal frame axis used by the current ring.
-    /// /params radius Radius of the current ring.
-    /// /params normalizedDistance Normalized distance of the ring along the lane.
-    /// /params laserBeamConfig Runtime passive config used to resolve the active body profile.
-    /// /params minimumBounds Current minimum mesh bounds.
-    /// /params maximumBounds Current maximum mesh bounds.
-    /// /returns Start vertex index of the created ring.
     /// </summary>
+    /// <param name="center">Center of the ring.</param>
+    /// <param name="tangent">Forward direction at the current ring.</param>
+    /// <param name="normal">Vertical frame axis used by the current ring.</param>
+    /// <param name="binormal">Horizontal frame axis used by the current ring.</param>
+    /// <param name="radius">Radius of the current ring.</param>
+    /// <param name="normalizedDistance">Normalized distance of the ring along the lane.</param>
+    /// <param name="laserBeamConfig">Runtime passive config used to resolve the active body profile.</param>
+    /// <param name="minimumBounds">Current minimum mesh bounds.</param>
+    /// <param name="maximumBounds">Current maximum mesh bounds.</param>
+    /// <returns>Start vertex index of the created ring.</returns>
     private static int AddTubeRing(float3 center,
                                    float3 tangent,
                                    float3 normal,
@@ -227,10 +224,9 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Connects two neighboring rings with side-surface triangles.
-    /// /params previousRingStartIndex Start index of the previous ring.
-    /// /params currentRingStartIndex Start index of the current ring.
-    /// /returns None.
     /// </summary>
+    /// <param name="previousRingStartIndex">Start index of the previous ring.</param>
+    /// <param name="currentRingStartIndex">Start index of the current ring.</param>
     private static void AddTubeBridge(int previousRingStartIndex, int currentRingStartIndex)
     {
         for (int sideIndex = 0; sideIndex < TubeSideCount; sideIndex++)
@@ -250,13 +246,12 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Closes the beam start with a simple cap so the tube does not appear hollow near the muzzle.
-    /// /params center Start-point position.
-    /// /params tangent Forward tangent at the first point.
-    /// /params firstRingStartIndex Start index of the first body ring.
-    /// /params minimumBounds Current minimum mesh bounds.
-    /// /params maximumBounds Current maximum mesh bounds.
-    /// /returns None.
     /// </summary>
+    /// <param name="center">Start-point position.</param>
+    /// <param name="tangent">Forward tangent at the first point.</param>
+    /// <param name="firstRingStartIndex">Start index of the first body ring.</param>
+    /// <param name="minimumBounds">Current minimum mesh bounds.</param>
+    /// <param name="maximumBounds">Current maximum mesh bounds.</param>
     private static void AddStartCap(float3 center,
                                     float3 tangent,
                                     int firstRingStartIndex,
@@ -279,13 +274,12 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Closes the final ring with a rounded cap so the beam terminates cleanly without a pointed spear tip.
-    /// /params endPosition Real terminal point of the lane.
-    /// /params tangent Forward tangent at the end of the lane.
-    /// /params finalRingStartIndex Start index of the final body ring.
-    /// /params minimumBounds Current minimum mesh bounds.
-    /// /params maximumBounds Current maximum mesh bounds.
-    /// /returns None.
     /// </summary>
+    /// <param name="endPosition">Real terminal point of the lane.</param>
+    /// <param name="tangent">Forward tangent at the end of the lane.</param>
+    /// <param name="finalRingStartIndex">Start index of the final body ring.</param>
+    /// <param name="minimumBounds">Current minimum mesh bounds.</param>
+    /// <param name="maximumBounds">Current maximum mesh bounds.</param>
     private static void AddEndCap(float3 endPosition,
                                   float3 tangent,
                                   int finalRingStartIndex,
@@ -308,16 +302,16 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the final body diameter at one point after breathing, profile shaping, source opening, and terminal closure are applied.
-    /// /params point Current sampled point.
-    /// /params normalizedDistance Normalized distance along the lane.
-    /// /params laneLength Total length of the current lane.
-    /// /params stormBurstNormalized Normalized storm burst currently active on the beam.
-    /// /params visualConfig Shared visual config used by the terminal closure.
-    /// /params laneVisual Render-time lane metadata.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params elapsedTimeSeconds Global elapsed time.
-    /// /returns Final full body diameter.
     /// </summary>
+    /// <param name="point">Current sampled point.</param>
+    /// <param name="normalizedDistance">Normalized distance along the lane.</param>
+    /// <param name="laneLength">Total length of the current lane.</param>
+    /// <param name="stormBurstNormalized">Normalized storm burst currently active on the beam.</param>
+    /// <param name="visualConfig">Shared visual config used by the terminal closure.</param>
+    /// <param name="laneVisual">Render-time lane metadata.</param>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="elapsedTimeSeconds">Global elapsed time.</param>
+    /// <returns>Final full body diameter.</returns>
     private static float ResolveTubeDiameter(PlayerLaserBeamRibbonPoint point,
                                              float normalizedDistance,
                                              float laneLength,
@@ -352,10 +346,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the profile-driven overall diameter multiplier used to preserve authored silhouette variety.
-    /// /params bodyProfile Active body profile selector.
-    /// /params normalizedDistance Normalized distance along the lane.
-    /// /returns Diameter multiplier derived from the active profile.
     /// </summary>
+    /// <param name="bodyProfile">Active body profile selector.</param>
+    /// <param name="normalizedDistance">Normalized distance along the lane.</param>
+    /// <returns>Diameter multiplier derived from the active profile.</returns>
     private static float ResolveBodyProfileDiameterMultiplier(LaserBeamBodyProfile bodyProfile,
                                                               float normalizedDistance)
     {
@@ -372,12 +366,11 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the vertical and horizontal ellipse scales used by one ring cross-section.
-    /// /params bodyProfile Active body profile selector.
-    /// /params normalizedDistance Normalized distance along the lane.
-    /// /params normalAxisScale Vertical ellipse scale aligned with the frame normal.
-    /// /params binormalAxisScale Horizontal ellipse scale aligned with the frame binormal.
-    /// /returns None.
     /// </summary>
+    /// <param name="bodyProfile">Active body profile selector.</param>
+    /// <param name="normalizedDistance">Normalized distance along the lane.</param>
+    /// <param name="normalAxisScale">Vertical ellipse scale aligned with the frame normal.</param>
+    /// <param name="binormalAxisScale">Horizontal ellipse scale aligned with the frame binormal.</param>
     private static void ResolveBodyProfileShapeScales(LaserBeamBodyProfile bodyProfile,
                                                       float normalizedDistance,
                                                       out float normalAxisScale,
@@ -402,12 +395,12 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the diameter multiplier applied near the source so the beam starts sealed and opens outward.
-    /// /params distanceAlongLane Current point distance.
-    /// /params laneLength Total lane length.
-    /// /params baseDiameter Current base body diameter.
-    /// /params laserBeamConfig Runtime passive config used to scale the source offset.
-    /// /returns Diameter multiplier applied near the source aperture.
     /// </summary>
+    /// <param name="distanceAlongLane">Current point distance.</param>
+    /// <param name="laneLength">Total lane length.</param>
+    /// <param name="baseDiameter">Current base body diameter.</param>
+    /// <param name="laserBeamConfig">Runtime passive config used to scale the source offset.</param>
+    /// <returns>Diameter multiplier applied near the source aperture.</returns>
     private static float ResolveSourceApertureDiameterMultiplier(float distanceAlongLane,
                                                                  float laneLength,
                                                                  float baseDiameter,
@@ -441,13 +434,13 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the taper multiplier applied near the end of the lane so the body closes cleanly into the rounded terminal cap.
-    /// /params distanceAlongLane Current point distance.
-    /// /params laneLength Total lane length.
-    /// /params baseDiameter Current base body diameter.
-    /// /params visualConfig Shared visual config used to shape the terminal closure.
-    /// /params laserBeamConfig Runtime passive config used to scale the terminal emphasis.
-    /// /returns Diameter multiplier applied near the terminal section.
     /// </summary>
+    /// <param name="distanceAlongLane">Current point distance.</param>
+    /// <param name="laneLength">Total lane length.</param>
+    /// <param name="baseDiameter">Current base body diameter.</param>
+    /// <param name="visualConfig">Shared visual config used to shape the terminal closure.</param>
+    /// <param name="laserBeamConfig">Runtime passive config used to scale the terminal emphasis.</param>
+    /// <returns>Diameter multiplier applied near the terminal section.</returns>
     private static float ResolveTerminalClosureDiameterMultiplier(float distanceAlongLane,
                                                                   float laneLength,
                                                                   float baseDiameter,
@@ -479,12 +472,12 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the tangent used to orient one sampled point between its neighbors.
-    /// /params ribbonPoints Shared ribbon point list.
-    /// /params pointStartIndex Start index of the current lane inside the shared point list.
-    /// /params pointCount Number of points belonging to the current lane.
-    /// /params localPointIndex Zero-based point index inside the current lane.
-    /// /returns Normalized tangent.
     /// </summary>
+    /// <param name="ribbonPoints">Shared ribbon point list.</param>
+    /// <param name="pointStartIndex">Start index of the current lane inside the shared point list.</param>
+    /// <param name="pointCount">Number of points belonging to the current lane.</param>
+    /// <param name="localPointIndex">Zero-based point index inside the current lane.</param>
+    /// <returns>Normalized tangent.</returns>
     private static float3 ResolvePointTangent(List<PlayerLaserBeamRibbonPoint> ribbonPoints,
                                               int pointStartIndex,
                                               int pointCount,
@@ -499,11 +492,11 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the first frame-normal axis used to seed the ring transport along the lane.
-    /// /params ribbonPoints Shared ribbon point list.
-    /// /params pointStartIndex Start index of the current lane inside the shared point list.
-    /// /params pointCount Number of points belonging to the current lane.
-    /// /returns Initial transported normal axis.
     /// </summary>
+    /// <param name="ribbonPoints">Shared ribbon point list.</param>
+    /// <param name="pointStartIndex">Start index of the current lane inside the shared point list.</param>
+    /// <param name="pointCount">Number of points belonging to the current lane.</param>
+    /// <returns>Initial transported normal axis.</returns>
     private static float3 ResolveInitialFrameNormal(List<PlayerLaserBeamRibbonPoint> ribbonPoints,
                                                     int pointStartIndex,
                                                     int pointCount)
@@ -520,10 +513,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Transports the previous frame-normal axis onto the plane orthogonal to the new tangent.
-    /// /params previousNormal Previous transported frame-normal axis.
-    /// /params tangent Current tangent.
-    /// /returns Stabilized transported normal axis.
     /// </summary>
+    /// <param name="previousNormal">Previous transported frame-normal axis.</param>
+    /// <param name="tangent">Current tangent.</param>
+    /// <returns>Stabilized transported normal axis.</returns>
     private static float3 TransportFrameNormal(float3 previousNormal, float3 tangent)
     {
         float3 projectedNormal = ProjectOntoPlane(previousNormal, tangent);
@@ -536,10 +529,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Resolves the orthogonal frame binormal from the transported normal axis and tangent.
-    /// /params normal Current transported normal axis.
-    /// /params tangent Current tangent.
-    /// /returns Stabilized frame binormal.
     /// </summary>
+    /// <param name="normal">Current transported normal axis.</param>
+    /// <param name="tangent">Current tangent.</param>
+    /// <returns>Stabilized frame binormal.</returns>
     private static float3 ResolveFrameBinormal(float3 normal, float3 tangent)
     {
         float3 binormal = math.cross(tangent, normal);
@@ -548,10 +541,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Re-orthonormalizes the transported normal axis after the binormal was resolved.
-    /// /params binormal Current frame binormal.
-    /// /params tangent Current tangent.
-    /// /returns Stabilized frame normal axis.
     /// </summary>
+    /// <param name="binormal">Current frame binormal.</param>
+    /// <param name="tangent">Current tangent.</param>
+    /// <returns>Stabilized frame normal axis.</returns>
     private static float3 ResolveFrameNormal(float3 binormal, float3 tangent)
     {
         float3 normal = math.cross(binormal, tangent);
@@ -560,10 +553,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Projects one vector onto the plane orthogonal to the provided normal.
-    /// /params vector Vector to project.
-    /// /params planeNormal Plane normal used for the projection.
-    /// /returns Projected vector.
     /// </summary>
+    /// <param name="vector">Vector to project.</param>
+    /// <param name="planeNormal">Plane normal used for the projection.</param>
+    /// <returns>Projected vector.</returns>
     private static float3 ProjectOntoPlane(float3 vector, float3 planeNormal)
     {
         return vector - planeNormal * math.dot(vector, planeNormal);
@@ -571,11 +564,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Expands the mesh bounds with one new point.
-    /// /params point New point to include.
-    /// /params minimumBounds Current minimum bounds.
-    /// /params maximumBounds Current maximum bounds.
-    /// /returns None.
     /// </summary>
+    /// <param name="point">New point to include.</param>
+    /// <param name="minimumBounds">Current minimum bounds.</param>
+    /// <param name="maximumBounds">Current maximum bounds.</param>
     private static void ExpandBounds(float3 point,
                                      ref float3 minimumBounds,
                                      ref float3 maximumBounds)
@@ -586,10 +578,10 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Builds a Unity bounds value from accumulated min and max points.
-    /// /params minimumBounds Minimum sampled bounds.
-    /// /params maximumBounds Maximum sampled bounds.
-    /// /returns Mesh bounds covering the current body.
     /// </summary>
+    /// <param name="minimumBounds">Minimum sampled bounds.</param>
+    /// <param name="maximumBounds">Maximum sampled bounds.</param>
+    /// <returns>Mesh bounds covering the current body.</returns>
     private static Bounds BuildBounds(float3 minimumBounds, float3 maximumBounds)
     {
         Vector3 minimumVector = ToVector3(minimumBounds);
@@ -605,9 +597,9 @@ internal static class PlayerLaserBeamPresentationRuntimeMeshUtility
 
     /// <summary>
     /// Converts one ECS float3 into a managed Unity Vector3.
-    /// /params value ECS float3 value.
-    /// /returns Managed Unity Vector3.
     /// </summary>
+    /// <param name="value">ECS float3 value.</param>
+    /// <returns>Managed Unity Vector3.</returns>
     private static Vector3 ToVector3(float3 value)
     {
         return new Vector3(value.x, value.y, value.z);

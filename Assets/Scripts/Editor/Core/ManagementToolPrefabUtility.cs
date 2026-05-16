@@ -19,7 +19,7 @@ public static class ManagementToolPrefabUtility
     /// </summary>
     /// <typeparam name="TComponent">Component type required on the prefab.</typeparam>
     /// <param name="prefabAsset">Output prefab reference set when a match is found.</param>
-    /// <returns>Returns true when a matching prefab is found; otherwise false.<returns>
+    /// <returns>Returns true when a matching prefab is found; otherwise false.</returns>
     public static bool TryFindFirstPrefabWithComponent<TComponent>(out GameObject prefabAsset) where TComponent : Component
     {
         return TryFindFirstPrefabWithComponentInHierarchy<TComponent>(out prefabAsset);
@@ -31,7 +31,7 @@ public static class ManagementToolPrefabUtility
     /// </summary>
     /// <typeparam name="TComponent">Component type required on the prefab hierarchy.</typeparam>
     /// <param name="prefabAsset">Output prefab reference set when a match is found.</param>
-    /// <returns>Returns true when a matching prefab is found; otherwise false.<returns>
+    /// <returns>Returns true when a matching prefab is found; otherwise false.</returns>
     public static bool TryFindFirstPrefabWithComponentInHierarchy<TComponent>(out GameObject prefabAsset) where TComponent : Component
     {
         List<GameObject> matchingPrefabs = FindPrefabsWithComponentInHierarchy<TComponent>();
@@ -52,7 +52,7 @@ public static class ManagementToolPrefabUtility
     /// </summary>
     /// <typeparam name="TComponent">Component type required on the prefab hierarchy.</typeparam>
     /// <param name="searchFolders">Optional folder filters passed to AssetDatabase.FindAssets.</param>
-    /// <returns>Returns a path-sorted list of matching prefab assets.<returns>
+    /// <returns>Returns a path-sorted list of matching prefab assets.</returns>
     public static List<GameObject> FindPrefabsWithComponentInHierarchy<TComponent>(string[] searchFolders = null) where TComponent : Component
     {
         List<GameObject> matchingPrefabs = new List<GameObject>();
@@ -83,7 +83,7 @@ public static class ManagementToolPrefabUtility
     /// </summary>
     /// <typeparam name="TComponent">Component type expected on the prefab.</typeparam>
     /// <param name="prefabAsset">Prefab to validate.</param>
-    /// <returns>Returns true if the prefab contains the component; otherwise false.<returns>
+    /// <returns>Returns true if the prefab contains the component; otherwise false.</returns>
     public static bool HasComponent<TComponent>(GameObject prefabAsset) where TComponent : Component
     {
         return HasComponentInHierarchy<TComponent>(prefabAsset);
@@ -95,7 +95,7 @@ public static class ManagementToolPrefabUtility
     /// </summary>
     /// <typeparam name="TComponent">Component type expected on the prefab hierarchy.</typeparam>
     /// <param name="prefabAsset">Prefab to validate.</param>
-    /// <returns>Returns true if the prefab hierarchy contains the component; otherwise false.<returns>
+    /// <returns>Returns true if the prefab hierarchy contains the component; otherwise false.</returns>
     public static bool HasComponentInHierarchy<TComponent>(GameObject prefabAsset) where TComponent : Component
     {
         if (prefabAsset == null)

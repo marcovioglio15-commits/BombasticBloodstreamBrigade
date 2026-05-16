@@ -4,7 +4,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Advances the authoritative player run timer and marks countdown expiry before run-outcome evaluation.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateBefore(typeof(PlayerRunOutcomeSystem))]
@@ -15,9 +14,8 @@ public partial struct PlayerRunTimerSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the minimum runtime data required by the run timer.
-    /// state Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerControllerConfig>();
@@ -28,9 +26,8 @@ public partial struct PlayerRunTimerSystem : ISystem
 
     /// <summary>
     /// Advances the local run timer using the active direction and freezes it once the run outcome is finalized.
-    /// state Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -66,10 +63,9 @@ public partial struct PlayerRunTimerSystem : ISystem
     #region Helpers
     /// <summary>
     /// Advances a forward timer.
-    /// deltaTime Frame delta time in seconds.
-    /// timerState Mutable timer state.
-    /// returns void.
     /// </summary>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
+    /// <param name="timerState">Mutable timer state.</param>
     private static void UpdateForwardTimer(float deltaTime, ref PlayerRunTimerState timerState)
     {
         timerState.CurrentSeconds = math.max(0f, timerState.CurrentSeconds) + deltaTime;
@@ -78,10 +74,9 @@ public partial struct PlayerRunTimerSystem : ISystem
 
     /// <summary>
     /// Advances a countdown timer and latches expiry when it reaches zero.
-    /// deltaTime Frame delta time in seconds.
-    /// timerState Mutable timer state.
-    /// returns void.
     /// </summary>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
+    /// <param name="timerState">Mutable timer state.</param>
     private static void UpdateBackwardTimer(float deltaTime, ref PlayerRunTimerState timerState)
     {
         if (timerState.Expired != 0)

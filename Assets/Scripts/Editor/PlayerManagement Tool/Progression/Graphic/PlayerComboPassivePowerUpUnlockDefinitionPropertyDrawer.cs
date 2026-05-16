@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws one combo-rank passive power-up unlock entry with Add Scaling and scoped passive selection support.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerComboPassivePowerUpUnlockDefinition))]
 public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : PropertyDrawer
@@ -21,9 +20,9 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : Pr
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for one combo passive unlock entry.
-    /// /params property Serialized passive unlock property.
-    /// /returns Root UI element used by the inspector.
     /// </summary>
+    /// <param name="property">Serialized passive unlock property.</param>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -69,12 +68,11 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : Pr
     #region Private Methods
     /// <summary>
     /// Refreshes scoped selector visibility and validation warnings for the enabled passive unlock entry.
-    /// /params isEnabledProperty Serialized enable flag.
-    /// /params passivePowerUpIdProperty Serialized passive PowerUpId.
-    /// /params enabledContent Container hidden when the unlock is disabled.
-    /// /params warningBox Warning element refreshed in place.
-    /// /returns void.
     /// </summary>
+    /// <param name="isEnabledProperty">Serialized enable flag.</param>
+    /// <param name="passivePowerUpIdProperty">Serialized passive PowerUpId.</param>
+    /// <param name="enabledContent">Container hidden when the unlock is disabled.</param>
+    /// <param name="warningBox">Warning element refreshed in place.</param>
     private static void RefreshEnabledContent(SerializedProperty isEnabledProperty,
                                               SerializedProperty passivePowerUpIdProperty,
                                               VisualElement enabledContent,
@@ -128,10 +126,9 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : Pr
 
     /// <summary>
     /// Adds a scoped passive PowerUpId picker that writes the same token field rendered with Add Scaling support.
-    /// /params parent Container receiving the popup.
-    /// /params passivePowerUpIdProperty Serialized passive PowerUpId property.
-    /// /returns void.
     /// </summary>
+    /// <param name="parent">Container receiving the popup.</param>
+    /// <param name="passivePowerUpIdProperty">Serialized passive PowerUpId property.</param>
     private static void BuildPassivePowerUpPopup(VisualElement parent, SerializedProperty passivePowerUpIdProperty)
     {
         if (parent == null || passivePowerUpIdProperty == null)
@@ -189,8 +186,8 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : Pr
     /// <summary>
     /// Builds a scoped passive PowerUpId option list from the active Power-Ups preset context.
     /// none.
-    /// returns Sorted passive PowerUpId options.
     /// </summary>
+    /// <returns>Sorted passive PowerUpId options.</returns>
     private static List<string> BuildScopedPassivePowerUpIdOptions()
     {
         List<string> passivePowerUpIds = new List<string>();
@@ -234,10 +231,10 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinitionPropertyDrawer : Pr
 
     /// <summary>
     /// Checks whether one passive PowerUpId exists in a case-insensitive option list.
-    /// /params passivePowerUpIds Available passive PowerUpId options.
-    /// /params passivePowerUpId Requested passive PowerUpId.
-    /// /returns True when the requested PowerUpId exists in the option list.
     /// </summary>
+    /// <param name="passivePowerUpIds">Available passive PowerUpId options.</param>
+    /// <param name="passivePowerUpId">Requested passive PowerUpId.</param>
+    /// <returns>True when the requested PowerUpId exists in the option list.</returns>
     private static bool ContainsPassivePowerUpId(IReadOnlyList<string> passivePowerUpIds, string passivePowerUpId)
     {
         if (passivePowerUpIds == null || string.IsNullOrWhiteSpace(passivePowerUpId))

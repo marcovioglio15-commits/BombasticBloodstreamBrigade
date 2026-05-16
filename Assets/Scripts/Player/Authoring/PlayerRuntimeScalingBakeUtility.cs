@@ -25,12 +25,11 @@ internal static class PlayerRuntimeScalingBakeUtility
     #region Public Methods
     /// <summary>
     /// Populates immutable and runtime progression phase buffers from progression presets.
-    /// scaledPreset: Scaled preset currently used by bake.
-    /// sourcePreset: Unscaled source preset used as runtime baseline.
-    /// basePhases: Destination immutable baseline buffer.
-    /// runtimePhases: Destination runtime buffer initialized from the scaled preset.
-    /// returns void.
     /// </summary>
+    /// <param name="scaledPreset">Scaled preset currently used by bake.</param>
+    /// <param name="sourcePreset">Unscaled source preset used as runtime baseline.</param>
+    /// <param name="basePhases">Destination immutable baseline buffer.</param>
+    /// <param name="runtimePhases">Destination runtime buffer initialized from the scaled preset.</param>
     public static void PopulateProgressionPhaseBuffers(PlayerProgressionPreset scaledPreset,
                                                        PlayerProgressionPreset sourcePreset,
                                                        DynamicBuffer<PlayerBaseGamePhaseElement> basePhases,
@@ -70,12 +69,11 @@ internal static class PlayerRuntimeScalingBakeUtility
 
     /// <summary>
     /// Populates immutable base configs for all modular power-ups so runtime scaling can rebuild active/passive snapshots.
-    /// authoring: Owning player authoring component.
-    /// sourcePreset: Unscaled power-ups preset.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// baseConfigs: Destination immutable base config buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="sourcePreset">Unscaled power-ups preset.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="baseConfigs">Destination immutable base config buffer.</param>
     public static void PopulatePowerUpBaseConfigs(PlayerAuthoring authoring,
                                                   PlayerPowerUpsPreset sourcePreset,
                                                   Func<GameObject, Entity> resolveDynamicPrefabEntity,
@@ -105,10 +103,9 @@ internal static class PlayerRuntimeScalingBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Populates power-up scaling metadata from the unscaled power-ups preset.
-    /// sourcePreset: Unscaled source power-ups preset.
-    /// scalingBuffer: Destination scaling metadata buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="sourcePreset">Unscaled source power-ups preset.</param>
+    /// <param name="scalingBuffer">Destination scaling metadata buffer.</param>
     public static void PopulatePowerUpScalingMetadata(PlayerPowerUpsPreset sourcePreset,
                                                       DynamicBuffer<PlayerRuntimePowerUpScalingElement> scalingBuffer)
     {

@@ -5,7 +5,6 @@ using Unity.Entities;
 /// Computes the authoritative terminal outcome for the current player run without reloading the gameplay scene immediately.
 /// Defeat is triggered by zero health, while victory requires every authored enemy wave to complete.
 /// None.
-/// returns None.
 /// </summary>
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(EnemySystemGroup))]
@@ -20,9 +19,8 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the runtime state required by run-outcome evaluation.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         activeBossMinionQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -37,9 +35,8 @@ public partial struct PlayerRunOutcomeSystem : ISystem
 
     /// <summary>
     /// Finalizes defeat or victory once the corresponding gameplay condition is satisfied.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -153,10 +150,9 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     #region Helpers
     /// <summary>
     /// Writes the resolved terminal run outcome once and marks the state as finalized.
-    /// runOutcomeState: Mutable runtime state stored on the local player entity.
-    /// outcome: Terminal outcome that should be exposed to UI.
-    /// returns None.
     /// </summary>
+    /// <param name="runOutcomeState">Mutable runtime state stored on the local player entity.</param>
+    /// <param name="outcome">Terminal outcome that should be exposed to UI.</param>
     private static void FinalizeOutcome(ref PlayerRunOutcomeState runOutcomeState, PlayerRunOutcome outcome)
     {
         runOutcomeState.Outcome = outcome;
@@ -166,9 +162,9 @@ public partial struct PlayerRunOutcomeSystem : ISystem
 
     /// <summary>
     /// Resolves whether any active boss minion is configured to delay run completion after its boss dies.
-    /// /params activeBossMinionQuery Query matching active boss-owned minions without despawn requests.
-    /// /returns True when at least one active minion blocks victory.
     /// </summary>
+    /// <param name="activeBossMinionQuery">Query matching active boss-owned minions without despawn requests.</param>
+    /// <returns>True when at least one active minion blocks victory.</returns>
     private static bool HasCompletionBlockingBossMinions(EntityQuery activeBossMinionQuery)
     {
         if (activeBossMinionQuery.IsEmptyIgnoreFilter)

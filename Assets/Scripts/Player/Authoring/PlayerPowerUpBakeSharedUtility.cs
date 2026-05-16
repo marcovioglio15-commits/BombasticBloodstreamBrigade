@@ -14,9 +14,9 @@ public static class PlayerPowerUpBakeSharedUtility
     #region Public Methods
     /// <summary>
     /// Builds VFX cap settings from player authoring values.
-    /// authoring: Source authoring component.
-    /// returns Sanitized VFX cap config.
     /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <returns>Sanitized VFX cap config.</returns>
     public static PlayerPowerUpVfxCapConfig BuildPowerUpVfxCapConfig(PlayerAuthoring authoring)
     {
         if (authoring == null)
@@ -34,11 +34,11 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Builds runtime elemental VFX assignments from the resolved authored catalog.
-    /// authoring: Owning player authoring component.
-    /// assignments: Source elemental VFX assignments.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Elemental VFX config for all supported elements.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="assignments">Source elemental VFX assignments.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Elemental VFX config for all supported elements.</returns>
     public static PlayerElementalVfxConfig BuildElementalVfxConfig(PlayerAuthoring authoring,
                                                                    IReadOnlyList<ElementalVfxByElementData> assignments,
                                                                    Func<GameObject, Entity> resolveDynamicPrefabEntity)
@@ -66,12 +66,12 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves a modular active power-up by ID with optional positional fallback.
-    /// preset: Source preset.
-    /// powerUpId: Requested power-up ID.
-    /// fallbackIndex: Fallback index inside the active list.
-    /// allowFallback: True when the fallback index can be used after ID lookup fails.
-    /// returns Resolved modular active power-up or null.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="powerUpId">Requested power-up ID.</param>
+    /// <param name="fallbackIndex">Fallback index inside the active list.</param>
+    /// <param name="allowFallback">True when the fallback index can be used after ID lookup fails.</param>
+    /// <returns>Resolved modular active power-up or null.</returns>
     public static ModularPowerUpDefinition ResolveLoadoutActivePowerUp(PlayerPowerUpsPreset preset,
                                                                        string powerUpId,
                                                                        int fallbackIndex,
@@ -114,10 +114,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves a modular passive power-up by ID.
-    /// preset: Source preset.
-    /// powerUpId: Requested power-up ID.
-    /// returns Resolved modular passive power-up or null.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="powerUpId">Requested power-up ID.</param>
+    /// <returns>Resolved modular passive power-up or null.</returns>
     public static ModularPowerUpDefinition ResolveLoadoutPassivePowerUp(PlayerPowerUpsPreset preset, string powerUpId)
     {
         if (preset == null)
@@ -154,11 +154,11 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves a legacy active tool by ID with positional fallback.
-    /// preset: Source preset.
-    /// toolId: Requested tool ID.
-    /// fallbackIndex: Fallback index inside the active tool list.
-    /// returns Resolved active tool or null.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="toolId">Requested tool ID.</param>
+    /// <param name="fallbackIndex">Fallback index inside the active tool list.</param>
+    /// <returns>Resolved active tool or null.</returns>
     public static ActiveToolDefinition ResolveLoadoutTool(PlayerPowerUpsPreset preset, string toolId, int fallbackIndex)
     {
         if (preset == null)
@@ -198,10 +198,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves a legacy passive tool by ID.
-    /// preset: Source preset.
-    /// toolId: Requested tool ID.
-    /// returns Resolved passive tool or null.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="toolId">Requested tool ID.</param>
+    /// <returns>Resolved passive tool or null.</returns>
     public static PassiveToolDefinition ResolveLoadoutPassiveTool(PlayerPowerUpsPreset preset, string toolId)
     {
         if (preset == null)
@@ -235,10 +235,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves one module definition by ID from the module catalog.
-    /// preset: Source preset.
-    /// moduleId: Requested module ID.
-    /// returns Resolved module definition or null.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="moduleId">Requested module ID.</param>
+    /// <returns>Resolved module definition or null.</returns>
     public static PowerUpModuleDefinition ResolveModuleDefinitionById(PlayerPowerUpsPreset preset, string moduleId)
     {
         if (preset == null || string.IsNullOrWhiteSpace(moduleId))
@@ -265,12 +265,12 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves and validates one optional power-up prefab to an ECS prefab entity.
-    /// authoring: Owning player authoring component.
-    /// optionalPrefab: Prefab candidate.
-    /// contextLabel: Label used in validation logs.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Resolved entity or Entity.Null when validation fails.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="optionalPrefab">Prefab candidate.</param>
+    /// <param name="contextLabel">Label used in validation logs.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Resolved entity or Entity.Null when validation fails.</returns>
     public static Entity ResolveOptionalPowerUpPrefabEntity(PlayerAuthoring authoring,
                                                             GameObject optionalPrefab,
                                                             string contextLabel,
@@ -293,10 +293,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Resolves a validated prefab through the baker callback.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// prefab: Prefab to resolve.
-    /// returns Resolved entity or Entity.Null when no resolver is available.
     /// </summary>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="prefab">Prefab to resolve.</param>
+    /// <returns>Resolved entity or Entity.Null when no resolver is available.</returns>
     public static Entity ResolvePrefabEntity(Func<GameObject, Entity> resolveDynamicPrefabEntity, GameObject prefab)
     {
         if (resolveDynamicPrefabEntity == null || prefab == null)
@@ -307,10 +307,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Validates bomb prefabs used by active power-ups.
-    /// authoring: Owning player authoring component.
-    /// bombPrefab: Bomb prefab candidate.
-    /// returns True when the prefab is not valid for baking.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="bombPrefab">Bomb prefab candidate.</param>
+    /// <returns>True when the prefab is not valid for baking.</returns>
     public static bool IsInvalidBombPrefab(PlayerAuthoring authoring, GameObject bombPrefab)
     {
         if (bombPrefab == null)
@@ -327,10 +327,10 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Validates generic VFX prefabs used by power-up bake paths.
-    /// authoring: Owning player authoring component.
-    /// optionalPrefab: Prefab candidate.
-    /// returns True when the prefab is not valid for baking.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="optionalPrefab">Prefab candidate.</param>
+    /// <returns>True when the prefab is not valid for baking.</returns>
     public static bool IsInvalidPowerUpPrefab(PlayerAuthoring authoring, GameObject optionalPrefab)
     {
         if (optionalPrefab == null)
@@ -347,9 +347,9 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Converts elemental effect authoring data into runtime-safe values.
-    /// effectData: Source elemental effect definition.
-    /// returns Runtime elemental effect config.
     /// </summary>
+    /// <param name="effectData">Source elemental effect definition.</param>
+    /// <returns>Runtime elemental effect config.</returns>
     public static ElementalEffectConfig BuildElementalEffectConfig(ElementalEffectDefinitionData effectData)
     {
         if (effectData == null)
@@ -385,10 +385,10 @@ public static class PlayerPowerUpBakeSharedUtility
     #region Private Methods
     /// <summary>
     /// Resolves one elemental VFX assignment from the preset list.
-    /// assignments: Source assignment list.
-    /// elementType: Requested element type.
-    /// returns Matching assignment or null.
     /// </summary>
+    /// <param name="assignments">Source assignment list.</param>
+    /// <param name="elementType">Requested element type.</param>
+    /// <returns>Matching assignment or null.</returns>
     private static ElementalVfxByElementData ResolveElementalVfxAssignment(IReadOnlyList<ElementalVfxByElementData> assignments, ElementType elementType)
     {
         if (assignments == null)
@@ -409,12 +409,12 @@ public static class PlayerPowerUpBakeSharedUtility
 
     /// <summary>
     /// Compiles one elemental VFX assignment into runtime-safe data.
-    /// authoring: Owning player authoring component.
-    /// assignment: Source elemental assignment.
-    /// labelPrefix: Label used in validation logs.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Runtime elemental VFX definition.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="assignment">Source elemental assignment.</param>
+    /// <param name="labelPrefix">Label used in validation logs.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Runtime elemental VFX definition.</returns>
     private static ElementalVfxDefinitionConfig BuildElementalVfxDefinitionConfig(PlayerAuthoring authoring,
                                                                                   ElementalVfxByElementData assignment,
                                                                                   string labelPrefix,

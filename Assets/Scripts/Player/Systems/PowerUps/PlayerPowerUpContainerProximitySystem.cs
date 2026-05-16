@@ -6,7 +6,6 @@ using UnityEngine;
 /// <summary>
 /// Resolves the nearest dropped power-up container within interaction range for each player.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpContainerSwapResolveSystem))]
@@ -18,9 +17,8 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
 
     /// <summary>
     /// Registers the runtime components required to track dropped-container proximity.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpContainerInteractionConfig>();
@@ -31,9 +29,8 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
 
     /// <summary>
     /// Updates the nearest dropped container for each player using squared-distance comparisons only.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = math.max(0f, Time.unscaledDeltaTime);

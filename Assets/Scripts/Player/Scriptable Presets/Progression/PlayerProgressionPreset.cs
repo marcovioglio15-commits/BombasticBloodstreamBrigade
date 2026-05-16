@@ -195,7 +195,7 @@ public sealed class PlayerProgressionPreset : ScriptableObject
     /// Returns legacy health data when an old preset still contains migrated base-stat health.
     /// </summary>
     /// <param name="legacyHealth">Resolved legacy health value when available.</param>
-    /// <returns>True when legacy health data exists, otherwise false.<returns>
+    /// <returns>True when legacy health data exists, otherwise false.</returns>
     public bool TryGetLegacyHealth(out float legacyHealth)
     {
         legacyHealth = 0f;

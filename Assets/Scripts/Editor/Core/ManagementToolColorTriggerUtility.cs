@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Centralizes direct right-click opening for management-tool color editing.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ManagementToolColorTriggerUtility
 {
@@ -18,10 +16,9 @@ internal static class ManagementToolColorTriggerUtility
     #region Public Methods
     /// <summary>
     /// Opens the provided action on right mouse down and suppresses competing default UI reactions.
-    /// /params evt Mouse event emitted by the recolorable tool element.
-    /// /params openAction Action that opens the dedicated color inspector.
-    /// /returns None.
     /// </summary>
+    /// <param name="evt">Mouse event emitted by the recolorable tool element.</param>
+    /// <param name="openAction">Action that opens the dedicated color inspector.</param>
     public static void HandleRightMouseDown(MouseDownEvent evt, Action openAction)
     {
         if (evt == null)

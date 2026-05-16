@@ -5,8 +5,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Rebuilds combo runtime data and applies active combo-rank bonuses onto the effective scalable-stat view.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerRuntimeScalingComboApplyUtility
 {
@@ -15,16 +13,15 @@ internal static class PlayerRuntimeScalingComboApplyUtility
     #region Public Methods
     /// <summary>
     /// Rebuilds the mutable combo runtime config and rank thresholds from immutable baselines plus Add Scaling metadata.
-    /// /params baseComboConfig Immutable combo baseline.
-    /// /params runtimeComboConfig Mutable runtime combo config rebuilt in place.
-    /// /params baseComboRanks Immutable combo-rank baseline buffer.
-    /// /params runtimeComboRanks Mutable runtime combo-rank buffer rebuilt in place.
-    /// /params basePassiveUnlocks Immutable combo passive-unlock baseline buffer.
-    /// /params runtimePassiveUnlocks Mutable runtime combo passive-unlock buffer rebuilt in place.
-    /// /params comboScaling Combo scaling metadata baked from Add Scaling rules.
-    /// /params variableContext Current typed scalable-stat context used to evaluate formulas.
-    /// /returns void.
     /// </summary>
+    /// <param name="baseComboConfig">Immutable combo baseline.</param>
+    /// <param name="runtimeComboConfig">Mutable runtime combo config rebuilt in place.</param>
+    /// <param name="baseComboRanks">Immutable combo-rank baseline buffer.</param>
+    /// <param name="runtimeComboRanks">Mutable runtime combo-rank buffer rebuilt in place.</param>
+    /// <param name="basePassiveUnlocks">Immutable combo passive-unlock baseline buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Mutable runtime combo passive-unlock buffer rebuilt in place.</param>
+    /// <param name="comboScaling">Combo scaling metadata baked from Add Scaling rules.</param>
+    /// <param name="variableContext">Current typed scalable-stat context used to evaluate formulas.</param>
     public static void RebuildRuntimeComboCounter(in PlayerBaseComboCounterConfig baseComboConfig,
                                                   ref PlayerRuntimeComboCounterConfig runtimeComboConfig,
                                                   DynamicBuffer<PlayerBaseComboRankElement> baseComboRanks,
@@ -150,10 +147,9 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     /// <summary>
     /// Copies the current scalable-stat buffer into the mutable list that receives temporary combo rank bonuses.
-    /// /params scalableStats Source scalable-stat buffer.
-    /// /params destination Mutable list reused as effective scalable-stat state.
-    /// /returns void.
     /// </summary>
+    /// <param name="scalableStats">Source scalable-stat buffer.</param>
+    /// <param name="destination">Mutable list reused as effective scalable-stat state.</param>
     public static void CopyBaseScalableStats(DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                              List<PlayerScalableStatElement> destination)
     {
@@ -177,13 +173,12 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     /// <summary>
     /// Applies cumulative Character Tuning formulas from every active combo rank onto the effective scalable-stat list.
-    /// /params activeRankIndex Highest currently active combo-rank index, or -1 when no rank is active.
-    /// /params comboValue Current combo value used to resolve progressive next-rank boost weight.
-    /// /params runtimeComboRanks Current runtime combo-rank buffer.
-    /// /params characterTuningFormulas Shared Character Tuning formula buffer.
-    /// /params mutableScalableStats Mutable effective scalable-stat list updated in place.
-    /// /returns void.
     /// </summary>
+    /// <param name="activeRankIndex">Highest currently active combo-rank index, or -1 when no rank is active.</param>
+    /// <param name="comboValue">Current combo value used to resolve progressive next-rank boost weight.</param>
+    /// <param name="runtimeComboRanks">Current runtime combo-rank buffer.</param>
+    /// <param name="characterTuningFormulas">Shared Character Tuning formula buffer.</param>
+    /// <param name="mutableScalableStats">Mutable effective scalable-stat list updated in place.</param>
     public static void ApplyActiveComboRankBonuses(int activeRankIndex,
                                                    int comboValue,
                                                    DynamicBuffer<PlayerRuntimeComboRankElement> runtimeComboRanks,
@@ -248,15 +243,14 @@ internal static class PlayerRuntimeScalingComboApplyUtility
     #region Private Methods
     /// <summary>
     /// Applies one boolean combo scaling result to the runtime combo config.
-    /// /params fieldId Target combo field identifier.
-    /// /params rankIndex Runtime rank index addressed by the scaling metadata.
-    /// /params passiveUnlockIndex Runtime passive unlock index addressed by the scaling metadata.
-    /// /params resolvedBoolean Evaluated boolean value.
-    /// /params runtimeComboConfig Mutable runtime combo config updated in place.
-    /// /params runtimeComboRanks Mutable runtime combo-rank buffer updated in place.
-    /// /params runtimePassiveUnlocks Mutable runtime passive-unlock buffer updated in place.
-    /// /returns void.
     /// </summary>
+    /// <param name="fieldId">Target combo field identifier.</param>
+    /// <param name="rankIndex">Runtime rank index addressed by the scaling metadata.</param>
+    /// <param name="passiveUnlockIndex">Runtime passive unlock index addressed by the scaling metadata.</param>
+    /// <param name="resolvedBoolean">Evaluated boolean value.</param>
+    /// <param name="runtimeComboConfig">Mutable runtime combo config updated in place.</param>
+    /// <param name="runtimeComboRanks">Mutable runtime combo-rank buffer updated in place.</param>
+    /// <param name="runtimePassiveUnlocks">Mutable runtime passive-unlock buffer updated in place.</param>
     private static void ApplyComboBooleanValue(PlayerRuntimeComboCounterFieldId fieldId,
                                                int rankIndex,
                                                int passiveUnlockIndex,
@@ -291,13 +285,12 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     /// <summary>
     /// Applies one numeric combo scaling result to the runtime combo config or one runtime combo rank.
-    /// /params fieldId Target combo field identifier.
-    /// /params rankIndex Runtime rank index addressed by the scaling metadata.
-    /// /params resolvedValue Evaluated numeric value.
-    /// /params runtimeComboConfig Mutable runtime combo config updated in place.
-    /// /params runtimeComboRanks Mutable runtime combo-rank buffer updated in place.
-    /// /returns void.
     /// </summary>
+    /// <param name="fieldId">Target combo field identifier.</param>
+    /// <param name="rankIndex">Runtime rank index addressed by the scaling metadata.</param>
+    /// <param name="resolvedValue">Evaluated numeric value.</param>
+    /// <param name="runtimeComboConfig">Mutable runtime combo config updated in place.</param>
+    /// <param name="runtimeComboRanks">Mutable runtime combo-rank buffer updated in place.</param>
     private static void ApplyComboNumericValue(PlayerRuntimeComboCounterFieldId fieldId,
                                                int rankIndex,
                                                float resolvedValue,
@@ -347,14 +340,13 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     /// <summary>
     /// Applies one token combo scaling result to a runtime passive unlock entry.
-    /// /params fieldId Target combo field identifier.
-    /// /params rankIndex Runtime rank index addressed by the scaling metadata.
-    /// /params passiveUnlockIndex Runtime passive unlock index addressed by the scaling metadata.
-    /// /params resolvedToken Evaluated token value.
-    /// /params runtimeComboRanks Runtime combo-rank buffer used to resolve the nested unlock range.
-    /// /params runtimePassiveUnlocks Mutable runtime passive-unlock buffer updated in place.
-    /// /returns void.
     /// </summary>
+    /// <param name="fieldId">Target combo field identifier.</param>
+    /// <param name="rankIndex">Runtime rank index addressed by the scaling metadata.</param>
+    /// <param name="passiveUnlockIndex">Runtime passive unlock index addressed by the scaling metadata.</param>
+    /// <param name="resolvedToken">Evaluated token value.</param>
+    /// <param name="runtimeComboRanks">Runtime combo-rank buffer used to resolve the nested unlock range.</param>
+    /// <param name="runtimePassiveUnlocks">Mutable runtime passive-unlock buffer updated in place.</param>
     private static void ApplyComboTokenValue(PlayerRuntimeComboCounterFieldId fieldId,
                                              int rankIndex,
                                              int passiveUnlockIndex,
@@ -379,13 +371,13 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     /// <summary>
     /// Resolves one rank-local passive unlock index to its absolute runtime buffer index.
-    /// /params rankIndex Runtime rank index owning the passive unlock.
-    /// /params passiveUnlockIndex Rank-local passive unlock index.
-    /// /params runtimeComboRanks Runtime rank buffer containing unlock ranges.
-    /// /params runtimePassiveUnlocks Runtime passive-unlock buffer addressed by resolved absolute index.
-    /// /params absoluteUnlockIndex Resolved absolute runtime passive-unlock index.
-    /// /returns True when the nested index resolves to a valid passive-unlock element.
     /// </summary>
+    /// <param name="rankIndex">Runtime rank index owning the passive unlock.</param>
+    /// <param name="passiveUnlockIndex">Rank-local passive unlock index.</param>
+    /// <param name="runtimeComboRanks">Runtime rank buffer containing unlock ranges.</param>
+    /// <param name="runtimePassiveUnlocks">Runtime passive-unlock buffer addressed by resolved absolute index.</param>
+    /// <param name="absoluteUnlockIndex">Resolved absolute runtime passive-unlock index.</param>
+    /// <returns>True when the nested index resolves to a valid passive-unlock element.</returns>
     private static bool TryResolvePassiveUnlockAbsoluteIndex(int rankIndex,
                                                              int passiveUnlockIndex,
                                                              DynamicBuffer<PlayerRuntimeComboRankElement> runtimeComboRanks,

@@ -17,12 +17,12 @@ public static class PlayerFormulaFunctionUtility
     #region Public Methods
     /// <summary>
     /// Evaluates one eager built-in formula function after all arguments have already been resolved.
-    /// /params functionName Function identifier as authored in the formula.
-    /// /params argumentValues Ordered resolved argument values.
-    /// /params result Resolved function result when evaluation succeeds.
-    /// /params errorMessage Failure reason when evaluation fails.
-    /// /returns True when the function is supported and evaluation succeeds.
     /// </summary>
+    /// <param name="functionName">Function identifier as authored in the formula.</param>
+    /// <param name="argumentValues">Ordered resolved argument values.</param>
+    /// <param name="result">Resolved function result when evaluation succeeds.</param>
+    /// <param name="errorMessage">Failure reason when evaluation fails.</param>
+    /// <returns>True when the function is supported and evaluation succeeds.</returns>
     public static bool TryEvaluate(string functionName,
                                    IReadOnlyList<PlayerFormulaValue> argumentValues,
                                    out PlayerFormulaValue result,
@@ -241,12 +241,12 @@ public static class PlayerFormulaFunctionUtility
 
     /// <summary>
     /// Infers the output type of one eager built-in formula function from already inferred argument types.
-    /// /params functionName Function identifier as authored in the formula.
-    /// /params argumentTypes Ordered inferred argument types.
-    /// /params resultType Resolved output type when inference succeeds.
-    /// /params errorMessage Failure reason when inference fails.
-    /// /returns True when the function is supported and the type contract is valid.
     /// </summary>
+    /// <param name="functionName">Function identifier as authored in the formula.</param>
+    /// <param name="argumentTypes">Ordered inferred argument types.</param>
+    /// <param name="resultType">Resolved output type when inference succeeds.</param>
+    /// <param name="errorMessage">Failure reason when inference fails.</param>
+    /// <returns>True when the function is supported and the type contract is valid.</returns>
     public static bool TryInferType(string functionName,
                                     IReadOnlyList<PlayerFormulaValueType> argumentTypes,
                                     out PlayerFormulaValueType resultType,

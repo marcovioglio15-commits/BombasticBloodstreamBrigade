@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the general shooting subsection of the Player Controller preset panel.
-/// /params none.
-/// /returns none.
 /// </summary>
 internal static class PlayerControllerPresetsPanelShootingSectionUtility
 {
@@ -16,10 +14,9 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
     #region Public Methods
     /// <summary>
     /// Builds the complete shooting settings section for the selected preset.
-    /// /params panel Owning panel that provides serialized context and callbacks.
-    /// /params section Pre-created section container that receives all controls.
-    /// /returns void.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized context and callbacks.</param>
+    /// <param name="section">Pre-created section container that receives all controls.</param>
     public static void BuildShootingSection(PlayerControllerPresetsPanel panel, VisualElement section)
     {
         if (panel == null || section == null)
@@ -74,10 +71,10 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
     #region Private Methods
     /// <summary>
     /// Builds the standard projectile values foldout.
-    /// /params valuesProperty Serialized shooting values property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing the standard projectile fields.
     /// </summary>
+    /// <param name="valuesProperty">Serialized shooting values property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing the standard projectile fields.</returns>
     private static Foldout BuildValuesFoldout(SerializedProperty valuesProperty, SerializedProperty scalingRulesProperty)
     {
         SerializedProperty shootSpeedProperty = valuesProperty.FindPropertyRelative("shootSpeed");
@@ -113,13 +110,13 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the core projectile tuning subsection.
-    /// /params shootSpeedProperty Serialized projectile speed property.
-    /// /params rateOfFireProperty Serialized fire cadence property.
-    /// /params projectileSizeMultiplierProperty Serialized projectile size multiplier property.
-    /// /params damageProperty Serialized projectile damage property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing the main projectile tuning values.
     /// </summary>
+    /// <param name="shootSpeedProperty">Serialized projectile speed property.</param>
+    /// <param name="rateOfFireProperty">Serialized fire cadence property.</param>
+    /// <param name="projectileSizeMultiplierProperty">Serialized projectile size multiplier property.</param>
+    /// <param name="damageProperty">Serialized projectile damage property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing the main projectile tuning values.</returns>
     private static Foldout BuildProjectileCoreFoldout(SerializedProperty shootSpeedProperty,
                                                       SerializedProperty rateOfFireProperty,
                                                       SerializedProperty projectileSizeMultiplierProperty,
@@ -136,12 +133,12 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the projectile lifetime and area subsection.
-    /// /params explosionRadiusProperty Serialized explosion radius property.
-    /// /params rangeProperty Serialized range property.
-    /// /params lifetimeProperty Serialized lifetime property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing area and lifetime values.
     /// </summary>
+    /// <param name="explosionRadiusProperty">Serialized explosion radius property.</param>
+    /// <param name="rangeProperty">Serialized range property.</param>
+    /// <param name="lifetimeProperty">Serialized lifetime property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing area and lifetime values.</returns>
     private static Foldout BuildLifetimeAndAreaFoldout(SerializedProperty explosionRadiusProperty,
                                                        SerializedProperty rangeProperty,
                                                        SerializedProperty lifetimeProperty,
@@ -156,11 +153,11 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the projectile penetration subsection.
-    /// /params penetrationModeProperty Serialized penetration mode property.
-    /// /params maxPenetrationsProperty Serialized max penetrations property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing penetration-specific controls.
     /// </summary>
+    /// <param name="penetrationModeProperty">Serialized penetration mode property.</param>
+    /// <param name="maxPenetrationsProperty">Serialized max penetrations property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing penetration-specific controls.</returns>
     private static Foldout BuildPenetrationFoldout(SerializedProperty penetrationModeProperty,
                                                    SerializedProperty maxPenetrationsProperty,
                                                    SerializedProperty scalingRulesProperty)
@@ -189,10 +186,10 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the projectile knockback subsection.
-    /// /params knockbackProperty Serialized knockback payload property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing knockback controls and warnings.
     /// </summary>
+    /// <param name="knockbackProperty">Serialized knockback payload property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing knockback controls and warnings.</returns>
     private static Foldout BuildKnockbackFoldout(SerializedProperty knockbackProperty,
                                                  SerializedProperty scalingRulesProperty)
     {
@@ -269,11 +266,11 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the object-pool subsection for projectile spawning.
-    /// /params initialPoolCapacityProperty Serialized initial capacity property.
-    /// /params poolExpandBatchProperty Serialized expand-batch property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing the pool controls.
     /// </summary>
+    /// <param name="initialPoolCapacityProperty">Serialized initial capacity property.</param>
+    /// <param name="poolExpandBatchProperty">Serialized expand-batch property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing the pool controls.</returns>
     private static Foldout BuildObjectPoolFoldout(SerializedProperty initialPoolCapacityProperty,
                                                   SerializedProperty poolExpandBatchProperty,
                                                   SerializedProperty scalingRulesProperty)
@@ -294,11 +291,11 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds the warning text for authored knockback values.
-    /// /params enabledProperty Serialized enabled property.
-    /// /params strengthProperty Serialized strength property.
-    /// /params durationSecondsProperty Serialized duration property.
-    /// /returns Warning text, or an empty string when the authored knockback payload is coherent.
     /// </summary>
+    /// <param name="enabledProperty">Serialized enabled property.</param>
+    /// <param name="strengthProperty">Serialized strength property.</param>
+    /// <param name="durationSecondsProperty">Serialized duration property.</param>
+    /// <returns>Warning text, or an empty string when the authored knockback payload is coherent.</returns>
     private static string BuildKnockbackWarningMessage(SerializedProperty enabledProperty,
                                                        SerializedProperty strengthProperty,
                                                        SerializedProperty durationSecondsProperty)
@@ -314,10 +311,9 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Registers a lightweight refresh callback for one scaling-aware field.
-    /// /params field Existing visual field that emits SerializedPropertyChangeEvent.
-    /// /params refreshAction Refresh callback executed after property changes.
-    /// /returns void.
     /// </summary>
+    /// <param name="field">Existing visual field that emits SerializedPropertyChangeEvent.</param>
+    /// <param name="refreshAction">Refresh callback executed after property changes.</param>
     private static void RegisterRefreshCallback(VisualElement field, System.Action refreshAction)
     {
         if (field == null)
@@ -331,11 +327,10 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Appends one warning line to the warning builder when the condition is true.
-    /// /params warningBuilder Destination warning builder.
-    /// /params condition Condition that triggers the warning.
-    /// /params warningLine Warning text appended when the condition is true.
-    /// /returns void.
     /// </summary>
+    /// <param name="warningBuilder">Destination warning builder.</param>
+    /// <param name="condition">Condition that triggers the warning.</param>
+    /// <param name="warningLine">Warning text appended when the condition is true.</param>
     private static void AppendWarningLine(StringBuilder warningBuilder, bool condition, string warningLine)
     {
         if (!condition)
@@ -349,9 +344,9 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Resolves whether the max penetration field is relevant for the selected penetration mode.
-    /// /params penetrationMode Currently selected projectile penetration behavior.
-    /// /returns True when the mode requires a maximum penetration count.
     /// </summary>
+    /// <param name="penetrationMode">Currently selected projectile penetration behavior.</param>
+    /// <returns>True when the mode requires a maximum penetration count.</returns>
     private static bool ShouldDisplayMaxPenetrationField(ProjectilePenetrationMode penetrationMode)
     {
         switch (penetrationMode)
@@ -366,9 +361,9 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Creates one nested foldout used inside the Shooting Values container.
-    /// /params title Visible foldout title.
-    /// /returns Configured nested foldout.
     /// </summary>
+    /// <param name="title">Visible foldout title.</param>
+    /// <returns>Configured nested foldout.</returns>
     private static Foldout CreateNestedFoldout(string title)
     {
         Foldout foldout = new Foldout();
@@ -380,12 +375,12 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
 
     /// <summary>
     /// Builds one scaling-aware field with an optional tooltip override.
-    /// /params property Serialized property bound to the field.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /params label Display label shown in the tool.
-    /// /params tooltip Optional tooltip shown in the UI.
-    /// /returns Configured VisualElement for the requested property.
     /// </summary>
+    /// <param name="property">Serialized property bound to the field.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <param name="label">Display label shown in the tool.</param>
+    /// <param name="tooltip">Optional tooltip shown in the UI.</param>
+    /// <returns>Configured VisualElement for the requested property.</returns>
     private static VisualElement CreateField(SerializedProperty property,
                                              SerializedProperty scalingRulesProperty,
                                              string label,

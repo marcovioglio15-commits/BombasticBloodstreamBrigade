@@ -16,7 +16,7 @@ public static class HUDMilestoneSelectionNavigationUtility
     /// <param name="isPanelVisible">True when the milestone panel is currently shown.</param>
     /// <param name="interactionLocked">True when a command was already queued and input must be ignored.</param>
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
-    /// <returns>True when custom input should be processed; otherwise false.<returns>
+    /// <returns>True when custom input should be processed; otherwise false.</returns>
     public static bool CanHandleSelectionInput(bool hasRuntimeContext,
                                                bool isPanelVisible,
                                                bool interactionLocked,
@@ -42,7 +42,7 @@ public static class HUDMilestoneSelectionNavigationUtility
     /// </summary>
     /// <param name="selectedOfferIndex">Current selected offer index cached by the HUD section.</param>
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
-    /// <returns>Valid selected offer index, or -1 when no offers are available.<returns>
+    /// <returns>Valid selected offer index, or -1 when no offers are available.</returns>
     public static int NormalizeSelectedOfferIndex(int selectedOfferIndex, int activeOfferCount)
     {
         if (activeOfferCount <= 0)
@@ -61,7 +61,7 @@ public static class HUDMilestoneSelectionNavigationUtility
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
     /// <param name="navigationStep">Discrete navigation step resolved from the current input value.</param>
     /// <param name="wrapNavigation">True to loop from end to start and vice versa.</param>
-    /// <returns>Next selected offer index after the requested navigation step.<returns>
+    /// <returns>Next selected offer index after the requested navigation step.</returns>
     public static int MoveSelection(int selectedOfferIndex,
                                     int activeOfferCount,
                                     int navigationStep,
@@ -91,7 +91,7 @@ public static class HUDMilestoneSelectionNavigationUtility
     /// </summary>
     /// <param name="navigateValue">Navigate action value read from the New Input System.</param>
     /// <param name="deadzone">Minimum axis magnitude required before a navigation step is accepted.</param>
-    /// <returns>-1 for previous, 1 for next, or 0 when the input should be ignored.<returns>
+    /// <returns>-1 for previous, 1 for next, or 0 when the input should be ignored.</returns>
     public static int ResolveNavigationStep(Vector2 navigateValue, float deadzone)
     {
         float absoluteX = Mathf.Abs(navigateValue.x);
@@ -113,7 +113,7 @@ public static class HUDMilestoneSelectionNavigationUtility
     /// <param name="optionView">Card view searched inside the discovered collection.</param>
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
     /// <param name="optionIndex">Resolved display-order index when found.</param>
-    /// <returns>True when the card view belongs to the current panel and maps to a valid offer; otherwise false.<returns>
+    /// <returns>True when the card view belongs to the current panel and maps to a valid offer; otherwise false.</returns>
     public static bool TryGetOptionViewIndex(IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews,
                                              MilestonePowerUpSelectionOptionView optionView,
                                              int activeOfferCount,

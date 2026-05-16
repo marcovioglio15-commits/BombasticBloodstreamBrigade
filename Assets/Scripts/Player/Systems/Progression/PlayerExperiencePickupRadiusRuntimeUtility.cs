@@ -25,7 +25,7 @@ internal static class PlayerExperiencePickupRadiusRuntimeUtility
     /// <param name="progressionConfig">Runtime progression config containing pickup radius metadata.</param>
     /// <param name="scalableStats">Current scalable-stat buffer used as formula variables.</param>
     /// <param name="fallbackValue">Fallback value returned when progression config is unavailable.</param>
-    /// <returns>Resolved non-negative pickup radius.<returns>
+    /// <returns>Resolved non-negative pickup radius.</returns>
     public static float ResolveCurrentPickupRadius(PlayerProgressionConfig progressionConfig,
                                                    DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                                    float fallbackValue)
@@ -64,7 +64,7 @@ internal static class PlayerExperiencePickupRadiusRuntimeUtility
     /// <param name="progressionConfig">Runtime progression config containing pickup radius metadata.</param>
     /// <param name="scalableStats">Managed scalable-stat list used as formula variables.</param>
     /// <param name="fallbackValue">Fallback value returned when progression config is unavailable.</param>
-    /// <returns>Resolved non-negative pickup radius.<returns>
+    /// <returns>Resolved non-negative pickup radius.</returns>
     public static float ResolveCurrentPickupRadius(PlayerProgressionConfig progressionConfig,
                                                    IReadOnlyList<PlayerScalableStatElement> scalableStats,
                                                    float fallbackValue)
@@ -103,7 +103,7 @@ internal static class PlayerExperiencePickupRadiusRuntimeUtility
     /// <param name="experienceCollection">Mutable runtime collection component.</param>
     /// <param name="progressionConfig">Runtime progression config containing pickup radius metadata.</param>
     /// <param name="scalableStats">Current scalable-stat buffer used as formula variables.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public static void SyncRuntimeComponent(ref PlayerExperienceCollection experienceCollection,
                                             PlayerProgressionConfig progressionConfig,
                                             DynamicBuffer<PlayerScalableStatElement> scalableStats)
@@ -127,7 +127,7 @@ internal static class PlayerExperiencePickupRadiusRuntimeUtility
     /// <param name="experienceCollection">Mutable runtime collection component.</param>
     /// <param name="progressionConfig">Runtime progression config containing pickup radius metadata.</param>
     /// <param name="scalableStats">Managed scalable-stat list used as formula variables.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public static void SyncRuntimeComponent(ref PlayerExperienceCollection experienceCollection,
                                             PlayerProgressionConfig progressionConfig,
                                             IReadOnlyList<PlayerScalableStatElement> scalableStats)

@@ -9,8 +9,6 @@ using UnityEditor;
 
 /// <summary>
 /// Drives one HUD fill image with optional liquid-shader properties and syringe-plunger motion.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class HUDLiquidBarRuntime
 {
@@ -68,10 +66,10 @@ internal sealed class HUDLiquidBarRuntime
     #region Public Methods
     /// <summary>
     /// Builds one runtime driver configured for the health bar defaults.
-    /// /params fillImage Health fill image driven by the HUD.
-    /// /params settings Presentation settings authored on the HUD manager.
-    /// /returns Runtime liquid-bar driver, or null when the fill image is missing.
     /// </summary>
+    /// <param name="fillImage">Health fill image driven by the HUD.</param>
+    /// <param name="settings">Presentation settings authored on the HUD manager.</param>
+    /// <returns>Runtime liquid-bar driver, or null when the fill image is missing.</returns>
     public static HUDLiquidBarRuntime CreateHealth(Image fillImage, HUDLiquidBarPresentationSettings settings)
     {
         if (fillImage == null)
@@ -82,10 +80,10 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Builds one runtime driver configured for the shield bar defaults.
-    /// /params fillImage Shield fill image driven by the HUD.
-    /// /params settings Presentation settings authored on the HUD manager.
-    /// /returns Runtime liquid-bar driver, or null when the fill image is missing.
     /// </summary>
+    /// <param name="fillImage">Shield fill image driven by the HUD.</param>
+    /// <param name="settings">Presentation settings authored on the HUD manager.</param>
+    /// <returns>Runtime liquid-bar driver, or null when the fill image is missing.</returns>
     public static HUDLiquidBarRuntime CreateShield(Image fillImage, HUDLiquidBarPresentationSettings settings)
     {
         if (fillImage == null)
@@ -96,10 +94,10 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Builds one runtime driver configured for the experience bar defaults.
-    /// /params fillImage Experience fill image driven by the HUD.
-    /// /params settings Presentation settings authored on the HUD manager.
-    /// /returns Runtime liquid-bar driver, or null when the fill image is missing.
     /// </summary>
+    /// <param name="fillImage">Experience fill image driven by the HUD.</param>
+    /// <param name="settings">Presentation settings authored on the HUD manager.</param>
+    /// <returns>Runtime liquid-bar driver, or null when the fill image is missing.</returns>
     public static HUDLiquidBarRuntime CreateExperience(Image fillImage, HUDLiquidBarPresentationSettings settings)
     {
         if (fillImage == null)
@@ -110,9 +108,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Applies the first visible state used before gameplay data is available.
-    /// /params normalizedValue Initial normalized fill value.
-    /// /returns void.
     /// </summary>
+    /// <param name="normalizedValue">Initial normalized fill value.</param>
     public void ApplyInitialVisualState(float normalizedValue)
     {
         Apply(normalizedValue, normalizedValue);
@@ -120,10 +117,9 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Applies one displayed fill value plus the raw target used to drive motion pulses.
-    /// /params displayedNormalizedValue Smoothed normalized value shown by the HUD this frame.
-    /// /params targetNormalizedValue Raw normalized target read from ECS.
-    /// /returns void.
     /// </summary>
+    /// <param name="displayedNormalizedValue">Smoothed normalized value shown by the HUD this frame.</param>
+    /// <param name="targetNormalizedValue">Raw normalized target read from ECS.</param>
     public void Apply(float displayedNormalizedValue, float targetNormalizedValue)
     {
         if (fillImage == null)
@@ -141,10 +137,9 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Applies the missing-player state while preserving the last displayed value when requested.
-    /// /params hideWhenMissing When true the bar and plunger are fully hidden.
-    /// /params displayedNormalizedValue Last displayed normalized value kept when the bar remains visible.
-    /// /returns void.
     /// </summary>
+    /// <param name="hideWhenMissing">When true the bar and plunger are fully hidden.</param>
+    /// <param name="displayedNormalizedValue">Last displayed normalized value kept when the bar remains visible.</param>
     public void HandleMissing(bool hideWhenMissing, float displayedNormalizedValue)
     {
         if (fillImage == null)
@@ -163,8 +158,6 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Releases runtime-created materials and restores the original graphic material binding.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Dispose()
     {
@@ -187,8 +180,6 @@ internal sealed class HUDLiquidBarRuntime
     #if UNITY_EDITOR
     /// <summary>
     /// Ensures the liquid-bar material reference asset exists as soon as editor assemblies reload.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [InitializeOnLoadMethod]
     private static void InitializeEditorReferenceAsset()
@@ -200,11 +191,10 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Builds one runtime liquid-bar driver.
-    /// /params fillImageValue Fill image driven by this runtime helper.
-    /// /params settingsValue Presentation settings authored on the HUD manager.
-    /// /params defaultMaterialResourcePathValue Resources path used when no explicit material template is assigned.
-    /// /returns None.
     /// </summary>
+    /// <param name="fillImageValue">Fill image driven by this runtime helper.</param>
+    /// <param name="settingsValue">Presentation settings authored on the HUD manager.</param>
+    /// <param name="defaultMaterialResourcePathValue">Resources path used when no explicit material template is assigned.</param>
     private HUDLiquidBarRuntime(Image fillImageValue,
                                 HUDLiquidBarPresentationSettings settingsValue,
                                 string defaultMaterialResourcePathValue)
@@ -221,8 +211,6 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Creates one runtime material clone when the liquid shader is enabled for this bar.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void CreateRuntimeMaterialIfNeeded()
     {
@@ -242,9 +230,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Resolves the material template that should be cloned for this bar.
-    /// /params None.
-    /// /returns Material template to clone, or null when no compatible material is available.
     /// </summary>
+    /// <returns>Material template to clone, or null when no compatible material is available.</returns>
     private Material ResolveTemplateMaterial()
     {
         if (settings != null && SupportsRuntimeProperties(settings.LiquidMaterialTemplate))
@@ -258,9 +245,9 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Resolves one referenced default material template and caches the reference asset for subsequent HUD instances.
-    /// /params materialAssetName Stable material asset name requested by the runtime.
-    /// /returns Resolved default material template, or null when not found.
     /// </summary>
+    /// <param name="materialAssetName">Stable material asset name requested by the runtime.</param>
+    /// <returns>Resolved default material template, or null when not found.</returns>
     private static Material ResolveReferencedMaterial(string materialAssetName)
     {
         HUDLiquidBarMaterialReference referenceAsset = ResolveReferenceAsset();
@@ -283,9 +270,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Resolves the Resources-backed material reference asset used by the liquid HUD bars.
-    /// /params None.
-    /// /returns Material reference asset, or null when it cannot be found.
     /// </summary>
+    /// <returns>Material reference asset, or null when it cannot be found.</returns>
     private static HUDLiquidBarMaterialReference ResolveReferenceAsset()
     {
         if (cachedReferenceAsset != null)
@@ -301,10 +287,10 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Resolves the plunger RectTransform from authored settings or from the bar root hierarchy.
-    /// /params fillImageValue Fill image whose parent owns the pointer children.
-    /// /params settingsValue Presentation settings authored on the HUD manager.
-    /// /returns Resolved plunger RectTransform, or null when no pointer should be driven.
     /// </summary>
+    /// <param name="fillImageValue">Fill image whose parent owns the pointer children.</param>
+    /// <param name="settingsValue">Presentation settings authored on the HUD manager.</param>
+    /// <returns>Resolved plunger RectTransform, or null when no pointer should be driven.</returns>
     private static RectTransform ResolvePointerRoot(Image fillImageValue, HUDLiquidBarPresentationSettings settingsValue)
     {
         if (settingsValue == null || !settingsValue.EnablePiston)
@@ -341,9 +327,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Updates the transient liquid slosh state from the latest raw target value.
-    /// /params targetNormalizedValue Raw normalized target read from ECS.
-    /// /returns void.
     /// </summary>
+    /// <param name="targetNormalizedValue">Raw normalized target read from ECS.</param>
     private void UpdateValueDeltaMotion(float targetNormalizedValue)
     {
         if (settings == null || !settings.EnableValueDeltaMotion)
@@ -380,9 +365,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Applies the normalized fill to the UI Image while skipping redundant writes.
-    /// /params normalizedValue Displayed normalized fill value.
-    /// /returns void.
     /// </summary>
+    /// <param name="normalizedValue">Displayed normalized fill value.</param>
     private void ApplyFill(float normalizedValue)
     {
         if (fillImage == null)
@@ -399,9 +383,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Updates the optional plunger position so it tracks the visible fill edge.
-    /// /params normalizedValue Displayed normalized fill value.
-    /// /returns void.
     /// </summary>
+    /// <param name="normalizedValue">Displayed normalized fill value.</param>
     private void UpdatePointerPosition(float normalizedValue)
     {
         if (pointerRoot == null || fillRectTransform == null)
@@ -427,9 +410,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Applies the runtime shader properties used by the liquid material.
-    /// /params normalizedValue Displayed normalized fill value.
-    /// /returns void.
     /// </summary>
+    /// <param name="normalizedValue">Displayed normalized fill value.</param>
     private void ApplyShaderProperties(float normalizedValue)
     {
         if (runtimeMaterial == null)
@@ -456,9 +438,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Shows or hides the bar fill and the optional plunger only when the state changes.
-    /// /params isVisible Target visibility for the runtime bar.
-    /// /returns void.
     /// </summary>
+    /// <param name="isVisible">Target visibility for the runtime bar.</param>
     private void SetVisible(bool isVisible)
     {
         if (fillImage != null && fillImage.enabled != isVisible)
@@ -477,9 +458,9 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Returns whether one material already exposes the runtime properties required by the liquid HUD bar shader.
-    /// /params materialValue Material inspected by the runtime.
-    /// /returns True when the material already matches the HUD liquid-bar property layout.
     /// </summary>
+    /// <param name="materialValue">Material inspected by the runtime.</param>
+    /// <returns>True when the material already matches the HUD liquid-bar property layout.</returns>
     private static bool SupportsRuntimeProperties(Material materialValue)
     {
         if (materialValue == null)
@@ -497,8 +478,6 @@ internal sealed class HUDLiquidBarRuntime
     #if UNITY_EDITOR
     /// <summary>
     /// Ensures the Resources reference asset exists and points at the current liquid-bar materials even after project folder reordering.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureReferenceAssetExists()
     {
@@ -565,9 +544,9 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Finds one material asset by its stable filename.
-    /// /params materialAssetName Filename without extension.
-    /// /returns Resolved material asset, or null when not found.
     /// </summary>
+    /// <param name="materialAssetName">Filename without extension.</param>
+    /// <returns>Resolved material asset, or null when not found.</returns>
     private static Material FindMaterialByName(string materialAssetName)
     {
         string[] assetGuids = AssetDatabase.FindAssets(string.Format("{0} t:Material", materialAssetName));
@@ -590,9 +569,8 @@ internal sealed class HUDLiquidBarRuntime
 
     /// <summary>
     /// Ensures one AssetDatabase folder path exists before creating the material reference asset.
-    /// /params folderPath Folder path that should exist.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Folder path that should exist.</param>
     private static void EnsureFolderExists(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))

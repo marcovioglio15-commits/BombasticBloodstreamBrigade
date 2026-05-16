@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Pushes ECS fade presentation state into the authored full-screen fade canvas view.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class GameSceneFadePresentationSystem : SystemBase
@@ -23,8 +21,6 @@ public partial class GameSceneFadePresentationSystem : SystemBase
     #region Lifecycle
     /// <summary>
     /// Creates the singleton query used to read fade presentation state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnCreate()
     {
@@ -33,8 +29,6 @@ public partial class GameSceneFadePresentationSystem : SystemBase
 
     /// <summary>
     /// Applies changed fade state to the active fade canvas view.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnUpdate()
     {

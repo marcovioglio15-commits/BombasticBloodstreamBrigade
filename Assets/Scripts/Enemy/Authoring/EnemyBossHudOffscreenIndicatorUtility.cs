@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Handles offscreen boss indicator reference recovery, configuration, projection, and visibility.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossHudOffscreenIndicatorUtility
 {
@@ -20,13 +18,12 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
     #region Public Methods
     /// <summary>
     /// Resolves missing offscreen-indicator references from the presenter hierarchy.
-    /// /params ownerTransform Transform that owns the boss HUD presenter.
-    /// /params offscreenIndicatorRoot Root RectTransform moved along the screen edge.
-    /// /params offscreenIndicatorImage Image used as the directional indicator.
-    /// /params indicatorParentRect Cached parent RectTransform used as coordinate space.
-    /// /params rootCanvas Cached canvas that owns the presenter.
-    /// /returns void.
     /// </summary>
+    /// <param name="ownerTransform">Transform that owns the boss HUD presenter.</param>
+    /// <param name="offscreenIndicatorRoot">Root RectTransform moved along the screen edge.</param>
+    /// <param name="offscreenIndicatorImage">Image used as the directional indicator.</param>
+    /// <param name="indicatorParentRect">Cached parent RectTransform used as coordinate space.</param>
+    /// <param name="rootCanvas">Cached canvas that owns the presenter.</param>
     public static void ResolveReferences(Transform ownerTransform,
                                          ref RectTransform offscreenIndicatorRoot,
                                          ref Image offscreenIndicatorImage,
@@ -48,14 +45,13 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Applies sprite, tint, and dimensions for the offscreen indicator.
-    /// /params entityManager Entity manager used to read optional managed indicator sprite data.
-    /// /params bossEntity Active boss entity that supplies managed visual config.
-    /// /params offscreenIndicatorRoot Indicator RectTransform sized in screen pixels.
-    /// /params offscreenIndicatorImage Image receiving sprite and tint data.
-    /// /params indicatorColor Color resolved from the boss visual preset.
-    /// /params sizePixels Square indicator size in screen pixels.
-    /// /returns void.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read optional managed indicator sprite data.</param>
+    /// <param name="bossEntity">Active boss entity that supplies managed visual config.</param>
+    /// <param name="offscreenIndicatorRoot">Indicator RectTransform sized in screen pixels.</param>
+    /// <param name="offscreenIndicatorImage">Image receiving sprite and tint data.</param>
+    /// <param name="indicatorColor">Color resolved from the boss visual preset.</param>
+    /// <param name="sizePixels">Square indicator size in screen pixels.</param>
     public static void ApplyConfig(EntityManager entityManager,
                                    Entity bossEntity,
                                    RectTransform offscreenIndicatorRoot,
@@ -83,17 +79,16 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Updates offscreen indicator placement and visibility for the selected primary boss.
-    /// /params entityManager Entity manager used to read the boss transform.
-    /// /params bossEntity Active boss entity tracked by the indicator.
-    /// /params hudConfig Baked HUD config containing edge padding and size.
-    /// /params targetCamera Optional camera configured on the presenter.
-    /// /params offscreenIndicatorRoot Indicator root to move and rotate.
-    /// /params cachedCamera Cached projection camera reused across frames.
-    /// /params nextCameraResolveTime Next unscaled time at which fallback camera lookup may run.
-    /// /params indicatorParentRect Cached parent RectTransform used as coordinate space.
-    /// /params rootCanvas Cached canvas that owns the presenter.
-    /// /returns void.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read the boss transform.</param>
+    /// <param name="bossEntity">Active boss entity tracked by the indicator.</param>
+    /// <param name="hudConfig">Baked HUD config containing edge padding and size.</param>
+    /// <param name="targetCamera">Optional camera configured on the presenter.</param>
+    /// <param name="offscreenIndicatorRoot">Indicator root to move and rotate.</param>
+    /// <param name="cachedCamera">Cached projection camera reused across frames.</param>
+    /// <param name="nextCameraResolveTime">Next unscaled time at which fallback camera lookup may run.</param>
+    /// <param name="indicatorParentRect">Cached parent RectTransform used as coordinate space.</param>
+    /// <param name="rootCanvas">Cached canvas that owns the presenter.</param>
     public static void Sync(EntityManager entityManager,
                             Entity bossEntity,
                             in EnemyBossHudConfig hudConfig,
@@ -149,10 +144,9 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Toggles the offscreen indicator root only when its active state changes.
-    /// /params offscreenIndicatorRoot Indicator root to toggle.
-    /// /params visible Desired indicator visibility.
-    /// /returns void.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root to toggle.</param>
+    /// <param name="visible">Desired indicator visibility.</param>
     public static void SetVisible(RectTransform offscreenIndicatorRoot, bool visible)
     {
         if (offscreenIndicatorRoot == null)
@@ -170,11 +164,10 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
     #region Private Methods
     /// <summary>
     /// Applies square dimensions to the offscreen indicator root and image rect only when needed.
-    /// /params offscreenIndicatorRoot Indicator root receiving the square size.
-    /// /params offscreenIndicatorImage Indicator image receiving the same square size.
-    /// /params sizePixels Requested square indicator size in pixels.
-    /// /returns void.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root receiving the square size.</param>
+    /// <param name="offscreenIndicatorImage">Indicator image receiving the same square size.</param>
+    /// <param name="sizePixels">Requested square indicator size in pixels.</param>
     private static void ApplySize(RectTransform offscreenIndicatorRoot, Image offscreenIndicatorImage, float sizePixels)
     {
         float resolvedSize = Mathf.Max(1f, sizePixels);
@@ -202,12 +195,12 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Resolves a camera for boss projection without calling Camera.main every frame.
-    /// /params currentTime Current unscaled time used to throttle camera lookup.
-    /// /params targetCamera Optional explicitly configured projection camera.
-    /// /params cachedCamera Cached fallback camera reused between lookups.
-    /// /params nextCameraResolveTime Next unscaled time at which fallback camera lookup may run.
-    /// /returns Active projection camera, or null when unavailable.
     /// </summary>
+    /// <param name="currentTime">Current unscaled time used to throttle camera lookup.</param>
+    /// <param name="targetCamera">Optional explicitly configured projection camera.</param>
+    /// <param name="cachedCamera">Cached fallback camera reused between lookups.</param>
+    /// <param name="nextCameraResolveTime">Next unscaled time at which fallback camera lookup may run.</param>
+    /// <returns>Active projection camera, or null when unavailable.</returns>
     private static Camera ResolveCamera(float currentTime,
                                         Camera targetCamera,
                                         ref Camera cachedCamera,
@@ -246,13 +239,13 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Applies the screen-edge position in the correct coordinate space for overlay, camera-space and world-space canvases.
-    /// /params offscreenIndicatorRoot Indicator root receiving the resolved position.
-    /// /params screenPosition Screen-space indicator position in pixels.
-    /// /params projectionCamera Camera used to project the boss into viewport space.
-    /// /params indicatorParentRect Cached parent RectTransform used as coordinate space.
-    /// /params rootCanvas Cached canvas that owns the presenter.
-    /// /returns True when the indicator position could be applied.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root receiving the resolved position.</param>
+    /// <param name="screenPosition">Screen-space indicator position in pixels.</param>
+    /// <param name="projectionCamera">Camera used to project the boss into viewport space.</param>
+    /// <param name="indicatorParentRect">Cached parent RectTransform used as coordinate space.</param>
+    /// <param name="rootCanvas">Cached canvas that owns the presenter.</param>
+    /// <returns>True when the indicator position could be applied.</returns>
     private static bool TryApplyPosition(RectTransform offscreenIndicatorRoot,
                                          Vector2 screenPosition,
                                          Camera projectionCamera,
@@ -278,11 +271,11 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Converts a parent-local screen point into the anchored position expected by the indicator RectTransform.
-    /// /params offscreenIndicatorRoot Indicator root whose anchors define the reference point.
-    /// /params parentRect Parent rect used as the coordinate frame.
-    /// /params localPoint Local point returned by RectTransformUtility.
-    /// /returns Anchored position corrected for the indicator anchor reference.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root whose anchors define the reference point.</param>
+    /// <param name="parentRect">Parent rect used as the coordinate frame.</param>
+    /// <param name="localPoint">Local point returned by RectTransformUtility.</param>
+    /// <returns>Anchored position corrected for the indicator anchor reference.</returns>
     private static Vector2 ResolveAnchoredPosition(RectTransform offscreenIndicatorRoot,
                                                    RectTransform parentRect,
                                                    Vector2 localPoint)
@@ -295,10 +288,10 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Resolves and caches the parent RectTransform used as the indicator coordinate space.
-    /// /params offscreenIndicatorRoot Indicator root whose parent is inspected.
-    /// /params indicatorParentRect Cached parent RectTransform used as coordinate space.
-    /// /returns Parent RectTransform when available.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root whose parent is inspected.</param>
+    /// <param name="indicatorParentRect">Cached parent RectTransform used as coordinate space.</param>
+    /// <returns>Parent RectTransform when available.</returns>
     private static RectTransform ResolveParentRect(RectTransform offscreenIndicatorRoot,
                                                    ref RectTransform indicatorParentRect)
     {
@@ -314,11 +307,11 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Resolves the event camera required by RectTransformUtility for the active canvas render mode.
-    /// /params projectionCamera Camera used as a fallback when the canvas has no explicit world camera.
-    /// /params offscreenIndicatorRoot Indicator root used to recover the owning canvas when needed.
-    /// /params rootCanvas Cached canvas that owns the presenter.
-    /// /returns Null for overlay canvas, otherwise the canvas world camera or projection fallback.
     /// </summary>
+    /// <param name="projectionCamera">Camera used as a fallback when the canvas has no explicit world camera.</param>
+    /// <param name="offscreenIndicatorRoot">Indicator root used to recover the owning canvas when needed.</param>
+    /// <param name="rootCanvas">Cached canvas that owns the presenter.</param>
+    /// <returns>Null for overlay canvas, otherwise the canvas world camera or projection fallback.</returns>
     private static Camera ResolveCanvasEventCamera(Camera projectionCamera,
                                                    RectTransform offscreenIndicatorRoot,
                                                    ref Canvas rootCanvas)
@@ -345,10 +338,10 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Resolves and caches the root canvas that owns the boss HUD presentation.
-    /// /params offscreenIndicatorRoot Indicator root used to recover the owning canvas.
-    /// /params rootCanvas Cached canvas that owns the presenter.
-    /// /returns Canvas owning the presenter, or null when unavailable.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root used to recover the owning canvas.</param>
+    /// <param name="rootCanvas">Cached canvas that owns the presenter.</param>
+    /// <returns>Canvas owning the presenter, or null when unavailable.</returns>
     private static Canvas ResolveRootCanvas(RectTransform offscreenIndicatorRoot, ref Canvas rootCanvas)
     {
         if (rootCanvas != null)
@@ -363,10 +356,9 @@ internal static class EnemyBossHudOffscreenIndicatorUtility
 
     /// <summary>
     /// Rotates the offscreen indicator toward the clamped edge direction.
-    /// /params offscreenIndicatorRoot Indicator root receiving the rotation.
-    /// /params edgePosition Current indicator screen position.
-    /// /returns void.
     /// </summary>
+    /// <param name="offscreenIndicatorRoot">Indicator root receiving the rotation.</param>
+    /// <param name="edgePosition">Current indicator screen position.</param>
     private static void ApplyRotation(RectTransform offscreenIndicatorRoot, Vector2 edgePosition)
     {
         Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);

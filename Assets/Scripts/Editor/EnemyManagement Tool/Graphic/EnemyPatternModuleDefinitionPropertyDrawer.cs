@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyPatternModuleDefinition.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyPatternModuleDefinition))]
 public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
@@ -17,9 +15,9 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Creates the module definition editor UI with catalog-aware kind filtering and context-sensitive payload visibility.
-    /// /params property Serialized module definition property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized module definition property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -75,11 +73,10 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Builds the module-kind field, switching to a filtered popup when the definition belongs to a shared catalog subsection.
-    /// /params root Root element that receives the field.
-    /// /params property Serialized module-definition property.
-    /// /params moduleKindProperty Serialized module-kind property.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Root element that receives the field.</param>
+    /// <param name="property">Serialized module-definition property.</param>
+    /// <param name="moduleKindProperty">Serialized module-kind property.</param>
     private static void BuildModuleKindField(VisualElement root,
                                              SerializedProperty property,
                                              SerializedProperty moduleKindProperty)
@@ -131,13 +128,12 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Refreshes module info and payload editor according to the selected module kind.
-    /// /params moduleKindProperty Module kind enum property.
-    /// /params payloadDataProperty Payload root property.
-    /// /params moduleInfoBox Info box UI element.
-    /// /params payloadContainer Payload host container.
-    /// /params editorMode Payload visibility mode for the current authoring context.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleKindProperty">Module kind enum property.</param>
+    /// <param name="payloadDataProperty">Payload root property.</param>
+    /// <param name="moduleInfoBox">Info box UI element.</param>
+    /// <param name="payloadContainer">Payload host container.</param>
+    /// <param name="editorMode">Payload visibility mode for the current authoring context.</param>
     private static void RefreshModuleUi(SerializedProperty moduleKindProperty,
                                         SerializedProperty payloadDataProperty,
                                         HelpBox moduleInfoBox,
@@ -152,9 +148,9 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves the payload editor mode implied by the current module-definition property.
-    /// /params property Serialized module-definition property.
-    /// /returns The resolved payload editor mode.
     /// </summary>
+    /// <param name="property">Serialized module-definition property.</param>
+    /// <returns>The resolved payload editor mode.</returns>
     private static EnemyAdvancedPatternPayloadEditorMode ResolveEditorMode(SerializedProperty property)
     {
         if (EnemyAdvancedPatternDrawerUtility.TryResolveContainingCatalogSection(property, out EnemyPatternModuleCatalogSection catalogSection))
@@ -174,9 +170,9 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Builds the list of legal module kinds for one shared catalog section.
-    /// /params catalogSection Target shared catalog section.
-    /// /returns The ordered list of selectable module kinds.
     /// </summary>
+    /// <param name="catalogSection">Target shared catalog section.</param>
+    /// <returns>The ordered list of selectable module kinds.</returns>
     private static List<EnemyPatternModuleKind> BuildCatalogChoices(EnemyPatternModuleCatalogSection catalogSection)
     {
         List<EnemyPatternModuleKind> choices = new List<EnemyPatternModuleKind>();
@@ -209,9 +205,9 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves the tooltip shown by the catalog-aware module-kind popup.
-    /// /params catalogSection Target shared catalog section.
-    /// /returns Tooltip text for the popup.
     /// </summary>
+    /// <param name="catalogSection">Target shared catalog section.</param>
+    /// <returns>Tooltip text for the popup.</returns>
     private static string ResolveCatalogTooltip(EnemyPatternModuleCatalogSection catalogSection)
     {
         switch (catalogSection)
@@ -232,10 +228,10 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves a short description for the selected module kind.
-    /// /params moduleKind Module kind value.
-    /// /params editorMode Payload visibility mode for the current authoring context.
-    /// /returns Human-readable module kind description.
     /// </summary>
+    /// <param name="moduleKind">Module kind value.</param>
+    /// <param name="editorMode">Payload visibility mode for the current authoring context.</param>
+    /// <returns>Human-readable module kind description.</returns>
     private static string ResolveModuleKindDescription(EnemyPatternModuleKind moduleKind, EnemyAdvancedPatternPayloadEditorMode editorMode)
     {
         switch (moduleKind)

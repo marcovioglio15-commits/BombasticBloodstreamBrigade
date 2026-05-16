@@ -1,7 +1,5 @@
 /// <summary>
 /// Stable identifiers used by ECS gameplay systems to request authored game audio events.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameAudioEventId : byte
 {

@@ -16,7 +16,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// </summary>
     /// <param name="formula">Raw expression string.</param>
     /// <param name="requireAtLeastOneVariable">True when formulas without [this] or named variables must be rejected.</param>
-    /// <returns>Compilation result containing either a compiled formula or a failure reason.<returns>
+    /// <returns>Compilation result containing either a compiled formula or a failure reason.</returns>
     internal static PlayerStatFormulaCompileResult Compile(string formula, bool requireAtLeastOneVariable)
     {
         if (string.IsNullOrWhiteSpace(formula))
@@ -52,7 +52,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="formula">Source expression string.</param>
     /// <param name="tokens">Produced token list.</param>
     /// <param name="errorMessage">Failure reason when tokenization fails.</param>
-    /// <returns>True when tokenization succeeds.<returns>
+    /// <returns>True when tokenization succeeds.</returns>
     private static bool Tokenize(string formula,
                                  out List<PlayerStatFormulaToken> tokens,
                                  out string errorMessage)
@@ -135,7 +135,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="index">Current lexer index, advanced after the token.</param>
     /// <param name="tokens">Destination token list.</param>
     /// <param name="errorMessage">Failure reason when tokenization fails.</param>
-    /// <returns>True when the variable token is valid.<returns>
+    /// <returns>True when the variable token is valid.</returns>
     private static bool TryReadVariableToken(string formula,
                                              ref int index,
                                              List<PlayerStatFormulaToken> tokens,
@@ -175,7 +175,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="index">Current lexer index, advanced after the token.</param>
     /// <param name="tokens">Destination token list.</param>
     /// <param name="errorMessage">Failure reason when tokenization fails.</param>
-    /// <returns>True when the string literal is valid.<returns>
+    /// <returns>True when the string literal is valid.</returns>
     private static bool TryReadStringLiteralToken(string formula,
                                                   ref int index,
                                                   List<PlayerStatFormulaToken> tokens,
@@ -252,7 +252,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="formula">Source expression string.</param>
     /// <param name="index">Current lexer index, advanced after the token.</param>
     /// <param name="tokens">Destination token list.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     private static void TryReadIdentifierToken(string formula, ref int index, List<PlayerStatFormulaToken> tokens)
     {
         int startIndex = index;
@@ -295,7 +295,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="formula">Source expression string.</param>
     /// <param name="index">Current lexer index, advanced after the token.</param>
     /// <param name="tokens">Destination token list.</param>
-    /// <returns>True when a token was read from the current position.<returns>
+    /// <returns>True when a token was read from the current position.</returns>
     private static bool TryReadOperatorOrPunctuationToken(string formula,
                                                           ref int index,
                                                           List<PlayerStatFormulaToken> tokens)
@@ -392,7 +392,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// </summary>
     /// <param name="formula">Source expression string.</param>
     /// <param name="index">Character index being inspected.</param>
-    /// <returns>True when the current position starts a number literal.<returns>
+    /// <returns>True when the current position starts a number literal.</returns>
     private static bool IsNumberStart(string formula, int index)
     {
         if (index < 0 || index >= formula.Length)
@@ -418,7 +418,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// <param name="formula">Source expression string.</param>
     /// <param name="index">Current lexer index, advanced after the token.</param>
     /// <param name="numberValue">Parsed numeric value.</param>
-    /// <returns>True when the literal is valid.<returns>
+    /// <returns>True when the literal is valid.</returns>
     private static bool TryReadNumberToken(string formula, ref int index, out float numberValue)
     {
         numberValue = 0f;
@@ -459,7 +459,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// Checks whether the character can start an identifier.
     /// </summary>
     /// <param name="character">Character to inspect.</param>
-    /// <returns>True when the character starts an identifier.<returns>
+    /// <returns>True when the character starts an identifier.</returns>
     private static bool IsIdentifierStart(char character)
     {
         return char.IsLetter(character) || character == '_';
@@ -469,7 +469,7 @@ internal static class PlayerStatFormulaCompilationUtility
     /// Checks whether the character can continue an identifier.
     /// </summary>
     /// <param name="character">Character to inspect.</param>
-    /// <returns>True when the character continues an identifier.<returns>
+    /// <returns>True when the character continues an identifier.</returns>
     private static bool IsIdentifierPart(char character)
     {
         return char.IsLetterOrDigit(character) || character == '_';
@@ -498,7 +498,7 @@ internal sealed class PlayerFormulaParser
     /// Creates one parser instance for the provided token list.
     /// </summary>
     /// <param name="tokensValue">Lexical token list.</param>
-    /// <returns>Initialized parser.<returns>
+    /// <returns>Initialized parser.</returns>
     public PlayerFormulaParser(List<PlayerStatFormulaToken> tokensValue)
     {
         tokens = tokensValue ?? new List<PlayerStatFormulaToken>();
@@ -514,7 +514,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="rootNode">Parsed root node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     public bool TryParse(out PlayerFormulaNode rootNode, out string errorMessage)
     {
         rootNode = null;
@@ -540,7 +540,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseConditional(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -570,7 +570,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseLogicalOr(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -597,7 +597,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseLogicalAnd(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -624,7 +624,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseEquality(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -651,7 +651,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseComparison(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -678,7 +678,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseAddition(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -705,7 +705,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseMultiplication(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -732,7 +732,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParsePower(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -758,7 +758,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseUnary(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -783,7 +783,7 @@ internal sealed class PlayerFormulaParser
     /// </summary>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParsePrimary(out PlayerFormulaNode node, out string errorMessage)
     {
         node = null;
@@ -841,7 +841,7 @@ internal sealed class PlayerFormulaParser
     /// <param name="functionName">Function identifier.</param>
     /// <param name="node">Parsed node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseFunctionCall(string functionName,
                                       out PlayerFormulaNode node,
                                       out string errorMessage)
@@ -894,7 +894,7 @@ internal sealed class PlayerFormulaParser
     /// <param name="functionName">Function identifier.</param>
     /// <param name="node">Parsed switch node when successful.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when parsing succeeds.<returns>
+    /// <returns>True when parsing succeeds.</returns>
     private bool TryParseSwitchFunctionCall(string functionName,
                                             out PlayerFormulaNode node,
                                             out string errorMessage)
@@ -995,7 +995,7 @@ internal sealed class PlayerFormulaParser
     /// Checks whether the current token matches the requested type.
     /// </summary>
     /// <param name="tokenType">Requested token type.</param>
-    /// <returns>True when the current token matches.<returns>
+    /// <returns>True when the current token matches.</returns>
     private bool Check(PlayerStatFormulaTokenType tokenType)
     {
         return CurrentToken.Type == tokenType;
@@ -1005,7 +1005,7 @@ internal sealed class PlayerFormulaParser
     /// Consumes one token of the requested type.
     /// </summary>
     /// <param name="tokenType">Requested token type.</param>
-    /// <returns>True when the current token matches and is consumed.<returns>
+    /// <returns>True when the current token matches and is consumed.</returns>
     private bool Match(PlayerStatFormulaTokenType tokenType)
     {
         if (!Check(tokenType))
@@ -1019,7 +1019,7 @@ internal sealed class PlayerFormulaParser
     /// Consumes one operator token with the requested text.
     /// </summary>
     /// <param name="operatorText">Requested operator text.</param>
-    /// <returns>True when the current operator matches and is consumed.<returns>
+    /// <returns>True when the current operator matches and is consumed.</returns>
     private bool MatchOperator(string operatorText)
     {
         if (CurrentToken.Type != PlayerStatFormulaTokenType.Operator)
@@ -1038,7 +1038,7 @@ internal sealed class PlayerFormulaParser
     /// <param name="tokenType">Requested token type.</param>
     /// <param name="failureMessage">Failure reason when the token is missing.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>
-    /// <returns>True when the token is consumed.<returns>
+    /// <returns>True when the token is consumed.</returns>
     private bool Consume(PlayerStatFormulaTokenType tokenType,
                          string failureMessage,
                          out string errorMessage)
@@ -1055,7 +1055,7 @@ internal sealed class PlayerFormulaParser
     /// <summary>
     /// Advances the parser by one token.
     /// </summary>
-    /// <returns>Consumed token.<returns>
+    /// <returns>Consumed token.</returns>
     private PlayerStatFormulaToken Advance()
     {
         if (currentIndex < tokens.Count - 1)
@@ -1068,7 +1068,7 @@ internal sealed class PlayerFormulaParser
     /// Formats one token for user-facing error messages.
     /// </summary>
     /// <param name="token">Token to describe.</param>
-    /// <returns>Readable token label.<returns>
+    /// <returns>Readable token label.</returns>
     private static string DescribeToken(PlayerStatFormulaToken token)
     {
         switch (token.Type)

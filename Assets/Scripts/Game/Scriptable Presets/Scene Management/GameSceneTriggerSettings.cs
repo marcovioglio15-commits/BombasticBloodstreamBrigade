@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores shared trigger authoring defaults used by Scene Manager transition volumes.
-/// /params None.
-/// /returns None.
 /// </summary>
 [System.Serializable]
 public sealed class GameSceneTriggerSettings

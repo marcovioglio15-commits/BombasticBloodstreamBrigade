@@ -7,8 +7,6 @@ using UnityEditor;
 
 /// <summary>
 /// Synchronizes editor preview outline state for player visuals and keeps the legacy outline material asset in sync when available.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerOutlineRuntimeMaterialSyncUtility
 {
@@ -39,9 +37,9 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
     #region Public Methods
     /// <summary>
     /// Applies the outline values authored inside one player visual preset to the runtime outline material used by the player renderer feature.
-    /// /params preset Player visual preset currently being edited or used at runtime.
-    /// /returns True when the outline material was found and updated.
     /// </summary>
+    /// <param name="preset">Player visual preset currently being edited or used at runtime.</param>
+    /// <returns>True when the outline material was found and updated.</returns>
     public static bool ApplyFromPreset(PlayerVisualPreset preset)
     {
         if (preset == null || preset.Outline == null)
@@ -54,9 +52,9 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Applies one ECS outline configuration to the runtime outline material used by the player renderer feature.
-    /// /params outlineConfig ECS outline config currently active on the player entity.
-    /// /returns True when the outline material was found and updated.
     /// </summary>
+    /// <param name="outlineConfig">ECS outline config currently active on the player entity.</param>
+    /// <returns>True when the outline material was found and updated.</returns>
     public static bool ApplyFromOutlineConfig(in OutlineVisualConfig outlineConfig)
     {
         return ApplyToMaterial(outlineConfig.Enabled != 0,
@@ -66,8 +64,6 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Clears cached material and reference lookups so subsequent calls reload current assets.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void ClearCache()
     {
@@ -84,8 +80,6 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Ensures the editor-side reference asset exists as soon as scripts reload, so play mode and build-time Resources lookup are both deterministic.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [InitializeOnLoadMethod]
     private static void InitializeEditorReferenceAsset()
@@ -97,11 +91,11 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Applies one resolved outline state to the player outline material while skipping redundant writes.
-    /// /params enabled When false, outline thickness is forced to zero.
-    /// /params outlineColor Outline color to write.
-    /// /params outlineThickness Outline thickness to write.
-    /// /returns True when the runtime outline material exists.
     /// </summary>
+    /// <param name="enabled">When false, outline thickness is forced to zero.</param>
+    /// <param name="outlineColor">Outline color to write.</param>
+    /// <param name="outlineThickness">Outline thickness to write.</param>
+    /// <returns>True when the runtime outline material exists.</returns>
     private static bool ApplyToMaterial(bool enabled, Color outlineColor, float outlineThickness)
     {
         Material outlineMaterial = ResolveOutlineMaterial();
@@ -133,11 +127,10 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Applies the current outline state to player authoring instances already loaded in editor scenes so preset editing keeps the scene preview responsive.
-    /// /params enabled When false, outline thickness is forced to zero.
-    /// /params outlineColor Outline color written to loaded player preview renderers.
-    /// /params outlineThickness Outline thickness written to loaded player preview renderers.
-    /// /returns None.
     /// </summary>
+    /// <param name="enabled">When false, outline thickness is forced to zero.</param>
+    /// <param name="outlineColor">Outline color written to loaded player preview renderers.</param>
+    /// <param name="outlineThickness">Outline thickness written to loaded player preview renderers.</param>
     private static void ApplyToLoadedPlayerScenePreview(bool enabled, Color outlineColor, float outlineThickness)
     {
         PlayerAuthoring[] playerAuthorings = Object.FindObjectsByType<PlayerAuthoring>(FindObjectsInactive.Include,
@@ -170,9 +163,8 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Resolves the outline material used by the player RenderObjects feature.
-    /// /params None.
-    /// /returns The resolved outline material, or null when no reference asset is available.
     /// </summary>
+    /// <returns>The resolved outline material, or null when no reference asset is available.</returns>
     private static Material ResolveOutlineMaterial()
     {
         if (cachedOutlineMaterial != null)
@@ -189,9 +181,8 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Resolves the Resources-backed reference asset that points at the player outline material.
-    /// /params None.
-    /// /returns The resolved reference asset, or null when it cannot be found.
     /// </summary>
+    /// <returns>The resolved reference asset, or null when it cannot be found.</returns>
     private static PlayerOutlineRuntimeMaterialReference ResolveReferenceAsset()
     {
         if (cachedReferenceAsset != null)
@@ -207,11 +198,11 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Checks whether the currently applied material state already matches the requested state.
-    /// /params enabled Requested enable flag.
-    /// /params outlineColor Requested outline color.
-    /// /params outlineThickness Requested outline thickness.
-    /// /returns True when no additional material write is required.
     /// </summary>
+    /// <param name="enabled">Requested enable flag.</param>
+    /// <param name="outlineColor">Requested outline color.</param>
+    /// <param name="outlineThickness">Requested outline thickness.</param>
+    /// <returns>True when no additional material write is required.</returns>
     private static bool IsAppliedStateUpToDate(bool enabled, Color outlineColor, float outlineThickness)
     {
         if (!appliedStateInitialized)
@@ -238,8 +229,6 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Ensures the Resources reference asset exists and points to the player outline material used by the renderer feature.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureReferenceAssetExists()
     {
@@ -271,9 +260,8 @@ public static class PlayerOutlineRuntimeMaterialSyncUtility
 
     /// <summary>
     /// Ensures one AssetDatabase folder path exists before creating the reference asset.
-    /// /params folderPath Folder path that should exist.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Folder path that should exist.</param>
     private static void EnsureFolderExists(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))

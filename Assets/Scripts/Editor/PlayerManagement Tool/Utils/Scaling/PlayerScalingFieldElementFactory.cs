@@ -35,7 +35,7 @@ public static class PlayerScalingFieldElementFactory
     /// <param name="labelOverride">Optional field label override.</param>
     /// <param name="allowedVariables">Optional formula variable whitelist for validation.</param>
     /// <param name="allowTokenScaling">True when string token properties should expose Add Scaling.</param>
-    /// <returns>Configured VisualElement ready to add into editor layout.<returns>
+    /// <returns>Configured VisualElement ready to add into editor layout.</returns>
     public static VisualElement CreateField(SerializedProperty targetProperty,
                                             SerializedProperty scalingRulesProperty,
                                             string labelOverride = null,
@@ -493,7 +493,7 @@ public static class PlayerScalingFieldElementFactory
     /// <param name="targetProperty">Current numeric property rendered by the field.</param>
     /// <param name="statKey">Current normalized stat key for the field.</param>
     /// <param name="autoRepairStatKey">When true, rewrites legacy rule keys to the current key.</param>
-    /// <returns>Resolved scaling-rule property, or null when not found.<returns>
+    /// <returns>Resolved scaling-rule property, or null when not found.</returns>
     private static SerializedProperty FindRuleProperty(SerializedProperty scalingRulesProperty,
                                                        SerializedProperty targetProperty,
                                                        string statKey,
@@ -557,7 +557,7 @@ public static class PlayerScalingFieldElementFactory
     /// <param name="scalingRulesProperty">Serialized scaling-rules array.</param>
     /// <param name="targetProperty">Current numeric property rendered by the field.</param>
     /// <param name="statKey">Current normalized stat key for the field.</param>
-    /// <returns>Existing or newly created scaling-rule property.<returns>
+    /// <returns>Existing or newly created scaling-rule property.</returns>
     private static SerializedProperty EnsureRuleProperty(SerializedProperty scalingRulesProperty,
                                                          SerializedProperty targetProperty,
                                                          string statKey)
@@ -617,7 +617,7 @@ public static class PlayerScalingFieldElementFactory
     /// </summary>
     /// <param name="leftProperty">First property to compare.</param>
     /// <param name="rightProperty">Second property to compare.</param>
-    /// <returns>True when both references point to the same serialized field.<returns>
+    /// <returns>True when both references point to the same serialized field.</returns>
     private static bool AreSameSerializedProperty(SerializedProperty leftProperty, SerializedProperty rightProperty)
     {
         if (leftProperty == null || rightProperty == null)

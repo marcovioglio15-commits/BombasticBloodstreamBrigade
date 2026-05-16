@@ -8,7 +8,6 @@ using UnityEngine;
 /// <summary>
 /// Stores the final combo HUD theme resolved from preset-authored rank visuals, hidden legacy fallbacks, and HUD defaults.
 /// none.
-/// returns none.
 /// </summary>
 internal readonly struct HUDComboCounterResolvedVisualTheme
 {
@@ -26,14 +25,13 @@ internal readonly struct HUDComboCounterResolvedVisualTheme
     #region Setup
     /// <summary>
     /// Stores one fully resolved combo HUD visual theme.
-    /// /params badgeSprite Final badge sprite to show for the active rank.
-    /// /params badgeTint Final badge tint to apply for the active rank.
-    /// /params rankTextColor Final rank-label color to apply for the active rank.
-    /// /params comboValueTextColor Final combo-value color to apply for the active rank.
-    /// /params progressFillColor Final progress-fill color to apply for the active rank.
-    /// /params progressBackgroundColor Final progress-background color to apply for the active rank.
-    /// /returns void.
     /// </summary>
+    /// <param name="badgeSprite">Final badge sprite to show for the active rank.</param>
+    /// <param name="badgeTint">Final badge tint to apply for the active rank.</param>
+    /// <param name="rankTextColor">Final rank-label color to apply for the active rank.</param>
+    /// <param name="comboValueTextColor">Final combo-value color to apply for the active rank.</param>
+    /// <param name="progressFillColor">Final progress-fill color to apply for the active rank.</param>
+    /// <param name="progressBackgroundColor">Final progress-background color to apply for the active rank.</param>
     public HUDComboCounterResolvedVisualTheme(Sprite badgeSprite,
                                               Color badgeTint,
                                               Color rankTextColor,
@@ -56,7 +54,6 @@ internal readonly struct HUDComboCounterResolvedVisualTheme
 /// <summary>
 /// Identifies which combo HUD color channel should be resolved from rank-owned visuals.
 /// none.
-/// returns none.
 /// </summary>
 internal enum HUDComboCounterVisualColorChannel : byte
 {
@@ -70,7 +67,6 @@ internal enum HUDComboCounterVisualColorChannel : byte
 /// <summary>
 /// Resolves combo HUD themes from preset-authored rank visuals and optional hidden legacy scene fallbacks.
 /// none.
-/// returns none.
 /// </summary>
 internal static class HUDComboCounterVisualThemeRuntimeUtility
 {
@@ -79,10 +75,10 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Resolves the preset-owned rank visuals matching the current runtime rank index.
-    /// /params progressionPreset Progression preset currently used by the player scene authoring.
-    /// /params currentRankIndex Active combo-rank index reported by ECS state.
-    /// /returns Matching preset-owned rank visuals, or null when none are available.
     /// </summary>
+    /// <param name="progressionPreset">Progression preset currently used by the player scene authoring.</param>
+    /// <param name="currentRankIndex">Active combo-rank index reported by ECS state.</param>
+    /// <returns>Matching preset-owned rank visuals, or null when none are available.</returns>
     public static PlayerComboRankVisualDefinition ResolvePresetRankVisual(PlayerProgressionPreset progressionPreset, int currentRankIndex)
     {
         if (progressionPreset == null || currentRankIndex < 0)
@@ -116,18 +112,18 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves the active combo-rank visual theme directly from the baked player ECS buffers.
-    /// /params entityManager Runtime entity manager used to inspect combo-rank visual buffers.
-    /// /params playerEntity Current player entity that owns the visual buffer.
-    /// /params currentRankIndex Active combo-rank index reported by ECS presentation state.
-    /// /params defaultBadgeSprite Default HUD badge sprite used when the baked rank has no sprite.
-    /// /params defaultBadgeTint Default HUD badge tint used when the baked rank buffer is unavailable.
-    /// /params defaultRankTextColor Default HUD rank-label color used when the baked rank buffer is unavailable.
-    /// /params defaultComboValueTextColor Default HUD combo-value color used when the baked rank buffer is unavailable.
-    /// /params defaultProgressFillColor Default HUD progress-fill color used when the baked rank buffer is unavailable.
-    /// /params defaultProgressBackgroundColor Default HUD progress-background color used when the baked rank buffer is unavailable.
-    /// /params resolvedTheme Resolved theme returned when the baked visual buffer contains the requested rank.
-    /// /returns True when the baked ECS visual buffer supplied the requested theme; otherwise false.
     /// </summary>
+    /// <param name="entityManager">Runtime entity manager used to inspect combo-rank visual buffers.</param>
+    /// <param name="playerEntity">Current player entity that owns the visual buffer.</param>
+    /// <param name="currentRankIndex">Active combo-rank index reported by ECS presentation state.</param>
+    /// <param name="defaultBadgeSprite">Default HUD badge sprite used when the baked rank has no sprite.</param>
+    /// <param name="defaultBadgeTint">Default HUD badge tint used when the baked rank buffer is unavailable.</param>
+    /// <param name="defaultRankTextColor">Default HUD rank-label color used when the baked rank buffer is unavailable.</param>
+    /// <param name="defaultComboValueTextColor">Default HUD combo-value color used when the baked rank buffer is unavailable.</param>
+    /// <param name="defaultProgressFillColor">Default HUD progress-fill color used when the baked rank buffer is unavailable.</param>
+    /// <param name="defaultProgressBackgroundColor">Default HUD progress-background color used when the baked rank buffer is unavailable.</param>
+    /// <param name="resolvedTheme">Resolved theme returned when the baked visual buffer contains the requested rank.</param>
+    /// <returns>True when the baked ECS visual buffer supplied the requested theme; otherwise false.</returns>
     public static bool TryResolveRuntimeTheme(EntityManager entityManager,
                                               Entity playerEntity,
                                               int currentRankIndex,
@@ -176,10 +172,10 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves one hidden legacy scene visual entry matching the current runtime rank identifier.
-    /// /params rankVisualDefinitions Hidden legacy visual list stored on HUDManager scenes.
-    /// /params currentRankId Active combo-rank identifier reported by ECS state.
-    /// /returns Matching hidden legacy visuals, or null when no fallback entry matches.
     /// </summary>
+    /// <param name="rankVisualDefinitions">Hidden legacy visual list stored on HUDManager scenes.</param>
+    /// <param name="currentRankId">Active combo-rank identifier reported by ECS state.</param>
+    /// <returns>Matching hidden legacy visuals, or null when no fallback entry matches.</returns>
     public static HUDComboCounterRankVisualDefinition ResolveLegacyRankVisual(IReadOnlyList<HUDComboCounterRankVisualDefinition> rankVisualDefinitions,
                                                                               FixedString64Bytes currentRankId)
     {
@@ -212,16 +208,16 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves the full combo HUD visual theme using preset-owned visuals first, hidden legacy scene data second, and HUD defaults last.
-    /// /params rankVisual Preset-owned visuals resolved from the active combo-rank index.
-    /// /params legacyRankVisual Hidden legacy scene visuals resolved from the active combo-rank identifier.
-    /// /params defaultBadgeSprite Default HUD badge sprite used when no override exists.
-    /// /params defaultBadgeTint Default HUD badge tint used when no override exists.
-    /// /params defaultRankTextColor Default HUD rank-label color used when no override exists.
-    /// /params defaultComboValueTextColor Default HUD combo-value color used when no override exists.
-    /// /params defaultProgressFillColor Default HUD progress-fill color used when no override exists.
-    /// /params defaultProgressBackgroundColor Default HUD progress-background color used when no override exists.
-    /// /returns Fully resolved visual theme for the active combo state.
     /// </summary>
+    /// <param name="rankVisual">Preset-owned visuals resolved from the active combo-rank index.</param>
+    /// <param name="legacyRankVisual">Hidden legacy scene visuals resolved from the active combo-rank identifier.</param>
+    /// <param name="defaultBadgeSprite">Default HUD badge sprite used when no override exists.</param>
+    /// <param name="defaultBadgeTint">Default HUD badge tint used when no override exists.</param>
+    /// <param name="defaultRankTextColor">Default HUD rank-label color used when no override exists.</param>
+    /// <param name="defaultComboValueTextColor">Default HUD combo-value color used when no override exists.</param>
+    /// <param name="defaultProgressFillColor">Default HUD progress-fill color used when no override exists.</param>
+    /// <param name="defaultProgressBackgroundColor">Default HUD progress-background color used when no override exists.</param>
+    /// <returns>Fully resolved visual theme for the active combo state.</returns>
     public static HUDComboCounterResolvedVisualTheme ResolveTheme(PlayerComboRankVisualDefinition rankVisual,
                                                                  HUDComboCounterRankVisualDefinition legacyRankVisual,
                                                                  Sprite defaultBadgeSprite,
@@ -265,11 +261,11 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Resolves the badge sprite from preset-owned visuals, hidden legacy data, and HUD defaults.
-    /// /params rankVisual Preset-owned visuals resolved from the active combo-rank index.
-    /// /params legacyRankVisual Hidden legacy scene visuals resolved from the active combo-rank identifier.
-    /// /params defaultBadgeSprite Default HUD badge sprite used when no override exists.
-    /// /returns Final badge sprite to show for the active combo state.
     /// </summary>
+    /// <param name="rankVisual">Preset-owned visuals resolved from the active combo-rank index.</param>
+    /// <param name="legacyRankVisual">Hidden legacy scene visuals resolved from the active combo-rank identifier.</param>
+    /// <param name="defaultBadgeSprite">Default HUD badge sprite used when no override exists.</param>
+    /// <returns>Final badge sprite to show for the active combo state.</returns>
     private static Sprite ResolveBadgeSprite(PlayerComboRankVisualDefinition rankVisual,
                                              HUDComboCounterRankVisualDefinition legacyRankVisual,
                                              Sprite defaultBadgeSprite)
@@ -289,12 +285,12 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves one combo HUD color channel from preset-owned visuals, hidden legacy data, and HUD defaults.
-    /// /params rankVisual Preset-owned visuals resolved from the active combo-rank index.
-    /// /params legacyRankVisual Hidden legacy scene visuals resolved from the active combo-rank identifier.
-    /// /params defaultColor Default HUD color used when no override exists.
-    /// /params colorChannel Requested combo HUD color channel.
-    /// /returns Final color to apply for the requested channel.
     /// </summary>
+    /// <param name="rankVisual">Preset-owned visuals resolved from the active combo-rank index.</param>
+    /// <param name="legacyRankVisual">Hidden legacy scene visuals resolved from the active combo-rank identifier.</param>
+    /// <param name="defaultColor">Default HUD color used when no override exists.</param>
+    /// <param name="colorChannel">Requested combo HUD color channel.</param>
+    /// <returns>Final color to apply for the requested channel.</returns>
     private static Color ResolveColor(PlayerComboRankVisualDefinition rankVisual,
                                       HUDComboCounterRankVisualDefinition legacyRankVisual,
                                       Color defaultColor,
@@ -315,10 +311,10 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves one combo HUD color channel directly from preset-owned rank visuals.
-    /// /params rankVisual Preset-owned visuals resolved from the active combo-rank index.
-    /// /params colorChannel Requested combo HUD color channel.
-    /// /returns Color stored on the preset-owned visuals.
     /// </summary>
+    /// <param name="rankVisual">Preset-owned visuals resolved from the active combo-rank index.</param>
+    /// <param name="colorChannel">Requested combo HUD color channel.</param>
+    /// <returns>Color stored on the preset-owned visuals.</returns>
     private static Color ResolvePresetColor(PlayerComboRankVisualDefinition rankVisual, HUDComboCounterVisualColorChannel colorChannel)
     {
         switch (colorChannel)
@@ -345,10 +341,10 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Resolves one combo HUD color channel directly from hidden legacy scene visuals.
-    /// /params legacyRankVisual Hidden legacy scene visuals resolved from the active combo-rank identifier.
-    /// /params colorChannel Requested combo HUD color channel.
-    /// /returns Color stored on the hidden legacy visuals.
     /// </summary>
+    /// <param name="legacyRankVisual">Hidden legacy scene visuals resolved from the active combo-rank identifier.</param>
+    /// <param name="colorChannel">Requested combo HUD color channel.</param>
+    /// <returns>Color stored on the hidden legacy visuals.</returns>
     private static Color ResolveLegacyColor(HUDComboCounterRankVisualDefinition legacyRankVisual,
                                             HUDComboCounterVisualColorChannel colorChannel)
     {
@@ -376,9 +372,9 @@ internal static class HUDComboCounterVisualThemeRuntimeUtility
 
     /// <summary>
     /// Converts one float4 color stored inside ECS buffers back to UnityEngine.Color.
-    /// /params colorValue Float4 color stored in the runtime buffer.
-    /// /returns Unity color rebuilt from the float4 channels.
     /// </summary>
+    /// <param name="colorValue">Float4 color stored in the runtime buffer.</param>
+    /// <returns>Unity color rebuilt from the float4 channels.</returns>
     private static Color ToColor(float4 colorValue)
     {
         return new Color(colorValue.x, colorValue.y, colorValue.z, colorValue.w);

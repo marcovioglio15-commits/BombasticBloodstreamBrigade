@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Resolves a build-safe sprite material for offensive engagement billboard views whose authored material asset is missing.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 {
@@ -32,9 +30,8 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
     #region Public Methods
     /// <summary>
     /// Assigns a build-safe sprite material when the authored prefab references a missing material asset.
-    /// /params spriteRenderer Renderer that owns the engagement billboard sprite.
-    /// /returns None.
     /// </summary>
+    /// <param name="spriteRenderer">Renderer that owns the engagement billboard sprite.</param>
     public static void EnsureSpriteRendererMaterial(SpriteRenderer spriteRenderer)
     {
         if (spriteRenderer == null)
@@ -58,8 +55,6 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Releases the shared runtime material used to replace missing billboard prefab material references.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void DestroySharedRuntimeMaterial()
     {
@@ -79,9 +74,9 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
     #region Helpers
     /// <summary>
     /// Checks whether a sprite renderer material can render in the current pipeline.
-    /// /params material Material currently assigned to the sprite renderer.
-    /// /returns True when the material and shader are valid and supported.
     /// </summary>
+    /// <param name="material">Material currently assigned to the sprite renderer.</param>
+    /// <returns>True when the material and shader are valid and supported.</returns>
     private static bool IsUsableSpriteMaterial(Material material)
     {
         if (material == null)
@@ -93,9 +88,8 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Resolves or creates the shared runtime material used by engagement billboards with missing prefab materials.
-    /// /params None.
-    /// /returns Runtime sprite material, or null when no supported shader is available.
     /// </summary>
+    /// <returns>Runtime sprite material, or null when no supported shader is available.</returns>
     private static Material ResolveSharedRuntimeSpriteMaterial()
     {
         if (sharedRuntimeSpriteMaterial != null)
@@ -116,9 +110,8 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Resolves the first supported shader that can render sprite billboard textures in player builds.
-    /// /params None.
-    /// /returns Supported sprite shader, or null when none can be found.
     /// </summary>
+    /// <returns>Supported sprite shader, or null when none can be found.</returns>
     private static Shader ResolveSpriteShader()
     {
         Shader spriteShader = Shader.Find(UrpSpriteUnlitShaderName);
@@ -141,9 +134,8 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Configures the generated sprite material for transparent billboard rendering.
-    /// /params material Runtime material created for engagement billboards.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material created for engagement billboards.</param>
     private static void ConfigureRuntimeSpriteMaterial(Material material)
     {
         material.hideFlags = HideFlags.HideAndDontSave;
@@ -162,11 +154,10 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Sets one float property when the active shader exposes it.
-    /// /params material Runtime material being configured.
-    /// /params propertyId Shader property id.
-    /// /params value Float value to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material being configured.</param>
+    /// <param name="propertyId">Shader property id.</param>
+    /// <param name="value">Float value to assign.</param>
     private static void SetFloatIfPresent(Material material, int propertyId, float value)
     {
         if (!material.HasProperty(propertyId))
@@ -177,11 +168,10 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Sets one color property when the active shader exposes it.
-    /// /params material Runtime material being configured.
-    /// /params propertyId Shader property id.
-    /// /params value Color value to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material being configured.</param>
+    /// <param name="propertyId">Shader property id.</param>
+    /// <param name="value">Color value to assign.</param>
     private static void SetColorIfPresent(Material material, int propertyId, Color value)
     {
         if (!material.HasProperty(propertyId))
@@ -192,8 +182,6 @@ internal static class EnemyOffensiveEngagementBillboardMaterialUtility
 
     /// <summary>
     /// Logs one warning when no supported shader can render offensive engagement billboards.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void LogMissingSpriteShaderWarning()
     {

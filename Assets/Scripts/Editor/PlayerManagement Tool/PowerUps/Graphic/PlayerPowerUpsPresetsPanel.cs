@@ -669,7 +669,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Detaches the active section UI before structural preset mutations so nested property trackers cannot react to moving array paths.
     /// none
-    /// returns void
     /// </summary>
     private void PrepareDeferredStructuralActions()
     {
@@ -702,7 +701,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Executes queued structural actions after the current section UI has been torn down, then rebuilds dependent views once.
     /// none
-    /// returns void
     /// </summary>
     private void ProcessDeferredStructuralActions()
     {
@@ -740,7 +738,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Queues a single preset-level refresh for the list pane and cross-panel dependents even if many serialized callbacks arrive in the same frame.
     /// none
-    /// returns void
     /// </summary>
     private void SchedulePresetSerializedChangeRefresh()
     {
@@ -762,7 +759,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Refreshes the left preset list and dependent panels after the current batch of serialized mutations settles.
     /// none
-    /// returns void
     /// </summary>
     private void RefreshPresetSerializedChangeDependents()
     {
@@ -778,7 +774,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Temporarily suppresses preset change callbacks while the section is being structurally rebuilt.
     /// none
-    /// returns void
     /// </summary>
     private void SuspendPresetSerializedChangeHandling()
     {
@@ -788,7 +783,6 @@ public sealed class PlayerPowerUpsPresetsPanel
     /// <summary>
     /// Re-enables preset change callbacks after a structural mutation batch completes.
     /// none
-    /// returns void
     /// </summary>
     private void ResumePresetSerializedChangeHandling()
     {

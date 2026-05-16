@@ -5,8 +5,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Provides pure helpers used by the managed scene transition execution system.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneTransitionExecutionUtility
 {
@@ -15,15 +13,15 @@ internal static class GameSceneTransitionExecutionUtility
     #region Request Resolution
     /// <summary>
     /// Resolves the target scene and transition override data for a request.
-    /// /params config Scene manager runtime config.
-    /// /params scenes Runtime scene definitions.
-    /// /params transitions Runtime transition definitions.
-    /// /params request Request to resolve.
-    /// /params transitionState Current transition state.
-    /// /params sceneDefinition Resolved target scene definition.
-    /// /params transition Resolved transition override data.
-    /// /returns True when a valid target scene was found.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="scenes">Runtime scene definitions.</param>
+    /// <param name="transitions">Runtime transition definitions.</param>
+    /// <param name="request">Request to resolve.</param>
+    /// <param name="transitionState">Current transition state.</param>
+    /// <param name="sceneDefinition">Resolved target scene definition.</param>
+    /// <param name="transition">Resolved transition override data.</param>
+    /// <returns>True when a valid target scene was found.</returns>
     public static bool TryResolveTargetScene(GameSceneManagerConfig config,
                                              DynamicBuffer<GameSceneDefinitionElement> scenes,
                                              DynamicBuffer<GameSceneTransitionElement> transitions,
@@ -67,12 +65,12 @@ internal static class GameSceneTransitionExecutionUtility
 
     /// <summary>
     /// Resolves the target scene ID for command-style transition requests.
-    /// /params config Scene manager runtime config.
-    /// /params scenes Runtime scene definitions.
-    /// /params request Request to inspect.
-    /// /params transitionState Current transition state.
-    /// /returns Target scene ID or an empty ID when unresolved.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="scenes">Runtime scene definitions.</param>
+    /// <param name="request">Request to inspect.</param>
+    /// <param name="transitionState">Current transition state.</param>
+    /// <returns>Target scene ID or an empty ID when unresolved.</returns>
     private static FixedString64Bytes ResolveTargetSceneId(GameSceneManagerConfig config,
                                                            DynamicBuffer<GameSceneDefinitionElement> scenes,
                                                            GameSceneTransitionRequest request,
@@ -100,11 +98,10 @@ internal static class GameSceneTransitionExecutionUtility
     #region Startup
     /// <summary>
     /// Initializes active scene tracking from the loaded Unity active scene when possible.
-    /// /params config Scene manager runtime config.
-    /// /params scenes Runtime scene definitions.
-    /// /params transitionState Mutable transition state component.
-    /// /returns None.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="scenes">Runtime scene definitions.</param>
+    /// <param name="transitionState">Mutable transition state component.</param>
     public static void InitializeStateFromLoadedScene(GameSceneManagerConfig config,
                                                       DynamicBuffer<GameSceneDefinitionElement> scenes,
                                                       ref GameSceneTransitionState transitionState)
@@ -132,10 +129,10 @@ internal static class GameSceneTransitionExecutionUtility
 
     /// <summary>
     /// Resolves whether the startup transition should run from the current active scene state.
-    /// /params config Scene manager runtime config.
-    /// /params transitionState Current transition state.
-    /// /returns True only when the manager is still at bootstrap or has not resolved an active scene yet.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="transitionState">Current transition state.</param>
+    /// <returns>True only when the manager is still at bootstrap or has not resolved an active scene yet.</returns>
     public static bool ShouldRunInitialTransition(GameSceneManagerConfig config, GameSceneTransitionState transitionState)
     {
         if (transitionState.ActiveSceneId.Length <= 0)
@@ -149,11 +146,11 @@ internal static class GameSceneTransitionExecutionUtility
 
     /// <summary>
     /// Resolves whether a startup transition should begin already black to cover initial scene loading.
-    /// /params config Scene manager runtime config.
-    /// /params request Transition request being started.
-    /// /params transitionState Current transition state before the request starts.
-    /// /returns True when the transition is the configured bootstrap-to-initial load.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="request">Transition request being started.</param>
+    /// <param name="transitionState">Current transition state before the request starts.</param>
+    /// <returns>True when the transition is the configured bootstrap-to-initial load.</returns>
     public static bool ShouldStartBehindBlack(GameSceneManagerConfig config,
                                               GameSceneTransitionRequest request,
                                               GameSceneTransitionState transitionState)
@@ -174,12 +171,12 @@ internal static class GameSceneTransitionExecutionUtility
     #region Runtime Cleanup
     /// <summary>
     /// Clears transient gameplay entities that are not owned by scene streaming before a restart loads the new instance.
-    /// /params entityManager EntityManager that owns transient gameplay runtime entities.
-    /// /params cleanupComplete True when this transition has already run the cleanup check.
-    /// /params reloadActiveScene True when the active scene is being restarted.
-    /// /params targetScene Target scene definition for the active transition.
-    /// /returns True once the cleanup gate has been consumed for this transition.
     /// </summary>
+    /// <param name="entityManager">EntityManager that owns transient gameplay runtime entities.</param>
+    /// <param name="cleanupComplete">True when this transition has already run the cleanup check.</param>
+    /// <param name="reloadActiveScene">True when the active scene is being restarted.</param>
+    /// <param name="targetScene">Target scene definition for the active transition.</param>
+    /// <returns>True once the cleanup gate has been consumed for this transition.</returns>
     public static bool RunPreLoadRuntimeCleanupIfNeeded(EntityManager entityManager,
                                                         bool cleanupComplete,
                                                         bool reloadActiveScene,
@@ -198,12 +195,11 @@ internal static class GameSceneTransitionExecutionUtility
     #region Scene Activation
     /// <summary>
     /// Moves Unity's active scene away from the scene about to be unloaded when possible.
-    /// /params sceneBeingUnloaded Scene definition passed to SceneManager.UnloadSceneAsync.
-    /// /params hasBootstrapScene True when bootstrapScene contains authored data.
-    /// /params bootstrapScene Persistent bootstrap scene candidate.
-    /// /params targetScene Active transition target scene candidate.
-    /// /returns None.
     /// </summary>
+    /// <param name="sceneBeingUnloaded">Scene definition passed to SceneManager.UnloadSceneAsync.</param>
+    /// <param name="hasBootstrapScene">True when bootstrapScene contains authored data.</param>
+    /// <param name="bootstrapScene">Persistent bootstrap scene candidate.</param>
+    /// <param name="targetScene">Active transition target scene candidate.</param>
     public static void TrySetSafeActiveSceneBeforeUnload(GameSceneDefinitionElement sceneBeingUnloaded,
                                                          bool hasBootstrapScene,
                                                          GameSceneDefinitionElement bootstrapScene,
@@ -228,10 +224,10 @@ internal static class GameSceneTransitionExecutionUtility
 
     /// <summary>
     /// Sets a loaded scene active when it does not match the scene currently being unloaded.
-    /// /params candidate Candidate scene definition.
-    /// /params excludedScene Scene definition that must not be selected.
-    /// /returns True when the candidate scene became active.
     /// </summary>
+    /// <param name="candidate">Candidate scene definition.</param>
+    /// <param name="excludedScene">Scene definition that must not be selected.</param>
+    /// <returns>True when the candidate scene became active.</returns>
     private static bool TrySetLoadedSceneActive(GameSceneDefinitionElement candidate, GameSceneDefinitionElement excludedScene)
     {
         Scene candidateScene = GameSceneLoadBackendUtility.ResolveLoadedScene(candidate);
@@ -248,9 +244,9 @@ internal static class GameSceneTransitionExecutionUtility
 
     /// <summary>
     /// Sets any loaded Unity scene active when no authored bootstrap or target scene can be used.
-    /// /params excludedScene Scene definition that must not be selected.
-    /// /returns True when any loaded scene became active.
     /// </summary>
+    /// <param name="excludedScene">Scene definition that must not be selected.</param>
+    /// <returns>True when any loaded scene became active.</returns>
     private static bool TrySetAnyLoadedSceneActive(GameSceneDefinitionElement excludedScene)
     {
         for (int index = 0; index < SceneManager.sceneCount; index++)
@@ -274,12 +270,11 @@ internal static class GameSceneTransitionExecutionUtility
     #region Fade
     /// <summary>
     /// Writes fade state values with the configured fade color.
-    /// /params fadeState Mutable fade presentation component.
-    /// /params alpha Desired overlay alpha.
-    /// /params visible True when the overlay should be visible.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
     /// </summary>
+    /// <param name="fadeState">Mutable fade presentation component.</param>
+    /// <param name="alpha">Desired overlay alpha.</param>
+    /// <param name="visible">True when the overlay should be visible.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     public static void SetFade(ref GameSceneFadePresentationState fadeState, float alpha, bool visible, GameSceneManagerConfig config)
     {
         fadeState.Alpha = Mathf.Clamp01(alpha);
@@ -291,10 +286,10 @@ internal static class GameSceneTransitionExecutionUtility
     #region Matching
     /// <summary>
     /// Matches a scene definition against one loaded Unity scene.
-    /// /params sceneDefinition Scene definition to inspect.
-    /// /params scene Loaded Unity scene.
-    /// /returns True when path or name matches.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition to inspect.</param>
+    /// <param name="scene">Loaded Unity scene.</param>
+    /// <returns>True when path or name matches.</returns>
     public static bool MatchesUnityScene(GameSceneDefinitionElement sceneDefinition, Scene scene)
     {
         string scenePath = sceneDefinition.ScenePath.ToString();
@@ -310,10 +305,10 @@ internal static class GameSceneTransitionExecutionUtility
     #region Logging
     /// <summary>
     /// Logs singleton count problems once until the manager count becomes valid again.
-    /// /params managerCount Current number of manager entities.
-    /// /params alreadyLogged True when the current invalid count has already been reported.
-    /// /returns True after an invalid manager count has been handled.
     /// </summary>
+    /// <param name="managerCount">Current number of manager entities.</param>
+    /// <param name="alreadyLogged">True when the current invalid count has already been reported.</param>
+    /// <returns>True after an invalid manager count has been handled.</returns>
     public static bool LogManagerCountWarning(int managerCount, bool alreadyLogged)
     {
         if (alreadyLogged)

@@ -72,8 +72,6 @@ public partial struct EnemyWorldSpaceStatusBarsSyncSystem : ISystem
 
     /// <summary>
     /// Clears cached scene references and destroys fallback status-bar clones owned by the static runtime pool.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void DestroyRuntimeState()
     {

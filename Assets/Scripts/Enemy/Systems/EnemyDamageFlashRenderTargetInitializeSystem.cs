@@ -6,7 +6,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Marks one enemy root after its flash render targets have received the runtime material override components.
-/// returns None.
 /// </summary>
 public struct EnemyDamageFlashRenderTargetsInitialized : IComponentData
 {
@@ -25,9 +24,8 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the minimum data required to run the initialization pass.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<DamageFlashConfig>();
@@ -37,9 +35,8 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Adds missing per-renderer material property components to every uninitialized enemy root.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -96,11 +93,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
     #region Render Target Recovery
     /// <summary>
     /// Ensures a GPU enemy has at least one valid render target before flash and outline material overrides are added.
-    /// /params entityManager Entity manager used to inspect baked linked entities and hierarchy entities.
-    /// /params enemyEntity Root enemy entity that owns the flash render target buffer.
-    /// /params renderTargets Mutable target buffer recovered when baked data is empty or stale.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect baked linked entities and hierarchy entities.</param>
+    /// <param name="enemyEntity">Root enemy entity that owns the flash render target buffer.</param>
+    /// <param name="renderTargets">Mutable target buffer recovered when baked data is empty or stale.</param>
     private static void EnsureRenderableTargets(EntityManager entityManager,
                                                 Entity enemyEntity,
                                                 DynamicBuffer<DamageFlashRenderTargetElement> renderTargets)
@@ -115,10 +111,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Checks whether the current target buffer still points to renderable entities.
-    /// /params entityManager Entity manager used to validate each target entity.
-    /// /params renderTargets Current target buffer to inspect.
-    /// /returns True when at least one target can receive material property overrides.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to validate each target entity.</param>
+    /// <param name="renderTargets">Current target buffer to inspect.</param>
+    /// <returns>True when at least one target can receive material property overrides.</returns>
     private static bool HasUsableRenderTarget(EntityManager entityManager,
                                               DynamicBuffer<DamageFlashRenderTargetElement> renderTargets)
     {
@@ -135,11 +131,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Adds renderable linked entities to a recovered flash target buffer.
-    /// /params entityManager Entity manager used to read the LinkedEntityGroup buffer.
-    /// /params enemyEntity Root enemy entity whose linked render entities are inspected.
-    /// /params renderTargets Mutable buffer receiving recovered targets.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read the LinkedEntityGroup buffer.</param>
+    /// <param name="enemyEntity">Root enemy entity whose linked render entities are inspected.</param>
+    /// <param name="renderTargets">Mutable buffer receiving recovered targets.</param>
     private static void AppendLinkedEntityRenderTargets(EntityManager entityManager,
                                                         Entity enemyEntity,
                                                         DynamicBuffer<DamageFlashRenderTargetElement> renderTargets)
@@ -155,11 +150,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Adds renderable transform children to a recovered flash target buffer when no linked group is available.
-    /// /params entityManager Entity manager used to walk Child buffers.
-    /// /params enemyEntity Root enemy entity whose transform hierarchy is inspected.
-    /// /params renderTargets Mutable buffer receiving recovered targets.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to walk Child buffers.</param>
+    /// <param name="enemyEntity">Root enemy entity whose transform hierarchy is inspected.</param>
+    /// <param name="renderTargets">Mutable buffer receiving recovered targets.</param>
     private static void AppendChildHierarchyRenderTargets(EntityManager entityManager,
                                                           Entity enemyEntity,
                                                           DynamicBuffer<DamageFlashRenderTargetElement> renderTargets)
@@ -197,11 +191,11 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Appends one entity when it is renderable and not already present in the target buffer.
-    /// /params entityManager Entity manager used to validate rendering components.
-    /// /params candidateEntity Entity considered for flash and outline overrides.
-    /// /params renderTargets Mutable target buffer receiving the candidate.
-    /// /returns True when the candidate was appended.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to validate rendering components.</param>
+    /// <param name="candidateEntity">Entity considered for flash and outline overrides.</param>
+    /// <param name="renderTargets">Mutable target buffer receiving the candidate.</param>
+    /// <returns>True when the candidate was appended.</returns>
     private static bool TryAppendRenderTarget(EntityManager entityManager,
                                               Entity candidateEntity,
                                               DynamicBuffer<DamageFlashRenderTargetElement> renderTargets)
@@ -225,10 +219,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Checks whether an entity exposes render mesh metadata that can be driven by Entities Graphics.
-    /// /params entityManager Entity manager used to inspect component presence.
-    /// /params entity Candidate render entity.
-    /// /returns True when the entity can receive GPU visual feedback.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect component presence.</param>
+    /// <param name="entity">Candidate render entity.</param>
+    /// <returns>True when the entity can receive GPU visual feedback.</returns>
     private static bool IsRenderableEntity(EntityManager entityManager, Entity entity)
     {
         if (!entityManager.Exists(entity))
@@ -239,10 +233,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
     /// <summary>
     /// Resolves a stable runtime base color for recovered targets when the authoring-time renderer color is unavailable.
-    /// /params entityManager Entity manager used to read existing material override components.
-    /// /params entity Render entity whose base color is inspected.
-    /// /returns Base color used to restore the renderer after flash playback.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read existing material override components.</param>
+    /// <param name="entity">Render entity whose base color is inspected.</param>
+    /// <returns>Base color used to restore the renderer after flash playback.</returns>
     private static float4 ResolveRuntimeBaseColor(EntityManager entityManager, Entity entity)
     {
         if (!entityManager.Exists(entity))
@@ -266,7 +260,6 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
 
 /// <summary>
 /// Re-synchronizes GPU outline material overrides when one enemy outline config changes after initial render-target setup.
-/// returns None.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup), OrderFirst = true)]
 [UpdateAfter(typeof(EnemyDamageFlashRenderTargetInitializeSystem))]
@@ -277,9 +270,8 @@ public partial struct EnemyOutlineRenderTargetSyncSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the minimum data required to run outline synchronization.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<OutlineVisualConfig>();
@@ -289,9 +281,8 @@ public partial struct EnemyOutlineRenderTargetSyncSystem : ISystem
 
     /// <summary>
     /// Propagates changed outline config values from enemy roots to all registered renderer entities.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;

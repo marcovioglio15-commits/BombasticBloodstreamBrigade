@@ -5,8 +5,6 @@ using UnityEngine.Serialization;
 #region Enums
 /// <summary>
 /// Selects the body silhouette used by the Laser Beam presentation runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum LaserBeamBodyProfile
 {
@@ -17,8 +15,6 @@ public enum LaserBeamBodyProfile
 
 /// <summary>
 /// Selects the cap-shape family used by Laser Beam source and impact visuals.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum LaserBeamCapShape
 {
@@ -31,8 +27,6 @@ public enum LaserBeamCapShape
 #region Runtime Payloads
 /// <summary>
 /// Stores scalable gameplay and presentation settings for the Laser Beam passive shooting override.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class PowerUpLaserBeamModuleData
@@ -479,8 +473,6 @@ public sealed class PowerUpLaserBeamModuleData
     #region Validation
     /// <summary>
     /// Keeps the payload API symmetrical with the other modular payloads without mutating authored numeric values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

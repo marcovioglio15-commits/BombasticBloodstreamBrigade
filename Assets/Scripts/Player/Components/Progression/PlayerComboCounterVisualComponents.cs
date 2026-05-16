@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one baked combo-rank HUD visual theme resolved from the progression preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerComboRankVisualElement : IBufferElementData

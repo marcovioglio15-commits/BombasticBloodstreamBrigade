@@ -3,8 +3,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores transition fade timing and presentation values authored by the Scene Manager preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 [System.Serializable]
 public sealed class GameSceneFadeSettings

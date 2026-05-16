@@ -168,7 +168,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// Creates a stable 64-bit key for one entity using index/version tuple.
     /// </summary>
     /// <param name="entity">Entity used as key source.</param>
-    /// <returns>Packed key used by native hash maps.<returns>
+    /// <returns>Packed key used by native hash maps.</returns>
     private static ulong ComposeEntityKey(Entity entity)
     {
         ulong versionPart = (uint)entity.Version;
@@ -181,7 +181,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// </summary>
     /// <param name="entity">Entity owning the debug-rule buffer.</param>
     /// <param name="ruleIndex">Rule index inside the debug-rule buffer.</param>
-    /// <returns>Combined key for rule-value change tracking.<returns>
+    /// <returns>Combined key for rule-value change tracking.</returns>
     private static ulong ComposeRuleKey(Entity entity, int ruleIndex)
     {
         ulong entityKey = ComposeEntityKey(entity);
@@ -193,7 +193,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// </summary>
     /// <param name="entityKey">Packed entity key.</param>
     /// <param name="currentHash">Current variable-context hash.</param>
-    /// <returns>True when values changed and rule evaluation should run, otherwise false.<returns>
+    /// <returns>True when values changed and rule evaluation should run, otherwise false.</returns>
     private bool HasEntityVariableHashChanged(ulong entityKey, uint currentHash)
     {
         if (lastEntityVariableHashes.TryGetValue(entityKey, out uint previousHash))
@@ -216,7 +216,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// </summary>
     /// <param name="ruleKey">Packed key for one rule entry.</param>
     /// <param name="currentValue">Current evaluated value.</param>
-    /// <returns>True when value changed beyond epsilon and should be logged, otherwise false.<returns>
+    /// <returns>True when value changed beyond epsilon and should be logged, otherwise false.</returns>
     private bool HasRuleValueChanged(ulong ruleKey, float currentValue)
     {
         if (lastLoggedRuleValues.TryGetValue(ruleKey, out float previousValue))
@@ -298,7 +298,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// Resolves target display name with fallback to stat key.
     /// </summary>
     /// <param name="debugRule">Debug-rule snapshot entry.</param>
-    /// <returns>Resolved display name used in the output message.<returns>
+    /// <returns>Resolved display name used in the output message.</returns>
     private static string ResolveTargetDisplayName(in PlayerScalingDebugRuleElement debugRule)
     {
         string targetDisplayName = debugRule.TargetDisplayName.ToString();
@@ -319,7 +319,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     /// Resolves the per-rule debug color with safe clamping and fallback to default yellow for invalid/legacy data.
     /// </summary>
     /// <param name="debugRule">Current debug-rule snapshot.</param>
-    /// <returns>Resolved color used for this log line.<returns>
+    /// <returns>Resolved color used for this log line.</returns>
     private static Color ResolveDebugColor(in PlayerScalingDebugRuleElement debugRule)
     {
         float red = Mathf.Clamp01(debugRule.DebugColor.x);

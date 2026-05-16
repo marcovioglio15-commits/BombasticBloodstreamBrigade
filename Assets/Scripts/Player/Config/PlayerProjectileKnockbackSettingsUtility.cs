@@ -10,9 +10,9 @@ public static class PlayerProjectileKnockbackSettingsUtility
     #region Public Methods
     /// <summary>
     /// Builds one runtime-safe knockback blob from authored shooting settings.
-    /// /params knockbackSettings Authored knockback configuration from the controller preset.
-    /// /returns Runtime knockback blob ready for bake-time and runtime controller data.
     /// </summary>
+    /// <param name="knockbackSettings">Authored knockback configuration from the controller preset.</param>
+    /// <returns>Runtime knockback blob ready for bake-time and runtime controller data.</returns>
     public static ProjectileKnockbackSettingsBlob BuildRuntimeSettings(ProjectileKnockbackSettings knockbackSettings)
     {
         if (knockbackSettings == null)

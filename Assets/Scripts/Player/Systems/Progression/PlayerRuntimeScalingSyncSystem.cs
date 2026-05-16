@@ -29,9 +29,8 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the runtime data required to rebuild scaled controller, progression, and power-up configs.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         runtimeScalingQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -80,9 +79,8 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
 
     /// <summary>
     /// Rebuilds runtime-scaled configs only when the scalable-stat hash changed since the previous applied sample.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);

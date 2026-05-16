@@ -15,11 +15,11 @@ public static class PlayerPowerUpActiveBakeUtility
     #region Public Methods
     /// <summary>
     /// Builds the runtime active loadout config from one power-ups preset.
-    /// authoring: Owning player authoring component.
-    /// preset: Source power-ups preset.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Primary and secondary active slot config.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Source power-ups preset.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Primary and secondary active slot config.</returns>
     public static PlayerPowerUpsConfig BuildPowerUpsConfig(PlayerAuthoring authoring,
                                                            PlayerPowerUpsPreset preset,
                                                            Func<GameObject, Entity> resolveDynamicPrefabEntity)
@@ -62,11 +62,11 @@ public static class PlayerPowerUpActiveBakeUtility
     /// <summary>
     /// Builds the runtime active loadout config from legacy active tool definitions only.
     /// Used as fallback when modular active power-ups are missing entirely.
-    /// authoring: Owning player authoring component.
-    /// preset: Source power-ups preset.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Primary and secondary legacy slot config.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Source power-ups preset.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Primary and secondary legacy slot config.</returns>
     public static PlayerPowerUpsConfig BuildLegacyLoadoutPowerUpsConfig(PlayerAuthoring authoring,
                                                                         PlayerPowerUpsPreset preset,
                                                                         Func<GameObject, Entity> resolveDynamicPrefabEntity)
@@ -97,12 +97,12 @@ public static class PlayerPowerUpActiveBakeUtility
 
     /// <summary>
     /// Compiles one modular active power-up into a runtime slot config.
-    /// authoring: Owning player authoring component.
-    /// preset: Source power-ups preset.
-    /// powerUp: Modular active power-up definition.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Runtime slot config or default.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Source power-ups preset.</param>
+    /// <param name="powerUp">Modular active power-up definition.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Runtime slot config or default.</returns>
     public static PlayerPowerUpSlotConfig BuildSlotConfigFromModularPowerUp(PlayerAuthoring authoring,
                                                                             PlayerPowerUpsPreset preset,
                                                                             ModularPowerUpDefinition powerUp,
@@ -312,7 +312,9 @@ public static class PlayerPowerUpActiveBakeUtility
                 case PowerUpModuleKind.Stackable:
                     break;
                 case PowerUpModuleKind.SpawnObject:
+                    BombToolData fallbackBombData = ResolveFallbackBombData(binding, moduleDefinition, payload);
                     PlayerPowerUpActiveSlotSynthesisUtility.AccumulateBombData(payload.Bomb,
+                                                                               fallbackBombData,
                                                                                ref hasBomb,
                                                                                ref bombPrefab,
                                                                                ref bombSpawnOffset,
@@ -557,11 +559,11 @@ public static class PlayerPowerUpActiveBakeUtility
 
     /// <summary>
     /// Compiles a legacy active tool definition into a runtime slot config.
-    /// authoring: Owning player authoring component.
-    /// activeTool: Legacy active tool definition.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// returns Runtime slot config or default.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="activeTool">Legacy active tool definition.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <returns>Runtime slot config or default.</returns>
     public static PlayerPowerUpSlotConfig BuildSlotConfig(PlayerAuthoring authoring,
                                                           ActiveToolDefinition activeTool,
                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity)
@@ -660,10 +662,30 @@ public static class PlayerPowerUpActiveBakeUtility
     }
 
     /// <summary>
-    /// Resolves the stable identifier stored by one legacy active tool definition.
-    /// activeTool: Legacy active tool definition being compiled.
-    /// returns Stable power-up identifier or an empty fixed string when unavailable.
+    /// Resolves module-default bomb data used only for object-reference fallback when a SpawnObject binding override is active.
     /// </summary>
+    /// <param name="binding">Module binding currently being compiled.</param>
+    /// <param name="moduleDefinition">Resolved module definition referenced by the binding.</param>
+    /// <param name="resolvedPayload">Payload selected for this binding before fallback is applied.</param>
+    /// <returns>Default bomb payload used as fallback, or null when no fallback is needed.</returns>
+    private static BombToolData ResolveFallbackBombData(PowerUpModuleBinding binding,
+                                                        PowerUpModuleDefinition moduleDefinition,
+                                                        PowerUpModuleData resolvedPayload)
+    {
+        if (binding == null || !binding.UseOverridePayload)
+            return null;
+
+        if (moduleDefinition == null || moduleDefinition.Data == null || ReferenceEquals(moduleDefinition.Data, resolvedPayload))
+            return null;
+
+        return moduleDefinition.Data.Bomb;
+    }
+
+    /// <summary>
+    /// Resolves the stable identifier stored by one legacy active tool definition.
+    /// </summary>
+    /// <param name="activeTool">Legacy active tool definition being compiled.</param>
+    /// <returns>Stable power-up identifier or an empty fixed string when unavailable.</returns>
     private static FixedString64Bytes ResolveLegacyPowerUpId(ActiveToolDefinition activeTool)
     {
         if (activeTool == null || activeTool.CommonData == null || string.IsNullOrWhiteSpace(activeTool.CommonData.PowerUpId))

@@ -71,7 +71,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="wallsLayerMask">Walls layer mask.</param>
     /// <param name="wallsEnabled">Whether walls collisions are enabled.</param>
     /// <param name="occupancyContext">Occupancy context used for free-trajectory scoring.</param>
-    /// <returns>Desired planar velocity for this frame.<returns>
+    /// <returns>Desired planar velocity for this frame.</returns>
     public static float3 ResolveWandererBasicVelocity(Entity enemyEntity,
                                                       in EnemyData enemyData,
                                                       in EnemyPatternConfig patternConfig,
@@ -130,7 +130,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="wallsLayerMask">Walls layer mask.</param>
     /// <param name="wallsEnabled">Whether walls collisions are enabled.</param>
     /// <param name="occupancyContext">Occupancy context used for free-trajectory scoring.</param>
-    /// <returns>Desired planar velocity for this frame.<returns>
+    /// <returns>Desired planar velocity for this frame.</returns>
     public static float3 ResolveBoundedWandererBasicVelocity(Entity enemyEntity,
                                                              in EnemyData enemyData,
                                                              in EnemyPatternConfig patternConfig,
@@ -175,7 +175,7 @@ public static class EnemyPatternWandererUtility
     /// </summary>
     /// <param name="x">Grid X coordinate.</param>
     /// <param name="y">Grid Y coordinate.</param>
-    /// <returns>Encoded integer key.<returns>
+    /// <returns>Encoded integer key.</returns>
     public static int EncodeCell(int x, int y)
     {
         unchecked
@@ -197,7 +197,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="priorityYieldUrgency">Output urgency in [0..1] when yielding to higher-priority neighbors is required.</param>
     /// <param name="priorityYieldGapNormalized">Output normalized priority-tier gap in [0..1] for active yield pressure.</param>
     /// <param name="occupancyContext">Occupancy context used for neighbor lookup.</param>
-    /// <returns>Planar clearance velocity contribution.<returns>
+    /// <returns>Planar clearance velocity contribution.</returns>
     public static float3 ResolveLocalClearanceVelocity(Entity enemyEntity,
                                                        int selfPriorityTier,
                                                        float3 enemyPosition,
@@ -245,7 +245,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="constrainToArea">Whether the destination must stay inside one local bounded area.</param>
     /// <param name="wanderAreaCenter">Center of the bounded wander area.</param>
     /// <param name="wanderAreaRadius">Radius of the bounded wander area.</param>
-    /// <returns>Desired planar velocity for this frame.<returns>
+    /// <returns>Desired planar velocity for this frame.</returns>
     private static float3 ResolveWandererBasicVelocityInternal(Entity enemyEntity,
                                                                in EnemyData enemyData,
                                                                in EnemyPatternConfig patternConfig,
@@ -447,7 +447,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="occupancyContext">Occupancy context used for free-trajectory scoring.</param>
     /// <param name="selectedTarget">Selected target output.</param>
     /// <param name="selectedDirectionAngle">Selected direction angle output.</param>
-    /// <returns>True when a valid destination is found.<returns>
+    /// <returns>True when a valid destination is found.</returns>
     private static bool TryPickWanderDestination(Entity enemyEntity,
                                                  int selfPriorityTier,
                                                  float bodyRadius,
@@ -602,7 +602,7 @@ public static class EnemyPatternWandererUtility
     /// <param name="position">Candidate position to test.</param>
     /// <param name="wanderAreaCenter">Center of the bounded wander area.</param>
     /// <param name="wanderAreaRadius">Radius of the bounded wander area.</param>
-    /// <returns>True when the point lies inside the bounded area.<returns>
+    /// <returns>True when the point lies inside the bounded area.</returns>
     private static bool IsPositionInsideWanderArea(float3 position, float3 wanderAreaCenter, float wanderAreaRadius)
     {
         float constrainedRadius = math.max(0f, wanderAreaRadius);

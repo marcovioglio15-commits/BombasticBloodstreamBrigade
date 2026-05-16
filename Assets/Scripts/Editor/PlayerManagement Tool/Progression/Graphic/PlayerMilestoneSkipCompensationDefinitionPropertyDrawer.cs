@@ -15,7 +15,7 @@ public sealed class PlayerMilestoneSkipCompensationDefinitionPropertyDrawer : Pr
     /// Builds the UI Toolkit inspector for one milestone skip-compensation definition.
     /// </summary>
     /// <param name="property">Serialized skip-compensation property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

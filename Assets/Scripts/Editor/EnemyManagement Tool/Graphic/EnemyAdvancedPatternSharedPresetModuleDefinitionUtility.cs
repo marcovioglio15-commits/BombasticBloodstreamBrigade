@@ -4,8 +4,6 @@ using UnityEditor;
 
 /// <summary>
 /// Resolves shared module-definition state keys, identity helpers and serialized field accessors.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 {
@@ -18,12 +16,12 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
     #region Public Methods
     /// <summary>
     /// Builds the foldout title shown by one shared module card.
-    /// /params moduleIndex Current module index.
-    /// /params moduleId Resolved module ID.
-    /// /params displayName Resolved display name.
-    /// /params moduleKind Resolved module kind.
-    /// /returns Card title text.
     /// </summary>
+    /// <param name="moduleIndex">Current module index.</param>
+    /// <param name="moduleId">Resolved module ID.</param>
+    /// <param name="displayName">Resolved display name.</param>
+    /// <param name="moduleKind">Resolved module kind.</param>
+    /// <returns>Card title text.</returns>
     public static string BuildModuleCardTitle(int moduleIndex,
                                               string moduleId,
                                               string displayName,
@@ -40,9 +38,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Builds the persistent foldout-state key for one shared module card.
-    /// /params moduleProperty Serialized module property that owns the card.
-    /// /returns Foldout-state key.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module property that owns the card.</param>
+    /// <returns>Foldout-state key.</returns>
     public static string BuildModuleCardStateKey(SerializedProperty moduleProperty)
     {
         return ManagementToolFoldoutStateUtility.BuildPropertyStateKey(moduleProperty, CardStateSuffix);
@@ -50,11 +48,11 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Generates a globally unique module ID across all shared catalog sections.
-    /// /params sharedPresetSerializedObject Serialized shared preset that owns every catalog section.
-    /// /params baseModuleId Preferred module ID prefix.
-    /// /params excludedPropertyPath Property path excluded from duplicate checks.
-    /// /returns Unique module ID.
     /// </summary>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset that owns every catalog section.</param>
+    /// <param name="baseModuleId">Preferred module ID prefix.</param>
+    /// <param name="excludedPropertyPath">Property path excluded from duplicate checks.</param>
+    /// <returns>Unique module ID.</returns>
     public static string GenerateUniqueModuleId(SerializedObject sharedPresetSerializedObject,
                                                 string baseModuleId,
                                                 string excludedPropertyPath)
@@ -96,12 +94,11 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Initializes a newly inserted module definition with one section-appropriate default payload setup.
-    /// /params moduleProperty Serialized module property being initialized.
-    /// /params section Catalog section that owns the new definition.
-    /// /params moduleId Unique module ID assigned to the definition.
-    /// /params displayName Display name assigned to the definition.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module property being initialized.</param>
+    /// <param name="section">Catalog section that owns the new definition.</param>
+    /// <param name="moduleId">Unique module ID assigned to the definition.</param>
+    /// <param name="displayName">Display name assigned to the definition.</param>
     public static void InitializeNewModuleDefinition(SerializedProperty moduleProperty,
                                                      EnemyPatternModuleCatalogSection section,
                                                      string moduleId,
@@ -118,9 +115,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Resolves the module ID of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /returns Module ID string, or an empty string when unavailable.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <returns>Module ID string, or an empty string when unavailable.</returns>
     public static string ResolveModuleDefinitionId(SerializedProperty moduleProperty)
     {
         if (moduleProperty == null)
@@ -136,9 +133,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Resolves the display name of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /returns Display name string, or an empty string when unavailable.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <returns>Display name string, or an empty string when unavailable.</returns>
     public static string ResolveModuleDefinitionDisplayName(SerializedProperty moduleProperty)
     {
         if (moduleProperty == null)
@@ -154,9 +151,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Resolves the module kind of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /returns Module kind, or Grunt when unavailable.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <returns>Module kind, or Grunt when unavailable.</returns>
     public static EnemyPatternModuleKind ResolveModuleDefinitionKind(SerializedProperty moduleProperty)
     {
         if (moduleProperty == null)
@@ -172,10 +169,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Sets the module ID of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /params moduleId New module ID.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <param name="moduleId">New module ID.</param>
     public static void SetModuleDefinitionId(SerializedProperty moduleProperty, string moduleId)
     {
         if (moduleProperty == null)
@@ -191,10 +187,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Sets the display name of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /params displayName New display name.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <param name="displayName">New display name.</param>
     public static void SetModuleDefinitionDisplayName(SerializedProperty moduleProperty, string displayName)
     {
         if (moduleProperty == null)
@@ -210,10 +205,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Sets the module kind of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /params moduleKind New module kind.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <param name="moduleKind">New module kind.</param>
     public static void SetModuleDefinitionKind(SerializedProperty moduleProperty, EnemyPatternModuleKind moduleKind)
     {
         if (moduleProperty == null)
@@ -229,10 +223,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
 
     /// <summary>
     /// Sets the notes text of one serialized definition.
-    /// /params moduleProperty Serialized module definition property.
-    /// /params notes New notes text.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
+    /// <param name="notes">New notes text.</param>
     public static void SetModuleDefinitionNotes(SerializedProperty moduleProperty, string notes)
     {
         if (moduleProperty == null)
@@ -250,12 +243,11 @@ internal static class EnemyAdvancedPatternSharedPresetModuleDefinitionUtility
     #region Private Methods
     /// <summary>
     /// Collects every module ID from one serialized catalog section except one optional excluded property path.
-    /// /params sharedPresetSerializedObject Serialized shared preset that owns the catalog.
-    /// /params definitionsPropertyName Serialized property name of the catalog.
-    /// /params excludedPropertyPath Property path excluded from duplicate checks.
-    /// /params moduleIds Destination hash set.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset that owns the catalog.</param>
+    /// <param name="definitionsPropertyName">Serialized property name of the catalog.</param>
+    /// <param name="excludedPropertyPath">Property path excluded from duplicate checks.</param>
+    /// <param name="moduleIds">Destination hash set.</param>
     private static void CollectModuleIds(SerializedObject sharedPresetSerializedObject,
                                          string definitionsPropertyName,
                                          string excludedPropertyPath,

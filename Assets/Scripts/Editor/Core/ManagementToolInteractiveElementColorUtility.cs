@@ -4,16 +4,12 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Adds persistent color customization to interactive management-tool controls such as buttons, foldouts and popup fields.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class ManagementToolInteractiveElementColorUtility
 {
     #region Nested Types
     /// <summary>
     /// Declares the supported interactive control kinds.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public enum InteractiveElementKind
     {
@@ -24,8 +20,6 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Stores one live interactive control registered under one persisted state key.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private sealed class InteractiveElementRegistration
     {
@@ -40,11 +34,10 @@ public static class ManagementToolInteractiveElementColorUtility
         #region Constructors
         /// <summary>
         /// Creates one live interactive-control registration.
-        /// /params targetElement Control currently attached to a management-tool window.
-        /// /params stateKey Stable persistence key used by EditorPrefs.
-        /// /params elementKind Interactive control kind used to apply colors correctly.
-        /// /returns None.
         /// </summary>
+        /// <param name="targetElement">Control currently attached to a management-tool window.</param>
+        /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+        /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
         public InteractiveElementRegistration(VisualElement targetElement,
                                               string stateKey,
                                               InteractiveElementKind elementKind)
@@ -76,10 +69,9 @@ public static class ManagementToolInteractiveElementColorUtility
     #region Public Methods
     /// <summary>
     /// Registers the provided root so current and future interactive descendants expose persistent color customization.
-    /// /params root Root visual element that owns the management-tool hierarchy.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Root visual element that owns the management-tool hierarchy.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
     public static void RegisterHierarchy(VisualElement root, string stateKeyPrefix)
     {
         if (root == null)
@@ -177,9 +169,8 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Forces one immediate rescan of a subtree already living under a registered management-tool root.
-    /// /params refreshRoot Subtree root that should be re-scanned for recolorable controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="refreshRoot">Subtree root that should be re-scanned for recolorable controls.</param>
     public static void RefreshRegisteredSubtree(VisualElement refreshRoot)
     {
         if (refreshRoot == null)
@@ -206,11 +197,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Registers one interactive control for persistent recoloring and connects its direct right-click opening.
-    /// /params targetElement Target control that should expose color editing.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should expose color editing.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     public static void RegisterInteractiveElement(VisualElement targetElement,
                                                   string stateKey,
                                                   InteractiveElementKind elementKind)
@@ -246,11 +236,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Saves and immediately applies one text/background color pair to every live interactive control bound to the provided state key.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params textColor Persisted text color.
-    /// /params backgroundColor Persisted background color.
-    /// /returns None.
     /// </summary>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="textColor">Persisted text color.</param>
+    /// <param name="backgroundColor">Persisted background color.</param>
     public static void SaveAndApplyColors(string stateKey, Color textColor, Color backgroundColor)
     {
         if (string.IsNullOrWhiteSpace(stateKey))
@@ -263,13 +252,12 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Saves and immediately applies one text/background color pair to the provided interactive control and every live control that shares its state key.
-    /// /params targetElement Target control that should be updated.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /params textColor Persisted text color.
-    /// /params backgroundColor Persisted background color.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should be updated.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
+    /// <param name="textColor">Persisted text color.</param>
+    /// <param name="backgroundColor">Persisted background color.</param>
     public static void SaveAndApplyColors(VisualElement targetElement,
                                           string stateKey,
                                           InteractiveElementKind elementKind,
@@ -284,9 +272,8 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Restores the default styling for every live interactive control bound to the provided state key and removes its persisted custom colors.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /returns None.
     /// </summary>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
     public static void ResetColors(string stateKey)
     {
         if (string.IsNullOrWhiteSpace(stateKey))
@@ -299,11 +286,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Restores the default styling for the provided interactive control and every live control that shares its state key.
-    /// /params targetElement Target control that should be reset.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to clear colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should be reset.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to clear colors correctly.</param>
     public static void ResetColors(VisualElement targetElement, string stateKey, InteractiveElementKind elementKind)
     {
         if (targetElement != null)
@@ -314,11 +300,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Applies the saved text/background colors to one interactive control when such state exists.
-    /// /params targetElement Target control that should receive its saved colors.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should receive its saved colors.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     public static void ApplySavedColors(VisualElement targetElement, string stateKey, InteractiveElementKind elementKind)
     {
         if (targetElement == null)
@@ -338,10 +323,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Resolves the current visible text color of the provided interactive control.
-    /// /params targetElement Target control being inspected.
-    /// /params elementKind Interactive control kind used to read the correct visual node.
-    /// /returns The currently resolved text color.
     /// </summary>
+    /// <param name="targetElement">Target control being inspected.</param>
+    /// <param name="elementKind">Interactive control kind used to read the correct visual node.</param>
+    /// <returns>The currently resolved text color.</returns>
     public static Color ResolveCurrentTextColor(VisualElement targetElement, InteractiveElementKind elementKind)
     {
         return ManagementToolInteractiveElementColorStyleUtility.ResolveCurrentTextColor(targetElement, elementKind);
@@ -349,10 +334,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Resolves the current visible background color of the provided interactive control.
-    /// /params targetElement Target control being inspected.
-    /// /params elementKind Interactive control kind used to read the correct visual node.
-    /// /returns The currently resolved background color.
     /// </summary>
+    /// <param name="targetElement">Target control being inspected.</param>
+    /// <param name="elementKind">Interactive control kind used to read the correct visual node.</param>
+    /// <returns>The currently resolved background color.</returns>
     public static Color ResolveCurrentBackgroundColor(VisualElement targetElement, InteractiveElementKind elementKind)
     {
         return ManagementToolInteractiveElementColorStyleUtility.ResolveCurrentBackgroundColor(targetElement, elementKind);
@@ -360,9 +345,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Returns whether the provided interactive control kind supports visible background recoloring.
-    /// /params elementKind Interactive control kind being inspected.
-    /// /returns True when background recoloring should be exposed to the user.
     /// </summary>
+    /// <param name="elementKind">Interactive control kind being inspected.</param>
+    /// <returns>True when background recoloring should be exposed to the user.</returns>
     public static bool CanCustomizeBackground(InteractiveElementKind elementKind)
     {
         switch (elementKind)
@@ -378,10 +363,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Appends one browser entry for each currently visible interactive recolor target under the supplied root.
-    /// /params root Root visual element whose live recolorable controls should be collected.
-    /// /params results Target list that receives the collected entries.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Root visual element whose live recolorable controls should be collected.</param>
+    /// <param name="results">Target list that receives the collected entries.</param>
     internal static void AppendBrowserEntries(VisualElement root, IList<ManagementToolColorBrowserEntry> results)
     {
         if (root == null)
@@ -407,11 +391,10 @@ public static class ManagementToolInteractiveElementColorUtility
     #region Private Methods
     /// <summary>
     /// Registers one live interactive-control instance under its persisted state key.
-    /// /params targetElement Target control instance.
-    /// /params stateKey Stable persistence key used by the control.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control instance.</param>
+    /// <param name="stateKey">Stable persistence key used by the control.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     private static void RegisterInteractiveInstance(VisualElement targetElement,
                                                     string stateKey,
                                                     InteractiveElementKind elementKind)
@@ -446,10 +429,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Unregisters one live interactive-control instance from its persisted state key.
-    /// /params targetElement Target control instance.
-    /// /params stateKey Stable persistence key used by the control.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control instance.</param>
+    /// <param name="stateKey">Stable persistence key used by the control.</param>
     private static void UnregisterInteractiveInstance(VisualElement targetElement, string stateKey)
     {
         if (targetElement == null)
@@ -485,9 +467,8 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Applies the persisted state to every currently live interactive control that shares the provided state key.
-    /// /params stateKey Stable persistence key used by the controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="stateKey">Stable persistence key used by the controls.</param>
     private static void ApplySavedColorsToRegisteredElements(string stateKey)
     {
         if (string.IsNullOrWhiteSpace(stateKey))
@@ -524,12 +505,11 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Opens the dedicated color inspector when the user right-clicks one supported interactive control.
-    /// /params targetElement Target control being edited.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /params evt Mouse event emitted by UI Toolkit.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control being edited.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
+    /// <param name="evt">Mouse event emitted by UI Toolkit.</param>
     private static void HandleInteractiveRightMouseDown(VisualElement targetElement,
                                                         string stateKey,
                                                         InteractiveElementKind elementKind,
@@ -549,9 +529,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Resolves the nearest registered management-tool root for one descendant element.
-    /// /params startElement Descendant element whose owning root must be resolved.
-    /// /returns The nearest registered root, or null when none is found.
     /// </summary>
+    /// <param name="startElement">Descendant element whose owning root must be resolved.</param>
+    /// <returns>The nearest registered root, or null when none is found.</returns>
     private static VisualElement ResolveRegisteredRoot(VisualElement startElement)
     {
         VisualElement currentElement = startElement;
@@ -569,10 +549,10 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Resolves the state-key prefix associated with one registered management-tool root.
-    /// /params root Registered management-tool root being inspected.
-    /// /params stateKeyPrefix Resolved stable prefix when present.
-    /// /returns True when one state-key prefix is available for the supplied root.
     /// </summary>
+    /// <param name="root">Registered management-tool root being inspected.</param>
+    /// <param name="stateKeyPrefix">Resolved stable prefix when present.</param>
+    /// <returns>True when one state-key prefix is available for the supplied root.</returns>
     private static bool TryGetStateKeyPrefix(VisualElement root, out string stateKeyPrefix)
     {
         stateKeyPrefix = string.Empty;
@@ -591,10 +571,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Handles right-click fallback routing on the tool root for targets that were not yet directly registered.
-    /// /params root Registered management-tool root receiving the bubbled mouse event.
-    /// /params evt Mouse event emitted by UI Toolkit.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Registered management-tool root receiving the bubbled mouse event.</param>
+    /// <param name="evt">Mouse event emitted by UI Toolkit.</param>
     private static void HandleRootRightMouseDownFallback(VisualElement root, MouseDownEvent evt)
     {
         if (root == null || evt == null)
@@ -627,10 +606,9 @@ public static class ManagementToolInteractiveElementColorUtility
 
     /// <summary>
     /// Schedules one deferred full-tree rescan so controls materialized after a panel swap or PropertyField rebind still recover their saved color mapping automatically.
-    /// /params registeredRoot Registered management-tool root that owns the hierarchy.
-    /// /params stateKeyPrefix Stable state-key prefix used by the root hierarchy.
-    /// /returns None.
     /// </summary>
+    /// <param name="registeredRoot">Registered management-tool root that owns the hierarchy.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used by the root hierarchy.</param>
     private static void ScheduleDeferredHierarchyRefresh(VisualElement registeredRoot, string stateKeyPrefix)
     {
         if (registeredRoot == null)

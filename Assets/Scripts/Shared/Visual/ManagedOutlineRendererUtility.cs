@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Applies managed outline property overrides to renderer hierarchies that already expose outline shader properties.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class ManagedOutlineRendererUtility
 {
@@ -24,12 +22,11 @@ public static class ManagedOutlineRendererUtility
     #region Public Methods
     /// <summary>
     /// Applies the requested outline state to every compatible renderer below the provided animator.
-    /// /params animator Root animator whose renderer hierarchy should receive outline overrides.
-    /// /params enabled When false, outline thickness is forced to zero.
-    /// /params outlineColor Outline color written to compatible renderers.
-    /// /params outlineThickness Outline thickness written to compatible renderers.
-    /// /returns None.
     /// </summary>
+    /// <param name="animator">Root animator whose renderer hierarchy should receive outline overrides.</param>
+    /// <param name="enabled">When false, outline thickness is forced to zero.</param>
+    /// <param name="outlineColor">Outline color written to compatible renderers.</param>
+    /// <param name="outlineThickness">Outline thickness written to compatible renderers.</param>
     public static void ApplyToAnimator(Animator animator,
                                        bool enabled,
                                        Color outlineColor,
@@ -60,8 +57,6 @@ public static class ManagedOutlineRendererUtility
 
     /// <summary>
     /// Clears the cached renderer sets.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void ClearCache()
     {
@@ -72,10 +67,10 @@ public static class ManagedOutlineRendererUtility
     #region Cache
     /// <summary>
     /// Resolves the cached renderer set associated with one animator, rebuilding it when the hierarchy changed.
-    /// /params animatorInstanceId Stable animator instance identifier.
-    /// /params animator Animator whose hierarchy should be cached.
-    /// /returns The cached renderer set for the animator.
     /// </summary>
+    /// <param name="animatorInstanceId">Stable animator instance identifier.</param>
+    /// <param name="animator">Animator whose hierarchy should be cached.</param>
+    /// <returns>The cached renderer set for the animator.</returns>
     private static CachedRendererSet GetOrCreateRendererSet(int animatorInstanceId, Animator animator)
     {
         CachedRendererSet rendererSet;
@@ -95,9 +90,9 @@ public static class ManagedOutlineRendererUtility
 
     /// <summary>
     /// Builds one renderer cache from the supplied animator hierarchy.
-    /// /params animator Animator whose renderer hierarchy should be scanned.
-    /// /returns The newly built renderer cache.
     /// </summary>
+    /// <param name="animator">Animator whose renderer hierarchy should be scanned.</param>
+    /// <returns>The newly built renderer cache.</returns>
     private static CachedRendererSet BuildRendererSet(Animator animator)
     {
         CachedRendererSet rendererSet = new CachedRendererSet();
@@ -128,9 +123,9 @@ public static class ManagedOutlineRendererUtility
 
     /// <summary>
     /// Creates one cached renderer entry and detects whether any shared material exposes outline properties.
-    /// /params renderer Renderer inspected for outline compatibility.
-    /// /returns The created cached renderer entry.
     /// </summary>
+    /// <param name="renderer">Renderer inspected for outline compatibility.</param>
+    /// <returns>The created cached renderer entry.</returns>
     private static CachedRendererEntry CreateRendererEntry(Renderer renderer)
     {
         CachedRendererEntry entry = new CachedRendererEntry();
@@ -159,11 +154,10 @@ public static class ManagedOutlineRendererUtility
     #region Apply
     /// <summary>
     /// Applies one outline override to a single cached renderer entry.
-    /// /params entry Cached renderer entry receiving the property-block update.
-    /// /params outlineColor Outline color to apply.
-    /// /params outlineThickness Outline thickness to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="entry">Cached renderer entry receiving the property-block update.</param>
+    /// <param name="outlineColor">Outline color to apply.</param>
+    /// <param name="outlineThickness">Outline thickness to apply.</param>
     private static void ApplyEntry(CachedRendererEntry entry, Color outlineColor, float outlineThickness)
     {
         Renderer renderer = entry.Renderer;
@@ -189,8 +183,6 @@ public static class ManagedOutlineRendererUtility
     #region Nested Types
     /// <summary>
     /// Cached renderer-set entry list bound to one animator instance.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private sealed class CachedRendererSet
     {
@@ -225,11 +217,11 @@ public static class ManagedOutlineRendererUtility
         #region Methods
         /// <summary>
         /// Checks whether the currently cached outline state already matches the requested state.
-        /// /params enabled Requested enable flag.
-        /// /params outlineColor Requested outline color.
-        /// /params outlineThickness Requested outline thickness.
-        /// /returns True when no renderer update is required.
         /// </summary>
+        /// <param name="enabled">Requested enable flag.</param>
+        /// <param name="outlineColor">Requested outline color.</param>
+        /// <param name="outlineThickness">Requested outline thickness.</param>
+        /// <returns>True when no renderer update is required.</returns>
         public bool IsAppliedStateUpToDate(bool enabled, Color outlineColor, float outlineThickness)
         {
             if (!AppliedStateInitialized)
@@ -246,11 +238,10 @@ public static class ManagedOutlineRendererUtility
 
         /// <summary>
         /// Stores one outline state after a successful renderer update.
-        /// /params enabled Applied enable flag.
-        /// /params outlineColor Applied outline color.
-        /// /params outlineThickness Applied outline thickness.
-        /// /returns None.
         /// </summary>
+        /// <param name="enabled">Applied enable flag.</param>
+        /// <param name="outlineColor">Applied outline color.</param>
+        /// <param name="outlineThickness">Applied outline thickness.</param>
         public void SetAppliedState(bool enabled, Color outlineColor, float outlineThickness)
         {
             AppliedEnabled = enabled ? (byte)1 : (byte)0;
@@ -261,10 +252,10 @@ public static class ManagedOutlineRendererUtility
 
         /// <summary>
         /// Compares two colors using a small tolerance suitable for inspector-authored values.
-        /// /params left First color.
-        /// /params right Second color.
-        /// /returns True when all channels are effectively equal.
         /// </summary>
+        /// <param name="left">First color.</param>
+        /// <param name="right">Second color.</param>
+        /// <returns>True when all channels are effectively equal.</returns>
         private static bool AreColorsEquivalent(Color left, Color right)
         {
             if (Mathf.Abs(left.r - right.r) > ColorEpsilon)
@@ -283,8 +274,6 @@ public static class ManagedOutlineRendererUtility
 
     /// <summary>
     /// Cached per-renderer outline capabilities and reusable property block.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private sealed class CachedRendererEntry
     {

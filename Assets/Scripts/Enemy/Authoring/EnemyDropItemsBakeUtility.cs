@@ -17,9 +17,8 @@ internal static class EnemyDropItemsBakeUtility
     #region Public Methods
     /// <summary>
     /// Creates the default summary config used before any Drop Items module is compiled.
-    /// /params None.
-    /// /returns Default drop-items summary config.
     /// </summary>
+    /// <returns>Default drop-items summary config.</returns>
     public static EnemyDropItemsConfig CreateDefaultConfig()
     {
         return new EnemyDropItemsConfig
@@ -34,10 +33,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Appends one compiled Drop Items payload to the aggregated bake result.
-    /// /params payload Effective payload block resolved from a module definition or binding override.
-    /// /params result Mutable compiled result receiving module data.
-    /// /returns None.
     /// </summary>
+    /// <param name="payload">Effective payload block resolved from a module definition or binding override.</param>
+    /// <param name="result">Mutable compiled result receiving module data.</param>
     public static void TryAppendModule(EnemyPatternModulePayloadData payload,
                                        ref EnemyCompiledPatternBakeResult result)
     {
@@ -60,9 +58,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Resolves one legal drop-items payload kind authored in the editor.
-    /// /params payloadKind Authored payload kind candidate.
-    /// /returns Sanitized payload kind used by bake.
     /// </summary>
+    /// <param name="payloadKind">Authored payload kind candidate.</param>
+    /// <returns>Sanitized payload kind used by bake.</returns>
     public static EnemyDropItemsPayloadKind ResolveDropItemsPayloadKind(EnemyDropItemsPayloadKind payloadKind)
     {
         switch (payloadKind)
@@ -78,9 +76,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Resolves one legal Extra Combo Points metric authored in the editor.
-    /// /params metric Authored metric candidate.
-    /// /returns Sanitized metric used by bake/runtime.
     /// </summary>
+    /// <param name="metric">Authored metric candidate.</param>
+    /// <returns>Sanitized metric used by bake/runtime.</returns>
     public static EnemyExtraComboPointsMetric ResolveMetric(EnemyExtraComboPointsMetric metric)
     {
         switch (metric)
@@ -99,9 +97,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Resolves one legal Extra Combo Points condition-combine mode authored in the editor.
-    /// /params combineMode Authored combine mode candidate.
-    /// /returns Sanitized combine mode used by bake/runtime.
     /// </summary>
+    /// <param name="combineMode">Authored combine mode candidate.</param>
+    /// <returns>Sanitized combine mode used by bake/runtime.</returns>
     public static EnemyExtraComboPointsConditionCombineMode ResolveConditionCombineMode(EnemyExtraComboPointsConditionCombineMode combineMode)
     {
         switch (combineMode)
@@ -120,10 +118,9 @@ internal static class EnemyDropItemsBakeUtility
     #region Private Methods
     /// <summary>
     /// Appends one compiled experience-drop module to the bake result.
-    /// /params experiencePayload Experience payload block resolved from authoring.
-    /// /params result Mutable compiled result receiving module data.
-    /// /returns None.
     /// </summary>
+    /// <param name="experiencePayload">Experience payload block resolved from authoring.</param>
+    /// <param name="result">Mutable compiled result receiving module data.</param>
     private static void TryAppendExperienceModule(EnemyExperienceDropPayload experiencePayload,
                                                   ref EnemyCompiledPatternBakeResult result)
     {
@@ -201,10 +198,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Appends one compiled Extra Combo Points module to the bake result.
-    /// /params extraComboPointsPayload Extra Combo Points payload block resolved from authoring.
-    /// /params result Mutable compiled result receiving module data.
-    /// /returns None.
     /// </summary>
+    /// <param name="extraComboPointsPayload">Extra Combo Points payload block resolved from authoring.</param>
+    /// <param name="result">Mutable compiled result receiving module data.</param>
     private static void TryAppendExtraComboPointsModule(EnemyExtraComboPointsPayload extraComboPointsPayload,
                                                         ref EnemyCompiledPatternBakeResult result)
     {
@@ -253,10 +249,10 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Adds one estimated drop count to the running summary while protecting against integer overflow.
-    /// /params currentEstimatedCount Current accumulated estimated count.
-    /// /params additionalEstimatedCount Additional count to append.
-    /// /returns Saturated estimated drop count.
     /// </summary>
+    /// <param name="currentEstimatedCount">Current accumulated estimated count.</param>
+    /// <param name="additionalEstimatedCount">Additional count to append.</param>
+    /// <returns>Saturated estimated drop count.</returns>
     private static int AddEstimatedDropCount(int currentEstimatedCount, int additionalEstimatedCount)
     {
         long resolvedCount = (long)math.max(0, currentEstimatedCount) + math.max(0, additionalEstimatedCount);
@@ -269,9 +265,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Samples one normalized multiplier curve into a compact fixed list used directly by ECS runtime.
-    /// /params normalizedMultiplierCurve Authored normalized response curve.
-    /// /returns Fixed-size sampled curve values in the 0..1 range.
     /// </summary>
+    /// <param name="normalizedMultiplierCurve">Authored normalized response curve.</param>
+    /// <returns>Fixed-size sampled curve values in the 0..1 range.</returns>
     private static FixedList64Bytes<float> BuildNormalizedMultiplierCurveSamples(AnimationCurve normalizedMultiplierCurve)
     {
         FixedList64Bytes<float> sampledCurve = default;
@@ -290,9 +286,9 @@ internal static class EnemyDropItemsBakeUtility
 
     /// <summary>
     /// Resolves a valid normalized multiplier curve when authoring data is missing.
-    /// /params normalizedMultiplierCurve Authored response curve.
-    /// /returns Non-null curve used by bake sampling.
     /// </summary>
+    /// <param name="normalizedMultiplierCurve">Authored response curve.</param>
+    /// <returns>Non-null curve used by bake sampling.</returns>
     private static AnimationCurve ResolveNormalizedMultiplierCurve(AnimationCurve normalizedMultiplierCurve)
     {
         if (normalizedMultiplierCurve != null)

@@ -13,7 +13,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// </summary>
     /// <param name="powerUpsConfig">Current runtime power-up config used to seed slot values.</param>
     /// <param name="currentKillCount">Current global kill count tracked by power-up charge systems.</param>
-    /// <returns>Initialized runtime state ready to add as PlayerPowerUpsState.<returns>
+    /// <returns>Initialized runtime state ready to add as PlayerPowerUpsState.</returns>
     public static PlayerPowerUpsState CreateInitialState(in PlayerPowerUpsConfig powerUpsConfig, uint currentKillCount)
     {
         PlayerPowerUpsState powerUpsState = new PlayerPowerUpsState
@@ -58,7 +58,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsConfig">Runtime loadout config to mutate.</param>
     /// <param name="powerUpsState">Runtime slot state to update.</param>
     /// <param name="targetSlotIndex">Resolved slot index receiving the new active power-up.</param>
-    /// <returns>True when the active power-up was equipped; otherwise false.<returns>
+    /// <returns>True when the active power-up was equipped; otherwise false.</returns>
     public static bool TryEquipIntoOldestSlot(in PlayerPowerUpSlotConfig activeSlotConfig,
                                               ref PlayerPowerUpsConfig powerUpsConfig,
                                               ref PlayerPowerUpsState powerUpsState,
@@ -82,7 +82,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsState">Runtime slot state to update.</param>
     /// <param name="targetSlotIndex">Resolved slot index receiving the new active power-up.</param>
     /// <param name="replacedPowerUp">Snapshot of the replaced slot ready to store in a dropped container.</param>
-    /// <returns>True when the active power-up was equipped; otherwise false.<returns>
+    /// <returns>True when the active power-up was equipped; otherwise false.</returns>
     public static bool TryEquipIntoOldestSlot(in PlayerPowerUpSlotConfig activeSlotConfig,
                                               PlayerPowerUpContainerStoredStateMode storedStateMode,
                                               ref PlayerPowerUpsConfig powerUpsConfig,
@@ -128,7 +128,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsConfig">Runtime loadout config to mutate.</param>
     /// <param name="powerUpsState">Runtime slot state to mutate.</param>
     /// <param name="storedPowerUpConsumed">True when the target slot was empty and the container should be destroyed after the equip.</param>
-    /// <returns>True when the swap succeeded; otherwise false.<returns>
+    /// <returns>True when the swap succeeded; otherwise false.</returns>
     public static bool TrySwapStoredPowerUpWithSlot(ref PlayerStoredActivePowerUpData storedPowerUp,
                                                     int targetSlotIndex,
                                                     PlayerPowerUpContainerStoredStateMode storedStateMode,
@@ -207,7 +207,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// </summary>
     /// <param name="powerUpsConfig">Current runtime loadout config.</param>
     /// <param name="powerUpsState">Current runtime slot state containing equip-order metadata.</param>
-    /// <returns>0 for primary or 1 for secondary.<returns>
+    /// <returns>0 for primary or 1 for secondary.</returns>
     private static int ResolveOldestActiveSlotIndex(in PlayerPowerUpsConfig powerUpsConfig, in PlayerPowerUpsState powerUpsState)
     {
         bool hasPrimary = powerUpsConfig.PrimarySlot.IsDefined != 0;
@@ -232,7 +232,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="storedStateMode">Storage policy applied while building the snapshot.</param>
     /// <param name="powerUpsConfig">Runtime loadout config inspected for slot data.</param>
     /// <param name="powerUpsState">Runtime slot state inspected for energy and cooldown values.</param>
-    /// <returns>Stored slot snapshot ready to serialize into a dropped container.<returns>
+    /// <returns>Stored slot snapshot ready to serialize into a dropped container.</returns>
     private static PlayerStoredActivePowerUpData CaptureStoredPowerUp(int slotIndex,
                                                                       PlayerPowerUpContainerStoredStateMode storedStateMode,
                                                                       in PlayerPowerUpsConfig powerUpsConfig,
@@ -339,7 +339,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// Consumes the next monotonically increasing equip-order value.
     /// </summary>
     /// <param name="powerUpsState">Runtime state that stores the next available order value.</param>
-    /// <returns>Equip-order value assigned to the newly equipped active power-up.<returns>
+    /// <returns>Equip-order value assigned to the newly equipped active power-up.</returns>
     private static int ConsumeNextEquipOrder(ref PlayerPowerUpsState powerUpsState)
     {
         int nextEquipOrder = powerUpsState.NextEquipOrder > 0 ? powerUpsState.NextEquipOrder : 1;

@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Draws projectile-specific runtime gizmos without bloating the shared runtime entity renderer.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class RuntimeEntityProjectileGizmoUtility
 {
@@ -33,12 +31,11 @@ internal static class RuntimeEntityProjectileGizmoUtility
     #region Public Methods
     /// <summary>
     /// Draws live projectile combat envelopes and travel hints near the player while respecting strict debug caps.
-    /// /params primitiveDrawer Active rendering backend receiving primitive calls.
-    /// /params entityManager Runtime entity manager used to fetch projectile components.
-    /// /params projectileQuery Query selecting active projectile entities.
-    /// /params playerPosition Runtime player position used for distance filtering.
-    /// /returns None.
     /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="entityManager">Runtime entity manager used to fetch projectile components.</param>
+    /// <param name="projectileQuery">Query selecting active projectile entities.</param>
+    /// <param name="playerPosition">Runtime player position used for distance filtering.</param>
     public static void DrawProjectileGizmos(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
                                             EntityManager entityManager,
                                             EntityQuery projectileQuery,
@@ -82,14 +79,14 @@ internal static class RuntimeEntityProjectileGizmoUtility
     #region Draw
     /// <summary>
     /// Draws one projectile when it is close enough and has at least one enabled projectile debug layer.
-    /// /params primitiveDrawer Active rendering backend receiving primitive calls.
-    /// /params entityManager Runtime entity manager used to fetch projectile components.
-    /// /params projectileEntity Projectile entity being drawn.
-    /// /params playerPosition Runtime player position used for distance filtering.
-    /// /params drawnCount Mutable draw count used by the caller cap.
-    /// /params labeledCount Mutable label count used by the caller cap.
-    /// /returns True when a projectile gizmo was drawn.
     /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="entityManager">Runtime entity manager used to fetch projectile components.</param>
+    /// <param name="projectileEntity">Projectile entity being drawn.</param>
+    /// <param name="playerPosition">Runtime player position used for distance filtering.</param>
+    /// <param name="drawnCount">Mutable draw count used by the caller cap.</param>
+    /// <param name="labeledCount">Mutable label count used by the caller cap.</param>
+    /// <returns>True when a projectile gizmo was drawn.</returns>
     private static bool TryDrawProjectile(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
                                           EntityManager entityManager,
                                           Entity projectileEntity,
@@ -148,13 +145,13 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Draws one projectile impact radius disc.
-    /// /params primitiveDrawer Active rendering backend receiving primitive calls.
-    /// /params projectile Projectile combat data used to resolve impact radius.
-    /// /params projectileTransform Projectile transform used for scale.
-    /// /params projectilePosition World-space projectile position.
-    /// /params isPlayerOwned True when the projectile belongs to the player.
-    /// /returns True when the impact radius disc was drawn.
     /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="projectile">Projectile combat data used to resolve impact radius.</param>
+    /// <param name="projectileTransform">Projectile transform used for scale.</param>
+    /// <param name="projectilePosition">World-space projectile position.</param>
+    /// <param name="isPlayerOwned">True when the projectile belongs to the player.</param>
+    /// <returns>True when the impact radius disc was drawn.</returns>
     private static bool DrawImpactRadius(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
                                          Projectile projectile,
                                          in LocalTransform projectileTransform,
@@ -174,15 +171,15 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Draws one projectile velocity vector using the same inherited velocity as runtime motion.
-    /// /params primitiveDrawer Active rendering backend receiving primitive calls.
-    /// /params entityManager Runtime entity manager used to fetch projectile components.
-    /// /params projectileEntity Projectile entity used to resolve special trajectory state.
-    /// /params projectile Projectile motion data.
-    /// /params projectileOwner Projectile owner data.
-    /// /params projectilePosition World-space projectile position.
-    /// /params isPlayerOwned True when the projectile belongs to the player.
-    /// /returns True when the velocity vector was drawn.
     /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="entityManager">Runtime entity manager used to fetch projectile components.</param>
+    /// <param name="projectileEntity">Projectile entity used to resolve special trajectory state.</param>
+    /// <param name="projectile">Projectile motion data.</param>
+    /// <param name="projectileOwner">Projectile owner data.</param>
+    /// <param name="projectilePosition">World-space projectile position.</param>
+    /// <param name="isPlayerOwned">True when the projectile belongs to the player.</param>
+    /// <returns>True when the velocity vector was drawn.</returns>
     private static bool DrawVelocity(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
                                      EntityManager entityManager,
                                      Entity projectileEntity,
@@ -203,17 +200,17 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Draws one estimated projectile travel endpoint using inherited velocity and propulsion-only range consumption.
-    /// /params primitiveDrawer Active rendering backend receiving primitive calls.
-    /// /params entityManager Runtime entity manager used to fetch projectile components.
-    /// /params projectileEntity Projectile entity used to resolve special trajectory state.
-    /// /params projectile Projectile motion and range data.
-    /// /params projectileRuntimeState Projectile runtime counters.
-    /// /params projectileTransform Projectile transform used as the endpoint origin.
-    /// /params projectileOwner Projectile owner data.
-    /// /params projectilePosition World-space projectile position.
-    /// /params isPlayerOwned True when the projectile belongs to the player.
-    /// /returns True when the remaining-range preview was drawn.
     /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="entityManager">Runtime entity manager used to fetch projectile components.</param>
+    /// <param name="projectileEntity">Projectile entity used to resolve special trajectory state.</param>
+    /// <param name="projectile">Projectile motion and range data.</param>
+    /// <param name="projectileRuntimeState">Projectile runtime counters.</param>
+    /// <param name="projectileTransform">Projectile transform used as the endpoint origin.</param>
+    /// <param name="projectileOwner">Projectile owner data.</param>
+    /// <param name="projectilePosition">World-space projectile position.</param>
+    /// <param name="isPlayerOwned">True when the projectile belongs to the player.</param>
+    /// <returns>True when the remaining-range preview was drawn.</returns>
     private static bool DrawRemainingRange(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
                                            EntityManager entityManager,
                                            Entity projectileEntity,
@@ -244,9 +241,8 @@ internal static class RuntimeEntityProjectileGizmoUtility
     #region Resolution
     /// <summary>
     /// Checks whether at least one projectile debug layer is currently enabled.
-    /// /params None.
-    /// /returns True when projectile gizmos should be evaluated.
     /// </summary>
+    /// <returns>True when projectile gizmos should be evaluated.</returns>
     private static bool AnyProjectileGizmoEnabled()
     {
         return RuntimeGizmoDebugState.ProjectileImpactRadiusEnabled ||
@@ -256,10 +252,10 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Resolves the projectile impact radius including explosion payload radius.
-    /// /params projectile Projectile combat data.
-    /// /params projectileTransform Projectile transform used for current scale.
-    /// /returns World-space impact radius.
     /// </summary>
+    /// <param name="projectile">Projectile combat data.</param>
+    /// <param name="projectileTransform">Projectile transform used for current scale.</param>
+    /// <returns>World-space impact radius.</returns>
     private static float ResolveProjectileImpactRadius(Projectile projectile,
                                                        in LocalTransform projectileTransform)
     {
@@ -270,13 +266,13 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Resolves the current travel velocity used by the projectile debug vector.
-    /// /params entityManager Runtime entity manager used to inspect special trajectory state.
-    /// /params projectileEntity Projectile entity being inspected.
-    /// /params projectile Projectile motion data.
-    /// /params projectileOwner Projectile owner data.
-    /// /params projectileVelocity Resolved world-space velocity when the method succeeds.
-    /// /returns True when the projectile has a drawable velocity.
     /// </summary>
+    /// <param name="entityManager">Runtime entity manager used to inspect special trajectory state.</param>
+    /// <param name="projectileEntity">Projectile entity being inspected.</param>
+    /// <param name="projectile">Projectile motion data.</param>
+    /// <param name="projectileOwner">Projectile owner data.</param>
+    /// <param name="projectileVelocity">Resolved world-space velocity when the method succeeds.</param>
+    /// <returns>True when the projectile has a drawable velocity.</returns>
     private static bool TryResolveProjectileTravelVelocity(EntityManager entityManager,
                                                            Entity projectileEntity,
                                                            Projectile projectile,
@@ -302,15 +298,15 @@ internal static class RuntimeEntityProjectileGizmoUtility
 
     /// <summary>
     /// Resolves an estimated endpoint for the projectile under its current linear velocity and remaining limits.
-    /// /params entityManager Runtime entity manager used to inspect special trajectory state.
-    /// /params projectileEntity Projectile entity being inspected.
-    /// /params projectile Projectile motion and range data.
-    /// /params projectileRuntimeState Projectile runtime counters.
-    /// /params projectileTransform Projectile transform used as the endpoint origin.
-    /// /params projectileOwner Projectile owner data.
-    /// /params projectileTravelEnd Resolved endpoint when the method succeeds.
-    /// /returns True when an endpoint can be estimated.
     /// </summary>
+    /// <param name="entityManager">Runtime entity manager used to inspect special trajectory state.</param>
+    /// <param name="projectileEntity">Projectile entity being inspected.</param>
+    /// <param name="projectile">Projectile motion and range data.</param>
+    /// <param name="projectileRuntimeState">Projectile runtime counters.</param>
+    /// <param name="projectileTransform">Projectile transform used as the endpoint origin.</param>
+    /// <param name="projectileOwner">Projectile owner data.</param>
+    /// <param name="projectileTravelEnd">Resolved endpoint when the method succeeds.</param>
+    /// <returns>True when an endpoint can be estimated.</returns>
     private static bool TryResolveProjectileTravelEnd(EntityManager entityManager,
                                                       Entity projectileEntity,
                                                       Projectile projectile,
@@ -346,9 +342,9 @@ internal static class RuntimeEntityProjectileGizmoUtility
     #region Conversion
     /// <summary>
     /// Converts a math vector to a UnityEngine vector.
-    /// /params value Source math vector.
-    /// /returns Managed Vector3 with matching components.
     /// </summary>
+    /// <param name="value">Source math vector.</param>
+    /// <returns>Managed Vector3 with matching components.</returns>
     private static Vector3 ToVector3(float3 value)
     {
         return new Vector3(value.x, value.y, value.z);

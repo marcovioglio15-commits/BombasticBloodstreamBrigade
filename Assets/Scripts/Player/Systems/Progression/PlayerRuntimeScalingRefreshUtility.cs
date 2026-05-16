@@ -10,42 +10,42 @@ internal static class PlayerRuntimeScalingRefreshUtility
     #region Public Methods
     /// <summary>
     /// Rebuilds runtime-scaled controller, progression, and power-up configs for one player entity when all required data is available.
-    /// entity: Player entity being refreshed.
-    /// scalableStatsLookup: Runtime scalable-stat buffer lookup.
-    /// controllerScalingLookup: Controller scaling metadata lookup.
-    /// baseMovementLookup: Immutable movement baseline lookup.
-    /// runtimeMovementLookup: Mutable runtime movement config lookup.
-    /// baseLookLookup: Immutable look baseline lookup.
-    /// runtimeLookLookup: Mutable runtime look config lookup.
-    /// baseCameraLookup: Immutable camera baseline lookup.
-    /// runtimeCameraLookup: Mutable runtime camera config lookup.
-    /// baseShootingLookup: Immutable shooting baseline lookup.
-    /// runtimeShootingLookup: Mutable runtime shooting config lookup.
-    /// baseAppliedElementSlotsLookup: Immutable shooting applied-element slot baseline lookup.
-    /// runtimeAppliedElementSlotsLookup: Mutable runtime shooting applied-element slot lookup.
-    /// baseHealthLookup: Immutable health baseline lookup.
-    /// runtimeHealthLookup: Mutable runtime health config lookup.
-    /// progressionScalingLookup: Progression scaling metadata lookup.
-    /// baseGamePhasesLookup: Immutable progression-phase baseline lookup.
-    /// runtimeGamePhasesLookup: Mutable runtime progression-phase lookup.
-    /// baseComboPassiveUnlocksLookup: Immutable combo passive-unlock baseline lookup.
-    /// runtimeComboPassiveUnlocksLookup: Mutable runtime combo passive-unlock lookup.
-    /// basePowerUpConfigsLookup: Immutable modular power-up baseline lookup.
-    /// powerUpScalingLookup: Runtime power-up scaling metadata lookup.
-    /// powerUpsConfigLookup: Mutable active-slot config lookup.
-    /// unlockCatalogLookup: Mutable unlock catalog lookup.
-    /// equippedPassiveToolsLookup: Mutable equipped-passive buffer lookup.
-    /// passiveToolsStateLookup: Mutable aggregated passive-state lookup.
-    /// healthLookup: Mutable health component lookup.
-    /// shieldLookup: Mutable shield component lookup.
-    /// progressionConfigLookup: Runtime progression config lookup.
-    /// experienceLookup: Mutable player experience lookup.
-    /// levelLookup: Mutable player level lookup.
-    /// experienceCollectionLookup: Mutable pickup-radius runtime lookup.
-    /// runtimeScalingStateLookup: Mutable runtime-scaling sync state lookup.
-    /// forceApply: True to bypass the scalable-stat hash short-circuit.
-    /// returns True when runtime-scaled data was rebuilt; otherwise false.
     /// </summary>
+    /// <param name="entity">Player entity being refreshed.</param>
+    /// <param name="scalableStatsLookup">Runtime scalable-stat buffer lookup.</param>
+    /// <param name="controllerScalingLookup">Controller scaling metadata lookup.</param>
+    /// <param name="baseMovementLookup">Immutable movement baseline lookup.</param>
+    /// <param name="runtimeMovementLookup">Mutable runtime movement config lookup.</param>
+    /// <param name="baseLookLookup">Immutable look baseline lookup.</param>
+    /// <param name="runtimeLookLookup">Mutable runtime look config lookup.</param>
+    /// <param name="baseCameraLookup">Immutable camera baseline lookup.</param>
+    /// <param name="runtimeCameraLookup">Mutable runtime camera config lookup.</param>
+    /// <param name="baseShootingLookup">Immutable shooting baseline lookup.</param>
+    /// <param name="runtimeShootingLookup">Mutable runtime shooting config lookup.</param>
+    /// <param name="baseAppliedElementSlotsLookup">Immutable shooting applied-element slot baseline lookup.</param>
+    /// <param name="runtimeAppliedElementSlotsLookup">Mutable runtime shooting applied-element slot lookup.</param>
+    /// <param name="baseHealthLookup">Immutable health baseline lookup.</param>
+    /// <param name="runtimeHealthLookup">Mutable runtime health config lookup.</param>
+    /// <param name="progressionScalingLookup">Progression scaling metadata lookup.</param>
+    /// <param name="baseGamePhasesLookup">Immutable progression-phase baseline lookup.</param>
+    /// <param name="runtimeGamePhasesLookup">Mutable runtime progression-phase lookup.</param>
+    /// <param name="baseComboPassiveUnlocksLookup">Immutable combo passive-unlock baseline lookup.</param>
+    /// <param name="runtimeComboPassiveUnlocksLookup">Mutable runtime combo passive-unlock lookup.</param>
+    /// <param name="basePowerUpConfigsLookup">Immutable modular power-up baseline lookup.</param>
+    /// <param name="powerUpScalingLookup">Runtime power-up scaling metadata lookup.</param>
+    /// <param name="powerUpsConfigLookup">Mutable active-slot config lookup.</param>
+    /// <param name="unlockCatalogLookup">Mutable unlock catalog lookup.</param>
+    /// <param name="equippedPassiveToolsLookup">Mutable equipped-passive buffer lookup.</param>
+    /// <param name="passiveToolsStateLookup">Mutable aggregated passive-state lookup.</param>
+    /// <param name="healthLookup">Mutable health component lookup.</param>
+    /// <param name="shieldLookup">Mutable shield component lookup.</param>
+    /// <param name="progressionConfigLookup">Runtime progression config lookup.</param>
+    /// <param name="experienceLookup">Mutable player experience lookup.</param>
+    /// <param name="levelLookup">Mutable player level lookup.</param>
+    /// <param name="experienceCollectionLookup">Mutable pickup-radius runtime lookup.</param>
+    /// <param name="runtimeScalingStateLookup">Mutable runtime-scaling sync state lookup.</param>
+    /// <param name="forceApply">True to bypass the scalable-stat hash short-circuit.</param>
+    /// <returns>True when runtime-scaled data was rebuilt; otherwise false.</returns>
     public static bool TryApplyForEntity(Entity entity,
                                          BufferLookup<PlayerScalableStatElement> scalableStatsLookup,
                                          BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup,

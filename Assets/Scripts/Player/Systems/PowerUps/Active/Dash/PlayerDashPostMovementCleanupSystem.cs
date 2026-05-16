@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Clears synthetic dash velocity after PlayerMovementApplySystem has consumed the final fixed-distance dash step.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMovementApplySystem))]
@@ -15,9 +13,8 @@ public partial struct PlayerDashPostMovementCleanupSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the dash and movement state required by the post-apply cleanup pass.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerDashState>();
@@ -26,9 +23,8 @@ public partial struct PlayerDashPostMovementCleanupSystem : ISystem
 
     /// <summary>
     /// Removes final-frame dash velocity so the next movement update resumes from player input instead of inherited dash speed.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         foreach ((RefRW<PlayerDashState> dashState,

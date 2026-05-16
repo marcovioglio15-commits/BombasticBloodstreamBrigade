@@ -5,8 +5,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Resolves runtime values for dropped power-up container interactions.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerPowerUpContainerInteractionRuntimeUtility
 {
@@ -19,10 +17,10 @@ internal static class PlayerPowerUpContainerInteractionRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Resolves the current post-swap interaction cooldown from baked config and optional Add Scaling metadata.
-    /// /params interactionConfig Runtime container interaction config baked on the player entity.
-    /// /params scalableStats Current runtime scalable-stat buffer used by formula variables.
-    /// /returns Non-negative cooldown duration in seconds.
     /// </summary>
+    /// <param name="interactionConfig">Runtime container interaction config baked on the player entity.</param>
+    /// <param name="scalableStats">Current runtime scalable-stat buffer used by formula variables.</param>
+    /// <returns>Non-negative cooldown duration in seconds.</returns>
     public static float ResolveInteractionLockDuration(in PlayerPowerUpContainerInteractionConfig interactionConfig,
                                                        DynamicBuffer<PlayerScalableStatElement> scalableStats)
     {
@@ -53,10 +51,10 @@ internal static class PlayerPowerUpContainerInteractionRuntimeUtility
 
     /// <summary>
     /// Resolves the current post-swap interaction cooldown directly from a player entity.
-    /// /params entityManager Entity manager used to read runtime player config and scalable stats.
-    /// /params playerEntity Player entity that owns the dropped-container interaction config.
-    /// /returns Non-negative cooldown duration in seconds.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read runtime player config and scalable stats.</param>
+    /// <param name="playerEntity">Player entity that owns the dropped-container interaction config.</param>
+    /// <returns>Non-negative cooldown duration in seconds.</returns>
     public static float ResolveInteractionLockDuration(EntityManager entityManager, Entity playerEntity)
     {
         if (playerEntity == Entity.Null)

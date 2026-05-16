@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides shared helpers for boss minions reserved during spawn-warning presentation.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossMinionPendingSpawnUtility
 {
@@ -25,9 +23,8 @@ internal static class EnemyBossMinionPendingSpawnUtility
     #region Public Methods
     /// <summary>
     /// Resolves the shared warning style used before boss-spawned minions become active.
-    /// /params None.
-    /// /returns Spawn warning config matching the default enemy-spawner visual language.
     /// </summary>
+    /// <returns>Spawn warning config matching the default enemy-spawner visual language.</returns>
     public static EnemySpawnWarningConfig BuildSpawnWarningConfig()
     {
         return new EnemySpawnWarningConfig
@@ -46,11 +43,11 @@ internal static class EnemyBossMinionPendingSpawnUtility
 
     /// <summary>
     /// Appends one pending minion activation to the owning boss buffer.
-    /// /params entityManager Entity manager used to reacquire the boss pending buffer.
-    /// /params bossEntity Boss that owns the pending minion.
-    /// /params pendingSpawn Pending minion data to append.
-    /// /returns True when the pending entry was stored.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to reacquire the boss pending buffer.</param>
+    /// <param name="bossEntity">Boss that owns the pending minion.</param>
+    /// <param name="pendingSpawn">Pending minion data to append.</param>
+    /// <returns>True when the pending entry was stored.</returns>
     public static bool TryAppendPendingSpawn(EntityManager entityManager,
                                              Entity bossEntity,
                                              in EnemyBossPendingMinionSpawnElement pendingSpawn)
@@ -68,11 +65,11 @@ internal static class EnemyBossMinionPendingSpawnUtility
 
     /// <summary>
     /// Checks whether a pending minion reservation can still be activated.
-    /// /params entityManager Entity manager used to inspect boss and minion entities.
-    /// /params bossEntity Boss that owns the pending spawn.
-    /// /params pendingSpawn Pending minion reservation.
-    /// /returns True when the minion and its source boss are still valid.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect boss and minion entities.</param>
+    /// <param name="bossEntity">Boss that owns the pending spawn.</param>
+    /// <param name="pendingSpawn">Pending minion reservation.</param>
+    /// <returns>True when the minion and its source boss are still valid.</returns>
     public static bool CanActivatePendingSpawn(EntityManager entityManager,
                                                Entity bossEntity,
                                                in EnemyBossPendingMinionSpawnElement pendingSpawn)
@@ -97,10 +94,9 @@ internal static class EnemyBossMinionPendingSpawnUtility
 
     /// <summary>
     /// Returns one reserved but unactivated minion to its pool.
-    /// /params entityManager Entity manager used to mutate the minion and pool buffer.
-    /// /params pendingSpawn Pending minion reservation to recycle.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the minion and pool buffer.</param>
+    /// <param name="pendingSpawn">Pending minion reservation to recycle.</param>
     public static void RecyclePendingSpawn(EntityManager entityManager,
                                            in EnemyBossPendingMinionSpawnElement pendingSpawn)
     {
@@ -127,10 +123,9 @@ internal static class EnemyBossMinionPendingSpawnUtility
 
     /// <summary>
     /// Recycles and clears every pending minion reservation owned by one boss.
-    /// /params entityManager Entity manager used to access the boss pending buffer.
-    /// /params bossEntity Boss whose pending minion reservations must be cancelled.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access the boss pending buffer.</param>
+    /// <param name="bossEntity">Boss whose pending minion reservations must be cancelled.</param>
     public static void RecycleAndClearPendingSpawns(EntityManager entityManager, Entity bossEntity)
     {
         if (!entityManager.Exists(bossEntity))

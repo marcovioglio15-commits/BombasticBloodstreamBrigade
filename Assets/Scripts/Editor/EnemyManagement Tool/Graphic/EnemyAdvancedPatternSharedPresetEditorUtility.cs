@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides commit-aware field helpers for the shared enemy Modules &amp; Patterns preset editor.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 {
@@ -21,17 +19,16 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
     #region Public Methods
     /// <summary>
     /// Adds one delayed text field bound to shared preset metadata with explicit undo-aware commit.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent element that receives the field.
-    /// /params propertyName Serialized property name on the shared preset.
-    /// /params label Inspector label shown by the field.
-    /// /params tooltip Tooltip shown on the field.
-    /// /params multiline True when the text field should be multiline.
-    /// /params synchronizeAssetName True when the ScriptableObject name must follow the field value.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent element that receives the field.</param>
+    /// <param name="propertyName">Serialized property name on the shared preset.</param>
+    /// <param name="label">Inspector label shown by the field.</param>
+    /// <param name="tooltip">Tooltip shown on the field.</param>
+    /// <param name="multiline">True when the text field should be multiline.</param>
+    /// <param name="synchronizeAssetName">True when the ScriptableObject name must follow the field value.</param>
     public static void AddSharedPresetTextField(EnemyAdvancedPatternPresetsPanel panel,
                                                 SerializedObject sharedPresetSerializedObject,
                                                 EnemyModulesAndPatternsPreset sharedPreset,
@@ -79,12 +76,11 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Adds the shared preset ID row with read-only display and regeneration action.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent element that receives the row.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent element that receives the row.</param>
     public static void AddSharedPresetIdRow(EnemyAdvancedPatternPresetsPanel panel,
                                             SerializedObject sharedPresetSerializedObject,
                                             EnemyModulesAndPatternsPreset sharedPreset,
@@ -123,15 +119,14 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Adds one shared-preset property field with explicit commit logic so list mutations remain persisted and undoable.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent element that receives the field.
-    /// /params propertyName Serialized property name on the shared preset.
-    /// /params label Inspector label shown by the field.
-    /// /params tooltip Tooltip shown on the field.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent element that receives the field.</param>
+    /// <param name="propertyName">Serialized property name on the shared preset.</param>
+    /// <param name="label">Inspector label shown by the field.</param>
+    /// <param name="tooltip">Tooltip shown on the field.</param>
     public static void AddSharedPresetPropertyField(EnemyAdvancedPatternPresetsPanel panel,
                                                     SerializedObject sharedPresetSerializedObject,
                                                     EnemyModulesAndPatternsPreset sharedPreset,
@@ -170,11 +165,10 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Assigns one shared Modules &amp; Patterns preset to the active advanced-pattern preset and rebuilds the details panel.
-    /// /params panel Owning panel that exposes the selected preset and serialized context.
-    /// /params sharedPresetProperty Serialized property storing the shared preset reference.
-    /// /params sharedPreset New shared preset reference to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that exposes the selected preset and serialized context.</param>
+    /// <param name="sharedPresetProperty">Serialized property storing the shared preset reference.</param>
+    /// <param name="sharedPreset">New shared preset reference to assign.</param>
     public static void AssignSharedPreset(EnemyAdvancedPatternPresetsPanel panel,
                                           SerializedProperty sharedPresetProperty,
                                           EnemyModulesAndPatternsPreset sharedPreset)
@@ -208,9 +202,8 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Creates one empty shared preset asset and assigns it to the current advanced-pattern preset.
-    /// /params panel Owning panel that provides selection and serialized context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides selection and serialized context.</param>
     public static void CreateAndAssignSharedPreset(EnemyAdvancedPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -252,15 +245,14 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
     #region Private Methods
     /// <summary>
     /// Applies one committed text change to the shared preset metadata.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params propertyName Serialized property name to update.
-    /// /params rawValue Newly committed text value.
-    /// /params textField Text field that should reflect the normalized value.
-    /// /params synchronizeAssetName True when the ScriptableObject name must follow the field value.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="propertyName">Serialized property name to update.</param>
+    /// <param name="rawValue">Newly committed text value.</param>
+    /// <param name="textField">Text field that should reflect the normalized value.</param>
+    /// <param name="synchronizeAssetName">True when the ScriptableObject name must follow the field value.</param>
     private static void ApplySharedPresetTextChange(EnemyAdvancedPatternPresetsPanel panel,
                                                     SerializedObject sharedPresetSerializedObject,
                                                     EnemyModulesAndPatternsPreset sharedPreset,
@@ -330,11 +322,10 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Regenerates the shared preset ID with undo support.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
     private static void RegenerateSharedPresetId(EnemyAdvancedPatternPresetsPanel panel,
                                                  SerializedObject sharedPresetSerializedObject,
                                                  EnemyModulesAndPatternsPreset sharedPreset)
@@ -361,12 +352,12 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Commits pending serialized-object edits for the shared preset using the normal undo pipeline.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params undoLabel Undo label used for the recorded operation.
-    /// /returns True when at least one serialized change is committed.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="undoLabel">Undo label used for the recorded operation.</param>
+    /// <returns>True when at least one serialized change is committed.</returns>
     internal static bool CommitSharedPresetSerializedChanges(EnemyAdvancedPatternPresetsPanel panel,
                                                              SerializedObject sharedPresetSerializedObject,
                                                              EnemyModulesAndPatternsPreset sharedPreset,
@@ -420,10 +411,10 @@ internal static class EnemyAdvancedPatternSharedPresetEditorUtility
 
     /// <summary>
     /// Normalizes the selected preset loadout against the currently assigned shared preset after shared pattern edits or assignment changes.
-    /// /params panel Owning panel that exposes the selected preset and serialized loadout.
-    /// /params sharedPreset Shared preset whose pattern IDs define the valid loadout space.
-    /// /returns True when the selected preset loadout changes.
     /// </summary>
+    /// <param name="panel">Owning panel that exposes the selected preset and serialized loadout.</param>
+    /// <param name="sharedPreset">Shared preset whose pattern IDs define the valid loadout space.</param>
+    /// <returns>True when the selected preset loadout changes.</returns>
     internal static bool SynchronizeSelectedPresetLoadoutWithSharedPreset(EnemyAdvancedPatternPresetsPanel panel,
                                                                           EnemyModulesAndPatternsPreset sharedPreset)
     {

@@ -309,10 +309,9 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
 
     /// <summary>
     /// Adds PlayerPowerUpVfxPrefabBindingElement buffers to entities missing them.
-    /// /params commandBuffer ECB used to enqueue structural changes.
-    /// /params missingPowerUpVfxPrefabBindingBufferQuery Query selecting entities without PlayerPowerUpVfxPrefabBindingElement buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingPowerUpVfxPrefabBindingBufferQuery">Query selecting entities without PlayerPowerUpVfxPrefabBindingElement buffer.</param>
     public static void AddMissingPowerUpVfxPrefabBindingBuffers(ref EntityCommandBuffer commandBuffer,
                                                                in EntityQuery missingPowerUpVfxPrefabBindingBufferQuery)
     {

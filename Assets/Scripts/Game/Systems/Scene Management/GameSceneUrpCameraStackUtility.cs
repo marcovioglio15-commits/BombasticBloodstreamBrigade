@@ -8,8 +8,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Centralizes URP camera stack mutations used by scene-management bridges.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneUrpCameraStackUtility
 {
@@ -18,11 +16,10 @@ public static class GameSceneUrpCameraStackUtility
     #region Public Methods
     /// <summary>
     /// Inserts an overlay camera into a base camera stack after removing stale copies from other loaded base stacks.
-    /// /params baseCameraData URP data that owns the target camera stack.
-    /// /params overlayCamera Overlay camera that should be rendered by the base stack.
-    /// /params stackIndex Desired insertion index, clamped to the current stack range.
-    /// /returns None.
     /// </summary>
+    /// <param name="baseCameraData">URP data that owns the target camera stack.</param>
+    /// <param name="overlayCamera">Overlay camera that should be rendered by the base stack.</param>
+    /// <param name="stackIndex">Desired insertion index, clamped to the current stack range.</param>
     public static void InsertOverlayCamera(UniversalAdditionalCameraData baseCameraData, Camera overlayCamera, int stackIndex)
     {
         // Reject invalid stack mutations before touching loaded scene cameras.
@@ -35,10 +32,9 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Appends an overlay camera to a base camera stack after removing stale copies from other loaded base stacks.
-    /// /params baseCameraData URP data that owns the target camera stack.
-    /// /params overlayCamera Overlay camera that should be rendered by the base stack.
-    /// /returns None.
     /// </summary>
+    /// <param name="baseCameraData">URP data that owns the target camera stack.</param>
+    /// <param name="overlayCamera">Overlay camera that should be rendered by the base stack.</param>
     public static void AppendOverlayCamera(UniversalAdditionalCameraData baseCameraData, Camera overlayCamera)
     {
         // Reject invalid stack mutations before touching loaded scene cameras.
@@ -51,9 +47,8 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Removes an overlay camera from every loaded base camera stack.
-    /// /params overlayCamera Overlay camera being detached.
-    /// /returns None.
     /// </summary>
+    /// <param name="overlayCamera">Overlay camera being detached.</param>
     public static void RemoveOverlayCameraFromLoadedBaseStacks(Camera overlayCamera)
     {
         // Use the shared cleanup path without preserving any stack owner.
@@ -65,11 +60,10 @@ public static class GameSceneUrpCameraStackUtility
     #region Stack Cleanup
     /// <summary>
     /// Performs the actual stack insertion after public validation has completed.
-    /// /params baseCameraData URP data that owns the target camera stack.
-    /// /params overlayCamera Overlay camera that should be rendered by the base stack.
-    /// /params stackIndex Desired insertion index, clamped to the current stack range.
-    /// /returns None.
     /// </summary>
+    /// <param name="baseCameraData">URP data that owns the target camera stack.</param>
+    /// <param name="overlayCamera">Overlay camera that should be rendered by the base stack.</param>
+    /// <param name="stackIndex">Desired insertion index, clamped to the current stack range.</param>
     private static void InsertOverlayCameraUnchecked(UniversalAdditionalCameraData baseCameraData, Camera overlayCamera, int stackIndex)
     {
         // Ensure an overlay camera is owned by only one loaded base stack at a time.
@@ -85,10 +79,9 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Removes an overlay camera from loaded base stacks, optionally preserving the target stack being rebuilt.
-    /// /params overlayCamera Overlay camera being detached.
-    /// /params preservedBaseCameraData Base camera data that should keep the overlay after insertion.
-    /// /returns None.
     /// </summary>
+    /// <param name="overlayCamera">Overlay camera being detached.</param>
+    /// <param name="preservedBaseCameraData">Base camera data that should keep the overlay after insertion.</param>
     private static void RemoveOverlayCameraFromLoadedBaseStacks(Camera overlayCamera, UniversalAdditionalCameraData preservedBaseCameraData)
     {
         // Null overlays are already detached from every URP stack by definition.
@@ -109,11 +102,10 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Removes an overlay camera from all base stacks found in a loaded scene.
-    /// /params scene Loaded scene being searched.
-    /// /params overlayCamera Overlay camera being detached.
-    /// /params preservedBaseCameraData Base camera data that should not be edited.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Loaded scene being searched.</param>
+    /// <param name="overlayCamera">Overlay camera being detached.</param>
+    /// <param name="preservedBaseCameraData">Base camera data that should not be edited.</param>
     private static void RemoveOverlayCameraFromSceneBaseStacks(Scene scene, Camera overlayCamera, UniversalAdditionalCameraData preservedBaseCameraData)
     {
         // Root traversal keeps the cleanup scene-local and avoids global object scans.
@@ -143,9 +135,8 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Removes null and non-overlay entries before a bridge rewrites one stack.
-    /// /params cameraStack Camera stack being normalized in place.
-    /// /returns None.
     /// </summary>
+    /// <param name="cameraStack">Camera stack being normalized in place.</param>
     private static void PruneInvalidStackEntries(List<Camera> cameraStack)
     {
         // Walk backward so removals never shift unvisited stack entries.
@@ -164,10 +155,10 @@ public static class GameSceneUrpCameraStackUtility
     #region Validation
     /// <summary>
     /// Checks whether the target base stack can be edited by scene-management code.
-    /// /params baseCameraData URP data that should own the stack.
-    /// /params overlayCamera Overlay camera requested for insertion.
-    /// /returns True when the stack and overlay camera are valid.
     /// </summary>
+    /// <param name="baseCameraData">URP data that should own the stack.</param>
+    /// <param name="overlayCamera">Overlay camera requested for insertion.</param>
+    /// <returns>True when the stack and overlay camera are valid.</returns>
     private static bool CanEditBaseStack(UniversalAdditionalCameraData baseCameraData, Camera overlayCamera)
     {
         // Only base cameras own stacks that can legally render overlays.
@@ -179,9 +170,9 @@ public static class GameSceneUrpCameraStackUtility
 
     /// <summary>
     /// Checks whether a camera is configured as a URP overlay camera.
-    /// /params overlayCamera Camera being inspected.
-    /// /returns True when the camera can legally live in a base camera stack.
     /// </summary>
+    /// <param name="overlayCamera">Camera being inspected.</param>
+    /// <returns>True when the camera can legally live in a base camera stack.</returns>
     private static bool IsValidOverlayCamera(Camera overlayCamera)
     {
         // A valid stack entry must be a live camera with URP overlay metadata.
@@ -196,9 +187,8 @@ public static class GameSceneUrpCameraStackUtility
     #region Editor Persistence
     /// <summary>
     /// Marks edited URP camera metadata dirty when stack cleanup runs in the Editor.
-    /// /params cameraData URP metadata that may have changed.
-    /// /returns None.
     /// </summary>
+    /// <param name="cameraData">URP metadata that may have changed.</param>
     private static void MarkCameraDataDirty(UniversalAdditionalCameraData cameraData)
     {
 #if UNITY_EDITOR

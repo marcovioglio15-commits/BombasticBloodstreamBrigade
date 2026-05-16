@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Root orchestrator for game master preset management and game-wide sub preset panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameMasterPresetsPanel
 {
@@ -307,8 +305,6 @@ public sealed class GameMasterPresetsPanel
     #region Constructors
     /// <summary>
     /// Initializes the game management root panel and restores persisted editor state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public GameMasterPresetsPanel()
     {
@@ -328,8 +324,6 @@ public sealed class GameMasterPresetsPanel
     #region Public Methods
     /// <summary>
     /// Rebinds this panel from current assets after apply, discard, undo or redo operations.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void RefreshFromSessionChange()
     {
@@ -347,8 +341,6 @@ public sealed class GameMasterPresetsPanel
     #region Layout
     /// <summary>
     /// Builds the split master preset area and the tabbed side-panel host.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildUI()
     {
@@ -360,8 +352,6 @@ public sealed class GameMasterPresetsPanel
     #region Preset List
     /// <summary>
     /// Refreshes the game master preset list from the active library.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RefreshPresetList()
     {
@@ -372,8 +362,6 @@ public sealed class GameMasterPresetsPanel
     #region Preset Actions
     /// <summary>
     /// Creates and selects a new game master preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void CreatePreset()
     {
@@ -382,9 +370,8 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Duplicates the provided game master preset.
-    /// /params preset Source preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
     internal void DuplicatePreset(GameMasterPreset preset)
     {
         GameMasterPresetsPanelPresetUtility.DuplicatePreset(this, preset);
@@ -392,9 +379,8 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Stages the provided game master preset for deletion.
-    /// /params preset Preset to stage.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to stage.</param>
     internal void DeletePreset(GameMasterPreset preset)
     {
         GameMasterPresetsPanelPresetUtility.DeletePreset(this, preset);
@@ -404,9 +390,8 @@ public sealed class GameMasterPresetsPanel
     #region Details
     /// <summary>
     /// Selects one preset and rebuilds detail controls.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     internal void SelectPreset(GameMasterPreset preset)
     {
         GameMasterPresetsPanelSectionsUtility.SelectPreset(this, preset);
@@ -414,8 +399,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Rebuilds the active master preset detail section.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void BuildActiveDetailsSection()
     {
@@ -424,10 +407,9 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Assigns one sub-preset object to the selected master preset.
-    /// /params propertyName Serialized property receiving the reference.
-    /// /params preset Preset object to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="propertyName">Serialized property receiving the reference.</param>
+    /// <param name="preset">Preset object to assign.</param>
     internal void AssignSubPreset(string propertyName, UnityEngine.Object preset)
     {
         GameMasterPresetsPanelSectionsUtility.AssignSubPreset(this, propertyName, preset);
@@ -437,8 +419,6 @@ public sealed class GameMasterPresetsPanel
     #region Audio Manager
     /// <summary>
     /// Creates a new Audio Manager preset and assigns it to the selected master preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void CreateAudioManagerPreset()
     {
@@ -447,8 +427,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Creates a new Scene Manager preset and assigns it to the selected master preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void CreateSceneManagerPreset()
     {
@@ -457,9 +435,8 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Opens or activates one side panel.
-    /// /params panelType Target panel type.
-    /// /returns None.
     /// </summary>
+    /// <param name="panelType">Target panel type.</param>
     internal void OpenSidePanel(GameManagementWindow.PanelType panelType)
     {
         GameMasterPresetsPanelSidePanelUtility.OpenSidePanel(this, panelType);
@@ -469,8 +446,6 @@ public sealed class GameMasterPresetsPanel
     #region Audio Authoring
     /// <summary>
     /// Finds a prefab containing GameAudioManagerAuthoring and selects it.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void FindAudioManagerPrefab()
     {
@@ -479,8 +454,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Finds a prefab containing GameSceneManagerAuthoring and selects it.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void FindSceneManagerPrefab()
     {
@@ -489,8 +462,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Assigns the selected master preset to the selected GameAudioManagerAuthoring prefab.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void AssignPresetToAuthoringPrefab()
     {
@@ -499,8 +470,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Assigns the selected master preset to the selected GameSceneManagerAuthoring prefab.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void AssignPresetToSceneAuthoringPrefab()
     {
@@ -509,8 +478,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Refreshes the active authoring status label.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RefreshActiveStatus()
     {
@@ -521,8 +488,6 @@ public sealed class GameMasterPresetsPanel
     #region Helpers
     /// <summary>
     /// Refreshes open side panel controllers and synchronizes their selected presets.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RefreshOpenSidePanels()
     {
@@ -531,9 +496,9 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Resolves display text for one game master preset.
-    /// /params preset Preset to display.
-    /// /returns Display text for list rows.
     /// </summary>
+    /// <param name="preset">Preset to display.</param>
+    /// <returns>Display text for list rows.</returns>
     internal string GetPresetDisplayName(GameMasterPreset preset)
     {
         if (preset == null)
@@ -553,8 +518,6 @@ public sealed class GameMasterPresetsPanel
     #region Nested Types
     /// <summary>
     /// Detail sections available for the selected game master preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal enum DetailsSectionType
     {
@@ -566,8 +529,6 @@ public sealed class GameMasterPresetsPanel
 
     /// <summary>
     /// Stores one opened side-panel tab and optional typed panel controller.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal sealed class SidePanelEntry
     {

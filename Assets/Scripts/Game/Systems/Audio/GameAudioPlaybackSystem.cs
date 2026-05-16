@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Consumes gameplay audio requests from the audio singleton and dispatches them to the FMOD wrapper.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct GameAudioPlaybackSystem : ISystem
@@ -27,9 +25,8 @@ public partial struct GameAudioPlaybackSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the singleton buffers required for runtime playback.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<GameAudioRuntimeConfig>();
@@ -40,9 +37,8 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Stops managed background music when the ECS audio playback system is destroyed.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnDestroy(ref SystemState state)
     {
         GameAudioFmodRuntimeUtility.StopBackgroundMusic();
@@ -50,9 +46,8 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Resolves queued audio requests, applies per-event caps, and clears consumed requests.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         Entity audioEntity = SystemAPI.GetSingletonEntity<GameAudioRuntimeConfig>();
@@ -118,10 +113,10 @@ public partial struct GameAudioPlaybackSystem : ISystem
     #region Private Methods
     /// <summary>
     /// Resolves whether background music should be stopped because the scene manager is entering or already in main menu.
-    /// /params sceneConfig Runtime scene manager configuration.
-    /// /params transitionState Current scene transition state.
-    /// /returns True when gameplay background music must not run.
     /// </summary>
+    /// <param name="sceneConfig">Runtime scene manager configuration.</param>
+    /// <param name="transitionState">Current scene transition state.</param>
+    /// <returns>True when gameplay background music must not run.</returns>
     private static bool ShouldStopBackgroundMusicForMainMenu(in GameSceneManagerConfig sceneConfig,
                                                              in GameSceneTransitionState transitionState)
     {
@@ -137,12 +132,11 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Forwards the baked background music config to the FMOD runtime bridge.
-    /// /params runtimeConfig Current baked audio singleton config.
-    /// /params enabled True when background music should be active.
-    /// /params autoStart True when music should start automatically.
-    /// /params volume Final music volume after master and routing multipliers.
-    /// /returns None.
     /// </summary>
+    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
+    /// <param name="enabled">True when background music should be active.</param>
+    /// <param name="autoStart">True when music should start automatically.</param>
+    /// <param name="volume">Final music volume after master and routing multipliers.</param>
     private static void SyncBackgroundMusic(in GameAudioRuntimeConfig runtimeConfig,
                                             bool enabled,
                                             bool autoStart,
@@ -160,11 +154,11 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Finds the first binding matching a requested event ID.
-    /// /params bindings Baked binding buffer.
-    /// /params eventId Requested event identifier.
-    /// /params binding Output binding when found.
-    /// /returns True when a matching binding exists.
     /// </summary>
+    /// <param name="bindings">Baked binding buffer.</param>
+    /// <param name="eventId">Requested event identifier.</param>
+    /// <param name="binding">Output binding when found.</param>
+    /// <returns>True when a matching binding exists.</returns>
     private static bool TryResolveBinding(DynamicBuffer<GameAudioEventBindingElement> bindings,
                                           GameAudioEventId eventId,
                                           out GameAudioEventBindingElement binding)
@@ -186,9 +180,9 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Resolves one baked event path to a managed string only when the fixed string changes.
-    /// /params binding Baked audio event binding.
-    /// /returns Cached managed event path.
     /// </summary>
+    /// <param name="binding">Baked audio event binding.</param>
+    /// <returns>Cached managed event path.</returns>
     private static string ResolveManagedEventPath(in GameAudioEventBindingElement binding)
     {
         int eventIndex = (byte)binding.EventId;
@@ -206,9 +200,9 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Resolves the baked music path to a managed string only when the fixed string changes.
-    /// /params runtimeConfig Current baked audio singleton config.
-    /// /returns Cached managed music path.
     /// </summary>
+    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
+    /// <returns>Cached managed music path.</returns>
     private static string ResolveManagedBackgroundMusicPath(in GameAudioRuntimeConfig runtimeConfig)
     {
         FixedString512Bytes eventPath = runtimeConfig.BackgroundMusicEventPath;
@@ -225,9 +219,9 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Resolves the baked music bank name to a managed string only when the fixed string changes.
-    /// /params runtimeConfig Current baked audio singleton config.
-    /// /returns Cached managed music bank name.
     /// </summary>
+    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
+    /// <returns>Cached managed music bank name.</returns>
     private static string ResolveManagedBackgroundMusicBankName(in GameAudioRuntimeConfig runtimeConfig)
     {
         FixedString64Bytes bankName = runtimeConfig.BackgroundMusicBankName;
@@ -244,11 +238,11 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Applies one binding's runtime rate limit and records the accepted play when allowed.
-    /// /params rateLimitStates Mutable singleton buffer storing event windows.
-    /// /params binding Event binding being evaluated.
-    /// /params elapsedTime Current world elapsed time in seconds.
-    /// /returns True when playback may proceed.
     /// </summary>
+    /// <param name="rateLimitStates">Mutable singleton buffer storing event windows.</param>
+    /// <param name="binding">Event binding being evaluated.</param>
+    /// <param name="elapsedTime">Current world elapsed time in seconds.</param>
+    /// <returns>True when playback may proceed.</returns>
     private static bool CanPlayNow(DynamicBuffer<GameAudioRateLimitStateElement> rateLimitStates,
                                    GameAudioEventBindingElement binding,
                                    float elapsedTime)
@@ -294,10 +288,10 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     /// <summary>
     /// Finds the buffer index for a rate-limit state entry.
-    /// /params rateLimitStates Mutable singleton state buffer.
-    /// /params eventId Event identifier to search.
-    /// /returns Buffer index when found; otherwise -1.
     /// </summary>
+    /// <param name="rateLimitStates">Mutable singleton state buffer.</param>
+    /// <param name="eventId">Event identifier to search.</param>
+    /// <returns>Buffer index when found; otherwise -1.</returns>
     private static int FindRateLimitStateIndex(DynamicBuffer<GameAudioRateLimitStateElement> rateLimitStates,
                                                GameAudioEventId eventId)
     {

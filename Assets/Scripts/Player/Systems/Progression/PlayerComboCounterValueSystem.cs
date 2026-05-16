@@ -4,7 +4,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Tracks consecutive enemy kills, rank-based point decay, and the configured damage-break behavior when the player is hit.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpCharacterTuningInitializeSystem))]
@@ -22,9 +21,8 @@ public partial struct PlayerComboCounterValueSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime components required to maintain combo state.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerComboCounterState>();
@@ -36,9 +34,8 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
     /// <summary>
     /// Updates combo values once per simulation tick using the previous enemy-frame kill buffer and latest survivability state.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -74,15 +71,14 @@ public partial struct PlayerComboCounterValueSystem : ISystem
     #region Private Methods
     /// <summary>
     /// Applies damage-break, rank-based point decay, and kill-gain rules to one player combo state.
-    /// comboCounterState: Mutable combo state updated in place.
-    /// runtimeComboConfig: Current runtime combo config.
-    /// runtimeComboRanks: Current runtime combo-rank thresholds used for downgrade resolution.
-    /// playerHealth: Current player health values.
-    /// playerShield: Current player shield values.
-    /// deltaTime: Frame delta time in seconds.
-    /// killedEnemyGainMultiplierSum: Sum of combo-point multipliers granted by every enemy killed during the previous enemy update.
-    /// returns void.
     /// </summary>
+    /// <param name="comboCounterState">Mutable combo state updated in place.</param>
+    /// <param name="runtimeComboConfig">Current runtime combo config.</param>
+    /// <param name="runtimeComboRanks">Current runtime combo-rank thresholds used for downgrade resolution.</param>
+    /// <param name="playerHealth">Current player health values.</param>
+    /// <param name="playerShield">Current player shield values.</param>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
+    /// <param name="killedEnemyGainMultiplierSum">Sum of combo-point multipliers granted by every enemy killed during the previous enemy update.</param>
     private static void UpdateComboState(ref PlayerComboCounterState comboCounterState,
                                          in PlayerRuntimeComboCounterConfig runtimeComboConfig,
                                          DynamicBuffer<PlayerRuntimeComboRankElement> runtimeComboRanks,
@@ -162,9 +158,9 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
     /// <summary>
     /// Sums combo-point multipliers from the enemy killed-events buffer.
-    /// killedEventsBuffer: Singleton killed-events buffer produced by enemy systems.
-    /// returns Sum of non-negative combo-point multipliers granted this frame.
     /// </summary>
+    /// <param name="killedEventsBuffer">Singleton killed-events buffer produced by enemy systems.</param>
+    /// <returns>Sum of non-negative combo-point multipliers granted this frame.</returns>
     private static float ResolveKilledEnemyGainMultiplierSum(DynamicBuffer<EnemyKilledEventElement> killedEventsBuffer)
     {
         float killedEnemyGainMultiplierSum = 0f;
@@ -180,12 +176,12 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
     /// <summary>
     /// Adds combo gain from one kill batch while preserving fractional reward carry and protecting against integer overflow.
-    /// currentComboValue: Current combo numeric value.
-    /// comboGainPerKill: Gain added per enemy kill.
-    /// killedEnemyGainMultiplierSum: Sum of kill multipliers granted by the killed enemies.
-    /// gainPointsCarry: Fractional carry preserved across kill batches.
-    /// returns Saturated combo value after kill gain.
     /// </summary>
+    /// <param name="currentComboValue">Current combo numeric value.</param>
+    /// <param name="comboGainPerKill">Gain added per enemy kill.</param>
+    /// <param name="killedEnemyGainMultiplierSum">Sum of kill multipliers granted by the killed enemies.</param>
+    /// <param name="gainPointsCarry">Fractional carry preserved across kill batches.</param>
+    /// <returns>Saturated combo value after kill gain.</returns>
     private static int AddKillGain(int currentComboValue,
                                    int comboGainPerKill,
                                    float killedEnemyGainMultiplierSum,

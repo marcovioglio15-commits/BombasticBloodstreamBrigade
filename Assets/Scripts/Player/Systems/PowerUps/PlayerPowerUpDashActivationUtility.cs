@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Resolves and starts Dash payloads for primary dash tools and chained active power-up modules.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerPowerUpDashActivationUtility
 {
@@ -14,16 +12,15 @@ public static class PlayerPowerUpDashActivationUtility
     #region Execution
     /// <summary>
     /// Starts a fixed-distance dash using the configured direction source and speed profile.
-    /// /params slotConfig Active slot that owns the dash payload.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used when resolving movement-input dash directions.
-    /// /params localTransform Player transform used as fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashState Mutable dash runtime state receiving the started dash.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Active slot that owns the dash payload.</param>
+    /// <param name="lookState">Current player look direction state.</param>
+    /// <param name="movementState">Current player movement state.</param>
+    /// <param name="runtimeMovementConfig">Movement config used when resolving movement-input dash directions.</param>
+    /// <param name="localTransform">Player transform used as fallback direction basis.</param>
+    /// <param name="moveInput">Raw movement input used as final movement-direction fallback.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction from previous frames.</param>
+    /// <param name="dashState">Mutable dash runtime state receiving the started dash.</param>
     public static void ExecuteDash(in PlayerPowerUpSlotConfig slotConfig,
                                    in PlayerLookState lookState,
                                    in PlayerMovementState movementState,
@@ -70,16 +67,16 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Executes a Dash payload chained to another active tool when the payload is configured and no dash is already running.
-    /// /params slotConfig Active slot containing a non-primary Dash payload.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used for movement-relative dash directions.
-    /// /params localTransform Player transform used for fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashState Mutable dash state receiving the chained dash.
-    /// /returns True when a dash was started.
     /// </summary>
+    /// <param name="slotConfig">Active slot containing a non-primary Dash payload.</param>
+    /// <param name="lookState">Current player look direction state.</param>
+    /// <param name="movementState">Current player movement state.</param>
+    /// <param name="runtimeMovementConfig">Movement config used for movement-relative dash directions.</param>
+    /// <param name="localTransform">Player transform used for fallback direction basis.</param>
+    /// <param name="moveInput">Raw movement input used as final movement-direction fallback.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction from previous frames.</param>
+    /// <param name="dashState">Mutable dash state receiving the chained dash.</param>
+    /// <returns>True when a dash was started.</returns>
     public static bool ExecuteDashIfConfigured(in PlayerPowerUpSlotConfig slotConfig,
                                                in PlayerLookState lookState,
                                                in PlayerMovementState movementState,
@@ -110,9 +107,9 @@ public static class PlayerPowerUpDashActivationUtility
     #region Queries
     /// <summary>
     /// Resolves whether a slot carries an executable Dash payload regardless of the primary active tool kind.
-    /// /params slotConfig Active slot inspected for chained Dash data.
-    /// /returns True when the dash payload has enough authored data to attempt execution.
     /// </summary>
+    /// <param name="slotConfig">Active slot inspected for chained Dash data.</param>
+    /// <returns>True when the dash payload has enough authored data to attempt execution.</returns>
     public static bool HasDashPayload(in PlayerPowerUpSlotConfig slotConfig)
     {
         if (slotConfig.Dash.Distance <= 0f)
@@ -123,16 +120,16 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Resolves the dash direction requested by the slot config, including movement/look inversion modes.
-    /// /params directionMode Designer-selected source and sign for dash direction.
-    /// /params lookState Current player look direction state.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Movement config used when resolving movement-input directions.
-    /// /params localTransform Player transform used as fallback direction basis.
-    /// /params moveInput Raw movement input used as final movement-direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when a valid direction was resolved.
     /// </summary>
+    /// <param name="directionMode">Designer-selected source and sign for dash direction.</param>
+    /// <param name="lookState">Current player look direction state.</param>
+    /// <param name="movementState">Current player movement state.</param>
+    /// <param name="runtimeMovementConfig">Movement config used when resolving movement-input directions.</param>
+    /// <param name="localTransform">Player transform used as fallback direction basis.</param>
+    /// <param name="moveInput">Raw movement input used as final movement-direction fallback.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction from previous frames.</param>
+    /// <param name="dashDirection">Resolved normalized planar dash direction.</param>
+    /// <returns>True when a valid direction was resolved.</returns>
     public static bool TryResolveDashActivationDirection(DashDirectionMode directionMode,
                                                          in PlayerLookState lookState,
                                                          in PlayerMovementState movementState,
@@ -177,12 +174,11 @@ public static class PlayerPowerUpDashActivationUtility
     #region Helpers
     /// <summary>
     /// Assigns the initial dash phase metadata consumed by movement and animation systems.
-    /// /params dashState Mutable dash state receiving initial phase metadata.
-    /// /params dashTransitionIn Transition-in duration in seconds.
-    /// /params dashHoldDuration Constant-speed hold duration in seconds.
-    /// /params dashTransitionOut Transition-out duration in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state receiving initial phase metadata.</param>
+    /// <param name="dashTransitionIn">Transition-in duration in seconds.</param>
+    /// <param name="dashHoldDuration">Constant-speed hold duration in seconds.</param>
+    /// <param name="dashTransitionOut">Transition-out duration in seconds.</param>
     private static void ApplyInitialPhase(ref PlayerDashState dashState,
                                           float dashTransitionIn,
                                           float dashHoldDuration,
@@ -208,11 +204,10 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Applies optional dash invulnerability timing from the slot payload.
-    /// /params slotConfig Active slot that owns the dash payload.
-    /// /params dashDuration Resolved dash duration in seconds.
-    /// /params dashState Mutable dash state receiving invulnerability time.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Active slot that owns the dash payload.</param>
+    /// <param name="dashDuration">Resolved dash duration in seconds.</param>
+    /// <param name="dashState">Mutable dash state receiving invulnerability time.</param>
     private static void ApplyInvulnerability(in PlayerPowerUpSlotConfig slotConfig, float dashDuration, ref PlayerDashState dashState)
     {
         if (slotConfig.Dash.GrantsInvulnerability == 0)
@@ -223,14 +218,14 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Resolves movement-based dash direction from release masks, desired direction, velocity, cached direction or raw input.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Runtime movement config used for input projection.
-    /// /params localTransform Player transform used by local movement reference.
-    /// /params moveInput Raw movement input.
-    /// /params lastValidMovementDirection Cached movement direction from previous frames.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when a movement direction was resolved.
     /// </summary>
+    /// <param name="movementState">Current player movement state.</param>
+    /// <param name="runtimeMovementConfig">Runtime movement config used for input projection.</param>
+    /// <param name="localTransform">Player transform used by local movement reference.</param>
+    /// <param name="moveInput">Raw movement input.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction from previous frames.</param>
+    /// <param name="dashDirection">Resolved normalized planar dash direction.</param>
+    /// <returns>True when a movement direction was resolved.</returns>
     private static bool TryResolveMovementDashDirection(in PlayerMovementState movementState,
                                                         in PlayerRuntimeMovementConfig runtimeMovementConfig,
                                                         in LocalTransform localTransform,
@@ -272,11 +267,11 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Resolves look-based dash direction from desired look, current look or player forward.
-    /// /params lookState Current player look state.
-    /// /params localTransform Player transform used as final fallback.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when a look direction was resolved.
     /// </summary>
+    /// <param name="lookState">Current player look state.</param>
+    /// <param name="localTransform">Player transform used as final fallback.</param>
+    /// <param name="dashDirection">Resolved normalized planar dash direction.</param>
+    /// <returns>True when a look direction was resolved.</returns>
     private static bool TryResolveLookDashDirection(in PlayerLookState lookState,
                                                     in LocalTransform localTransform,
                                                     out float3 dashDirection)
@@ -307,11 +302,11 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Resolves the effective speed-profile duration whose area maps authored distance to speed.
-    /// /params transitionInDuration Speed transition-in duration.
-    /// /params holdDuration Full-speed hold duration.
-    /// /params transitionOutDuration Speed transition-out duration.
-    /// /returns Positive profile duration used for distance-to-speed conversion.
     /// </summary>
+    /// <param name="transitionInDuration">Speed transition-in duration.</param>
+    /// <param name="holdDuration">Full-speed hold duration.</param>
+    /// <param name="transitionOutDuration">Speed transition-out duration.</param>
+    /// <returns>Positive profile duration used for distance-to-speed conversion.</returns>
     private static float ResolveDashProfileDuration(float transitionInDuration,
                                                     float holdDuration,
                                                     float transitionOutDuration)
@@ -322,12 +317,12 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Preserves diagonal dash direction when a digital diagonal input resolves through a release-only axis transition.
-    /// /params movementState Current player movement state.
-    /// /params runtimeMovementConfig Runtime movement config used for input projection.
-    /// /params localTransform Player transform used by local movement reference.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when release-mask preservation produced a direction.
     /// </summary>
+    /// <param name="movementState">Current player movement state.</param>
+    /// <param name="runtimeMovementConfig">Runtime movement config used for input projection.</param>
+    /// <param name="localTransform">Player transform used by local movement reference.</param>
+    /// <param name="dashDirection">Resolved normalized planar dash direction.</param>
+    /// <returns>True when release-mask preservation produced a direction.</returns>
     private static bool TryResolveDashDirectionFromReleaseMask(in PlayerMovementState movementState,
                                                                in PlayerRuntimeMovementConfig runtimeMovementConfig,
                                                                in LocalTransform localTransform,
@@ -363,12 +358,12 @@ public static class PlayerPowerUpDashActivationUtility
 
     /// <summary>
     /// Projects raw movement input into world space using the current movement reference and direction mode.
-    /// /params input Raw two-axis movement input.
-    /// /params runtimeMovementConfig Runtime movement config used for input projection.
-    /// /params localTransform Player transform used by local movement reference.
-    /// /params dashDirection Resolved normalized planar dash direction.
-    /// /returns True when input produced a non-zero world direction.
     /// </summary>
+    /// <param name="input">Raw two-axis movement input.</param>
+    /// <param name="runtimeMovementConfig">Runtime movement config used for input projection.</param>
+    /// <param name="localTransform">Player transform used by local movement reference.</param>
+    /// <param name="dashDirection">Resolved normalized planar dash direction.</param>
+    /// <returns>True when input produced a non-zero world direction.</returns>
     private static bool TryResolveDashDirectionFromInput(float2 input,
                                                          in PlayerRuntimeMovementConfig runtimeMovementConfig,
                                                          in LocalTransform localTransform,

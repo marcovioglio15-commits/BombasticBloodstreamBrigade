@@ -3,8 +3,6 @@ using UnityEditor;
 
 /// <summary>
 /// Applies structural mutations to the shared pattern list used by enemy Modules and Patterns presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
 {
@@ -13,11 +11,10 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
     #region Public Methods
     /// <summary>
     /// Adds one new shared pattern definition.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
     public static void AddPatternDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                             SerializedObject sharedPresetSerializedObject,
                                             EnemyModulesAndPatternsPreset sharedPreset)
@@ -48,12 +45,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
 
     /// <summary>
     /// Duplicates one shared pattern definition.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params patternIndex Index of the source pattern.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="patternIndex">Index of the source pattern.</param>
     public static void DuplicatePatternDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                                   SerializedObject sharedPresetSerializedObject,
                                                   EnemyModulesAndPatternsPreset sharedPreset,
@@ -94,12 +90,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
 
     /// <summary>
     /// Deletes one shared pattern definition.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params patternIndex Index of the pattern to remove.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="patternIndex">Index of the pattern to remove.</param>
     public static void DeletePatternDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                                SerializedObject sharedPresetSerializedObject,
                                                EnemyModulesAndPatternsPreset sharedPreset,
@@ -120,13 +115,12 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
 
     /// <summary>
     /// Moves one shared pattern definition.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params fromIndex Source index.
-    /// /params toIndex Destination index.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="fromIndex">Source index.</param>
+    /// <param name="toIndex">Destination index.</param>
     public static void MovePatternDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                              SerializedObject sharedPresetSerializedObject,
                                              EnemyModulesAndPatternsPreset sharedPreset,
@@ -154,11 +148,10 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
 
     /// <summary>
     /// Sets the foldout state of every currently visible shared pattern card.
-    /// /params panel Owning panel that stores filter state.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params expanded True to expand every visible card, otherwise false.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores filter state.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="expanded">True to expand every visible card, otherwise false.</param>
     public static void SetAllPatternFoldoutStates(EnemyAdvancedPatternPresetsPanel panel,
                                                   SerializedObject sharedPresetSerializedObject,
                                                   bool expanded)
@@ -193,13 +186,12 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsMutationUtility
     #region Private Methods
     /// <summary>
     /// Applies one explicit mutation to the shared pattern list and synchronizes the selected preset loadout afterwards.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params undoLabel Undo label used for the mutation.
-    /// /params mutation Mutation callback that receives the serialized array property.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="undoLabel">Undo label used for the mutation.</param>
+    /// <param name="mutation">Mutation callback that receives the serialized array property.</param>
     private static void ApplyPatternMutation(EnemyAdvancedPatternPresetsPanel panel,
                                              SerializedObject sharedPresetSerializedObject,
                                              EnemyModulesAndPatternsPreset sharedPreset,

@@ -9,8 +9,6 @@ using FMODUnity;
 
 /// <summary>
 /// Dispatches runtime audio events through FMOD when the NASHCORE_FMOD scripting define is enabled.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameAudioFmodRuntimeUtility
 {
@@ -40,14 +38,13 @@ public static class GameAudioFmodRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Plays one authored FMOD event path as a one-shot sound.
-    /// /params eventPath FMOD event path resolved from the Audio Manager preset.
-    /// /params position World-space playback position.
-    /// /params hasPosition True when the event should receive 3D attributes.
-    /// /params volume Playback volume after binding and global multipliers.
-    /// /params pitch Playback pitch after binding and request multipliers.
-    /// /params logMissingEventPath True when empty paths should be reported in development contexts.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">FMOD event path resolved from the Audio Manager preset.</param>
+    /// <param name="position">World-space playback position.</param>
+    /// <param name="hasPosition">True when the event should receive 3D attributes.</param>
+    /// <param name="volume">Playback volume after binding and global multipliers.</param>
+    /// <param name="pitch">Playback pitch after binding and request multipliers.</param>
+    /// <param name="logMissingEventPath">True when empty paths should be reported in development contexts.</param>
     public static void PlayOneShot(string eventPath,
                                    float3 position,
                                    bool hasPosition,
@@ -82,16 +79,15 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Starts, updates or stops the managed background music event instance.
-    /// /params eventPath FMOD music event path.
-    /// /params bankName FMOD bank that contains the music event, or empty when already loaded elsewhere.
-    /// /params enabled True when music playback is enabled.
-    /// /params autoStart True when music should start automatically.
-    /// /params volume Music volume after preset and routing multipliers.
-    /// /params restartWhenPathChanges True when changing event path should restart the current music.
-    /// /params stopWhenDisabled True when disabling music should stop the current instance.
-    /// /params logMissingEventPath True when missing or disabled backend states should be logged.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">FMOD music event path.</param>
+    /// <param name="bankName">FMOD bank that contains the music event, or empty when already loaded elsewhere.</param>
+    /// <param name="enabled">True when music playback is enabled.</param>
+    /// <param name="autoStart">True when music should start automatically.</param>
+    /// <param name="volume">Music volume after preset and routing multipliers.</param>
+    /// <param name="restartWhenPathChanges">True when changing event path should restart the current music.</param>
+    /// <param name="stopWhenDisabled">True when disabling music should stop the current instance.</param>
+    /// <param name="logMissingEventPath">True when missing or disabled backend states should be logged.</param>
     public static void SyncBackgroundMusic(string eventPath,
                                            string bankName,
                                            bool enabled,
@@ -136,8 +132,6 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Stops the current background music instance if one is active.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void StopBackgroundMusic()
     {
@@ -150,8 +144,6 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Immediately stops the current background music instance when entering non-gameplay scenes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void StopBackgroundMusicImmediate()
     {
@@ -167,9 +159,8 @@ public static class GameAudioFmodRuntimeUtility
 #if NASHCORE_FMOD
     /// <summary>
     /// Stops the current background music instance with the requested FMOD stop mode.
-    /// /params stopMode FMOD stop behavior used for the active music instance.
-    /// /returns None.
     /// </summary>
+    /// <param name="stopMode">FMOD stop behavior used for the active music instance.</param>
     private static void StopBackgroundMusic(FMOD.Studio.STOP_MODE stopMode)
     {
         if (!backgroundMusicInstanceValid)
@@ -190,8 +181,6 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Clears managed background music identity state after a stop or disabled backend call.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void ClearBackgroundMusicState()
     {
@@ -201,9 +190,8 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs an empty path warning only in contexts where runtime diagnostics are useful.
-    /// /params shouldLog True when the current preset allows missing-path logs.
-    /// /returns None.
     /// </summary>
+    /// <param name="shouldLog">True when the current preset allows missing-path logs.</param>
     private static void LogMissingPath(bool shouldLog)
     {
         if (!shouldLog)
@@ -216,10 +204,9 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs the disabled-backend state when FMOD integration has not been compiled into the project.
-    /// /params eventPath Event path that would have been played.
-    /// /params shouldLog True when the current preset allows diagnostic logs.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">Event path that would have been played.</param>
+    /// <param name="shouldLog">True when the current preset allows diagnostic logs.</param>
     private static void LogFmodDisabled(string eventPath, bool shouldLog)
     {
         if (!shouldLog)
@@ -233,12 +220,11 @@ public static class GameAudioFmodRuntimeUtility
 #if NASHCORE_FMOD
     /// <summary>
     /// Creates and starts the background music instance.
-    /// /params eventPath FMOD event path.
-    /// /params bankName FMOD bank that contains the music event.
-    /// /params volume Music volume.
-    /// /params logMissingEventPath True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">FMOD event path.</param>
+    /// <param name="bankName">FMOD bank that contains the music event.</param>
+    /// <param name="volume">Music volume.</param>
+    /// <param name="logMissingEventPath">True when diagnostics are enabled.</param>
     private static void StartBackgroundMusic(string eventPath,
                                              string bankName,
                                              float volume,
@@ -293,10 +279,10 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Loads the configured music bank once before resolving the FMOD event path.
-    /// /params bankName Bank name authored in the Audio Manager preset.
-    /// /params shouldLog True when diagnostic logs are enabled.
-    /// /returns True when playback can continue.
     /// </summary>
+    /// <param name="bankName">Bank name authored in the Audio Manager preset.</param>
+    /// <param name="shouldLog">True when diagnostic logs are enabled.</param>
+    /// <returns>True when playback can continue.</returns>
     private static bool EnsureBackgroundMusicBankLoaded(string bankName, bool shouldLog)
     {
         if (string.IsNullOrWhiteSpace(bankName))
@@ -323,10 +309,9 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Keeps background music centered on the active FMOD listener so authored 3D music events behave like global music.
-    /// /params eventPath FMOD event path used for diagnostics.
-    /// /params shouldLog True when diagnostic logs are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">FMOD event path used for diagnostics.</param>
+    /// <param name="shouldLog">True when diagnostic logs are enabled.</param>
     private static void SyncBackgroundMusicListenerAnchor(string eventPath, bool shouldLog)
     {
         if (!backgroundMusicInstance.isValid())
@@ -345,9 +330,9 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Resolves and caches the transform currently acting as FMOD listener for music anchoring.
-    /// /params elapsedTime Current unscaled Unity time used to rate-limit scene scans.
-    /// /returns Active listener or camera transform, or null when none is available yet.
     /// </summary>
+    /// <param name="elapsedTime">Current unscaled Unity time used to rate-limit scene scans.</param>
+    /// <returns>Active listener or camera transform, or null when none is available yet.</returns>
     private static Transform ResolveBackgroundMusicListenerTransform(float elapsedTime)
     {
         if (cachedBackgroundMusicListenerTransform != null)
@@ -394,11 +379,11 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Resolves the FMOD event description without throwing repeated path lookup exceptions.
-    /// /params eventPath FMOD event path to resolve.
-    /// /params shouldLog True when diagnostic logs are enabled.
-    /// /params eventDescription Output event description when resolution succeeds.
-    /// /returns True when FMOD resolves the event path.
     /// </summary>
+    /// <param name="eventPath">FMOD event path to resolve.</param>
+    /// <param name="shouldLog">True when diagnostic logs are enabled.</param>
+    /// <param name="eventDescription">Output event description when resolution succeeds.</param>
+    /// <returns>True when FMOD resolves the event path.</returns>
     private static bool TryResolveBackgroundMusicEvent(string eventPath,
                                                        bool shouldLog,
                                                        out EventDescription eventDescription)
@@ -414,12 +399,11 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs one FMOD result warning per failed operation and path.
-    /// /params operation Operation being attempted.
-    /// /params target FMOD path or bank name involved in the operation.
-    /// /params result FMOD result code returned by the API.
-    /// /params shouldLog True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="operation">Operation being attempted.</param>
+    /// <param name="target">FMOD path or bank name involved in the operation.</param>
+    /// <param name="result">FMOD result code returned by the API.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
     private static void LogMusicFmodResultWarning(string operation,
                                                   string target,
                                                   RESULT result,
@@ -442,12 +426,11 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs one FMOD exception warning per failed operation and target.
-    /// /params operation Operation being attempted.
-    /// /params target FMOD path or bank name involved in the operation.
-    /// /params exception Exception thrown by the FMOD Unity wrapper.
-    /// /params shouldLog True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="operation">Operation being attempted.</param>
+    /// <param name="target">FMOD path or bank name involved in the operation.</param>
+    /// <param name="exception">Exception thrown by the FMOD Unity wrapper.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
     private static void LogMusicExceptionWarning(string operation,
                                                  string target,
                                                  System.Exception exception,
@@ -470,11 +453,10 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs a successful music start once per event path in editor and development builds.
-    /// /params eventPath FMOD event path that was started.
-    /// /params bankName FMOD bank loaded before the event was resolved.
-    /// /params shouldLog True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">FMOD event path that was started.</param>
+    /// <param name="bankName">FMOD bank loaded before the event was resolved.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
     private static void LogMusicStarted(string eventPath, string bankName, bool shouldLog)
     {
         if (!shouldLog)
@@ -492,9 +474,8 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs a missing background music path warning.
-    /// /params shouldLog True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
     private static void LogMissingMusicPath(bool shouldLog)
     {
         if (!shouldLog)
@@ -507,10 +488,9 @@ public static class GameAudioFmodRuntimeUtility
 
     /// <summary>
     /// Logs disabled-backend music diagnostics once per path.
-    /// /params eventPath Music event path.
-    /// /params shouldLog True when diagnostics are enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventPath">Music event path.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
     private static void LogFmodDisabledMusic(string eventPath, bool shouldLog)
     {
         if (!shouldLog)

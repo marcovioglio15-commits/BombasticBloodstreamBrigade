@@ -18,10 +18,10 @@ public static class EnemyPatternMovementRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Resolves additional wall-clearance radius enforced during runtime movement.
-    /// patternConfig: Current compiled pattern configuration.
-    /// enemyData: Current immutable enemy data.
-    /// returns Additional wall-clearance radius in meters.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="enemyData">Current immutable enemy data.</param>
+    /// <returns>Additional wall-clearance radius in meters.</returns>
     public static float ResolveWallClearanceForMovement(in EnemyPatternConfig patternConfig, in EnemyData enemyData)
     {
         if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererBasic &&
@@ -33,11 +33,11 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Resolves whether the optional short-range interaction is currently active by using activation distance plus release hysteresis.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// playerDistance: Current planar distance from enemy to player.
-    /// returns True when the short-range interaction should drive the active movement slot.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="playerDistance">Current planar distance from enemy to player.</param>
+    /// <returns>True when the short-range interaction should drive the active movement slot.</returns>
     public static bool ResolveShortRangeInteractionActive(in EnemyPatternConfig patternConfig,
                                                           in EnemyPatternRuntimeState patternRuntimeState,
                                                           float playerDistance)
@@ -56,11 +56,11 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Resolves the movement kind that should currently be considered active after short-range overrides.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// playerDistance: Current planar distance from enemy to player.
-    /// returns Active movement kind for this frame.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="playerDistance">Current planar distance from enemy to player.</param>
+    /// <returns>Active movement kind for this frame.</returns>
     public static EnemyCompiledMovementPatternKind ResolveActiveMovementKind(in EnemyPatternConfig patternConfig,
                                                                              in EnemyPatternRuntimeState patternRuntimeState,
                                                                              float playerDistance)
@@ -87,11 +87,11 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Returns whether the current frame is driven by a non-grunt short-range interaction override.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// shortRangeInteractionActive: Whether the short-range interaction is active this frame.
-    /// returns True when the short-range override currently owns movement decisions.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="shortRangeInteractionActive">Whether the short-range interaction is active this frame.</param>
+    /// <returns>True when the short-range override currently owns movement decisions.</returns>
     public static bool IsShortRangeOverrideDriving(in EnemyPatternConfig patternConfig,
                                                    in EnemyPatternRuntimeState patternRuntimeState,
                                                    bool shortRangeInteractionActive)
@@ -116,10 +116,9 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Clears transient long-range target state when a short-range interaction takes over movement.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// returns None.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
     public static void PrepareShortRangeTakeover(in EnemyPatternConfig patternConfig,
                                                  ref EnemyPatternRuntimeState patternRuntimeState)
     {
@@ -133,11 +132,11 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Builds the effective pattern config used by movement systems after short-range overrides are resolved.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// playerDistance: Current planar distance from enemy to player.
-    /// returns Effective pattern config for the current frame.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="playerDistance">Current planar distance from enemy to player.</param>
+    /// <returns>Effective pattern config for the current frame.</returns>
     public static EnemyPatternConfig BuildActivePatternConfig(in EnemyPatternConfig patternConfig,
                                                               in EnemyPatternRuntimeState patternRuntimeState,
                                                               float playerDistance)
@@ -183,11 +182,11 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Resolves whether the effective movement for the current frame still requires the custom movement system.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Current mutable pattern runtime state.
-    /// playerDistance: Current planar distance from enemy to player.
-    /// returns True when custom movement should stay in control for this frame.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="playerDistance">Current planar distance from enemy to player.</param>
+    /// <returns>True when custom movement should stay in control for this frame.</returns>
     public static bool UsesCustomMovement(in EnemyPatternConfig patternConfig,
                                           in EnemyPatternRuntimeState patternRuntimeState,
                                           float playerDistance)
@@ -198,10 +197,10 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Computes how much requested displacement was blocked by collision resolution.
-    /// requestedDistance: Requested displacement length.
-    /// allowedDistance: Allowed displacement length.
-    /// returns Blocked ratio in the [0..1] range.
     /// </summary>
+    /// <param name="requestedDistance">Requested displacement length.</param>
+    /// <param name="allowedDistance">Allowed displacement length.</param>
+    /// <returns>Blocked ratio in the [0..1] range.</returns>
     public static float ResolveBlockedDisplacementRatio(float requestedDistance, float allowedDistance)
     {
         if (requestedDistance <= DirectionEpsilon)
@@ -213,17 +212,17 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Resolves a lightweight wall-discomfort response used by Wanderer-based patterns to leave tight wall-adjacent spots early.
-    /// baseVelocity: Current desired planar velocity before wall comfort correction.
-    /// enemyPosition: Current enemy world position.
-    /// bodyRadius: Current immutable body radius.
-    /// minimumWallDistance: Additional authored wall clearance distance.
-    /// desiredSpeed: Desired planar speed magnitude used for the comfort correction.
-    /// physicsWorldSingleton: Physics world singleton used for wall distance queries.
-    /// wallsLayerMask: Walls layer mask.
-    /// wallsEnabled: Whether wall queries are enabled.
-    /// wallComfortPressure: Output normalized wall-pressure scalar in the [0..1] range.
-    /// returns Corrected planar velocity that biases movement away from the wall comfort shell.
     /// </summary>
+    /// <param name="baseVelocity">Current desired planar velocity before wall comfort correction.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="bodyRadius">Current immutable body radius.</param>
+    /// <param name="minimumWallDistance">Additional authored wall clearance distance.</param>
+    /// <param name="desiredSpeed">Desired planar speed magnitude used for the comfort correction.</param>
+    /// <param name="physicsWorldSingleton">Physics world singleton used for wall distance queries.</param>
+    /// <param name="wallsLayerMask">Walls layer mask.</param>
+    /// <param name="wallsEnabled">Whether wall queries are enabled.</param>
+    /// <param name="wallComfortPressure">Output normalized wall-pressure scalar in the [0..1] range.</param>
+    /// <returns>Corrected planar velocity that biases movement away from the wall comfort shell.</returns>
     public static float3 ResolveWallComfortVelocity(float3 baseVelocity,
                                                     float3 enemyPosition,
                                                     float bodyRadius,
@@ -288,10 +287,9 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Consumes the active Wanderer target when wall clearance invalidates remaining progress.
-    /// patternRuntimeState: Mutable Wanderer runtime state.
-    /// patternConfig: Current compiled pattern configuration.
-    /// returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Mutable Wanderer runtime state.</param>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
     public static void ConsumeWanderTargetOnClearance(ref EnemyPatternRuntimeState patternRuntimeState,
                                                       in EnemyPatternConfig patternConfig)
     {
@@ -305,14 +303,14 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Resolves current Wanderer DVD desired velocity and initializes the first direction if needed.
-    /// enemyEntity: Current enemy entity.
-    /// patternConfig: Current compiled pattern configuration.
-    /// patternRuntimeState: Mutable Wanderer runtime state.
-    /// moveSpeed: Resolved movement speed.
-    /// maxSpeed: Resolved maximum movement speed.
-    /// elapsedTime: Elapsed world time in seconds.
-    /// returns Desired planar velocity for the current frame.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Mutable Wanderer runtime state.</param>
+    /// <param name="moveSpeed">Resolved movement speed.</param>
+    /// <param name="maxSpeed">Resolved maximum movement speed.</param>
+    /// <param name="elapsedTime">Elapsed world time in seconds.</param>
+    /// <returns>Desired planar velocity for the current frame.</returns>
     public static float3 ResolveWandererDvdVelocity(Entity enemyEntity,
                                                     in EnemyPatternConfig patternConfig,
                                                     ref EnemyPatternRuntimeState patternRuntimeState,
@@ -363,10 +361,10 @@ public static class EnemyPatternMovementRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Resolves the extra comfort shell added over the authored wall clearance so wall-adjacent wanderers start leaving earlier.
-    /// bodyRadius: Current immutable body radius.
-    /// minimumWallDistance: Additional authored wall clearance distance.
-    /// returns Extra comfort shell thickness in meters.
     /// </summary>
+    /// <param name="bodyRadius">Current immutable body radius.</param>
+    /// <param name="minimumWallDistance">Additional authored wall clearance distance.</param>
+    /// <returns>Extra comfort shell thickness in meters.</returns>
     private static float ResolveWallComfortBand(float bodyRadius, float minimumWallDistance)
     {
         float distanceDrivenBand = minimumWallDistance * 0.55f;
@@ -377,9 +375,8 @@ public static class EnemyPatternMovementRuntimeUtility
 
     /// <summary>
     /// Copies the short-range coward category fields into the legacy coward slots consumed by the existing movement helpers.
-    /// activePatternConfig Mutable active pattern config for the current frame.
-    /// returns None.
     /// </summary>
+    /// <param name="activePatternConfig">Mutable active pattern config for the current frame.</param>
     private static void ApplyShortRangeCowardOverride(ref EnemyPatternConfig activePatternConfig)
     {
         activePatternConfig.MovementKind = EnemyCompiledMovementPatternKind.Coward;

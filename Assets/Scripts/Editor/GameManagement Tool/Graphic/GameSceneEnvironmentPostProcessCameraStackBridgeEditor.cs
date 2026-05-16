@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Draws the environment post-process camera stack bridge with context-aware layer routing fields.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomEditor(typeof(GameSceneEnvironmentPostProcessCameraStackBridge))]
 public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Editor
@@ -36,8 +34,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
     #region Unity Methods
     /// <summary>
     /// Resolves serialized properties once when the inspector is enabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -60,8 +56,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws the inspector and hides layer fields that are inactive for the current routing mode.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public override void OnInspectorGUI()
     {
@@ -78,8 +72,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
     #region Inspector Sections
     /// <summary>
     /// Draws camera reference fields.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawCameraReferences()
     {
@@ -89,8 +81,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws layer-routing fields and only shows masks used by the current routing mode.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawLayerRouting()
     {
@@ -110,8 +100,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws URP behavior toggles used by the runtime bridge.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawUrpBehavior()
     {
@@ -126,8 +114,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws debug gizmo fields only while selected-scene gizmos are enabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawDebugGizmos()
     {
@@ -147,8 +133,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
     #region Validation
     /// <summary>
     /// Draws coherent authoring warnings for common routing mistakes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawValidationWarnings()
     {
@@ -169,8 +153,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws warnings for derived gameplay mask routing.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawDerivedMaskWarnings()
     {
@@ -183,8 +165,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridgeEditor : Edi
 
     /// <summary>
     /// Draws warnings for explicit gameplay mask routing.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawExplicitMaskWarnings()
     {

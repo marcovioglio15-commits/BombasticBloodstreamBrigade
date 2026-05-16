@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides stable state keys and reusable foldout binding helpers shared by management-tool editor panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class ManagementToolFoldoutStateUtility
 {
@@ -20,11 +18,11 @@ public static class ManagementToolFoldoutStateUtility
     #region Public Methods
     /// <summary>
     /// Creates one foldout already bound to a persistent state key.
-    /// /params title Visible title shown in the foldout header.
-    /// /params stateKey Stable state key used to restore and store the expanded state.
-    /// /params defaultValue Expanded state used when the key was never seen before.
-    /// /returns Configured foldout instance.
     /// </summary>
+    /// <param name="title">Visible title shown in the foldout header.</param>
+    /// <param name="stateKey">Stable state key used to restore and store the expanded state.</param>
+    /// <param name="defaultValue">Expanded state used when the key was never seen before.</param>
+    /// <returns>Configured foldout instance.</returns>
     public static Foldout CreateFoldout(string title, string stateKey, bool defaultValue)
     {
         Foldout foldout = new Foldout();
@@ -35,12 +33,12 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Creates one foldout whose state key is derived from a serialized property plus a local suffix.
-    /// /params property Serialized property that identifies the owning data context.
-    /// /params title Visible title shown in the foldout header.
-    /// /params suffix Local suffix appended to the property key when multiple foldouts share the same property root.
-    /// /params defaultValue Expanded state used when no persisted state exists yet.
-    /// /returns Configured foldout instance.
     /// </summary>
+    /// <param name="property">Serialized property that identifies the owning data context.</param>
+    /// <param name="title">Visible title shown in the foldout header.</param>
+    /// <param name="suffix">Local suffix appended to the property key when multiple foldouts share the same property root.</param>
+    /// <param name="defaultValue">Expanded state used when no persisted state exists yet.</param>
+    /// <returns>Configured foldout instance.</returns>
     public static Foldout CreatePropertyFoldout(SerializedProperty property,
                                                 string title,
                                                 string suffix,
@@ -52,11 +50,10 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Binds one foldout to the provided state key.
-    /// /params foldout Foldout that must persist its expanded state.
-    /// /params stateKey Stable state key used to restore and store the expanded state.
-    /// /params defaultValue Expanded state used when no persisted state exists yet.
-    /// /returns None.
     /// </summary>
+    /// <param name="foldout">Foldout that must persist its expanded state.</param>
+    /// <param name="stateKey">Stable state key used to restore and store the expanded state.</param>
+    /// <param name="defaultValue">Expanded state used when no persisted state exists yet.</param>
     public static void BindFoldoutState(Foldout foldout, string stateKey, bool defaultValue)
     {
         if (foldout == null)
@@ -78,9 +75,9 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Builds the stable key that identifies the serialized object owning one UI subtree.
-    /// /params serializedObject Serialized object that owns the target stateful controls.
-    /// /returns Stable serialized-object key, or an empty string when unavailable.
     /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the target stateful controls.</param>
+    /// <returns>Stable serialized-object key, or an empty string when unavailable.</returns>
     public static string BuildSerializedObjectStateKey(SerializedObject serializedObject)
     {
         if (serializedObject == null)
@@ -109,9 +106,9 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Builds the stable context key for one serialized property.
-    /// /params property Serialized property that identifies the owning data context.
-    /// /returns Stable property context key without any local suffix.
     /// </summary>
+    /// <param name="property">Serialized property that identifies the owning data context.</param>
+    /// <returns>Stable property context key without any local suffix.</returns>
     public static string BuildPropertyContextKey(SerializedProperty property)
     {
         if (property == null)
@@ -136,10 +133,10 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Builds the stable state key for one serialized property and one local suffix.
-    /// /params property Serialized property that identifies the owning data context.
-    /// /params suffix Local suffix appended to distinguish multiple foldouts under the same property.
-    /// /returns Stable state key, or the property context key when the suffix is empty.
     /// </summary>
+    /// <param name="property">Serialized property that identifies the owning data context.</param>
+    /// <param name="suffix">Local suffix appended to distinguish multiple foldouts under the same property.</param>
+    /// <returns>Stable state key, or the property context key when the suffix is empty.</returns>
     public static string BuildPropertyStateKey(SerializedProperty property, string suffix)
     {
         string propertyContextKey = BuildPropertyContextKey(property);
@@ -155,10 +152,10 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Resolves the last persisted expanded state for one foldout key.
-    /// /params stateKey Stable state key used by one foldout.
-    /// /params defaultValue Expanded state returned when the key has not been stored yet.
-    /// /returns Persisted expanded state or the provided default.
     /// </summary>
+    /// <param name="stateKey">Stable state key used by one foldout.</param>
+    /// <param name="defaultValue">Expanded state returned when the key has not been stored yet.</param>
+    /// <returns>Persisted expanded state or the provided default.</returns>
     public static bool ResolveFoldoutState(string stateKey, bool defaultValue)
     {
         if (string.IsNullOrWhiteSpace(stateKey))
@@ -174,10 +171,9 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Stores or clears one foldout expanded state.
-    /// /params stateKey Stable state key used by one foldout.
-    /// /params expanded Expanded state that must be persisted.
-    /// /returns None.
     /// </summary>
+    /// <param name="stateKey">Stable state key used by one foldout.</param>
+    /// <param name="expanded">Expanded state that must be persisted.</param>
     public static void SetFoldoutState(string stateKey, bool expanded)
     {
         if (string.IsNullOrWhiteSpace(stateKey))
@@ -188,10 +184,9 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Removes stale foldout states whose keys are no longer part of one valid key set.
-    /// /params keyPrefix Shared prefix used by the group that is currently being rebuilt.
-    /// /params validStateKeys Current valid keys for the rebuilt group.
-    /// /returns None.
     /// </summary>
+    /// <param name="keyPrefix">Shared prefix used by the group that is currently being rebuilt.</param>
+    /// <param name="validStateKeys">Current valid keys for the rebuilt group.</param>
     public static void PruneFoldoutStates(string keyPrefix, HashSet<string> validStateKeys)
     {
         if (string.IsNullOrWhiteSpace(keyPrefix))
@@ -219,9 +214,8 @@ public static class ManagementToolFoldoutStateUtility
 
     /// <summary>
     /// Captures the current expanded state of every foldout under the provided root that exposes a state key through viewDataKey.
-    /// /params root Root visual element whose descendant foldouts must be persisted before a rebuild or clear.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Root visual element whose descendant foldouts must be persisted before a rebuild or clear.</param>
     public static void CaptureFoldoutStates(VisualElement root)
     {
         if (root == null)

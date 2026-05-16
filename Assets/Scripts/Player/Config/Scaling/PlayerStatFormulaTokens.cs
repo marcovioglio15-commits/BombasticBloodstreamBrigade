@@ -39,7 +39,7 @@ internal readonly struct PlayerStatFormulaToken
     /// <param name="numberValue">Numeric payload when applicable.</param>
     /// <param name="booleanValue">Boolean payload when applicable.</param>
     /// <param name="startIndexValue">Character index where the token starts in the source expression.</param>
-    /// <returns>Initialized token value.<returns>
+    /// <returns>Initialized token value.</returns>
     public PlayerStatFormulaToken(PlayerStatFormulaTokenType typeValue,
                                   string textValue,
                                   float numberValue,

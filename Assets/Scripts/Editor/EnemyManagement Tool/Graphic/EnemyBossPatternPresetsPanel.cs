@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides the Enemy Management Tool panel used to author boss-only pattern presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class EnemyBossPatternPresetsPanel
 {
@@ -93,8 +91,6 @@ public sealed class EnemyBossPatternPresetsPanel
     #region Constructors
     /// <summary>
     /// Creates the panel, restores its active subsection and loads the boss preset library.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public EnemyBossPatternPresetsPanel()
     {
@@ -114,8 +110,6 @@ public sealed class EnemyBossPatternPresetsPanel
     #region Public Methods
     /// <summary>
     /// Reloads library references and keeps the current selection after session-level changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void RefreshFromSessionChange()
     {
@@ -139,9 +133,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Selects one boss preset from an external owner, clearing filters if needed.
-    /// /params preset Boss pattern preset to select.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Boss pattern preset to select.</param>
     public void SelectPresetFromExternal(EnemyBossPatternPreset preset)
     {
         if (preset == null)
@@ -173,8 +166,6 @@ public sealed class EnemyBossPatternPresetsPanel
     #region UI Construction
     /// <summary>
     /// Builds the split-view layout for list and details panes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildUI()
     {
@@ -186,9 +177,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Builds the left pane containing actions, search and preset list.
-    /// /params None.
-    /// /returns The created left pane.
     /// </summary>
+    /// <returns>The created left pane.</returns>
     private VisualElement BuildLeftPane()
     {
         VisualElement leftPane = new VisualElement();
@@ -243,9 +233,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Builds the scrollable details pane.
-    /// /params None.
-    /// /returns The created right pane.
     /// </summary>
+    /// <returns>The created right pane.</returns>
     private VisualElement BuildRightPane()
     {
         VisualElement rightPane = new VisualElement();
@@ -265,9 +254,8 @@ public sealed class EnemyBossPatternPresetsPanel
     #region Preset List
     /// <summary>
     /// Creates one list item used by the boss preset list.
-    /// /params None.
-    /// /returns The list item label.
     /// </summary>
+    /// <returns>The list item label.</returns>
     private VisualElement MakePresetItem()
     {
         Label label = new Label();
@@ -290,10 +278,9 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Binds one boss preset to a list item.
-    /// /params element List element to bind.
-    /// /params index Filtered preset index.
-    /// /returns None.
     /// </summary>
+    /// <param name="element">List element to bind.</param>
+    /// <param name="index">Filtered preset index.</param>
     private void BindPresetItem(VisualElement element, int index)
     {
         Label label = element as Label;
@@ -325,9 +312,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Applies list selection changes to the details pane.
-    /// /params selection Selected list objects.
-    /// /returns None.
     /// </summary>
+    /// <param name="selection">Selected list objects.</param>
     private void OnPresetSelectionChanged(IEnumerable<object> selection)
     {
         foreach (object item in selection)
@@ -346,8 +332,6 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Rebuilds the filtered boss preset list and repairs selection when needed.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RefreshPresetList()
     {
@@ -392,10 +376,10 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Checks whether one preset matches the current search text.
-    /// /params preset Candidate preset.
-    /// /params searchText Current search text.
-    /// /returns True when the preset should be visible.
     /// </summary>
+    /// <param name="preset">Candidate preset.</param>
+    /// <param name="searchText">Current search text.</param>
+    /// <returns>True when the preset should be visible.</returns>
     private static bool IsMatchingSearch(EnemyBossPatternPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))
@@ -413,8 +397,6 @@ public sealed class EnemyBossPatternPresetsPanel
     #region Preset Actions
     /// <summary>
     /// Creates and selects one new boss pattern preset asset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void CreatePreset()
     {
@@ -423,8 +405,6 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Duplicates the currently selected boss pattern preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DuplicatePreset()
     {
@@ -433,9 +413,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Duplicates a specific boss pattern preset asset and registers the copy.
-    /// /params preset Preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to duplicate.</param>
     private void DuplicatePreset(EnemyBossPatternPreset preset)
     {
         EnemyBossPatternPresetsPanelPresetUtility.DuplicatePreset(this, preset);
@@ -443,8 +422,6 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Stages the currently selected boss pattern preset for deletion.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DeletePreset()
     {
@@ -453,9 +430,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Stages one boss pattern preset for deletion after confirmation.
-    /// /params preset Preset to delete.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to delete.</param>
     private void DeletePreset(EnemyBossPatternPreset preset)
     {
         EnemyBossPatternPresetsPanelPresetUtility.DeletePreset(this, preset);
@@ -465,9 +441,8 @@ public sealed class EnemyBossPatternPresetsPanel
     #region Preset Details
     /// <summary>
     /// Selects one boss preset and rebuilds the details pane.
-    /// /params preset Boss pattern preset to edit.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Boss pattern preset to edit.</param>
     private void SelectPreset(EnemyBossPatternPreset preset)
     {
         SelectPresetInternal(preset);
@@ -475,9 +450,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Selects one boss preset and rebuilds the details pane.
-    /// /params preset Boss pattern preset to edit.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Boss pattern preset to edit.</param>
     internal void SelectPresetInternal(EnemyBossPatternPreset preset)
     {
         selectedPreset = preset;
@@ -507,9 +481,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Builds the subsection tab row for the selected boss preset.
-    /// /params None.
-    /// /returns The created tab row.
     /// </summary>
+    /// <returns>The created tab row.</returns>
     private VisualElement BuildDetailsSectionButtons()
     {
         VisualElement buttonsRoot = new VisualElement();
@@ -527,11 +500,10 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Adds one subsection button to the selected boss preset details.
-    /// /params parent Tab row parent.
-    /// /params sectionType Target subsection.
-    /// /params buttonLabel Visible button label.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Tab row parent.</param>
+    /// <param name="sectionType">Target subsection.</param>
+    /// <param name="buttonLabel">Visible button label.</param>
     private static void AddDetailsSectionButton(VisualElement parent, SectionType sectionType, string buttonLabel)
     {
         Button sectionButton = new Button(() => SetSectionFromButton(parent, sectionType));
@@ -543,10 +515,9 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Resolves the panel stored on the button row and activates the requested subsection.
-    /// /params parent Tab row parent.
-    /// /params sectionType Target subsection.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Tab row parent.</param>
+    /// <param name="sectionType">Target subsection.</param>
     private static void SetSectionFromButton(VisualElement parent, SectionType sectionType)
     {
         if (parent == null)
@@ -562,9 +533,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Persists and rebuilds the active boss preset subsection.
-    /// /params sectionType Target subsection.
-    /// /returns None.
     /// </summary>
+    /// <param name="sectionType">Target subsection.</param>
     private void SetActiveSection(SectionType sectionType)
     {
         activeSection = sectionType;
@@ -574,8 +544,6 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Rebuilds the currently active details subsection.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void BuildActiveDetailsSection()
     {
@@ -615,8 +583,6 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Regenerates the selected boss preset ID.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RegeneratePresetId()
     {
@@ -637,9 +603,8 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Applies a committed preset-name edit from the metadata section.
-    /// /params newName New preset name.
-    /// /returns None.
     /// </summary>
+    /// <param name="newName">New preset name.</param>
     internal void HandlePresetNameChanged(string newName)
     {
         RenamePreset(selectedPreset, newName);
@@ -647,10 +612,9 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Renames the preset asset and display metadata.
-    /// /params preset Preset to rename.
-    /// /params newName Requested name.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to rename.</param>
+    /// <param name="newName">Requested name.</param>
     private void RenamePreset(EnemyBossPatternPreset preset, string newName)
     {
         EnemyBossPatternPresetsPanelPresetUtility.RenamePreset(this, preset, newName);
@@ -658,10 +622,9 @@ public sealed class EnemyBossPatternPresetsPanel
 
     /// <summary>
     /// Opens the rename popup for a boss preset list item.
-    /// /params anchor UI anchor for popup placement.
-    /// /params preset Preset being renamed.
-    /// /returns None.
     /// </summary>
+    /// <param name="anchor">UI anchor for popup placement.</param>
+    /// <param name="preset">Preset being renamed.</param>
     private void ShowRenamePopup(VisualElement anchor, EnemyBossPatternPreset preset)
     {
         EnemyBossPatternPresetsPanelPresetUtility.ShowRenamePopup(this, anchor, preset);

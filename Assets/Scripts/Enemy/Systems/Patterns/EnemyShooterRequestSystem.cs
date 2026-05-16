@@ -276,10 +276,10 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Resolves whether one Shooter module currently requires movement to remain stopped.
-    /// /params shooterConfig Shooter configuration that declares the movement policy.
-    /// /params runtime Mutable Shooter timing state for active and post-fire phases.
-    /// /returns True when the enemy should hold position for this module.
     /// </summary>
+    /// <param name="shooterConfig">Shooter configuration that declares the movement policy.</param>
+    /// <param name="runtime">Mutable Shooter timing state for active and post-fire phases.</param>
+    /// <returns>True when the enemy should hold position for this module.</returns>
     private static bool ShouldLockShooterMovement(in EnemyShooterConfigElement shooterConfig,
                                                   in EnemyShooterRuntimeElement runtime)
     {
@@ -291,9 +291,9 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Resolves the first-shot delay for a burst, including stop-before-fire timing only when movement locking is enabled.
-    /// /params shooterConfig Shooter config containing windup and stop timing values.
-    /// /returns Seconds to wait before the first shot in the burst.
     /// </summary>
+    /// <param name="shooterConfig">Shooter config containing windup and stop timing values.</param>
+    /// <returns>Seconds to wait before the first shot in the burst.</returns>
     private static float ResolveBurstWindupDuration(in EnemyShooterConfigElement shooterConfig)
     {
         float aimWindupSeconds = math.max(0f, shooterConfig.AimWindupSeconds);
@@ -306,9 +306,9 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Resolves post-fire stop timing only for Shooter modules that explicitly lock movement while aiming.
-    /// /params shooterConfig Shooter config containing movement policy and post-fire stop timing.
-    /// /returns Seconds to keep movement locked after the final shot.
     /// </summary>
+    /// <param name="shooterConfig">Shooter config containing movement policy and post-fire stop timing.</param>
+    /// <returns>Seconds to keep movement locked after the final shot.</returns>
     private static float ResolvePostFireStopDuration(in EnemyShooterConfigElement shooterConfig)
     {
         if (shooterConfig.MovementPolicy != EnemyShooterMovementPolicy.StopWhileAiming)
@@ -319,11 +319,11 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Evaluates optional activation gates beyond distance checks for one Weapon Interaction.
-    /// /params shooterConfig Shooter config containing gate flags.
-    /// /params enemyRuntimeState Enemy runtime state used for speed and damage checks.
-    /// /params patternRuntimeState Pattern runtime state used for Wanderer wait checks.
-    /// /returns True when every configured gate is satisfied.
     /// </summary>
+    /// <param name="shooterConfig">Shooter config containing gate flags.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used for speed and damage checks.</param>
+    /// <param name="patternRuntimeState">Pattern runtime state used for Wanderer wait checks.</param>
+    /// <returns>True when every configured gate is satisfied.</returns>
     private static bool AreActivationGatesValid(in EnemyShooterConfigElement shooterConfig,
                                                 in EnemyRuntimeState enemyRuntimeState,
                                                 in EnemyPatternRuntimeState patternRuntimeState)
@@ -394,7 +394,6 @@ public partial struct EnemyShooterRequestSystem : ISystem
     /// <param name="resolvedAimDirection">Best resolved aim direction retained across modules.</param>
     /// <param name="hasResolvedAimDirection">Whether a valid aim direction has already been captured.</param>
     /// <param name="aimPriority">Priority of the currently captured aim direction.</param>
-    /// <returns>None.<returns>
     private static void TryCaptureAimDirection(float3 candidateDirection,
                                                EnemyShooterMovementPolicy movementPolicy,
                                                bool exclusiveLookDirectionControl,
@@ -442,12 +441,11 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Enqueues the default target-facing spread shot pattern.
-    /// /params shootRequests Buffer receiving projectile spawn requests.
-    /// /params shooterPosition World position of the shooter.
-    /// /params baseDirection Target-facing aim direction.
-    /// /params shooterConfig Shooter projectile payload.
-    /// /returns None.
     /// </summary>
+    /// <param name="shootRequests">Buffer receiving projectile spawn requests.</param>
+    /// <param name="shooterPosition">World position of the shooter.</param>
+    /// <param name="baseDirection">Target-facing aim direction.</param>
+    /// <param name="shooterConfig">Shooter projectile payload.</param>
     private static void EnqueueForwardSpreadRequests(DynamicBuffer<ShootRequest> shootRequests,
                                                      float3 shooterPosition,
                                                      float3 baseDirection,
@@ -481,12 +479,11 @@ public partial struct EnemyShooterRequestSystem : ISystem
 
     /// <summary>
     /// Enqueues a full-circle projectile burst evenly distributed around the shooter.
-    /// /params shootRequests Buffer receiving projectile spawn requests.
-    /// /params shooterPosition World position of the shooter.
-    /// /params baseDirection First projectile direction, usually aimed at the player.
-    /// /params shooterConfig Shooter projectile payload.
-    /// /returns None.
     /// </summary>
+    /// <param name="shootRequests">Buffer receiving projectile spawn requests.</param>
+    /// <param name="shooterPosition">World position of the shooter.</param>
+    /// <param name="baseDirection">First projectile direction, usually aimed at the player.</param>
+    /// <param name="shooterConfig">Shooter projectile payload.</param>
     private static void EnqueueRadialBurstRequests(DynamicBuffer<ShootRequest> shootRequests,
                                                    float3 shooterPosition,
                                                    float3 baseDirection,

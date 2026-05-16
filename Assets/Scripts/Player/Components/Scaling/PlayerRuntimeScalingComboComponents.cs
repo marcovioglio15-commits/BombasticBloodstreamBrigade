@@ -4,7 +4,6 @@ using Unity.Entities;
 /// <summary>
 /// Stores immutable combo runtime rules used to rebuild the active combo config whenever scalable stats change.
 /// none.
-/// returns none.
 /// </summary>
 public struct PlayerBaseComboCounterConfig : IComponentData
 {
@@ -18,7 +17,6 @@ public struct PlayerBaseComboCounterConfig : IComponentData
 /// <summary>
 /// Stores the current combo runtime rules after progression Add Scaling formulas are resolved.
 /// none.
-/// returns none.
 /// </summary>
 public struct PlayerRuntimeComboCounterConfig : IComponentData
 {
@@ -32,7 +30,6 @@ public struct PlayerRuntimeComboCounterConfig : IComponentData
 /// <summary>
 /// Stores one immutable combo-rank milestone, point-decay rate, progressive boost data, passive unlock range, and flattened Character Tuning formula range used by that rank.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerBaseComboRankElement : IBufferElementData
@@ -50,7 +47,6 @@ public struct PlayerBaseComboRankElement : IBufferElementData
 /// <summary>
 /// Stores one current combo-rank milestone, point-decay rate, progressive boost data, and passive unlock range after progression Add Scaling formulas are resolved.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerRuntimeComboRankElement : IBufferElementData
@@ -68,7 +64,6 @@ public struct PlayerRuntimeComboRankElement : IBufferElementData
 /// <summary>
 /// Stores one immutable passive power-up unlock authored under a combo rank.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerBaseComboPassiveUnlockElement : IBufferElementData
@@ -80,7 +75,6 @@ public struct PlayerBaseComboPassiveUnlockElement : IBufferElementData
 /// <summary>
 /// Stores one current passive power-up unlock after progression Add Scaling formulas are resolved.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerRuntimeComboPassiveUnlockElement : IBufferElementData
@@ -92,7 +86,6 @@ public struct PlayerRuntimeComboPassiveUnlockElement : IBufferElementData
 /// <summary>
 /// Identifies one combo runtime field that can be rebuilt from a progression Add Scaling rule.
 /// none.
-/// returns none.
 /// </summary>
 public enum PlayerRuntimeComboCounterFieldId : byte
 {
@@ -111,7 +104,6 @@ public enum PlayerRuntimeComboCounterFieldId : byte
 /// <summary>
 /// Stores one combo scaling metadata entry baked from progression Add Scaling authoring data.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerRuntimeComboCounterScalingElement : IBufferElementData

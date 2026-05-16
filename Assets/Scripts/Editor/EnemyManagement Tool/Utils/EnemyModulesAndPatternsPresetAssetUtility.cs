@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides asset-creation helpers for shared EnemyModulesAndPatternsPreset assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class EnemyModulesAndPatternsPresetAssetUtility
 {
@@ -18,9 +16,9 @@ public static class EnemyModulesAndPatternsPresetAssetUtility
     #region Public Methods
     /// <summary>
     /// Creates one shared Modules & Patterns preset asset inside the default enemy authoring folder.
-    /// /params presetName Requested asset name.
-    /// /returns The created shared preset asset, or null when creation fails.
     /// </summary>
+    /// <param name="presetName">Requested asset name.</param>
+    /// <returns>The created shared preset asset, or null when creation fails.</returns>
     public static EnemyModulesAndPatternsPreset CreatePresetAsset(string presetName)
     {
         EnsureFolder(DefaultPresetsFolder);
@@ -51,9 +49,8 @@ public static class EnemyModulesAndPatternsPresetAssetUtility
     #region Private Methods
     /// <summary>
     /// Ensures that the requested folder path exists inside the AssetDatabase.
-    /// /params folderPath Requested folder path.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Requested folder path.</param>
     private static void EnsureFolder(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))

@@ -22,9 +22,8 @@ public partial struct EnemySpawnSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Caches the query used to iterate initialized wave spawners.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         spawnerQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -42,9 +41,8 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Schedules wave starts, emits due events and activates pooled enemies at their baked positions.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -60,11 +58,10 @@ public partial struct EnemySpawnSystem : ISystem
     #region Helpers
     /// <summary>
     /// Processes one spawner by updating wave scheduling and consuming due events.
-    /// entityManager: Entity manager used to access components and buffers.
-    /// spawnerEntity: Spawner entity being processed.
-    /// elapsedTime: Current elapsed world time.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access components and buffers.</param>
+    /// <param name="spawnerEntity">Spawner entity being processed.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
     private static void ProcessSpawner(EntityManager entityManager,
                                        Entity spawnerEntity,
                                        float elapsedTime)
@@ -130,13 +127,12 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Assigns a deterministic scheduled start time to a wave as soon as its prerequisite state is available.
-    /// spawnerState: Global mutable spawner state.
-    /// waveDefinitions: Immutable wave definition buffer.
-    /// waveRuntime: Mutable wave runtime buffer.
-    /// waveIndex: Wave index to schedule.
-    /// runtime: Current wave runtime state to update.
-    /// returns None.
     /// </summary>
+    /// <param name="spawnerState">Global mutable spawner state.</param>
+    /// <param name="waveDefinitions">Immutable wave definition buffer.</param>
+    /// <param name="waveRuntime">Mutable wave runtime buffer.</param>
+    /// <param name="waveIndex">Wave index to schedule.</param>
+    /// <param name="runtime">Current wave runtime state to update.</param>
     private static void TryScheduleWaveStart(EnemySpawnerState spawnerState,
                                              DynamicBuffer<EnemySpawnerWaveDefinitionElement> waveDefinitions,
                                              DynamicBuffer<EnemySpawnerWaveRuntimeElement> waveRuntime,
@@ -168,11 +164,10 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Starts a wave once the current world time reaches its scheduled start timestamp.
-    /// /params elapsedTime Current elapsed world time.
-    /// /params definition Immutable definition of the wave.
-    /// /params runtime Current wave runtime state to update.
-    /// /returns None.
     /// </summary>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="definition">Immutable definition of the wave.</param>
+    /// <param name="runtime">Current wave runtime state to update.</param>
     private static void TryStartWave(float elapsedTime,
                                      EnemySpawnerWaveDefinitionElement definition,
                                      ref EnemySpawnerWaveRuntimeElement runtime)
@@ -198,15 +193,14 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Reserves every upcoming spawn event whose warning lead window has opened.
-    /// entityManager: Entity manager used to access pools and enemy instances.
-    /// spawnerEntity: Spawner that owns the wave.
-    /// localToWorld: Current spawner local-to-world matrix.
-    /// elapsedTime: Current elapsed world time.
-    /// definition: Immutable definition of the wave.
-    /// warningConfig: Spawner-level fallback warning tuning.
-    /// runtime: Mutable runtime state for the wave.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access pools and enemy instances.</param>
+    /// <param name="spawnerEntity">Spawner that owns the wave.</param>
+    /// <param name="localToWorld">Current spawner local-to-world matrix.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="definition">Immutable definition of the wave.</param>
+    /// <param name="warningConfig">Spawner-level fallback warning tuning.</param>
+    /// <param name="runtime">Mutable runtime state for the wave.</param>
     private static void ReserveUpcomingEvents(EntityManager entityManager,
                                               Entity spawnerEntity,
                                               float4x4 localToWorld,
@@ -275,16 +269,15 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Activates every reserved event whose due time has been reached at the current frame.
-    /// entityManager: Entity manager used to access pools and enemy instances.
-    /// spawnerEntity: Spawner that owns the wave.
-    /// localToWorld: Current spawner local-to-world matrix.
-    /// elapsedTime: Current elapsed world time.
-    /// definition: Immutable definition of the wave.
-    /// warningConfig: Immutable warning tuning baked from authoring.
-    /// runtime: Mutable runtime state for the processed wave.
-    /// spawnerState: Mutable global spawner state.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access pools and enemy instances.</param>
+    /// <param name="spawnerEntity">Spawner that owns the wave.</param>
+    /// <param name="localToWorld">Current spawner local-to-world matrix.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="definition">Immutable definition of the wave.</param>
+    /// <param name="warningConfig">Immutable warning tuning baked from authoring.</param>
+    /// <param name="runtime">Mutable runtime state for the processed wave.</param>
+    /// <param name="spawnerState">Mutable global spawner state.</param>
     private static void ActivateDueEvents(EntityManager entityManager,
                                           Entity spawnerEntity,
                                           float4x4 localToWorld,
@@ -355,11 +348,10 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Marks a wave as spawn-finished or completed once its conditions are satisfied.
-    /// elapsedTime: Current elapsed world time.
-    /// definition: Immutable definition of the wave.
-    /// runtime: Mutable runtime state for the wave.
-    /// returns None.
     /// </summary>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="definition">Immutable definition of the wave.</param>
+    /// <param name="runtime">Mutable runtime state for the wave.</param>
     private static void TryFinalizeWave(float elapsedTime,
                                         EnemySpawnerWaveDefinitionElement definition,
                                         ref EnemySpawnerWaveRuntimeElement runtime)
@@ -391,12 +383,11 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Writes one wave runtime element after any spawn-side structural changes have completed.
-    /// entityManager: Entity manager used to reacquire the runtime buffer.
-    /// spawnerEntity: Spawner that owns the runtime buffer.
-    /// waveIndex: Wave index to update.
-    /// runtime: Runtime data to store.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to reacquire the runtime buffer.</param>
+    /// <param name="spawnerEntity">Spawner that owns the runtime buffer.</param>
+    /// <param name="waveIndex">Wave index to update.</param>
+    /// <param name="runtime">Runtime data to store.</param>
     private static void SetWaveRuntime(EntityManager entityManager,
                                        Entity spawnerEntity,
                                        int waveIndex,
@@ -410,12 +401,11 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Writes one staged wave event after enemy reservation or activation has potentially changed archetypes.
-    /// entityManager: Entity manager used to reacquire the event buffer.
-    /// spawnerEntity: Spawner that owns the event buffer.
-    /// eventIndex: Event index to update.
-    /// waveEvent: Event data to store.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to reacquire the event buffer.</param>
+    /// <param name="spawnerEntity">Spawner that owns the event buffer.</param>
+    /// <param name="eventIndex">Event index to update.</param>
+    /// <param name="waveEvent">Event data to store.</param>
     private static void SetWaveEvent(EntityManager entityManager,
                                      Entity spawnerEntity,
                                      int eventIndex,
@@ -429,13 +419,13 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Resolves the prerequisite reference time that drives scheduling for a non-first wave.
-    /// spawnerState: Global mutable spawner state.
-    /// previousWaveDefinition: Immutable definition of the previous wave.
-    /// previousWaveRuntime: Mutable runtime state of the previous wave.
-    /// startMode: Requested start mode for the current wave.
-    /// referenceTime: Resolved reference time when the prerequisite is satisfied.
-    /// returns True when the prerequisite is satisfied and the reference time is valid, otherwise false.
     /// </summary>
+    /// <param name="spawnerState">Global mutable spawner state.</param>
+    /// <param name="previousWaveDefinition">Immutable definition of the previous wave.</param>
+    /// <param name="previousWaveRuntime">Mutable runtime state of the previous wave.</param>
+    /// <param name="startMode">Requested start mode for the current wave.</param>
+    /// <param name="referenceTime">Resolved reference time when the prerequisite is satisfied.</param>
+    /// <returns>True when the prerequisite is satisfied and the reference time is valid, otherwise false.</returns>
     private static bool TryResolveReferenceTime(EnemySpawnerState spawnerState,
                                                 EnemySpawnerWaveDefinitionElement previousWaveDefinition,
                                                 EnemySpawnerWaveRuntimeElement previousWaveRuntime,
@@ -483,11 +473,11 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Resolves the concrete pool entity associated with the provided prefab.
-    /// poolMap: Prefab-to-pool map buffer stored on the spawner.
-    /// prefabEntity: Referenced prefab to resolve.
-    /// poolEntity: Resolved pool entity when found.
-    /// returns True when the mapping exists, otherwise false.
     /// </summary>
+    /// <param name="poolMap">Prefab-to-pool map buffer stored on the spawner.</param>
+    /// <param name="prefabEntity">Referenced prefab to resolve.</param>
+    /// <param name="poolEntity">Resolved pool entity when found.</param>
+    /// <returns>True when the mapping exists, otherwise false.</returns>
     private static bool TryGetPoolEntity(DynamicBuffer<EnemySpawnerPrefabPoolMapElement> poolMap,
                                          Entity prefabEntity,
                                          out Entity poolEntity)
@@ -509,13 +499,13 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Acquires one pooled enemy instance from the requested pool, expanding it on demand.
-    /// entityManager: Entity manager used to access the pool entity.
-    /// poolEntity: Concrete pool that should provide an enemy instance.
-    /// spawnerEntity: Spawner that owns the pool.
-    /// prefabEntity: Prefab associated with the pool.
-    /// enemyEntity: Resolved pooled enemy instance when acquisition succeeds.
-    /// returns True when an instance was acquired, otherwise false.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access the pool entity.</param>
+    /// <param name="poolEntity">Concrete pool that should provide an enemy instance.</param>
+    /// <param name="spawnerEntity">Spawner that owns the pool.</param>
+    /// <param name="prefabEntity">Prefab associated with the pool.</param>
+    /// <param name="enemyEntity">Resolved pooled enemy instance when acquisition succeeds.</param>
+    /// <returns>True when an instance was acquired, otherwise false.</returns>
     private static bool TryAcquireEnemy(EntityManager entityManager,
                                         Entity poolEntity,
                                         Entity spawnerEntity,
@@ -563,13 +553,13 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Builds the warning payload stored on a reserved enemy and later consumed by presentation.
-    /// /params entityManager Entity manager used to inspect prefab data for body-aware sizing.
-    /// /params prefabEntity Enemy prefab baked on the staged event.
-    /// /params worldPosition Final world position presented by the warning ring.
-    /// /params spawnTime Absolute world time when the reserved enemy becomes active.
-    /// /params warningConfig Immutable warning tuning baked from spawner authoring.
-    /// /returns Resolved warning payload for one reserved enemy.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect prefab data for body-aware sizing.</param>
+    /// <param name="prefabEntity">Enemy prefab baked on the staged event.</param>
+    /// <param name="worldPosition">Final world position presented by the warning ring.</param>
+    /// <param name="spawnTime">Absolute world time when the reserved enemy becomes active.</param>
+    /// <param name="warningConfig">Immutable warning tuning baked from spawner authoring.</param>
+    /// <returns>Resolved warning payload for one reserved enemy.</returns>
     internal static EnemySpawnWarningState CreateWarningState(EntityManager entityManager,
                                                              Entity prefabEntity,
                                                              float3 worldPosition,
@@ -608,11 +598,11 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Resolves a compact body-aware warning radius so each enemy keeps its own readable telegraph.
-    /// entityManager: Entity manager used to inspect the baked prefab data.
-    /// prefabEntity: Enemy prefab baked on the staged event.
-    /// warningConfig: Immutable warning tuning baked from spawner authoring.
-    /// returns Resolved world-space warning radius for the reserved enemy.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect the baked prefab data.</param>
+    /// <param name="prefabEntity">Enemy prefab baked on the staged event.</param>
+    /// <param name="warningConfig">Immutable warning tuning baked from spawner authoring.</param>
+    /// <returns>Resolved world-space warning radius for the reserved enemy.</returns>
     private static float ResolveWarningRadius(EntityManager entityManager,
                                               Entity prefabEntity,
                                               EnemySpawnWarningConfig warningConfig)
@@ -632,10 +622,10 @@ public partial struct EnemySpawnSystem : ISystem
 
     /// <summary>
     /// Resolves the absolute wave start time used by staged events before and after the wave starts.
-    /// /params runtime Mutable runtime state of the processed wave.
-    /// /params definition Immutable wave definition carrying the maximum event warning lead time.
-    /// /returns Scheduled start time before activation, otherwise the effective spawn start time.
     /// </summary>
+    /// <param name="runtime">Mutable runtime state of the processed wave.</param>
+    /// <param name="definition">Immutable wave definition carrying the maximum event warning lead time.</param>
+    /// <returns>Scheduled start time before activation, otherwise the effective spawn start time.</returns>
     private static float ResolveWaveActualSpawnStartTime(EnemySpawnerWaveRuntimeElement runtime,
                                                          EnemySpawnerWaveDefinitionElement definition)
     {

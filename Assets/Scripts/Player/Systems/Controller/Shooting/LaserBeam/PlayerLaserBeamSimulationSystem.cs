@@ -6,8 +6,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Resolves activation, cooldown and bounced lane geometry for the player Laser Beam passive override.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerShootingIntentSystem))]
@@ -23,9 +21,8 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers all required runtime dependencies for Laser Beam simulation.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerLaserBeamState>();
@@ -43,9 +40,8 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
     /// <summary>
     /// Updates beam activation timers and rebuilds the current segment buffer for every active player beam.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
@@ -359,32 +355,32 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     #region Helpers
     /// <summary>
     /// Appends one beam lane using either the straight-line builder or the Perfect Circle sampler, depending on passive state.
-    /// /params laserBeamLanes Output lane buffer for the current player.
-    /// /params laneIndex Stable lane index assigned to the lane.
-    /// /params isSplitChild True when the lane belongs to one split branch.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params shooterPosition Current player position.
-    /// /params shooterVelocity Current player velocity.
-    /// /params spawnPosition World-space origin of the lane.
-    /// /params direction World-space forward direction of the lane.
-    /// /params activeSeconds Current uninterrupted active time.
-    /// /params globalTime Current elapsed world time.
-    /// /params travelDistance Straight-line travel budget used when Perfect Circle is disabled.
-    /// /params rangeLimit Effective projectile range inherited by the beam.
-    /// /params lifetimeLimit Effective projectile lifetime inherited by the beam.
-    /// /params speedMultiplier Beam-local speed multiplier applied to motion simulation.
-    /// /params collisionRadius Effective gameplay width of the lane.
-    /// /params bodyWidth Effective visual width of the lane.
-    /// /params damageMultiplier Lane-local damage multiplier.
-    /// /params maximumBounceSegments Maximum reflected wall segments supported by straight-line mode.
-    /// /params perfectCircleConfig Aggregated Perfect Circle passive configuration.
-    /// /params hasPerfectCircle True when the current lane must follow Perfect Circle sampling.
-    /// /params physicsWorldSingleton Physics world used for wall clipping.
-    /// /params wallsCollisionFilter Collision filter used for world walls.
-    /// /params reachedVirtualDespawn True when the simulated lane has reached its despawn condition and can emit split-on-despawn branches.
-    /// /params wallsEnabled True when wall clipping should be evaluated.
-    /// /returns True when at least one lane segment was appended.
     /// </summary>
+    /// <param name="laserBeamLanes">Output lane buffer for the current player.</param>
+    /// <param name="laneIndex">Stable lane index assigned to the lane.</param>
+    /// <param name="isSplitChild">True when the lane belongs to one split branch.</param>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="shooterPosition">Current player position.</param>
+    /// <param name="shooterVelocity">Current player velocity.</param>
+    /// <param name="spawnPosition">World-space origin of the lane.</param>
+    /// <param name="direction">World-space forward direction of the lane.</param>
+    /// <param name="activeSeconds">Current uninterrupted active time.</param>
+    /// <param name="globalTime">Current elapsed world time.</param>
+    /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
+    /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
+    /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
+    /// <param name="speedMultiplier">Beam-local speed multiplier applied to motion simulation.</param>
+    /// <param name="collisionRadius">Effective gameplay width of the lane.</param>
+    /// <param name="bodyWidth">Effective visual width of the lane.</param>
+    /// <param name="damageMultiplier">Lane-local damage multiplier.</param>
+    /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by straight-line mode.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle passive configuration.</param>
+    /// <param name="hasPerfectCircle">True when the current lane must follow Perfect Circle sampling.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall clipping.</param>
+    /// <param name="wallsCollisionFilter">Collision filter used for world walls.</param>
+    /// <param name="reachedVirtualDespawn">True when the simulated lane has reached its despawn condition and can emit split-on-despawn branches.</param>
+    /// <param name="wallsEnabled">True when wall clipping should be evaluated.</param>
+    /// <returns>True when at least one lane segment was appended.</returns>
     private static bool TryAppendLane(ref DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                       int laneIndex,
                                       bool isSplitChild,
@@ -475,29 +471,28 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
     /// <summary>
     /// Appends all split-child lanes emitted from currently resolved primary terminal segments.
-    /// /params laserBeamLanes Output lane buffer containing the already-built primary lanes.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params shooterPosition Current player position.
-    /// /params shooterVelocity Current player velocity.
-    /// /params primaryLaneCount Number of primary lanes already present in the buffer.
-    /// /params activeSeconds Current uninterrupted active time.
-    /// /params globalTime Current elapsed world time.
-    /// /params travelDistance Straight-line travel budget used when Perfect Circle is disabled.
-    /// /params rangeLimit Effective projectile range inherited by the parent lanes.
-    /// /params lifetimeLimit Effective projectile lifetime inherited by the parent lanes.
-    /// /params speedMultiplier Beam-local speed multiplier inherited by the parent lanes.
-    /// /params collisionRadius Effective gameplay width inherited by the parent lanes.
-    /// /params bodyWidth Effective visual width inherited by the parent lanes.
-    /// /params maximumBounceSegments Maximum reflected wall segments supported by straight-line mode.
-    /// /params primaryLaneReachedVirtualDespawnFlags Per-lane flags telling whether each primary lane reached a virtual despawn condition.
-    /// /params perfectCircleConfig Aggregated Perfect Circle passive configuration.
-    /// /params hasPerfectCircle True when split children must also sample Perfect Circle.
-    /// /params splittingProjectilesConfig Aggregated split-projectile passive configuration.
-    /// /params physicsWorldSingleton Physics world used for wall clipping.
-    /// /params wallsCollisionFilter Collision filter used for world walls.
-    /// /params wallsEnabled True when wall clipping should be evaluated.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamLanes">Output lane buffer containing the already-built primary lanes.</param>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="shooterPosition">Current player position.</param>
+    /// <param name="shooterVelocity">Current player velocity.</param>
+    /// <param name="primaryLaneCount">Number of primary lanes already present in the buffer.</param>
+    /// <param name="activeSeconds">Current uninterrupted active time.</param>
+    /// <param name="globalTime">Current elapsed world time.</param>
+    /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
+    /// <param name="rangeLimit">Effective projectile range inherited by the parent lanes.</param>
+    /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the parent lanes.</param>
+    /// <param name="speedMultiplier">Beam-local speed multiplier inherited by the parent lanes.</param>
+    /// <param name="collisionRadius">Effective gameplay width inherited by the parent lanes.</param>
+    /// <param name="bodyWidth">Effective visual width inherited by the parent lanes.</param>
+    /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by straight-line mode.</param>
+    /// <param name="primaryLaneReachedVirtualDespawnFlags">Per-lane flags telling whether each primary lane reached a virtual despawn condition.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle passive configuration.</param>
+    /// <param name="hasPerfectCircle">True when split children must also sample Perfect Circle.</param>
+    /// <param name="splittingProjectilesConfig">Aggregated split-projectile passive configuration.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall clipping.</param>
+    /// <param name="wallsCollisionFilter">Collision filter used for world walls.</param>
+    /// <param name="wallsEnabled">True when wall clipping should be evaluated.</param>
     private static void AppendSplitChildLanes(ref DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                               Entity shooterEntity,
                                               float3 shooterPosition,
@@ -610,30 +605,29 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
     /// <summary>
     /// Appends one split-child lane with inherited size, lifetime and speed modifiers from the split passive.
-    /// /params laserBeamLanes Output lane buffer.
-    /// /params laneIndex Stable lane index assigned to the split branch.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params shooterPosition Current player position.
-    /// /params shooterVelocity Current player velocity.
-    /// /params spawnPosition World-space origin of the split branch.
-    /// /params direction World-space forward direction of the split branch.
-    /// /params activeSeconds Current uninterrupted active time.
-    /// /params globalTime Current elapsed world time.
-    /// /params parentTravelDistance Straight-line travel budget inherited from the parent lane.
-    /// /params parentRangeLimit Effective projectile range inherited from the parent lane.
-    /// /params parentLifetimeLimit Effective projectile lifetime inherited from the parent lane.
-    /// /params speedMultiplier Beam-local speed multiplier inherited from the parent lane.
-    /// /params parentCollisionRadius Effective gameplay width inherited from the parent lane.
-    /// /params parentBodyWidth Effective visual width inherited from the parent lane.
-    /// /params maximumBounceSegments Maximum reflected wall segments supported by straight-line mode.
-    /// /params perfectCircleConfig Aggregated Perfect Circle passive configuration.
-    /// /params hasPerfectCircle True when the split branch must also sample Perfect Circle.
-    /// /params splittingProjectilesConfig Aggregated split-projectile passive configuration.
-    /// /params physicsWorldSingleton Physics world used for wall clipping.
-    /// /params wallsCollisionFilter Collision filter used for world walls.
-    /// /params wallsEnabled True when wall clipping should be evaluated.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamLanes">Output lane buffer.</param>
+    /// <param name="laneIndex">Stable lane index assigned to the split branch.</param>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="shooterPosition">Current player position.</param>
+    /// <param name="shooterVelocity">Current player velocity.</param>
+    /// <param name="spawnPosition">World-space origin of the split branch.</param>
+    /// <param name="direction">World-space forward direction of the split branch.</param>
+    /// <param name="activeSeconds">Current uninterrupted active time.</param>
+    /// <param name="globalTime">Current elapsed world time.</param>
+    /// <param name="parentTravelDistance">Straight-line travel budget inherited from the parent lane.</param>
+    /// <param name="parentRangeLimit">Effective projectile range inherited from the parent lane.</param>
+    /// <param name="parentLifetimeLimit">Effective projectile lifetime inherited from the parent lane.</param>
+    /// <param name="speedMultiplier">Beam-local speed multiplier inherited from the parent lane.</param>
+    /// <param name="parentCollisionRadius">Effective gameplay width inherited from the parent lane.</param>
+    /// <param name="parentBodyWidth">Effective visual width inherited from the parent lane.</param>
+    /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by straight-line mode.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle passive configuration.</param>
+    /// <param name="hasPerfectCircle">True when the split branch must also sample Perfect Circle.</param>
+    /// <param name="splittingProjectilesConfig">Aggregated split-projectile passive configuration.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall clipping.</param>
+    /// <param name="wallsCollisionFilter">Collision filter used for world walls.</param>
+    /// <param name="wallsEnabled">True when wall clipping should be evaluated.</param>
     private static void AppendSplitChildLane(ref DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                              int laneIndex,
                                              Entity shooterEntity,

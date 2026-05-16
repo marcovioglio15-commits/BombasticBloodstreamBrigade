@@ -330,7 +330,7 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     /// Builds the detail section tab row.
     /// </summary>
     /// <param name="panel">Owning panel that stores detail section state.</param>
-    /// <returns>Returns the detail tab row.<returns>
+    /// <returns>Returns the detail tab row.</returns>
     public static VisualElement BuildDetailsSectionButtons(PlayerMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -573,7 +573,7 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     /// <param name="createAction">Callback that creates and assigns a new preset.</param>
     /// <param name="openSectionAction">Callback that opens the related management section.</param>
     /// <param name="panelType">Panel type associated with the referenced preset.</param>
-    /// <returns>Returns the constructed sub-preset row.<returns>
+    /// <returns>Returns the constructed sub-preset row.</returns>
     private static VisualElement BuildSubPresetRow(PlayerMasterPresetsPanel panel,
                                                    string label,
                                                    Type presetType,
@@ -654,7 +654,7 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     /// </summary>
     /// <param name="panel">Owning panel that stores the detail root.</param>
     /// <param name="sectionTitle">Visible section title.</param>
-    /// <returns>Returns the created section container.<returns>
+    /// <returns>Returns the created section container.</returns>
     private static VisualElement CreateDetailsSectionContainer(PlayerMasterPresetsPanel panel, string sectionTitle)
     {
         if (panel.DetailSectionContentRoot == null)
@@ -678,7 +678,7 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     /// <param name="presetName">Base asset name requested by the caller.</param>
     /// <param name="folderPath">Destination folder path.</param>
     /// <typeparam name="T">Concrete ScriptableObject preset type.</typeparam>
-    /// <returns>Returns the created asset instance, or null when creation fails.<returns>
+    /// <returns>Returns the created asset instance, or null when creation fails.</returns>
     private static T CreateSubPresetAsset<T>(string presetName, string folderPath) where T : ScriptableObject
     {
         EnsureFolder(folderPath);

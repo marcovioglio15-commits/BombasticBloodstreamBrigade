@@ -12,8 +12,6 @@ using static GameSceneManagementProjectSetupSerializedUtility;
 
 /// <summary>
 /// Builds and maintains the additive gameplay UI scene used by the default Scene Manager setup.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneManagementProjectSetupGameplayUiUtility
 {
@@ -22,8 +20,6 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Public Methods
     /// <summary>
     /// Creates the separate gameplay UI scene and moves authored HUD/menu roots out of the gameplay scene.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void EnsureGameplayUiScene()
     {
@@ -48,9 +44,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Scene Opening
     /// <summary>
     /// Opens the existing gameplay UI scene or creates an empty additive scene at the expected path.
-    /// /params None.
-    /// /returns Open gameplay UI scene.
     /// </summary>
+    /// <returns>Open gameplay UI scene.</returns>
     private static Scene OpenOrCreateGameplayUiScene()
     {
         SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(GameSceneManagementProjectSetupUtility.GameplayUiScenePath);
@@ -65,10 +60,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Root Migration
     /// <summary>
     /// Moves every top-level UI root from gameplay to the additive UI scene before references are serialized.
-    /// /params gameplayScene Scene currently holding simulation and possibly authored UI roots.
-    /// /params gameplayUiScene Scene that should own gameplay UI roots.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayScene">Scene currently holding simulation and possibly authored UI roots.</param>
+    /// <param name="gameplayUiScene">Scene that should own gameplay UI roots.</param>
     private static void MoveGameplayUiRoots(Scene gameplayScene, Scene gameplayUiScene)
     {
         GameObject[] rootObjects = gameplayScene.GetRootGameObjects();
@@ -86,9 +80,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Resolves whether one gameplay root belongs to authored UI and should be separated.
-    /// /params rootObject Gameplay scene root inspected for UI components.
-    /// /returns True when the root should move into the gameplay UI scene.
     /// </summary>
+    /// <param name="rootObject">Gameplay scene root inspected for UI components.</param>
+    /// <returns>True when the root should move into the gameplay UI scene.</returns>
     private static bool ShouldMoveGameplayUiRoot(GameObject rootObject)
     {
         if (rootObject == null)
@@ -118,9 +112,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Resolves whether one root is the authored camera used by screen-space camera UI canvases.
-    /// /params rootObject Gameplay scene root inspected for camera ownership.
-    /// /returns True when this root is the authored UI camera.
     /// </summary>
+    /// <param name="rootObject">Gameplay scene root inspected for camera ownership.</param>
+    /// <returns>True when this root is the authored UI camera.</returns>
     private static bool IsNamedUiCameraRoot(GameObject rootObject)
     {
         if (!string.Equals(rootObject.name, "UI Camera", StringComparison.Ordinal))
@@ -133,10 +127,10 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Canvas
     /// <summary>
     /// Ensures the gameplay UI scene owns the gameplay canvas and removes duplicate gameplay copies.
-    /// /params gameplayScene Scene currently holding gameplay simulation content.
-    /// /params gameplayUiScene Scene that should own gameplay UI roots.
-    /// /returns Gameplay UI canvas or null when no authored canvas exists yet.
     /// </summary>
+    /// <param name="gameplayScene">Scene currently holding gameplay simulation content.</param>
+    /// <param name="gameplayUiScene">Scene that should own gameplay UI roots.</param>
+    /// <returns>Gameplay UI canvas or null when no authored canvas exists yet.</returns>
     private static Canvas EnsureGameplayUiCanvas(Scene gameplayScene, Scene gameplayUiScene)
     {
         Canvas uiSceneCanvas = FindGameplayCanvas(gameplayUiScene);
@@ -156,9 +150,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Applies stable screen-space settings to the separated gameplay UI canvas.
-    /// /params canvas Gameplay UI canvas to configure.
-    /// /returns None.
     /// </summary>
+    /// <param name="canvas">Gameplay UI canvas to configure.</param>
     private static void ConfigureGameplayUiCanvas(Canvas canvas)
     {
         if (canvas == null)
@@ -177,9 +170,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Finds the authored gameplay canvas by HUDManager first, CanvasMain second and any root Canvas last.
-    /// /params scene Scene searched by root hierarchy.
-    /// /returns Gameplay canvas when available.
     /// </summary>
+    /// <param name="scene">Scene searched by root hierarchy.</param>
+    /// <returns>Gameplay canvas when available.</returns>
     private static Canvas FindGameplayCanvas(Scene scene)
     {
         HUDManager hudManager = FindFirstComponentInScene<HUDManager>(scene);
@@ -216,10 +209,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region HUD
     /// <summary>
     /// Ensures the gameplay UI scene owns the authored HUD manager root and removes duplicate gameplay copies.
-    /// /params gameplayScene Scene currently holding gameplay simulation content.
-    /// /params gameplayUiScene Scene that should own gameplay UI roots.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayScene">Scene currently holding gameplay simulation content.</param>
+    /// <param name="gameplayUiScene">Scene that should own gameplay UI roots.</param>
     private static void EnsureGameplayUiHudManager(Scene gameplayScene, Scene gameplayUiScene)
     {
         HUDManager uiSceneHudManager = FindFirstComponentInScene<HUDManager>(gameplayUiScene);
@@ -239,9 +231,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Camera References
     /// <summary>
     /// Ensures the additive UI camera can rebuild URP camera stacking at runtime without cross-scene references.
-    /// /params gameplayUiScene Scene that owns gameplay UI roots.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayUiScene">Scene that owns gameplay UI roots.</param>
     private static void EnsureGameplayUiCameraStackBridge(Scene gameplayUiScene)
     {
         Camera uiCamera = FindCameraByName(gameplayUiScene, "UI Camera");
@@ -263,9 +254,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Configures the additive UI camera as a post-process-free URP overlay camera.
-    /// /params uiCamera Camera owned by the gameplay UI scene.
-    /// /returns None.
     /// </summary>
+    /// <param name="uiCamera">Camera owned by the gameplay UI scene.</param>
     private static void ConfigureGameplayUiCamera(Camera uiCamera)
     {
         // UI cameras must be overlays and must not contribute post-processing to the base stack.
@@ -284,9 +274,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Restores screen-space camera canvas references after UI roots have moved into the companion scene.
-    /// /params gameplayUiScene Scene that owns gameplay UI roots.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayUiScene">Scene that owns gameplay UI roots.</param>
     private static void EnsureGameplayUiCameraReferences(Scene gameplayUiScene)
     {
         Camera uiCamera = FindCameraByName(gameplayUiScene, "UI Camera");
@@ -316,10 +305,10 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Finds one camera by GameObject name inside an opened scene.
-    /// /params scene Scene searched for the camera.
-    /// /params cameraName Exact GameObject name expected for the camera.
-    /// /returns Matching camera or null when missing.
     /// </summary>
+    /// <param name="scene">Scene searched for the camera.</param>
+    /// <param name="cameraName">Exact GameObject name expected for the camera.</param>
+    /// <returns>Matching camera or null when missing.</returns>
     private static Camera FindCameraByName(Scene scene, string cameraName)
     {
         System.Collections.Generic.List<Camera> cameras = FindComponentsInScene<Camera>(scene);
@@ -342,9 +331,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Camera Stack Cleanup
     /// <summary>
     /// Removes null or cross-scene entries from URP camera stacks after the UI camera has been separated.
-    /// /params scene Scene whose camera stack references should be normalized before saving.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Scene whose camera stack references should be normalized before saving.</param>
     private static void CleanCameraStacks(Scene scene)
     {
         System.Collections.Generic.List<UniversalAdditionalCameraData> cameraDataList = FindComponentsInScene<UniversalAdditionalCameraData>(scene);
@@ -380,10 +368,9 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
     #region Event System
     /// <summary>
     /// Ensures the gameplay UI scene owns one EventSystem and removes the gameplay-scene duplicate.
-    /// /params gameplayScene Scene currently holding gameplay simulation content.
-    /// /params gameplayUiScene Scene that should own gameplay UI roots.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayScene">Scene currently holding gameplay simulation content.</param>
+    /// <param name="gameplayUiScene">Scene that should own gameplay UI roots.</param>
     private static void EnsureGameplayUiEventSystem(Scene gameplayScene, Scene gameplayUiScene)
     {
         EventSystem uiEventSystem = FindFirstComponentInScene<EventSystem>(gameplayUiScene);
@@ -410,9 +397,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Creates an Input System backed EventSystem when the migrated UI scene had none.
-    /// /params gameplayUiScene Scene receiving the generated EventSystem.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayUiScene">Scene receiving the generated EventSystem.</param>
     private static void CreateGameplayUiEventSystem(Scene gameplayUiScene)
     {
         GameObject eventSystemObject = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
@@ -424,9 +410,8 @@ internal static class GameSceneManagementProjectSetupGameplayUiUtility
 
     /// <summary>
     /// Ensures one EventSystem has the additive-transition coordinator attached and wired.
-    /// /params eventSystem EventSystem that should be coordinated.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventSystem">EventSystem that should be coordinated.</param>
     private static void EnsureEventSystemCoordinator(EventSystem eventSystem)
     {
         if (eventSystem == null)

@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores registered boss pattern preset assets used by Enemy Management Tool.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyBossPatternPresetLibrary", menuName = "Enemy/Boss Pattern Preset Library", order = 17)]
 public sealed class EnemyBossPatternPresetLibrary : ScriptableObject
@@ -34,9 +32,8 @@ public sealed class EnemyBossPatternPresetLibrary : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Adds a boss pattern preset to the library if not already present.
-    /// /params preset Preset to register.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to register.</param>
     public void AddPreset(EnemyBossPatternPreset preset)
     {
         if (preset == null)
@@ -50,9 +47,8 @@ public sealed class EnemyBossPatternPresetLibrary : ScriptableObject
 
     /// <summary>
     /// Removes a boss pattern preset from the library when present.
-    /// /params preset Preset to unregister.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to unregister.</param>
     public void RemovePreset(EnemyBossPatternPreset preset)
     {
         if (preset == null)

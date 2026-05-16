@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws the combo-counter HUD section and exposes warnings for missing authored bindings.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(HUDComboCounterSection))]
 public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
@@ -16,9 +15,9 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for the combo-counter HUD section.
-    /// property Serialized combo-counter HUD section property.
-    /// returns Root UI element used by the inspector.
     /// </summary>
+    /// <param name="property">Serialized combo-counter HUD section property.</param>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -94,10 +93,10 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Creates one bound property field with the requested display label.
-    /// property Serialized property bound to the field.
-    /// label Inspector label shown for the bound field.
-    /// returns Configured property field bound to the serialized property.
     /// </summary>
+    /// <param name="property">Serialized property bound to the field.</param>
+    /// <param name="label">Inspector label shown for the bound field.</param>
+    /// <returns>Configured property field bound to the serialized property.</returns>
     private static PropertyField CreateBoundField(SerializedProperty property, string label)
     {
         PropertyField propertyField = new PropertyField(property, label);
@@ -107,15 +106,14 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Rebuilds validation warnings for the combo HUD bindings.
-    /// rootObjectProperty Serialized combo HUD root object property.
-    /// rankBadgeImageProperty Serialized rank badge image property.
-    /// rankTextProperty Serialized rank text property.
-    /// comboValueTextProperty Serialized combo value text property.
-    /// progressFillImageProperty Serialized progress fill image property.
-    /// progressBackgroundImageProperty Serialized progress background image property.
-    /// warningBox Warning help box refreshed in place.
-    /// returns void.
     /// </summary>
+    /// <param name="rootObjectProperty">Serialized combo HUD root object property.</param>
+    /// <param name="rankBadgeImageProperty">Serialized rank badge image property.</param>
+    /// <param name="rankTextProperty">Serialized rank text property.</param>
+    /// <param name="comboValueTextProperty">Serialized combo value text property.</param>
+    /// <param name="progressFillImageProperty">Serialized progress fill image property.</param>
+    /// <param name="progressBackgroundImageProperty">Serialized progress background image property.</param>
+    /// <param name="warningBox">Warning help box refreshed in place.</param>
     private static void RefreshWarnings(SerializedProperty rootObjectProperty,
                                         SerializedProperty rankBadgeImageProperty,
                                         SerializedProperty rankTextProperty,

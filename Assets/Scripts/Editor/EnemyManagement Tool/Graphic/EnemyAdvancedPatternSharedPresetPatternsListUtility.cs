@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the card-based shared pattern editors used by the enemy Modules and Patterns preset flow.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
 {
@@ -15,12 +13,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
     #region Public Methods
     /// <summary>
     /// Builds the shared pattern list with filters, card actions and loadout synchronization hooks.
-    /// /params panel Owning panel that stores transient filter state and rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent foldout that receives the pattern list UI.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores transient filter state and rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent foldout that receives the pattern list UI.</param>
     public static void BuildPatternSection(EnemyAdvancedPatternPresetsPanel panel,
                                            SerializedObject sharedPresetSerializedObject,
                                            EnemyModulesAndPatternsPreset sharedPreset,
@@ -144,11 +141,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
 
     /// <summary>
     /// Returns whether one shared pattern matches the current pattern filters.
-    /// /params panel Owning panel that stores filter text.
-    /// /params patternId Candidate pattern ID.
-    /// /params displayName Candidate pattern display name.
-    /// /returns True when the pattern should remain visible.
     /// </summary>
+    /// <param name="panel">Owning panel that stores filter text.</param>
+    /// <param name="patternId">Candidate pattern ID.</param>
+    /// <param name="displayName">Candidate pattern display name.</param>
+    /// <returns>True when the pattern should remain visible.</returns>
     internal static bool IsMatchingPatternFilters(EnemyAdvancedPatternPresetsPanel panel,
                                                   string patternId,
                                                   string displayName)
@@ -183,13 +180,12 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
     #region Private Methods
     /// <summary>
     /// Rebuilds the visible shared pattern cards from the current filter state.
-    /// /params panel Owning panel that stores filter state.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params cardsContainer Container that receives generated cards.
-    /// /params countLabel Count label updated with visible and total entries.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores filter state.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="cardsContainer">Container that receives generated cards.</param>
+    /// <param name="countLabel">Count label updated with visible and total entries.</param>
     private static void RebuildPatternCards(EnemyAdvancedPatternPresetsPanel panel,
                                             SerializedObject sharedPresetSerializedObject,
                                             EnemyModulesAndPatternsPreset sharedPreset,
@@ -248,17 +244,17 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
 
     /// <summary>
     /// Creates one shared pattern card with foldout, actions and bound property field.
-    /// /params panel Owning panel that provides callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params patternsProperty Serialized patterns array that owns the card.
-    /// /params patternProperty Serialized pattern property displayed by the card.
-    /// /params patternIndex Current pattern index.
-    /// /params patternId Resolved pattern ID.
-    /// /params displayName Resolved display name.
-    /// /params unreplaceable Resolved unreplaceable flag.
-    /// /returns Created card element.
     /// </summary>
+    /// <param name="panel">Owning panel that provides callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="patternsProperty">Serialized patterns array that owns the card.</param>
+    /// <param name="patternProperty">Serialized pattern property displayed by the card.</param>
+    /// <param name="patternIndex">Current pattern index.</param>
+    /// <param name="patternId">Resolved pattern ID.</param>
+    /// <param name="displayName">Resolved display name.</param>
+    /// <param name="unreplaceable">Resolved unreplaceable flag.</param>
+    /// <returns>Created card element.</returns>
     private static VisualElement CreatePatternCard(EnemyAdvancedPatternPresetsPanel panel,
                                                    SerializedObject sharedPresetSerializedObject,
                                                    EnemyModulesAndPatternsPreset sharedPreset,
@@ -380,11 +376,10 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
 
     /// <summary>
     /// Updates the foldout title of one shared pattern card after an identity field changes.
-    /// /params foldout Foldout whose title must be refreshed.
-    /// /params patternIndex Current pattern index.
-    /// /params patternProperty Serialized pattern definition property.
-    /// /returns None.
     /// </summary>
+    /// <param name="foldout">Foldout whose title must be refreshed.</param>
+    /// <param name="patternIndex">Current pattern index.</param>
+    /// <param name="patternProperty">Serialized pattern definition property.</param>
     private static void UpdatePatternCardTitle(Foldout foldout,
                                                int patternIndex,
                                                SerializedProperty patternProperty)

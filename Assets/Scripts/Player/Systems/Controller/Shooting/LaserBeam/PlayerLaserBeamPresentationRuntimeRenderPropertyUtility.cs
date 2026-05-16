@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Centralizes Laser Beam renderer property-block assignment and shared endpoint/body-role resolution helpers.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 {
@@ -54,30 +52,29 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
     #region Public Methods
     /// <summary>
     /// Applies the shared body and endpoint shader properties to the provided property block.
-    /// /params propertyBlock Property block to populate.
-    /// /params palette Resolved beam palette.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params stormBurstNormalized Normalized storm burst currently active on the beam.
-    /// /params stormTickProgressA Progress vector of the first four active traveling damage packets.
-    /// /params stormTickProgressB Progress vector of the next four active traveling damage packets.
-    /// /params stormTickActiveA Active-state vector of the first four traveling damage packets.
-    /// /params stormTickActiveB Active-state vector of the next four traveling damage packets.
-    /// /params segmentLength Segment length value consumed by the shader.
-    /// /params widthScale Width scale value consumed by the shader.
-    /// /params beamRole Shader role selector used for body/source/terminal/contact rendering.
-    /// /params bodyLayerRole Body-layer selector used only by body renderers.
-    /// /params capShape Cap-shape selector consumed by endpoint rendering.
-    /// /params terminalBlockedByWall True when the terminal point is a wall hit.
-    /// /params opacity Final opacity multiplier.
-    /// /params coreBrightness Final core brightness multiplier.
-    /// /params rimBrightness Final rim brightness multiplier.
-    /// /params stormIdleIntensity Final idle-storm intensity.
-    /// /params stormBurstIntensity Final burst-storm intensity.
-    /// /params sourceDischargeIntensity Final source-discharge intensity.
-    /// /params terminalCapIntensity Final terminal-cap intensity.
-    /// /params contactFlareIntensity Final contact-flare intensity.
-    /// /returns None.
     /// </summary>
+    /// <param name="propertyBlock">Property block to populate.</param>
+    /// <param name="palette">Resolved beam palette.</param>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="stormBurstNormalized">Normalized storm burst currently active on the beam.</param>
+    /// <param name="stormTickProgressA">Progress vector of the first four active traveling damage packets.</param>
+    /// <param name="stormTickProgressB">Progress vector of the next four active traveling damage packets.</param>
+    /// <param name="stormTickActiveA">Active-state vector of the first four traveling damage packets.</param>
+    /// <param name="stormTickActiveB">Active-state vector of the next four traveling damage packets.</param>
+    /// <param name="segmentLength">Segment length value consumed by the shader.</param>
+    /// <param name="widthScale">Width scale value consumed by the shader.</param>
+    /// <param name="beamRole">Shader role selector used for body/source/terminal/contact rendering.</param>
+    /// <param name="bodyLayerRole">Body-layer selector used only by body renderers.</param>
+    /// <param name="capShape">Cap-shape selector consumed by endpoint rendering.</param>
+    /// <param name="terminalBlockedByWall">True when the terminal point is a wall hit.</param>
+    /// <param name="opacity">Final opacity multiplier.</param>
+    /// <param name="coreBrightness">Final core brightness multiplier.</param>
+    /// <param name="rimBrightness">Final rim brightness multiplier.</param>
+    /// <param name="stormIdleIntensity">Final idle-storm intensity.</param>
+    /// <param name="stormBurstIntensity">Final burst-storm intensity.</param>
+    /// <param name="sourceDischargeIntensity">Final source-discharge intensity.</param>
+    /// <param name="terminalCapIntensity">Final terminal-cap intensity.</param>
+    /// <param name="contactFlareIntensity">Final contact-flare intensity.</param>
     public static void ApplySharedPaletteAndBeamProperties(MaterialPropertyBlock propertyBlock,
                                                            in PlayerLaserBeamResolvedPalette palette,
                                                            in LaserBeamPassiveConfig laserBeamConfig,
@@ -141,11 +138,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Applies one incremental dissipation step to the currently assigned beam property block.
-    /// /params propertyBlock Property block to modify in place.
-    /// /params previousFadeNormalized Previously applied remaining fade amount in the 0-1 range.
-    /// /params currentFadeNormalized Current remaining fade amount in the 0-1 range.
-    /// /returns None.
     /// </summary>
+    /// <param name="propertyBlock">Property block to modify in place.</param>
+    /// <param name="previousFadeNormalized">Previously applied remaining fade amount in the 0-1 range.</param>
+    /// <param name="currentFadeNormalized">Current remaining fade amount in the 0-1 range.</param>
     public static void ApplyDissipationFadeStep(MaterialPropertyBlock propertyBlock,
                                                 float previousFadeNormalized,
                                                 float currentFadeNormalized)
@@ -171,14 +167,13 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Applies per-layer opacity and intensity adjustments so the body layers stay separated.
-    /// /params layerRole Layer role currently being rendered.
-    /// /params opacity Mutable opacity multiplier.
-    /// /params coreBrightness Mutable core brightness multiplier.
-    /// /params rimBrightness Mutable rim brightness multiplier.
-    /// /params stormIdleIntensity Mutable idle-storm multiplier.
-    /// /params stormBurstIntensity Mutable burst-storm multiplier.
-    /// /returns None.
     /// </summary>
+    /// <param name="layerRole">Layer role currently being rendered.</param>
+    /// <param name="opacity">Mutable opacity multiplier.</param>
+    /// <param name="coreBrightness">Mutable core brightness multiplier.</param>
+    /// <param name="rimBrightness">Mutable rim brightness multiplier.</param>
+    /// <param name="stormIdleIntensity">Mutable idle-storm multiplier.</param>
+    /// <param name="stormBurstIntensity">Mutable burst-storm multiplier.</param>
     public static void ApplyBodyLayerOverrides(PlayerLaserBeamBodyLayerRole layerRole,
                                                ref float opacity,
                                                ref float coreBrightness,
@@ -214,12 +209,11 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the particle gradient colors used by the requested endpoint role.
-    /// /params palette Resolved beam palette.
-    /// /params visualRole Endpoint visual role.
-    /// /params minimumColor Gradient minimum color.
-    /// /params maximumColor Gradient maximum color.
-    /// /returns None.
     /// </summary>
+    /// <param name="palette">Resolved beam palette.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <param name="minimumColor">Gradient minimum color.</param>
+    /// <param name="maximumColor">Gradient maximum color.</param>
     public static void ResolveParticleGradientColors(in PlayerLaserBeamResolvedPalette palette,
                                                      PlayerLaserBeamEndpointVisualRole visualRole,
                                                      out Color minimumColor,
@@ -244,10 +238,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the role-specific opacity multiplier used by endpoint effects.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint opacity multiplier.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint opacity multiplier.</returns>
     public static float ResolveEndpointOpacity(in LaserBeamPassiveConfig laserBeamConfig,
                                                PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -264,10 +258,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the role-specific core brightness used by endpoint effects.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint core brightness multiplier.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint core brightness multiplier.</returns>
     public static float ResolveEndpointCoreBrightness(in LaserBeamPassiveConfig laserBeamConfig,
                                                       PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -284,10 +278,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the role-specific rim brightness used by endpoint effects.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint rim brightness multiplier.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint rim brightness multiplier.</returns>
     public static float ResolveEndpointRimBrightness(in LaserBeamPassiveConfig laserBeamConfig,
                                                      PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -304,10 +298,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the role-specific idle-storm intensity used by endpoint effects.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint idle-storm intensity.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint idle-storm intensity.</returns>
     public static float ResolveEndpointStormIdleIntensity(in LaserBeamPassiveConfig laserBeamConfig,
                                                           PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -324,10 +318,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the role-specific burst-storm intensity used by endpoint effects.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint burst-storm intensity.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint burst-storm intensity.</returns>
     public static float ResolveEndpointStormBurstIntensity(in LaserBeamPassiveConfig laserBeamConfig,
                                                            PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -344,14 +338,13 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the progress and active-state vectors used by the shader to render the currently started tick packets.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params laserBeamState Runtime beam state.
-    /// /params stormTickProgressA Progress vector of the first four active packets.
-    /// /params stormTickProgressB Progress vector of the next four active packets.
-    /// /params stormTickActiveA Active-state vector of the first four packets.
-    /// /params stormTickActiveB Active-state vector of the next four packets.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="laserBeamState">Runtime beam state.</param>
+    /// <param name="stormTickProgressA">Progress vector of the first four active packets.</param>
+    /// <param name="stormTickProgressB">Progress vector of the next four active packets.</param>
+    /// <param name="stormTickActiveA">Active-state vector of the first four packets.</param>
+    /// <param name="stormTickActiveB">Active-state vector of the next four packets.</param>
     public static void ResolveStormTickPulseVectors(in LaserBeamPassiveConfig laserBeamConfig,
                                                     in PlayerLaserBeamState laserBeamState,
                                                     out Vector4 stormTickProgressA,
@@ -396,10 +389,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the endpoint direction used by the requested role.
-    /// /params endpoint Per-lane endpoint metadata.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Forward direction used by the visual.
     /// </summary>
+    /// <param name="endpoint">Per-lane endpoint metadata.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Forward direction used by the visual.</returns>
     public static float3 ResolveEndpointDirection(in PlayerLaserBeamLaneEndpoint endpoint,
                                                   PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -414,10 +407,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the anchor point used by the requested endpoint role.
-    /// /params endpoint Per-lane endpoint metadata.
-    /// /params visualRole Endpoint visual role.
-    /// /returns World-space anchor point.
     /// </summary>
+    /// <param name="endpoint">Per-lane endpoint metadata.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>World-space anchor point.</returns>
     public static float3 ResolveEndpointAnchorPoint(in PlayerLaserBeamLaneEndpoint endpoint,
                                                     PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -444,10 +437,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the width inherited by the requested endpoint role.
-    /// /params endpoint Per-lane endpoint metadata.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Beam width consumed by endpoint scaling.
     /// </summary>
+    /// <param name="endpoint">Per-lane endpoint metadata.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Beam width consumed by endpoint scaling.</returns>
     public static float ResolveEndpointWidth(in PlayerLaserBeamLaneEndpoint endpoint,
                                              PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -462,10 +455,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the shared visual-config forward offset used by the requested endpoint role.
-    /// /params visualConfig Shared visual config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Forward offset in world units.
     /// </summary>
+    /// <param name="visualConfig">Shared visual config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Forward offset in world units.</returns>
     public static float ResolveEndpointForwardOffset(in PlayerLaserBeamVisualConfig visualConfig,
                                                      PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -480,10 +473,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the authored endpoint scale multiplier used by the requested role.
-    /// /params laserBeamConfig Runtime passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Authored scale multiplier.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Authored scale multiplier.</returns>
     public static float ResolveEndpointScaleMultiplier(in LaserBeamPassiveConfig laserBeamConfig,
                                                        PlayerLaserBeamEndpointVisualRole visualRole)
     {
@@ -500,11 +493,11 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the endpoint rotation used by source, terminal-cap and contact-flare visuals.
-    /// /params endpoint Per-lane endpoint metadata.
-    /// /params direction Forward direction used by the current endpoint.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Endpoint world rotation.
     /// </summary>
+    /// <param name="endpoint">Per-lane endpoint metadata.</param>
+    /// <param name="direction">Forward direction used by the current endpoint.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Endpoint world rotation.</returns>
     public static quaternion ResolveEndpointRotation(in PlayerLaserBeamLaneEndpoint endpoint,
                                                      float3 direction,
                                                      PlayerLaserBeamEndpointVisualRole visualRole)
@@ -523,11 +516,11 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Compresses endpoint effect scale so source, terminal-cap and contact visuals remain readable.
-    /// /params rawWidth Raw beam width inherited from gameplay lane generation.
-    /// /params authoredScaleMultiplier Authored endpoint scale multiplier from the Laser Beam passive config.
-    /// /params visualRole Endpoint visual role.
-    /// /returns Compressed uniform endpoint effect scale.
     /// </summary>
+    /// <param name="rawWidth">Raw beam width inherited from gameplay lane generation.</param>
+    /// <param name="authoredScaleMultiplier">Authored endpoint scale multiplier from the Laser Beam passive config.</param>
+    /// <param name="visualRole">Endpoint visual role.</param>
+    /// <returns>Compressed uniform endpoint effect scale.</returns>
     public static float ResolveEndpointVisualScale(float rawWidth,
                                                    float authoredScaleMultiplier,
                                                    PlayerLaserBeamEndpointVisualRole visualRole)
@@ -560,14 +553,13 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
     #region Private Methods
     /// <summary>
     /// Writes one traveling packet progress into the appropriate shader vector slot.
-    /// /params stormTickProgressA Progress vector of the first four packets.
-    /// /params stormTickProgressB Progress vector of the next four packets.
-    /// /params stormTickActiveA Active-state vector of the first four packets.
-    /// /params stormTickActiveB Active-state vector of the next four packets.
-    /// /params renderedPulseIndex Zero-based rendered pulse slot.
-    /// /params pulseProgress Normalized progress of the packet. Values above 1 keep the trail active while hiding the head.
-    /// /returns None.
     /// </summary>
+    /// <param name="stormTickProgressA">Progress vector of the first four packets.</param>
+    /// <param name="stormTickProgressB">Progress vector of the next four packets.</param>
+    /// <param name="stormTickActiveA">Active-state vector of the first four packets.</param>
+    /// <param name="stormTickActiveB">Active-state vector of the next four packets.</param>
+    /// <param name="renderedPulseIndex">Zero-based rendered pulse slot.</param>
+    /// <param name="pulseProgress">Normalized progress of the packet. Values above 1 keep the trail active while hiding the head.</param>
     private static void AssignStormTickPulse(ref Vector4 stormTickProgressA,
                                              ref Vector4 stormTickProgressB,
                                              ref Vector4 stormTickActiveA,
@@ -612,12 +604,12 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the amount the endpoint visual should sink into the body so the handoff reads as one continuous beam.
-    /// /params endWidth Beam width resolved at the lane endpoint.
-    /// /params distanceBias Minimum embed distance applied even on thin beams.
-    /// /params distanceFactor Additional distance derived from the current endpoint width.
-    /// /params maximumDistance Upper bound used to avoid over-sinking the effect.
-    /// /returns Embed distance in world units.
     /// </summary>
+    /// <param name="endWidth">Beam width resolved at the lane endpoint.</param>
+    /// <param name="distanceBias">Minimum embed distance applied even on thin beams.</param>
+    /// <param name="distanceFactor">Additional distance derived from the current endpoint width.</param>
+    /// <param name="maximumDistance">Upper bound used to avoid over-sinking the effect.</param>
+    /// <returns>Embed distance in world units.</returns>
     private static float ResolveEndpointEmbedDistance(float endWidth,
                                                       float distanceBias,
                                                       float distanceFactor,
@@ -630,9 +622,9 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the target opacity multiplier used by the shutdown dissipation curve.
-    /// /params fadeNormalized Remaining fade amount in the 0-1 range.
-    /// /returns Target opacity multiplier.
     /// </summary>
+    /// <param name="fadeNormalized">Remaining fade amount in the 0-1 range.</param>
+    /// <returns>Target opacity multiplier.</returns>
     private static float ResolveOpacityDissipationFactor(float fadeNormalized)
     {
         float clampedFade = math.saturate(fadeNormalized);
@@ -641,9 +633,9 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
 
     /// <summary>
     /// Resolves the target energy multiplier used by brightness and endpoint intensities during shutdown dissipation.
-    /// /params fadeNormalized Remaining fade amount in the 0-1 range.
-    /// /returns Target energy multiplier.
     /// </summary>
+    /// <param name="fadeNormalized">Remaining fade amount in the 0-1 range.</param>
+    /// <returns>Target energy multiplier.</returns>
     private static float ResolveEnergyDissipationFactor(float fadeNormalized)
     {
         return math.sqrt(ResolveOpacityDissipationFactor(fadeNormalized));

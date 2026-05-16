@@ -5,7 +5,6 @@ using UnityEngine;
 /// <summary>
 /// Freezes all player-driven runtime state once a run outcome becomes final so no late input, dashes, milestones, or time-scale resumes can continue.
 /// None.
-/// returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup), OrderFirst = true)]
 public partial struct PlayerRunOutcomeFreezeSystem : ISystem
@@ -15,9 +14,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares the runtime state required to freeze gameplay after victory or defeat.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerControllerConfig>();
@@ -30,9 +28,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Clears active player runtime state and milestone runtime side effects while keeping the finalized run outcome intact.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         ComponentLookup<PlayerDashState> dashLookup = SystemAPI.GetComponentLookup<PlayerDashState>(false);
@@ -86,9 +83,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
     #region Helpers
     /// <summary>
     /// Clears all live player input channels so later gameplay systems observe a fully idle controller.
-    /// inputState: Mutable runtime input state stored on the player entity.
-    /// returns None.
     /// </summary>
+    /// <param name="inputState">Mutable runtime input state stored on the player entity.</param>
     private static void ResetInputState(ref PlayerInputState inputState)
     {
         inputState.Move = float2.zero;
@@ -101,9 +97,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Stops all runtime movement immediately, including any held digital-direction bookkeeping.
-    /// movementState: Mutable movement state stored on the player entity.
-    /// returns None.
     /// </summary>
+    /// <param name="movementState">Mutable movement state stored on the player entity.</param>
     private static void ResetMovementState(ref PlayerMovementState movementState)
     {
         movementState.DesiredDirection = float3.zero;
@@ -117,9 +112,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Freezes look state on the current facing direction and clears digital-look bookkeeping.
-    /// lookState: Mutable look state stored on the player entity.
-    /// returns None.
     /// </summary>
+    /// <param name="lookState">Mutable look state stored on the player entity.</param>
     private static void ResetLookState(ref PlayerLookState lookState)
     {
         float3 frozenDirection = PlayerControllerMath.NormalizePlanar(lookState.CurrentDirection, new float3(0f, 0f, 1f));
@@ -135,9 +129,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Stops all shooting state so automatic modes cannot continue firing after the run outcome is final.
-    /// shootingState: Mutable shooting state stored on the player entity.
-    /// returns None.
     /// </summary>
+    /// <param name="shootingState">Mutable shooting state stored on the player entity.</param>
     private static void ResetShootingState(ref PlayerShootingState shootingState)
     {
         shootingState.AutomaticEnabled = 0;
@@ -147,10 +140,9 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Ends any active dash immediately when the player run reaches a terminal outcome.
-    /// entity: Player entity whose optional dash state should be cleared.
-    /// dashLookup: Component lookup used to mutate PlayerDashState.
-    /// returns None.
     /// </summary>
+    /// <param name="entity">Player entity whose optional dash state should be cleared.</param>
+    /// <param name="dashLookup">Component lookup used to mutate PlayerDashState.</param>
     private static void ResetDashState(Entity entity, ref ComponentLookup<PlayerDashState> dashLookup)
     {
         if (!dashLookup.HasComponent(entity))
@@ -161,13 +153,12 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     /// <summary>
     /// Cancels any active milestone selection flow and clears its queued commands and offers.
-    /// entity: Player entity that owns the milestone runtime state.
-    /// milestoneSelectionLookup: Lookup used to mutate selection state.
-    /// milestoneResumeLookup: Lookup used to mutate time-scale resume state.
-    /// milestoneOfferLookup: Lookup used to clear rolled milestone offers.
-    /// milestoneCommandLookup: Lookup used to clear queued HUD commands.
-    /// returns None.
     /// </summary>
+    /// <param name="entity">Player entity that owns the milestone runtime state.</param>
+    /// <param name="milestoneSelectionLookup">Lookup used to mutate selection state.</param>
+    /// <param name="milestoneResumeLookup">Lookup used to mutate time-scale resume state.</param>
+    /// <param name="milestoneOfferLookup">Lookup used to clear rolled milestone offers.</param>
+    /// <param name="milestoneCommandLookup">Lookup used to clear queued HUD commands.</param>
     private static void ResetMilestoneRuntimeState(Entity entity,
                                                    ref ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionLookup,
                                                    ref ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneResumeLookup,

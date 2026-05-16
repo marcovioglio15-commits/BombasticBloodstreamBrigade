@@ -200,7 +200,7 @@ public partial struct PlayerLookDirectionSystem : ISystem
     /// <param name="playerPosition">World position of the player entity.</param>
     /// <param name="fallbackDirection">Fallback planar direction used when normalization requires a safe default.</param>
     /// <param name="desiredDirection">Resolved normalized planar look direction.</param>
-    /// <returns>True when the ray/plane intersection yields a valid non-zero planar direction.<returns>
+    /// <returns>True when the ray/plane intersection yields a valid non-zero planar direction.</returns>
     private static bool TryResolveMousePointerDirection(Camera camera,
                                                         float2 mouseScreenPosition,
                                                         float3 playerPosition,

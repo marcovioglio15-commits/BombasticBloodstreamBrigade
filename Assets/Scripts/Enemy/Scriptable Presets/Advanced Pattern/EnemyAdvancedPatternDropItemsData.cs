@@ -348,9 +348,8 @@ public sealed class EnemyExtraComboPointsConditionData
     #region Helpers
     /// <summary>
     /// Creates the default normalized curve used to reward quick kills more than delayed kills.
-    /// /params None.
-    /// /returns Default normalized multiplier curve.
     /// </summary>
+    /// <returns>Default normalized multiplier curve.</returns>
     private static AnimationCurve CreateDefaultNormalizedMultiplierCurve()
     {
         return new AnimationCurve(new Keyframe(0f, 1f),

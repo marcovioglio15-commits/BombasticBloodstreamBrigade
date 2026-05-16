@@ -3,8 +3,6 @@ using UnityEditor;
 
 /// <summary>
 /// Provides editor helpers for validating and synchronizing Scene Manager presets with Build Settings.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneManagementBuildSettingsUtility
 {
@@ -13,9 +11,9 @@ public static class GameSceneManagementBuildSettingsUtility
     #region Public Methods
     /// <summary>
     /// Resolves the enabled Build Settings index for one scene path.
-    /// /params scenePath Project-relative scene path.
-    /// /returns Build index when enabled, otherwise -1.
     /// </summary>
+    /// <param name="scenePath">Project-relative scene path.</param>
+    /// <returns>Build index when enabled, otherwise -1.</returns>
     public static int ResolveBuildIndex(string scenePath)
     {
         if (string.IsNullOrWhiteSpace(scenePath))
@@ -42,10 +40,9 @@ public static class GameSceneManagementBuildSettingsUtility
 
     /// <summary>
     /// Adds warnings for scene definitions whose build settings metadata is missing or out of date.
-    /// /params preset Scene manager preset to inspect.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene manager preset to inspect.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     public static void CollectBuildSettingsWarnings(GameSceneManagerPreset preset, List<string> warnings)
     {
         if (preset == null || warnings == null || preset.SceneDefinitions == null)
@@ -79,9 +76,9 @@ public static class GameSceneManagementBuildSettingsUtility
 
     /// <summary>
     /// Adds every non-SubScene scene definition to Build Settings in authored order.
-    /// /params preset Scene manager preset containing ordered scene definitions.
-    /// /returns True when Build Settings changed.
     /// </summary>
+    /// <param name="preset">Scene manager preset containing ordered scene definitions.</param>
+    /// <returns>True when Build Settings changed.</returns>
     public static bool ApplySceneOrderToBuildSettings(GameSceneManagerPreset preset)
     {
         if (preset == null || preset.SceneDefinitions == null)
@@ -119,10 +116,10 @@ public static class GameSceneManagementBuildSettingsUtility
     #region Helpers
     /// <summary>
     /// Resolves whether a non-bootstrap scene is intentionally omitted from Build Settings because Addressables owns it.
-    /// /params preset Scene manager preset containing the active backend.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when Build Settings validation should skip the scene.
     /// </summary>
+    /// <param name="preset">Scene manager preset containing the active backend.</param>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when Build Settings validation should skip the scene.</returns>
     private static bool ShouldSkipBuildSettingsForAddressables(GameSceneManagerPreset preset, GameSceneDefinition sceneDefinition)
     {
         if (preset.LoadBackend != GameSceneLoadBackend.Addressables)
@@ -136,9 +133,9 @@ public static class GameSceneManagementBuildSettingsUtility
 
     /// <summary>
     /// Resolves whether one scene definition is not loaded by Unity Build Settings.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when Build Settings should ignore the entry.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when Build Settings should ignore the entry.</returns>
     private static bool ShouldSkipBuildSettings(GameSceneDefinition sceneDefinition)
     {
         switch (sceneDefinition.SceneKind)

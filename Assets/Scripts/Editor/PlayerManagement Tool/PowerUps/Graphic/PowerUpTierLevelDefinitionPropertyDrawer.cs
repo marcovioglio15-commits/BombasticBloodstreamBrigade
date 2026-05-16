@@ -23,7 +23,7 @@ public sealed class PowerUpTierLevelDefinitionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit inspector for one tier definition.
     /// </summary>
     /// <param name="property">Serialized tier definition property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -88,7 +88,7 @@ public sealed class PowerUpTierLevelDefinitionPropertyDrawer : PropertyDrawer
     /// Sums all non-negative entry percentages configured inside the serialized tier entry array.
     /// </summary>
     /// <param name="entriesProperty">Serialized entries array belonging to the tier definition.</param>
-    /// <returns>Total configured percentage for the current tier.<returns>
+    /// <returns>Total configured percentage for the current tier.</returns>
     private static float CalculateEntryPercentageSum(SerializedProperty entriesProperty)
     {
         if (entriesProperty == null || !entriesProperty.isArray)
@@ -118,7 +118,7 @@ public sealed class PowerUpTierLevelDefinitionPropertyDrawer : PropertyDrawer
     /// Builds a warning message when the same typed power-up entry appears more than once inside one tier.
     /// </summary>
     /// <param name="entriesProperty">Serialized entries array belonging to the tier definition.</param>
-    /// <returns>Warning text when duplicates are detected; otherwise an empty string.<returns>
+    /// <returns>Warning text when duplicates are detected; otherwise an empty string.</returns>
     private static string BuildDuplicateEntryWarning(SerializedProperty entriesProperty)
     {
         if (entriesProperty == null || !entriesProperty.isArray)
@@ -168,7 +168,7 @@ public sealed class PowerUpTierLevelDefinitionPropertyDrawer : PropertyDrawer
     /// Resolves one serialized tier-entry kind while guarding against invalid enum payloads.
     /// </summary>
     /// <param name="entryKindProperty">Serialized enum property storing the tier-entry kind.</param>
-    /// <returns>Resolved tier-entry kind or Active when the payload is invalid.<returns>
+    /// <returns>Resolved tier-entry kind or Active when the payload is invalid.</returns>
     private static PowerUpTierEntryKind ResolveEntryKind(SerializedProperty entryKindProperty)
     {
         if (entryKindProperty == null || entryKindProperty.propertyType != SerializedPropertyType.Enum)
@@ -186,7 +186,7 @@ public sealed class PowerUpTierLevelDefinitionPropertyDrawer : PropertyDrawer
     /// Returns one trimmed string value from a serialized property when available.
     /// </summary>
     /// <param name="stringProperty">Serialized string property to normalize.</param>
-    /// <returns>Trimmed string value or an empty string when unavailable.<returns>
+    /// <returns>Trimmed string value or an empty string when unavailable.</returns>
     private static string ResolveNormalizedStringValue(SerializedProperty stringProperty)
     {
         if (stringProperty == null)

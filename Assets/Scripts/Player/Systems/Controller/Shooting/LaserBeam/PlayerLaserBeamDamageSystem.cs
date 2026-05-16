@@ -5,8 +5,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Applies continuous Laser Beam damage and moving tick-packet damage against enemies intersecting resolved beam lanes.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyProjectileHitSystem))]
@@ -23,9 +21,8 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Creates the enemy query used by the Laser Beam hit-resolution path.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnCreate(ref SystemState state)
     {
         enemyQuery = SystemAPI.QueryBuilder()
@@ -39,9 +36,8 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
     /// <summary>
     /// Resolves Laser Beam damage work only when at least one beam has a fresh tick budget or active storm packets to process.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -356,9 +352,8 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
     #region Private Methods
     /// <summary>
     /// Consumes beam ticks and retires completed traveling packets even when no enemies are currently present.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     private void ConsumeBeamTicksWithoutTargets(ref SystemState state)
     {
         foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
@@ -402,10 +397,10 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
     /// <summary>
     /// Resolves how many authored beam ticks elapsed since the last damage update and rewinds the timer back into the valid range.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params tickIntervalSeconds Authored tick interval.
-    /// /returns Number of ticks that must be consumed this frame.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="tickIntervalSeconds">Authored tick interval.</param>
+    /// <returns>Number of ticks that must be consumed this frame.</returns>
     private static int ResolvePendingTickCount(ref PlayerLaserBeamState laserBeamState,
                                                float tickIntervalSeconds)
     {
@@ -427,11 +422,11 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
     /// <summary>
     /// Resolves the projectile-derived damage-per-second budget shared by continuous beam damage and moving tick packets.
-    /// /params projectileTemplate Projectile template built from the current shooting config.
-    /// /params runtimeShootingConfig Current runtime shooting config.
-    /// /params chargeImpulseDamageMultiplier Active charge-impulse damage multiplier.
-    /// /returns Base damage-per-second budget before beam-specific multipliers.
     /// </summary>
+    /// <param name="projectileTemplate">Projectile template built from the current shooting config.</param>
+    /// <param name="runtimeShootingConfig">Current runtime shooting config.</param>
+    /// <param name="chargeImpulseDamageMultiplier">Active charge-impulse damage multiplier.</param>
+    /// <returns>Base damage-per-second budget before beam-specific multipliers.</returns>
     private static float ResolveBaseDamagePerSecond(PlayerProjectileRequestTemplate projectileTemplate,
                                                     in PlayerRuntimeShootingConfig runtimeShootingConfig,
                                                     float chargeImpulseDamageMultiplier)
@@ -444,11 +439,11 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
     /// <summary>
     /// Accumulates elapsed beam lifetime into a capped continuous-damage cadence and returns how many slices must be applied this frame.
-    /// /params laserBeamState Mutable beam state that stores the running continuous-damage accumulator.
-    /// /params deltaTime Frame delta time added to the accumulator.
-    /// /params sliceIntervalSeconds Maximum interval between two flat continuous-damage applications.
-    /// /returns Number of continuous-damage slices that should be emitted this frame.
     /// </summary>
+    /// <param name="laserBeamState">Mutable beam state that stores the running continuous-damage accumulator.</param>
+    /// <param name="deltaTime">Frame delta time added to the accumulator.</param>
+    /// <param name="sliceIntervalSeconds">Maximum interval between two flat continuous-damage applications.</param>
+    /// <returns>Number of continuous-damage slices that should be emitted this frame.</returns>
     private static int ResolvePendingContinuousDamageSliceCount(ref PlayerLaserBeamState laserBeamState,
                                                                 float deltaTime,
                                                                 float sliceIntervalSeconds)
@@ -466,37 +461,36 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
     /// <summary>
     /// Applies every active traveling tick packet as a moving storm trail that damages the lane portion already traversed during the current frame.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneLength Total length of the current lane.
-    /// /params tickDamagePerPulse Damage carried by one authored tick packet before lane multipliers.
-    /// /params penetrationMode Projectile penetration mode inherited from the current shooting config.
-    /// /params maximumPenetrations Maximum penetration budget inherited from the current shooting config.
-    /// /params projectileTemplate Projectile template used to resolve hit payloads.
-    /// /params laserBeamState Current beam runtime state containing active traveling packets.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /params laserBeamLanes Resolved lane buffer of the current player.
-    /// /params segmentStartIndex First segment index belonging to the current lane.
-    /// /params hitCandidates Sorted lane hit candidates.
-    /// /params traversedHitCandidates Reusable output list used to store the candidates currently covered by one packet trail.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params enemyDataArray Cached immutable data of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneLength">Total length of the current lane.</param>
+    /// <param name="tickDamagePerPulse">Damage carried by one authored tick packet before lane multipliers.</param>
+    /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
+    /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
+    /// <param name="laserBeamState">Current beam runtime state containing active traveling packets.</param>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
+    /// <param name="segmentStartIndex">First segment index belonging to the current lane.</param>
+    /// <param name="hitCandidates">Sorted lane hit candidates.</param>
+    /// <param name="traversedHitCandidates">Reusable output list used to store the candidates currently covered by one packet trail.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="enemyDataArray">Cached immutable data of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ApplyStormTickPulseLaneHits(Entity shooterEntity,
                                                     float laneLength,
                                                     float tickDamagePerPulse,

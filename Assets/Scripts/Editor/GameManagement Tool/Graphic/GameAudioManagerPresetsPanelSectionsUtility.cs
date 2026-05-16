@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds Audio Manager preset detail sections, validation output and event-map maintenance actions.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameAudioManagerPresetsPanelSectionsUtility
 {
@@ -19,9 +17,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
     #region Public Methods
     /// <summary>
     /// Loads the persisted active Audio Manager details section.
-    /// /params None.
-    /// /returns Persisted section value or Metadata when none exists.
     /// </summary>
+    /// <returns>Persisted section value or Metadata when none exists.</returns>
     public static GameAudioManagerPresetsPanel.DetailsSectionType LoadActiveSection()
     {
         return ManagementToolStateUtility.LoadEnumValue(ActiveSectionStateKey, GameAudioManagerPresetsPanel.DetailsSectionType.Metadata);
@@ -29,10 +26,9 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Selects one Audio Manager preset and rebuilds details.
-    /// /params panel Owning panel with detail roots.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with detail roots.</param>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     public static void SelectPreset(GameAudioManagerPresetsPanel panel, GameAudioManagerPreset preset)
     {
         if (panel == null || panel.DetailsRoot == null)
@@ -67,9 +63,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Rebuilds the currently selected Audio Manager details section.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     public static void BuildActiveSection(GameAudioManagerPresetsPanel panel)
     {
         if (panel == null || panel.SectionContentRoot == null || panel.PresetSerializedObject == null)
@@ -108,9 +103,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Marks the selected Audio Manager preset dirty in the draft session.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     public static void MarkSelectedPresetDirty(GameAudioManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null || panel.PresetSerializedObject == null)
@@ -125,9 +119,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
     #region Section Builders
     /// <summary>
     /// Builds metadata fields for the selected Audio Manager preset.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildMetadataSection(GameAudioManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Preset Details");
@@ -149,12 +142,11 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds a details section for one serialized property root.
-    /// /params panel Owning panel with serialized preset context.
-    /// /params title Section title.
-    /// /params propertyName Serialized property name.
-    /// /params tooltip Tooltip applied to the property field.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="title">Section title.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="tooltip">Tooltip applied to the property field.</param>
     private static void BuildPropertySection(GameAudioManagerPresetsPanel panel, string title, string propertyName, string tooltip)
     {
         VisualElement section = CreateSection(panel, title);
@@ -173,9 +165,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds background music controls with dependent options shown only while music management is enabled.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildBackgroundMusicSection(GameAudioManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Background Music");
@@ -246,9 +237,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds gameplay event to FMOD event-path mapping controls.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void BuildEventMapSection(GameAudioManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Event Sound Map");
@@ -276,9 +266,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds focused rate-limit controls for every event binding.
-    /// /params panel Owning panel with serialized event bindings.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized event bindings.</param>
     private static void BuildRateLimitsSection(GameAudioManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Rate Limits");
@@ -323,9 +312,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds non-mutating validation warning output.
-    /// /params panel Owning panel with selected preset and warning buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset and warning buffer.</param>
     private static void BuildValidationSection(GameAudioManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Validation");
@@ -355,9 +343,9 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
     #region Section Helpers
     /// <summary>
     /// Builds buttons for Audio Manager detail sections.
-    /// /params panel Owning panel that stores the active section.
-    /// /returns Section button row.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the active section.</param>
+    /// <returns>Section button row.</returns>
     private static VisualElement BuildSectionButtons(GameAudioManagerPresetsPanel panel)
     {
         VisualElement buttonsRoot = new VisualElement();
@@ -376,12 +364,11 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one Audio Manager detail section selector button.
-    /// /params panel Owning panel receiving the selected section.
-    /// /params parent Parent button row.
-    /// /params sectionType Section activated by the button.
-    /// /params label Visible label.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the selected section.</param>
+    /// <param name="parent">Parent button row.</param>
+    /// <param name="sectionType">Section activated by the button.</param>
+    /// <param name="label">Visible label.</param>
     private static void AddSectionButton(GameAudioManagerPresetsPanel panel,
                                          VisualElement parent,
                                          GameAudioManagerPresetsPanel.DetailsSectionType sectionType,
@@ -404,9 +391,9 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds event-map maintenance buttons.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns Toolbar visual element.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <returns>Toolbar visual element.</returns>
     private static Toolbar BuildEventMapToolbar(GameAudioManagerPresetsPanel panel)
     {
         Toolbar toolbar = new Toolbar();
@@ -434,9 +421,9 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Resolves a stable minimum width for Audio Manager section buttons.
-    /// /params sectionType Section represented by the selector button.
-    /// /returns Minimum width that keeps the label readable before wrapping to a new row.
     /// </summary>
+    /// <param name="sectionType">Section represented by the selector button.</param>
+    /// <returns>Minimum width that keeps the label readable before wrapping to a new row.</returns>
     private static float ResolveSectionButtonWidth(GameAudioManagerPresetsPanel.DetailsSectionType sectionType)
     {
         switch (sectionType)
@@ -460,10 +447,10 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates a styled section container and registers its heading for recolor utilities.
-    /// /params panel Owning panel with active details content root.
-    /// /params title Section title.
-    /// /returns Section container.
     /// </summary>
+    /// <param name="panel">Owning panel with active details content root.</param>
+    /// <param name="title">Section title.</param>
+    /// <returns>Section container.</returns>
     private static VisualElement CreateSection(GameAudioManagerPresetsPanel panel, string title)
     {
         VisualElement section = new VisualElement();
@@ -480,14 +467,13 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one bound text field and marks the draft dirty on edit.
-    /// /params panel Owning panel with serialized preset context.
-    /// /params parent Parent section.
-    /// /params label Display label.
-    /// /params propertyName Serialized property name.
-    /// /params refreshList True when list labels should update after change.
-    /// /params multiline True when multiline editing is enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="refreshList">True when list labels should update after change.</param>
+    /// <param name="multiline">True when multiline editing is enabled.</param>
     private static void AddBoundTextField(GameAudioManagerPresetsPanel panel,
                                           VisualElement parent,
                                           string label,
@@ -519,13 +505,12 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one delayed string property field.
-    /// /params panel Owning panel with selected preset context.
-    /// /params parent Parent section.
-    /// /params property Serialized string property.
-    /// /params label Display label.
-    /// /params tooltip Field tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized string property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
     private static void AddDelayedStringProperty(GameAudioManagerPresetsPanel panel,
                                                  VisualElement parent,
                                                  SerializedProperty property,
@@ -552,14 +537,13 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one explicit boolean toggle and optionally rebuilds the active section after edits.
-    /// /params panel Owning panel with selected preset context.
-    /// /params parent Parent section.
-    /// /params property Serialized boolean property.
-    /// /params label Display label.
-    /// /params tooltip Field tooltip.
-    /// /params rebuildOnChange True when dependent controls must refresh immediately.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized boolean property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <param name="rebuildOnChange">True when dependent controls must refresh immediately.</param>
     private static void AddBooleanToggleProperty(GameAudioManagerPresetsPanel panel,
                                                  VisualElement parent,
                                                  SerializedProperty property,
@@ -590,15 +574,14 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one float slider property field.
-    /// /params panel Owning panel with selected preset context.
-    /// /params parent Parent section.
-    /// /params property Serialized float property.
-    /// /params label Display label.
-    /// /params lowValue Lower slider value.
-    /// /params highValue Upper slider value.
-    /// /params tooltip Field tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized float property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="lowValue">Lower slider value.</param>
+    /// <param name="highValue">Upper slider value.</param>
+    /// <param name="tooltip">Field tooltip.</param>
     private static void AddFloatSliderProperty(GameAudioManagerPresetsPanel panel,
                                                VisualElement parent,
                                                SerializedProperty property,
@@ -629,9 +612,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
     #region Event Map Actions
     /// <summary>
     /// Adds missing default event bindings to the selected preset.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void AddMissingDefaultBindings(GameAudioManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)
@@ -645,9 +627,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Synchronizes default event identity labels and descriptions.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void SynchronizeDefaultIdentities(GameAudioManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)
@@ -661,9 +642,8 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Resets all event bindings to the current default catalog.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void ResetEventMap(GameAudioManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)

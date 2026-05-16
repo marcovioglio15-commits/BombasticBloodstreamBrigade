@@ -89,7 +89,7 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
     /// Checks whether one runtime cheat input action is resolved and currently enabled.
     /// </summary>
     /// <param name="action">Resolved action from PlayerInputRuntime.</param>
-    /// <returns>True when the action exists and is enabled.<returns>
+    /// <returns>True when the action exists and is enabled.</returns>
     private static bool IsCheatActionReady(InputAction action)
     {
         if (action == null)
@@ -110,7 +110,7 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
     /// </summary>
     /// <param name="presetDigitAction">Button action bound to digit and numpad digit keys.</param>
     /// <param name="presetIndex">Resolved preset index when a valid key is pressed.</param>
-    /// <returns>True when a supported numeric key was pressed this frame, otherwise false.<returns>
+    /// <returns>True when a supported numeric key was pressed this frame, otherwise false.</returns>
     private static bool TryResolvePressedPresetIndex(InputAction presetDigitAction, out int presetIndex)
     {
         presetIndex = -1;

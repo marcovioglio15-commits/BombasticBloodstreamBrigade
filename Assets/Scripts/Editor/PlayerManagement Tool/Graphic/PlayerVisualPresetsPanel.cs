@@ -110,7 +110,6 @@ public sealed class PlayerVisualPresetsPanel
     /// <summary>
     /// Initializes the player visual presets panel and restores the previously selected sections.
     /// None.
-    /// returns None.
     /// </summary>
     public PlayerVisualPresetsPanel()
     {
@@ -132,7 +131,6 @@ public sealed class PlayerVisualPresetsPanel
     /// <summary>
     /// Refreshes the panel after asset changes and preserves the selection when possible.
     /// None.
-    /// returns None.
     /// </summary>
     public void RefreshFromSessionChange()
     {
@@ -156,9 +154,8 @@ public sealed class PlayerVisualPresetsPanel
 
     /// <summary>
     /// Selects one preset from an external caller such as the player master side panel synchronizer.
-    /// preset: Preset to select.
-    /// returns None.
     /// </summary>
+    /// <param name="preset">Preset to select.</param>
     public void SelectPresetFromExternal(PlayerVisualPreset preset)
     {
         if (preset == null)

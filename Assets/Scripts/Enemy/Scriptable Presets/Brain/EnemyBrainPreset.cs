@@ -4,7 +4,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores movement settings used by enemy simulation and steering systems.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBrainMovementSettings
@@ -132,7 +131,6 @@ public sealed class EnemyBrainMovementSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes movement values after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -171,7 +169,6 @@ public sealed class EnemyBrainMovementSettings
 
 /// <summary>
 /// Stores neighbor separation settings used by enemy steering.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBrainSteeringSettings
@@ -222,7 +219,6 @@ public sealed class EnemyBrainSteeringSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes steering values after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -242,7 +238,6 @@ public sealed class EnemyBrainSteeringSettings
 
 /// <summary>
 /// Stores enemy damage settings applied against the player.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBrainDamageSettings
@@ -350,7 +345,6 @@ public sealed class EnemyBrainDamageSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes damage values after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -379,7 +373,6 @@ public sealed class EnemyBrainDamageSettings
 
 /// <summary>
 /// Stores health and shield values assigned when an enemy is activated from pool.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBrainHealthStatisticsSettings
@@ -419,7 +412,6 @@ public sealed class EnemyBrainHealthStatisticsSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes health values after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -436,7 +428,6 @@ public sealed class EnemyBrainHealthStatisticsSettings
 
 /// <summary>
 /// Stores authoring-time simulation settings for one enemy brain preset.
-/// returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyBrainPreset", menuName = "Enemy/Brain Preset", order = 10)]
 public sealed class EnemyBrainPreset : ScriptableObject
@@ -545,7 +536,6 @@ public sealed class EnemyBrainPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Validates nested settings and guarantees stable metadata defaults.
-    /// returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -574,7 +564,6 @@ public sealed class EnemyBrainPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Revalidates the asset after inspector changes.
-    /// returns None.
     /// </summary>
     private void OnValidate()
     {

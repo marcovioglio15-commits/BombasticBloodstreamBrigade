@@ -479,11 +479,11 @@ public partial struct EnemySteeringSystem : ISystem
     #region Helpers
     /// <summary>
     /// Resolves the active-array index of the boss that owns one minion.
-    /// /params enemyEntity Enemy entity to inspect.
-    /// /params bossMinionOwnerLookup Lookup used to read boss-minion ownership.
-    /// /params enemyIndexByEntity Active enemy entity-to-array-index map.
-    /// /returns Owning boss index, or -1 when the enemy is not an active boss-owned minion.
     /// </summary>
+    /// <param name="enemyEntity">Enemy entity to inspect.</param>
+    /// <param name="bossMinionOwnerLookup">Lookup used to read boss-minion ownership.</param>
+    /// <param name="enemyIndexByEntity">Active enemy entity-to-array-index map.</param>
+    /// <returns>Owning boss index, or -1 when the enemy is not an active boss-owned minion.</returns>
     private static int ResolveOwnedBossIndex(Entity enemyEntity,
                                              in ComponentLookup<EnemyBossMinionOwner> bossMinionOwnerLookup,
                                              NativeParallelHashMap<Entity, int> enemyIndexByEntity)

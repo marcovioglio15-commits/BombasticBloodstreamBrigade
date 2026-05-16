@@ -2,8 +2,6 @@ using Unity.Entities;
 
 /// <summary>
 /// Shared helper for releasing legacy pooled VFX entities that may still exist during runtime cleanup.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerPowerUpVfxPoolUtility
 {
@@ -12,11 +10,10 @@ public static class PlayerPowerUpVfxPoolUtility
     #region Public Methods
     /// <summary>
     /// Clears transient VFX runtime components and disables a pooled instance for later reuse.
-    /// /params entityManager Entity manager used to inspect the VFX entity.
-    /// /params commandBuffer Command buffer receiving deferred release operations.
-    /// /params vfxEntity Runtime VFX entity being returned to the pool.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect the VFX entity.</param>
+    /// <param name="commandBuffer">Command buffer receiving deferred release operations.</param>
+    /// <param name="vfxEntity">Runtime VFX entity being returned to the pool.</param>
     public static void ReleaseVfxEntity(EntityManager entityManager,
                                         ref EntityCommandBuffer commandBuffer,
                                         Entity vfxEntity)
@@ -40,11 +37,10 @@ public static class PlayerPowerUpVfxPoolUtility
     #region Helpers
     /// <summary>
     /// Queues a component removal only when the pooled VFX entity currently owns that component.
-    /// /params entityManager Entity manager used for the presence check.
-    /// /params commandBuffer Command buffer receiving the deferred removal.
-    /// /params vfxEntity Runtime VFX entity being released.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for the presence check.</param>
+    /// <param name="commandBuffer">Command buffer receiving the deferred removal.</param>
+    /// <param name="vfxEntity">Runtime VFX entity being released.</param>
     private static void RemoveComponentIfPresent<TComponent>(EntityManager entityManager,
                                                              ref EntityCommandBuffer commandBuffer,
                                                              Entity vfxEntity)

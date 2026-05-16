@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Resolves runtime-usable offensive engagement billboard views, creating scene clones when ECS component objects are not directly renderable.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 {
@@ -22,11 +20,11 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Resolves one offensive billboard view that is guaranteed to belong to a live scene object.
-    /// /params entityManager Entity manager used to inspect runtime ECS state.
-    /// /params enemyEntity Enemy entity whose billboard view must be resolved.
-    /// /params billboardView Runtime-usable billboard view returned to the caller when available.
-    /// /returns True when a runtime-usable billboard view was resolved; otherwise false.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect runtime ECS state.</param>
+    /// <param name="enemyEntity">Enemy entity whose billboard view must be resolved.</param>
+    /// <param name="billboardView">Runtime-usable billboard view returned to the caller when available.</param>
+    /// <returns>True when a runtime-usable billboard view was resolved; otherwise false.</returns>
     public static bool TryResolveRuntimeView(EntityManager entityManager,
                                              Entity enemyEntity,
                                              out EnemyOffensiveEngagementBillboardView billboardView)
@@ -78,9 +76,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Releases fallback runtime clones whose owning enemies are no longer active.
-    /// /params entityManager Entity manager used to inspect enemy lifetime and activation state.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect enemy lifetime and activation state.</param>
     public static void ReleaseInactiveViews(EntityManager entityManager)
     {
         // Ensure caches exist even when the first call happens during teardown.
@@ -120,8 +117,6 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Destroys every active or pooled fallback clone and clears runtime caches.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void Shutdown()
     {
@@ -143,8 +138,6 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Lazily allocates the runtime caches used by the billboard resolver utility.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureCollections()
     {
@@ -172,10 +165,10 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Returns a scene-usable billboard view, instantiating one fallback clone when the baked ECS object is not renderable directly.
-    /// /params enemyEntity Enemy entity that owns the resolved view.
-    /// /params resolvedView View returned by ECS component-object lookup.
-    /// /returns Scene-usable billboard view when available; otherwise null.
     /// </summary>
+    /// <param name="enemyEntity">Enemy entity that owns the resolved view.</param>
+    /// <param name="resolvedView">View returned by ECS component-object lookup.</param>
+    /// <returns>Scene-usable billboard view when available; otherwise null.</returns>
     private static EnemyOffensiveEngagementBillboardView ResolveRuntimeUsableView(Entity enemyEntity,
                                                                                   EnemyOffensiveEngagementBillboardView resolvedView)
     {
@@ -220,9 +213,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Acquires one fallback clone from the pool or creates a fresh runtime instance from the baked template.
-    /// /params None.
-    /// /returns Runtime scene clone when available; otherwise null.
     /// </summary>
+    /// <returns>Runtime scene clone when available; otherwise null.</returns>
     private static EnemyOffensiveEngagementBillboardView AcquireFallbackView()
     {
         // Reuse pooled clones first to avoid repeated instantiation during combat peaks.
@@ -266,9 +258,9 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Returns whether the provided billboard view currently belongs to a valid live scene object.
-    /// /params billboardView Billboard view evaluated for runtime usability.
-    /// /returns True when the view belongs to a live scene object; otherwise false.
     /// </summary>
+    /// <param name="billboardView">Billboard view evaluated for runtime usability.</param>
+    /// <returns>True when the view belongs to a live scene object; otherwise false.</returns>
     private static bool IsRuntimeUsableView(EnemyOffensiveEngagementBillboardView billboardView)
     {
         // Reject null views or detached objects first.
@@ -289,9 +281,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Ensures a resolved runtime billboard object is active before rendering commands are applied.
-    /// /params billboardView Billboard view that should be active in the live scene.
-    /// /returns None.
     /// </summary>
+    /// <param name="billboardView">Billboard view that should be active in the live scene.</param>
     private static void EnsureViewActive(EnemyOffensiveEngagementBillboardView billboardView)
     {
         // Reactivate pooled or hidden clones so the renderer can be shown again this frame.
@@ -312,10 +303,10 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Returns whether the enemy still exists and remains enabled for gameplay updates.
-    /// /params entityManager Entity manager used to inspect ECS lifetime state.
-    /// /params enemyEntity Enemy entity evaluated for runtime validity.
-    /// /returns True when the enemy still exists and remains active; otherwise false.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect ECS lifetime state.</param>
+    /// <param name="enemyEntity">Enemy entity evaluated for runtime validity.</param>
+    /// <returns>True when the enemy still exists and remains active; otherwise false.</returns>
     private static bool IsEnemyAlive(EntityManager entityManager, Entity enemyEntity)
     {
         // Mirror the pool semantics so fallback clones are released as soon as the owning enemy returns inactive.
@@ -331,9 +322,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Resets and pools one fallback clone for later reuse.
-    /// /params fallbackView Runtime billboard clone returned to the pool.
-    /// /returns None.
     /// </summary>
+    /// <param name="fallbackView">Runtime billboard clone returned to the pool.</param>
     private static void ReleaseFallbackView(EnemyOffensiveEngagementBillboardView fallbackView)
     {
         // Hide the clone first so pooled instances never keep stale sprite or transform state.
@@ -354,9 +344,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Removes cached views that no longer belong to valid active enemies.
-    /// /params entityManager Entity manager used to inspect enemy lifetime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect enemy lifetime state.</param>
     private static void ReleaseStaleCachedViews(EntityManager entityManager)
     {
         // Collect stale cache keys first to avoid mutating the dictionary during enumeration.
@@ -382,9 +371,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
 
     /// <summary>
     /// Destroys every view instance provided by the supplied enumerable.
-    /// /params views View collection that should be destroyed during shutdown.
-    /// /returns None.
     /// </summary>
+    /// <param name="views">View collection that should be destroyed during shutdown.</param>
     private static void DestroyViews(IEnumerable<EnemyOffensiveEngagementBillboardView> views)
     {
         // Destroy the backing GameObjects because the cloned billboards are scene objects.

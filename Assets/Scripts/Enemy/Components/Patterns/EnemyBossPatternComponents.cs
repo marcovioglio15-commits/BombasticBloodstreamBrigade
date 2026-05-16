@@ -6,8 +6,6 @@ using UnityEngine;
 #region Boss Pattern Components
 /// <summary>
 /// Tags an enemy entity as a boss controlled by a boss pattern preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossTag : IComponentData
 {
@@ -15,8 +13,6 @@ public struct EnemyBossTag : IComponentData
 
 /// <summary>
 /// Stores immutable boss HUD text and color configuration baked from the visual preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossHudConfig : IComponentData
 {
@@ -33,8 +29,6 @@ public struct EnemyBossHudConfig : IComponentData
 
 /// <summary>
 /// Managed boss visual data for UI assets that cannot be stored in unmanaged ECS components.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class EnemyBossHudManagedConfig : IComponentData
 {
@@ -45,8 +39,6 @@ public sealed class EnemyBossHudManagedConfig : IComponentData
 
 /// <summary>
 /// Tracks mutable boss interaction switching state.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPatternRuntimeState : IComponentData
 {
@@ -61,8 +53,6 @@ public struct EnemyBossPatternRuntimeState : IComponentData
 
 /// <summary>
 /// Stores the base boss pattern used when no boss-specific interaction is active.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPatternBaseConfig : IComponentData
 {
@@ -76,8 +66,6 @@ public struct EnemyBossPatternBaseConfig : IComponentData
 
 /// <summary>
 /// Stores one compiled boss-specific interaction layer.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPatternInteractionElement : IBufferElementData
 {
@@ -103,8 +91,6 @@ public struct EnemyBossPatternInteractionElement : IBufferElementData
 
 /// <summary>
 /// Stores shooter configs referenced by the base boss pattern and boss-specific interactions.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPatternShooterConfigElement : IBufferElementData
 {
@@ -113,8 +99,6 @@ public struct EnemyBossPatternShooterConfigElement : IBufferElementData
 
 /// <summary>
 /// Stores offensive engagement configs referenced by the base boss pattern and boss-specific interactions.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPatternOffensiveEngagementConfigElement : IBufferElementData
 {
@@ -123,8 +107,6 @@ public struct EnemyBossPatternOffensiveEngagementConfigElement : IBufferElementD
 
 /// <summary>
 /// Stores one boss-owned minion spawn rule and its runtime pool state.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossMinionSpawnElement : IBufferElementData
 {
@@ -153,8 +135,6 @@ public struct EnemyBossMinionSpawnElement : IBufferElementData
 
 /// <summary>
 /// Stores one boss minion reserved during its spawn warning window and activated once the ring completes.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossPendingMinionSpawnElement : IBufferElementData
 {
@@ -167,8 +147,6 @@ public struct EnemyBossPendingMinionSpawnElement : IBufferElementData
 
 /// <summary>
 /// Marks minions spawned by a boss and stores the source rule for alive-count throttling.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyBossMinionOwner : IComponentData
 {
@@ -180,8 +158,6 @@ public struct EnemyBossMinionOwner : IComponentData
 
 /// <summary>
 /// Scales rewards emitted by special enemies such as boss-spawned minions.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct EnemyDropRewardMultiplier : IComponentData
 {

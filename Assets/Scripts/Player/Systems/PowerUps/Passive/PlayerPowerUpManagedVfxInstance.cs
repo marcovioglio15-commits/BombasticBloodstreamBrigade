@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Cached runtime state for one managed power-up VFX instance.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerPowerUpManagedVfxInstance
 {
@@ -13,8 +11,10 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public GameObject SourcePrefab;
     public GameObject InstanceObject;
     public Transform InstanceTransform;
+    public Vector3 RootBaseLocalScale;
     public ParticleSystem[] ParticleSystems;
     public TrailRenderer[] TrailRenderers;
+    public float[] TrailRendererBaseWidths;
     public Entity PrefabEntity;
     public float RemainingSeconds;
     public Entity FollowTargetEntity;

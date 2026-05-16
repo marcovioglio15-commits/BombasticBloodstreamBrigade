@@ -16,12 +16,12 @@ public static class PlayerScalableStatClampUtility
     #region Public Methods
     /// <summary>
     /// Resolves one normalized numeric scalable-stat value using the provided clamp range and stat type.
-    /// statType: Runtime scalable stat type.
-    /// minimumValue: Raw minimum clamp value configured for the stat.
-    /// maximumValue: Raw maximum clamp value configured for the stat.
-    /// rawValue: Unnormalized numeric value to sanitize.
-    /// returns Clamped numeric value normalized for the scalable-stat type.
     /// </summary>
+    /// <param name="statType">Runtime scalable stat type.</param>
+    /// <param name="minimumValue">Raw minimum clamp value configured for the stat.</param>
+    /// <param name="maximumValue">Raw maximum clamp value configured for the stat.</param>
+    /// <param name="rawValue">Unnormalized numeric value to sanitize.</param>
+    /// <returns>Clamped numeric value normalized for the scalable-stat type.</returns>
     public static float ResolveNormalizedValue(PlayerScalableStatType statType,
                                                float minimumValue,
                                                float maximumValue,
@@ -51,10 +51,10 @@ public static class PlayerScalableStatClampUtility
 
     /// <summary>
     /// Resolves one normalized scalable-stat value using a baked blob entry as clamp metadata source.
-    /// scalableStat: Baked scalable-stat metadata.
-    /// rawValue: Unnormalized value to sanitize for runtime usage.
-    /// returns Clamped value normalized for the scalable-stat type.
     /// </summary>
+    /// <param name="scalableStat">Baked scalable-stat metadata.</param>
+    /// <param name="rawValue">Unnormalized value to sanitize for runtime usage.</param>
+    /// <returns>Clamped value normalized for the scalable-stat type.</returns>
     public static float ResolveNormalizedValue(ref PlayerScalableStatBlob scalableStat, float rawValue)
     {
         return ResolveNormalizedValue((PlayerScalableStatType)scalableStat.Type,
@@ -65,10 +65,10 @@ public static class PlayerScalableStatClampUtility
 
     /// <summary>
     /// Resolves one normalized scalable-stat value using a runtime buffer element as clamp metadata source.
-    /// scalableStat: Runtime scalable-stat entry.
-    /// rawValue: Unnormalized value to sanitize for runtime usage.
-    /// returns Clamped value normalized for the scalable-stat type.
     /// </summary>
+    /// <param name="scalableStat">Runtime scalable-stat entry.</param>
+    /// <param name="rawValue">Unnormalized value to sanitize for runtime usage.</param>
+    /// <returns>Clamped value normalized for the scalable-stat type.</returns>
     public static float ResolveNormalizedValue(in PlayerScalableStatElement scalableStat, float rawValue)
     {
         return ResolveNormalizedValue((PlayerScalableStatType)scalableStat.Type,
@@ -79,9 +79,9 @@ public static class PlayerScalableStatClampUtility
 
     /// <summary>
     /// Resolves one numeric projection from the current runtime scalable stat entry.
-    /// scalableStat: Runtime scalable stat entry.
-    /// returns Numeric projection of the typed scalable stat.
     /// </summary>
+    /// <param name="scalableStat">Runtime scalable stat entry.</param>
+    /// <returns>Numeric projection of the typed scalable stat.</returns>
     public static float ResolveNumericProjection(in PlayerScalableStatElement scalableStat)
     {
         PlayerScalableStatType statType = (PlayerScalableStatType)scalableStat.Type;
@@ -99,12 +99,11 @@ public static class PlayerScalableStatClampUtility
 
     /// <summary>
     /// Resolves one ordered clamp range from raw serialized minimum and maximum values.
-    /// minimumValue: Raw serialized minimum value.
-    /// maximumValue: Raw serialized maximum value.
-    /// resolvedMinimumValue: Ordered lower bound used by runtime normalization.
-    /// resolvedMaximumValue: Ordered upper bound used by runtime normalization.
-    /// returns void.
     /// </summary>
+    /// <param name="minimumValue">Raw serialized minimum value.</param>
+    /// <param name="maximumValue">Raw serialized maximum value.</param>
+    /// <param name="resolvedMinimumValue">Ordered lower bound used by runtime normalization.</param>
+    /// <param name="resolvedMaximumValue">Ordered upper bound used by runtime normalization.</param>
     public static void ResolveOrderedRange(float minimumValue,
                                            float maximumValue,
                                            out float resolvedMinimumValue,

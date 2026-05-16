@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyPatternCoreMovementAssembly.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyPatternCoreMovementAssembly))]
 public sealed class EnemyPatternCoreMovementAssemblyPropertyDrawer : PropertyDrawer
@@ -16,9 +14,9 @@ public sealed class EnemyPatternCoreMovementAssemblyPropertyDrawer : PropertyDra
     #region Public Methods
     /// <summary>
     /// Creates the core-movement assembly UI.
-    /// /params property Serialized core-movement assembly property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized core-movement assembly property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

@@ -7,8 +7,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one editor-facing Laser Beam visual preset option resolved from authored player visual presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public readonly struct PlayerLaserBeamVisualPresetEditorOption
 {
@@ -23,10 +21,9 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
     #region Public Methods
     /// <summary>
     /// Creates one editor-facing option entry.
-    /// /params stableId Stable numeric preset ID.
-    /// /params displayName Designer-facing preset label.
-    /// /returns None.
     /// </summary>
+    /// <param name="stableId">Stable numeric preset ID.</param>
+    /// <param name="displayName">Designer-facing preset label.</param>
     public PlayerLaserBeamVisualPresetEditorOption(int stableId, string displayName)
     {
         StableId = Mathf.Max(0, stableId);
@@ -38,9 +35,8 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
 
     /// <summary>
     /// Builds the popup label shown to designers inside selector fields.
-    /// /params None.
-    /// /returns User-facing popup label.
     /// </summary>
+    /// <returns>User-facing popup label.</returns>
     public string BuildDisplayLabel()
     {
         return string.Format("{0} [{1}]", DisplayName, StableId);
@@ -50,10 +46,10 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
     #region Private Methods
     /// <summary>
     /// Builds one compact formula token from the designer-facing preset name.
-    /// /params displayName Designer-facing preset name.
-    /// /params stableId Stable numeric preset ID.
-    /// /returns Sanitized token suitable for bracket-based formula constants.
     /// </summary>
+    /// <param name="displayName">Designer-facing preset name.</param>
+    /// <param name="stableId">Stable numeric preset ID.</param>
+    /// <returns>Sanitized token suitable for bracket-based formula constants.</returns>
     private static string BuildFormulaToken(string displayName, int stableId)
     {
         StringBuilder builder = new StringBuilder(displayName.Length);
@@ -78,8 +74,6 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
 
 /// <summary>
 /// Resolves editor-facing Laser Beam visual preset selector options and formula constants from authored visual presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerLaserBeamVisualPresetEditorUtility
 {
@@ -93,9 +87,9 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
     #region Public Methods
     /// <summary>
     /// Checks whether the provided property should behave as a Laser Beam visual preset selector.
-    /// /params property Serialized property to inspect.
-    /// /returns True when the property is the Laser Beam visual preset selector field.
     /// </summary>
+    /// <param name="property">Serialized property to inspect.</param>
+    /// <returns>True when the property is the Laser Beam visual preset selector field.</returns>
     public static bool IsSelectorProperty(SerializedProperty property)
     {
         if (property == null)
@@ -112,9 +106,8 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
 
     /// <summary>
     /// Builds the merged selector options currently authored across all PlayerVisualPreset assets in the project.
-    /// /params None.
-    /// /returns Stable ID-sorted visual preset options.
     /// </summary>
+    /// <returns>Stable ID-sorted visual preset options.</returns>
     public static List<PlayerLaserBeamVisualPresetEditorOption> BuildOptions()
     {
         Dictionary<int, PlayerLaserBeamVisualPresetEditorOption> optionsById = new Dictionary<int, PlayerLaserBeamVisualPresetEditorOption>();
@@ -170,10 +163,10 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
 
     /// <summary>
     /// Resolves the current popup index for one stable preset ID.
-    /// /params options Available selector options.
-    /// /params stableId Current stable preset ID.
-    /// /returns Matching option index, or -1 when the ID is not present.
     /// </summary>
+    /// <param name="options">Available selector options.</param>
+    /// <param name="stableId">Current stable preset ID.</param>
+    /// <returns>Matching option index, or -1 when the ID is not present.</returns>
     public static int ResolveSelectedIndex(IReadOnlyList<PlayerLaserBeamVisualPresetEditorOption> options, int stableId)
     {
         if (options == null)
@@ -192,9 +185,9 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
 
     /// <summary>
     /// Builds the helper text that exposes formula tokens for Laser Beam visual preset selectors.
-    /// /params options Available selector options.
-    /// /returns Compact helper text line for Add Scaling.
     /// </summary>
+    /// <param name="options">Available selector options.</param>
+    /// <returns>Compact helper text line for Add Scaling.</returns>
     public static string BuildHelperText(IReadOnlyList<PlayerLaserBeamVisualPresetEditorOption> options)
     {
         if (options == null || options.Count <= 0)
@@ -219,11 +212,11 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
 
     /// <summary>
     /// Normalizes bracket tokens such as [ElectricAzure] into stable numeric IDs for Laser Beam visual preset selector formulas.
-    /// /params formula Raw designer-authored formula.
-    /// /params property Serialized selector property.
-    /// /params allowedVariables Known scalable-stat variables that must preserve bracket syntax.
-    /// /returns Formula normalized for validation and bake-time/runtime evaluation.
     /// </summary>
+    /// <param name="formula">Raw designer-authored formula.</param>
+    /// <param name="property">Serialized selector property.</param>
+    /// <param name="allowedVariables">Known scalable-stat variables that must preserve bracket syntax.</param>
+    /// <returns>Formula normalized for validation and bake-time/runtime evaluation.</returns>
     public static string NormalizeFormulaTokens(string formula,
                                                 SerializedProperty property,
                                                 ISet<string> allowedVariables)
@@ -286,11 +279,11 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
     #region Private Methods
     /// <summary>
     /// Resolves one bracket token into a stable Laser Beam visual preset ID.
-    /// /params token Raw bracket token without surrounding brackets.
-    /// /params options Available visual preset options.
-    /// /params stableId Resolved stable preset ID when successful.
-    /// /returns True when the token maps to a valid visual preset ID.
     /// </summary>
+    /// <param name="token">Raw bracket token without surrounding brackets.</param>
+    /// <param name="options">Available visual preset options.</param>
+    /// <param name="stableId">Resolved stable preset ID when successful.</param>
+    /// <returns>True when the token maps to a valid visual preset ID.</returns>
     private static bool TryResolvePresetId(string token,
                                            IReadOnlyList<PlayerLaserBeamVisualPresetEditorOption> options,
                                            out int stableId)
@@ -326,10 +319,10 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
 
     /// <summary>
     /// Resolves legacy palette enum names into their compatible stable visual preset IDs.
-    /// /params token Legacy palette enum token.
-    /// /params stableId Resolved stable preset ID when successful.
-    /// /returns True when the token matches one known legacy palette name.
     /// </summary>
+    /// <param name="token">Legacy palette enum token.</param>
+    /// <param name="stableId">Resolved stable preset ID when successful.</param>
+    /// <returns>True when the token matches one known legacy palette name.</returns>
     private static bool TryResolveLegacyPresetId(string token, out int stableId)
     {
         stableId = 0;

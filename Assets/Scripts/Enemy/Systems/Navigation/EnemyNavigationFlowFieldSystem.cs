@@ -24,9 +24,8 @@ public partial struct EnemyNavigationFlowFieldSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Creates the shared navigation singleton and required queries.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         navigationEntity = state.EntityManager.CreateEntity();
@@ -62,9 +61,8 @@ public partial struct EnemyNavigationFlowFieldSystem : ISystem
 
     /// <summary>
     /// Rebuilds the static navigation grid when wall geometry changes and refreshes the flow field as the player moves across cells.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         if (!state.EntityManager.Exists(navigationEntity))
@@ -137,8 +135,8 @@ public partial struct EnemyNavigationFlowFieldSystem : ISystem
     #region Helpers
     /// <summary>
     /// Resolves the largest baked enemy wall-navigation radius currently available in the world.
-    /// returns Largest body-plus-wall-distance radius used to size the shared navigation clearance.
     /// </summary>
+    /// <returns>Largest body-plus-wall-distance radius used to size the shared navigation clearance.</returns>
     private float ResolveMaximumNavigationRadius()
     {
         float maximumNavigationRadius = 0.55f;

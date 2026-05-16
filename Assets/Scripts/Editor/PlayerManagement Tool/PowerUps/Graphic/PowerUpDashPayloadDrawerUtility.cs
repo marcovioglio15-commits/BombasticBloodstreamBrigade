@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the scaling-aware Dash payload UI shared by modules, overrides, and legacy active-tool drawers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PowerUpDashPayloadDrawerUtility
 {
@@ -16,10 +14,9 @@ public static class PowerUpDashPayloadDrawerUtility
     #region Public Methods
     /// <summary>
     /// Adds Dash controls, Add Scaling buttons, contextual visibility and non-mutating warnings to the provided container.
-    /// /params payloadContainer Container that receives Dash controls.
-    /// /params dashPayloadProperty Serialized DashToolData payload.
-    /// /returns None.
     /// </summary>
+    /// <param name="payloadContainer">Container that receives Dash controls.</param>
+    /// <param name="dashPayloadProperty">Serialized DashToolData payload.</param>
     public static void BuildDashPayloadUi(VisualElement payloadContainer, SerializedProperty dashPayloadProperty)
     {
         if (payloadContainer == null || dashPayloadProperty == null)
@@ -101,10 +98,9 @@ public static class PowerUpDashPayloadDrawerUtility
     #region Visibility
     /// <summary>
     /// Shows or hides one dependent Dash options group from a serialized boolean toggle.
-    /// /params toggleProperty Serialized boolean toggle controlling the section.
-    /// /params container Visual section shown only when the toggle is enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="toggleProperty">Serialized boolean toggle controlling the section.</param>
+    /// <param name="container">Visual section shown only when the toggle is enabled.</param>
     private static void UpdateBooleanContainerVisibility(SerializedProperty toggleProperty, VisualElement container)
     {
         if (container == null)
@@ -123,16 +119,15 @@ public static class PowerUpDashPayloadDrawerUtility
     #region Warnings
     /// <summary>
     /// Refreshes validation warnings for Dash payload fields without mutating serialized values.
-    /// /params distanceProperty Serialized Distance field.
-    /// /params durationProperty Serialized Duration field.
-    /// /params speedTransitionInSecondsProperty Serialized transition-in field.
-    /// /params speedTransitionOutSecondsProperty Serialized transition-out field.
-    /// /params wallBounceIntensityProperty Serialized wall bounce intensity field.
-    /// /params grantsInvulnerabilityProperty Serialized invulnerability toggle.
-    /// /params invulnerabilityExtraTimeProperty Serialized post-dash invulnerability field.
-    /// /params warningBox HelpBox receiving the current warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="distanceProperty">Serialized Distance field.</param>
+    /// <param name="durationProperty">Serialized Duration field.</param>
+    /// <param name="speedTransitionInSecondsProperty">Serialized transition-in field.</param>
+    /// <param name="speedTransitionOutSecondsProperty">Serialized transition-out field.</param>
+    /// <param name="wallBounceIntensityProperty">Serialized wall bounce intensity field.</param>
+    /// <param name="grantsInvulnerabilityProperty">Serialized invulnerability toggle.</param>
+    /// <param name="invulnerabilityExtraTimeProperty">Serialized post-dash invulnerability field.</param>
+    /// <param name="warningBox">HelpBox receiving the current warning text.</param>
     private static void RefreshDashWarnings(SerializedProperty distanceProperty,
                                             SerializedProperty durationProperty,
                                             SerializedProperty speedTransitionInSecondsProperty,
@@ -190,17 +185,16 @@ public static class PowerUpDashPayloadDrawerUtility
 
     /// <summary>
     /// Registers serialized-property watchers that refresh Dash warnings after field edits.
-    /// /params payloadContainer Root payload element used to observe serialized-property changes.
-    /// /params distanceProperty Serialized Distance field.
-    /// /params durationProperty Serialized Duration field.
-    /// /params speedTransitionInSecondsProperty Serialized transition-in field.
-    /// /params speedTransitionOutSecondsProperty Serialized transition-out field.
-    /// /params wallBounceIntensityProperty Serialized wall bounce intensity field.
-    /// /params grantsInvulnerabilityProperty Serialized invulnerability toggle.
-    /// /params invulnerabilityExtraTimeProperty Serialized post-dash invulnerability field.
-    /// /params warningBox HelpBox receiving the current warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="payloadContainer">Root payload element used to observe serialized-property changes.</param>
+    /// <param name="distanceProperty">Serialized Distance field.</param>
+    /// <param name="durationProperty">Serialized Duration field.</param>
+    /// <param name="speedTransitionInSecondsProperty">Serialized transition-in field.</param>
+    /// <param name="speedTransitionOutSecondsProperty">Serialized transition-out field.</param>
+    /// <param name="wallBounceIntensityProperty">Serialized wall bounce intensity field.</param>
+    /// <param name="grantsInvulnerabilityProperty">Serialized invulnerability toggle.</param>
+    /// <param name="invulnerabilityExtraTimeProperty">Serialized post-dash invulnerability field.</param>
+    /// <param name="warningBox">HelpBox receiving the current warning text.</param>
     private static void RegisterDashWarningRefresh(VisualElement payloadContainer,
                                                    SerializedProperty distanceProperty,
                                                    SerializedProperty durationProperty,
@@ -233,11 +227,10 @@ public static class PowerUpDashPayloadDrawerUtility
 
     /// <summary>
     /// Registers one warning refresh callback for every provided Dash payload property.
-    /// /params payloadContainer Root payload element used to observe serialized-property changes.
-    /// /params refreshWarnings Callback that recomputes current warning text.
-    /// /params watchedProperties Serialized fields that should trigger warning refreshes.
-    /// /returns None.
     /// </summary>
+    /// <param name="payloadContainer">Root payload element used to observe serialized-property changes.</param>
+    /// <param name="refreshWarnings">Callback that recomputes current warning text.</param>
+    /// <param name="watchedProperties">Serialized fields that should trigger warning refreshes.</param>
     private static void RegisterDashWarningRefresh(VisualElement payloadContainer,
                                                    Action refreshWarnings,
                                                    params SerializedProperty[] watchedProperties)

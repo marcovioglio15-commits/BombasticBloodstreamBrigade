@@ -19,7 +19,7 @@ public sealed class PlayerMilestonePowerUpUnlockDefinitionPropertyDrawer : Prope
     /// Builds the UI Toolkit inspector for one milestone power-up extraction definition.
     /// </summary>
     /// <param name="property">Serialized milestone power-up extraction property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

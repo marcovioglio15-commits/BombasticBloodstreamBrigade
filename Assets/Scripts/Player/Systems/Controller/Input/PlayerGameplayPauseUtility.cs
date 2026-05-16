@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Centralizes the hard-pause check used by gameplay ECS systems that must freeze their mutable runtime state while UI owns the simulation.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerGameplayPauseUtility
 {
@@ -18,9 +16,8 @@ internal static class PlayerGameplayPauseUtility
     #region Public Methods
     /// <summary>
     /// Resolves whether gameplay is currently under a hard pause driven by UI or end-of-run flows.
-    /// /params None.
-    /// /returns True when simulation-facing gameplay state must remain frozen for the current frame.
     /// </summary>
+    /// <returns>True when simulation-facing gameplay state must remain frozen for the current frame.</returns>
     public static bool IsHardGameplayPauseActive()
     {
         return IsTimeScaleHardPaused() || GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldGameplay();
@@ -28,9 +25,8 @@ internal static class PlayerGameplayPauseUtility
 
     /// <summary>
     /// Resolves whether Unity's scaled time is paused, without treating scene transitions as a pause by itself.
-    /// /params None.
-    /// /returns True when Time.timeScale is effectively zero.
     /// </summary>
+    /// <returns>True when Time.timeScale is effectively zero.</returns>
     public static bool IsTimeScaleHardPaused()
     {
         return Time.timeScale <= HardPauseTimeScaleThreshold;
@@ -38,9 +34,9 @@ internal static class PlayerGameplayPauseUtility
 
     /// <summary>
     /// Resolves whether a finalized run outcome should freeze presentation systems that would otherwise move during transition fade-out.
-    /// /params runOutcomeQuery Query selecting local player run outcome state.
-    /// /returns True when at least one player run outcome is finalized.
     /// </summary>
+    /// <param name="runOutcomeQuery">Query selecting local player run outcome state.</param>
+    /// <returns>True when at least one player run outcome is finalized.</returns>
     public static bool IsFinalizedRunOutcomeActive(EntityQuery runOutcomeQuery)
     {
         if (runOutcomeQuery.IsEmptyIgnoreFilter)

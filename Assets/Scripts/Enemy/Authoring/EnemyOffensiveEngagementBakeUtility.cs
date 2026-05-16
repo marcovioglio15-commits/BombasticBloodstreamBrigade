@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Compiles offensive engagement feedback settings from the active shared pattern and visual preset into ECS runtime buffers.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyOffensiveEngagementBakeUtility
 {
@@ -18,10 +16,9 @@ internal static class EnemyOffensiveEngagementBakeUtility
     #region Public Methods
     /// <summary>
     /// Appends every supported offensive engagement feedback configuration for the currently selected shared pattern.
-    /// /params authoring Enemy authoring component that resolves visual and advanced-pattern presets.
-    /// /params configs Target dynamic buffer populated during bake.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Enemy authoring component that resolves visual and advanced-pattern presets.</param>
+    /// <param name="configs">Target dynamic buffer populated during bake.</param>
     public static void AppendConfigs(EnemyAuthoring authoring, DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs)
     {
         if (authoring == null)
@@ -53,12 +50,12 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Builds one short-range offensive engagement config from an explicit pattern assemble slot.
-    /// /params interaction Short-range interaction slot being compiled.
-    /// /params sharedPreset Shared source preset used to resolve the selected module kind.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params config Output baked offensive engagement config.
-    /// /returns True when the slot exposes a supported predictive warning config.
     /// </summary>
+    /// <param name="interaction">Short-range interaction slot being compiled.</param>
+    /// <param name="sharedPreset">Shared source preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="config">Output baked offensive engagement config.</param>
+    /// <returns>True when the slot exposes a supported predictive warning config.</returns>
     internal static bool TryBuildShortRangeConfig(EnemyPatternShortRangeInteractionAssembly interaction,
                                                   EnemyModulesAndPatternsPreset sharedPreset,
                                                   EnemyOffensiveEngagementFeedbackSettings globalSettings,
@@ -86,12 +83,12 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Builds one weapon offensive engagement config from an explicit pattern assemble slot.
-    /// /params interaction Weapon interaction slot being compiled.
-    /// /params sharedPreset Shared source preset used to resolve the selected module kind.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params config Output baked offensive engagement config.
-    /// /returns True when the slot exposes a supported predictive warning config.
     /// </summary>
+    /// <param name="interaction">Weapon interaction slot being compiled.</param>
+    /// <param name="sharedPreset">Shared source preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="config">Output baked offensive engagement config.</param>
+    /// <returns>True when the slot exposes a supported predictive warning config.</returns>
     internal static bool TryBuildWeaponConfig(EnemyPatternWeaponInteractionAssembly interaction,
                                               EnemyModulesAndPatternsPreset sharedPreset,
                                               EnemyOffensiveEngagementFeedbackSettings globalSettings,
@@ -121,12 +118,11 @@ internal static class EnemyOffensiveEngagementBakeUtility
     #region Private Methods
     /// <summary>
     /// Appends the short-range offensive engagement feedback configuration when the selected module kind supports timing prediction.
-    /// /params pattern Selected shared pattern definition.
-    /// /params sharedPreset Shared preset used to resolve the selected module kind.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params configs Target dynamic buffer populated during bake.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Selected shared pattern definition.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="configs">Target dynamic buffer populated during bake.</param>
     private static void AppendShortRangeConfig(EnemyModulesPatternDefinition pattern,
                                                EnemyModulesAndPatternsPreset sharedPreset,
                                                EnemyOffensiveEngagementFeedbackSettings globalSettings,
@@ -145,12 +141,11 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Appends the weapon offensive engagement feedback configuration when the selected module kind supports timing prediction.
-    /// /params pattern Selected shared pattern definition.
-    /// /params sharedPreset Shared preset used to resolve the selected module kind.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params configs Target dynamic buffer populated during bake.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Selected shared pattern definition.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="configs">Target dynamic buffer populated during bake.</param>
     private static void AppendWeaponConfig(EnemyModulesPatternDefinition pattern,
                                            EnemyModulesAndPatternsPreset sharedPreset,
                                            EnemyOffensiveEngagementFeedbackSettings globalSettings,
@@ -169,11 +164,11 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Resolves the authored feedback settings block that should be baked for the current interaction.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params useOverrideSettings True when the interaction-specific override is enabled.
-    /// /params overrideSettings Optional interaction-specific override settings.
-    /// /returns The settings block that should be baked.
     /// </summary>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="useOverrideSettings">True when the interaction-specific override is enabled.</param>
+    /// <param name="overrideSettings">Optional interaction-specific override settings.</param>
+    /// <returns>The settings block that should be baked.</returns>
     private static EnemyOffensiveEngagementFeedbackSettings ResolveSettings(EnemyOffensiveEngagementFeedbackSettings globalSettings,
                                                                             bool useOverrideSettings,
                                                                             EnemyOffensiveEngagementFeedbackSettings overrideSettings)
@@ -189,16 +184,16 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Resolves one module binding and authored feedback block into a baked offensive engagement config.
-    /// /params binding Module binding being compiled.
-    /// /params sharedPreset Shared source preset used to resolve the selected module kind.
-    /// /params globalSettings Generic visual feedback settings resolved from the visual preset.
-    /// /params useOverrideSettings True when the interaction-specific override is enabled.
-    /// /params overrideSettings Optional interaction-specific override settings.
-    /// /params section Source module catalog section.
-    /// /params source Interaction source currently being compiled.
-    /// /params config Output baked offensive engagement config.
-    /// /returns True when a supported and visible config was produced.
     /// </summary>
+    /// <param name="binding">Module binding being compiled.</param>
+    /// <param name="sharedPreset">Shared source preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="useOverrideSettings">True when the interaction-specific override is enabled.</param>
+    /// <param name="overrideSettings">Optional interaction-specific override settings.</param>
+    /// <param name="section">Source module catalog section.</param>
+    /// <param name="source">Interaction source currently being compiled.</param>
+    /// <param name="config">Output baked offensive engagement config.</param>
+    /// <returns>True when a supported and visible config was produced.</returns>
     private static bool TryBuildConfig(EnemyPatternModuleBinding binding,
                                        EnemyModulesAndPatternsPreset sharedPreset,
                                        EnemyOffensiveEngagementFeedbackSettings globalSettings,
@@ -232,13 +227,13 @@ internal static class EnemyOffensiveEngagementBakeUtility
 
     /// <summary>
     /// Converts one authored settings block into a baked offensive engagement buffer entry.
-    /// /params source Interaction source currently being compiled.
-    /// /params timingMode Supported timing model used to predict the behaviour commit.
-    /// /params useOverrideVisualSettings True when the interaction-specific override provided the baked settings.
-    /// /params settings Resolved authored settings block.
-    /// /params config Output baked offensive engagement config.
-    /// /returns True when the settings expose at least one visible feedback channel.
     /// </summary>
+    /// <param name="source">Interaction source currently being compiled.</param>
+    /// <param name="timingMode">Supported timing model used to predict the behaviour commit.</param>
+    /// <param name="useOverrideVisualSettings">True when the interaction-specific override provided the baked settings.</param>
+    /// <param name="settings">Resolved authored settings block.</param>
+    /// <param name="config">Output baked offensive engagement config.</param>
+    /// <returns>True when the settings expose at least one visible feedback channel.</returns>
     private static bool TryCreateConfig(EnemyOffensiveEngagementTriggerSource source,
                                         EnemyOffensiveEngagementTimingMode timingMode,
                                         bool useOverrideVisualSettings,

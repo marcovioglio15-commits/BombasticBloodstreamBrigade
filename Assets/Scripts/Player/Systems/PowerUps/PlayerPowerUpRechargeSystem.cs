@@ -146,11 +146,11 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
 
     /// <summary>
     /// Checks whether a slot crossed its activation energy requirement during the current recharge pass.
-    /// /params previousEnergy Energy value before recharge.
-    /// /params currentEnergy Energy value after recharge.
-    /// /params slotConfig Runtime slot config used to resolve activation threshold.
-    /// /returns True when the threshold was crossed this frame.
     /// </summary>
+    /// <param name="previousEnergy">Energy value before recharge.</param>
+    /// <param name="currentEnergy">Energy value after recharge.</param>
+    /// <param name="slotConfig">Runtime slot config used to resolve activation threshold.</param>
+    /// <returns>True when the threshold was crossed this frame.</returns>
     private static bool DidReachEnergyRequirement(float previousEnergy, float currentEnergy, in PlayerPowerUpSlotConfig slotConfig)
     {
         if (slotConfig.IsDefined == 0)

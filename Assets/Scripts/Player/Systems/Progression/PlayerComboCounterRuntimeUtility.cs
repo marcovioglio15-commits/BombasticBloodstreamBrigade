@@ -4,7 +4,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Centralizes combo-rank resolution, time-based decay, HUD presentation data, and runtime-scaling signatures.
 /// none.
-/// returns none.
 /// </summary>
 internal static class PlayerComboCounterRuntimeUtility
 {
@@ -18,11 +17,11 @@ internal static class PlayerComboCounterRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Resolves the highest currently active combo rank from the current runtime combo value.
-    /// comboValue: Current combo numeric value.
-    /// runtimeConfig: Current runtime combo config.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns Highest active rank index, or -1 when no rank is active.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="runtimeConfig">Current runtime combo config.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Highest active rank index, or -1 when no rank is active.</returns>
     public static int ResolveActiveRankIndex(int comboValue,
                                              in PlayerRuntimeComboCounterConfig runtimeConfig,
                                              DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
@@ -57,11 +56,10 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Updates cached combo HUD data from the latest runtime combo config, thresholds, and combo value.
-    /// comboCounterState: Mutable combo runtime state receiving presentation fields.
-    /// runtimeConfig: Current runtime combo config.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns void.
     /// </summary>
+    /// <param name="comboCounterState">Mutable combo runtime state receiving presentation fields.</param>
+    /// <param name="runtimeConfig">Current runtime combo config.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
     public static void UpdatePresentation(ref PlayerComboCounterState comboCounterState,
                                           in PlayerRuntimeComboCounterConfig runtimeConfig,
                                           DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
@@ -108,11 +106,11 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves the combo value that should remain after a damage event breaks the current combo.
-    /// comboValue: Current combo numeric value before the break.
-    /// runtimeConfig: Current runtime combo config.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns Combo value preserved after the configured damage-break behavior.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value before the break.</param>
+    /// <param name="runtimeConfig">Current runtime combo config.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Combo value preserved after the configured damage-break behavior.</returns>
     public static int ResolveDamageBreakComboValue(int comboValue,
                                                    in PlayerRuntimeComboCounterConfig runtimeConfig,
                                                    DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
@@ -129,12 +127,11 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Applies point decay over time using the currently active combo rank and keeps fractional loss in the combo state carry.
-    /// comboCounterState: Mutable combo runtime state receiving the updated combo value and fractional decay carry.
-    /// runtimeConfig: Current runtime combo config.
-    /// runtimeRanks: Current runtime combo-rank thresholds and decay rates.
-    /// deltaTime: Frame delta time in seconds.
-    /// returns void.
     /// </summary>
+    /// <param name="comboCounterState">Mutable combo runtime state receiving the updated combo value and fractional decay carry.</param>
+    /// <param name="runtimeConfig">Current runtime combo config.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds and decay rates.</param>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
     public static void ApplyRankDecay(ref PlayerComboCounterState comboCounterState,
                                       in PlayerRuntimeComboCounterConfig runtimeConfig,
                                       DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
@@ -230,10 +227,10 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Combines the permanent scalable-stat signature with the currently active combo-rank signature used by runtime bonuses.
-    /// scalableStatsHash: Hash built from permanent scalable stats.
-    /// activeRankIndex: Currently active combo-rank index, or -1 when no combo bonus is active.
-    /// returns Combined runtime-scaling signature.
     /// </summary>
+    /// <param name="scalableStatsHash">Hash built from permanent scalable stats.</param>
+    /// <param name="activeRankIndex">Currently active combo-rank index, or -1 when no combo bonus is active.</param>
+    /// <returns>Combined runtime-scaling signature.</returns>
     public static uint ComputeRuntimeScalingHash(uint scalableStatsHash, int activeRankIndex)
     {
         uint sanitizedActiveRankSignature = (uint)(math.max(-1, activeRankIndex) + 1);
@@ -242,12 +239,12 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Combines the permanent scalable-stat signature with combo rank and progressive boost progress signatures.
-    /// /params scalableStatsHash Hash built from permanent scalable stats.
-    /// /params activeRankIndex Currently active combo-rank index, or -1 when no combo bonus is active.
-    /// /params comboValue Current combo value used only when the next rank exposes progressive boost.
-    /// /params runtimeRanks Current runtime combo-rank thresholds and progressive boost settings.
-    /// /returns Combined runtime-scaling signature.
     /// </summary>
+    /// <param name="scalableStatsHash">Hash built from permanent scalable stats.</param>
+    /// <param name="activeRankIndex">Currently active combo-rank index, or -1 when no combo bonus is active.</param>
+    /// <param name="comboValue">Current combo value used only when the next rank exposes progressive boost.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds and progressive boost settings.</param>
+    /// <returns>Combined runtime-scaling signature.</returns>
     public static uint ComputeRuntimeScalingHash(uint scalableStatsHash,
                                                  int activeRankIndex,
                                                  int comboValue,
@@ -272,12 +269,12 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves normalized progress from the previous rank threshold toward the requested target rank.
-    /// /params comboValue Current combo numeric value.
-    /// /params activeRankIndex Currently active combo-rank index, or -1 before the first rank.
-    /// /params targetRankIndex Rank whose bonuses are being progressively approached.
-    /// /params runtimeRanks Current runtime combo-rank thresholds.
-    /// /returns Normalized progress in the 0..1 range.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="activeRankIndex">Currently active combo-rank index, or -1 before the first rank.</param>
+    /// <param name="targetRankIndex">Rank whose bonuses are being progressively approached.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Normalized progress in the 0..1 range.</returns>
     public static float ResolveProgressToRank(int comboValue,
                                               int activeRankIndex,
                                               int targetRankIndex,
@@ -311,10 +308,10 @@ internal static class PlayerComboCounterRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Resolves the next unreached rank threshold after the current combo value.
-    /// comboValue: Current combo numeric value.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns Next unreached rank index, or -1 when the top rank is already active.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Next unreached rank index, or -1 when the top rank is already active.</returns>
     private static int ResolveNextRankIndex(int comboValue,
                                             DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
     {
@@ -335,10 +332,10 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves the threshold that should remain when damage downgrades the combo to the previous reached rank.
-    /// activeRankIndex: Highest rank currently reached before the break.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns Previous-rank threshold, or zero when no lower rank exists.
     /// </summary>
+    /// <param name="activeRankIndex">Highest rank currently reached before the break.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Previous-rank threshold, or zero when no lower rank exists.</returns>
     private static int ResolvePreviousRankRequiredValue(int activeRankIndex,
                                                         DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
     {
@@ -359,11 +356,11 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves how many integer combo points must be lost before the currently active rank stops being active.
-    /// comboValue: Current combo numeric value.
-    /// activeRankIndex: Highest rank currently active before the decay step.
-    /// runtimeRanks: Current runtime combo-rank thresholds.
-    /// returns Integer point loss required to leave the current rank.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="activeRankIndex">Highest rank currently active before the decay step.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
+    /// <returns>Integer point loss required to leave the current rank.</returns>
     private static int ResolvePointsToLeaveCurrentRank(int comboValue,
                                                        int activeRankIndex,
                                                        in PlayerRuntimeComboCounterConfig runtimeConfig,
@@ -392,11 +389,11 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves whether decay should stop at the current rank threshold because the lower rank has no point decay.
-    /// /params activeRankIndex Current active rank index.
-    /// /params runtimeConfig Current runtime combo config.
-    /// /params runtimeRanks Current runtime combo-rank thresholds and decay rates.
-    /// /returns True when decay must preserve the current rank threshold.
     /// </summary>
+    /// <param name="activeRankIndex">Current active rank index.</param>
+    /// <param name="runtimeConfig">Current runtime combo config.</param>
+    /// <param name="runtimeRanks">Current runtime combo-rank thresholds and decay rates.</param>
+    /// <returns>True when decay must preserve the current rank threshold.</returns>
     private static bool ShouldPreserveCurrentRankFloor(int activeRankIndex,
                                                        in PlayerRuntimeComboCounterConfig runtimeConfig,
                                                        DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
@@ -417,12 +414,12 @@ internal static class PlayerComboCounterRuntimeUtility
 
     /// <summary>
     /// Resolves the normalized progress shown by the HUD bar for the current combo value.
-    /// comboValue: Current combo numeric value.
-    /// currentRankRequiredValue: Threshold of the currently active rank, or zero when none is active.
-    /// nextRankRequiredValue: Threshold of the next rank, or zero when already at the top rank.
-    /// hasActiveRank: True when at least one combo rank is active.
-    /// returns Normalized progress in the 0..1 range.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="currentRankRequiredValue">Threshold of the currently active rank, or zero when none is active.</param>
+    /// <param name="nextRankRequiredValue">Threshold of the next rank, or zero when already at the top rank.</param>
+    /// <param name="hasActiveRank">True when at least one combo rank is active.</param>
+    /// <returns>Normalized progress in the 0..1 range.</returns>
     private static float ResolveProgressNormalized(int comboValue,
                                                    int currentRankRequiredValue,
                                                    int nextRankRequiredValue,

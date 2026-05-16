@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Scriptable preset that stores FMOD-backed gameplay audio settings for the Game Management Tool.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "GameAudioManagerPreset", menuName = "Game/Audio Manager Preset", order = 20)]
 public sealed class GameAudioManagerPreset : ScriptableObject
@@ -121,8 +119,6 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Ensures required object references and a stable ID exist without clamping authored numeric values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void EnsureInitialized()
     {
@@ -145,8 +141,6 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     /// <summary>
     /// Rebuilds the event map with all supported default event descriptors.
     /// Existing FMOD paths are discarded and must be reauthored intentionally.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void ResetEventBindingsToDefaults()
     {
@@ -163,9 +157,8 @@ public sealed class GameAudioManagerPreset : ScriptableObject
 
     /// <summary>
     /// Adds missing default bindings while preserving existing authored FMOD paths and rate caps.
-    /// /params None.
-    /// /returns Number of bindings added to the preset.
     /// </summary>
+    /// <returns>Number of bindings added to the preset.</returns>
     public int EnsureDefaultEventBindings()
     {
         EnsureInitialized();
@@ -188,9 +181,8 @@ public sealed class GameAudioManagerPreset : ScriptableObject
 
     /// <summary>
     /// Updates identity text on existing default events without touching FMOD paths or authored mix values.
-    /// /params None.
-    /// /returns Number of bindings whose identity was synchronized.
     /// </summary>
+    /// <returns>Number of bindings whose identity was synchronized.</returns>
     public int SynchronizeDefaultEventIdentities()
     {
         EnsureInitialized();
@@ -217,8 +209,6 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Keeps required reference containers alive in the editor without changing authored tuning values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnValidate()
     {
@@ -229,9 +219,9 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     #region Private Methods
     /// <summary>
     /// Creates one default event binding and applies special default caps for dense events.
-    /// /params definition Event descriptor used to initialize identity fields.
-    /// /returns Created event binding.
     /// </summary>
+    /// <param name="definition">Event descriptor used to initialize identity fields.</param>
+    /// <returns>Created event binding.</returns>
     private static GameAudioEventBinding CreateDefaultBinding(GameAudioDefaultEventDefinition definition)
     {
         GameAudioEventBinding binding = new GameAudioEventBinding();
@@ -245,9 +235,9 @@ public sealed class GameAudioManagerPreset : ScriptableObject
 
     /// <summary>
     /// Checks whether the preset already has a binding for one event ID.
-    /// /params eventId Event identifier to search.
-    /// /returns True when a matching binding exists.
     /// </summary>
+    /// <param name="eventId">Event identifier to search.</param>
+    /// <returns>True when a matching binding exists.</returns>
     private bool ContainsBinding(GameAudioEventId eventId)
     {
         for (int index = 0; index < eventBindings.Count; index++)

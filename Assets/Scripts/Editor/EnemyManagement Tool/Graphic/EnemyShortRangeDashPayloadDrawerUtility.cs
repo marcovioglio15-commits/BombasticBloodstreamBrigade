@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the specialized short-range dash payload editor used by advanced-pattern drawers.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyShortRangeDashPayloadDrawerUtility
 {
@@ -16,10 +14,10 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
     #region Public Methods
     /// <summary>
     /// Builds the payload editor for the short-range dash module.
-    /// /params payloadDataProperty Serialized payload data root.
-    /// /params payloadContainer Target UI container.
-    /// /returns True when UI is built successfully.
     /// </summary>
+    /// <param name="payloadDataProperty">Serialized payload data root.</param>
+    /// <param name="payloadContainer">Target UI container.</param>
+    /// <returns>True when UI is built successfully.</returns>
     public static bool BuildShortRangeDashPayloadEditor(SerializedProperty payloadDataProperty, VisualElement payloadContainer)
     {
         SerializedProperty shortRangeDashProperty = payloadDataProperty.FindPropertyRelative("shortRangeDash");
@@ -179,11 +177,10 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
     #region Private Methods
     /// <summary>
     /// Updates distance-field visibility according to the selected travel distance source.
-    /// /params distanceSourceProperty Serialized distance source property.
-    /// /params playerDistanceContainer Container for player-distance controls.
-    /// /params fixedDistanceContainer Container for fixed-distance controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="distanceSourceProperty">Serialized distance source property.</param>
+    /// <param name="playerDistanceContainer">Container for player-distance controls.</param>
+    /// <param name="fixedDistanceContainer">Container for fixed-distance controls.</param>
     private static void UpdateDistanceSourceVisibility(SerializedProperty distanceSourceProperty,
                                                        VisualElement playerDistanceContainer,
                                                        VisualElement fixedDistanceContainer)
@@ -206,11 +203,11 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
 
     /// <summary>
     /// Collects non-destructive authoring warnings for the short-range dash payload.
-    /// /params aimProperty Serialized aim payload property.
-    /// /params distanceProperty Serialized distance payload property.
-    /// /params pathProperty Serialized path payload property.
-    /// /returns Ordered warning list.
     /// </summary>
+    /// <param name="aimProperty">Serialized aim payload property.</param>
+    /// <param name="distanceProperty">Serialized distance payload property.</param>
+    /// <param name="pathProperty">Serialized path payload property.</param>
+    /// <returns>Ordered warning list.</returns>
     private static List<string> CollectWarnings(SerializedProperty aimProperty,
                                                 SerializedProperty recoveryProperty,
                                                 SerializedProperty distanceProperty,
@@ -268,10 +265,9 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
 
     /// <summary>
     /// Adds authoring warnings for the forward progression curve.
-    /// /params forwardProgressCurve Authored forward progression curve.
-    /// /params warnings Mutable warning list.
-    /// /returns None.
     /// </summary>
+    /// <param name="forwardProgressCurve">Authored forward progression curve.</param>
+    /// <param name="warnings">Mutable warning list.</param>
     private static void AddForwardCurveWarnings(AnimationCurve forwardProgressCurve, List<string> warnings)
     {
         if (forwardProgressCurve == null || warnings == null)
@@ -289,10 +285,9 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
 
     /// <summary>
     /// Adds authoring warnings for the lateral offset curve.
-    /// /params lateralOffsetCurve Authored lateral offset curve.
-    /// /params warnings Mutable warning list.
-    /// /returns None.
     /// </summary>
+    /// <param name="lateralOffsetCurve">Authored lateral offset curve.</param>
+    /// <param name="warnings">Mutable warning list.</param>
     private static void AddLateralCurveWarnings(AnimationCurve lateralOffsetCurve, List<string> warnings)
     {
         if (lateralOffsetCurve == null || warnings == null)

@@ -8,8 +8,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Owns Addressables scene load handles so additive scenes can be unloaded and released through Addressables.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneAddressablesRuntimeUtility
 {
@@ -22,10 +20,10 @@ internal static class GameSceneAddressablesRuntimeUtility
     #region Load
     /// <summary>
     /// Starts loading one scene through Addressables using the authored addressable key.
-    /// /params sceneDefinition Scene definition being loaded.
-    /// /params operationState Mutable operation state receiving the Addressables handle.
-    /// /returns True when an Addressables operation was started.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being loaded.</param>
+    /// <param name="operationState">Mutable operation state receiving the Addressables handle.</param>
+    /// <returns>True when an Addressables operation was started.</returns>
     public static bool TryStartLoad(GameSceneDefinitionElement sceneDefinition, ref GameSceneSceneOperationState operationState)
     {
         string loadKey = ResolveLoadKey(sceneDefinition);
@@ -52,11 +50,11 @@ internal static class GameSceneAddressablesRuntimeUtility
 
     /// <summary>
     /// Finalizes an Addressables load operation and stores its handle for future unload/release.
-    /// /params sceneDefinition Scene definition that completed loading.
-    /// /params handle Completed Addressables scene load handle.
-    /// /params setActiveScene True when the loaded scene should become Unity's active scene.
-    /// /returns True when the scene loaded successfully.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition that completed loading.</param>
+    /// <param name="handle">Completed Addressables scene load handle.</param>
+    /// <param name="setActiveScene">True when the loaded scene should become Unity's active scene.</param>
+    /// <returns>True when the scene loaded successfully.</returns>
     public static bool CompleteLoad(GameSceneDefinitionElement sceneDefinition,
                                     AsyncOperationHandle<SceneInstance> handle,
                                     bool setActiveScene)
@@ -81,10 +79,10 @@ internal static class GameSceneAddressablesRuntimeUtility
     #region Unload
     /// <summary>
     /// Starts unloading a previously Addressables-loaded scene and transfers release ownership to Addressables.
-    /// /params sceneDefinition Scene definition being unloaded.
-    /// /params operationState Mutable operation state receiving the Addressables unload handle.
-    /// /returns True when an Addressables unload operation was started.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being unloaded.</param>
+    /// <param name="operationState">Mutable operation state receiving the Addressables unload handle.</param>
+    /// <returns>True when an Addressables unload operation was started.</returns>
     public static bool TryStartUnload(GameSceneDefinitionElement sceneDefinition, ref GameSceneSceneOperationState operationState)
     {
         if (!TryGetLoadedHandle(sceneDefinition.SceneId, out AsyncOperationHandle<SceneInstance> handle))
@@ -97,10 +95,10 @@ internal static class GameSceneAddressablesRuntimeUtility
 
     /// <summary>
     /// Finalizes an Addressables unload operation and clears the cached load handle.
-    /// /params sceneId Stable Scene Manager scene ID that was unloaded.
-    /// /params handle Completed Addressables scene unload handle.
-    /// /returns True when the unload operation completed successfully.
     /// </summary>
+    /// <param name="sceneId">Stable Scene Manager scene ID that was unloaded.</param>
+    /// <param name="handle">Completed Addressables scene unload handle.</param>
+    /// <returns>True when the unload operation completed successfully.</returns>
     public static bool CompleteUnload(FixedString64Bytes sceneId, AsyncOperationHandle<SceneInstance> handle)
     {
         string sceneIdText = sceneId.ToString();
@@ -124,10 +122,10 @@ internal static class GameSceneAddressablesRuntimeUtility
     #region Lookup
     /// <summary>
     /// Resolves whether the scene has an active Addressables load handle.
-    /// /params sceneId Stable Scene Manager scene ID.
-    /// /params handle Cached load handle when available.
-    /// /returns True when an active Addressables handle is known for the scene.
     /// </summary>
+    /// <param name="sceneId">Stable Scene Manager scene ID.</param>
+    /// <param name="handle">Cached load handle when available.</param>
+    /// <returns>True when an active Addressables handle is known for the scene.</returns>
     public static bool TryGetLoadedHandle(FixedString64Bytes sceneId, out AsyncOperationHandle<SceneInstance> handle)
     {
         handle = default;
@@ -142,9 +140,9 @@ internal static class GameSceneAddressablesRuntimeUtility
     #region Helpers
     /// <summary>
     /// Resolves the Addressables key used for scene loading.
-    /// /params sceneDefinition Scene definition being loaded.
-    /// /returns Authored Addressables key or an empty string when missing.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being loaded.</param>
+    /// <returns>Authored Addressables key or an empty string when missing.</returns>
     private static string ResolveLoadKey(GameSceneDefinitionElement sceneDefinition)
     {
         string addressableKey = sceneDefinition.AddressableKey.ToString();
@@ -157,9 +155,8 @@ internal static class GameSceneAddressablesRuntimeUtility
 
     /// <summary>
     /// Sets a loaded scene active when Unity reports a valid scene instance.
-    /// /params scene Loaded Unity scene.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Loaded Unity scene.</param>
     private static void TrySetSceneActive(Scene scene)
     {
         if (scene.IsValid() && scene.isLoaded)
@@ -168,9 +165,8 @@ internal static class GameSceneAddressablesRuntimeUtility
 
     /// <summary>
     /// Releases a failed Addressables load handle when it is still valid.
-    /// /params handle Failed Addressables scene load handle.
-    /// /returns None.
     /// </summary>
+    /// <param name="handle">Failed Addressables scene load handle.</param>
     private static void ReleaseFailedLoad(AsyncOperationHandle<SceneInstance> handle)
     {
         if (handle.IsValid())
@@ -179,8 +175,6 @@ internal static class GameSceneAddressablesRuntimeUtility
 
     /// <summary>
     /// Creates the handle dictionary on first use.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureHandleDictionary()
     {

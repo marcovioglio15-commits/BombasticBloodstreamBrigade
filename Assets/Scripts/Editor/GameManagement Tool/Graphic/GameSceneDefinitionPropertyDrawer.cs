@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// UI Toolkit drawer that keeps scene asset, path, GUID and build index metadata synchronized.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(GameSceneDefinition))]
 public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
@@ -17,9 +15,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
     #region UI
     /// <summary>
     /// Builds the scene definition editor UI.
-    /// /params property Serialized GameSceneDefinition property.
-    /// /returns Configured visual tree for the property.
     /// </summary>
+    /// <param name="property">Serialized GameSceneDefinition property.</param>
+    /// <returns>Configured visual tree for the property.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -47,10 +45,10 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Builds the editor-only SceneAsset field and synchronizes serialized runtime metadata on change.
-    /// /params property Serialized GameSceneDefinition property.
-    /// /params sceneAssetProperty Editor-only SceneAsset property.
-    /// /returns Configured object field.
     /// </summary>
+    /// <param name="property">Serialized GameSceneDefinition property.</param>
+    /// <param name="sceneAssetProperty">Editor-only SceneAsset property.</param>
+    /// <returns>Configured object field.</returns>
     private static VisualElement BuildSceneAssetField(SerializedProperty property, SerializedProperty sceneAssetProperty)
     {
         ObjectField field = new ObjectField("Scene Asset");
@@ -64,10 +62,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Adds the optional companion UI scene field only for scene kinds that can use additive UI separation.
-    /// /params root Parent visual element.
-    /// /params parentProperty Serialized GameSceneDefinition property.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Parent visual element.</param>
+    /// <param name="parentProperty">Serialized GameSceneDefinition property.</param>
     private static void AddCompanionUiProperty(VisualElement root, SerializedProperty parentProperty)
     {
         SerializedProperty companionProperty = parentProperty.FindPropertyRelative("companionUiSceneId");
@@ -89,10 +86,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Adds the Addressables key field only for Unity scenes loaded through the Addressables backend.
-    /// /params root Parent visual element.
-    /// /params parentProperty Serialized GameSceneDefinition property.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Parent visual element.</param>
+    /// <param name="parentProperty">Serialized GameSceneDefinition property.</param>
     private static void AddAddressableKeyProperty(VisualElement root, SerializedProperty parentProperty)
     {
         SerializedProperty addressableKeyProperty = parentProperty.FindPropertyRelative("addressableKey");
@@ -114,10 +110,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Applies contextual display state to the companion UI field from the current scene kind.
-    /// /params field Companion UI scene field visual element.
-    /// /params sceneKindProperty Serialized enum property driving visibility.
-    /// /returns None.
     /// </summary>
+    /// <param name="field">Companion UI scene field visual element.</param>
+    /// <param name="sceneKindProperty">Serialized enum property driving visibility.</param>
     private static void RefreshCompanionUiFieldVisibility(VisualElement field, SerializedProperty sceneKindProperty)
     {
         field.style.display = ShouldShowCompanionUiField(sceneKindProperty)
@@ -127,10 +122,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Applies contextual display state to the Addressables key field from the current scene kind.
-    /// /params field Addressables key field visual element.
-    /// /params sceneKindProperty Serialized enum property driving visibility.
-    /// /returns None.
     /// </summary>
+    /// <param name="field">Addressables key field visual element.</param>
+    /// <param name="sceneKindProperty">Serialized enum property driving visibility.</param>
     private static void RefreshAddressableKeyFieldVisibility(VisualElement field, SerializedProperty sceneKindProperty)
     {
         field.style.display = ShouldShowAddressableKeyField(sceneKindProperty)
@@ -140,9 +134,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves whether companion UI is useful for the current scene kind.
-    /// /params sceneKindProperty Serialized scene kind enum property.
-    /// /returns True when the companion UI field should be visible.
     /// </summary>
+    /// <param name="sceneKindProperty">Serialized scene kind enum property.</param>
+    /// <returns>True when the companion UI field should be visible.</returns>
     private static bool ShouldShowCompanionUiField(SerializedProperty sceneKindProperty)
     {
         if (sceneKindProperty == null)
@@ -162,9 +156,9 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves whether Addressables key editing is useful for the current scene kind.
-    /// /params sceneKindProperty Serialized scene kind enum property.
-    /// /returns True when Addressables key should be visible.
     /// </summary>
+    /// <param name="sceneKindProperty">Serialized scene kind enum property.</param>
+    /// <returns>True when Addressables key should be visible.</returns>
     private static bool ShouldShowAddressableKeyField(SerializedProperty sceneKindProperty)
     {
         if (sceneKindProperty == null)
@@ -185,12 +179,11 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Adds one property field with optional editing enabled.
-    /// /params root Parent visual element.
-    /// /params parentProperty Serialized GameSceneDefinition property.
-    /// /params propertyName Relative property name.
-    /// /params enabled True when the field should be editable.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Parent visual element.</param>
+    /// <param name="parentProperty">Serialized GameSceneDefinition property.</param>
+    /// <param name="propertyName">Relative property name.</param>
+    /// <param name="enabled">True when the field should be editable.</param>
     private static void AddProperty(VisualElement root, SerializedProperty parentProperty, string propertyName, bool enabled)
     {
         SerializedProperty childProperty = parentProperty.FindPropertyRelative(propertyName);
@@ -207,11 +200,10 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Synchronizes path, GUID, name and build index from a selected scene asset.
-    /// /params property Serialized GameSceneDefinition property.
-    /// /params sceneAssetProperty Editor-only SceneAsset property.
-    /// /params sceneAsset Selected scene asset.
-    /// /returns None.
     /// </summary>
+    /// <param name="property">Serialized GameSceneDefinition property.</param>
+    /// <param name="sceneAssetProperty">Editor-only SceneAsset property.</param>
+    /// <param name="sceneAsset">Selected scene asset.</param>
     private static void SynchronizeSceneAsset(SerializedProperty property, SerializedProperty sceneAssetProperty, SceneAsset sceneAsset)
     {
         property.serializedObject.Update();
@@ -244,11 +236,10 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Writes one string relative property when it exists.
-    /// /params parentProperty Parent serialized property.
-    /// /params propertyName Relative string property name.
-    /// /params value Value to write.
-    /// /returns None.
     /// </summary>
+    /// <param name="parentProperty">Parent serialized property.</param>
+    /// <param name="propertyName">Relative string property name.</param>
+    /// <param name="value">Value to write.</param>
     private static void SetString(SerializedProperty parentProperty, string propertyName, string value)
     {
         SerializedProperty property = parentProperty.FindPropertyRelative(propertyName);
@@ -259,11 +250,10 @@ public sealed class GameSceneDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Writes one integer relative property when it exists.
-    /// /params parentProperty Parent serialized property.
-    /// /params propertyName Relative int property name.
-    /// /params value Value to write.
-    /// /returns None.
     /// </summary>
+    /// <param name="parentProperty">Parent serialized property.</param>
+    /// <param name="propertyName">Relative int property name.</param>
+    /// <param name="value">Value to write.</param>
     private static void SetInt(SerializedProperty parentProperty, string propertyName, int value)
     {
         SerializedProperty property = parentProperty.FindPropertyRelative(propertyName);

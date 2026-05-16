@@ -8,8 +8,6 @@ using UnityEditor;
 
 /// <summary>
 /// Stores one designer-authored Laser Beam visual preset resolved by stable numeric ID at runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class PlayerLaserBeamVisualPresetDefinition
@@ -93,14 +91,13 @@ public sealed class PlayerLaserBeamVisualPresetDefinition
     #region Public Methods
     /// <summary>
     /// Overwrites this visual preset definition with one complete authored assignment.
-    /// /params stableIdValue Stable numeric ID.
-    /// /params displayNameValue Designer-facing preset name.
-    /// /params coreColorValue White-hot core color.
-    /// /params flowColorValue Primary beam flow color.
-    /// /params stormColorValue Electrical storm color.
-    /// /params contactColorValue Contact highlight color.
-    /// /returns None.
     /// </summary>
+    /// <param name="stableIdValue">Stable numeric ID.</param>
+    /// <param name="displayNameValue">Designer-facing preset name.</param>
+    /// <param name="coreColorValue">White-hot core color.</param>
+    /// <param name="flowColorValue">Primary beam flow color.</param>
+    /// <param name="stormColorValue">Electrical storm color.</param>
+    /// <param name="contactColorValue">Contact highlight color.</param>
     public void Assign(int stableIdValue,
                        string displayNameValue,
                        Color coreColorValue,
@@ -119,8 +116,6 @@ public sealed class PlayerLaserBeamVisualPresetDefinition
 
     /// <summary>
     /// Clamps authored color alpha channels to a valid range after inspector edits.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -136,8 +131,6 @@ public sealed class PlayerLaserBeamVisualPresetDefinition
 
 /// <summary>
 /// Stores editable shared assets and color-preset mappings used by the Laser Beam managed presentation runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class PlayerLaserBeamVisualSettings
@@ -227,8 +220,6 @@ public sealed class PlayerLaserBeamVisualSettings
     #region Public Methods
     /// <summary>
     /// Validates material references and authored visual preset entries for Laser Beam visuals.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

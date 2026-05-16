@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the shared Modules &amp; Patterns preset editor used by enemy advanced-pattern presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 {
@@ -19,9 +17,8 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
     #region Public Methods
     /// <summary>
     /// Builds the inline shared-preset editor for the selected advanced-pattern preset.
-    /// /params panel Owning panel that provides serialized context and refresh callbacks.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized context and refresh callbacks.</param>
     public static void BuildSection(EnemyAdvancedPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -117,9 +114,8 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
     #region Private Methods
     /// <summary>
     /// Creates the row that hosts shared-preset action buttons.
-    /// /params None.
-    /// /returns The created actions row.
     /// </summary>
+    /// <returns>The created actions row.</returns>
     private static VisualElement CreateActionsRow()
     {
         VisualElement actionsRow = new VisualElement();
@@ -131,11 +127,11 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Creates one persistent foldout used to group shared-preset subsections.
-    /// /params title Visible foldout title.
-    /// /params viewDataKey Stable view-data key used to preserve the expanded state.
-    /// /params tooltip Tooltip shown on the foldout.
-    /// /returns The created foldout.
     /// </summary>
+    /// <param name="title">Visible foldout title.</param>
+    /// <param name="viewDataKey">Stable view-data key used to preserve the expanded state.</param>
+    /// <param name="tooltip">Tooltip shown on the foldout.</param>
+    /// <returns>The created foldout.</returns>
     private static Foldout CreateFoldout(string title, string viewDataKey, string tooltip)
     {
         Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(title, viewDataKey, true);
@@ -146,12 +142,11 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Builds the metadata foldout content for the shared preset.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params metadataFoldout Foldout that receives the generated metadata controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="metadataFoldout">Foldout that receives the generated metadata controls.</param>
     private static void BuildMetadataFoldoutContent(EnemyAdvancedPatternPresetsPanel panel,
                                                     SerializedObject sharedPresetSerializedObject,
                                                     EnemyModulesAndPatternsPreset sharedPreset,
@@ -192,12 +187,11 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Builds the grouped module-catalog foldout content for the shared preset.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params modulesFoldout Foldout that receives the generated module-catalog controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="modulesFoldout">Foldout that receives the generated module-catalog controls.</param>
     private static void BuildModulesFoldoutContent(EnemyAdvancedPatternPresetsPanel panel,
                                                    SerializedObject sharedPresetSerializedObject,
                                                    EnemyModulesAndPatternsPreset sharedPreset,
@@ -211,12 +205,11 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Builds the grouped assembled-pattern foldout content for the shared preset.
-    /// /params panel Owning panel used for refresh callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params patternsFoldout Foldout that receives the generated pattern controls.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for refresh callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="patternsFoldout">Foldout that receives the generated pattern controls.</param>
     private static void BuildPatternsFoldoutContent(EnemyAdvancedPatternPresetsPanel panel,
                                                     SerializedObject sharedPresetSerializedObject,
                                                     EnemyModulesAndPatternsPreset sharedPreset,
@@ -230,9 +223,9 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Builds the visible shared preset display name using the same version formatting used by the main preset lists.
-    /// /params sharedPreset Shared preset being summarized.
-    /// /returns Display name with optional semantic version suffix.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset being summarized.</param>
+    /// <returns>Display name with optional semantic version suffix.</returns>
     private static string BuildSharedPresetDisplayName(EnemyModulesAndPatternsPreset sharedPreset)
     {
         if (sharedPreset == null)
@@ -249,9 +242,9 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Builds the tooltip shown by shared preset summary controls.
-    /// /params sharedPreset Shared preset being summarized.
-    /// /returns Tooltip text for the current shared preset.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset being summarized.</param>
+    /// <returns>Tooltip text for the current shared preset.</returns>
     private static string BuildSharedPresetTooltip(EnemyModulesAndPatternsPreset sharedPreset)
     {
         if (sharedPreset == null)
@@ -265,10 +258,9 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
 
     /// <summary>
     /// Refreshes the visible shared-preset object field so its inline text and tooltip mirror the same name/version/description formatting used by the preset lists.
-    /// /params sharedPresetField Object field showing the current shared preset reference.
-    /// /params sharedPreset Shared preset currently assigned to the field.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPresetField">Object field showing the current shared preset reference.</param>
+    /// <param name="sharedPreset">Shared preset currently assigned to the field.</param>
     private static void RefreshSharedPresetFieldPresentation(ObjectField sharedPresetField,
                                                              EnemyModulesAndPatternsPreset sharedPreset)
     {

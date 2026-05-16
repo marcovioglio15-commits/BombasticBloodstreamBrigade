@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Rebuilds the authored Laser Beam endpoint particle prefabs, then synchronizes the runtime visual bridge rig.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerLaserBeamVisualRigPrefabUtility
 {
@@ -26,8 +24,6 @@ public static class PlayerLaserBeamVisualRigPrefabUtility
     #region Public Methods
     /// <summary>
     /// Rebuilds the full authored Laser Beam visual rig and updates the player visual bridge prefab.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     //[MenuItem("Tools/Player/Rebuild Laser Beam Visual Rig Prefabs")]
     public static void RebuildLaserBeamVisualRigPrefabs()
@@ -37,8 +33,6 @@ public static class PlayerLaserBeamVisualRigPrefabUtility
 
     /// <summary>
     /// Executes the rebuild entry point from Unity batch mode via -executeMethod.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void ExecuteRebuild()
     {

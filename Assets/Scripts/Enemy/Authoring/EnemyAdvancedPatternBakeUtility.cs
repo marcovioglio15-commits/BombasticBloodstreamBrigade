@@ -16,7 +16,7 @@ public static class EnemyAdvancedPatternBakeUtility
     /// Compiles one advanced pattern preset into movement config and shooter module list.
     /// </summary>
     /// <param name="preset">Preset to compile. Null returns default grunt config.</param>
-    /// <returns>Compiled bake result.<returns>
+    /// <returns>Compiled bake result.</returns>
     public static EnemyCompiledPatternBakeResult Compile(EnemyAdvancedPatternPreset preset)
     {
         EnemyCompiledPatternBakeResult result = CreateDefaultResult(preset);
@@ -275,10 +275,9 @@ public static class EnemyAdvancedPatternBakeUtility
 
     /// <summary>
     /// Copies the short-range dash payload into the short-range dash section of the compiled pattern config.
-    /// /params payload Resolved module payload for the short-range dash module.
-    /// /params patternConfig Mutable compiled pattern config.
-    /// /returns None.
     /// </summary>
+    /// <param name="payload">Resolved module payload for the short-range dash module.</param>
+    /// <param name="patternConfig">Mutable compiled pattern config.</param>
     internal static void ApplyShortRangeDashPayload(EnemyPatternModulePayloadData payload, ref EnemyPatternConfig patternConfig)
     {
         patternConfig.ShortRangeMovementKind = EnemyCompiledMovementPatternKind.ShortRangeDash;
@@ -474,9 +473,9 @@ public static class EnemyAdvancedPatternBakeUtility
 
     /// <summary>
     /// Resolves authored Shooter projectile distribution to a supported runtime value.
-    /// /params shotPattern Authored projectile distribution mode.
-    /// /returns Valid Shooter shot pattern.
     /// </summary>
+    /// <param name="shotPattern">Authored projectile distribution mode.</param>
+    /// <returns>Valid Shooter shot pattern.</returns>
     internal static EnemyShooterShotPattern ResolveShooterShotPattern(EnemyShooterShotPattern shotPattern)
     {
         switch (shotPattern)
@@ -507,9 +506,9 @@ public static class EnemyAdvancedPatternBakeUtility
 
     /// <summary>
     /// Resolves one legal short-range dash distance source enum value.
-    /// /params distanceSource Authored distance source candidate.
-    /// /returns Sanitized short-range dash distance source.
     /// </summary>
+    /// <param name="distanceSource">Authored distance source candidate.</param>
+    /// <returns>Sanitized short-range dash distance source.</returns>
     internal static EnemyShortRangeDashDistanceSource ResolveShortRangeDashDistanceSource(EnemyShortRangeDashDistanceSource distanceSource)
     {
         switch (distanceSource)
@@ -525,9 +524,9 @@ public static class EnemyAdvancedPatternBakeUtility
 
     /// <summary>
     /// Resolves one legal short-range dash mirror mode enum value.
-    /// /params mirrorMode Authored mirror mode candidate.
-    /// /returns Sanitized short-range dash mirror mode.
     /// </summary>
+    /// <param name="mirrorMode">Authored mirror mode candidate.</param>
+    /// <returns>Sanitized short-range dash mirror mode.</returns>
     internal static EnemyShortRangeDashMirrorMode ResolveShortRangeDashMirrorMode(EnemyShortRangeDashMirrorMode mirrorMode)
     {
         switch (mirrorMode)
@@ -570,10 +569,10 @@ public static class EnemyAdvancedPatternBakeUtility
 
     /// <summary>
     /// Samples authored dash curves into one compact local path stored directly inside the runtime config.
-    /// /params forwardProgressCurve Authored forward-progression curve.
-    /// /params lateralOffsetCurve Authored lateral-offset curve.
-    /// /returns Fixed-size sampled path where x is normalized lateral offset and y is normalized forward progress.
     /// </summary>
+    /// <param name="forwardProgressCurve">Authored forward-progression curve.</param>
+    /// <param name="lateralOffsetCurve">Authored lateral-offset curve.</param>
+    /// <returns>Fixed-size sampled path where x is normalized lateral offset and y is normalized forward progress.</returns>
     private static FixedList128Bytes<float2> BuildShortRangeDashPathSamples(AnimationCurve forwardProgressCurve,
                                                                             AnimationCurve lateralOffsetCurve)
     {

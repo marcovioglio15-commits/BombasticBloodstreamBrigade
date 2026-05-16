@@ -4,7 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores player outline presentation settings applied to managed renderers.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class PlayerVisualOutlineSettings
@@ -62,7 +61,6 @@ public sealed class PlayerVisualOutlineSettings
     /// <summary>
     /// Validates outline authored values after inspector edits.
     /// None.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -75,7 +73,6 @@ public sealed class PlayerVisualOutlineSettings
 
 /// <summary>
 /// Stores runtime bridge, damage feedback and player-facing power-up VFX settings shared by one visual setup.
-/// returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "PlayerVisualPreset", menuName = "Player/Visual Preset", order = 10)]
 public sealed class PlayerVisualPreset : ScriptableObject
@@ -341,9 +338,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
 
     /// <summary>
     /// Imports legacy elemental enemy VFX assignments from another preset when this visual preset does not already own authored data.
-    /// /params sourceAssignments Legacy assignment list to copy.
-    /// /returns True when the visual preset was updated.
     /// </summary>
+    /// <param name="sourceAssignments">Legacy assignment list to copy.</param>
+    /// <returns>True when the visual preset was updated.</returns>
     internal bool ImportElementalEnemyVfxAssignments(IReadOnlyList<ElementalVfxByElementData> sourceAssignments)
     {
         if (PlayerElementalVfxAssignmentUtility.HasAnyConfiguredVfx(elementalEnemyVfxByElement))
@@ -357,7 +354,6 @@ public sealed class PlayerVisualPreset : ScriptableObject
     /// <summary>
     /// Ensures the preset keeps a stable ID after edits and duplications.
     /// None.
-    /// returns None.
     /// </summary>
     private void OnValidate()
     {

@@ -5,8 +5,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Detects player entry into baked scene transition volumes and submits scene manager requests.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(GameSceneManagementSystemGroup))]
 public partial class GameSceneTransitionTriggerSystem : SystemBase
@@ -22,8 +20,6 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
     #region Lifecycle
     /// <summary>
     /// Creates the entity queries used by the trigger system.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnCreate()
     {
@@ -39,8 +35,6 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
 
     /// <summary>
     /// Processes trigger entry and cooldown state only when a manager, player and trigger exist.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnUpdate()
     {
@@ -94,9 +88,8 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
     #region Private Methods
     /// <summary>
     /// Resolves the first player position available to transition triggers.
-    /// /params None.
-    /// /returns Player world position.
     /// </summary>
+    /// <returns>Player world position.</returns>
     private float3 ResolvePlayerPosition()
     {
         NativeArray<LocalTransform> transforms = playerQuery.ToComponentDataArray<LocalTransform>(Allocator.Temp);
@@ -107,15 +100,15 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
 
     /// <summary>
     /// Updates one trigger and submits a request on first player entry.
-    /// /params playerPosition Current player world position.
-    /// /params trigger Baked trigger data.
-    /// /params transitions Available transition definitions.
-    /// /params requests Request buffer that receives a transition request.
-    /// /params config Scene manager config containing trigger defaults.
-    /// /params deltaTime Frame delta time used to update cooldown.
-    /// /params runtimeState Mutable runtime state for this trigger.
-    /// /returns True when this trigger submitted a request.
     /// </summary>
+    /// <param name="playerPosition">Current player world position.</param>
+    /// <param name="trigger">Baked trigger data.</param>
+    /// <param name="transitions">Available transition definitions.</param>
+    /// <param name="requests">Request buffer that receives a transition request.</param>
+    /// <param name="config">Scene manager config containing trigger defaults.</param>
+    /// <param name="deltaTime">Frame delta time used to update cooldown.</param>
+    /// <param name="runtimeState">Mutable runtime state for this trigger.</param>
+    /// <returns>True when this trigger submitted a request.</returns>
     private static bool ProcessTrigger(float3 playerPosition,
                                        GameSceneTransitionTrigger trigger,
                                        DynamicBuffer<GameSceneTransitionElement> transitions,
@@ -154,11 +147,11 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
 
     /// <summary>
     /// Checks whether one point lies inside an axis-aligned trigger box.
-    /// /params point World-space point.
-    /// /params center World-space box center.
-    /// /params halfExtents World-space half extents.
-    /// /returns True when the point is inside the box.
     /// </summary>
+    /// <param name="point">World-space point.</param>
+    /// <param name="center">World-space box center.</param>
+    /// <param name="halfExtents">World-space half extents.</param>
+    /// <returns>True when the point is inside the box.</returns>
     private static bool IsPointInside(float3 point, float3 center, float3 halfExtents)
     {
         float3 delta = math.abs(point - center);
@@ -169,11 +162,11 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
 
     /// <summary>
     /// Resolves the transition request represented by a trigger or matching transition definition.
-    /// /params trigger Baked trigger data.
-    /// /params transitions Available transition definitions.
-    /// /params request Output request when one can be built.
-    /// /returns True when a request target was resolved.
     /// </summary>
+    /// <param name="trigger">Baked trigger data.</param>
+    /// <param name="transitions">Available transition definitions.</param>
+    /// <param name="request">Output request when one can be built.</param>
+    /// <returns>True when a request target was resolved.</returns>
     private static bool TryBuildRequest(GameSceneTransitionTrigger trigger,
                                         DynamicBuffer<GameSceneTransitionElement> transitions,
                                         out GameSceneTransitionRequest request)
@@ -216,10 +209,10 @@ public partial class GameSceneTransitionTriggerSystem : SystemBase
 
     /// <summary>
     /// Resolves cooldown from trigger override or scene manager defaults.
-    /// /params trigger Baked trigger data.
-    /// /params config Scene manager singleton config.
-    /// /returns Non-negative cooldown seconds.
     /// </summary>
+    /// <param name="trigger">Baked trigger data.</param>
+    /// <param name="config">Scene manager singleton config.</param>
+    /// <returns>Non-negative cooldown seconds.</returns>
     private static float ResolveCooldown(GameSceneTransitionTrigger trigger, GameSceneManagerConfig config)
     {
         if (trigger.CooldownSeconds >= 0f)

@@ -727,25 +727,24 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
     /// <summary>
     /// Applies non-health hit payloads for one already accepted projectile impact.
-    /// /params enemyIndex Enemy index inside the active enemy arrays.
-    /// /params shooterEntity Player entity that owns the projectile.
-    /// /params projectileData Projectile payload applied to the enemy.
-    /// /params projectileTransform Projectile transform at impact time.
-    /// /params elementalPayload Elemental payload carried by the projectile.
-    /// /params enemyEntities Active enemy entity array.
-    /// /params enemyPositions Active enemy position array.
-    /// /params enemyRuntimeArray Active enemy runtime state array.
-    /// /params enemyDataArray Active enemy immutable data array.
-    /// /params projectedEnemyKnockback Mutable projected knockback state array.
-    /// /params elementalVfxConfigLookup Lookup used to resolve player elemental VFX configuration.
-    /// /params elementalVfxAnchorLookup Lookup used to resolve enemy elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup used to resolve enemy hit VFX configuration.
-    /// /params spawnInactivityLockLookup Lookup used to suppress knockback during spawn locks.
-    /// /params canEnqueueShooterVfxRequests True when VFX requests can be queued on the shooter.
-    /// /params shooterVfxRequests Buffer receiving VFX spawn requests.
-    /// /params elementalStackLookup Lookup used to mutate enemy elemental stacks.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyIndex">Enemy index inside the active enemy arrays.</param>
+    /// <param name="shooterEntity">Player entity that owns the projectile.</param>
+    /// <param name="projectileData">Projectile payload applied to the enemy.</param>
+    /// <param name="projectileTransform">Projectile transform at impact time.</param>
+    /// <param name="elementalPayload">Elemental payload carried by the projectile.</param>
+    /// <param name="enemyEntities">Active enemy entity array.</param>
+    /// <param name="enemyPositions">Active enemy position array.</param>
+    /// <param name="enemyRuntimeArray">Active enemy runtime state array.</param>
+    /// <param name="enemyDataArray">Active enemy immutable data array.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback state array.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup used to resolve player elemental VFX configuration.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup used to resolve enemy elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup used to resolve enemy hit VFX configuration.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used to suppress knockback during spawn locks.</param>
+    /// <param name="canEnqueueShooterVfxRequests">True when VFX requests can be queued on the shooter.</param>
+    /// <param name="shooterVfxRequests">Buffer receiving VFX spawn requests.</param>
+    /// <param name="elementalStackLookup">Lookup used to mutate enemy elemental stacks.</param>
     private static void ApplyHitPayloads(int enemyIndex,
                                          Entity shooterEntity,
                                          in Projectile projectileData,

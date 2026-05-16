@@ -16,7 +16,7 @@ public sealed class PlayerLevelUpMilestoneDefinitionPropertyDrawer : PropertyDra
     /// Builds one UI Toolkit inspector for one serialized milestone definition.
     /// </summary>
     /// <param name="property">Serialized milestone property.</param>
-    /// <returns>Generated root visual element for the property drawer.<returns>
+    /// <returns>Generated root visual element for the property drawer.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

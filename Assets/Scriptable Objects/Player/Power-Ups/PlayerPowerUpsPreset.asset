@@ -8718,7 +8718,7 @@ MonoBehaviour:
         characterTuning:
           formulas: []
         bomb:
-          bombPrefab: {fileID: 0}
+          bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
           spawnOffset: {x: 0, y: 0, z: 1.2}
           spawnOffsetOrientation: 0
           deploySpeed: 4.5
@@ -8727,13 +8727,13 @@ MonoBehaviour:
           bounceDamping: 0.65
           linearDampingPerSecond: 1.2
           fuseSeconds: 1.25
-          radius: 7
+          radius: 3.5
           enableDamagePayload: 1
           damage: 120
           affectAllEnemiesInRadius: 1
-          explosionVfxPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
           scaleVfxToRadius: 1
-          vfxScaleMultiplier: 1
+          vfxScaleMultiplier: 2
         dash:
           distance: 6
           directionMode: 0

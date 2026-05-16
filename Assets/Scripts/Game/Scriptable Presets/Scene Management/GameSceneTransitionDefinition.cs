@@ -3,8 +3,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Defines a directed transition between two managed scenes.
-/// /params None.
-/// /returns None.
 /// </summary>
 [System.Serializable]
 public sealed class GameSceneTransitionDefinition

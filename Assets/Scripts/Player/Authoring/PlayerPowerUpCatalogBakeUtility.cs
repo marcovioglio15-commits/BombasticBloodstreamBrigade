@@ -15,12 +15,11 @@ public static class PlayerPowerUpCatalogBakeUtility
     #region Public Methods
     /// <summary>
     /// Populates the equipped passive runtime buffer.
-    /// authoring: Owning player authoring component.
-    /// preset: Source power-ups preset.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// equippedPassiveToolsBuffer: Destination ECS buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Source power-ups preset.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="equippedPassiveToolsBuffer">Destination ECS buffer.</param>
     public static void PopulateEquippedPassiveToolsBuffer(PlayerAuthoring authoring,
                                                           PlayerPowerUpsPreset preset,
                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity,
@@ -54,16 +53,15 @@ public static class PlayerPowerUpCatalogBakeUtility
 
     /// <summary>
     /// Populates unlock catalog and tier buffers used by milestone power-up rolls.
-    /// authoring: Owning player authoring component.
-    /// preset: Scaled source power-ups preset.
-    /// sourcePreset: Unscaled source power-ups preset used to extract runtime scaling metadata.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// powerUpUnlockCatalogBuffer: Destination unlock catalog buffer.
-    /// powerUpTierDefinitionsBuffer: Destination tier definition buffer.
-    /// powerUpTierEntriesBuffer: Destination flattened tier entry buffer.
-    /// powerUpTierEntryScalingBuffer: Destination optional tier-entry scaling metadata buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Scaled source power-ups preset.</param>
+    /// <param name="sourcePreset">Unscaled source power-ups preset used to extract runtime scaling metadata.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="powerUpUnlockCatalogBuffer">Destination unlock catalog buffer.</param>
+    /// <param name="powerUpTierDefinitionsBuffer">Destination tier definition buffer.</param>
+    /// <param name="powerUpTierEntriesBuffer">Destination flattened tier entry buffer.</param>
+    /// <param name="powerUpTierEntryScalingBuffer">Destination optional tier-entry scaling metadata buffer.</param>
     public static void PopulatePowerUpUnlockTierBuffers(PlayerAuthoring authoring,
                                                         PlayerPowerUpsPreset preset,
                                                         PlayerPowerUpsPreset sourcePreset,
@@ -118,12 +116,11 @@ public static class PlayerPowerUpCatalogBakeUtility
 
     /// <summary>
     /// Bakes cheat preset snapshots used by runtime debug shortcuts.
-    /// authoring: Owning player authoring component.
-    /// resolveDynamicPrefabEntity: Prefab-to-entity resolver provided by the baker.
-    /// cheatPresetEntriesBuffer: Destination cheat preset entry buffer.
-    /// cheatPresetPassivesBuffer: Destination flattened passive config buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="cheatPresetEntriesBuffer">Destination cheat preset entry buffer.</param>
+    /// <param name="cheatPresetPassivesBuffer">Destination flattened passive config buffer.</param>
     public static void PopulatePowerUpCheatPresetBuffers(PlayerAuthoring authoring,
                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
                                                          DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntriesBuffer,

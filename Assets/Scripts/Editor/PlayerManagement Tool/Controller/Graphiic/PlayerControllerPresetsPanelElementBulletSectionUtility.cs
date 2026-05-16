@@ -8,8 +8,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the stacked default-element authoring UI used by the shooting section of player controller presets.
-/// /params none.
-/// /returns none.
 /// </summary>
 internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 {
@@ -31,10 +29,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
     #region Public Methods
     /// <summary>
     /// Builds the complete elemental projectile subsection, including scalable element slots and one behaviour block per element.
-    /// /params valuesProperty Serialized shooting values property.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /returns Foldout containing all stacked-element controls.
     /// </summary>
+    /// <param name="valuesProperty">Serialized shooting values property.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <returns>Foldout containing all stacked-element controls.</returns>
     public static Foldout BuildElementBulletSettingsFoldout(SerializedProperty valuesProperty, SerializedProperty scalingRulesProperty)
     {
         SerializedProperty appliedElementsProperty = valuesProperty.FindPropertyRelative("appliedElements");
@@ -194,13 +192,13 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
     #region Private Methods
     /// <summary>
     /// Builds one nested foldout dedicated to one supported gameplay element.
-    /// /params elementProperty Serialized per-element behaviour property.
-    /// /params appliedElementsProperty Serialized fixed element slot array.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /params title Visible foldout title.
-    /// /params representedElement Element represented by the foldout.
-    /// /returns Foldout entry containing the root foldout and its refresh callback.
     /// </summary>
+    /// <param name="elementProperty">Serialized per-element behaviour property.</param>
+    /// <param name="appliedElementsProperty">Serialized fixed element slot array.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <param name="title">Visible foldout title.</param>
+    /// <param name="representedElement">Element represented by the foldout.</param>
+    /// <returns>Foldout entry containing the root foldout and its refresh callback.</returns>
     private static ElementBehaviourFoldoutEntry BuildElementBehaviourFoldout(SerializedProperty elementProperty,
                                                                              SerializedProperty appliedElementsProperty,
                                                                              SerializedProperty scalingRulesProperty,
@@ -382,9 +380,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Builds warning text for the stacked applied-element slot array.
-    /// /params appliedElementsProperty Serialized fixed element slot array.
-    /// /returns Warning text, or an empty string when the slots are coherent.
     /// </summary>
+    /// <param name="appliedElementsProperty">Serialized fixed element slot array.</param>
+    /// <returns>Warning text, or an empty string when the slots are coherent.</returns>
     private static string BuildAppliedElementsWarningMessage(SerializedProperty appliedElementsProperty)
     {
         StringBuilder warningBuilder = new StringBuilder(128);
@@ -411,19 +409,19 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Builds warning text for one per-element behaviour block.
-    /// /params stacksPerHitProperty Serialized stacks per hit property.
-    /// /params procThresholdStacksProperty Serialized threshold property.
-    /// /params maximumStacksProperty Serialized maximum stacks property.
-    /// /params stackDecayPerSecondProperty Serialized stack decay property.
-    /// /params dotDamagePerTickProperty Serialized dot damage property.
-    /// /params dotTickIntervalProperty Serialized dot interval property.
-    /// /params dotDurationSecondsProperty Serialized dot duration property.
-    /// /params impedimentSlowPercentPerStackProperty Serialized progressive slow property.
-    /// /params impedimentProcSlowPercentProperty Serialized threshold slow property.
-    /// /params impedimentMaxSlowPercentProperty Serialized max slow property.
-    /// /params impedimentDurationSecondsProperty Serialized impediment duration property.
-    /// /returns Warning text, or an empty string when the authored values are coherent.
     /// </summary>
+    /// <param name="stacksPerHitProperty">Serialized stacks per hit property.</param>
+    /// <param name="procThresholdStacksProperty">Serialized threshold property.</param>
+    /// <param name="maximumStacksProperty">Serialized maximum stacks property.</param>
+    /// <param name="stackDecayPerSecondProperty">Serialized stack decay property.</param>
+    /// <param name="dotDamagePerTickProperty">Serialized dot damage property.</param>
+    /// <param name="dotTickIntervalProperty">Serialized dot interval property.</param>
+    /// <param name="dotDurationSecondsProperty">Serialized dot duration property.</param>
+    /// <param name="impedimentSlowPercentPerStackProperty">Serialized progressive slow property.</param>
+    /// <param name="impedimentProcSlowPercentProperty">Serialized threshold slow property.</param>
+    /// <param name="impedimentMaxSlowPercentProperty">Serialized max slow property.</param>
+    /// <param name="impedimentDurationSecondsProperty">Serialized impediment duration property.</param>
+    /// <returns>Warning text, or an empty string when the authored values are coherent.</returns>
     private static string BuildElementBehaviourWarningMessage(SerializedProperty stacksPerHitProperty,
                                                               SerializedProperty procThresholdStacksProperty,
                                                               SerializedProperty maximumStacksProperty,
@@ -462,9 +460,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Reports whether at least one fixed slot currently emits a gameplay element.
-    /// /params appliedElementsProperty Serialized fixed element slot array.
-    /// /returns True when at least one slot is not None.
     /// </summary>
+    /// <param name="appliedElementsProperty">Serialized fixed element slot array.</param>
+    /// <returns>True when at least one slot is not None.</returns>
     private static bool HasAnyAppliedElement(SerializedProperty appliedElementsProperty)
     {
         for (int slotIndex = 0; slotIndex < appliedElementsProperty.arraySize; slotIndex++)
@@ -480,10 +478,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Reports whether one specific gameplay element is present in the authored fixed slot array.
-    /// /params appliedElementsProperty Serialized fixed element slot array.
-    /// /params appliedElement Element to search for.
-    /// /returns True when the element is present in at least one slot.
     /// </summary>
+    /// <param name="appliedElementsProperty">Serialized fixed element slot array.</param>
+    /// <param name="appliedElement">Element to search for.</param>
+    /// <returns>True when the element is present in at least one slot.</returns>
     private static bool ContainsAppliedElement(SerializedProperty appliedElementsProperty, PlayerProjectileAppliedElement appliedElement)
     {
         for (int slotIndex = 0; slotIndex < appliedElementsProperty.arraySize; slotIndex++)
@@ -499,10 +497,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Registers a lightweight refresh callback for one scaling-aware field.
-    /// /params field Existing visual field that emits SerializedPropertyChangeEvent.
-    /// /params refreshAction Refresh callback executed after property changes.
-    /// /returns void.
     /// </summary>
+    /// <param name="field">Existing visual field that emits SerializedPropertyChangeEvent.</param>
+    /// <param name="refreshAction">Refresh callback executed after property changes.</param>
     private static void RegisterRefreshCallback(VisualElement field, Action refreshAction)
     {
         if (field == null)
@@ -516,11 +513,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Appends one warning line to the warning builder when the condition is true.
-    /// /params warningBuilder Destination warning builder.
-    /// /params condition Condition that triggers the warning.
-    /// /params warningLine Warning text appended when the condition is true.
-    /// /returns void.
     /// </summary>
+    /// <param name="warningBuilder">Destination warning builder.</param>
+    /// <param name="condition">Condition that triggers the warning.</param>
+    /// <param name="warningLine">Warning text appended when the condition is true.</param>
     private static void AppendWarningLine(StringBuilder warningBuilder, bool condition, string warningLine)
     {
         if (!condition)
@@ -534,12 +530,12 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Builds one scaling-aware field with an optional tooltip override.
-    /// /params property Serialized property bound to the field.
-    /// /params scalingRulesProperty Serialized scaling rules property.
-    /// /params label Display label shown in the tool.
-    /// /params tooltip Optional tooltip shown in the UI.
-    /// /returns Configured VisualElement for the requested property.
     /// </summary>
+    /// <param name="property">Serialized property bound to the field.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules property.</param>
+    /// <param name="label">Display label shown in the tool.</param>
+    /// <param name="tooltip">Optional tooltip shown in the UI.</param>
+    /// <returns>Configured VisualElement for the requested property.</returns>
     private static VisualElement CreateField(SerializedProperty property,
                                              SerializedProperty scalingRulesProperty,
                                              string label,
@@ -555,11 +551,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Resizes the authored applied-element array and removes scaling rules that target removed slots.
-    /// /params appliedElementsProperty Serialized applied-element slot array.
-    /// /params scalingRulesProperty Serialized scaling rules list.
-    /// /params targetSlotCount Requested slot count.
-    /// /returns void.
     /// </summary>
+    /// <param name="appliedElementsProperty">Serialized applied-element slot array.</param>
+    /// <param name="scalingRulesProperty">Serialized scaling rules list.</param>
+    /// <param name="targetSlotCount">Requested slot count.</param>
     private static void ResizeAppliedElementSlots(SerializedProperty appliedElementsProperty,
                                                   SerializedProperty scalingRulesProperty,
                                                   int targetSlotCount)
@@ -578,10 +573,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Removes Add Scaling rules that target applied-element slots no longer present in the authored array.
-    /// /params scalingRulesProperty Serialized scaling rules list.
-    /// /params validSlotCount Number of currently valid slot indices.
-    /// /returns void.
     /// </summary>
+    /// <param name="scalingRulesProperty">Serialized scaling rules list.</param>
+    /// <param name="validSlotCount">Number of currently valid slot indices.</param>
     private static void PruneRemovedAppliedElementScalingRules(SerializedProperty scalingRulesProperty, int validSlotCount)
     {
         if (scalingRulesProperty == null || !scalingRulesProperty.isArray)
@@ -611,10 +605,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Resolves one applied-element slot index from a scaling stat key.
-    /// /params statKey Stored scaling stat key.
-    /// /params slotIndex Resolved applied-element slot index.
-    /// /returns True when the key targets one applied-element slot.
     /// </summary>
+    /// <param name="statKey">Stored scaling stat key.</param>
+    /// <param name="slotIndex">Resolved applied-element slot index.</param>
+    /// <returns>True when the key targets one applied-element slot.</returns>
     private static bool TryResolveAppliedElementSlotIndex(string statKey, out int slotIndex)
     {
         slotIndex = -1;
@@ -638,9 +632,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
 
     /// <summary>
     /// Creates one nested foldout used inside the Element Bullet Settings container.
-    /// /params title Visible foldout title.
-    /// /returns Configured nested foldout.
     /// </summary>
+    /// <param name="title">Visible foldout title.</param>
+    /// <returns>Configured nested foldout.</returns>
     private static Foldout CreateNestedFoldout(string title)
     {
         Foldout foldout = new Foldout();

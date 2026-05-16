@@ -12,10 +12,9 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
     #region Public Methods
     /// <summary>
     /// Ensures the EventSystem keeps one valid overlay button selected while the overlay is visible.
-    /// primaryButton: Primary-slot replacement button.
-    /// secondaryButton: Secondary-slot replacement button.
-    /// returns void.
     /// </summary>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
     public static void EnsureOverlaySelection(Button primaryButton, Button secondaryButton)
     {
         EventSystem eventSystem = EventSystem.current;
@@ -31,10 +30,9 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
 
     /// <summary>
     /// Selects the first currently valid overlay button.
-    /// primaryButton: Primary-slot replacement button.
-    /// secondaryButton: Secondary-slot replacement button.
-    /// returns void.
     /// </summary>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
     public static void SelectFirstOverlayButton(Button primaryButton, Button secondaryButton)
     {
         EventSystem eventSystem = EventSystem.current;
@@ -53,10 +51,9 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
 
     /// <summary>
     /// Clears EventSystem focus when it currently points to one of the overlay buttons being hidden.
-    /// primaryButton: Primary-slot replacement button.
-    /// secondaryButton: Secondary-slot replacement button.
-    /// returns void.
     /// </summary>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
     public static void ClearOverlaySelection(Button primaryButton, Button secondaryButton)
     {
         EventSystem eventSystem = EventSystem.current;
@@ -72,11 +69,10 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
 
     /// <summary>
     /// Applies the interactable state to both overlay replacement buttons.
-    /// /params primaryButton Primary-slot replacement button.
-    /// /params secondaryButton Secondary-slot replacement button.
-    /// /params isInteractable True when UI submit should be able to confirm a slot replacement.
-    /// /returns void.
     /// </summary>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
+    /// <param name="isInteractable">True when UI submit should be able to confirm a slot replacement.</param>
     public static void SetOverlayButtonsInteractable(Button primaryButton, Button secondaryButton, bool isInteractable)
     {
         if (primaryButton != null)
@@ -90,10 +86,10 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
     #region Private Methods
     /// <summary>
     /// Returns the first overlay button that can currently receive navigation focus.
-    /// primaryButton: Primary-slot replacement button.
-    /// secondaryButton: Secondary-slot replacement button.
-    /// returns First valid button or null when no overlay button is selectable.
     /// </summary>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
+    /// <returns>First valid button or null when no overlay button is selectable.</returns>
     private static Button ResolveFirstSelectableOverlayButton(Button primaryButton, Button secondaryButton)
     {
         if (primaryButton != null && primaryButton.IsActive() && primaryButton.interactable)
@@ -107,11 +103,11 @@ internal static class HUDPowerUpContainerInteractionSelectionUtility
 
     /// <summary>
     /// Returns whether the provided GameObject belongs to the overlay slot-selection button set.
-    /// selectedObject: EventSystem-selected object inspected for overlay ownership.
-    /// primaryButton: Primary-slot replacement button.
-    /// secondaryButton: Secondary-slot replacement button.
-    /// returns True when the selection belongs to the overlay buttons.
     /// </summary>
+    /// <param name="selectedObject">EventSystem-selected object inspected for overlay ownership.</param>
+    /// <param name="primaryButton">Primary-slot replacement button.</param>
+    /// <param name="secondaryButton">Secondary-slot replacement button.</param>
+    /// <returns>True when the selection belongs to the overlay buttons.</returns>
     private static bool IsOverlaySelection(GameObject selectedObject, Button primaryButton, Button secondaryButton)
     {
         if (selectedObject == null)

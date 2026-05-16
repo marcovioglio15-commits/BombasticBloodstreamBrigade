@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Builds runtime-safe shooting value blobs from controller authoring data.
-/// /params none.
-/// /returns none.
 /// </summary>
 public static class PlayerShootingConfigRuntimeUtility
 {
@@ -12,9 +10,9 @@ public static class PlayerShootingConfigRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Converts authored shooting values into the runtime blob used by controller config, bake baselines and runtime rebuilds.
-    /// /params sourceValues Authoring-side shooting values block.
-    /// /returns Runtime-safe shooting values blob.
     /// </summary>
+    /// <param name="sourceValues">Authoring-side shooting values block.</param>
+    /// <returns>Runtime-safe shooting values blob.</returns>
     public static ShootingValuesBlob BuildRuntimeValues(ShootingValues sourceValues)
     {
         ShootingValues resolvedValues = sourceValues;

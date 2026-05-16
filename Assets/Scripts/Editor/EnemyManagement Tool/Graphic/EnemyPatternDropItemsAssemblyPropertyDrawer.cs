@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyPatternDropItemsAssembly.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyPatternDropItemsAssembly))]
 public sealed class EnemyPatternDropItemsAssemblyPropertyDrawer : PropertyDrawer
@@ -16,9 +14,9 @@ public sealed class EnemyPatternDropItemsAssemblyPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Creates the drop-items assembly UI.
-    /// /params property Serialized drop-items assembly property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized drop-items assembly property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -60,10 +58,9 @@ public sealed class EnemyPatternDropItemsAssemblyPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Updates the drop-items nested settings visibility from the enabled toggle.
-    /// /params enabledProperty Serialized enabled property.
-    /// /params settingsContainer Nested settings container.
-    /// /returns None.
     /// </summary>
+    /// <param name="enabledProperty">Serialized enabled property.</param>
+    /// <param name="settingsContainer">Nested settings container.</param>
     private static void UpdateVisibility(SerializedProperty enabledProperty, VisualElement settingsContainer)
     {
         if (settingsContainer == null)

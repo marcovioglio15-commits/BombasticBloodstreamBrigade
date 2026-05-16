@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides shared projectile motion helpers so simulation, collision and debug rendering use the same inherited-velocity rules.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class ProjectileKinematicsUtility
 {
@@ -17,11 +15,11 @@ public static class ProjectileKinematicsUtility
     #region Velocity
     /// <summary>
     /// Resolves the current world-space velocity used by a linear projectile this frame.
-    /// /params projectile Projectile data containing the authored propulsion velocity and inheritance flag.
-    /// /params owner Projectile owner used to locate the shooter movement state.
-    /// /params movementStateLookup Read-only movement lookup used by Burst systems.
-    /// /returns Projectile propulsion velocity plus full shooter velocity when inheritance is enabled.
     /// </summary>
+    /// <param name="projectile">Projectile data containing the authored propulsion velocity and inheritance flag.</param>
+    /// <param name="owner">Projectile owner used to locate the shooter movement state.</param>
+    /// <param name="movementStateLookup">Read-only movement lookup used by Burst systems.</param>
+    /// <returns>Projectile propulsion velocity plus full shooter velocity when inheritance is enabled.</returns>
     public static float3 ResolveLinearVelocity(in Projectile projectile,
                                                in ProjectileOwner owner,
                                                in ComponentLookup<PlayerMovementState> movementStateLookup)
@@ -36,11 +34,11 @@ public static class ProjectileKinematicsUtility
 
     /// <summary>
     /// Resolves the current world-space velocity used by debug-only projectile rendering.
-    /// /params projectile Projectile data containing the authored propulsion velocity and inheritance flag.
-    /// /params owner Projectile owner used to locate the shooter movement state.
-    /// /params entityManager Entity manager used by managed debug rendering.
-    /// /returns Projectile propulsion velocity plus full shooter velocity when inheritance is enabled.
     /// </summary>
+    /// <param name="projectile">Projectile data containing the authored propulsion velocity and inheritance flag.</param>
+    /// <param name="owner">Projectile owner used to locate the shooter movement state.</param>
+    /// <param name="entityManager">Entity manager used by managed debug rendering.</param>
+    /// <returns>Projectile propulsion velocity plus full shooter velocity when inheritance is enabled.</returns>
     public static float3 ResolveLinearVelocity(in Projectile projectile,
                                                in ProjectileOwner owner,
                                                EntityManager entityManager)
@@ -55,10 +53,10 @@ public static class ProjectileKinematicsUtility
 
     /// <summary>
     /// Resolves the full shooter velocity that should be inherited by projectile world motion.
-    /// /params shooterEntity Shooter entity that may own PlayerMovementState.
-    /// /params movementStateLookup Read-only movement lookup used by Burst systems.
-    /// /returns Shooter velocity, or zero when the shooter is not readable.
     /// </summary>
+    /// <param name="shooterEntity">Shooter entity that may own PlayerMovementState.</param>
+    /// <param name="movementStateLookup">Read-only movement lookup used by Burst systems.</param>
+    /// <returns>Shooter velocity, or zero when the shooter is not readable.</returns>
     public static float3 ResolveInheritedVelocity(Entity shooterEntity,
                                                   in ComponentLookup<PlayerMovementState> movementStateLookup)
     {
@@ -73,10 +71,10 @@ public static class ProjectileKinematicsUtility
 
     /// <summary>
     /// Resolves the full shooter velocity that should be inherited by managed debug rendering.
-    /// /params shooterEntity Shooter entity that may own PlayerMovementState.
-    /// /params entityManager Entity manager used to inspect the live world.
-    /// /returns Shooter velocity, or zero when the shooter is not readable.
     /// </summary>
+    /// <param name="shooterEntity">Shooter entity that may own PlayerMovementState.</param>
+    /// <param name="entityManager">Entity manager used to inspect the live world.</param>
+    /// <returns>Shooter velocity, or zero when the shooter is not readable.</returns>
     public static float3 ResolveInheritedVelocity(Entity shooterEntity,
                                                   EntityManager entityManager)
     {
@@ -96,12 +94,12 @@ public static class ProjectileKinematicsUtility
     #region Displacement
     /// <summary>
     /// Resolves the world-space displacement applied by one linear simulation frame.
-    /// /params projectile Projectile data containing propulsion velocity and inheritance settings.
-    /// /params owner Projectile owner used to locate shooter velocity.
-    /// /params movementStateLookup Read-only movement lookup used by Burst systems.
-    /// /params deltaTime Frame delta time in seconds.
-    /// /returns World-space displacement for this frame.
     /// </summary>
+    /// <param name="projectile">Projectile data containing propulsion velocity and inheritance settings.</param>
+    /// <param name="owner">Projectile owner used to locate shooter velocity.</param>
+    /// <param name="movementStateLookup">Read-only movement lookup used by Burst systems.</param>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
+    /// <returns>World-space displacement for this frame.</returns>
     public static float3 ResolveLinearDisplacement(in Projectile projectile,
                                                    in ProjectileOwner owner,
                                                    in ComponentLookup<PlayerMovementState> movementStateLookup,
@@ -112,10 +110,10 @@ public static class ProjectileKinematicsUtility
 
     /// <summary>
     /// Resolves the distance that should consume projectile range during one linear simulation frame.
-    /// /params projectile Projectile data containing the authored propulsion velocity.
-    /// /params deltaTime Frame delta time in seconds.
-    /// /returns Propulsion-only travel distance, excluding inherited shooter drift.
     /// </summary>
+    /// <param name="projectile">Projectile data containing the authored propulsion velocity.</param>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
+    /// <returns>Propulsion-only travel distance, excluding inherited shooter drift.</returns>
     public static float ResolveLinearRangeStepDistance(in Projectile projectile,
                                                        float deltaTime)
     {
@@ -126,10 +124,10 @@ public static class ProjectileKinematicsUtility
     #region Range
     /// <summary>
     /// Resolves how many seconds remain before a linear projectile exhausts its configured range.
-    /// /params projectile Projectile data containing max range and propulsion speed.
-    /// /params traveledDistance Propulsion-only distance already consumed.
-    /// /returns Remaining range time, or positive infinity when range is disabled.
     /// </summary>
+    /// <param name="projectile">Projectile data containing max range and propulsion speed.</param>
+    /// <param name="traveledDistance">Propulsion-only distance already consumed.</param>
+    /// <returns>Remaining range time, or positive infinity when range is disabled.</returns>
     public static float ResolveRemainingRangeSeconds(in Projectile projectile,
                                                      float traveledDistance)
     {
@@ -149,9 +147,9 @@ public static class ProjectileKinematicsUtility
     #region Validation
     /// <summary>
     /// Checks whether an ECS entity value can be used for lookup access.
-    /// /params entity Entity value to validate.
-    /// /returns True when the entity is non-null and not deferred.
     /// </summary>
+    /// <param name="entity">Entity value to validate.</param>
+    /// <returns>True when the entity is non-null and not deferred.</returns>
     private static bool IsEntityUsable(Entity entity)
     {
         if (entity == Entity.Null)

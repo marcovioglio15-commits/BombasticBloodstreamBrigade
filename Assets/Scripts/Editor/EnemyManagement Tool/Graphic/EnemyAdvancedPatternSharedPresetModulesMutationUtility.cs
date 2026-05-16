@@ -3,8 +3,6 @@ using UnityEditor;
 
 /// <summary>
 /// Applies structural mutations to the shared module catalogs used by enemy Modules and Patterns presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
 {
@@ -13,12 +11,11 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
     #region Public Methods
     /// <summary>
     /// Adds one new module definition to the requested catalog section.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section receiving the new definition.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section receiving the new definition.</param>
     public static void AddModuleDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                            SerializedObject sharedPresetSerializedObject,
                                            EnemyModulesAndPatternsPreset sharedPreset,
@@ -52,13 +49,12 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
 
     /// <summary>
     /// Duplicates one module definition inside the current catalog section.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section that owns the duplicated definition.
-    /// /params moduleIndex Index of the source definition.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section that owns the duplicated definition.</param>
+    /// <param name="moduleIndex">Index of the source definition.</param>
     public static void DuplicateModuleDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                                  SerializedObject sharedPresetSerializedObject,
                                                  EnemyModulesAndPatternsPreset sharedPreset,
@@ -101,13 +97,12 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
 
     /// <summary>
     /// Deletes one module definition from the current catalog section.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section that owns the deleted definition.
-    /// /params moduleIndex Index of the definition to remove.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section that owns the deleted definition.</param>
+    /// <param name="moduleIndex">Index of the definition to remove.</param>
     public static void DeleteModuleDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                               SerializedObject sharedPresetSerializedObject,
                                               EnemyModulesAndPatternsPreset sharedPreset,
@@ -130,14 +125,13 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
 
     /// <summary>
     /// Moves one module definition inside its current catalog section.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section that owns the moved definition.
-    /// /params fromIndex Source index.
-    /// /params toIndex Destination index.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section that owns the moved definition.</param>
+    /// <param name="fromIndex">Source index.</param>
+    /// <param name="toIndex">Destination index.</param>
     public static void MoveModuleDefinition(EnemyAdvancedPatternPresetsPanel panel,
                                             SerializedObject sharedPresetSerializedObject,
                                             EnemyModulesAndPatternsPreset sharedPreset,
@@ -167,12 +161,11 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
 
     /// <summary>
     /// Sets the foldout state of every module card currently visible under one catalog section filter.
-    /// /params panel Owning panel that stores the active filters.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params section Catalog section whose visible cards are being updated.
-    /// /params expanded True to expand every visible card, otherwise false.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the active filters.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="section">Catalog section whose visible cards are being updated.</param>
+    /// <param name="expanded">True to expand every visible card, otherwise false.</param>
     public static void SetAllModuleFoldoutStates(EnemyAdvancedPatternPresetsPanel panel,
                                                  SerializedObject sharedPresetSerializedObject,
                                                  EnemyPatternModuleCatalogSection section,
@@ -208,14 +201,13 @@ internal static class EnemyAdvancedPatternSharedPresetModulesMutationUtility
     #region Private Methods
     /// <summary>
     /// Applies one explicit mutation to the requested catalog section through the shared preset serialized object.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section being mutated.
-    /// /params undoLabel Undo label used for the mutation.
-    /// /params mutation Mutation callback that receives the serialized array property.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section being mutated.</param>
+    /// <param name="undoLabel">Undo label used for the mutation.</param>
+    /// <param name="mutation">Mutation callback that receives the serialized array property.</param>
     private static void ApplyModuleCatalogMutation(EnemyAdvancedPatternPresetsPanel panel,
                                                    SerializedObject sharedPresetSerializedObject,
                                                    EnemyModulesAndPatternsPreset sharedPreset,

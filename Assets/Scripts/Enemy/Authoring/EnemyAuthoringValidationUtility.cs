@@ -11,10 +11,10 @@ internal static class EnemyAuthoringValidationUtility
     #region Public Methods
     /// <summary>
     /// Validates whether the authored shooter projectile prefab can be converted safely.
-    /// /params authoring Source enemy authoring component that owns the reference.
-    /// /params projectilePrefabObject Candidate projectile prefab.
-    /// /returns True when the prefab is invalid for bake.
     /// </summary>
+    /// <param name="authoring">Source enemy authoring component that owns the reference.</param>
+    /// <param name="projectilePrefabObject">Candidate projectile prefab.</param>
+    /// <returns>True when the prefab is invalid for bake.</returns>
     public static bool IsInvalidShooterProjectilePrefab(EnemyAuthoring authoring, GameObject projectilePrefabObject)
     {
         if (projectilePrefabObject == null)
@@ -37,10 +37,10 @@ internal static class EnemyAuthoringValidationUtility
 
     /// <summary>
     /// Validates whether one experience drop prefab can be converted safely.
-    /// /params authoring Source enemy authoring component that owns the reference.
-    /// /params dropPrefabObject Candidate experience-drop prefab.
-    /// /returns True when the prefab is invalid for bake.
     /// </summary>
+    /// <param name="authoring">Source enemy authoring component that owns the reference.</param>
+    /// <param name="dropPrefabObject">Candidate experience-drop prefab.</param>
+    /// <returns>True when the prefab is invalid for bake.</returns>
     public static bool IsInvalidExperienceDropPrefab(EnemyAuthoring authoring, GameObject dropPrefabObject)
     {
         if (dropPrefabObject == null)
@@ -63,10 +63,10 @@ internal static class EnemyAuthoringValidationUtility
 
     /// <summary>
     /// Validates whether one hit-VFX prefab can be converted safely.
-    /// /params authoring Source enemy authoring component that owns the reference.
-    /// /params hitVfxPrefabObject Candidate hit-VFX prefab.
-    /// /returns True when the prefab is invalid for bake.
     /// </summary>
+    /// <param name="authoring">Source enemy authoring component that owns the reference.</param>
+    /// <param name="hitVfxPrefabObject">Candidate hit-VFX prefab.</param>
+    /// <returns>True when the prefab is invalid for bake.</returns>
     public static bool IsInvalidHitVfxPrefab(EnemyAuthoring authoring, GameObject hitVfxPrefabObject)
     {
         if (hitVfxPrefabObject == null)
@@ -89,10 +89,10 @@ internal static class EnemyAuthoringValidationUtility
 
     /// <summary>
     /// Adds one estimated count to the running summary while protecting against integer overflow.
-    /// /params currentEstimatedCount Current accumulated estimated count.
-    /// /params additionalEstimatedCount Additional count to append.
-    /// /returns Saturated estimated count.
     /// </summary>
+    /// <param name="currentEstimatedCount">Current accumulated estimated count.</param>
+    /// <param name="additionalEstimatedCount">Additional count to append.</param>
+    /// <returns>Saturated estimated count.</returns>
     public static int AddEstimatedCount(int currentEstimatedCount, int additionalEstimatedCount)
     {
         long resolvedCount = (long)math.max(0, currentEstimatedCount) + math.max(0, additionalEstimatedCount);

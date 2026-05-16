@@ -6,8 +6,6 @@ using UnityEngine.Serialization;
 /// <summary>
 /// Stores enemy-specific advanced-pattern metadata, active loadout selection and the shared Modules & Patterns preset reference.
 /// Legacy local catalogs remain serialized only as a compatibility fallback for already-authored assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyAdvancedPatternPreset", menuName = "Enemy/Advanced Pattern Preset", order = 12)]
 public sealed class EnemyAdvancedPatternPreset : ScriptableObject
@@ -179,9 +177,9 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
     /// <summary>
     /// Resolves one shared or legacy module definition by module ID.
     /// Shared catalog data has priority when a Modules & Patterns preset is assigned.
-    /// /params moduleId Target module identifier.
-    /// /returns The resolved module definition, or null when not found.
     /// </summary>
+    /// <param name="moduleId">Target module identifier.</param>
+    /// <returns>The resolved module definition, or null when not found.</returns>
     public EnemyPatternModuleDefinition ResolveModuleDefinitionById(string moduleId)
     {
         if (string.IsNullOrWhiteSpace(moduleId))
@@ -201,9 +199,9 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
     /// <summary>
     /// Resolves one pattern definition by pattern ID using the hidden legacy local catalog.
     /// This compatibility wrapper keeps legacy bake/editor code working after the shared-preset split.
-    /// /params patternId Target pattern identifier.
-    /// /returns The resolved legacy pattern definition, or null when not found.
     /// </summary>
+    /// <param name="patternId">Target pattern identifier.</param>
+    /// <returns>The resolved legacy pattern definition, or null when not found.</returns>
     public EnemyPatternDefinition ResolvePatternById(string patternId)
     {
         return ResolveLegacyPatternById(patternId);
@@ -211,9 +209,9 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one shared pattern definition by pattern ID.
-    /// /params patternId Target shared pattern identifier.
-    /// /returns The resolved shared pattern definition, or null when no shared preset is assigned or no match exists.
     /// </summary>
+    /// <param name="patternId">Target shared pattern identifier.</param>
+    /// <returns>The resolved shared pattern definition, or null when no shared preset is assigned or no match exists.</returns>
     public EnemyModulesPatternDefinition ResolveSharedPatternById(string patternId)
     {
         if (modulesAndPatternsPreset == null)
@@ -224,9 +222,9 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one legacy local module definition by module ID.
-    /// /params moduleId Target legacy module identifier.
-    /// /returns The resolved legacy module definition, or null when not found.
     /// </summary>
+    /// <param name="moduleId">Target legacy module identifier.</param>
+    /// <returns>The resolved legacy module definition, or null when not found.</returns>
     public EnemyPatternModuleDefinition ResolveLegacyModuleDefinitionById(string moduleId)
     {
         if (string.IsNullOrWhiteSpace(moduleId))
@@ -252,9 +250,9 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one legacy local pattern definition by pattern ID.
-    /// /params patternId Target legacy pattern identifier.
-    /// /returns The resolved legacy pattern definition, or null when not found.
     /// </summary>
+    /// <param name="patternId">Target legacy pattern identifier.</param>
+    /// <returns>The resolved legacy pattern definition, or null when not found.</returns>
     public EnemyPatternDefinition ResolveLegacyPatternById(string patternId)
     {
         if (string.IsNullOrWhiteSpace(patternId))
@@ -280,8 +278,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Validates metadata, active loadout data, referenced shared preset and hidden legacy compatibility data.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -321,8 +317,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
     #region Private Methods
     /// <summary>
     /// Ensures hidden legacy data remains structurally valid whenever older assets are still loaded.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateLegacyCompatibilityData()
     {
@@ -348,8 +342,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Adds a default pattern loadout entry from the shared preset when available, otherwise from hidden legacy data.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void AddDefaultLoadoutEntry()
     {
@@ -365,8 +357,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Normalizes active loadout IDs against the currently assigned shared preset, or against legacy data when no shared preset exists.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void NormalizeLoadoutIds()
     {
@@ -432,9 +422,8 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Builds the hidden legacy module catalog used by old presets that still serialize local module definitions.
-    /// /params None.
-    /// /returns The default legacy module-definition list.
     /// </summary>
+    /// <returns>The default legacy module-definition list.</returns>
     private static List<EnemyPatternModuleDefinition> BuildDefaultLegacyModuleDefinitions()
     {
         List<EnemyPatternModuleDefinition> definitions = new List<EnemyPatternModuleDefinition>();
@@ -467,12 +456,12 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Creates one default hidden legacy module definition.
-    /// /params moduleIdValue Module identifier.
-    /// /params displayNameValue Display name.
-    /// /params moduleKindValue Module kind.
-    /// /params notesValue Notes text.
-    /// /returns The created legacy module definition.
     /// </summary>
+    /// <param name="moduleIdValue">Module identifier.</param>
+    /// <param name="displayNameValue">Display name.</param>
+    /// <param name="moduleKindValue">Module kind.</param>
+    /// <param name="notesValue">Notes text.</param>
+    /// <returns>The created legacy module definition.</returns>
     private static EnemyPatternModuleDefinition CreateDefaultLegacyModule(string moduleIdValue,
                                                                           string displayNameValue,
                                                                           EnemyPatternModuleKind moduleKindValue,
@@ -487,9 +476,8 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Builds the hidden default legacy pattern list used by already-authored local presets.
-    /// /params None.
-    /// /returns The default legacy pattern list.
     /// </summary>
+    /// <returns>The default legacy pattern list.</returns>
     private static List<EnemyPatternDefinition> BuildDefaultLegacyPatternDefinitions()
     {
         List<EnemyPatternDefinition> definitions = new List<EnemyPatternDefinition>();
@@ -510,8 +498,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Validates the hidden legacy module-definition list and keeps module IDs unique.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateLegacyModuleDefinitions()
     {
@@ -547,8 +533,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Validates the hidden legacy pattern list and keeps pattern IDs unique.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateLegacyPatternDefinitions()
     {
@@ -584,8 +568,6 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Migrates hidden legacy shooter runtime values into hidden legacy shooter modules when those modules still miss a runtime projectile payload.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void MigrateLegacyRuntimeProjectileToShooterPayload()
     {
@@ -621,10 +603,10 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Normalizes one identifier while preserving author intent whenever possible.
-    /// /params rawId Raw authored identifier.
-    /// /params fallback Fallback identifier used when the authored value is empty.
-    /// /returns The normalized identifier.
     /// </summary>
+    /// <param name="rawId">Raw authored identifier.</param>
+    /// <param name="fallback">Fallback identifier used when the authored value is empty.</param>
+    /// <returns>The normalized identifier.</returns>
     private static string NormalizeId(string rawId, string fallback)
     {
         if (string.IsNullOrWhiteSpace(rawId))
@@ -640,11 +622,11 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one unique identifier against a set of already-used values.
-    /// /params baseId Requested base identifier.
-    /// /params usedIds Already-used identifier set.
-    /// /params fallbackBaseId Fallback identifier used when the base ID is invalid.
-    /// /returns A unique identifier.
     /// </summary>
+    /// <param name="baseId">Requested base identifier.</param>
+    /// <param name="usedIds">Already-used identifier set.</param>
+    /// <param name="fallbackBaseId">Fallback identifier used when the base ID is invalid.</param>
+    /// <returns>A unique identifier.</returns>
     private static string ResolveUniqueId(string baseId,
                                           HashSet<string> usedIds,
                                           string fallbackBaseId)

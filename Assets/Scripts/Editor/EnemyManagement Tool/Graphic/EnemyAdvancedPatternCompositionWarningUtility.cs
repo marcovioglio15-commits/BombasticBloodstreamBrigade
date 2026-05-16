@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds warning messages for unsupported or ambiguous advanced-pattern compositions without mutating authoring data.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternCompositionWarningUtility
 {
@@ -14,10 +12,9 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
     #region Public Methods
     /// <summary>
     /// Appends composition warnings for the selected preset to the provided container.
-    /// /params panel Owning panel that provides the selected preset.
-    /// /params container Target UI container that receives generated warning boxes.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides the selected preset.</param>
+    /// <param name="container">Target UI container that receives generated warning boxes.</param>
     public static void AddWarnings(EnemyAdvancedPatternPresetsPanel panel, VisualElement container)
     {
         if (panel == null || container == null)
@@ -42,9 +39,9 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
     #region Private Methods
     /// <summary>
     /// Collects all warnings implied by the current preset loadout source.
-    /// /params preset Selected advanced-pattern preset.
-    /// /returns The distinct warning set.
     /// </summary>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <returns>The distinct warning set.</returns>
     private static HashSet<string> CollectWarnings(EnemyAdvancedPatternPreset preset)
     {
         HashSet<string> warnings = new HashSet<string>();
@@ -77,11 +74,10 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Analyzes one shared assembled pattern against the new category model.
-    /// /params preset Selected advanced-pattern preset.
-    /// /params pattern Shared assembled pattern to inspect.
-    /// /params warnings Mutable warning set.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <param name="pattern">Shared assembled pattern to inspect.</param>
+    /// <param name="warnings">Mutable warning set.</param>
     private static void AnalyzeSharedPattern(EnemyAdvancedPatternPreset preset,
                                              EnemyModulesPatternDefinition pattern,
                                              HashSet<string> warnings)
@@ -148,15 +144,14 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Adds warnings for one optional shared pattern category.
-    /// /params patternName Display name of the analyzed pattern.
-    /// /params categoryEnabled Whether the category is enabled.
-    /// /params binding Optional category binding.
-    /// /params section Expected catalog section for the category.
-    /// /params preset Selected advanced-pattern preset.
-    /// /params warnings Mutable warning set.
-    /// /params categoryLabel Display label of the category.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternName">Display name of the analyzed pattern.</param>
+    /// <param name="categoryEnabled">Whether the category is enabled.</param>
+    /// <param name="binding">Optional category binding.</param>
+    /// <param name="section">Expected catalog section for the category.</param>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <param name="warnings">Mutable warning set.</param>
+    /// <param name="categoryLabel">Display label of the category.</param>
     private static void AnalyzeOptionalCategory(string patternName,
                                                 bool categoryEnabled,
                                                 EnemyPatternModuleBinding binding,
@@ -190,16 +185,15 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Adds warnings for enabled engagement triggers that currently point to unsupported predictive module kinds.
-    /// /params patternName Display name of the analyzed pattern.
-    /// /params categoryEnabled Whether the owning category is enabled.
-    /// /params triggerEnabled Whether the engagement trigger is enabled for that category.
-    /// /params binding Optional category binding.
-    /// /params section Expected catalog section for the category.
-    /// /params preset Selected advanced-pattern preset.
-    /// /params warnings Mutable warning set.
-    /// /params categoryLabel Display label of the category.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternName">Display name of the analyzed pattern.</param>
+    /// <param name="categoryEnabled">Whether the owning category is enabled.</param>
+    /// <param name="triggerEnabled">Whether the engagement trigger is enabled for that category.</param>
+    /// <param name="binding">Optional category binding.</param>
+    /// <param name="section">Expected catalog section for the category.</param>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <param name="warnings">Mutable warning set.</param>
+    /// <param name="categoryLabel">Display label of the category.</param>
     private static void AnalyzeOffensiveEngagementTrigger(string patternName,
                                                           bool categoryEnabled,
                                                           bool triggerEnabled,
@@ -234,12 +228,11 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Adds warnings for the shared Drop Items category, which now supports multiple module bindings.
-    /// /params patternName Display name of the analyzed pattern.
-    /// /params dropItemsAssembly Shared Drop Items assembly to inspect.
-    /// /params preset Selected advanced-pattern preset.
-    /// /params warnings Mutable warning set.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternName">Display name of the analyzed pattern.</param>
+    /// <param name="dropItemsAssembly">Shared Drop Items assembly to inspect.</param>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <param name="warnings">Mutable warning set.</param>
     private static void AnalyzeDropItemsCategory(string patternName,
                                                  EnemyPatternDropItemsAssembly dropItemsAssembly,
                                                  EnemyAdvancedPatternPreset preset,
@@ -285,11 +278,10 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Analyzes one hidden legacy pattern for backward-compatible warnings.
-    /// /params preset Selected advanced-pattern preset.
-    /// /params pattern Legacy pattern to inspect.
-    /// /params warnings Mutable warning set.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Selected advanced-pattern preset.</param>
+    /// <param name="pattern">Legacy pattern to inspect.</param>
+    /// <param name="warnings">Mutable warning set.</param>
     private static void AnalyzeLegacyPattern(EnemyAdvancedPatternPreset preset,
                                              EnemyPatternDefinition pattern,
                                              HashSet<string> warnings)
@@ -373,10 +365,10 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Resolves the payload block used by one legacy binding after considering its optional override payload.
-    /// /params definition Source module definition.
-    /// /params binding Source binding.
-    /// /returns The effective payload block.
     /// </summary>
+    /// <param name="definition">Source module definition.</param>
+    /// <param name="binding">Source binding.</param>
+    /// <returns>The effective payload block.</returns>
     private static EnemyPatternModulePayloadData ResolvePayload(EnemyPatternModuleDefinition definition, EnemyPatternModuleBinding binding)
     {
         if (binding != null && binding.UseOverridePayload && binding.OverridePayload != null)
@@ -390,9 +382,9 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
     /// <summary>
     /// Resolves a user-facing Wanderer label from the provided payload.
-    /// /params payload Effective payload block of the module.
-    /// /returns The resolved Wanderer display label.
     /// </summary>
+    /// <param name="payload">Effective payload block of the module.</param>
+    /// <returns>The resolved Wanderer display label.</returns>
     private static string ResolveWandererLabel(EnemyPatternModulePayloadData payload)
     {
         if (payload == null || payload.Wanderer == null)

@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes default ECS values used by enemy advanced-pattern bake and pool reset paths.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyPatternDefaultsUtility
 {
@@ -13,9 +11,8 @@ internal static class EnemyPatternDefaultsUtility
     #region Public Methods
     /// <summary>
     /// Creates the default compiled pattern config used when no authored advanced-pattern data overrides it.
-    /// /params None.
-    /// /returns Default runtime pattern config.
     /// </summary>
+    /// <returns>Default runtime pattern config.</returns>
     public static EnemyPatternConfig CreatePatternConfig()
     {
         return new EnemyPatternConfig
@@ -90,9 +87,8 @@ internal static class EnemyPatternDefaultsUtility
 
     /// <summary>
     /// Creates the default mutable runtime state for custom enemy movement patterns.
-    /// /params None.
-    /// /returns Default pattern runtime state.
     /// </summary>
+    /// <returns>Default pattern runtime state.</returns>
     public static EnemyPatternRuntimeState CreatePatternRuntimeState()
     {
         return new EnemyPatternRuntimeState
@@ -120,9 +116,8 @@ internal static class EnemyPatternDefaultsUtility
 
     /// <summary>
     /// Builds the default sampled local path used by the short-range dash when no authored curve is available.
-    /// /params None.
-    /// /returns Fixed-size sampled path in local dash space where x is normalized lateral offset and y is normalized forward progress.
     /// </summary>
+    /// <returns>Fixed-size sampled path in local dash space where x is normalized lateral offset and y is normalized forward progress.</returns>
     public static FixedList128Bytes<float2> BuildDefaultShortRangeDashPathSamples()
     {
         FixedList128Bytes<float2> pathSamples = default;

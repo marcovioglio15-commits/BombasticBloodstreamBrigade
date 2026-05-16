@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Maintains one managed attached mesh ribbon VFX instance per player while Elemental Trail passive is enabled.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpsInitializeSystem))]
@@ -34,9 +32,8 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Configures update requirements for player-owned Elemental Trail presentation.
-    /// /params state DOTS system state used to register required runtime components.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">DOTS system state used to register required runtime components.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPassiveToolsState>();
@@ -47,9 +44,8 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Releases managed trail instances when the world owning this system is destroyed.
-    /// /params state DOTS system state provided by Unity during teardown.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">DOTS system state provided by Unity during teardown.</param>
     public void OnDestroy(ref SystemState state)
     {
         if (managedInstances.Count <= 0)
@@ -67,9 +63,8 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Synchronizes attached Elemental Trail VFX instances with active player entities.
-    /// /params state DOTS system state used to read ECS gameplay state and EntityManager data.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">DOTS system state used to read ECS gameplay state and EntityManager data.</param>
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();
@@ -131,10 +126,10 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     #region Helpers
     /// <summary>
     /// Resolves the authored managed prefab reference baked on a player entity.
-    /// /params entityManager Entity manager used to read the Unity object reference component.
-    /// /params playerEntity Player entity owning the attached VFX.
-    /// /returns Authored prefab GameObject, or null when no valid reference is available.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read the Unity object reference component.</param>
+    /// <param name="playerEntity">Player entity owning the attached VFX.</param>
+    /// <returns>Authored prefab GameObject, or null when no valid reference is available.</returns>
     private static GameObject ResolveTrailPrefab(EntityManager entityManager, Entity playerEntity)
     {
         if (!entityManager.HasComponent<PlayerElementalTrailAttachedVfxPrefabReference>(playerEntity))
@@ -146,10 +141,10 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Returns a reusable managed VFX instance for the requested player and prefab.
-    /// /params playerEntity Player entity used as owner key for the managed instance cache.
-    /// /params trailPrefab Prefab that should back the attached trail presentation.
-    /// /returns Existing or newly instantiated managed trail instance, or null when creation fails.
     /// </summary>
+    /// <param name="playerEntity">Player entity used as owner key for the managed instance cache.</param>
+    /// <param name="trailPrefab">Prefab that should back the attached trail presentation.</param>
+    /// <returns>Existing or newly instantiated managed trail instance, or null when creation fails.</returns>
     private static PlayerElementalTrailRibbonInstance GetOrCreateManagedInstance(Entity playerEntity, GameObject trailPrefab)
     {
         PlayerElementalTrailRibbonInstance managedInstance;
@@ -190,9 +185,8 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Disables one cached managed ribbon instance and clears its currently visible samples.
-    /// /params playerEntity Player entity used to resolve the cached managed instance.
-    /// /returns None.
     /// </summary>
+    /// <param name="playerEntity">Player entity used to resolve the cached managed instance.</param>
     private static void SetManagedInstanceInactive(Entity playerEntity)
     {
         PlayerElementalTrailRibbonInstance managedInstance;
@@ -205,9 +199,8 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Destroys managed instances whose owner entity no longer exists in the current world.
-    /// /params entityManager Entity manager used to validate cached owner entities.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to validate cached owner entities.</param>
     private static void CleanupInvalidOwnerInstances(EntityManager entityManager)
     {
         if (managedInstances.Count <= 0)
@@ -237,10 +230,9 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Releases a legacy pooled VFX entity reference if one was left by older runtime paths.
-    /// /params entityManager Entity manager used to disable and strip transient VFX components.
-    /// /params vfxEntity Entity previously referenced by PlayerElementalTrailAttachedVfxState.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to disable and strip transient VFX components.</param>
+    /// <param name="vfxEntity">Entity previously referenced by PlayerElementalTrailAttachedVfxState.</param>
     private static void ReleasePooledTrailEntityIfAny(EntityManager entityManager, Entity vfxEntity)
     {
         if (!IsValidEntity(entityManager, vfxEntity))
@@ -261,10 +253,10 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
 
     /// <summary>
     /// Checks whether an entity handle can be safely accessed through the current EntityManager.
-    /// /params entityManager Entity manager that owns the runtime world.
-    /// /params entity Entity handle to validate.
-    /// /returns True when the entity is non-null, has a valid index and still exists.
     /// </summary>
+    /// <param name="entityManager">Entity manager that owns the runtime world.</param>
+    /// <param name="entity">Entity handle to validate.</param>
+    /// <returns>True when the entity is non-null, has a valid index and still exists.</returns>
     private static bool IsValidEntity(EntityManager entityManager, Entity entity)
     {
         if (entity == Entity.Null)

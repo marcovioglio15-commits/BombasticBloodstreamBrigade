@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Compiles the shared Modules & Patterns preset referenced by one enemy advanced-pattern preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyModulesAndPatternsBakeUtility
 {
@@ -13,9 +11,9 @@ internal static class EnemyModulesAndPatternsBakeUtility
     #region Public Methods
     /// <summary>
     /// Compiles the active shared pattern loadout referenced by one enemy advanced-pattern preset.
-    /// /params preset Enemy-specific advanced-pattern preset that owns the shared preset reference and loadout.
-    /// /returns The compiled bake result ready for ECS authoring.
     /// </summary>
+    /// <param name="preset">Enemy-specific advanced-pattern preset that owns the shared preset reference and loadout.</param>
+    /// <returns>The compiled bake result ready for ECS authoring.</returns>
     public static EnemyCompiledPatternBakeResult Compile(EnemyAdvancedPatternPreset preset)
     {
         EnemyCompiledPatternBakeResult result = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(preset);
@@ -38,10 +36,10 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Compiles one explicit shared pattern by ID so boss presets can reuse normal enemy pattern assemblies.
-    /// /params sharedPreset Source normal enemy Modules & Patterns preset.
-    /// /params patternId Pattern ID to compile.
-    /// /returns The compiled bake result, or a default result when the pattern is unavailable.
     /// </summary>
+    /// <param name="sharedPreset">Source normal enemy Modules & Patterns preset.</param>
+    /// <param name="patternId">Pattern ID to compile.</param>
+    /// <returns>The compiled bake result, or a default result when the pattern is unavailable.</returns>
     public static EnemyCompiledPatternBakeResult CompilePatternById(EnemyModulesAndPatternsPreset sharedPreset, string patternId)
     {
         EnemyCompiledPatternBakeResult result = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
@@ -59,11 +57,11 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies one core movement module binding to a compiled pattern result.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params binding Module binding being compiled.
-    /// /params result Mutable compiled result.
-    /// /returns True when a legal core movement module was applied.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="binding">Module binding being compiled.</param>
+    /// <param name="result">Mutable compiled result.</param>
+    /// <returns>True when a legal core movement module was applied.</returns>
     internal static bool TryApplyCoreMovementModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                     EnemyPatternModuleBinding binding,
                                                     ref EnemyCompiledPatternBakeResult result)
@@ -99,13 +97,13 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies one short-range interaction module binding to a compiled pattern config.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params binding Module binding being compiled.
-    /// /params activationRange Player distance that activates the interaction.
-    /// /params releaseDistanceBuffer Extra release buffer added after activation.
-    /// /params patternConfig Mutable compiled pattern config.
-    /// /returns True when a legal short-range interaction module was applied.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="binding">Module binding being compiled.</param>
+    /// <param name="activationRange">Player distance that activates the interaction.</param>
+    /// <param name="releaseDistanceBuffer">Extra release buffer added after activation.</param>
+    /// <param name="patternConfig">Mutable compiled pattern config.</param>
+    /// <returns>True when a legal short-range interaction module was applied.</returns>
     internal static bool TryApplyShortRangeInteractionModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                              EnemyPatternModuleBinding binding,
                                                              float activationRange,
@@ -169,19 +167,19 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Adds one weapon interaction module binding to a compiled pattern result.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params binding Module binding being compiled.
-    /// /params useMinimumRange True when minimum range gating should be applied.
-    /// /params minimumRange Authored minimum player range.
-    /// /params useMaximumRange True when maximum range gating should be applied.
-    /// /params maximumRange Authored maximum player range.
-    /// /params exclusiveLookDirectionControl True when this weapon controls look direction while active.
-    /// /params activationGates Additional non-range activation gates.
-    /// /params maximumActivationSpeed Maximum enemy speed allowed by speed gating.
-    /// /params recentlyDamagedWindowSeconds Recent damage window used by damage gating.
-    /// /params result Mutable compiled result.
-    /// /returns True when a legal weapon interaction module was applied.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="binding">Module binding being compiled.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    /// <param name="result">Mutable compiled result.</param>
+    /// <returns>True when a legal weapon interaction module was applied.</returns>
     internal static bool TryAddWeaponInteractionModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                        EnemyPatternModuleBinding binding,
                                                        bool useMinimumRange,
@@ -230,11 +228,11 @@ internal static class EnemyModulesAndPatternsBakeUtility
     #region Private Methods
     /// <summary>
     /// Compiles one shared pattern definition into movement, shooter and drop buffers.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params selectedPattern Shared assembled pattern to compile.
-    /// /params result Existing result object that receives compiled values.
-    /// /returns Compiled bake result.
     /// </summary>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="selectedPattern">Shared assembled pattern to compile.</param>
+    /// <param name="result">Existing result object that receives compiled values.</param>
+    /// <returns>Compiled bake result.</returns>
     private static EnemyCompiledPatternBakeResult CompilePattern(EnemyModulesAndPatternsPreset sharedPreset,
                                                                  EnemyModulesPatternDefinition selectedPattern,
                                                                  EnemyCompiledPatternBakeResult result)
@@ -249,11 +247,10 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies the core movement selection to the compiled result.
-    /// /params pattern Shared pattern definition currently being compiled.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params result Mutable compiled result.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Shared pattern definition currently being compiled.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="result">Mutable compiled result.</param>
     private static void ApplyCoreMovement(EnemyModulesPatternDefinition pattern,
                                           EnemyModulesAndPatternsPreset sharedPreset,
                                           ref EnemyCompiledPatternBakeResult result)
@@ -271,11 +268,10 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies the optional short-range interaction selection to the compiled pattern config.
-    /// /params pattern Shared pattern definition currently being compiled.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params patternConfig Mutable compiled pattern config.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Shared pattern definition currently being compiled.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="patternConfig">Mutable compiled pattern config.</param>
     private static void ApplyShortRangeInteraction(EnemyModulesPatternDefinition pattern,
                                                    EnemyModulesAndPatternsPreset sharedPreset,
                                                    ref EnemyPatternConfig patternConfig)
@@ -297,11 +293,10 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies one optional weapon interaction to the compiled result.
-    /// /params pattern Shared pattern definition currently being compiled.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params result Mutable compiled result.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Shared pattern definition currently being compiled.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="result">Mutable compiled result.</param>
     private static void ApplyWeaponInteraction(EnemyModulesPatternDefinition pattern,
                                                EnemyModulesAndPatternsPreset sharedPreset,
                                                ref EnemyCompiledPatternBakeResult result)
@@ -329,9 +324,9 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Resolves legal Weapon Interaction activation gate flags authored by the shared pattern assembly.
-    /// /params gates Authored gate flags.
-    /// /returns Sanitized gate flags.
     /// </summary>
+    /// <param name="gates">Authored gate flags.</param>
+    /// <returns>Sanitized gate flags.</returns>
     internal static EnemyWeaponInteractionActivationGate ResolveWeaponActivationGates(EnemyWeaponInteractionActivationGate gates)
     {
         EnemyWeaponInteractionActivationGate legalMask = EnemyWeaponInteractionActivationGate.RequireBelowSpeed |
@@ -342,11 +337,10 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Applies the optional drop-items selection to the compiled result.
-    /// /params pattern Shared pattern definition currently being compiled.
-    /// /params sharedPreset Shared preset used to resolve module definitions.
-    /// /params result Mutable compiled result.
-    /// /returns None.
     /// </summary>
+    /// <param name="pattern">Shared pattern definition currently being compiled.</param>
+    /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
+    /// <param name="result">Mutable compiled result.</param>
     private static void ApplyDropItems(EnemyModulesPatternDefinition pattern,
                                        EnemyModulesAndPatternsPreset sharedPreset,
                                        ref EnemyCompiledPatternBakeResult result)
@@ -383,10 +377,9 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Copies the short-range coward payload into the short-range section of the compiled pattern config.
-    /// /params payload Resolved module payload for the short-range coward module.
-    /// /params patternConfig Mutable compiled pattern config.
-    /// /returns None.
     /// </summary>
+    /// <param name="payload">Resolved module payload for the short-range coward module.</param>
+    /// <param name="patternConfig">Mutable compiled pattern config.</param>
     private static void ApplyShortRangeCowardPayload(EnemyPatternModulePayloadData payload, ref EnemyPatternConfig patternConfig)
     {
         if (payload == null || payload.Coward == null)
@@ -414,9 +407,9 @@ internal static class EnemyModulesAndPatternsBakeUtility
 
     /// <summary>
     /// Resolves whether the compiled pattern still requires the custom pattern movement system after the new category split.
-    /// /params patternConfig Compiled pattern config.
-    /// /returns True when the pattern should keep the custom movement tag.
     /// </summary>
+    /// <param name="patternConfig">Compiled pattern config.</param>
+    /// <returns>True when the pattern should keep the custom movement tag.</returns>
     private static bool ResolveHasCustomMovement(EnemyPatternConfig patternConfig)
     {
         if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.Grunt)

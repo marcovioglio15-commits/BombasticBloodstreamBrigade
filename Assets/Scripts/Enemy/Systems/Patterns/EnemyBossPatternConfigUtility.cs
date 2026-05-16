@@ -1,7 +1,5 @@
 /// <summary>
 /// Provides shared helpers for composing boss movement categories into one runtime pattern config.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternConfigUtility
 {
@@ -10,13 +8,13 @@ internal static class EnemyBossPatternConfigUtility
     #region Public Methods
     /// <summary>
     /// Builds a complete pattern config from independently selected boss core and short-range rules.
-    /// /params defaultConfig Baseline config used when a category has no active rule.
-    /// /params hasCoreConfig True when coreConfig contains the selected core movement rule.
-    /// /params coreConfig Selected core movement config.
-    /// /params hasShortRangeConfig True when shortRangeConfig contains the selected short-range interaction rule.
-    /// /params shortRangeConfig Selected short-range interaction config.
-    /// /returns Merged pattern config ready for runtime assignment.
     /// </summary>
+    /// <param name="defaultConfig">Baseline config used when a category has no active rule.</param>
+    /// <param name="hasCoreConfig">True when coreConfig contains the selected core movement rule.</param>
+    /// <param name="coreConfig">Selected core movement config.</param>
+    /// <param name="hasShortRangeConfig">True when shortRangeConfig contains the selected short-range interaction rule.</param>
+    /// <param name="shortRangeConfig">Selected short-range interaction config.</param>
+    /// <returns>Merged pattern config ready for runtime assignment.</returns>
     public static EnemyPatternConfig BuildMergedConfig(EnemyPatternConfig defaultConfig,
                                                        bool hasCoreConfig,
                                                        in EnemyPatternConfig coreConfig,
@@ -35,9 +33,9 @@ internal static class EnemyBossPatternConfigUtility
 
     /// <summary>
     /// Resolves whether a merged pattern config needs custom pattern movement systems.
-    /// /params patternConfig Pattern config to inspect.
-    /// /returns True when the config uses non-default movement behaviour.
     /// </summary>
+    /// <param name="patternConfig">Pattern config to inspect.</param>
+    /// <returns>True when the config uses non-default movement behaviour.</returns>
     public static bool RequiresCustomMovement(in EnemyPatternConfig patternConfig)
     {
         if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.Grunt)
@@ -53,10 +51,9 @@ internal static class EnemyBossPatternConfigUtility
     #region Private Methods
     /// <summary>
     /// Copies only the short-range interaction fields from a source config into the target config.
-    /// /params targetConfig Pattern config receiving short-range fields.
-    /// /params sourceConfig Pattern config containing compiled short-range fields.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetConfig">Pattern config receiving short-range fields.</param>
+    /// <param name="sourceConfig">Pattern config containing compiled short-range fields.</param>
     private static void CopyShortRangeInteraction(ref EnemyPatternConfig targetConfig, in EnemyPatternConfig sourceConfig)
     {
         targetConfig.HasShortRangeInteraction = sourceConfig.HasShortRangeInteraction;
@@ -96,9 +93,8 @@ internal static class EnemyBossPatternConfigUtility
 
     /// <summary>
     /// Clears short-range fields when no boss short-range rule is currently active.
-    /// /params targetConfig Pattern config receiving the cleared short-range state.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetConfig">Pattern config receiving the cleared short-range state.</param>
     private static void ClearShortRangeInteraction(ref EnemyPatternConfig targetConfig)
     {
         targetConfig.HasShortRangeInteraction = 0;

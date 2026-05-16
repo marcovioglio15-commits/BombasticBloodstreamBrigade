@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Game-level master preset that groups global sub-presets shared by gameplay systems.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "GameMasterPreset", menuName = "Game/Master Preset", order = 19)]
 public sealed class GameMasterPreset : ScriptableObject
@@ -90,8 +88,6 @@ public sealed class GameMasterPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Ensures this preset owns stable metadata required by editor tooling.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -103,8 +99,6 @@ public sealed class GameMasterPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Keeps required identifiers initialized when the asset is edited.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnValidate()
     {

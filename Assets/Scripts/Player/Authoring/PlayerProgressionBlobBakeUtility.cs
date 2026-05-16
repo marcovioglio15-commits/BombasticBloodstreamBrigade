@@ -19,7 +19,7 @@ internal static class PlayerProgressionBlobBakeUtility
     /// <param name="powerUpsPreset">Scaled scoped power-ups preset used to resolve milestone drop pools into tier rolls.</param>
     /// <param name="sourcePreset">Unscaled source progression preset used to extract runtime scaling metadata.</param>
     /// <param name="sourcePowerUpsPreset">Unscaled scoped power-ups preset used to extract runtime scaling metadata.</param>
-    /// <returns>Persistent blob asset reference ready to assign to PlayerProgressionConfig.<returns>
+    /// <returns>Persistent blob asset reference ready to assign to PlayerProgressionConfig.</returns>
     public static BlobAssetReference<PlayerProgressionConfigBlob> BuildProgressionConfigBlob(PlayerProgressionPreset preset,
                                                                                              PlayerPowerUpsPreset powerUpsPreset,
                                                                                              PlayerProgressionPreset sourcePreset,

@@ -5,8 +5,6 @@ using Unity.Physics;
 
 /// <summary>
 /// Resolves boss-minion spawn positions against the shared enemy navigation grid and wall collision queries.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossMinionSpawnPositionUtility
 {
@@ -24,21 +22,21 @@ internal static class EnemyBossMinionSpawnPositionUtility
     #region Public Methods
     /// <summary>
     /// Resolves a deterministic spawn point near the boss and projects unsafe candidates back into reachable room space.
-    /// /params bossPosition Current boss world position.
-    /// /params spawnPlaneHeight World-space height used for minion placement and wall probes.
-    /// /params radius Requested spawn radius around the boss.
-    /// /params bossEntity Boss entity used for deterministic candidate rotation.
-    /// /params ruleIndex Source minion rule index.
-    /// /params spawnIndex Current minion spawn index within the trigger batch.
-    /// /params minionData Minion body data used to preserve wall clearance.
-    /// /params hasPhysicsWorld True when wall queries can be evaluated.
-    /// /params physicsWorldSingleton Physics world used for wall clearance and direct path checks.
-    /// /params wallsLayerMask Wall layer mask used by DOTS physics queries.
-    /// /params navigationReady True when the shared navigation flow field is available.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /returns Resolved world spawn position.
     /// </summary>
+    /// <param name="bossPosition">Current boss world position.</param>
+    /// <param name="spawnPlaneHeight">World-space height used for minion placement and wall probes.</param>
+    /// <param name="radius">Requested spawn radius around the boss.</param>
+    /// <param name="bossEntity">Boss entity used for deterministic candidate rotation.</param>
+    /// <param name="ruleIndex">Source minion rule index.</param>
+    /// <param name="spawnIndex">Current minion spawn index within the trigger batch.</param>
+    /// <param name="minionData">Minion body data used to preserve wall clearance.</param>
+    /// <param name="hasPhysicsWorld">True when wall queries can be evaluated.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall clearance and direct path checks.</param>
+    /// <param name="wallsLayerMask">Wall layer mask used by DOTS physics queries.</param>
+    /// <param name="navigationReady">True when the shared navigation flow field is available.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <returns>Resolved world spawn position.</returns>
     public static float3 ResolveSpawnPosition(float3 bossPosition,
                                               float spawnPlaneHeight,
                                               float radius,
@@ -93,19 +91,19 @@ internal static class EnemyBossMinionSpawnPositionUtility
     #region Candidate Resolution
     /// <summary>
     /// Resolves whether a candidate can be used directly or after projection to a reachable navigation cell.
-    /// /params candidatePosition Candidate world position before safety correction.
-    /// /params bossPosition Current boss world position used to reject wall-separated candidates.
-    /// /params clearance Minimum minion wall clearance.
-    /// /params searchDistance Distance budget used to find reachable fallback cells.
-    /// /params hasPhysicsWorld True when wall queries can be evaluated.
-    /// /params physicsWorldSingleton Physics world used for wall clearance and direct path checks.
-    /// /params wallsLayerMask Wall layer mask used by DOTS physics queries.
-    /// /params navigationReady True when the shared navigation flow field is available.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /params resolvedPosition Output safe candidate.
-    /// /returns True when a safe candidate was resolved.
     /// </summary>
+    /// <param name="candidatePosition">Candidate world position before safety correction.</param>
+    /// <param name="bossPosition">Current boss world position used to reject wall-separated candidates.</param>
+    /// <param name="clearance">Minimum minion wall clearance.</param>
+    /// <param name="searchDistance">Distance budget used to find reachable fallback cells.</param>
+    /// <param name="hasPhysicsWorld">True when wall queries can be evaluated.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall clearance and direct path checks.</param>
+    /// <param name="wallsLayerMask">Wall layer mask used by DOTS physics queries.</param>
+    /// <param name="navigationReady">True when the shared navigation flow field is available.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <param name="resolvedPosition">Output safe candidate.</param>
+    /// <returns>True when a safe candidate was resolved.</returns>
     private static bool TryResolveSafeCandidate(float3 candidatePosition,
                                                 float3 bossPosition,
                                                 float clearance,
@@ -163,13 +161,13 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Projects a desired spawn point to the nearest reachable navigation cell when the desired cell is outside the room.
-    /// /params desiredPosition Desired world position.
-    /// /params searchDistance Distance budget used to scale local cell search.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /params projectedPosition Output desired position or nearest reachable cell center.
-    /// /returns True when a reachable position was found.
     /// </summary>
+    /// <param name="desiredPosition">Desired world position.</param>
+    /// <param name="searchDistance">Distance budget used to scale local cell search.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <param name="projectedPosition">Output desired position or nearest reachable cell center.</param>
+    /// <returns>True when a reachable position was found.</returns>
     private static bool TryProjectToReachablePosition(float3 desiredPosition,
                                                       float searchDistance,
                                                       in EnemyNavigationGridState navigationGridState,
@@ -229,11 +227,11 @@ internal static class EnemyBossMinionSpawnPositionUtility
     #region Navigation Helpers
     /// <summary>
     /// Resolves whether one world position belongs to a reachable navigation cell.
-    /// /params worldPosition World position to inspect.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /returns True when the position maps to a walkable and reachable cell.
     /// </summary>
+    /// <param name="worldPosition">World position to inspect.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <returns>True when the position maps to a walkable and reachable cell.</returns>
     private static bool IsReachablePosition(float3 worldPosition,
                                             in EnemyNavigationGridState navigationGridState,
                                             NativeArray<EnemyNavigationCellElement> navigationCells)
@@ -247,10 +245,10 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves whether one navigation cell is walkable and connected to the player-side flow field.
-    /// /params cellIndex Navigation cell index.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /returns True when the cell is currently reachable.
     /// </summary>
+    /// <param name="cellIndex">Navigation cell index.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <returns>True when the cell is currently reachable.</returns>
     private static bool IsReachableCell(int cellIndex, NativeArray<EnemyNavigationCellElement> navigationCells)
     {
         if (cellIndex < 0 || cellIndex >= navigationCells.Length)
@@ -262,12 +260,12 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves grid coordinates and clamps out-of-grid positions to the nearest border cell for fallback searches.
-    /// /params worldPosition World position to map.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params cellX Output cell X coordinate.
-    /// /params cellY Output cell Y coordinate.
-    /// /returns True when the grid has valid dimensions.
     /// </summary>
+    /// <param name="worldPosition">World position to map.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="cellX">Output cell X coordinate.</param>
+    /// <param name="cellY">Output cell Y coordinate.</param>
+    /// <returns>True when the grid has valid dimensions.</returns>
     private static bool TryResolveClampedCellCoordinates(float3 worldPosition,
                                                          in EnemyNavigationGridState navigationGridState,
                                                          out int cellX,
@@ -288,12 +286,12 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves grid coordinates only when the world position is inside the navigation grid.
-    /// /params worldPosition World position to map.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params cellX Output cell X coordinate.
-    /// /params cellY Output cell Y coordinate.
-    /// /returns True when the position maps inside the grid.
     /// </summary>
+    /// <param name="worldPosition">World position to map.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="cellX">Output cell X coordinate.</param>
+    /// <param name="cellY">Output cell Y coordinate.</param>
+    /// <returns>True when the position maps inside the grid.</returns>
     private static bool TryResolveCellCoordinates(float3 worldPosition,
                                                   in EnemyNavigationGridState navigationGridState,
                                                   out int cellX,
@@ -306,10 +304,10 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves a bounded search radius in navigation cells from a world-space spawn distance.
-    /// /params searchDistance World-space distance budget.
-    /// /params cellSize Navigation cell size.
-    /// /returns Search radius in cells.
     /// </summary>
+    /// <param name="searchDistance">World-space distance budget.</param>
+    /// <param name="cellSize">Navigation cell size.</param>
+    /// <returns>Search radius in cells.</returns>
     private static int ResolveCellSearchRadius(float searchDistance, float cellSize)
     {
         float safeCellSize = math.max(0.01f, cellSize);
@@ -319,11 +317,11 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Converts grid coordinates to a linear cell index.
-    /// /params cellX Cell X coordinate.
-    /// /params cellY Cell Y coordinate.
-    /// /params width Grid width.
-    /// /returns Linear cell index.
     /// </summary>
+    /// <param name="cellX">Cell X coordinate.</param>
+    /// <param name="cellY">Cell Y coordinate.</param>
+    /// <param name="width">Grid width.</param>
+    /// <returns>Linear cell index.</returns>
     private static int ResolveCellIndex(int cellX, int cellY, int width)
     {
         return cellY * width + cellX;
@@ -331,12 +329,12 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves the world-space center of one navigation cell.
-    /// /params origin Grid origin.
-    /// /params cellSize Grid cell size.
-    /// /params cellX Cell X coordinate.
-    /// /params cellY Cell Y coordinate.
-    /// /returns Planar cell center.
     /// </summary>
+    /// <param name="origin">Grid origin.</param>
+    /// <param name="cellSize">Grid cell size.</param>
+    /// <param name="cellX">Cell X coordinate.</param>
+    /// <param name="cellY">Cell Y coordinate.</param>
+    /// <returns>Planar cell center.</returns>
     private static float2 ResolveCellCenter(float2 origin, float cellSize, int cellX, int cellY)
     {
         return origin + new float2((cellX + 0.5f) * cellSize, (cellY + 0.5f) * cellSize);
@@ -344,12 +342,12 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves whether grid coordinates are inside the grid dimensions.
-    /// /params cellX Cell X coordinate.
-    /// /params cellY Cell Y coordinate.
-    /// /params width Grid width.
-    /// /params height Grid height.
-    /// /returns True when the coordinates are inside the grid.
     /// </summary>
+    /// <param name="cellX">Cell X coordinate.</param>
+    /// <param name="cellY">Cell Y coordinate.</param>
+    /// <param name="width">Grid width.</param>
+    /// <param name="height">Grid height.</param>
+    /// <returns>True when the coordinates are inside the grid.</returns>
     private static bool IsInsideGrid(int cellX, int cellY, int width, int height)
     {
         return cellX >= 0 && cellY >= 0 && cellX < width && cellY < height;
@@ -359,10 +357,10 @@ internal static class EnemyBossMinionSpawnPositionUtility
     #region Candidate Math
     /// <summary>
     /// Resolves one deterministic normalized angle for the requested candidate probe.
-    /// /params seed Deterministic base seed.
-    /// /params candidateIndex Candidate probe index.
-    /// /returns Normalized angle in the [0..1] range.
     /// </summary>
+    /// <param name="seed">Deterministic base seed.</param>
+    /// <param name="candidateIndex">Candidate probe index.</param>
+    /// <returns>Normalized angle in the [0..1] range.</returns>
     private static float ResolveNormalizedCandidateAngle(uint seed, int candidateIndex)
     {
         uint candidateSeed = math.hash(new uint2(seed, (uint)math.max(0, candidateIndex + 1)));
@@ -371,9 +369,9 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves a radius scale for deterministic fallback probes around the boss.
-    /// /params candidateIndex Candidate probe index.
-    /// /returns Radius scale applied to the authored spawn radius.
     /// </summary>
+    /// <param name="candidateIndex">Candidate probe index.</param>
+    /// <returns>Radius scale applied to the authored spawn radius.</returns>
     private static float ResolveCandidateRadiusScale(int candidateIndex)
     {
         switch (candidateIndex % 4)
@@ -391,11 +389,11 @@ internal static class EnemyBossMinionSpawnPositionUtility
 
     /// <summary>
     /// Resolves one radial world position around the boss from a normalized angle.
-    /// /params bossPosition Current boss world position.
-    /// /params radius Candidate radius.
-    /// /params normalizedAngle Normalized angle in the [0..1] range.
-    /// /returns Candidate world position.
     /// </summary>
+    /// <param name="bossPosition">Current boss world position.</param>
+    /// <param name="radius">Candidate radius.</param>
+    /// <param name="normalizedAngle">Normalized angle in the [0..1] range.</param>
+    /// <returns>Candidate world position.</returns>
     private static float3 ResolveRadialCandidate(float3 bossPosition, float radius, float normalizedAngle)
     {
         float angle = normalizedAngle * TwoPi;

@@ -4,8 +4,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Provides scene-hierarchy helpers shared by Scene Manager setup utilities.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneManagementProjectSetupSceneUtility
 {
@@ -14,9 +12,9 @@ internal static class GameSceneManagementProjectSetupSceneUtility
     #region Public Methods
     /// <summary>
     /// Gets the first component of the requested type in a scene.
-    /// /params scene Scene searched by root hierarchy.
-    /// /returns First matching component or null.
     /// </summary>
+    /// <param name="scene">Scene searched by root hierarchy.</param>
+    /// <returns>First matching component or null.</returns>
     public static TComponent FindFirstComponentInScene<TComponent>(Scene scene) where TComponent : Component
     {
         List<TComponent> components = FindComponentsInScene<TComponent>(scene);
@@ -29,9 +27,9 @@ internal static class GameSceneManagementProjectSetupSceneUtility
 
     /// <summary>
     /// Gets all components of the requested type from every root object in a scene.
-    /// /params scene Scene searched by root hierarchy.
-    /// /returns List of matching components.
     /// </summary>
+    /// <param name="scene">Scene searched by root hierarchy.</param>
+    /// <returns>List of matching components.</returns>
     public static List<TComponent> FindComponentsInScene<TComponent>(Scene scene) where TComponent : Component
     {
         List<TComponent> components = new List<TComponent>();
@@ -52,9 +50,9 @@ internal static class GameSceneManagementProjectSetupSceneUtility
 
     /// <summary>
     /// Gets an existing component from one object or adds it when missing.
-    /// /params gameObject Object receiving the requested component.
-    /// /returns Existing or newly added component.
     /// </summary>
+    /// <param name="gameObject">Object receiving the requested component.</param>
+    /// <returns>Existing or newly added component.</returns>
     public static TComponent EnsureComponent<TComponent>(GameObject gameObject) where TComponent : Component
     {
         TComponent component = gameObject.GetComponent<TComponent>();
@@ -67,9 +65,8 @@ internal static class GameSceneManagementProjectSetupSceneUtility
 
     /// <summary>
     /// Configures a RectTransform to fill its parent or screen-space canvas.
-    /// /params rectTransform RectTransform to stretch.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">RectTransform to stretch.</param>
     public static void StretchToParent(RectTransform rectTransform)
     {
         if (rectTransform == null)

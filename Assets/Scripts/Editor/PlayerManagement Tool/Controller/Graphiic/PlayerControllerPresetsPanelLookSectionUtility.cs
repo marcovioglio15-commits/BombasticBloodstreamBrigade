@@ -281,7 +281,7 @@ internal static class PlayerControllerPresetsPanelLookSectionUtility
     /// <param name="accelerationProperty">Serialized acceleration multiplier property.</param>
     /// <param name="scalingRulesProperty">Controller scaling-rules array used by Add Scaling.</param>
     /// <param name="refreshFields">Optional list that receives fields which should trigger preview refreshes.</param>
-    /// <returns>Returns the constructed cone row.<returns>
+    /// <returns>Returns the constructed cone row.</returns>
     private static VisualElement BuildConeRow(string label,
                                               SerializedProperty enabledProperty,
                                               SerializedProperty angleProperty,

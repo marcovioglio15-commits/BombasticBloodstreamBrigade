@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Handles the one-time upgrade from legacy single-element shooting authoring to the new stacked multi-element model.
-/// /params none.
-/// /returns none.
 /// </summary>
 public static class PlayerControllerElementalShootingMigrationUtility
 {
@@ -22,9 +20,9 @@ public static class PlayerControllerElementalShootingMigrationUtility
     #region Public Methods
     /// <summary>
     /// Ensures the authored applied-element array is initialized while preserving the authored slot count.
-    /// /params sourceSlots Authored array that may come from old or malformed serialized data.
-    /// /returns Initialized slot array used by the upgraded authoring model.
     /// </summary>
+    /// <param name="sourceSlots">Authored array that may come from old or malformed serialized data.</param>
+    /// <returns>Initialized slot array used by the upgraded authoring model.</returns>
     public static PlayerProjectileAppliedElement[] EnsureAppliedElementSlots(PlayerProjectileAppliedElement[] sourceSlots)
     {
         if (sourceSlots != null)
@@ -35,10 +33,10 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Resizes the authored applied-element array while preserving existing values up to the new slot count.
-    /// /params sourceSlots Current authored slot array.
-    /// /params targetSlotCount Requested slot count.
-    /// /returns Resized authored slot array.
     /// </summary>
+    /// <param name="sourceSlots">Current authored slot array.</param>
+    /// <param name="targetSlotCount">Requested slot count.</param>
+    /// <returns>Resized authored slot array.</returns>
     public static PlayerProjectileAppliedElement[] ResizeAppliedElementSlots(PlayerProjectileAppliedElement[] sourceSlots, int targetSlotCount)
     {
         int resolvedTargetSlotCount = Mathf.Max(0, targetSlotCount);
@@ -58,9 +56,8 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Migrates legacy single-element authoring data into the new stacked slot array and per-element behaviour container.
-    /// /params values Shooting values block being validated.
-    /// /returns void.
     /// </summary>
+    /// <param name="values">Shooting values block being validated.</param>
     public static void MigrateLegacyElementalPayloadAuthoring(ShootingValues values)
     {
         if (values == null)
@@ -93,9 +90,8 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Migrates legacy Add Scaling stat keys that targeted the old single-element fields into the new multi-element paths.
-    /// /params preset Controller preset whose scaling rules should be upgraded once.
-    /// /returns void.
     /// </summary>
+    /// <param name="preset">Controller preset whose scaling rules should be upgraded once.</param>
     public static void MigrateLegacyScalingRules(PlayerControllerPreset preset)
     {
         if (preset == null)
@@ -155,9 +151,8 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Removes Add Scaling rules that target applied-element slots no longer present in the authored array.
-    /// /params preset Controller preset whose scaling rules should be pruned.
-    /// /returns void.
     /// </summary>
+    /// <param name="preset">Controller preset whose scaling rules should be pruned.</param>
     public static void PruneAppliedElementScalingRules(PlayerControllerPreset preset)
     {
         if (preset == null)
@@ -191,9 +186,9 @@ public static class PlayerControllerElementalShootingMigrationUtility
     #region Private Methods
     /// <summary>
     /// Reports whether at least one authored slot contains a valid gameplay element.
-    /// /params appliedElementSlots Fixed-size authored slot array.
-    /// /returns True when the array contains at least one element other than None.
     /// </summary>
+    /// <param name="appliedElementSlots">Fixed-size authored slot array.</param>
+    /// <returns>True when the array contains at least one element other than None.</returns>
     private static bool HasAnyAssignedElement(PlayerProjectileAppliedElement[] appliedElementSlots)
     {
         if (appliedElementSlots == null)
@@ -210,10 +205,10 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Extracts one applied-element slot index from a normalized scaling stat key.
-    /// /params statKey Normalized scaling stat key.
-    /// /params slotIndex Resolved slot index when present.
-    /// /returns True when the key targets one applied-element slot entry.
     /// </summary>
+    /// <param name="statKey">Normalized scaling stat key.</param>
+    /// <param name="slotIndex">Resolved slot index when present.</param>
+    /// <returns>True when the key targets one applied-element slot entry.</returns>
     private static bool TryExtractAppliedElementSlotIndex(string statKey, out int slotIndex)
     {
         slotIndex = -1;
@@ -235,9 +230,9 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Resolves the current authored applied-element slot count from one shooting values block.
-    /// /params values Shooting values container whose slot count should be inspected.
-    /// /returns Current authored slot count.
     /// </summary>
+    /// <param name="values">Shooting values container whose slot count should be inspected.</param>
+    /// <returns>Current authored slot count.</returns>
     private static int ResolveAppliedElementSlotCount(ShootingValues values)
     {
         if (values == null || values.AppliedElementsMutable == null)
@@ -248,10 +243,10 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Builds the upgraded stat key for one per-element behaviour property.
-    /// /params elementKey Lowercase serialized element field name.
-    /// /params propertySuffix Serialized behaviour property suffix.
-    /// /returns Upgraded stat key string.
     /// </summary>
+    /// <param name="elementKey">Lowercase serialized element field name.</param>
+    /// <param name="propertySuffix">Serialized behaviour property suffix.</param>
+    /// <returns>Upgraded stat key string.</returns>
     private static string BuildElementBehaviourStatKey(string elementKey, string propertySuffix)
     {
         return ElementBehavioursPrefix + elementKey + "." + propertySuffix;
@@ -259,9 +254,9 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Normalizes one stored stat key so older private backing-field segments do not block migration.
-    /// /params statKey Serialized stat key stored by the legacy rule.
-    /// /returns Normalized key string used by migration comparisons.
     /// </summary>
+    /// <param name="statKey">Serialized stat key stored by the legacy rule.</param>
+    /// <returns>Normalized key string used by migration comparisons.</returns>
     private static string NormalizeLegacyStatKey(string statKey)
     {
         if (string.IsNullOrWhiteSpace(statKey))
@@ -272,10 +267,10 @@ public static class PlayerControllerElementalShootingMigrationUtility
 
     /// <summary>
     /// Clones a scaling rule while replacing only the destination stat key.
-    /// /params sourceRule Existing rule to clone.
-    /// /params statKey New stat key written into the cloned rule.
-    /// /returns Cloned scaling rule.
     /// </summary>
+    /// <param name="sourceRule">Existing rule to clone.</param>
+    /// <param name="statKey">New stat key written into the cloned rule.</param>
+    /// <returns>Cloned scaling rule.</returns>
     private static PlayerStatScalingRule CloneRuleWithNewStatKey(PlayerStatScalingRule sourceRule, string statKey)
     {
         PlayerStatScalingRule clonedRule = new PlayerStatScalingRule();

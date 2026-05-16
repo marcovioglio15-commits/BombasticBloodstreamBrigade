@@ -19,7 +19,7 @@ public static class PlayerControllerPresetLibraryUtility
     /// Loads the PlayerControllerPresetLibrary asset from the default path, or creates and saves a new one if it does
     /// not exist.
     /// </summary>
-    /// <returns>The loaded or newly created PlayerControllerPresetLibrary instance.<returns>
+    /// <returns>The loaded or newly created PlayerControllerPresetLibrary instance.</returns>
     public static PlayerControllerPresetLibrary GetOrCreateLibrary()
     {
         PlayerControllerPresetLibrary library = AssetDatabase.LoadAssetAtPath<PlayerControllerPresetLibrary>(DefaultLibraryPath);
@@ -39,7 +39,7 @@ public static class PlayerControllerPresetLibraryUtility
     /// Creates a new PlayerControllerPreset asset with the specified name in the default presets folder.
     /// </summary>
     /// <param name="presetName">The name to assign to the new preset asset.</param>
-    /// <returns>The created PlayerControllerPreset asset.<returns>
+    /// <returns>The created PlayerControllerPreset asset.</returns>
     public static PlayerControllerPreset CreatePresetAsset(string presetName)
     {
         EnsureFolder(DefaultPresetsFolder);

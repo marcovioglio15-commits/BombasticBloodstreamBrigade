@@ -14,7 +14,7 @@ public static class PlayerPassiveToolsAggregationUtility
     /// </summary>
     /// <param name="entity">Player entity being aggregated.</param>
     /// <param name="equippedPassiveToolsLookup">Buffer lookup containing equipped passive entries.</param>
-    /// <returns>Aggregated passive runtime state.<returns>
+    /// <returns>Aggregated passive runtime state.</returns>
     public static PlayerPassiveToolsState BuildPassiveToolsState(Entity entity, in BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup)
     {
         PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
@@ -30,7 +30,7 @@ public static class PlayerPassiveToolsAggregationUtility
     /// Builds aggregated passive state from a direct equipped-passives dynamic buffer.
     /// </summary>
     /// <param name="equippedPassiveToolsBuffer">Runtime equipped passive entries.</param>
-    /// <returns>Aggregated passive runtime state.<returns>
+    /// <returns>Aggregated passive runtime state.</returns>
     public static PlayerPassiveToolsState BuildPassiveToolsState(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer)
     {
         PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
@@ -50,7 +50,7 @@ public static class PlayerPassiveToolsAggregationUtility
     /// <summary>
     /// Builds the neutral passive state used when gameplay needs projectile math without equipped passive effects.
     /// </summary>
-    /// <returns>Passive state with projectile multipliers initialized to 1 and all hooks disabled.<returns>
+    /// <returns>Passive state with projectile multipliers initialized to 1 and all hooks disabled.</returns>
     public static PlayerPassiveToolsState CreateDefaultState()
     {
         return new PlayerPassiveToolsState
@@ -85,9 +85,9 @@ public static class PlayerPassiveToolsAggregationUtility
 
     /// <summary>
     /// Builds a neutral passive snapshot that exposes only one Laser Beam config.
-    /// laserBeamConfig: Standalone Laser Beam settings to expose to beam simulation and presentation.
-    /// returns Passive state with only HasLaserBeam enabled.
     /// </summary>
+    /// <param name="laserBeamConfig">Standalone Laser Beam settings to expose to beam simulation and presentation.</param>
+    /// <returns>Passive state with only HasLaserBeam enabled.</returns>
     public static PlayerPassiveToolsState CreateStandaloneLaserBeamState(in LaserBeamPassiveConfig laserBeamConfig)
     {
         PlayerPassiveToolsState passiveToolsState = CreateDefaultState();

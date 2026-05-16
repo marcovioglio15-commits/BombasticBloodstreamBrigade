@@ -29,7 +29,7 @@ public sealed class PlayerCompiledStatFormula
     /// </summary>
     /// <param name="rootNodeValue">Root expression node.</param>
     /// <param name="variableNamesValue">Distinct variable names referenced by the formula.</param>
-    /// <returns>Initialized compiled formula.<returns>
+    /// <returns>Initialized compiled formula.</returns>
     internal PlayerCompiledStatFormula(PlayerFormulaNode rootNodeValue, string[] variableNamesValue)
     {
         rootNode = rootNodeValue;
@@ -47,7 +47,7 @@ public sealed class PlayerCompiledStatFormula
     /// <param name="variableValues">Current typed variable context.</param>
     /// <param name="result">Resolved typed value when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeds.<returns>
+    /// <returns>True when evaluation succeeds.</returns>
     public bool TryEvaluate(PlayerFormulaValue thisValue,
                             IReadOnlyDictionary<string, PlayerFormulaValue> variableValues,
                             out PlayerFormulaValue result,
@@ -75,7 +75,7 @@ public sealed class PlayerCompiledStatFormula
     /// <param name="variableValues">Typed variable context.</param>
     /// <param name="result">Resolved numeric result when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeds with a numeric result.<returns>
+    /// <returns>True when evaluation succeeds with a numeric result.</returns>
     public bool TryEvaluate(float thisValue,
                             IReadOnlyDictionary<string, PlayerFormulaValue> variableValues,
                             out float result,
@@ -110,7 +110,7 @@ public sealed class PlayerCompiledStatFormula
     /// <param name="variableValues">Legacy numeric variable context.</param>
     /// <param name="result">Resolved numeric result when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeds.<returns>
+    /// <returns>True when evaluation succeeds.</returns>
     public bool TryEvaluate(float thisValue,
                             IReadOnlyDictionary<string, float> variableValues,
                             out float result,
@@ -136,7 +136,7 @@ public sealed class PlayerCompiledStatFormula
     /// <param name="variableTypes">Known types for scoped variables.</param>
     /// <param name="resultType">Resolved result type when inference succeeds.</param>
     /// <param name="errorMessage">Failure reason when type inference fails.</param>
-    /// <returns>True when type inference succeeds.<returns>
+    /// <returns>True when type inference succeeds.</returns>
     public bool TryInferResultType(PlayerFormulaValueType thisType,
                                    IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes,
                                    out PlayerFormulaValueType resultType,
@@ -193,7 +193,7 @@ internal sealed class PlayerFormulaLiteralNode : PlayerFormulaNode
     /// Creates one literal node.
     /// </summary>
     /// <param name="valueValue">Literal payload.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaLiteralNode(PlayerFormulaValue valueValue)
     {
         value = valueValue;
@@ -237,7 +237,7 @@ internal sealed class PlayerFormulaVariableNode : PlayerFormulaNode
     /// Creates one variable node.
     /// </summary>
     /// <param name="variableNameValue">Referenced variable name.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaVariableNode(string variableNameValue)
     {
         variableName = string.IsNullOrWhiteSpace(variableNameValue)
@@ -325,7 +325,7 @@ internal sealed class PlayerFormulaUnaryNode : PlayerFormulaNode
     /// </summary>
     /// <param name="operatorTextValue">Unary operator text.</param>
     /// <param name="operandNodeValue">Operand expression node.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaUnaryNode(string operatorTextValue, PlayerFormulaNode operandNodeValue)
     {
         operatorText = operatorTextValue ?? string.Empty;
@@ -447,7 +447,7 @@ internal sealed class PlayerFormulaBinaryNode : PlayerFormulaNode
     /// <param name="operatorTextValue">Binary operator text.</param>
     /// <param name="leftNodeValue">Left operand node.</param>
     /// <param name="rightNodeValue">Right operand node.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaBinaryNode(string operatorTextValue,
                                    PlayerFormulaNode leftNodeValue,
                                    PlayerFormulaNode rightNodeValue)
@@ -678,7 +678,7 @@ internal sealed class PlayerFormulaFunctionNode : PlayerFormulaNode
     /// </summary>
     /// <param name="functionNameValue">Function identifier.</param>
     /// <param name="argumentNodesValue">Ordered argument nodes.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaFunctionNode(string functionNameValue, PlayerFormulaNode[] argumentNodesValue)
     {
         functionName = string.IsNullOrWhiteSpace(functionNameValue)
@@ -756,7 +756,7 @@ internal sealed class PlayerFormulaFunctionNode : PlayerFormulaNode
     /// <param name="variableValues">Current typed variable context.</param>
     /// <param name="result">Resolved selected branch result.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeds.<returns>
+    /// <returns>True when evaluation succeeds.</returns>
     private bool EvaluateSelect(PlayerFormulaValue thisValue,
                                 IReadOnlyDictionary<string, PlayerFormulaValue> variableValues,
                                 out PlayerFormulaValue result,
@@ -786,7 +786,7 @@ internal sealed class PlayerFormulaFunctionNode : PlayerFormulaNode
     /// <param name="variableTypes">Known scoped variable types.</param>
     /// <param name="resultType">Resolved result type.</param>
     /// <param name="errorMessage">Failure reason when inference fails.</param>
-    /// <returns>True when inference succeeds.<returns>
+    /// <returns>True when inference succeeds.</returns>
     private bool InferSelectType(PlayerFormulaValueType thisType,
                                  IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes,
                                  out PlayerFormulaValueType resultType,
@@ -843,7 +843,7 @@ internal sealed class PlayerFormulaConditionalNode : PlayerFormulaNode
     /// <param name="conditionNodeValue">Condition expression node.</param>
     /// <param name="whenTrueNodeValue">True branch expression node.</param>
     /// <param name="whenFalseNodeValue">False branch expression node.</param>
-    /// <returns>Initialized node.<returns>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaConditionalNode(PlayerFormulaNode conditionNodeValue,
                                         PlayerFormulaNode whenTrueNodeValue,
                                         PlayerFormulaNode whenFalseNodeValue)
@@ -934,7 +934,7 @@ internal static class PlayerFormulaNodeUtility
     /// </summary>
     /// <param name="leftType">Left operand type.</param>
     /// <param name="rightType">Right operand type.</param>
-    /// <returns>True when both types are numeric.<returns>
+    /// <returns>True when both types are numeric.</returns>
     public static bool AreBothNumbers(PlayerFormulaValueType leftType, PlayerFormulaValueType rightType)
     {
         return leftType == PlayerFormulaValueType.Number && rightType == PlayerFormulaValueType.Number;
@@ -944,7 +944,7 @@ internal static class PlayerFormulaNodeUtility
     /// Checks whether all provided types are numeric.
     /// </summary>
     /// <param name="types">Types to inspect.</param>
-    /// <returns>True when every type is numeric.<returns>
+    /// <returns>True when every type is numeric.</returns>
     public static bool AreAllNumbers(IReadOnlyList<PlayerFormulaValueType> types)
     {
         if (types == null)
@@ -968,7 +968,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="actualCount">Actual number of arguments.</param>
     /// <param name="expectedCount">Required number of arguments.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when the count is valid.<returns>
+    /// <returns>True when the count is valid.</returns>
     public static bool TryRequireFunctionArgumentCount(string functionName,
                                                        int actualCount,
                                                        int expectedCount,
@@ -994,7 +994,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="contextLabel">Operator or function name used in the error message.</param>
     /// <param name="numberValue">Resolved numeric payload.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when the value is numeric.<returns>
+    /// <returns>True when the value is numeric.</returns>
     public static bool TryRequireNumber(PlayerFormulaValue value,
                                         string contextLabel,
                                         out float numberValue,
@@ -1023,7 +1023,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="contextLabel">Operator or function name used in the error message.</param>
     /// <param name="booleanValue">Resolved boolean payload.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when the value is boolean.<returns>
+    /// <returns>True when the value is boolean.</returns>
     public static bool TryRequireBoolean(PlayerFormulaValue value,
                                          string contextLabel,
                                          out bool booleanValue,
@@ -1054,7 +1054,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="resolvedLeftValue">Resolved left numeric payload.</param>
     /// <param name="resolvedRightValue">Resolved right numeric payload.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when both values are numeric.<returns>
+    /// <returns>True when both values are numeric.</returns>
     public static bool TryRequireBinaryNumbers(PlayerFormulaValue leftValue,
                                                PlayerFormulaValue rightValue,
                                                string contextLabel,
@@ -1084,7 +1084,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="resolvedLeftValue">Resolved left boolean payload.</param>
     /// <param name="resolvedRightValue">Resolved right boolean payload.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when both values are boolean.<returns>
+    /// <returns>True when both values are boolean.</returns>
     public static bool TryRequireBinaryBooleans(PlayerFormulaValue leftValue,
                                                 PlayerFormulaValue rightValue,
                                                 string contextLabel,
@@ -1112,7 +1112,7 @@ internal static class PlayerFormulaNodeUtility
     /// <param name="rightValue">Right operand value.</param>
     /// <param name="contextLabel">Operator name used in the error message.</param>
     /// <param name="errorMessage">Failure reason when validation fails.</param>
-    /// <returns>True when both values have the same valid type.<returns>
+    /// <returns>True when both values have the same valid type.</returns>
     public static bool TryRequireComparableValues(PlayerFormulaValue leftValue,
                                                   PlayerFormulaValue rightValue,
                                                   string contextLabel,
@@ -1161,7 +1161,7 @@ public readonly struct PlayerStatFormulaCompileResult
     /// <param name="isValidValue">Compilation success flag.</param>
     /// <param name="compiledFormulaValue">Compiled formula when successful.</param>
     /// <param name="errorMessageValue">Failure reason when compilation fails.</param>
-    /// <returns>Initialized compile result.<returns>
+    /// <returns>Initialized compile result.</returns>
     public PlayerStatFormulaCompileResult(bool isValidValue,
                                           PlayerCompiledStatFormula compiledFormulaValue,
                                           string errorMessageValue)

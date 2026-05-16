@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Lightweight helpers used by ECS systems to enqueue gameplay audio requests.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameAudioEventRequestUtility
 {
@@ -13,11 +11,10 @@ public static class GameAudioEventRequestUtility
     #region Public Methods
     /// <summary>
     /// Adds one positioned audio event request to an already resolved singleton request buffer.
-    /// /params requests Mutable singleton audio request buffer.
-    /// /params eventId Gameplay audio event to request.
-    /// /params position World-space position for 3D playback.
-    /// /returns None.
     /// </summary>
+    /// <param name="requests">Mutable singleton audio request buffer.</param>
+    /// <param name="eventId">Gameplay audio event to request.</param>
+    /// <param name="position">World-space position for 3D playback.</param>
     public static void EnqueuePositioned(DynamicBuffer<GameAudioEventRequest> requests,
                                          GameAudioEventId eventId,
                                          float3 position)
@@ -27,10 +24,9 @@ public static class GameAudioEventRequestUtility
 
     /// <summary>
     /// Adds one non-positioned audio event request to an already resolved singleton request buffer.
-    /// /params requests Mutable singleton audio request buffer.
-    /// /params eventId Gameplay audio event to request.
-    /// /returns None.
     /// </summary>
+    /// <param name="requests">Mutable singleton audio request buffer.</param>
+    /// <param name="eventId">Gameplay audio event to request.</param>
     public static void EnqueueGlobal(DynamicBuffer<GameAudioEventRequest> requests, GameAudioEventId eventId)
     {
         Enqueue(requests, eventId, float3.zero, false, 1f, 1f);
@@ -38,14 +34,13 @@ public static class GameAudioEventRequestUtility
 
     /// <summary>
     /// Adds one audio request with explicit playback multipliers.
-    /// /params requests Mutable singleton audio request buffer.
-    /// /params eventId Gameplay audio event to request.
-    /// /params position World-space position for 3D playback.
-    /// /params hasPosition True when position should be used.
-    /// /params volumeMultiplier Request-local volume multiplier.
-    /// /params pitchMultiplier Request-local pitch multiplier.
-    /// /returns None.
     /// </summary>
+    /// <param name="requests">Mutable singleton audio request buffer.</param>
+    /// <param name="eventId">Gameplay audio event to request.</param>
+    /// <param name="position">World-space position for 3D playback.</param>
+    /// <param name="hasPosition">True when position should be used.</param>
+    /// <param name="volumeMultiplier">Request-local volume multiplier.</param>
+    /// <param name="pitchMultiplier">Request-local pitch multiplier.</param>
     public static void Enqueue(DynamicBuffer<GameAudioEventRequest> requests,
                                GameAudioEventId eventId,
                                float3 position,

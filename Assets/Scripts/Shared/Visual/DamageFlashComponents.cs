@@ -4,7 +4,6 @@ using Unity.Rendering;
 
 /// <summary>
 /// Stores immutable runtime tuning used by short hit-flash feedback presentation.
-/// returns None.
 /// </summary>
 public struct DamageFlashConfig : IComponentData
 {
@@ -17,7 +16,6 @@ public struct DamageFlashConfig : IComponentData
 
 /// <summary>
 /// Stores mutable runtime hit-flash playback state.
-/// returns None.
 /// </summary>
 public struct DamageFlashState : IComponentData
 {
@@ -29,7 +27,6 @@ public struct DamageFlashState : IComponentData
 
 /// <summary>
 /// Stores the original material color used to restore per-instance renderer overrides after a hit flash ends.
-/// returns None.
 /// </summary>
 public struct DamageFlashBaseColor : IComponentData
 {
@@ -40,7 +37,6 @@ public struct DamageFlashBaseColor : IComponentData
 
 /// <summary>
 /// Stores one renderer entity driven by a root-level hit-flash controller.
-/// returns None.
 /// </summary>
 public struct DamageFlashRenderTargetElement : IBufferElementData
 {
@@ -52,7 +48,6 @@ public struct DamageFlashRenderTargetElement : IBufferElementData
 
 /// <summary>
 /// Custom Entities Graphics override for the shader-side flash tint color.
-/// returns None.
 /// </summary>
 [MaterialProperty("_HitFlashColor")]
 public struct MaterialHitFlashColor : IComponentData
@@ -64,7 +59,6 @@ public struct MaterialHitFlashColor : IComponentData
 
 /// <summary>
 /// Custom Entities Graphics override for the shader-side flash blend factor.
-/// returns None.
 /// </summary>
 [MaterialProperty("_HitFlashBlend")]
 public struct MaterialHitFlashBlend : IComponentData

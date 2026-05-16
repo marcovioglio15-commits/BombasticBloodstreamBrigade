@@ -47,9 +47,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Requires at least one active warning state before the presentation system starts ticking.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EnemySpawnWarningState>();
@@ -57,9 +56,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Renders each currently active spawn-warning ring and recycles views once their warning state expires.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -114,9 +112,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Releases all pooled runtime objects allocated by the warning presentation system.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnDestroy(ref SystemState state)
     {
         DestroyRuntimeState();
@@ -124,8 +121,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Destroys every runtime warning-ring object and material owned by the static presentation pool.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void DestroyRuntimeState()
     {
@@ -138,10 +133,10 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     #region Rendering
     /// <summary>
     /// Resolves whether one warning state should be disabled because it can no longer produce visible output.
-    /// warningState: Current warning payload stored on the enemy.
-    /// elapsedTime: Current elapsed world time.
-    /// returns True when the warning state should be disabled immediately, otherwise false.
     /// </summary>
+    /// <param name="warningState">Current warning payload stored on the enemy.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <returns>True when the warning state should be disabled immediately, otherwise false.</returns>
     private static bool ShouldDisableWarningState(in EnemySpawnWarningState warningState, float elapsedTime)
     {
         if (warningState.MaximumAlpha <= 0f)
@@ -158,12 +153,12 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Resolves the live opacity and width scale of one warning at the current frame.
-    /// warningState: Current warning payload stored on the enemy.
-    /// elapsedTime: Current elapsed world time.
-    /// opacity: Resolved output opacity for the current frame.
-    /// widthScale: Resolved output width multiplier for the current frame.
-    /// returns True when the warning should be visible during this frame, otherwise false.
     /// </summary>
+    /// <param name="warningState">Current warning payload stored on the enemy.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="opacity">Resolved output opacity for the current frame.</param>
+    /// <param name="widthScale">Resolved output width multiplier for the current frame.</param>
+    /// <returns>True when the warning should be visible during this frame, otherwise false.</returns>
     private static bool TryResolveWarningVisualState(in EnemySpawnWarningState warningState,
                                                      float elapsedTime,
                                                      out float opacity,
@@ -204,9 +199,9 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     #region View Pool
     /// <summary>
     /// Resolves an existing warning view for the enemy or creates a new pooled one when needed.
-    /// enemyEntity: Enemy that currently owns the warning state.
-    /// returns Runtime ring view associated with the provided enemy.
     /// </summary>
+    /// <param name="enemyEntity">Enemy that currently owns the warning state.</param>
+    /// <returns>Runtime ring view associated with the provided enemy.</returns>
     private static EnemySpawnWarningRingView GetOrCreateView(Entity enemyEntity)
     {
         if (activeViewByEnemy.TryGetValue(enemyEntity, out EnemySpawnWarningRingView activeView))
@@ -223,7 +218,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Returns hidden pooled views back to the free stack once they are no longer visible this frame.
-    /// returns None.
     /// </summary>
     private static void RecycleHiddenViews()
     {
@@ -249,8 +243,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Acquires one pooled warning ring view or creates a new one when the pool is empty.
-    /// returns Runtime warning ring view ready for rendering, or null when creation failed.
     /// </summary>
+    /// <returns>Runtime warning ring view ready for rendering, or null when creation failed.</returns>
     private static EnemySpawnWarningRingView AcquireView()
     {
         Material warningMaterial = ResolveSharedWarningMaterial();
@@ -289,7 +283,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Destroys every active or pooled warning view immediately.
-    /// returns None.
     /// </summary>
     private static void DestroyAllViews()
     {
@@ -319,8 +312,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     #region Runtime Resources
     /// <summary>
     /// Resolves the hidden runtime root used to parent every pooled warning view.
-    /// returns Runtime root transform used by warning views.
     /// </summary>
+    /// <returns>Runtime root transform used by warning views.</returns>
     private static Transform ResolveRuntimeRootTransform()
     {
         if (runtimeRootObject == null)
@@ -334,7 +327,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Destroys the hidden runtime root when the system shuts down.
-    /// returns None.
     /// </summary>
     private static void DestroyRuntimeRoot()
     {
@@ -347,8 +339,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Resolves the shared material assigned to every pooled LineRenderer.
-    /// returns Shared runtime material used by warning views.
     /// </summary>
+    /// <returns>Shared runtime material used by warning views.</returns>
     private static Material ResolveSharedWarningMaterial()
     {
         if (sharedWarningMaterial != null)
@@ -369,9 +361,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Resolves a build-safe shader fallback when the built-in sprite material cannot be loaded.
-    /// /params None.
-    /// /returns First supported line-renderer shader found in the current project.
     /// </summary>
+    /// <returns>First supported line-renderer shader found in the current project.</returns>
     private static Shader ResolveFallbackLineShader()
     {
         Shader lineShader = Shader.Find(UrpParticlesUnlitShaderName);
@@ -394,9 +385,8 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Applies transparent line-renderer settings to the shared warning material.
-    /// /params warningMaterial Runtime material used by pooled warning rings.
-    /// /returns None.
     /// </summary>
+    /// <param name="warningMaterial">Runtime material used by pooled warning rings.</param>
     private static void ConfigureWarningMaterial(Material warningMaterial)
     {
         warningMaterial.hideFlags = HideFlags.HideAndDontSave;
@@ -416,11 +406,10 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Sets one material float only when the active shader exposes the requested property.
-    /// /params material Runtime material being configured.
-    /// /params propertyId Shader property id.
-    /// /params value Float value to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material being configured.</param>
+    /// <param name="propertyId">Shader property id.</param>
+    /// <param name="value">Float value to assign.</param>
     private static void SetFloatIfPresent(Material material, int propertyId, float value)
     {
         if (!material.HasProperty(propertyId))
@@ -431,11 +420,10 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Sets one material color only when the active shader exposes the requested property.
-    /// /params material Runtime material being configured.
-    /// /params propertyId Shader property id.
-    /// /params value Color value to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material being configured.</param>
+    /// <param name="propertyId">Shader property id.</param>
+    /// <param name="value">Color value to assign.</param>
     private static void SetColorIfPresent(Material material, int propertyId, Color value)
     {
         if (!material.HasProperty(propertyId))
@@ -446,8 +434,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Logs one warning when no supported runtime shader can be found for spawn-warning rings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void LogMissingLineShaderWarning()
     {
@@ -460,7 +446,6 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
 
     /// <summary>
     /// Destroys the shared runtime material when the system shuts down.
-    /// returns None.
     /// </summary>
     private static void DestroySharedMaterial()
     {

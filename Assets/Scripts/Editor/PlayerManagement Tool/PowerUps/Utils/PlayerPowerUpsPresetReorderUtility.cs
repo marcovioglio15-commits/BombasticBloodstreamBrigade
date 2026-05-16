@@ -13,7 +13,7 @@ internal static class PlayerPowerUpsPresetReorderUtility
     /// <param name="isActiveSection">True for the active list, false for the passive list.</param>
     /// <param name="fromIndex">Current list index of the element to move.</param>
     /// <param name="toIndex">Destination list index after the reorder.</param>
-    /// <returns>True when the move was applied, otherwise false.<returns>
+    /// <returns>True when the move was applied, otherwise false.</returns>
     public static bool MovePowerUpDefinition(PlayerPowerUpsPreset preset,
                                              bool isActiveSection,
                                              int fromIndex,
@@ -31,7 +31,7 @@ internal static class PlayerPowerUpsPresetReorderUtility
     /// <param name="preset">Preset that owns the module list.</param>
     /// <param name="fromIndex">Current module index.</param>
     /// <param name="toIndex">Destination module index.</param>
-    /// <returns>True when the move was applied, otherwise false.<returns>
+    /// <returns>True when the move was applied, otherwise false.</returns>
     public static bool MoveModuleDefinition(PlayerPowerUpsPreset preset, int fromIndex, int toIndex)
     {
         if (preset == null)

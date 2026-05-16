@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Bakes EnemySpawnerAuthoring data into finite wave buffers and prefab-specific pool requirements.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 {
@@ -15,9 +13,8 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
     #region Bake
     /// <summary>
     /// Converts the authored wave grid into ECS wave definitions, events and pool requirements.
-    /// /params authoring Spawner authoring source component.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Spawner authoring source component.</param>
     public override void Bake(EnemySpawnerAuthoring authoring)
     {
         if (authoring == null)
@@ -84,14 +81,13 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
     #region Helpers
     /// <summary>
     /// Stages wave definitions, runtime defaults and exact spawn events from the authored spawner data.
-    /// /params authoring Spawner authoring source.
-    /// /params spawnerWarningConfig Spawner-level fallback warning config used when enemy visuals do not override warning settings.
-    /// /params stagedWaveDefinitions Target wave definition list.
-    /// /params stagedWaveRuntime Target wave runtime default list.
-    /// /params stagedWaveEvents Target exact spawn event list.
-    /// /params plannedCountByPrefab Target prefab usage count map.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Spawner authoring source.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config used when enemy visuals do not override warning settings.</param>
+    /// <param name="stagedWaveDefinitions">Target wave definition list.</param>
+    /// <param name="stagedWaveRuntime">Target wave runtime default list.</param>
+    /// <param name="stagedWaveEvents">Target exact spawn event list.</param>
+    /// <param name="plannedCountByPrefab">Target prefab usage count map.</param>
     private void StageWaves(EnemySpawnerAuthoring authoring,
                             EnemySpawnWarningConfig spawnerWarningConfig,
                             List<EnemySpawnerWaveDefinitionElement> stagedWaveDefinitions,
@@ -135,14 +131,13 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Stages exact spawn events for all painted cells of one wave.
-    /// /params authoring Spawner authoring source.
-    /// /params wave Wave being converted.
-    /// /params waveIndex Current wave index.
-    /// /params spawnerWarningConfig Spawner-level fallback warning config used for non-overridden events.
-    /// /params stagedEventsForWave Target event list for the current wave.
-    /// /params plannedCountByPrefab Target prefab usage count map.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Spawner authoring source.</param>
+    /// <param name="wave">Wave being converted.</param>
+    /// <param name="waveIndex">Current wave index.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config used for non-overridden events.</param>
+    /// <param name="stagedEventsForWave">Target event list for the current wave.</param>
+    /// <param name="plannedCountByPrefab">Target prefab usage count map.</param>
     private void StageWaveCells(EnemySpawnerAuthoring authoring,
                                 EnemySpawnWaveAuthoring wave,
                                 int waveIndex,
@@ -199,11 +194,11 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Resolves the prefab entity used by one painted cell through its master and visual presets.
-    /// authoring: Spawner authoring component used only for warning context.
-    /// masterPreset: Enemy master preset painted on the cell.
-    /// prefabEntity: Resolved prefab entity when successful.
-    /// returns True when the cell references a valid enemy prefab, otherwise false.
     /// </summary>
+    /// <param name="authoring">Spawner authoring component used only for warning context.</param>
+    /// <param name="masterPreset">Enemy master preset painted on the cell.</param>
+    /// <param name="prefabEntity">Resolved prefab entity when successful.</param>
+    /// <returns>True when the cell references a valid enemy prefab, otherwise false.</returns>
     private bool TryResolveCellPrefab(EnemySpawnerAuthoring authoring,
                                       EnemyMasterPreset masterPreset,
                                       out Entity prefabEntity)
@@ -258,9 +253,9 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Builds the spawner-level fallback warning config from authoring values.
-    /// /params authoring Spawner authoring source component.
-    /// /returns Baked fallback warning config.
     /// </summary>
+    /// <param name="authoring">Spawner authoring source component.</param>
+    /// <returns>Baked fallback warning config.</returns>
     private static EnemySpawnWarningConfig BuildSpawnerWarningConfig(EnemySpawnerAuthoring authoring)
     {
         return new EnemySpawnWarningConfig
@@ -279,9 +274,9 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Resolves spawn overrides from the visual preset assigned to a painted enemy type.
-    /// /params masterPreset Painted enemy master preset.
-    /// /returns Spawn overrides block, or null when unavailable.
     /// </summary>
+    /// <param name="masterPreset">Painted enemy master preset.</param>
+    /// <returns>Spawn overrides block, or null when unavailable.</returns>
     private static EnemyVisualSpawnOverridesSettings ResolveSpawnOverrides(EnemyMasterPreset masterPreset)
     {
         if (masterPreset == null || masterPreset.VisualPreset == null)
@@ -292,9 +287,9 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Resolves the local-space spawn offset applied by one enemy visual preset.
-    /// /params spawnOverrides Spawn override settings for the painted enemy type.
-    /// /returns Local-space spawn offset.
     /// </summary>
+    /// <param name="spawnOverrides">Spawn override settings for the painted enemy type.</param>
+    /// <returns>Local-space spawn offset.</returns>
     private static float3 ResolveSpawnOffset(EnemyVisualSpawnOverridesSettings spawnOverrides)
     {
         if (spawnOverrides == null || !spawnOverrides.OverrideSpawnOffset)
@@ -306,12 +301,11 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Writes event-level spawn warning overrides onto newly staged events for one painted cell.
-    /// /params stagedEventsForWave Event list receiving overrides.
-    /// /params firstInsertedEventIndex First event index inserted for the painted cell.
-    /// /params spawnOverrides Spawn override settings for the painted enemy type.
-    /// /params spawnerWarningConfig Spawner-level fallback warning config.
-    /// /returns None.
     /// </summary>
+    /// <param name="stagedEventsForWave">Event list receiving overrides.</param>
+    /// <param name="firstInsertedEventIndex">First event index inserted for the painted cell.</param>
+    /// <param name="spawnOverrides">Spawn override settings for the painted enemy type.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config.</param>
     private static void ApplySpawnWarningOverrides(List<EnemySpawnerWaveEventElement> stagedEventsForWave,
                                                    int firstInsertedEventIndex,
                                                    EnemyVisualSpawnOverridesSettings spawnOverrides,
@@ -333,10 +327,10 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Builds an event-level warning config from visual preset override settings.
-    /// /params spawnOverrides Visual preset override settings.
-    /// /params cellSize Baked spawner cell size.
-    /// /returns Event-level warning config.
     /// </summary>
+    /// <param name="spawnOverrides">Visual preset override settings.</param>
+    /// <param name="cellSize">Baked spawner cell size.</param>
+    /// <returns>Event-level warning config.</returns>
     private static EnemySpawnWarningConfig BuildSpawnWarningOverrideConfig(EnemyVisualSpawnOverridesSettings spawnOverrides, float cellSize)
     {
         return new EnemySpawnWarningConfig
@@ -355,10 +349,10 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Resolves the largest warning lead time needed before a wave can activate its first spawn event.
-    /// /params stagedEventsForWave Sorted or unsorted events belonging to one wave.
-    /// /params spawnerWarningConfig Spawner-level fallback warning config.
-    /// /returns Maximum effective warning lead time in seconds.
     /// </summary>
+    /// <param name="stagedEventsForWave">Sorted or unsorted events belonging to one wave.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config.</param>
+    /// <returns>Maximum effective warning lead time in seconds.</returns>
     private static float ResolveMaximumWaveWarningLeadTime(List<EnemySpawnerWaveEventElement> stagedEventsForWave,
                                                            EnemySpawnWarningConfig spawnerWarningConfig)
     {
@@ -380,8 +374,8 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Creates the default runtime buffer entry for one wave.
-    /// returns Default wave runtime state.
     /// </summary>
+    /// <returns>Default wave runtime state.</returns>
     private static EnemySpawnerWaveRuntimeElement CreateDefaultWaveRuntime()
     {
         return new EnemySpawnerWaveRuntimeElement
@@ -405,9 +399,9 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
 
     /// <summary>
     /// Counts the total planned enemies across all unique prefab requirements.
-    /// plannedCountByPrefab: Prefab usage count map.
-    /// returns Total planned enemy count for the spawner.
     /// </summary>
+    /// <param name="plannedCountByPrefab">Prefab usage count map.</param>
+    /// <returns>Total planned enemy count for the spawner.</returns>
     private static int CountTotalPlannedEnemies(Dictionary<Entity, int> plannedCountByPrefab)
     {
         int totalPlannedEnemies = 0;
@@ -421,10 +415,10 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
     /// <summary>
     /// Resolves the maximum planar spawn distance authored by the staged wave events.
     /// The returned radius includes half a cell diagonal so the full painted cell area stays inside the envelope.
-    /// stagedWaveEvents: Fully staged exact spawn events of the spawner.
-    /// cellSize: Authored square cell size used by the spawn grid.
-    /// returns Maximum planar spawn distance from the spawner center.
     /// </summary>
+    /// <param name="stagedWaveEvents">Fully staged exact spawn events of the spawner.</param>
+    /// <param name="cellSize">Authored square cell size used by the spawn grid.</param>
+    /// <returns>Maximum planar spawn distance from the spawner center.</returns>
     private static float ResolveMaximumSpawnDistanceFromCenter(List<EnemySpawnerWaveEventElement> stagedWaveEvents, float cellSize)
     {
         if (stagedWaveEvents == null || stagedWaveEvents.Count == 0)

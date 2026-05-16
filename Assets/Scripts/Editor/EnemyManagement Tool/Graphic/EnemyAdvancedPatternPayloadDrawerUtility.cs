@@ -17,7 +17,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// </summary>
     /// <param name="payloadDataProperty">Payload data root.</param>
     /// <param name="payloadContainer">Target UI container.</param>
-    /// <returns>Returns true when UI is built.<returns>
+    /// <returns>Returns true when UI is built.</returns>
     public static bool BuildStationaryPayloadEditor(SerializedProperty payloadDataProperty, VisualElement payloadContainer)
     {
         SerializedProperty stationaryProperty = payloadDataProperty.FindPropertyRelative("stationary");
@@ -38,7 +38,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// </summary>
     /// <param name="payloadDataProperty">Payload data root.</param>
     /// <param name="payloadContainer">Target UI container.</param>
-    /// <returns>Returns true when UI is built.<returns>
+    /// <returns>Returns true when UI is built.</returns>
     public static bool BuildDropItemsPayloadEditor(SerializedProperty payloadDataProperty, VisualElement payloadContainer)
     {
         SerializedProperty dropItemsProperty = payloadDataProperty.FindPropertyRelative("dropItems");
@@ -223,7 +223,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// </summary>
     /// <param name="payloadDataProperty">Payload data root.</param>
     /// <param name="payloadContainer">Target UI container.</param>
-    /// <returns>Returns true when UI is built.<returns>
+    /// <returns>Returns true when UI is built.</returns>
     public static bool BuildWandererPayloadEditor(SerializedProperty payloadDataProperty, VisualElement payloadContainer)
     {
         SerializedProperty wandererProperty = payloadDataProperty.FindPropertyRelative("wanderer");
@@ -307,7 +307,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// </summary>
     /// <param name="payloadDataProperty">Payload data root.</param>
     /// <param name="payloadContainer">Target UI container.</param>
-    /// <returns>Returns true when UI is built.<returns>
+    /// <returns>Returns true when UI is built.</returns>
     public static bool BuildCowardPayloadEditor(SerializedProperty payloadDataProperty,
                                                 VisualElement payloadContainer,
                                                 bool includeActivationAndPatrolSettings)
@@ -408,7 +408,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// </summary>
     /// <param name="payloadDataProperty">Payload data root.</param>
     /// <param name="payloadContainer">Target UI container.</param>
-    /// <returns>Returns true when UI is built.<returns>
+    /// <returns>Returns true when UI is built.</returns>
     public static bool BuildShooterPayloadEditor(SerializedProperty payloadDataProperty,
                                                  VisualElement payloadContainer,
                                                  bool includeRangeSettings)
@@ -589,13 +589,13 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     #region Private Methods
     /// <summary>
     /// Adds a bound float slider so dense movement-bias values remain readable in the tool.
-    /// /params parent Parent visual element receiving the slider.
-    /// /params property Float serialized property to bind.
-    /// /params label Slider label.
-    /// /params lowValue Minimum slider value.
-    /// /params highValue Maximum slider value.
-    /// /returns True when the slider is added.
     /// </summary>
+    /// <param name="parent">Parent visual element receiving the slider.</param>
+    /// <param name="property">Float serialized property to bind.</param>
+    /// <param name="label">Slider label.</param>
+    /// <param name="lowValue">Minimum slider value.</param>
+    /// <param name="highValue">Maximum slider value.</param>
+    /// <returns>True when the slider is added.</returns>
     private static bool AddFloatSliderField(VisualElement parent,
                                             SerializedProperty property,
                                             string label,
@@ -614,13 +614,13 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
     /// <summary>
     /// Adds a bound integer slider for count settings with fixed expected ranges.
-    /// /params parent Parent visual element receiving the slider.
-    /// /params property Integer serialized property to bind.
-    /// /params label Slider label.
-    /// /params lowValue Minimum slider value.
-    /// /params highValue Maximum slider value.
-    /// /returns True when the slider is added.
     /// </summary>
+    /// <param name="parent">Parent visual element receiving the slider.</param>
+    /// <param name="property">Integer serialized property to bind.</param>
+    /// <param name="label">Slider label.</param>
+    /// <param name="lowValue">Minimum slider value.</param>
+    /// <param name="highValue">Maximum slider value.</param>
+    /// <returns>True when the slider is added.</returns>
     private static bool AddIntSliderField(VisualElement parent,
                                           SerializedProperty property,
                                           string label,
@@ -660,10 +660,9 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
     /// <summary>
     /// Updates visibility for Shooter stop timing fields that only affect Stop While Aiming movement.
-    /// /params movementPolicyProperty Serialized Shooter movement policy field.
-    /// /params stopTimingContainer Container that owns the stop timing fields.
-    /// /returns None.
     /// </summary>
+    /// <param name="movementPolicyProperty">Serialized Shooter movement policy field.</param>
+    /// <param name="stopTimingContainer">Container that owns the stop timing fields.</param>
     private static void UpdateShooterStopTimingVisibility(SerializedProperty movementPolicyProperty,
                                                           VisualElement stopTimingContainer)
     {
@@ -678,11 +677,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
     /// <summary>
     /// Updates visibility for forward-spread angle controls based on shot pattern and projectile count.
-    /// /params shotPatternProperty Serialized Shooter shot pattern field.
-    /// /params projectilesPerShotProperty Serialized projectile count field.
-    /// /params spreadContainer Container that owns the spread angle field.
-    /// /returns None.
     /// </summary>
+    /// <param name="shotPatternProperty">Serialized Shooter shot pattern field.</param>
+    /// <param name="projectilesPerShotProperty">Serialized projectile count field.</param>
+    /// <param name="spreadContainer">Container that owns the spread angle field.</param>
     private static void UpdateShooterSpreadVisibility(SerializedProperty shotPatternProperty,
                                                       SerializedProperty projectilesPerShotProperty,
                                                       VisualElement spreadContainer)
@@ -698,9 +696,9 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
     /// <summary>
     /// Resolves a serialized Shooter movement policy for editor-only visibility decisions.
-    /// /params movementPolicyProperty Serialized enum field.
-    /// /returns Valid movement policy value.
     /// </summary>
+    /// <param name="movementPolicyProperty">Serialized enum field.</param>
+    /// <returns>Valid movement policy value.</returns>
     private static EnemyShooterMovementPolicy ResolveShooterMovementPolicy(SerializedProperty movementPolicyProperty)
     {
         if (movementPolicyProperty == null || movementPolicyProperty.propertyType != SerializedPropertyType.Enum)
@@ -718,9 +716,9 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
     /// <summary>
     /// Resolves a serialized Shooter shot pattern for editor-only visibility decisions.
-    /// /params shotPatternProperty Serialized enum field.
-    /// /returns Valid shot pattern value.
     /// </summary>
+    /// <param name="shotPatternProperty">Serialized enum field.</param>
+    /// <returns>Valid shot pattern value.</returns>
     private static EnemyShooterShotPattern ResolveShooterShotPattern(SerializedProperty shotPatternProperty)
     {
         if (shotPatternProperty == null || shotPatternProperty.propertyType != SerializedPropertyType.Enum)

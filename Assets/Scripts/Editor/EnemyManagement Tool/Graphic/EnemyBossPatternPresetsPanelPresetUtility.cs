@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Handles asset actions for boss pattern preset panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelPresetUtility
 {
@@ -16,9 +14,8 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
     #region Public Methods
     /// <summary>
     /// Creates and selects one new boss pattern preset asset.
-    /// /params panel Owning panel.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
     public static void CreatePreset(EnemyBossPatternPresetsPanel panel)
     {
         EnemyBossPatternPreset newPreset = EnemyBossPatternPresetLibraryUtility.CreatePresetAsset("EnemyBossPatternPreset");
@@ -36,10 +33,9 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Duplicates a specific boss pattern preset asset and registers the copy.
-    /// /params panel Owning panel.
-    /// /params preset Preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="preset">Preset to duplicate.</param>
     public static void DuplicatePreset(EnemyBossPatternPresetsPanel panel, EnemyBossPatternPreset preset)
     {
         if (panel == null || preset == null)
@@ -66,10 +62,9 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Stages one boss pattern preset for deletion after confirmation.
-    /// /params panel Owning panel.
-    /// /params preset Preset to delete.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="preset">Preset to delete.</param>
     public static void DeletePreset(EnemyBossPatternPresetsPanel panel, EnemyBossPatternPreset preset)
     {
         if (panel == null || preset == null)
@@ -89,11 +84,10 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Renames the preset asset and display metadata.
-    /// /params panel Owning panel.
-    /// /params preset Preset to rename.
-    /// /params newName Requested name.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="preset">Preset to rename.</param>
+    /// <param name="newName">Requested name.</param>
     public static void RenamePreset(EnemyBossPatternPresetsPanel panel, EnemyBossPatternPreset preset, string newName)
     {
         if (panel == null || preset == null)
@@ -122,11 +116,10 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Opens the rename popup for a boss preset list item.
-    /// /params panel Owning panel.
-    /// /params anchor UI anchor for popup placement.
-    /// /params preset Preset being renamed.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="anchor">UI anchor for popup placement.</param>
+    /// <param name="preset">Preset being renamed.</param>
     public static void ShowRenamePopup(EnemyBossPatternPresetsPanel panel, VisualElement anchor, EnemyBossPatternPreset preset)
     {
         if (panel == null || anchor == null || preset == null)
@@ -138,9 +131,9 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Formats one boss preset display name for list rows.
-    /// /params preset Preset to format.
-    /// /returns Display name with optional version.
     /// </summary>
+    /// <param name="preset">Preset to format.</param>
+    /// <returns>Display name with optional version.</returns>
     public static string GetPresetDisplayName(EnemyBossPatternPreset preset)
     {
         if (preset == null)
@@ -159,10 +152,9 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
     #region Private Methods
     /// <summary>
     /// Refreshes the panel list and selects one target preset.
-    /// /params panel Owning panel.
-    /// /params preset Preset to select.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="preset">Preset to select.</param>
     private static void SelectAndRefresh(EnemyBossPatternPresetsPanel panel, EnemyBossPatternPreset preset)
     {
         panel.RefreshPresetList();
@@ -176,10 +168,10 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Resolves the unique asset path used by a duplicated preset.
-    /// /params preset Source preset.
-    /// /params duplicatedPath Output unique path.
-    /// /returns True when a valid duplicate path was resolved.
     /// </summary>
+    /// <param name="preset">Source preset.</param>
+    /// <param name="duplicatedPath">Output unique path.</param>
+    /// <returns>True when a valid duplicate path was resolved.</returns>
     private static bool TryResolveDuplicatePath(EnemyBossPatternPreset preset, out string duplicatedPath)
     {
         duplicatedPath = string.Empty;
@@ -206,10 +198,9 @@ internal static class EnemyBossPatternPresetsPanelPresetUtility
 
     /// <summary>
     /// Applies regenerated metadata to a duplicated boss preset.
-    /// /params duplicatedPreset Newly duplicated preset.
-    /// /params finalName Asset filename without extension.
-    /// /returns None.
     /// </summary>
+    /// <param name="duplicatedPreset">Newly duplicated preset.</param>
+    /// <param name="finalName">Asset filename without extension.</param>
     private static void ApplyDuplicatedMetadata(EnemyBossPatternPreset duplicatedPreset, string finalName)
     {
         SerializedObject duplicatedSerialized = new SerializedObject(duplicatedPreset);

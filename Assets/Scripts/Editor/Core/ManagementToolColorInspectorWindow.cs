@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Dedicated editor window used to edit persistent colors for one management-tool label or interactive control.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 {
@@ -32,10 +30,9 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
     #region Public Methods
     /// <summary>
     /// Opens the inspector window for one recolorable management-tool label.
-    /// /params label Target label being edited.
-    /// /params targetStateKey Stable persistence key used by EditorPrefs.
-    /// /returns None.
     /// </summary>
+    /// <param name="label">Target label being edited.</param>
+    /// <param name="targetStateKey">Stable persistence key used by EditorPrefs.</param>
     public static void OpenForLabel(Label label, string targetStateKey)
     {
         if (label == null)
@@ -54,11 +51,10 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Opens the inspector window for one recolorable interactive management-tool control.
-    /// /params targetElement Target control being edited.
-    /// /params targetStateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control being edited.</param>
+    /// <param name="targetStateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     public static void OpenForInteractive(VisualElement targetElement,
                                           string targetStateKey,
                                           ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
@@ -81,8 +77,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
     #region Unity Methods
     /// <summary>
     /// Applies window chrome defaults when Unity enables the editor window.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -92,8 +86,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Draws the inspector UI with IMGUI so the color editor stays independent from the management-tool visual tree.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnGUI()
     {
@@ -131,10 +123,9 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
     #region Private Methods
     /// <summary>
     /// Applies the active label context to the window and reloads its current colors.
-    /// /params label Target label being edited.
-    /// /params targetStateKey Stable persistence key used by EditorPrefs.
-    /// /returns None.
     /// </summary>
+    /// <param name="label">Target label being edited.</param>
+    /// <param name="targetStateKey">Stable persistence key used by EditorPrefs.</param>
     private void ApplyLabelContext(Label label, string targetStateKey)
     {
         isLabelTarget = true;
@@ -151,11 +142,10 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Applies the active interactive-control context to the window and reloads its current colors.
-    /// /params targetElement Target control being edited.
-    /// /params targetStateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control being edited.</param>
+    /// <param name="targetStateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     private void ApplyInteractiveContext(VisualElement targetElement,
                                          string targetStateKey,
                                          ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
@@ -174,8 +164,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Draws the static target-information header shown at the top of the inspector.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawHeader()
     {
@@ -191,8 +179,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Draws the placeholder message shown before the user selects any recolorable target.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawEmptyState()
     {
@@ -201,8 +187,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Draws a lightweight warning when the original clicked element is no longer attached to a panel.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawDetachedTargetWarning()
     {
@@ -214,8 +198,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Draws the bottom-row action buttons for reset and close.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawActionButtons()
     {
@@ -239,8 +221,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Reloads the visible color fields from persisted state when present, otherwise from the currently live target visuals.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ReloadCurrentColors()
     {
@@ -276,8 +256,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Persists the currently edited colors and propagates them to every live target that shares the active state key.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyCurrentColors()
     {
@@ -298,8 +276,6 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Removes the persisted custom state for the active target and reloads the now-restored default colors.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResetCurrentColors()
     {
@@ -323,9 +299,8 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Returns whether the window currently points to a valid persisted color context.
-    /// /params None.
-    /// /returns True when the window can edit one management-tool target.
     /// </summary>
+    /// <returns>True when the window can edit one management-tool target.</returns>
     private bool HasValidContext()
     {
         return !string.IsNullOrWhiteSpace(stateKey);
@@ -333,9 +308,8 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Returns whether the original clicked target is still attached to a panel.
-    /// /params None.
-    /// /returns True when the source element is currently live.
     /// </summary>
+    /// <returns>True when the source element is currently live.</returns>
     private bool HasLiveTarget()
     {
         if (isLabelTarget)
@@ -346,9 +320,9 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Resolves one readable label title for the inspector header.
-    /// /params label Target label being inspected.
-    /// /returns One readable title string.
     /// </summary>
+    /// <param name="label">Target label being inspected.</param>
+    /// <returns>One readable title string.</returns>
     private static string ResolveLabelDisplayName(Label label)
     {
         if (label == null)
@@ -365,9 +339,9 @@ internal sealed class ManagementToolColorInspectorWindow : EditorWindow
 
     /// <summary>
     /// Resolves one readable type name for the inspector header.
-    /// /params elementKind Interactive control kind being inspected.
-    /// /returns One readable type name.
     /// </summary>
+    /// <param name="elementKind">Interactive control kind being inspected.</param>
+    /// <returns>One readable type name.</returns>
     private static string ResolveInteractiveTypeName(ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
         switch (elementKind)

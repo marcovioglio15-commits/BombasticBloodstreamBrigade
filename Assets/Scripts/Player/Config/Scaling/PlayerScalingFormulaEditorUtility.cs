@@ -17,7 +17,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Checks whether Add Scaling can be offered for the provided serialized property.
     /// </summary>
     /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property can host a formula-based scaling rule.<returns>
+    /// <returns>True when the property can host a formula-based scaling rule.</returns>
     public static bool SupportsScalingTarget(SerializedProperty property)
     {
         if (property == null)
@@ -40,7 +40,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Resolves the formula result type required by the current serialized target property.
     /// </summary>
     /// <param name="property">Serialized target property.</param>
-    /// <returns>Required formula result type for validation.<returns>
+    /// <returns>Required formula result type for validation.</returns>
     public static PlayerFormulaValueType ResolveRequiredResultType(SerializedProperty property)
     {
         if (property == null)
@@ -67,7 +67,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// <param name="formula">Raw designer-authored formula.</param>
     /// <param name="targetProperty">Serialized property currently receiving Add Scaling.</param>
     /// <param name="allowedVariables">Known scalable-stat variables that must keep bracket syntax.</param>
-    /// <returns>Formula normalized for validation and bake-time/runtime evaluation.<returns>
+    /// <returns>Formula normalized for validation and bake-time/runtime evaluation.</returns>
     public static string NormalizeFormulaForTarget(string formula,
                                                    SerializedProperty targetProperty,
                                                    ISet<string> allowedVariables)
@@ -130,7 +130,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// <param name="allowedVariables">Available scalable-stat names in the current scope.</param>
     /// <param name="variableTypes">Optional precise scalable-stat types keyed by stat name.</param>
     /// <param name="targetProperty">Formula target property used to append contextual constants.</param>
-    /// <returns>Compact multi-line helper text.<returns>
+    /// <returns>Compact multi-line helper text.</returns>
     public static string BuildHelperText(ISet<string> allowedVariables,
                                          IReadOnlyDictionary<string, PlayerScalableStatType> variableTypes,
                                          SerializedProperty targetProperty)
@@ -155,7 +155,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Builds a compact label describing the enum members available as bracket constants for the current target.
     /// </summary>
     /// <param name="targetProperty">Current target property.</param>
-    /// <returns>Empty string when the target is not an enum; otherwise a formatted helper line.<returns>
+    /// <returns>Empty string when the target is not an enum; otherwise a formatted helper line.</returns>
     public static string BuildEnumValuesLabelText(SerializedProperty targetProperty)
     {
         if (targetProperty == null || targetProperty.propertyType != SerializedPropertyType.Enum)
@@ -186,7 +186,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Resolves whether the target property is currently an enum-backed Add Scaling field.
     /// </summary>
     /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property is an enum.<returns>
+    /// <returns>True when the property is an enum.</returns>
     public static bool IsEnumTarget(SerializedProperty property)
     {
         return property != null && property.propertyType == SerializedPropertyType.Enum;
@@ -196,7 +196,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Resolves whether the target property is currently a boolean-backed Add Scaling field.
     /// </summary>
     /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property is a boolean.<returns>
+    /// <returns>True when the property is a boolean.</returns>
     public static bool IsBooleanTarget(SerializedProperty property)
     {
         return property != null && property.propertyType == SerializedPropertyType.Boolean;
@@ -208,7 +208,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// Builds the helper line that exposes Laser Beam visual preset constants for selector fields.
     /// </summary>
     /// <param name="targetProperty">Current formula target property.</param>
-    /// <returns>Helper label line, or empty when the target is not a Laser Beam visual preset selector.<returns>
+    /// <returns>Helper label line, or empty when the target is not a Laser Beam visual preset selector.</returns>
     private static string BuildLaserBeamVisualPresetLabelText(SerializedProperty targetProperty)
     {
         if (!PlayerLaserBeamVisualPresetEditorUtility.IsSelectorProperty(targetProperty))

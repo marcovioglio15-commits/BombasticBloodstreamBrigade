@@ -220,7 +220,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
     /// Resolves the visible title for one panel type.
     /// </summary>
     /// <param name="panelType">Panel type to resolve.</param>
-    /// <returns>Returns the display title used by tab headers.<returns>
+    /// <returns>Returns the display title used by tab headers.</returns>
     private static string GetPanelTitle(PlayerManagementWindow.PanelType panelType)
     {
         switch (panelType)
@@ -249,7 +249,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
     /// <param name="progressionPanel">Resolved progression panel controller when built.</param>
     /// <param name="powerUpsPanel">Resolved power-ups panel controller when built.</param>
     /// <param name="animationPanel">Resolved animation panel controller when built.</param>
-    /// <returns>Returns the panel root shown in the content host.<returns>
+    /// <returns>Returns the panel root shown in the content host.</returns>
     private static VisualElement BuildSidePanelContent(PlayerMasterPresetsPanel panel,
                                                        PlayerManagementWindow.PanelType panelType,
                                                        out PlayerControllerPresetsPanel controllerPanel,

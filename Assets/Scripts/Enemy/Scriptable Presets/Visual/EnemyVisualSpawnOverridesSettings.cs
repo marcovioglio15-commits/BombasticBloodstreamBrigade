@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores enemy-type overrides for spawner-dependent spawn offset and spawn warning settings.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualSpawnOverridesSettings
@@ -149,8 +147,6 @@ public sealed class EnemyVisualSpawnOverridesSettings
     #region Public Methods
     /// <summary>
     /// Keeps the settings object structurally valid without snapping authored override values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

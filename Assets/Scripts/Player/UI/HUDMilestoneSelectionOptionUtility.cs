@@ -22,7 +22,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// <param name="panelRoot">Panel root potentially shown while the selection is active.</param>
     /// <param name="skipButton">Optional skip button configured for the panel.</param>
     /// <param name="optionViews">Auto-discovered card views under the panel hierarchy.</param>
-    /// <returns>True when any valid UI control exists; otherwise false.<returns>
+    /// <returns>True when any valid UI control exists; otherwise false.</returns>
     public static bool HasUiConfigured(GameObject panelRoot,
                                        Button skipButton,
                                        IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews)
@@ -40,7 +40,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// Returns whether the current panel exposes at least one auto-discovered card view.
     /// </summary>
     /// <param name="optionViews">Auto-discovered card views under the panel hierarchy.</param>
-    /// <returns>True when at least one valid card view exists; otherwise false.<returns>
+    /// <returns>True when at least one valid card view exists; otherwise false.</returns>
     public static bool HasDiscoveredOptionView(IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews)
     {
         if (optionViews == null || optionViews.Count <= 0)
@@ -106,7 +106,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// </summary>
     /// <param name="rootTransform">Root transform used as traversal start point.</param>
     /// <param name="targetName">Exact GameObject name requested.</param>
-    /// <returns>Resolved descendant transform when found; otherwise null.<returns>
+    /// <returns>Resolved descendant transform when found; otherwise null.</returns>
     public static Transform FindDescendantByName(Transform rootTransform, string targetName)
     {
         if (rootTransform == null)
@@ -346,7 +346,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// </summary>
     /// <param name="milestoneLevel">Milestone level that triggered the current selection panel.</param>
     /// <param name="offerCount">Number of rolled offers currently shown to the player.</param>
-    /// <returns>Formatted header string for the milestone selection panel.<returns>
+    /// <returns>Formatted header string for the milestone selection panel.</returns>
     public static string BuildHeaderText(int milestoneLevel, int offerCount)
     {
         return string.Format("Milestone Lv {0} - Choose 1 of {1} Power-Ups", milestoneLevel, offerCount);
@@ -356,7 +356,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// Returns the user-facing unlock kind label for one milestone offer.
     /// </summary>
     /// <param name="unlockKind">Unlock kind stored in the rolled offer payload.</param>
-    /// <returns>User-facing label for the unlock kind.<returns>
+    /// <returns>User-facing label for the unlock kind.</returns>
     public static string ResolveUnlockKindLabel(PlayerPowerUpUnlockKind unlockKind)
     {
         switch (unlockKind)
@@ -377,7 +377,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// </summary>
     /// <param name="optionIndex">Display order index used for numbering.</param>
     /// <param name="offer">Rolled milestone offer bound to the UI slot.</param>
-    /// <returns>Formatted display title for the option.<returns>
+    /// <returns>Formatted display title for the option.</returns>
     private static string BuildDisplayName(int optionIndex, in PlayerMilestonePowerUpSelectionOfferElement offer)
     {
         string displayName = offer.DisplayName.ToString();
@@ -392,7 +392,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// Builds the plain description shown when the prefab already exposes a dedicated unlock-kind label.
     /// </summary>
     /// <param name="offer">Rolled milestone offer bound to the UI slot.</param>
-    /// <returns>Description text shown for the option.<returns>
+    /// <returns>Description text shown for the option.</returns>
     private static string BuildDescription(in PlayerMilestonePowerUpSelectionOfferElement offer)
     {
         string description = offer.Description.ToString();
@@ -407,7 +407,7 @@ public static class HUDMilestoneSelectionOptionUtility
     /// Builds the fallback description shown when the prefab does not expose a dedicated unlock-kind label.
     /// </summary>
     /// <param name="offer">Rolled milestone offer bound to the UI slot.</param>
-    /// <returns>Description text with embedded unlock-kind prefix.<returns>
+    /// <returns>Description text with embedded unlock-kind prefix.</returns>
     private static string BuildDescriptionWithEmbeddedType(in PlayerMilestonePowerUpSelectionOfferElement offer)
     {
         string description = BuildDescription(in offer);

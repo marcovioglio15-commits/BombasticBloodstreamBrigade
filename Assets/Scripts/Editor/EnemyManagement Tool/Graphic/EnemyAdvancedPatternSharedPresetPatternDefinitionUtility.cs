@@ -3,8 +3,6 @@ using UnityEditor;
 
 /// <summary>
 /// Resolves shared pattern-definition state keys, identity helpers and serialized field accessors.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 {
@@ -17,12 +15,12 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
     #region Public Methods
     /// <summary>
     /// Builds the foldout title shown by one shared pattern card.
-    /// /params patternIndex Current pattern index.
-    /// /params patternId Resolved pattern ID.
-    /// /params displayName Resolved display name.
-    /// /params unreplaceable Resolved unreplaceable flag.
-    /// /returns Card title text.
     /// </summary>
+    /// <param name="patternIndex">Current pattern index.</param>
+    /// <param name="patternId">Resolved pattern ID.</param>
+    /// <param name="displayName">Resolved display name.</param>
+    /// <param name="unreplaceable">Resolved unreplaceable flag.</param>
+    /// <returns>Card title text.</returns>
     public static string BuildPatternCardTitle(int patternIndex,
                                                string patternId,
                                                string displayName,
@@ -40,9 +38,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Builds the persistent foldout-state key for one shared pattern card.
-    /// /params patternProperty Serialized pattern property that owns the card.
-    /// /returns Foldout-state key.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property that owns the card.</param>
+    /// <returns>Foldout-state key.</returns>
     public static string BuildPatternCardStateKey(SerializedProperty patternProperty)
     {
         return ManagementToolFoldoutStateUtility.BuildPropertyStateKey(patternProperty, CardStateSuffix);
@@ -50,11 +48,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Generates a unique pattern ID inside the shared pattern list.
-    /// /params patternsProperty Serialized patterns array.
-    /// /params basePatternId Preferred pattern ID prefix.
-    /// /params excludedPropertyPath Property path excluded from duplicate checks.
-    /// /returns Unique pattern ID.
     /// </summary>
+    /// <param name="patternsProperty">Serialized patterns array.</param>
+    /// <param name="basePatternId">Preferred pattern ID prefix.</param>
+    /// <param name="excludedPropertyPath">Property path excluded from duplicate checks.</param>
+    /// <returns>Unique pattern ID.</returns>
     public static string GenerateUniquePatternId(SerializedProperty patternsProperty,
                                                  string basePatternId,
                                                  string excludedPropertyPath)
@@ -79,11 +77,10 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Initializes a newly inserted shared pattern with one default identity and one best-effort core movement binding.
-    /// /params sharedPresetSerializedObject Serialized shared preset used to resolve the first core movement module.
-    /// /params patternProperty Serialized pattern property being initialized.
-    /// /params patternId Unique pattern ID assigned to the new pattern.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset used to resolve the first core movement module.</param>
+    /// <param name="patternProperty">Serialized pattern property being initialized.</param>
+    /// <param name="patternId">Unique pattern ID assigned to the new pattern.</param>
     public static void InitializeNewPatternDefinition(SerializedObject sharedPresetSerializedObject,
                                                       SerializedProperty patternProperty,
                                                       string patternId)
@@ -122,9 +119,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Resolves the pattern ID of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /returns Pattern ID string, or an empty string when unavailable.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <returns>Pattern ID string, or an empty string when unavailable.</returns>
     public static string ResolvePatternId(SerializedProperty patternProperty)
     {
         if (patternProperty == null)
@@ -140,9 +137,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Resolves the display name of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /returns Display name string, or an empty string when unavailable.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <returns>Display name string, or an empty string when unavailable.</returns>
     public static string ResolvePatternDisplayName(SerializedProperty patternProperty)
     {
         if (patternProperty == null)
@@ -158,9 +155,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Resolves the unreplaceable flag of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /returns Unreplaceable flag value.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <returns>Unreplaceable flag value.</returns>
     public static bool ResolvePatternUnreplaceable(SerializedProperty patternProperty)
     {
         if (patternProperty == null)
@@ -176,10 +173,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Sets the pattern ID of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /params patternId New pattern ID.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <param name="patternId">New pattern ID.</param>
     public static void SetPatternId(SerializedProperty patternProperty, string patternId)
     {
         if (patternProperty == null)
@@ -195,10 +191,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Sets the display name of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /params displayName New display name.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <param name="displayName">New display name.</param>
     public static void SetPatternDisplayName(SerializedProperty patternProperty, string displayName)
     {
         if (patternProperty == null)
@@ -214,10 +209,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Sets the description of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /params description New description text.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <param name="description">New description text.</param>
     public static void SetPatternDescription(SerializedProperty patternProperty, string description)
     {
         if (patternProperty == null)
@@ -233,10 +227,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Sets the unreplaceable flag of one serialized shared pattern.
-    /// /params patternProperty Serialized pattern property.
-    /// /params unreplaceable New unreplaceable flag.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternProperty">Serialized pattern property.</param>
+    /// <param name="unreplaceable">New unreplaceable flag.</param>
     public static void SetPatternUnreplaceable(SerializedProperty patternProperty, bool unreplaceable)
     {
         if (patternProperty == null)
@@ -254,11 +247,11 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
     #region Private Methods
     /// <summary>
     /// Returns whether the shared pattern list already contains one pattern ID.
-    /// /params patternsProperty Serialized patterns array.
-    /// /params patternId Candidate pattern ID.
-    /// /params excludedPropertyPath Property path excluded from duplicate checks.
-    /// /returns True when the candidate ID already exists.
     /// </summary>
+    /// <param name="patternsProperty">Serialized patterns array.</param>
+    /// <param name="patternId">Candidate pattern ID.</param>
+    /// <param name="excludedPropertyPath">Property path excluded from duplicate checks.</param>
+    /// <returns>True when the candidate ID already exists.</returns>
     private static bool ContainsPatternId(SerializedProperty patternsProperty,
                                           string patternId,
                                           string excludedPropertyPath)
@@ -290,10 +283,10 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Resolves the first authored module ID from one shared catalog section.
-    /// /params sharedPresetSerializedObject Serialized shared preset that owns the catalog.
-    /// /params definitionsPropertyName Serialized property name of the catalog.
-    /// /returns First authored module ID, or an empty string when unavailable.
     /// </summary>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset that owns the catalog.</param>
+    /// <param name="definitionsPropertyName">Serialized property name of the catalog.</param>
+    /// <returns>First authored module ID, or an empty string when unavailable.</returns>
     private static string ResolveFirstModuleId(SerializedObject sharedPresetSerializedObject, string definitionsPropertyName)
     {
         if (sharedPresetSerializedObject == null)
@@ -320,9 +313,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternDefinitionUtility
 
     /// <summary>
     /// Resolves the module ID of one serialized module property.
-    /// /params moduleProperty Serialized module property.
-    /// /returns Module ID string, or an empty string when unavailable.
     /// </summary>
+    /// <param name="moduleProperty">Serialized module property.</param>
+    /// <returns>Module ID string, or an empty string when unavailable.</returns>
     private static string ResolveModuleIdFromProperty(SerializedProperty moduleProperty)
     {
         if (moduleProperty == null)

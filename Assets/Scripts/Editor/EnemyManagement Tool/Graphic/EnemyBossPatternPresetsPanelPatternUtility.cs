@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the boss Pattern Assemble subsection using the same Core, Short-Range and Weapon slots as normal enemies.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelPatternUtility
 {
@@ -21,9 +19,8 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Public Methods
     /// <summary>
     /// Builds the boss pattern assemble section with base slots and ordered boss interactions.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildPatternAssembleSection(EnemyBossPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -56,12 +53,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Base Pattern
     /// <summary>
     /// Builds the always-available base pattern assemble card.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params basePatternProperty Serialized base pattern root.
-    /// /params sourcePreset Source module catalog.
-    /// /params parent Parent receiving the card.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="basePatternProperty">Serialized base pattern root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="parent">Parent receiving the card.</param>
     private static void BuildBasePatternCard(EnemyBossPatternPresetsPanel panel,
                                              SerializedProperty basePatternProperty,
                                              EnemyModulesAndPatternsPreset sourcePreset,
@@ -96,12 +92,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Builds the required base Core Movement slot.
-    /// /params panel Owning panel used for serialized context.
-    /// /params parent Parent receiving controls.
-    /// /params coreMovementProperty Serialized core movement root.
-    /// /params sourcePreset Source module catalog.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="coreMovementProperty">Serialized core movement root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
     private static void BuildBaseCoreMovementSlot(EnemyBossPatternPresetsPanel panel,
                                                   VisualElement parent,
                                                   SerializedProperty coreMovementProperty,
@@ -130,12 +125,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Interactions
     /// <summary>
     /// Builds ordered boss interaction cards and list actions.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params interactionsProperty Serialized interactions array.
-    /// /params sourcePreset Source module catalog.
-    /// /params parent Parent receiving interaction UI.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="parent">Parent receiving interaction UI.</param>
     private static void BuildInteractionCards(EnemyBossPatternPresetsPanel panel,
                                               SerializedProperty interactionsProperty,
                                               EnemyModulesAndPatternsPreset sourcePreset,
@@ -172,14 +166,13 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Builds one ordered boss interaction card.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params interactionsProperty Serialized array that owns the interaction.
-    /// /params interactionProperty Serialized interaction being drawn.
-    /// /params sourcePreset Source module catalog.
-    /// /params index Interaction index in the array.
-    /// /params parent Parent receiving the card.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="interactionsProperty">Serialized array that owns the interaction.</param>
+    /// <param name="interactionProperty">Serialized interaction being drawn.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="index">Interaction index in the array.</param>
+    /// <param name="parent">Parent receiving the card.</param>
     private static void BuildInteractionCard(EnemyBossPatternPresetsPanel panel,
                                              SerializedProperty interactionsProperty,
                                              SerializedProperty interactionProperty,
@@ -226,12 +219,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Adds the trigger-specific threshold fields for one boss interaction.
-    /// /params panel Owning panel.
-    /// /params parent Parent receiving controls.
-    /// /params interactionProperty Serialized interaction root.
-    /// /params interactionType Selected interaction type.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="interactionProperty">Serialized interaction root.</param>
+    /// <param name="interactionType">Selected interaction type.</param>
     private static void AddInteractionTypeFields(EnemyBossPatternPresetsPanel panel,
                                                  VisualElement parent,
                                                  SerializedProperty interactionProperty,
@@ -269,12 +261,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Slots
     /// <summary>
     /// Builds an optional Core Movement override slot.
-    /// /params panel Owning panel used for serialized context.
-    /// /params parent Parent receiving controls.
-    /// /params coreMovementProperty Serialized core override root.
-    /// /params sourcePreset Source module catalog.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="coreMovementProperty">Serialized core override root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
     private static void BuildCoreOverrideSlot(EnemyBossPatternPresetsPanel panel,
                                               VisualElement parent,
                                               SerializedProperty coreMovementProperty,
@@ -307,15 +298,14 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Builds a short-range slot with dependent controls.
-    /// /params panel Owning panel used for serialized context.
-    /// /params parent Parent receiving controls.
-    /// /params shortRangeProperty Serialized short-range slot root.
-    /// /params sourcePreset Source module catalog.
-    /// /params title Foldout title.
-    /// /params enabledLabel Enabled toggle label.
-    /// /params tooltip Foldout tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="shortRangeProperty">Serialized short-range slot root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="title">Foldout title.</param>
+    /// <param name="enabledLabel">Enabled toggle label.</param>
+    /// <param name="tooltip">Foldout tooltip.</param>
     private static void BuildShortRangeSlot(EnemyBossPatternPresetsPanel panel,
                                             VisualElement parent,
                                             SerializedProperty shortRangeProperty,
@@ -356,15 +346,14 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Builds a weapon slot with dependent range and activation-gate controls.
-    /// /params panel Owning panel used for serialized context.
-    /// /params parent Parent receiving controls.
-    /// /params weaponProperty Serialized weapon slot root.
-    /// /params sourcePreset Source module catalog.
-    /// /params title Foldout title.
-    /// /params enabledLabel Enabled toggle label.
-    /// /params tooltip Foldout tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="weaponProperty">Serialized weapon slot root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="title">Foldout title.</param>
+    /// <param name="enabledLabel">Enabled toggle label.</param>
+    /// <param name="tooltip">Foldout tooltip.</param>
     private static void BuildWeaponSlot(EnemyBossPatternPresetsPanel panel,
                                         VisualElement parent,
                                         SerializedProperty weaponProperty,
@@ -426,12 +415,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Adds optional offensive engagement feedback fields for a slot.
-    /// /params panel Owning panel.
-    /// /params parent Parent receiving controls.
-    /// /params slotProperty Serialized slot root.
-    /// /params labelPrefix Slot label prefix.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="slotProperty">Serialized slot root.</param>
+    /// <param name="labelPrefix">Slot label prefix.</param>
     private static void BuildEngagementFeedbackFields(EnemyBossPatternPresetsPanel panel,
                                                       VisualElement parent,
                                                       SerializedProperty slotProperty,
@@ -467,11 +455,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Resolves whether a boss pattern slot currently supports offensive engagement feedback.
-    /// /params sourcePreset Source module catalog used by boss assemble slots.
-    /// /params bindingProperty Serialized module binding to inspect.
-    /// /params section Catalog section used by the slot.
-    /// /returns True when the selected source module exposes a supported timing hook.
     /// </summary>
+    /// <param name="sourcePreset">Source module catalog used by boss assemble slots.</param>
+    /// <param name="bindingProperty">Serialized module binding to inspect.</param>
+    /// <param name="section">Catalog section used by the slot.</param>
+    /// <returns>True when the selected source module exposes a supported timing hook.</returns>
     private static bool SupportsEngagementFeedback(EnemyModulesAndPatternsPreset sourcePreset,
                                                    SerializedProperty bindingProperty,
                                                    EnemyPatternModuleCatalogSection section)
@@ -497,11 +485,10 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Mutations
     /// <summary>
     /// Adds one boss interaction initialized from the first available Core Movement module.
-    /// /params panel Owning panel used for serialized context and rebuild callbacks.
-    /// /params interactionsProperty Serialized interactions array.
-    /// /params sourcePreset Source module catalog.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
     private static void AddInteraction(EnemyBossPatternPresetsPanel panel,
                                        SerializedProperty interactionsProperty,
                                        EnemyModulesAndPatternsPreset sourcePreset)
@@ -525,11 +512,10 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Configures serialized defaults for a newly inserted boss interaction.
-    /// /params insertedInteraction Serialized interaction created by the array insertion.
-    /// /params sourcePreset Source module catalog.
-    /// /params insertIndex Interaction index used for readable labels.
-    /// /returns None.
     /// </summary>
+    /// <param name="insertedInteraction">Serialized interaction created by the array insertion.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="insertIndex">Interaction index used for readable labels.</param>
     private static void ConfigureInsertedInteraction(SerializedProperty insertedInteraction,
                                                      EnemyModulesAndPatternsPreset sourcePreset,
                                                      int insertIndex)
@@ -542,10 +528,9 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Enables the core override slot on a new interaction when a Core Movement module exists.
-    /// /params coreMovementProperty Serialized core override root.
-    /// /params sourcePreset Source module catalog.
-    /// /returns None.
     /// </summary>
+    /// <param name="coreMovementProperty">Serialized core override root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
     private static void ConfigureDefaultCoreOverride(SerializedProperty coreMovementProperty, EnemyModulesAndPatternsPreset sourcePreset)
     {
         if (coreMovementProperty == null)
@@ -562,10 +547,10 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #region Formatting
     /// <summary>
     /// Builds the foldout title for one boss interaction.
-    /// /params interactionProperty Serialized interaction property.
-    /// /params index Interaction index.
-    /// /returns Human-readable title.
     /// </summary>
+    /// <param name="interactionProperty">Serialized interaction property.</param>
+    /// <param name="index">Interaction index.</param>
+    /// <returns>Human-readable title.</returns>
     private static string BuildInteractionTitle(SerializedProperty interactionProperty, int index)
     {
         SerializedProperty displayNameProperty = interactionProperty.FindPropertyRelative("displayName");
@@ -580,9 +565,9 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Resolves one serialized interaction type property to a typed enum.
-    /// /params interactionTypeProperty Serialized interaction type property.
-    /// /returns Typed interaction type.
     /// </summary>
+    /// <param name="interactionTypeProperty">Serialized interaction type property.</param>
+    /// <returns>Typed interaction type.</returns>
     private static EnemyBossPatternInteractionType ResolveInteractionType(SerializedProperty interactionTypeProperty)
     {
         if (interactionTypeProperty == null)
@@ -593,9 +578,9 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Converts an interaction type into user-facing text.
-    /// /params interactionType Interaction type to format.
-    /// /returns Human-readable interaction type.
     /// </summary>
+    /// <param name="interactionType">Interaction type to format.</param>
+    /// <returns>Human-readable interaction type.</returns>
     private static string FormatInteractionType(EnemyBossPatternInteractionType interactionType)
     {
         return EnemyBossPatternInteractionDefinition.FormatInteractionType(interactionType);
@@ -603,12 +588,12 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Creates a slot foldout with consistent state keys and tooltip.
-    /// /params property Serialized slot property.
-    /// /params title Foldout title.
-    /// /params tooltip Foldout tooltip.
-    /// /params expanded Initial expanded state.
-    /// /returns Configured foldout.
     /// </summary>
+    /// <param name="property">Serialized slot property.</param>
+    /// <param name="title">Foldout title.</param>
+    /// <param name="tooltip">Foldout tooltip.</param>
+    /// <param name="expanded">Initial expanded state.</param>
+    /// <returns>Configured foldout.</returns>
     private static Foldout CreateSlotFoldout(SerializedProperty property, string title, string tooltip, bool expanded)
     {
         Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(property,
@@ -622,12 +607,12 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
 
     /// <summary>
     /// Creates the reactive enum-flags field used by weapon interaction gates.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params property Serialized activation gate flags.
-    /// /params label Visible field label.
-    /// /params tooltip Field tooltip.
-    /// /returns Configured enum-flags field.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="property">Serialized activation gate flags.</param>
+    /// <param name="label">Visible field label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <returns>Configured enum-flags field.</returns>
     private static EnumFlagsField CreateReactiveWeaponGateField(EnemyBossPatternPresetsPanel panel,
                                                                 SerializedProperty property,
                                                                 string label,

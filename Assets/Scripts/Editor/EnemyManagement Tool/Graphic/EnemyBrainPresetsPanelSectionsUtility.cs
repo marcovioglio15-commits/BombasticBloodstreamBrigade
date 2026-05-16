@@ -172,7 +172,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// </summary>
     /// <param name="panel">Owning panel that provides the content root.</param>
     /// <param name="sectionTitle">Header text for the section.</param>
-    /// <returns>Returns the created section container, or null when the panel is not ready.<returns>
+    /// <returns>Returns the created section container, or null when the panel is not ready.</returns>
     private static VisualElement CreateDetailsSectionContainer(EnemyBrainPresetsPanel panel, string sectionTitle)
     {
         if (panel == null)
@@ -199,7 +199,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// Creates a subsection content container with a bold local header.
     /// </summary>
     /// <param name="sectionTitle">Subsection title shown in the header.</param>
-    /// <returns>Returns the ready-to-fill subsection container.<returns>
+    /// <returns>Returns the ready-to-fill subsection container.</returns>
     private static VisualElement CreateBrainSubSectionContainer(string sectionTitle)
     {
         VisualElement container = new VisualElement();
@@ -260,7 +260,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// </summary>
     /// <param name="toggleProperty">Boolean property that drives the foldout state.</param>
     /// <param name="title">Foldout title.</param>
-    /// <returns>Returns the configured foldout.<returns>
+    /// <returns>Returns the configured foldout.</returns>
     private static Foldout CreateToggleableDamageFoldout(SerializedProperty toggleProperty, string title)
     {
         Foldout foldout = new Foldout();
@@ -342,7 +342,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// Builds the movement subsection content.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context.</param>
-    /// <returns>Returns the movement subsection content.<returns>
+    /// <returns>Returns the movement subsection content.</returns>
     private static VisualElement BuildMovementSubSection(EnemyBrainPresetsPanel panel)
     {
         SerializedProperty movementProperty = panel.PresetSerializedObject.FindProperty("movement");
@@ -365,7 +365,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// Builds the steering subsection content.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context.</param>
-    /// <returns>Returns the steering subsection content.<returns>
+    /// <returns>Returns the steering subsection content.</returns>
     private static VisualElement BuildSteeringSubSection(EnemyBrainPresetsPanel panel)
     {
         SerializedProperty steeringProperty = panel.PresetSerializedObject.FindProperty("steering");
@@ -381,7 +381,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// Builds the damage subsection content.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context.</param>
-    /// <returns>Returns the damage subsection content.<returns>
+    /// <returns>Returns the damage subsection content.</returns>
     private static VisualElement BuildDamageSubSection(EnemyBrainPresetsPanel panel)
     {
         SerializedProperty damageProperty = panel.PresetSerializedObject.FindProperty("damage");
@@ -418,7 +418,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     /// Builds the health statistics subsection content.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context.</param>
-    /// <returns>Returns the health statistics subsection content.<returns>
+    /// <returns>Returns the health statistics subsection content.</returns>
     private static VisualElement BuildHealthStatisticsSubSection(EnemyBrainPresetsPanel panel)
     {
         SerializedProperty healthStatisticsProperty = panel.PresetSerializedObject.FindProperty("healthStatistics");

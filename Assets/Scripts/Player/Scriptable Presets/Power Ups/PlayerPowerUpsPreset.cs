@@ -627,7 +627,7 @@ public sealed class PlayerPowerUpsPreset : ScriptableObject
     /// <param name="isActiveSection">True when the active power-up list should be reordered, false for the passive list.</param>
     /// <param name="fromIndex">Current index of the entry to move.</param>
     /// <param name="toIndex">Destination index after the move.</param>
-    /// <returns>True when the reorder was applied, otherwise false.<returns>
+    /// <returns>True when the reorder was applied, otherwise false.</returns>
     public bool MovePowerUpDefinition(bool isActiveSection, int fromIndex, int toIndex)
     {
         List<ModularPowerUpDefinition> powerUpDefinitions = isActiveSection
@@ -643,7 +643,7 @@ public sealed class PlayerPowerUpsPreset : ScriptableObject
     /// </summary>
     /// <param name="fromIndex">Current index of the module definition to move.</param>
     /// <param name="toIndex">Destination index after the move.</param>
-    /// <returns>True when the reorder was applied, otherwise false.<returns>
+    /// <returns>True when the reorder was applied, otherwise false.</returns>
     public bool MoveModuleDefinition(int fromIndex, int toIndex)
     {
         return MoveListElement(moduleDefinitions, fromIndex, toIndex);
@@ -658,7 +658,7 @@ public sealed class PlayerPowerUpsPreset : ScriptableObject
     /// <param name="elements">List that owns the element to move.</param>
     /// <param name="fromIndex">Current element index.</param>
     /// <param name="toIndex">Destination element index.</param>
-    /// <returns>True when the move was applied, otherwise false.<returns>
+    /// <returns>True when the move was applied, otherwise false.</returns>
     private static bool MoveListElement<T>(List<T> elements, int fromIndex, int toIndex)
     {
         if (elements == null)

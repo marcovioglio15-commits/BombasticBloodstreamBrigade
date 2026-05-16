@@ -3,7 +3,6 @@ using System;
 /// <summary>
 /// Stores live runtime visibility flags shared by the debug canvas panel and the runtime gizmo renderers.
 /// none.
-/// returns none.
 /// </summary>
 public static class RuntimeGizmoDebugState
 {
@@ -307,7 +306,6 @@ public static class RuntimeGizmoDebugState
     /// <summary>
     /// Restores the whole debug state to project defaults, usually on domain reload or when the user wants a clean baseline.
     /// none.
-    /// returns void.
     /// </summary>
     public static void ResetToDefaults()
     {

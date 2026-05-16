@@ -3,8 +3,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Draws a discontinuous circular UI ring with a runtime-controlled normalized fill amount.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(CanvasRenderer))]
@@ -52,13 +50,12 @@ public sealed class GameSceneLoadingProgressRingGraphic : MaskableGraphic
     #region Public Methods
     /// <summary>
     /// Applies runtime ring settings and marks geometry dirty only when values actually change.
-    /// /params progressValue Normalized 0..1 fill amount.
-    /// /params segmentCountValue Segment count requested by the Scene Manager preset.
-    /// /params segmentGapDegreesValue Segment gap requested by the Scene Manager preset.
-    /// /params ringThicknessValue Ring thickness requested by the Scene Manager preset.
-    /// /params colorValue Graphic color.
-    /// /returns None.
     /// </summary>
+    /// <param name="progressValue">Normalized 0..1 fill amount.</param>
+    /// <param name="segmentCountValue">Segment count requested by the Scene Manager preset.</param>
+    /// <param name="segmentGapDegreesValue">Segment gap requested by the Scene Manager preset.</param>
+    /// <param name="ringThicknessValue">Ring thickness requested by the Scene Manager preset.</param>
+    /// <param name="colorValue">Graphic color.</param>
     public void SetPresentation(float progressValue,
                                 int segmentCountValue,
                                 float segmentGapDegreesValue,
@@ -103,9 +100,8 @@ public sealed class GameSceneLoadingProgressRingGraphic : MaskableGraphic
     #region Graphic
     /// <summary>
     /// Generates segmented ring mesh geometry for the current rect transform.
-    /// /params vertexHelper Unity UI vertex helper receiving mesh data.
-    /// /returns None.
     /// </summary>
+    /// <param name="vertexHelper">Unity UI vertex helper receiving mesh data.</param>
     protected override void OnPopulateMesh(VertexHelper vertexHelper)
     {
         vertexHelper.Clear();
@@ -153,15 +149,14 @@ public sealed class GameSceneLoadingProgressRingGraphic : MaskableGraphic
     #region Mesh Helpers
     /// <summary>
     /// Adds one curved ring segment as a set of small quads.
-    /// /params vertexHelper Unity UI vertex helper receiving mesh data.
-    /// /params center Local-space rect center.
-    /// /params innerRadius Inner ring radius.
-    /// /params outerRadius Outer ring radius.
-    /// /params startDegrees Segment start angle in degrees.
-    /// /params endDegrees Segment end angle in degrees.
-    /// /params vertexColor Color assigned to generated vertices.
-    /// /returns None.
     /// </summary>
+    /// <param name="vertexHelper">Unity UI vertex helper receiving mesh data.</param>
+    /// <param name="center">Local-space rect center.</param>
+    /// <param name="innerRadius">Inner ring radius.</param>
+    /// <param name="outerRadius">Outer ring radius.</param>
+    /// <param name="startDegrees">Segment start angle in degrees.</param>
+    /// <param name="endDegrees">Segment end angle in degrees.</param>
+    /// <param name="vertexColor">Color assigned to generated vertices.</param>
     private void AddSegment(VertexHelper vertexHelper,
                             Vector2 center,
                             float innerRadius,
@@ -183,15 +178,14 @@ public sealed class GameSceneLoadingProgressRingGraphic : MaskableGraphic
 
     /// <summary>
     /// Adds one ring-slice quad with consistent winding for Unity UI.
-    /// /params vertexHelper Unity UI vertex helper receiving mesh data.
-    /// /params center Local-space rect center.
-    /// /params innerRadius Inner ring radius.
-    /// /params outerRadius Outer ring radius.
-    /// /params startDegrees Slice start angle in degrees.
-    /// /params endDegrees Slice end angle in degrees.
-    /// /params vertexColor Color assigned to generated vertices.
-    /// /returns None.
     /// </summary>
+    /// <param name="vertexHelper">Unity UI vertex helper receiving mesh data.</param>
+    /// <param name="center">Local-space rect center.</param>
+    /// <param name="innerRadius">Inner ring radius.</param>
+    /// <param name="outerRadius">Outer ring radius.</param>
+    /// <param name="startDegrees">Slice start angle in degrees.</param>
+    /// <param name="endDegrees">Slice end angle in degrees.</param>
+    /// <param name="vertexColor">Color assigned to generated vertices.</param>
     private void AddQuad(VertexHelper vertexHelper,
                          Vector2 center,
                          float innerRadius,
@@ -215,11 +209,11 @@ public sealed class GameSceneLoadingProgressRingGraphic : MaskableGraphic
 
     /// <summary>
     /// Resolves a point on the ring using top-origin degrees and the configured fill direction.
-    /// /params center Local-space rect center.
-    /// /params radius Circle radius.
-    /// /params degrees Top-origin angle in degrees.
-    /// /returns Local-space point on the circle.
     /// </summary>
+    /// <param name="center">Local-space rect center.</param>
+    /// <param name="radius">Circle radius.</param>
+    /// <param name="degrees">Top-origin angle in degrees.</param>
+    /// <returns>Local-space point on the circle.</returns>
     private Vector2 ResolvePoint(Vector2 center, float radius, float degrees)
     {
         float orientedDegrees = fillClockwise ? 90f - degrees : 90f + degrees;

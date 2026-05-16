@@ -5,8 +5,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Resolves the gameplay base camera without relying on global Camera.main ordering while additive scenes overlap.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerRuntimeCameraUtility
 {
@@ -24,9 +22,9 @@ internal static class PlayerRuntimeCameraUtility
     #region Public Methods
     /// <summary>
     /// Resolves the active gameplay base camera, preferring cameras owned by Unity's active scene.
-    /// /params camera Resolved camera when a valid base camera is available.
-    /// /returns True when a valid base camera was found.
     /// </summary>
+    /// <param name="camera">Resolved camera when a valid base camera is available.</param>
+    /// <returns>True when a valid base camera was found.</returns>
     public static bool TryResolveGameplayCamera(out Camera camera)
     {
         camera = null;
@@ -66,11 +64,11 @@ internal static class PlayerRuntimeCameraUtility
     #region Scene Camera Resolution
     /// <summary>
     /// Searches one loaded scene for a renderable base camera.
-    /// /params scene Scene whose root hierarchy should be inspected.
-    /// /params requireMainCameraTag True when the camera must be tagged MainCamera.
-    /// /params camera Resolved camera when one matches the filter.
-    /// /returns True when a valid scene camera was found.
     /// </summary>
+    /// <param name="scene">Scene whose root hierarchy should be inspected.</param>
+    /// <param name="requireMainCameraTag">True when the camera must be tagged MainCamera.</param>
+    /// <param name="camera">Resolved camera when one matches the filter.</param>
+    /// <returns>True when a valid scene camera was found.</returns>
     private static bool TryResolveSceneCamera(Scene scene, bool requireMainCameraTag, out Camera camera)
     {
         camera = null;
@@ -108,9 +106,9 @@ internal static class PlayerRuntimeCameraUtility
     #region Validation
     /// <summary>
     /// Checks whether one camera can be used as the gameplay render owner.
-    /// /params camera Camera candidate being inspected.
-    /// /returns True when the camera is enabled and is not a URP overlay camera.
     /// </summary>
+    /// <param name="camera">Camera candidate being inspected.</param>
+    /// <returns>True when the camera is enabled and is not a URP overlay camera.</returns>
     private static bool IsValidBaseCamera(Camera camera)
     {
         if (camera == null)
@@ -129,9 +127,9 @@ internal static class PlayerRuntimeCameraUtility
 
     /// <summary>
     /// Checks whether one camera is explicitly marked as the gameplay main camera.
-    /// /params camera Camera candidate being inspected.
-    /// /returns True when the camera owns the configured MainCamera tag.
     /// </summary>
+    /// <param name="camera">Camera candidate being inspected.</param>
+    /// <returns>True when the camera owns the configured MainCamera tag.</returns>
     private static bool CameraHasMainTag(Camera camera)
     {
         if (camera == null)

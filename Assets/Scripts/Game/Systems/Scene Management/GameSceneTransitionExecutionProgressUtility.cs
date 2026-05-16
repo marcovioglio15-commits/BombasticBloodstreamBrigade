@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Applies aggregate loading-progress presentation for the managed scene transition executor.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneTransitionExecutionProgressUtility
 {
@@ -13,12 +11,11 @@ internal static class GameSceneTransitionExecutionProgressUtility
     #region Presentation
     /// <summary>
     /// Applies the appropriate loading-progress visibility and status when a transition phase starts.
-    /// /params phase Transition phase being entered.
-    /// /params loadingProgressState Mutable loading-progress presentation component.
-    /// /params config Scene manager runtime config.
-    /// /params snapshot Immutable snapshot of the executor progress counters.
-    /// /returns None.
     /// </summary>
+    /// <param name="phase">Transition phase being entered.</param>
+    /// <param name="loadingProgressState">Mutable loading-progress presentation component.</param>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="snapshot">Immutable snapshot of the executor progress counters.</param>
     public static void ApplyForPhase(GameSceneTransitionPhase phase,
                                      ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                      GameSceneManagerConfig config,
@@ -46,13 +43,12 @@ internal static class GameSceneTransitionExecutionProgressUtility
 
     /// <summary>
     /// Applies aggregate loading progress for the current operation step.
-    /// /params loadingProgressState Mutable loading-progress presentation component.
-    /// /params config Scene manager runtime config.
-    /// /params operationKind Current operation kind used for status text.
-    /// /params sceneDefinition Scene definition currently being processed.
-    /// /params snapshot Immutable snapshot of the executor progress counters.
-    /// /returns None.
     /// </summary>
+    /// <param name="loadingProgressState">Mutable loading-progress presentation component.</param>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="operationKind">Current operation kind used for status text.</param>
+    /// <param name="sceneDefinition">Scene definition currently being processed.</param>
+    /// <param name="snapshot">Immutable snapshot of the executor progress counters.</param>
     public static void ApplyCurrent(ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                     GameSceneManagerConfig config,
                                     GameSceneLoadingProgressOperationKind operationKind,
@@ -70,9 +66,9 @@ internal static class GameSceneTransitionExecutionProgressUtility
     #region Counting
     /// <summary>
     /// Resolves how many transition load/unload steps have completed for aggregate progress.
-    /// /params snapshot Immutable snapshot of the executor progress counters.
-    /// /returns Completed loading-progress operation count.
     /// </summary>
+    /// <param name="snapshot">Immutable snapshot of the executor progress counters.</param>
+    /// <returns>Completed loading-progress operation count.</returns>
     public static int ResolveCompletedSteps(GameSceneTransitionProgressSnapshot snapshot)
     {
         int completedSteps = 0;
@@ -110,11 +106,11 @@ internal static class GameSceneTransitionExecutionProgressUtility
 
     /// <summary>
     /// Resolves the scene currently represented by a list index, falling back when the index has already completed.
-    /// /params scenes Operation scene list.
-    /// /params index Current operation index.
-    /// /params fallback Fallback scene definition.
-    /// /returns Current scene definition or fallback.
     /// </summary>
+    /// <param name="scenes">Operation scene list.</param>
+    /// <param name="index">Current operation index.</param>
+    /// <param name="fallback">Fallback scene definition.</param>
+    /// <returns>Current scene definition or fallback.</returns>
     public static GameSceneDefinitionElement ResolveCurrentListScene(List<GameSceneDefinitionElement> scenes,
                                                                      int index,
                                                                      GameSceneDefinitionElement fallback)
@@ -134,8 +130,6 @@ internal static class GameSceneTransitionExecutionProgressUtility
 
 /// <summary>
 /// Captures transition operation counters needed to calculate aggregate loading progress without mutating executor state.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct GameSceneTransitionProgressSnapshot
 {
@@ -166,27 +160,26 @@ internal readonly struct GameSceneTransitionProgressSnapshot
     #region Constructor
     /// <summary>
     /// Creates an immutable progress snapshot from the executor's current managed fields.
-    /// /params reloadActiveScene True when the source scene is unloaded before loading the replacement.
-    /// /params hasSourceScene True when a source scene definition is available.
-    /// /params sourceScene Source scene definition.
-    /// /params hasSourceCompanionScene True when a source companion scene definition is available.
-    /// /params sourceCompanionScene Source companion scene definition.
-    /// /params targetScene Main transition target scene.
-    /// /params hasTargetCompanionScene True when a target companion scene definition is available.
-    /// /params targetSceneLoaded True when the target scene load step has completed.
-    /// /params targetCompanionSceneLoaded True when the companion scene load step has completed.
-    /// /params sourceSceneUnloadComplete True when the source scene unload step has completed.
-    /// /params sourceCompanionSceneUnloadComplete True when the source companion scene unload step has completed.
-    /// /params persistentPlayerPreLoadUnloadScenes Persistent player scenes unloaded before target loading.
-    /// /params persistentPlayerLoadScenes Persistent player scenes loaded for the target.
-    /// /params persistentPlayerPostLoadUnloadScenes Persistent player scenes unloaded after target loading.
-    /// /params persistentPlayerPreLoadUnloadIndex Current pre-load unload operation index.
-    /// /params persistentPlayerLoadIndex Current persistent player load operation index.
-    /// /params persistentPlayerPostLoadUnloadIndex Current post-load unload operation index.
-    /// /params loadingProgressTotalSteps Aggregate progress denominator for this transition.
-    /// /params activeOperation Current managed Unity async operation.
-    /// /returns None.
     /// </summary>
+    /// <param name="reloadActiveScene">True when the source scene is unloaded before loading the replacement.</param>
+    /// <param name="hasSourceScene">True when a source scene definition is available.</param>
+    /// <param name="sourceScene">Source scene definition.</param>
+    /// <param name="hasSourceCompanionScene">True when a source companion scene definition is available.</param>
+    /// <param name="sourceCompanionScene">Source companion scene definition.</param>
+    /// <param name="targetScene">Main transition target scene.</param>
+    /// <param name="hasTargetCompanionScene">True when a target companion scene definition is available.</param>
+    /// <param name="targetSceneLoaded">True when the target scene load step has completed.</param>
+    /// <param name="targetCompanionSceneLoaded">True when the companion scene load step has completed.</param>
+    /// <param name="sourceSceneUnloadComplete">True when the source scene unload step has completed.</param>
+    /// <param name="sourceCompanionSceneUnloadComplete">True when the source companion scene unload step has completed.</param>
+    /// <param name="persistentPlayerPreLoadUnloadScenes">Persistent player scenes unloaded before target loading.</param>
+    /// <param name="persistentPlayerLoadScenes">Persistent player scenes loaded for the target.</param>
+    /// <param name="persistentPlayerPostLoadUnloadScenes">Persistent player scenes unloaded after target loading.</param>
+    /// <param name="persistentPlayerPreLoadUnloadIndex">Current pre-load unload operation index.</param>
+    /// <param name="persistentPlayerLoadIndex">Current persistent player load operation index.</param>
+    /// <param name="persistentPlayerPostLoadUnloadIndex">Current post-load unload operation index.</param>
+    /// <param name="loadingProgressTotalSteps">Aggregate progress denominator for this transition.</param>
+    /// <param name="activeOperation">Current managed Unity async operation.</param>
     public GameSceneTransitionProgressSnapshot(bool reloadActiveScene,
                                                bool hasSourceScene,
                                                GameSceneDefinitionElement sourceScene,

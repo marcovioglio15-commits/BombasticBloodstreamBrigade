@@ -5,8 +5,6 @@ using UnityEngine.ResourceManagement.ResourceProviders;
 
 /// <summary>
 /// Identifies the active managed scene operation type owned by the transition executor.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal enum GameSceneSceneOperationKind : byte
 {
@@ -18,8 +16,6 @@ internal enum GameSceneSceneOperationKind : byte
 
 /// <summary>
 /// Stores one in-flight Unity scene operation, including Addressables handles that must be released correctly.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct GameSceneSceneOperationState
 {
@@ -79,9 +75,9 @@ internal struct GameSceneSceneOperationState
     #region Factory
     /// <summary>
     /// Builds operation state for a regular SceneManager async operation.
-    /// /params operation Unity async operation returned by SceneManager.
-    /// /returns Scene operation state.
     /// </summary>
+    /// <param name="operation">Unity async operation returned by SceneManager.</param>
+    /// <returns>Scene operation state.</returns>
     public static GameSceneSceneOperationState FromSceneManager(AsyncOperation operation)
     {
         return new GameSceneSceneOperationState
@@ -93,10 +89,10 @@ internal struct GameSceneSceneOperationState
 
     /// <summary>
     /// Builds operation state for an Addressables scene load handle.
-    /// /params sceneId Stable Scene Manager scene ID being loaded.
-    /// /params operation Addressables scene load operation.
-    /// /returns Scene operation state.
     /// </summary>
+    /// <param name="sceneId">Stable Scene Manager scene ID being loaded.</param>
+    /// <param name="operation">Addressables scene load operation.</param>
+    /// <returns>Scene operation state.</returns>
     public static GameSceneSceneOperationState FromAddressablesLoad(FixedString64Bytes sceneId,
                                                                     AsyncOperationHandle<SceneInstance> operation)
     {
@@ -110,10 +106,10 @@ internal struct GameSceneSceneOperationState
 
     /// <summary>
     /// Builds operation state for an Addressables scene unload handle.
-    /// /params sceneId Stable Scene Manager scene ID being unloaded.
-    /// /params operation Addressables scene unload operation.
-    /// /returns Scene operation state.
     /// </summary>
+    /// <param name="sceneId">Stable Scene Manager scene ID being unloaded.</param>
+    /// <param name="operation">Addressables scene unload operation.</param>
+    /// <returns>Scene operation state.</returns>
     public static GameSceneSceneOperationState FromAddressablesUnload(FixedString64Bytes sceneId,
                                                                       AsyncOperationHandle<SceneInstance> operation)
     {
@@ -129,8 +125,6 @@ internal struct GameSceneSceneOperationState
     #region Lifecycle
     /// <summary>
     /// Clears operation references after completion or transition shutdown.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Clear()
     {

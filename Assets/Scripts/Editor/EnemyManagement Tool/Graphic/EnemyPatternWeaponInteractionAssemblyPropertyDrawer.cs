@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyPatternWeaponInteractionAssembly.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyPatternWeaponInteractionAssembly))]
 public sealed class EnemyPatternWeaponInteractionAssemblyPropertyDrawer : PropertyDrawer
@@ -16,9 +14,9 @@ public sealed class EnemyPatternWeaponInteractionAssemblyPropertyDrawer : Proper
     #region Public Methods
     /// <summary>
     /// Creates the weapon-interaction assembly UI.
-    /// /params property Serialized weapon-interaction assembly property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized weapon-interaction assembly property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -278,20 +276,19 @@ public sealed class EnemyPatternWeaponInteractionAssemblyPropertyDrawer : Proper
     #region Private Methods
     /// <summary>
     /// Updates nested settings visibility, range-gated fields, and unsupported-module warnings from the current toggle state.
-    /// /params enabledProperty Serialized enabled property.
-    /// /params useMinimumRangeProperty Serialized minimum-range toggle.
-    /// /params useMaximumRangeProperty Serialized maximum-range toggle.
-    /// /params displayTriggerProperty Serialized trigger toggle.
-    /// /params useOverrideProperty Serialized override toggle.
-    /// /params bindingProperty Serialized module binding.
-    /// /params settingsContainer Main nested settings container.
-    /// /params minimumRangeContainer Nested minimum-range field container.
-    /// /params maximumRangeContainer Nested maximum-range field container.
-    /// /params feedbackOptionsContainer Nested feedback options container.
-    /// /params feedbackOverrideContainer Nested override settings container.
-    /// /params unsupportedModuleBox Warning box shown for unsupported module kinds.
-    /// /returns None.
     /// </summary>
+    /// <param name="enabledProperty">Serialized enabled property.</param>
+    /// <param name="useMinimumRangeProperty">Serialized minimum-range toggle.</param>
+    /// <param name="useMaximumRangeProperty">Serialized maximum-range toggle.</param>
+    /// <param name="displayTriggerProperty">Serialized trigger toggle.</param>
+    /// <param name="useOverrideProperty">Serialized override toggle.</param>
+    /// <param name="bindingProperty">Serialized module binding.</param>
+    /// <param name="settingsContainer">Main nested settings container.</param>
+    /// <param name="minimumRangeContainer">Nested minimum-range field container.</param>
+    /// <param name="maximumRangeContainer">Nested maximum-range field container.</param>
+    /// <param name="feedbackOptionsContainer">Nested feedback options container.</param>
+    /// <param name="feedbackOverrideContainer">Nested override settings container.</param>
+    /// <param name="unsupportedModuleBox">Warning box shown for unsupported module kinds.</param>
     private static void UpdateVisibility(SerializedProperty enabledProperty,
                                          SerializedProperty useMinimumRangeProperty,
                                          SerializedProperty useMaximumRangeProperty,
@@ -380,9 +377,9 @@ public sealed class EnemyPatternWeaponInteractionAssemblyPropertyDrawer : Proper
 
     /// <summary>
     /// Resolves activation gates from the serialized enum property.
-    /// /params activationGatesProperty Serialized activation gates property.
-    /// /returns Current activation gate flags.
     /// </summary>
+    /// <param name="activationGatesProperty">Serialized activation gates property.</param>
+    /// <returns>Current activation gate flags.</returns>
     private static EnemyWeaponInteractionActivationGate ResolveActivationGates(SerializedProperty activationGatesProperty)
     {
         if (activationGatesProperty == null || activationGatesProperty.propertyType != SerializedPropertyType.Enum)

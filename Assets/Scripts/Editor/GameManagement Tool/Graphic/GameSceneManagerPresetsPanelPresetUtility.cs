@@ -8,8 +8,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds Scene Manager preset browser UI and handles preset asset mutations.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneManagerPresetsPanelPresetUtility
 {
@@ -18,10 +16,10 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
     #region Public Methods
     /// <summary>
     /// Builds the main split view containing the Scene Manager preset list and details.
-    /// /params panel Owning panel that stores UI state.
-    /// /params leftPaneWidth Fixed browser pane width.
-    /// /returns Main content visual root.
     /// </summary>
+    /// <param name="panel">Owning panel that stores UI state.</param>
+    /// <param name="leftPaneWidth">Fixed browser pane width.</param>
+    /// <returns>Main content visual root.</returns>
     public static VisualElement BuildMainContent(GameSceneManagerPresetsPanel panel, float leftPaneWidth)
     {
         TwoPaneSplitView splitView = GameManagementPanelLayoutUtility.CreateHorizontalSplitView(leftPaneWidth);
@@ -32,9 +30,8 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Refreshes visible presets from the current library and search filter.
-    /// /params panel Owning panel with library and list state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with library and list state.</param>
     public static void RefreshPresetList(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null)
@@ -61,9 +58,8 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Creates and selects a new Scene Manager preset.
-    /// /params panel Owning panel that receives the new selection.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the new selection.</param>
     public static void CreatePreset(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null)
@@ -85,10 +81,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Duplicates one Scene Manager preset asset and registers it.
-    /// /params panel Owning panel that receives the duplicate selection.
-    /// /params preset Source preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the duplicate selection.</param>
+    /// <param name="preset">Source preset to duplicate.</param>
     public static void DuplicatePreset(GameSceneManagerPresetsPanel panel, GameSceneManagerPreset preset)
     {
         if (panel == null || preset == null)
@@ -124,10 +119,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Stages one Scene Manager preset for deletion after confirmation.
-    /// /params panel Owning panel with library state.
-    /// /params preset Preset to delete.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with library state.</param>
+    /// <param name="preset">Preset to delete.</param>
     public static void DeletePreset(GameSceneManagerPresetsPanel panel, GameSceneManagerPreset preset)
     {
         if (panel == null || preset == null)
@@ -152,9 +146,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
     #region Private Methods
     /// <summary>
     /// Builds the left preset browser pane.
-    /// /params panel Owning panel used by controls.
-    /// /returns Left pane visual element.
     /// </summary>
+    /// <param name="panel">Owning panel used by controls.</param>
+    /// <returns>Left pane visual element.</returns>
     private static VisualElement BuildLeftPane(GameSceneManagerPresetsPanel panel)
     {
         VisualElement leftPane = new VisualElement();
@@ -183,9 +177,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Builds create, duplicate and delete buttons for Scene Manager presets.
-    /// /params panel Owning panel used by callbacks.
-    /// /returns Toolbar visual element.
     /// </summary>
+    /// <param name="panel">Owning panel used by callbacks.</param>
+    /// <returns>Toolbar visual element.</returns>
     private static Toolbar BuildToolbar(GameSceneManagerPresetsPanel panel)
     {
         Toolbar toolbar = new Toolbar();
@@ -213,9 +207,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Builds the selected preset detail scroll area.
-    /// /params panel Owning panel receiving the details root.
-    /// /returns Right pane visual element.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the details root.</param>
+    /// <returns>Right pane visual element.</returns>
     private static VisualElement BuildRightPane(GameSceneManagerPresetsPanel panel)
     {
         VisualElement rightPane = new VisualElement();
@@ -232,10 +226,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Adds library presets that pass search and staged-delete filters.
-    /// /params panel Owning panel with filtered output list.
-    /// /params searchText Current search text.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with filtered output list.</param>
+    /// <param name="searchText">Current search text.</param>
     private static void AddMatchingPresets(GameSceneManagerPresetsPanel panel, string searchText)
     {
         for (int index = 0; index < panel.Library.Presets.Count; index++)
@@ -255,9 +248,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Creates one list row label with context actions.
-    /// /params panel Owning panel used by context callbacks.
-    /// /returns List row label.
     /// </summary>
+    /// <param name="panel">Owning panel used by context callbacks.</param>
+    /// <returns>List row label.</returns>
     private static VisualElement MakePresetItem(GameSceneManagerPresetsPanel panel)
     {
         Label label = new Label();
@@ -278,11 +271,10 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Binds one row to a filtered Scene Manager preset.
-    /// /params panel Owning panel with filtered presets.
-    /// /params element Row visual element.
-    /// /params index Filtered preset index.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with filtered presets.</param>
+    /// <param name="element">Row visual element.</param>
+    /// <param name="index">Filtered preset index.</param>
     private static void BindPresetItem(GameSceneManagerPresetsPanel panel, VisualElement element, int index)
     {
         Label label = element as Label;
@@ -305,10 +297,9 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Selects the first preset included in the ListView selection event.
-    /// /params panel Owning panel receiving the selection.
-    /// /params selection Current ListView selection.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the selection.</param>
+    /// <param name="selection">Current ListView selection.</param>
     private static void OnPresetSelectionChanged(GameSceneManagerPresetsPanel panel, IEnumerable<object> selection)
     {
         foreach (object item in selection)
@@ -327,10 +318,10 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Checks whether one preset matches the current search text.
-    /// /params preset Preset to inspect.
-    /// /params searchText Current search text.
-    /// /returns True when visible.
     /// </summary>
+    /// <param name="preset">Preset to inspect.</param>
+    /// <param name="searchText">Current search text.</param>
+    /// <returns>True when visible.</returns>
     private static bool MatchesSearch(GameSceneManagerPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))
@@ -344,11 +335,10 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
 
     /// <summary>
     /// Updates duplicated preset metadata and optionally regenerates the stable ID.
-    /// /params preset Preset to update.
-    /// /params name New preset name.
-    /// /params regenerateId True when a fresh ID should be assigned.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to update.</param>
+    /// <param name="name">New preset name.</param>
+    /// <param name="regenerateId">True when a fresh ID should be assigned.</param>
     private static void SynchronizePresetMetadata(GameSceneManagerPreset preset, string name, bool regenerateId)
     {
         SerializedObject serializedObject = new SerializedObject(preset);

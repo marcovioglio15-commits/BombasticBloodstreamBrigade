@@ -11,14 +11,13 @@ internal static class HUDPowerUpContainerTimeScaleUtility
     #region Public Methods
     /// <summary>
     /// Starts the unscaled Time.timeScale resume state for the overlay.
-    /// isResuming: Mutable flag tracking whether a resume is currently active.
-    /// startTimeScale: Mutable cached start Time.timeScale used for interpolation.
-    /// targetTimeScale: Mutable cached target Time.timeScale used for interpolation.
-    /// durationSeconds: Mutable total resume duration in seconds.
-    /// elapsedSeconds: Mutable elapsed unscaled time since the resume started.
-    /// configuredDurationSeconds: Resume duration requested by the runtime interaction config.
-    /// returns void.
     /// </summary>
+    /// <param name="isResuming">Mutable flag tracking whether a resume is currently active.</param>
+    /// <param name="startTimeScale">Mutable cached start Time.timeScale used for interpolation.</param>
+    /// <param name="targetTimeScale">Mutable cached target Time.timeScale used for interpolation.</param>
+    /// <param name="durationSeconds">Mutable total resume duration in seconds.</param>
+    /// <param name="elapsedSeconds">Mutable elapsed unscaled time since the resume started.</param>
+    /// <param name="configuredDurationSeconds">Resume duration requested by the runtime interaction config.</param>
     public static void BeginResume(ref bool isResuming,
                                    ref float startTimeScale,
                                    ref float targetTimeScale,
@@ -47,15 +46,14 @@ internal static class HUDPowerUpContainerTimeScaleUtility
 
     /// <summary>
     /// Starts the configured unscaled Time.timeScale resume by reading the player container-interaction config.
-    /// /params entityManager Entity manager used to read the runtime player config.
-    /// /params playerEntity Player entity that owns the dropped-container interaction config.
-    /// /params isResuming Mutable flag tracking whether a resume is currently active.
-    /// /params startTimeScale Mutable cached start Time.timeScale used for interpolation.
-    /// /params targetTimeScale Mutable cached target Time.timeScale used for interpolation.
-    /// /params durationSeconds Mutable total resume duration in seconds.
-    /// /params elapsedSeconds Mutable elapsed unscaled time since the resume started.
-    /// /returns void.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read the runtime player config.</param>
+    /// <param name="playerEntity">Player entity that owns the dropped-container interaction config.</param>
+    /// <param name="isResuming">Mutable flag tracking whether a resume is currently active.</param>
+    /// <param name="startTimeScale">Mutable cached start Time.timeScale used for interpolation.</param>
+    /// <param name="targetTimeScale">Mutable cached target Time.timeScale used for interpolation.</param>
+    /// <param name="durationSeconds">Mutable total resume duration in seconds.</param>
+    /// <param name="elapsedSeconds">Mutable elapsed unscaled time since the resume started.</param>
     public static void BeginResume(EntityManager entityManager,
                                    Entity playerEntity,
                                    ref bool isResuming,
@@ -88,14 +86,14 @@ internal static class HUDPowerUpContainerTimeScaleUtility
 
     /// <summary>
     /// Advances the active Time.timeScale resume and reports whether the interpolation completed.
-    /// isResuming: Mutable flag tracking whether a resume is currently active.
-    /// startTimeScale: Mutable cached start Time.timeScale used for interpolation.
-    /// targetTimeScale: Mutable cached target Time.timeScale used for interpolation.
-    /// durationSeconds: Mutable total resume duration in seconds.
-    /// elapsedSeconds: Mutable elapsed unscaled time since the resume started.
-    /// milestoneSelectionActive: True when another HUD flow must keep the game paused.
-    /// returns True when the resume has fully completed or was already inactive.
     /// </summary>
+    /// <param name="isResuming">Mutable flag tracking whether a resume is currently active.</param>
+    /// <param name="startTimeScale">Mutable cached start Time.timeScale used for interpolation.</param>
+    /// <param name="targetTimeScale">Mutable cached target Time.timeScale used for interpolation.</param>
+    /// <param name="durationSeconds">Mutable total resume duration in seconds.</param>
+    /// <param name="elapsedSeconds">Mutable elapsed unscaled time since the resume started.</param>
+    /// <param name="milestoneSelectionActive">True when another HUD flow must keep the game paused.</param>
+    /// <returns>True when the resume has fully completed or was already inactive.</returns>
     public static bool UpdateResume(ref bool isResuming,
                                     ref float startTimeScale,
                                     ref float targetTimeScale,
@@ -135,10 +133,9 @@ internal static class HUDPowerUpContainerTimeScaleUtility
 
     /// <summary>
     /// Cancels milestone-driven resume state so another overlay can keep gameplay paused until it closes.
-    /// /params entityManager Entity manager used to write the milestone resume component.
-    /// /params playerEntity Player entity that may own milestone resume state.
-    /// /returns void.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to write the milestone resume component.</param>
+    /// <param name="playerEntity">Player entity that may own milestone resume state.</param>
     public static void CancelMilestoneResume(EntityManager entityManager, Entity playerEntity)
     {
         if (playerEntity == Entity.Null)
@@ -156,13 +153,12 @@ internal static class HUDPowerUpContainerTimeScaleUtility
 
     /// <summary>
     /// Clears the active Time.timeScale resume state.
-    /// isResuming: Mutable flag tracking whether a resume is currently active.
-    /// startTimeScale: Mutable cached start Time.timeScale used for interpolation.
-    /// targetTimeScale: Mutable cached target Time.timeScale used for interpolation.
-    /// durationSeconds: Mutable total resume duration in seconds.
-    /// elapsedSeconds: Mutable elapsed unscaled time since the resume started.
-    /// returns void.
     /// </summary>
+    /// <param name="isResuming">Mutable flag tracking whether a resume is currently active.</param>
+    /// <param name="startTimeScale">Mutable cached start Time.timeScale used for interpolation.</param>
+    /// <param name="targetTimeScale">Mutable cached target Time.timeScale used for interpolation.</param>
+    /// <param name="durationSeconds">Mutable total resume duration in seconds.</param>
+    /// <param name="elapsedSeconds">Mutable elapsed unscaled time since the resume started.</param>
     public static void StopResume(ref bool isResuming,
                                   ref float startTimeScale,
                                   ref float targetTimeScale,

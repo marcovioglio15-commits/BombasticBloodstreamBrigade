@@ -10,11 +10,11 @@ public static class PlayerCharacterTuningFormulaValidationUtility
     #region Public Methods
     /// <summary>
     /// Validates one Character Tuning assignment formula using the scalable-stat parser and formula engine.
-    /// assignmentFormula Assignment string entered by designers.
-    /// allowedVariables Optional scalable-stat whitelist for the current preset scope.
-    /// warningMessage Failure reason when validation fails.
-    /// returns True when the assignment is valid.
     /// </summary>
+    /// <param name="assignmentFormula">Assignment string entered by designers.</param>
+    /// <param name="allowedVariables">Optional scalable-stat whitelist for the current preset scope.</param>
+    /// <param name="warningMessage">Failure reason when validation fails.</param>
+    /// <returns>True when the assignment is valid.</returns>
     public static bool TryValidateAssignmentFormula(string assignmentFormula,
                                                     ISet<string> allowedVariables,
                                                     IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes,

@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Evaluates runtime scaling formulas against the current typed scalable-stat context.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerRuntimeScalingFormulaEvaluationUtility
 {
@@ -13,13 +11,13 @@ internal static class PlayerRuntimeScalingFormulaEvaluationUtility
     #region Public Methods
     /// <summary>
     /// Evaluates one numeric scaling formula and optionally rounds the result for integer-backed fields.
-    /// /params formula Runtime formula text baked for the target field.
-    /// /params baseValue Immutable baseline value passed as the reserved [this] token.
-    /// /params isInteger True when the resolved value must be rounded to the nearest integer.
-    /// /params variableContext Current typed scalable-stat context.
-    /// /params resolvedValue Evaluated numeric result when the formula succeeds.
-    /// /returns True when the formula evaluated successfully.
     /// </summary>
+    /// <param name="formula">Runtime formula text baked for the target field.</param>
+    /// <param name="baseValue">Immutable baseline value passed as the reserved [this] token.</param>
+    /// <param name="isInteger">True when the resolved value must be rounded to the nearest integer.</param>
+    /// <param name="variableContext">Current typed scalable-stat context.</param>
+    /// <param name="resolvedValue">Evaluated numeric result when the formula succeeds.</param>
+    /// <returns>True when the formula evaluated successfully.</returns>
     public static bool TryEvaluateNumericValue(string formula,
                                                float baseValue,
                                                bool isInteger,
@@ -43,12 +41,12 @@ internal static class PlayerRuntimeScalingFormulaEvaluationUtility
 
     /// <summary>
     /// Evaluates one boolean scaling formula against the current typed scalable-stat context.
-    /// /params formula Runtime formula text baked for the target field.
-    /// /params baseValue Immutable baseline boolean passed as the reserved [this] token.
-    /// /params variableContext Current typed scalable-stat context.
-    /// /params resolvedValue Evaluated boolean result when the formula succeeds.
-    /// /returns True when the formula evaluated successfully and resolved to a boolean.
     /// </summary>
+    /// <param name="formula">Runtime formula text baked for the target field.</param>
+    /// <param name="baseValue">Immutable baseline boolean passed as the reserved [this] token.</param>
+    /// <param name="variableContext">Current typed scalable-stat context.</param>
+    /// <param name="resolvedValue">Evaluated boolean result when the formula succeeds.</param>
+    /// <returns>True when the formula evaluated successfully and resolved to a boolean.</returns>
     public static bool TryEvaluateBooleanValue(string formula,
                                                bool baseValue,
                                                IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
@@ -76,12 +74,12 @@ internal static class PlayerRuntimeScalingFormulaEvaluationUtility
 
     /// <summary>
     /// Evaluates one token scaling formula against the current typed scalable-stat context.
-    /// /params formula Runtime formula text baked for the target field.
-    /// /params baseValue Immutable baseline token passed as the reserved [this] token.
-    /// /params variableContext Current typed scalable-stat context.
-    /// /params resolvedValue Evaluated token result when the formula succeeds.
-    /// /returns True when the formula evaluated successfully and resolved to a token.
     /// </summary>
+    /// <param name="formula">Runtime formula text baked for the target field.</param>
+    /// <param name="baseValue">Immutable baseline token passed as the reserved [this] token.</param>
+    /// <param name="variableContext">Current typed scalable-stat context.</param>
+    /// <param name="resolvedValue">Evaluated token result when the formula succeeds.</param>
+    /// <returns>True when the formula evaluated successfully and resolved to a token.</returns>
     public static bool TryEvaluateTokenValue(string formula,
                                              string baseValue,
                                              IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,

@@ -3,8 +3,6 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// Keeps exactly one EventSystem enabled while UI scenes overlap during additive transitions.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DefaultExecutionOrder(-32000)]
 [DisallowMultipleComponent]
@@ -26,8 +24,6 @@ public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Resolves the local EventSystem early enough to silence UGUI's duplicate-owner warning during additive scene activation.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Awake()
     {
@@ -39,8 +35,6 @@ public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
 
     /// <summary>
     /// Claims EventSystem ownership for this UI scene when it is enabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -57,8 +51,6 @@ public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
     #region Coordination
     /// <summary>
     /// Resolves the controlled EventSystem from the authored reference or local component.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResolveEventSystem()
     {
@@ -68,9 +60,8 @@ public sealed class GameSceneEventSystemCoordinator : MonoBehaviour
 
     /// <summary>
     /// Disables every other enabled EventSystem so Unity's UGUI runtime sees a single active owner.
-    /// /params activeEventSystem EventSystem that should remain enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="activeEventSystem">EventSystem that should remain enabled.</param>
     private static void DisableOtherEventSystems(EventSystem activeEventSystem)
     {
         EventSystem[] eventSystems = Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);

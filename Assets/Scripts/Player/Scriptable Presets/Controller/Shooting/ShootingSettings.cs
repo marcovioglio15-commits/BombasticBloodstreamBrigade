@@ -5,8 +5,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores trigger, prefab and pooled-shooting settings used by one player controller preset.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ShootingSettings
@@ -105,8 +103,6 @@ public sealed class ShootingSettings
     #region Validation
     /// <summary>
     /// Validates the authored shooting container and keeps nested blocks initialized before bake or editor rendering.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {
@@ -128,8 +124,6 @@ public sealed class ShootingSettings
 
 /// <summary>
 /// Stores numeric projectile tuning, default elemental payload slots and per-element bullet behaviour blocks.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ShootingValues
@@ -347,8 +341,6 @@ public sealed class ShootingValues
     #region Validation
     /// <summary>
     /// Validates authored projectile values, guarantees the new multi-element data shape and preserves migrated legacy data.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {
@@ -392,8 +384,6 @@ public sealed class ShootingValues
 
 /// <summary>
 /// Stores the default knockback payload emitted by base player projectiles.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ProjectileKnockbackSettings
@@ -466,8 +456,6 @@ public sealed class ProjectileKnockbackSettings
     #region Validation
     /// <summary>
     /// Validates the authored knockback payload container and preserves the current authored values.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {

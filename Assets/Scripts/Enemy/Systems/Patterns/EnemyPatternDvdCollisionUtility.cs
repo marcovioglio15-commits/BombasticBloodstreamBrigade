@@ -60,17 +60,17 @@ public static class EnemyPatternDvdCollisionUtility
     #region Public Methods
     /// <summary>
     /// Predicts the earliest DVD-to-DVD collision over the current frame and resolves the bounced velocity for the current enemy only.
-    /// enemyEntity: Current enemy entity.
-    /// currentPosition: Current enemy world position.
-    /// currentVelocity: Current enemy planar velocity before pair collision response.
-    /// collisionRadius: Current enemy collision radius.
-    /// bounceDamping: Current enemy configured bounce damping.
-    /// deltaTime: Current frame simulation delta time.
-    /// occupancyContext: Immutable occupancy snapshot used for neighborhood lookup.
-    /// bouncedVelocity: Output bounced planar velocity.
-    /// collisionTimeSeconds: Output time of impact in seconds from the current frame start.
-    /// returns True when a valid DVD pair collision is found; otherwise false.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="currentPosition">Current enemy world position.</param>
+    /// <param name="currentVelocity">Current enemy planar velocity before pair collision response.</param>
+    /// <param name="collisionRadius">Current enemy collision radius.</param>
+    /// <param name="bounceDamping">Current enemy configured bounce damping.</param>
+    /// <param name="deltaTime">Current frame simulation delta time.</param>
+    /// <param name="occupancyContext">Immutable occupancy snapshot used for neighborhood lookup.</param>
+    /// <param name="bouncedVelocity">Output bounced planar velocity.</param>
+    /// <param name="collisionTimeSeconds">Output time of impact in seconds from the current frame start.</param>
+    /// <returns>True when a valid DVD pair collision is found; otherwise false.</returns>
     public static bool TryResolveBounceVelocity(Entity enemyEntity,
                                                 float3 currentPosition,
                                                 float3 currentVelocity,
@@ -195,20 +195,20 @@ public static class EnemyPatternDvdCollisionUtility
     #region Private Methods
     /// <summary>
     /// Evaluates whether two moving discs collide during the current frame.
-    /// selfPosition: Current self position.
-    /// selfVelocity: Current self planar velocity.
-    /// selfRadius: Current self collision radius.
-    /// otherPosition: Current neighbor position.
-    /// otherVelocity: Current neighbor planar velocity.
-    /// otherRadius: Current neighbor collision radius.
-    /// deltaTime: Current frame simulation delta time.
-    /// selfEntity: Current self entity used for deterministic fallbacks.
-    /// otherEntity: Current neighbor entity used for deterministic fallbacks.
-    /// collisionTimeSeconds: Output time of impact in seconds from frame start.
-    /// approachSpeed: Output closing speed along the collision normal.
-    /// collisionNormal: Output collision normal from neighbor to self.
-    /// returns True when the two discs collide while approaching one another; otherwise false.
     /// </summary>
+    /// <param name="selfPosition">Current self position.</param>
+    /// <param name="selfVelocity">Current self planar velocity.</param>
+    /// <param name="selfRadius">Current self collision radius.</param>
+    /// <param name="otherPosition">Current neighbor position.</param>
+    /// <param name="otherVelocity">Current neighbor planar velocity.</param>
+    /// <param name="otherRadius">Current neighbor collision radius.</param>
+    /// <param name="deltaTime">Current frame simulation delta time.</param>
+    /// <param name="selfEntity">Current self entity used for deterministic fallbacks.</param>
+    /// <param name="otherEntity">Current neighbor entity used for deterministic fallbacks.</param>
+    /// <param name="collisionTimeSeconds">Output time of impact in seconds from frame start.</param>
+    /// <param name="approachSpeed">Output closing speed along the collision normal.</param>
+    /// <param name="collisionNormal">Output collision normal from neighbor to self.</param>
+    /// <returns>True when the two discs collide while approaching one another; otherwise false.</returns>
     private static bool TryResolveCollisionCandidate(float3 selfPosition,
                                                      float3 selfVelocity,
                                                      float selfRadius,
@@ -279,12 +279,12 @@ public static class EnemyPatternDvdCollisionUtility
 
     /// <summary>
     /// Resolves the bounced self velocity for an equal-mass pair using the provided collision normal.
-    /// selfVelocity: Current self velocity.
-    /// otherVelocity: Current other velocity.
-    /// collisionNormal: Collision normal from other to self.
-    /// bounceDamping: Shared restitution coefficient in the [0..1] range.
-    /// returns Bounced self velocity.
     /// </summary>
+    /// <param name="selfVelocity">Current self velocity.</param>
+    /// <param name="otherVelocity">Current other velocity.</param>
+    /// <param name="collisionNormal">Collision normal from other to self.</param>
+    /// <param name="bounceDamping">Shared restitution coefficient in the [0..1] range.</param>
+    /// <returns>Bounced self velocity.</returns>
     private static float3 ResolveEqualMassBounceVelocity(float3 selfVelocity,
                                                          float3 otherVelocity,
                                                          float3 collisionNormal,
@@ -309,11 +309,11 @@ public static class EnemyPatternDvdCollisionUtility
 
     /// <summary>
     /// Resolves one stable collision normal from a 2D relative position, falling back to a deterministic direction when necessary.
-    /// relativePosition: Relative position from other to self on the XZ plane.
-    /// selfEntity: Current self entity.
-    /// otherEntity: Current other entity.
-    /// returns Normalized collision normal from other to self.
     /// </summary>
+    /// <param name="relativePosition">Relative position from other to self on the XZ plane.</param>
+    /// <param name="selfEntity">Current self entity.</param>
+    /// <param name="otherEntity">Current other entity.</param>
+    /// <returns>Normalized collision normal from other to self.</returns>
     private static float3 ResolveCollisionNormal(float2 relativePosition, Entity selfEntity, Entity otherEntity)
     {
         float2 planarNormal = math.normalizesafe(relativePosition, float2.zero);

@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Maintains pooled 3D body blobs and particle endpoints for the Laser Beam presentation path.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerLaserBeamSimulationSystem))]
@@ -28,9 +26,8 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime data required by the Laser Beam presentation path.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerLaserBeamState>();
@@ -44,9 +41,8 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
 
     /// <summary>
     /// Releases all pooled managed visuals owned by the presentation system.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnDestroy(ref SystemState state)
     {
         Dictionary<Entity, PlayerLaserBeamManagedInstance>.Enumerator enumerator = managedInstances.GetEnumerator();
@@ -67,9 +63,8 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
 
     /// <summary>
     /// Synchronizes pooled managed visuals with the current authoritative Laser Beam lane buffer.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();

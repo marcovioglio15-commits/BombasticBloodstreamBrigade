@@ -15,9 +15,9 @@ public sealed class PlayerLaserBeamVisualPresetSelectorAttributeDrawer : Propert
     #region Public Methods
     /// <summary>
     /// Builds the popup-based editor UI for the Laser Beam visual preset selector field.
-    /// /params property Serialized selector property.
-    /// /returns Configured UI Toolkit element.
     /// </summary>
+    /// <param name="property">Serialized selector property.</param>
+    /// <returns>Configured UI Toolkit element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

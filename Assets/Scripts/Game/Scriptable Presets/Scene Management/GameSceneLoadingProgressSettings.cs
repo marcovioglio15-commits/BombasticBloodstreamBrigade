@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores authored loading-progress presentation values used by Scene Manager transitions.
-/// /params None.
-/// /returns None.
 /// </summary>
 [System.Serializable]
 public sealed class GameSceneLoadingProgressSettings

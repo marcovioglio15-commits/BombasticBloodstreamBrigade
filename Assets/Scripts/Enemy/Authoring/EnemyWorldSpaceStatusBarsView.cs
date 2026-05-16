@@ -156,10 +156,9 @@ public sealed class EnemyWorldSpaceStatusBarsView : MonoBehaviour
 
     /// <summary>
     /// Updates the visibility state of the widget without re-sampling health or shield values.
-    /// /params enemyActive Whether the owning enemy is currently active.
-    /// /params enemyVisible Whether the owning enemy is currently visible after presentation culling.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyActive">Whether the owning enemy is currently active.</param>
+    /// <param name="enemyVisible">Whether the owning enemy is currently visible after presentation culling.</param>
     public void SyncVisibilityState(bool enemyActive, bool enemyVisible)
     {
         if (ResolveImmediateRefresh(enemyActive))
@@ -172,11 +171,10 @@ public sealed class EnemyWorldSpaceStatusBarsView : MonoBehaviour
 
     /// <summary>
     /// Updates displayed health and shield values while preserving the current visibility state.
-    /// /params healthNormalized Target normalized health value.
-    /// /params shieldNormalized Target normalized shield value.
-    /// /params deltaTime Presentation delta time used for smoothing.
-    /// /returns None.
     /// </summary>
+    /// <param name="healthNormalized">Target normalized health value.</param>
+    /// <param name="shieldNormalized">Target normalized shield value.</param>
+    /// <param name="deltaTime">Presentation delta time used for smoothing.</param>
     public void SyncDisplayedValues(float healthNormalized, float shieldNormalized, float deltaTime)
     {
         float targetHealthNormalized = Mathf.Clamp01(healthNormalized);

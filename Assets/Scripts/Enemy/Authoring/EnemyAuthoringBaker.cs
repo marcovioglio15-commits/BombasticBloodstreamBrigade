@@ -265,10 +265,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     #region Helpers
     /// <summary>
     /// Writes the base boss offensive engagement configs into the active runtime buffer used immediately after spawn.
-    /// /params compiledBossPattern Compiled boss pattern data.
-    /// /params offensiveEngagementConfigs Active target buffer populated during bake.
-    /// /returns None.
     /// </summary>
+    /// <param name="compiledBossPattern">Compiled boss pattern data.</param>
+    /// <param name="offensiveEngagementConfigs">Active target buffer populated during bake.</param>
     private static void AppendInitialBossOffensiveEngagementConfigs(EnemyCompiledBossPatternBakeResult compiledBossPattern,
                                                                     DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs)
     {
@@ -283,12 +282,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Copies one boss-owned offensive engagement config slice into an active runtime buffer.
-    /// /params firstConfigIndex First source config index.
-    /// /params configCount Number of configs to copy.
-    /// /params compiledBossPattern Compiled boss source data.
-    /// /params targetConfigs Active target buffer receiving configs.
-    /// /returns None.
     /// </summary>
+    /// <param name="firstConfigIndex">First source config index.</param>
+    /// <param name="configCount">Number of configs to copy.</param>
+    /// <param name="compiledBossPattern">Compiled boss source data.</param>
+    /// <param name="targetConfigs">Active target buffer receiving configs.</param>
     private static void AppendBossOffensiveEngagementConfigSlice(int firstConfigIndex,
                                                                  int configCount,
                                                                  EnemyCompiledBossPatternBakeResult compiledBossPattern,
@@ -310,11 +308,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Writes boss-specific ECS buffers and HUD configuration when a Boss Pattern Preset is assigned.
-    /// /params authoring Source authoring component.
-    /// /params entity Enemy entity being baked.
-    /// /params compiledBossPattern Compiled boss data, or null for normal enemies.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <param name="entity">Enemy entity being baked.</param>
+    /// <param name="compiledBossPattern">Compiled boss data, or null for normal enemies.</param>
     private void TryBakeBossRuntime(EnemyAuthoring authoring,
                                     Entity entity,
                                     EnemyCompiledBossPatternBakeResult compiledBossPattern)
@@ -380,9 +377,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Builds unmanaged boss HUD configuration from the resolved visual preset.
-    /// /params authoring Source authoring component.
-    /// /returns Baked boss HUD config component.
     /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <returns>Baked boss HUD config component.</returns>
     private static EnemyBossHudConfig BuildBossHudConfig(EnemyAuthoring authoring)
     {
         EnemyVisualPreset visualPreset = authoring != null ? authoring.VisualPreset : null;
@@ -416,10 +413,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Adds managed boss HUD assets such as custom off-screen indicator sprites.
-    /// /params authoring Source authoring component.
-    /// /params entity Enemy entity receiving managed data.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <param name="entity">Enemy entity receiving managed data.</param>
     private void TryBakeBossHudManagedConfig(EnemyAuthoring authoring, Entity entity)
     {
         if (authoring == null)
@@ -441,9 +437,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Declares preset dependencies consumed during enemy bake so edits on master, sub-preset and shared pattern assets trigger a rebake.
-    /// /params authoring Source authoring component used to resolve all preset references.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source authoring component used to resolve all preset references.</param>
     private void DeclarePresetDependencies(EnemyAuthoring authoring)
     {
         if (authoring == null)
@@ -603,6 +598,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 #endif
             return;
         }
+
+#if UNITY_EDITOR
+        EnemyProjectileVisualOrderValidationUtility.ValidateProjectilePrefab(projectilePrefabObject, authoring);
+#endif
 
         Entity projectilePrefabEntity = GetEntity(projectilePrefabObject, TransformUsageFlags.Dynamic);
         AddComponent(entity, new ShooterProjectilePrefab
@@ -816,10 +815,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Registers all renderer entities that must react to enemy hit flash feedback.
-    /// authoring: Source enemy authoring component used to enumerate renderers.
-    /// rootEntity: Root enemy entity that owns the flash config and render target buffer.
-    /// returns None.
     /// </summary>
+    /// <param name="authoring">Source enemy authoring component used to enumerate renderers.</param>
+    /// <param name="rootEntity">Root enemy entity that owns the flash config and render target buffer.</param>
     private void BakeDamageFlashRenderTargets(EnemyAuthoring authoring, Entity rootEntity)
     {
         if (authoring == null)
@@ -860,9 +858,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Resolves the first valid base color exposed by one authored renderer.
-    /// renderer: Renderer inspected for compatible material color properties.
-    /// returns Resolved base color or white when the renderer has no supported color property.
     /// </summary>
+    /// <param name="renderer">Renderer inspected for compatible material color properties.</param>
+    /// <returns>Resolved base color or white when the renderer has no supported color property.</returns>
     private static float4 ResolveRendererBaseColor(Renderer renderer)
     {
         if (renderer == null)

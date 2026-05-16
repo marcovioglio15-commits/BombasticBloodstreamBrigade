@@ -164,7 +164,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
     /// <param name="rawInput"></param>
     /// <param name="elapsedTime"></param>
     /// <param name="releaseGraceSeconds"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static float2 ResolveDigitalInput(ref PlayerMovementState movementState, float2 rawInput, float elapsedTime, float releaseGraceSeconds)
     {
         // Build the current input mask from the raw input and update the movement state with the new mask and press times

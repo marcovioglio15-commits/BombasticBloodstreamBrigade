@@ -2,8 +2,6 @@ using Unity.Entities;
 
 /// <summary>
 /// Consumes queued power-up VFX requests and forwards them to the managed runtime VFX pool.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(PlayerElementalTrailResolveSystem))]
@@ -15,9 +13,8 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Requires player-side VFX request and cap buffers before updating the managed VFX pool.
-    /// /params state System state used by Unity Entities.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">System state used by Unity Entities.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpVfxSpawnRequest>();
@@ -26,9 +23,8 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 
     /// <summary>
     /// Clears all managed VFX instances owned by the static runtime pool when the world is destroyed.
-    /// /params state System state used by Unity Entities.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">System state used by Unity Entities.</param>
     public void OnDestroy(ref SystemState state)
     {
         PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
@@ -36,9 +32,8 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 
     /// <summary>
     /// Updates active managed VFX instances and consumes newly queued spawn requests.
-    /// /params state System state used by Unity Entities.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">System state used by Unity Entities.</param>
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();
@@ -75,9 +70,9 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
     #region Helpers
     /// <summary>
     /// Sanitizes runtime VFX cap values without mutating authoring data.
-    /// /params sourceConfig Baked cap config read from the player entity.
-    /// /returns Runtime-safe cap config for this frame.
     /// </summary>
+    /// <param name="sourceConfig">Baked cap config read from the player entity.</param>
+    /// <returns>Runtime-safe cap config for this frame.</returns>
     private static PlayerPowerUpVfxCapConfig SanitizeCapConfig(in PlayerPowerUpVfxCapConfig sourceConfig)
     {
         PlayerPowerUpVfxCapConfig config = sourceConfig;

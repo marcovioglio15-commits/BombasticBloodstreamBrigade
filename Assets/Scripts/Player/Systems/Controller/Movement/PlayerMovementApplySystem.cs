@@ -5,8 +5,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Applies resolved player movement velocity to the transform while enforcing wall collision and dash-specific wall bounce response.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMovementSpeedSystem))]
@@ -23,9 +21,8 @@ public partial struct PlayerMovementApplySystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares movement, transform, runtime movement config and physics world requirements for player movement application.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerMovementState>();
@@ -36,9 +33,8 @@ public partial struct PlayerMovementApplySystem : ISystem
 
     /// <summary>
     /// Applies velocity-driven displacement, resolves wall blocking, and redirects active dash motion after wall hits.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
@@ -130,12 +126,12 @@ public partial struct PlayerMovementApplySystem : ISystem
     #region Helpers
     /// <summary>
     /// Applies dash-specific wall bounce and redirects the active dash for following frames.
-    /// /params entity Player entity that may own a dash state.
-    /// /params hitNormal Wall surface normal returned by the sweep collision.
-    /// /params resolvedVelocity Mutable velocity after collision response.
-    /// /params dashLookup Mutable lookup used to read and write PlayerDashState.
-    /// /returns True when an active dash consumed the wall collision response.
     /// </summary>
+    /// <param name="entity">Player entity that may own a dash state.</param>
+    /// <param name="hitNormal">Wall surface normal returned by the sweep collision.</param>
+    /// <param name="resolvedVelocity">Mutable velocity after collision response.</param>
+    /// <param name="dashLookup">Mutable lookup used to read and write PlayerDashState.</param>
+    /// <returns>True when an active dash consumed the wall collision response.</returns>
     private static bool TryApplyDashWallBounce(Entity entity,
                                                float3 hitNormal,
                                                ref float3 resolvedVelocity,
@@ -173,9 +169,9 @@ public partial struct PlayerMovementApplySystem : ISystem
 
     /// <summary>
     /// Converts the authored dash bounce intensity into a softer physical response for wall impacts.
-    /// /params bounceIntensity Authored intensity in the normalized [0..1] range.
-    /// /returns Smoothed bounce coefficient consumed by the shared wall utility.
     /// </summary>
+    /// <param name="bounceIntensity">Authored intensity in the normalized [0..1] range.</param>
+    /// <returns>Smoothed bounce coefficient consumed by the shared wall utility.</returns>
     private static float ResolveSoftenedDashBounceCoefficient(float bounceIntensity)
     {
         float clampedIntensity = math.saturate(bounceIntensity);
@@ -185,9 +181,8 @@ public partial struct PlayerMovementApplySystem : ISystem
 
     /// <summary>
     /// Stops dash motion after a non-bouncing wall impact while preserving already-authored invulnerability timers.
-    /// /params dashState Mutable dash state to stop.
-    /// /returns None.
     /// </summary>
+    /// <param name="dashState">Mutable dash state to stop.</param>
     private static void StopDashAfterWallImpact(ref PlayerDashState dashState)
     {
         dashState.IsDashing = 0;

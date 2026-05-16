@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds reusable UI Toolkit editors and warnings for offensive engagement feedback settings.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
 {
@@ -17,10 +15,10 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
     #region Public Methods
     /// <summary>
     /// Builds the editor UI for one offensive engagement feedback settings block.
-    /// /params settingsProperty Serialized settings block to draw.
-    /// /params onValueChanged Optional callback invoked after any serialized value changes.
-    /// /returns The built visual element tree.
     /// </summary>
+    /// <param name="settingsProperty">Serialized settings block to draw.</param>
+    /// <param name="onValueChanged">Optional callback invoked after any serialized value changes.</param>
+    /// <returns>The built visual element tree.</returns>
     public static VisualElement BuildSettingsEditor(SerializedProperty settingsProperty, Action onValueChanged = null)
     {
         VisualElement root = new VisualElement();
@@ -120,10 +118,10 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
 
     /// <summary>
     /// Returns whether the currently selected module binding supports predictive engagement feedback in the provided catalog section.
-    /// /params bindingProperty Serialized module binding.
-    /// /params section Catalog section used to interpret the binding.
-    /// /returns True when the currently selected module kind maps to a supported engagement timing mode.
     /// </summary>
+    /// <param name="bindingProperty">Serialized module binding.</param>
+    /// <param name="section">Catalog section used to interpret the binding.</param>
+    /// <returns>True when the currently selected module kind maps to a supported engagement timing mode.</returns>
     public static bool SupportsDisplayTrigger(SerializedProperty bindingProperty, EnemyPatternModuleCatalogSection section)
     {
         if (bindingProperty == null)
@@ -162,9 +160,9 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
     #region Private Methods
     /// <summary>
     /// Creates one titled container used to visually separate major settings groups.
-    /// /params title Group title shown above the contained fields.
-    /// /returns The created group container.
     /// </summary>
+    /// <param name="title">Group title shown above the contained fields.</param>
+    /// <returns>The created group container.</returns>
     private static VisualElement CreateGroupContainer(string title)
     {
         VisualElement container = new VisualElement();
@@ -179,12 +177,11 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
 
     /// <summary>
     /// Adds one bound property field and routes local change notifications through the optional callback.
-    /// /params parent Parent container that receives the property field.
-    /// /params property Serialized property to bind.
-    /// /params label UI label for the property field.
-    /// /params onValueChanged Optional callback invoked after the field changes.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent container that receives the property field.</param>
+    /// <param name="property">Serialized property to bind.</param>
+    /// <param name="label">UI label for the property field.</param>
+    /// <param name="onValueChanged">Optional callback invoked after the field changes.</param>
     private static void AddField(VisualElement parent,
                                  SerializedProperty property,
                                  string label,
@@ -209,11 +206,10 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
 
     /// <summary>
     /// Registers warning refresh callbacks for every property that affects warning generation.
-    /// /params root Root visual element that tracks property changes.
-    /// /params warningProperties All properties that may affect warning text.
-    /// /params warningBox Warning box refreshed after any tracked property changes.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Root visual element that tracks property changes.</param>
+    /// <param name="warningProperties">All properties that may affect warning text.</param>
+    /// <param name="warningBox">Warning box refreshed after any tracked property changes.</param>
     private static void RegisterWarningRefresh(VisualElement root,
                                                SerializedProperty enableColorBlendProperty,
                                                SerializedProperty colorBlendLeadTimeSecondsProperty,
@@ -277,20 +273,19 @@ internal static class EnemyOffensiveEngagementFeedbackDrawerUtility
 
     /// <summary>
     /// Rebuilds the consolidated warning text for the current settings block.
-    /// /params warningBox Warning box updated in place.
-    /// /params enableColorBlendProperty Serialized color-blend enable toggle.
-    /// /params colorBlendLeadTimeSecondsProperty Serialized color-blend lead time.
-    /// /params colorBlendFadeOutSecondsProperty Serialized color-blend fade-out duration.
-    /// /params colorBlendMaximumBlendProperty Serialized color-blend maximum blend.
-    /// /params enableBillboardProperty Serialized billboard enable toggle.
-    /// /params billboardSpriteProperty Serialized billboard sprite reference.
-    /// /params billboardLeadTimeSecondsProperty Serialized billboard lead time.
-    /// /params billboardBaseScaleProperty Serialized billboard base scale.
-    /// /params billboardPulseScaleMultiplierProperty Serialized billboard pulse multiplier.
-    /// /params billboardPulseExpandDurationSecondsProperty Serialized billboard expand duration.
-    /// /params billboardPulseContractDurationSecondsProperty Serialized billboard contract duration.
-    /// /returns None.
     /// </summary>
+    /// <param name="warningBox">Warning box updated in place.</param>
+    /// <param name="enableColorBlendProperty">Serialized color-blend enable toggle.</param>
+    /// <param name="colorBlendLeadTimeSecondsProperty">Serialized color-blend lead time.</param>
+    /// <param name="colorBlendFadeOutSecondsProperty">Serialized color-blend fade-out duration.</param>
+    /// <param name="colorBlendMaximumBlendProperty">Serialized color-blend maximum blend.</param>
+    /// <param name="enableBillboardProperty">Serialized billboard enable toggle.</param>
+    /// <param name="billboardSpriteProperty">Serialized billboard sprite reference.</param>
+    /// <param name="billboardLeadTimeSecondsProperty">Serialized billboard lead time.</param>
+    /// <param name="billboardBaseScaleProperty">Serialized billboard base scale.</param>
+    /// <param name="billboardPulseScaleMultiplierProperty">Serialized billboard pulse multiplier.</param>
+    /// <param name="billboardPulseExpandDurationSecondsProperty">Serialized billboard expand duration.</param>
+    /// <param name="billboardPulseContractDurationSecondsProperty">Serialized billboard contract duration.</param>
     private static void RefreshWarnings(HelpBox warningBox,
                                         SerializedProperty enableColorBlendProperty,
                                         SerializedProperty colorBlendLeadTimeSecondsProperty,

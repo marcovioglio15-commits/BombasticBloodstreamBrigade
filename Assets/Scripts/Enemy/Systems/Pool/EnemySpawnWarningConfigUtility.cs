@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides shared spawn-warning config helpers for spawner bake and runtime paths.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemySpawnWarningConfigUtility
 {
@@ -12,10 +10,10 @@ internal static class EnemySpawnWarningConfigUtility
     #region Public Methods
     /// <summary>
     /// Resolves the warning config for one baked spawn event.
-    /// /params waveEvent Baked spawn event that may carry an override.
-    /// /params fallbackConfig Spawner-level fallback warning config.
-    /// /returns Event-specific warning config.
     /// </summary>
+    /// <param name="waveEvent">Baked spawn event that may carry an override.</param>
+    /// <param name="fallbackConfig">Spawner-level fallback warning config.</param>
+    /// <returns>Event-specific warning config.</returns>
     public static EnemySpawnWarningConfig ResolveEventWarningConfig(in EnemySpawnerWaveEventElement waveEvent,
                                                                     in EnemySpawnWarningConfig fallbackConfig)
     {
@@ -27,9 +25,9 @@ internal static class EnemySpawnWarningConfigUtility
 
     /// <summary>
     /// Resolves the effective warning lead time used by scheduling and warning presentation.
-    /// /params warningConfig Warning config to inspect.
-    /// /returns Effective lead time in seconds, or zero when warnings are disabled.
     /// </summary>
+    /// <param name="warningConfig">Warning config to inspect.</param>
+    /// <returns>Effective lead time in seconds, or zero when warnings are disabled.</returns>
     public static float ResolveEffectiveLeadTimeSeconds(in EnemySpawnWarningConfig warningConfig)
     {
         if (warningConfig.Enabled == 0)

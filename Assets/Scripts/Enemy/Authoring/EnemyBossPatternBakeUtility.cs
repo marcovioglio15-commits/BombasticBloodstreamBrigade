@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Compiles boss pattern presets by reusing the same module slots authored by normal enemy Pattern Assemble.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternBakeUtility
 {
@@ -15,11 +13,11 @@ internal static class EnemyBossPatternBakeUtility
     #region Public Methods
     /// <summary>
     /// Compiles one boss pattern preset using a baker-provided prefab resolver for minion spawn rules.
-    /// /params preset Boss pattern preset to compile.
-    /// /params globalEngagementSettings Generic offensive engagement feedback settings resolved from the visual preset.
-    /// /params minionPrefabResolver Callback that converts a minion prefab GameObject to an entity prefab.
-    /// /returns Compiled boss pattern data.
     /// </summary>
+    /// <param name="preset">Boss pattern preset to compile.</param>
+    /// <param name="globalEngagementSettings">Generic offensive engagement feedback settings resolved from the visual preset.</param>
+    /// <param name="minionPrefabResolver">Callback that converts a minion prefab GameObject to an entity prefab.</param>
+    /// <returns>Compiled boss pattern data.</returns>
     public static EnemyCompiledBossPatternBakeResult Compile(EnemyBossPatternPreset preset,
                                                              EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
                                                              System.Func<GameObject, Entity> minionPrefabResolver)
@@ -54,10 +52,10 @@ internal static class EnemyBossPatternBakeUtility
     #region Pattern Compile
     /// <summary>
     /// Compiles the always-available base boss pattern from normal Core, Short-Range and Weapon slots.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params basePattern Base boss assembly to compile.
-    /// /returns Compiled base pattern result.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="basePattern">Base boss assembly to compile.</param>
+    /// <returns>Compiled base pattern result.</returns>
     private static EnemyCompiledPatternBakeResult CompileBasePattern(EnemyModulesAndPatternsPreset sharedPreset,
                                                                      EnemyBossPatternAssemblyDefinition basePattern)
     {
@@ -79,11 +77,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Compiles all ordered boss-specific interactions and appends their shooter config slices.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params interactions Ordered boss interaction definitions.
-    /// /params result Mutable boss compile result.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="interactions">Ordered boss interaction definitions.</param>
+    /// <param name="result">Mutable boss compile result.</param>
     private static void CompileInteractions(EnemyModulesAndPatternsPreset sharedPreset,
                                             IReadOnlyList<EnemyBossPatternInteractionDefinition> interactions,
                                             IReadOnlyList<EnemyOffensiveEngagementConfigElement> baseEngagementConfigs,
@@ -135,11 +132,11 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Compiles one boss interaction by starting from the base pattern and applying only enabled override slots.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params basePattern Compiled base pattern used as inherited fallback.
-    /// /params interaction Boss-specific interaction to compile.
-    /// /returns Compiled interaction pattern result.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="basePattern">Compiled base pattern used as inherited fallback.</param>
+    /// <param name="interaction">Boss-specific interaction to compile.</param>
+    /// <returns>Compiled interaction pattern result.</returns>
     private static EnemyCompiledPatternBakeResult CompileInteractionPattern(EnemyModulesAndPatternsPreset sharedPreset,
                                                                            EnemyCompiledPatternBakeResult basePattern,
                                                                            EnemyBossPatternInteractionDefinition interaction)
@@ -168,11 +165,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Applies one optional short-range slot to a compiled pattern config.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params shortRangeInteraction Short-range slot to apply.
-    /// /params patternConfig Mutable compiled pattern config.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="shortRangeInteraction">Short-range slot to apply.</param>
+    /// <param name="patternConfig">Mutable compiled pattern config.</param>
     private static void ApplyShortRangeSlot(EnemyModulesAndPatternsPreset sharedPreset,
                                             EnemyPatternShortRangeInteractionAssembly shortRangeInteraction,
                                             ref EnemyPatternConfig patternConfig)
@@ -189,11 +185,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Applies one optional weapon slot to a compiled pattern result.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params weaponInteraction Weapon slot to apply.
-    /// /params result Mutable compiled pattern result.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="weaponInteraction">Weapon slot to apply.</param>
+    /// <param name="result">Mutable compiled pattern result.</param>
     private static void ApplyWeaponSlot(EnemyModulesAndPatternsPreset sharedPreset,
                                         EnemyPatternWeaponInteractionAssembly weaponInteraction,
                                         ref EnemyCompiledPatternBakeResult result)
@@ -216,10 +211,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Clones the base pattern config and optionally copies inherited shooter configs for interaction layers.
-    /// /params basePattern Compiled base pattern to clone.
-    /// /params inheritWeapon True when base shooter configs should remain active for the interaction.
-    /// /returns A mutable cloned pattern result.
     /// </summary>
+    /// <param name="basePattern">Compiled base pattern to clone.</param>
+    /// <param name="inheritWeapon">True when base shooter configs should remain active for the interaction.</param>
+    /// <returns>A mutable cloned pattern result.</returns>
     private static EnemyCompiledPatternBakeResult CloneBasePattern(EnemyCompiledPatternBakeResult basePattern, bool inheritWeapon)
     {
         EnemyCompiledPatternBakeResult result = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
@@ -246,10 +241,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Appends one compiled pattern shooter slice to the boss-owned source buffer.
-    /// /params compiledPattern Compiled pattern providing shooter configs.
-    /// /params result Mutable boss compile result.
-    /// /returns First appended shooter config index.
     /// </summary>
+    /// <param name="compiledPattern">Compiled pattern providing shooter configs.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    /// <returns>First appended shooter config index.</returns>
     private static int AppendShooterConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
     {
         if (compiledPattern == null || result == null)
@@ -265,10 +260,10 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Appends one compiled offensive engagement slice to the boss-owned source buffer.
-    /// /params engagementConfigs Compiled engagement configs for one boss layer.
-    /// /params result Mutable boss compile result.
-    /// /returns First appended engagement config index.
     /// </summary>
+    /// <param name="engagementConfigs">Compiled engagement configs for one boss layer.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    /// <returns>First appended engagement config index.</returns>
     private static int AppendOffensiveEngagementConfigs(IReadOnlyList<EnemyOffensiveEngagementConfigElement> engagementConfigs,
                                                         EnemyCompiledBossPatternBakeResult result)
     {
@@ -285,11 +280,11 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Compiles the offensive engagement configs owned by the always-available base boss pattern.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params basePattern Base boss assembly to inspect.
-    /// /params globalEngagementSettings Generic feedback settings resolved from the visual preset.
-    /// /returns Ordered base engagement configs.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="basePattern">Base boss assembly to inspect.</param>
+    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
+    /// <returns>Ordered base engagement configs.</returns>
     private static List<EnemyOffensiveEngagementConfigElement> CompileBaseEngagementConfigs(EnemyModulesAndPatternsPreset sharedPreset,
                                                                                             EnemyBossPatternAssemblyDefinition basePattern,
                                                                                             EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings)
@@ -306,13 +301,13 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Compiles the offensive engagement configs for one boss interaction, inheriting base configs unless the slot is overridden.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params baseEngagementConfigs Base configs inherited by interactions without slot overrides.
-    /// /params interaction Boss interaction being compiled.
-    /// /params interactionIndex Authored interaction index used by managed visual override resolution.
-    /// /params globalEngagementSettings Generic feedback settings resolved from the visual preset.
-    /// /returns Ordered engagement configs for the interaction layer.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="baseEngagementConfigs">Base configs inherited by interactions without slot overrides.</param>
+    /// <param name="interaction">Boss interaction being compiled.</param>
+    /// <param name="interactionIndex">Authored interaction index used by managed visual override resolution.</param>
+    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
+    /// <returns>Ordered engagement configs for the interaction layer.</returns>
     private static List<EnemyOffensiveEngagementConfigElement> CompileInteractionEngagementConfigs(EnemyModulesAndPatternsPreset sharedPreset,
                                                                                                    IReadOnlyList<EnemyOffensiveEngagementConfigElement> baseEngagementConfigs,
                                                                                                    EnemyBossPatternInteractionDefinition interaction,
@@ -353,13 +348,12 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Appends one short-range engagement config when the slot uses a supported module and visible feedback channel.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params shortRangeInteraction Short-range slot being compiled.
-    /// /params globalEngagementSettings Generic feedback settings resolved from the visual preset.
-    /// /params visualSettingsKey Boss visual override key baked into the config.
-    /// /params configs Target config list.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="shortRangeInteraction">Short-range slot being compiled.</param>
+    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked into the config.</param>
+    /// <param name="configs">Target config list.</param>
     private static void AppendShortRangeEngagementConfig(EnemyModulesAndPatternsPreset sharedPreset,
                                                          EnemyPatternShortRangeInteractionAssembly shortRangeInteraction,
                                                          EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
@@ -383,13 +377,12 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Appends one weapon engagement config when the slot uses a supported module and visible feedback channel.
-    /// /params sharedPreset Source shared preset containing module definitions.
-    /// /params weaponInteraction Weapon slot being compiled.
-    /// /params globalEngagementSettings Generic feedback settings resolved from the visual preset.
-    /// /params visualSettingsKey Boss visual override key baked into the config.
-    /// /params configs Target config list.
-    /// /returns None.
     /// </summary>
+    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
+    /// <param name="weaponInteraction">Weapon slot being compiled.</param>
+    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked into the config.</param>
+    /// <param name="configs">Target config list.</param>
     private static void AppendWeaponEngagementConfig(EnemyModulesAndPatternsPreset sharedPreset,
                                                      EnemyPatternWeaponInteractionAssembly weaponInteraction,
                                                      EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
@@ -413,9 +406,9 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Copies inherited engagement configs so interaction edits do not mutate the base layer list.
-    /// /params sourceConfigs Source configs to copy.
-    /// /returns Mutable cloned config list.
     /// </summary>
+    /// <param name="sourceConfigs">Source configs to copy.</param>
+    /// <returns>Mutable cloned config list.</returns>
     private static List<EnemyOffensiveEngagementConfigElement> CloneEngagementConfigs(IReadOnlyList<EnemyOffensiveEngagementConfigElement> sourceConfigs)
     {
         int capacity = sourceConfigs != null ? sourceConfigs.Count : 0;
@@ -432,10 +425,9 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Removes inherited engagement configs for the source overridden by an interaction slot.
-    /// /params configs Mutable config list.
-    /// /params source Interaction source to remove.
-    /// /returns None.
     /// </summary>
+    /// <param name="configs">Mutable config list.</param>
+    /// <param name="source">Interaction source to remove.</param>
     private static void RemoveConfigsBySource(List<EnemyOffensiveEngagementConfigElement> configs,
                                               EnemyOffensiveEngagementTriggerSource source)
     {
@@ -453,9 +445,8 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Configures the normal enemy pattern output used by the authoring baker as the boss spawn baseline.
-    /// /params result Mutable boss compile result.
-    /// /returns None.
     /// </summary>
+    /// <param name="result">Mutable boss compile result.</param>
     private static void ConfigureInitialPattern(EnemyCompiledBossPatternBakeResult result)
     {
         if (result == null)
@@ -471,9 +462,9 @@ internal static class EnemyBossPatternBakeUtility
 
     /// <summary>
     /// Checks whether any compiled boss interaction requires the custom movement system.
-    /// /params result Compiled boss result.
-    /// /returns True when any interaction needs custom pattern movement.
     /// </summary>
+    /// <param name="result">Compiled boss result.</param>
+    /// <returns>True when any interaction needs custom pattern movement.</returns>
     private static bool ResolveAnyInteractionHasCustomMovement(EnemyCompiledBossPatternBakeResult result)
     {
         if (result == null)
@@ -492,11 +483,10 @@ internal static class EnemyBossPatternBakeUtility
     #region Minions
     /// <summary>
     /// Converts minion authoring rules into baked spawn entries with automatic pool sizes.
-    /// /params minionSpawn Source minion spawn settings.
-    /// /params minionPrefabResolver Callback used to bake prefab references.
-    /// /params result Mutable boss result.
-    /// /returns None.
     /// </summary>
+    /// <param name="minionSpawn">Source minion spawn settings.</param>
+    /// <param name="minionPrefabResolver">Callback used to bake prefab references.</param>
+    /// <param name="result">Mutable boss result.</param>
     private static void TryAppendMinionRules(EnemyBossMinionSpawnSettings minionSpawn,
                                              System.Func<GameObject, Entity> minionPrefabResolver,
                                              EnemyCompiledBossPatternBakeResult result)
@@ -561,10 +551,9 @@ internal static class EnemyBossPatternBakeUtility
     #region Runtime Projectile
     /// <summary>
     /// Copies the first available shooter runtime projectile settings from a compiled pattern into the boss result.
-    /// /params compiledPattern Compiled pattern that may contain shooter runtime settings.
-    /// /params result Mutable boss bake result.
-    /// /returns None.
     /// </summary>
+    /// <param name="compiledPattern">Compiled pattern that may contain shooter runtime settings.</param>
+    /// <param name="result">Mutable boss bake result.</param>
     private static void TryAssignShooterRuntimeSettings(EnemyCompiledPatternBakeResult compiledPattern,
                                                         EnemyCompiledBossPatternBakeResult result)
     {
@@ -586,8 +575,6 @@ internal static class EnemyBossPatternBakeUtility
 
 /// <summary>
 /// Stores compiled boss pattern data before it is written by EnemyAuthoringBaker.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class EnemyCompiledBossPatternBakeResult
 {

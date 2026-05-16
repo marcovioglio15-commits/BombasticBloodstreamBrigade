@@ -18,7 +18,7 @@ public static class PlayerElementalStackUtility
     /// <param name="effectConfig">Elemental effect payload.</param>
     /// <param name="stackLookup">Buffer lookup containing player elemental stacks.</param>
     /// <param name="thresholdProcTriggered">True when threshold proc triggers while applying stacks.</param>
-    /// <returns>True when stacks are applied.<returns>
+    /// <returns>True when stacks are applied.</returns>
     public static bool TryApplyStacks(Entity playerEntity,
                                       float stacksToAdd,
                                       in ElementalEffectConfig effectConfig,

@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Library asset that lists all GameSceneManagerPreset assets visible in Game Management Tool.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "GameSceneManagerPresetLibrary", menuName = "Game/Scene Manager Preset Library", order = 24)]
 public sealed class GameSceneManagerPresetLibrary : ScriptableObject
@@ -34,9 +32,8 @@ public sealed class GameSceneManagerPresetLibrary : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Adds one scene manager preset reference if it is not already registered.
-    /// /params preset Preset asset to register.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to register.</param>
     public void AddPreset(GameSceneManagerPreset preset)
     {
         if (preset == null)
@@ -50,9 +47,8 @@ public sealed class GameSceneManagerPresetLibrary : ScriptableObject
 
     /// <summary>
     /// Removes one scene manager preset reference from this library.
-    /// /params preset Preset asset to unregister.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to unregister.</param>
     public void RemovePreset(GameSceneManagerPreset preset)
     {
         if (preset == null)

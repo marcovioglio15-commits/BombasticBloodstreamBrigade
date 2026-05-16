@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the boss minion spawn subsection for boss pattern presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelMinionUtility
 {
@@ -19,9 +17,8 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
     #region Public Methods
     /// <summary>
     /// Builds the minion spawning subsection for a boss pattern preset.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildMinionSpawnSection(EnemyBossPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -90,13 +87,12 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
     #region Rule Cards
     /// <summary>
     /// Builds one editable minion spawn rule card.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params rulesProperty Serialized minion rules array.
-    /// /params ruleProperty Serialized minion rule.
-    /// /params index Rule index.
-    /// /params parent Parent container receiving the card.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="rulesProperty">Serialized minion rules array.</param>
+    /// <param name="ruleProperty">Serialized minion rule.</param>
+    /// <param name="index">Rule index.</param>
+    /// <param name="parent">Parent container receiving the card.</param>
     private static void BuildMinionRuleCard(EnemyBossPatternPresetsPanel panel,
                                             SerializedProperty rulesProperty,
                                             SerializedProperty ruleProperty,
@@ -158,10 +154,9 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
     #region Mutations
     /// <summary>
     /// Adds one new minion spawn rule to the selected boss preset.
-    /// /params panel Owning panel used for serialized context and rebuild callbacks.
-    /// /params rulesProperty Serialized minion rules array.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="rulesProperty">Serialized minion rules array.</param>
     private static void AddMinionRule(EnemyBossPatternPresetsPanel panel, SerializedProperty rulesProperty)
     {
         if (panel == null || rulesProperty == null)
@@ -179,10 +174,9 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
     #region Helpers
     /// <summary>
     /// Adds warnings for one minion rule.
-    /// /params ruleProperty Serialized minion rule.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="ruleProperty">Serialized minion rule.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     private static void AddMinionRuleWarnings(SerializedProperty ruleProperty, VisualElement parent)
     {
         if (ruleProperty == null || parent == null)
@@ -211,10 +205,9 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
 
     /// <summary>
     /// Adds lifecycle warnings for boss-owned minions after the boss has died.
-    /// /params requireMinionsKilledForRunCompletionProperty Serialized completion-blocking toggle.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="requireMinionsKilledForRunCompletionProperty">Serialized completion-blocking toggle.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     private static void AddMinionLifecycleWarnings(SerializedProperty requireMinionsKilledForRunCompletionProperty, VisualElement parent)
     {
         if (parent == null)
@@ -232,9 +225,9 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
 
     /// <summary>
     /// Calculates the editor-facing automatic pool size for one minion rule.
-    /// /params ruleProperty Serialized minion rule.
-    /// /returns Automatic pool capacity shown in the editor.
     /// </summary>
+    /// <param name="ruleProperty">Serialized minion rule.</param>
+    /// <returns>Automatic pool capacity shown in the editor.</returns>
     private static int CalculateMinionPoolSize(SerializedProperty ruleProperty)
     {
         if (ruleProperty == null)

@@ -116,7 +116,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="hasMissingMilestoneTimeScaleResumeState">True when PlayerMilestoneTimeScaleResumeState is missing.</param>
     /// <param name="hasMissingMilestoneSelectionOfferBuffer">True when PlayerMilestonePowerUpSelectionOfferElement buffer is missing.</param>
     /// <param name="hasMissingMilestoneSelectionCommandBuffer">True when PlayerMilestonePowerUpSelectionCommand buffer is missing.</param>
-    /// <returns>A populated immutable snapshot.<returns>
+    /// <returns>A populated immutable snapshot.</returns>
     public PlayerPowerUpsMissingRuntimeFlags(
         bool hasMissingState,
         bool hasMissingPassiveToolsState,
@@ -219,7 +219,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="missingMilestoneTimeScaleResumeStateQuery">Query for entities missing PlayerMilestoneTimeScaleResumeState.</param>
     /// <param name="missingMilestoneSelectionOfferBufferQuery">Query for entities missing PlayerMilestonePowerUpSelectionOfferElement buffer.</param>
     /// <param name="missingMilestoneSelectionCommandBufferQuery">Query for entities missing PlayerMilestonePowerUpSelectionCommand buffer.</param>
-    /// <returns>A snapshot of all missing-runtime flags.<returns>
+    /// <returns>A snapshot of all missing-runtime flags.</returns>
     public static PlayerPowerUpsMissingRuntimeFlags Create(
         in EntityQuery missingStateQuery,
         in EntityQuery missingPassiveToolsStateQuery,

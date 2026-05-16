@@ -7,8 +7,6 @@ using static GameSceneManagementProjectSetupSceneUtility;
 
 /// <summary>
 /// Applies the loading-progress view upgrade to configured bootstrap scenes without rewriting Scene Manager presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneManagementLoadingProgressSceneUpgradeUtility
 {
@@ -21,8 +19,6 @@ public static class GameSceneManagementLoadingProgressSceneUpgradeUtility
     #region Public Methods
     /// <summary>
     /// Batch entry point used by Unity -executeMethod to upgrade bootstrap fade canvases.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void ExecuteBatchUpgrade()
     {
@@ -31,9 +27,8 @@ public static class GameSceneManagementLoadingProgressSceneUpgradeUtility
 
     /// <summary>
     /// Adds the loading-progress view to every bootstrap fade canvas referenced by Scene Manager presets.
-    /// /params logToConsole True when upgrade progress should be logged.
-    /// /returns None.
     /// </summary>
+    /// <param name="logToConsole">True when upgrade progress should be logged.</param>
     public static void UpgradeConfiguredBootstrapScenes(bool logToConsole)
     {
         HashSet<string> upgradedScenePaths = new HashSet<string>();
@@ -60,10 +55,10 @@ public static class GameSceneManagementLoadingProgressSceneUpgradeUtility
     #region Helpers
     /// <summary>
     /// Resolves the bootstrap scene path from one Scene Manager preset.
-    /// /params preset Scene Manager preset to inspect.
-    /// /params scenePath Resolved bootstrap scene path.
-    /// /returns True when a valid scene path was resolved.
     /// </summary>
+    /// <param name="preset">Scene Manager preset to inspect.</param>
+    /// <param name="scenePath">Resolved bootstrap scene path.</param>
+    /// <returns>True when a valid scene path was resolved.</returns>
     private static bool TryResolveBootstrapScenePath(GameSceneManagerPreset preset, out string scenePath)
     {
         scenePath = string.Empty;
@@ -100,10 +95,9 @@ public static class GameSceneManagementLoadingProgressSceneUpgradeUtility
 
     /// <summary>
     /// Opens one bootstrap scene, upgrades its fade canvas and saves it when a view exists.
-    /// /params scenePath Project-relative bootstrap scene path.
-    /// /params logToConsole True when the upgrade should log scene-level status.
-    /// /returns None.
     /// </summary>
+    /// <param name="scenePath">Project-relative bootstrap scene path.</param>
+    /// <param name="logToConsole">True when the upgrade should log scene-level status.</param>
     private static void UpgradeBootstrapScene(string scenePath, bool logToConsole)
     {
         SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);

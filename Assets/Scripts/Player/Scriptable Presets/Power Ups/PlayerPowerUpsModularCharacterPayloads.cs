@@ -32,9 +32,8 @@ public sealed class PowerUpCharacterTuningFormulaData
     #region Setup
     /// <summary>
     /// Assigns the serialized acquisition formula.
-    /// formulaValue Assignment formula stored on this entry.
-    /// returns void.
     /// </summary>
+    /// <param name="formulaValue">Assignment formula stored on this entry.</param>
     public void Configure(string formulaValue)
     {
         formula = formulaValue;
@@ -45,7 +44,6 @@ public sealed class PowerUpCharacterTuningFormulaData
     /// <summary>
     /// Normalizes the stored formula string to avoid null serialization state.
     /// none.
-    /// returns void.
     /// </summary>
     public void Validate()
     {
@@ -89,9 +87,8 @@ public sealed class PowerUpCharacterTuningModuleData
     #region Setup
     /// <summary>
     /// Replaces the stored acquisition-formula list with the provided entries.
-    /// formulasValue New ordered list of acquisition formulas.
-    /// returns void.
     /// </summary>
+    /// <param name="formulasValue">New ordered list of acquisition formulas.</param>
     public void Configure(List<PowerUpCharacterTuningFormulaData> formulasValue)
     {
         formulas = formulasValue;
@@ -102,7 +99,6 @@ public sealed class PowerUpCharacterTuningModuleData
     /// <summary>
     /// Sanitizes the nested acquisition formulas and guarantees a non-null list.
     /// none.
-    /// returns void.
     /// </summary>
     public void Validate()
     {
@@ -157,9 +153,8 @@ public sealed class PowerUpStackableModuleData
     #region Setup
     /// <summary>
     /// Assigns the total acquisition cap exposed by the Stackable module.
-    /// maxAcquisitionsValue Total number of allowed acquisitions.
-    /// returns void.
     /// </summary>
+    /// <param name="maxAcquisitionsValue">Total number of allowed acquisitions.</param>
     public void Configure(int maxAcquisitionsValue)
     {
         maxAcquisitions = maxAcquisitionsValue;
@@ -170,7 +165,6 @@ public sealed class PowerUpStackableModuleData
     /// <summary>
     /// Clamps the total acquisition cap to a meaningful stackable range.
     /// none.
-    /// returns void.
     /// </summary>
     public void Validate()
     {

@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Editor asset factory for GameAudioManagerPresetLibrary and GameAudioManagerPreset assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameAudioManagerPresetLibraryUtility
 {
@@ -19,9 +17,8 @@ public static class GameAudioManagerPresetLibraryUtility
     #region Public Methods
     /// <summary>
     /// Loads the audio manager preset library or creates it at the default path.
-    /// /params None.
-    /// /returns Existing or newly created library asset.
     /// </summary>
+    /// <returns>Existing or newly created library asset.</returns>
     public static GameAudioManagerPresetLibrary GetOrCreateLibrary()
     {
         GameAudioManagerPresetLibrary library = AssetDatabase.LoadAssetAtPath<GameAudioManagerPresetLibrary>(DefaultLibraryPath);
@@ -38,9 +35,9 @@ public static class GameAudioManagerPresetLibraryUtility
 
     /// <summary>
     /// Creates one audio manager preset asset with complete default event bindings.
-    /// /params presetName Requested preset display name.
-    /// /returns Created preset asset or null when asset creation fails.
     /// </summary>
+    /// <param name="presetName">Requested preset display name.</param>
+    /// <returns>Created preset asset or null when asset creation fails.</returns>
     public static GameAudioManagerPreset CreatePresetAsset(string presetName)
     {
         GameManagementAssetUtility.EnsureFolder(DefaultPresetsFolder);
@@ -63,10 +60,9 @@ public static class GameAudioManagerPresetLibraryUtility
     #region Private Methods
     /// <summary>
     /// Writes the serialized preset name so list display and asset filename start synchronized.
-    /// /params preset Preset asset to update.
-    /// /params finalName Asset filename without extension.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to update.</param>
+    /// <param name="finalName">Asset filename without extension.</param>
     private static void SynchronizePresetName(GameAudioManagerPreset preset, string finalName)
     {
         if (preset == null)

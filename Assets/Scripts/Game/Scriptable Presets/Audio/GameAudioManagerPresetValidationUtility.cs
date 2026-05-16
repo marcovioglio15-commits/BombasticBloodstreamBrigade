@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Produces non-mutating validation warnings for GameAudioManagerPreset assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameAudioManagerPresetValidationUtility
 {
@@ -12,10 +10,9 @@ public static class GameAudioManagerPresetValidationUtility
     #region Public Methods
     /// <summary>
     /// Collects warnings describing values that may lead to missing or invalid runtime audio playback.
-    /// /params preset Audio manager preset to inspect.
-    /// /params warnings Mutable list that receives warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Audio manager preset to inspect.</param>
+    /// <param name="warnings">Mutable list that receives warning text.</param>
     public static void CollectWarnings(GameAudioManagerPreset preset, List<string> warnings)
     {
         if (warnings == null)
@@ -39,10 +36,9 @@ public static class GameAudioManagerPresetValidationUtility
     #region Private Methods
     /// <summary>
     /// Validates global playback settings without modifying the preset.
-    /// /params preset Preset that owns the playback settings.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset that owns the playback settings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidatePlaybackSettings(GameAudioManagerPreset preset, List<string> warnings)
     {
         GameAudioPlaybackSettings playbackSettings = preset.PlaybackSettings;
@@ -65,10 +61,9 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Validates FMOD routing path fields without requiring the FMOD package at edit time.
-    /// /params preset Preset that owns routing settings.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset that owns routing settings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateRoutingSettings(GameAudioManagerPreset preset, List<string> warnings)
     {
         GameAudioRoutingSettings routingSettings = preset.RoutingSettings;
@@ -94,10 +89,9 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Validates background music settings without requiring the FMOD package at edit time.
-    /// /params preset Preset that owns background music settings.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset that owns background music settings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateBackgroundMusicSettings(GameAudioManagerPreset preset, List<string> warnings)
     {
         GameAudioBackgroundMusicSettings backgroundMusicSettings = preset.BackgroundMusicSettings;
@@ -123,10 +117,9 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Validates event map coverage, paths and per-binding playback values.
-    /// /params preset Preset that owns event bindings.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset that owns event bindings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateEventBindings(GameAudioManagerPreset preset, List<string> warnings)
     {
         IReadOnlyList<GameAudioEventBinding> eventBindings = preset.EventBindings;
@@ -163,11 +156,10 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Validates one event binding and reports warnings scoped to its display name.
-    /// /params binding Event binding to inspect.
-    /// /params bindingIndex Index used when display metadata is missing.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="binding">Event binding to inspect.</param>
+    /// <param name="bindingIndex">Index used when display metadata is missing.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateEventBinding(GameAudioEventBinding binding, int bindingIndex, List<string> warnings)
     {
         string label = string.IsNullOrWhiteSpace(binding.EventCode)
@@ -197,11 +189,10 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Validates one binding rate-limit block without changing the authored values.
-    /// /params binding Event binding that owns the cap settings.
-    /// /params label Display label included in warnings.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="binding">Event binding that owns the cap settings.</param>
+    /// <param name="label">Display label included in warnings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateRateLimit(GameAudioEventBinding binding, string label, List<string> warnings)
     {
         GameAudioRateLimitSettings rateLimit = binding.RateLimit;
@@ -224,10 +215,10 @@ public static class GameAudioManagerPresetValidationUtility
 
     /// <summary>
     /// Checks whether a binding list contains one event ID.
-    /// /params bindings Binding list to search.
-    /// /params eventId Event ID to find.
-    /// /returns True when at least one binding uses the event ID.
     /// </summary>
+    /// <param name="bindings">Binding list to search.</param>
+    /// <param name="eventId">Event ID to find.</param>
+    /// <returns>True when at least one binding uses the event ID.</returns>
     private static bool ContainsEvent(IReadOnlyList<GameAudioEventBinding> bindings, GameAudioEventId eventId)
     {
         for (int index = 0; index < bindings.Count; index++)

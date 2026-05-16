@@ -12,9 +12,9 @@ public static class DamageFlashRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Converts a Unity color into a linear float4 suitable for ECS material and presentation paths.
-    /// color: Source color authored in inspector space.
-    /// returns Linear-space float4 color.
     /// </summary>
+    /// <param name="color">Source color authored in inspector space.</param>
+    /// <returns>Linear-space float4 color.</returns>
     public static float4 ToLinearFloat4(Color color)
     {
         Color linearColor = color.linear;
@@ -23,9 +23,9 @@ public static class DamageFlashRuntimeUtility
 
     /// <summary>
     /// Converts a float4 color produced by ECS runtime data into a Unity Color for managed renderer APIs.
-    /// color: Linear-space float4 color.
-    /// returns Unity Color with matching component values.
     /// </summary>
+    /// <param name="color">Linear-space float4 color.</param>
+    /// <returns>Unity Color with matching component values.</returns>
     public static Color ToManagedColor(float4 color)
     {
         return new Color(color.x, color.y, color.z, color.w);
@@ -33,10 +33,9 @@ public static class DamageFlashRuntimeUtility
 
     /// <summary>
     /// Refreshes the flash timer of one entity when it receives valid damage.
-    /// entityManager: Entity manager used to access flash components.
-    /// entity: Damaged entity that should restart the flash feedback.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access flash components.</param>
+    /// <param name="entity">Damaged entity that should restart the flash feedback.</param>
     public static void Trigger(EntityManager entityManager, Entity entity)
     {
         if (!entityManager.Exists(entity))
@@ -60,11 +59,11 @@ public static class DamageFlashRuntimeUtility
 
     /// <summary>
     /// Advances one flash state and returns the blend value that should be rendered this frame.
-    /// state: Mutable runtime flash state to advance.
-    /// config: Immutable flash config used to clamp duration and intensity.
-    /// deltaTime: Current frame delta time in seconds.
-    /// returns Blend factor in the [0..1] range to render this frame.
     /// </summary>
+    /// <param name="state">Mutable runtime flash state to advance.</param>
+    /// <param name="config">Immutable flash config used to clamp duration and intensity.</param>
+    /// <param name="deltaTime">Current frame delta time in seconds.</param>
+    /// <returns>Blend factor in the [0..1] range to render this frame.</returns>
     public static float Advance(ref DamageFlashState state,
                                 in DamageFlashConfig config,
                                 float deltaTime)
@@ -87,11 +86,11 @@ public static class DamageFlashRuntimeUtility
 
     /// <summary>
     /// Resolves the per-instance material color used by standard URP materials during a hit flash.
-    /// baseColor: Original material color stored for restoration.
-    /// config: Immutable flash config providing the target flash tint.
-    /// blend: Current flash blend in the [0..1] range.
-    /// returns Blended color to write into per-instance material overrides.
     /// </summary>
+    /// <param name="baseColor">Original material color stored for restoration.</param>
+    /// <param name="config">Immutable flash config providing the target flash tint.</param>
+    /// <param name="blend">Current flash blend in the [0..1] range.</param>
+    /// <returns>Blended color to write into per-instance material overrides.</returns>
     public static float4 ResolveBaseColor(in DamageFlashBaseColor baseColor,
                                           in DamageFlashConfig config,
                                           float blend)
@@ -101,11 +100,11 @@ public static class DamageFlashRuntimeUtility
 
     /// <summary>
     /// Resolves the per-instance material color used by standard URP materials during any enemy flash overlay.
-    /// baseColor: Original material color stored for restoration.
-    /// flashColor: Target overlay color selected for the current frame.
-    /// blend: Current overlay blend in the [0..1] range.
-    /// returns Blended color to write into per-instance material overrides.
     /// </summary>
+    /// <param name="baseColor">Original material color stored for restoration.</param>
+    /// <param name="flashColor">Target overlay color selected for the current frame.</param>
+    /// <param name="blend">Current overlay blend in the [0..1] range.</param>
+    /// <returns>Blended color to write into per-instance material overrides.</returns>
     public static float4 ResolveBaseColor(in DamageFlashBaseColor baseColor,
                                           float4 flashColor,
                                           float blend)

@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores the base boss pattern assembled with the same interaction slots used by normal enemies.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossPatternAssemblyDefinition
@@ -58,8 +56,6 @@ public sealed class EnemyBossPatternAssemblyDefinition
     #region Public Methods
     /// <summary>
     /// Ensures nested base pattern slots always exist before editor drawing and bake-time compilation.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -83,8 +79,6 @@ public sealed class EnemyBossPatternAssemblyDefinition
 
 /// <summary>
 /// Stores one optional core movement override inside a boss-specific interaction layer.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossPatternCoreMovementOverrideAssembly
@@ -124,8 +118,6 @@ public sealed class EnemyBossPatternCoreMovementOverrideAssembly
     #region Public Methods
     /// <summary>
     /// Ensures the optional core override owns one valid binding instance.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -141,8 +133,6 @@ public sealed class EnemyBossPatternCoreMovementOverrideAssembly
 
 /// <summary>
 /// Stores one ordered boss-specific interaction that can override selected normal Pattern Assemble slots.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossPatternInteractionDefinition
@@ -347,8 +337,6 @@ public sealed class EnemyBossPatternInteractionDefinition
     #region Public Methods
     /// <summary>
     /// Keeps interaction identity and nested slot references valid without changing authored thresholds.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -371,9 +359,9 @@ public sealed class EnemyBossPatternInteractionDefinition
 
     /// <summary>
     /// Converts an interaction type into a readable default label.
-    /// /params type Interaction type to format.
-    /// /returns Human-readable interaction type label.
     /// </summary>
+    /// <param name="type">Interaction type to format.</param>
+    /// <returns>Human-readable interaction type label.</returns>
     public static string FormatInteractionType(EnemyBossPatternInteractionType type)
     {
         switch (type)

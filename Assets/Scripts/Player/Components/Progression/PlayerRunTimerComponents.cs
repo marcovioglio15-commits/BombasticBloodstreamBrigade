@@ -3,7 +3,6 @@ using Unity.Entities;
 /// <summary>
 /// Declares the scroll direction used by the run timer.
 /// none.
-/// returns none.
 /// </summary>
 public enum PlayerRunTimerDirection : byte
 {
@@ -14,7 +13,6 @@ public enum PlayerRunTimerDirection : byte
 /// <summary>
 /// Stores the authoritative run-timer configuration bound to the local player entity.
 /// none.
-/// returns none.
 /// </summary>
 public struct PlayerRunTimerConfig : IComponentData
 {
@@ -27,7 +25,6 @@ public struct PlayerRunTimerConfig : IComponentData
 /// <summary>
 /// Stores mutable runtime state for the local run timer.
 /// none.
-/// returns none.
 /// </summary>
 public struct PlayerRunTimerState : IComponentData
 {

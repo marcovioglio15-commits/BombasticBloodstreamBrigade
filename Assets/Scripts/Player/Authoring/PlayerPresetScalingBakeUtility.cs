@@ -30,7 +30,7 @@ public readonly struct PlayerScalingDebugRuleSnapshot
     /// <param name="thisValueValue">Input [this] value before scaling is applied.</param>
     /// <param name="finalValueValue">Final evaluated value after scaling logic is applied.</param>
     /// <param name="debugColorValue">Editor-only color used by runtime console logs for this rule.</param>
-    /// <returns>Initialized immutable debug snapshot.<returns>
+    /// <returns>Initialized immutable debug snapshot.</returns>
     public PlayerScalingDebugRuleSnapshot(string presetTypeLabelValue,
                                           string targetDisplayNameValue,
                                           string statKeyValue,
@@ -77,7 +77,7 @@ public sealed class PlayerScaledPresetScope : IDisposable
     /// <param name="animationBindingsPreset">Resolved animation preset used by bake.</param>
     /// <param name="instantiatedPresetsValue">Owned clone instances to destroy on dispose.</param>
     /// <param name="debugRuleSnapshotsValue">Collected debug snapshots for rules with Debug in Console enabled.</param>
-    /// <returns>Initialized scope instance.<returns>
+    /// <returns>Initialized scope instance.</returns>
     public PlayerScaledPresetScope(PlayerControllerPreset controllerPreset,
                                    PlayerProgressionPreset progressionPreset,
                                    PlayerPowerUpsPreset powerUpsPreset,
@@ -138,7 +138,7 @@ public static class PlayerPresetScalingBakeUtility
     /// <param name="progressionPreset">Original progression preset reference.</param>
     /// <param name="powerUpsPreset">Original power-ups preset reference.</param>
     /// <param name="animationBindingsPreset">Original animation preset reference.</param>
-    /// <returns>Disposable scope containing scaled or original preset references.<returns>
+    /// <returns>Disposable scope containing scaled or original preset references.</returns>
     public static PlayerScaledPresetScope CreateScope(PlayerControllerPreset controllerPreset,
                                                       PlayerProgressionPreset progressionPreset,
                                                       PlayerPowerUpsPreset powerUpsPreset,

@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides reusable UI and serialized-array helpers for boss pattern preset panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelSharedUtility
 {
@@ -17,10 +15,10 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
     #region UI
     /// <summary>
     /// Creates the standard section container under the panel details root.
-    /// /params panel Owning panel.
-    /// /params sectionTitle Header label.
-    /// /returns The created container, or null when the panel is not ready.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="sectionTitle">Header label.</param>
+    /// <returns>The created container, or null when the panel is not ready.</returns>
     public static VisualElement CreateDetailsSectionContainer(EnemyBossPatternPresetsPanel panel, string sectionTitle)
     {
         if (panel == null)
@@ -43,9 +41,8 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Creates one card container matching existing Enemy Management Tool styling.
-    /// /params None.
-    /// /returns Created card container.
     /// </summary>
+    /// <returns>Created card container.</returns>
     public static VisualElement CreateCard()
     {
         VisualElement card = new VisualElement();
@@ -67,13 +64,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Adds one bound property field that marks the session dirty when edited.
-    /// /params panel Owning panel used for list refresh.
-    /// /params parent Parent receiving the field.
-    /// /params property Serialized property to bind.
-    /// /params label Field label.
-    /// /params tooltip Field tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for list refresh.</param>
+    /// <param name="parent">Parent receiving the field.</param>
+    /// <param name="property">Serialized property to bind.</param>
+    /// <param name="label">Field label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
     public static void AddTrackedPropertyField(EnemyBossPatternPresetsPanel panel,
                                                VisualElement parent,
                                                SerializedProperty property,
@@ -113,12 +109,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Creates a property field that rebuilds the active section after edits.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params property Serialized property to bind.
-    /// /params label Field label.
-    /// /params tooltip Field tooltip.
-    /// /returns Configured property field.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="property">Serialized property to bind.</param>
+    /// <param name="label">Field label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <returns>Configured property field.</returns>
     public static VisualElement CreateReactivePropertyField(EnemyBossPatternPresetsPanel panel,
                                                             SerializedProperty property,
                                                             string label,
@@ -145,14 +141,13 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Adds one delayed text field that marks the session dirty when committed.
-    /// /params panel Owning panel used for list refresh.
-    /// /params parent Parent receiving the field.
-    /// /params property Serialized string property.
-    /// /params label Field label.
-    /// /params tooltip Field tooltip.
-    /// /params multiline True when the field accepts multiline input.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for list refresh.</param>
+    /// <param name="parent">Parent receiving the field.</param>
+    /// <param name="property">Serialized string property.</param>
+    /// <param name="label">Field label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <param name="multiline">True when the field accepts multiline input.</param>
     public static void AddTrackedTextField(EnemyBossPatternPresetsPanel panel,
                                            VisualElement parent,
                                            SerializedProperty property,
@@ -184,15 +179,14 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Adds one tracked float slider bound to a serialized property.
-    /// /params panel Owning panel used for list refresh.
-    /// /params parent Parent receiving the field.
-    /// /params property Serialized float property.
-    /// /params label Slider label.
-    /// /params lowValue Lower slider bound.
-    /// /params highValue Upper slider bound.
-    /// /params tooltip Slider tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for list refresh.</param>
+    /// <param name="parent">Parent receiving the field.</param>
+    /// <param name="property">Serialized float property.</param>
+    /// <param name="label">Slider label.</param>
+    /// <param name="lowValue">Lower slider bound.</param>
+    /// <param name="highValue">Upper slider bound.</param>
+    /// <param name="tooltip">Slider tooltip.</param>
     public static void AddFloatSliderField(EnemyBossPatternPresetsPanel panel,
                                            VisualElement parent,
                                            SerializedProperty property,
@@ -220,15 +214,14 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Adds one tracked integer slider bound to a serialized property.
-    /// /params panel Owning panel used for list refresh.
-    /// /params parent Parent receiving the field.
-    /// /params property Serialized int property.
-    /// /params label Slider label.
-    /// /params lowValue Lower slider bound.
-    /// /params highValue Upper slider bound.
-    /// /params tooltip Slider tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel used for list refresh.</param>
+    /// <param name="parent">Parent receiving the field.</param>
+    /// <param name="property">Serialized int property.</param>
+    /// <param name="label">Slider label.</param>
+    /// <param name="lowValue">Lower slider bound.</param>
+    /// <param name="highValue">Upper slider bound.</param>
+    /// <param name="tooltip">Slider tooltip.</param>
     public static void AddIntSliderField(EnemyBossPatternPresetsPanel panel,
                                          VisualElement parent,
                                          SerializedProperty property,
@@ -256,9 +249,9 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Resolves the object selector type for explicit ObjectField controls.
-    /// /params property Serialized object-reference property being edited.
-    /// /returns Object type accepted by the selector.
     /// </summary>
+    /// <param name="property">Serialized object-reference property being edited.</param>
+    /// <returns>Object type accepted by the selector.</returns>
     private static Type ResolveObjectFieldType(SerializedProperty property)
     {
         if (property != null && string.Equals(property.name, "minionPrefab", StringComparison.Ordinal))
@@ -269,12 +262,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Creates a reactive boolean toggle that applies its value before rebuilding dependent controls.
-    /// /params panel Owning panel used for serialized context.
-    /// /params property Serialized boolean property.
-    /// /params label Visible label.
-    /// /params tooltip Field tooltip.
-    /// /returns Configured toggle element.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="property">Serialized boolean property.</param>
+    /// <param name="label">Visible label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <returns>Configured toggle element.</returns>
     private static Toggle CreateReactiveBooleanField(EnemyBossPatternPresetsPanel panel,
                                                      SerializedProperty property,
                                                      string label,
@@ -295,12 +288,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Creates a reactive enum field for non-flags boss preset options.
-    /// /params panel Owning panel used for serialized context.
-    /// /params property Serialized enum property.
-    /// /params label Visible label.
-    /// /params tooltip Field tooltip.
-    /// /returns Configured enum element.
     /// </summary>
+    /// <param name="panel">Owning panel used for serialized context.</param>
+    /// <param name="property">Serialized enum property.</param>
+    /// <param name="label">Visible label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <returns>Configured enum element.</returns>
     private static EnumField CreateReactiveEnumField(EnemyBossPatternPresetsPanel panel,
                                                      SerializedProperty property,
                                                      string label,
@@ -320,9 +313,9 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Resolves a serialized enum property to the matching typed enum value used by EnumField.
-    /// /params property Serialized enum property.
-    /// /returns Typed enum value for known boss preset enums.
     /// </summary>
+    /// <param name="property">Serialized enum property.</param>
+    /// <returns>Typed enum value for known boss preset enums.</returns>
     private static Enum ResolveEnumValue(SerializedProperty property)
     {
         if (property == null)
@@ -336,10 +329,9 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Applies serialized changes, marks the preset dirty and optionally rebuilds dependent controls.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /params rebuildActiveSection True when the active section must refresh after this edit.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
+    /// <param name="rebuildActiveSection">True when the active section must refresh after this edit.</param>
     private static void ApplyTrackedPropertyChange(EnemyBossPatternPresetsPanel panel, bool rebuildActiveSection)
     {
         if (panel == null || panel.PresetSerializedObject == null)
@@ -360,12 +352,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
     #region Array
     /// <summary>
     /// Builds action buttons for array-owned cards.
-    /// /params panel Owning panel used for rebuild callbacks.
-    /// /params arrayProperty Serialized array containing the element.
-    /// /params index Element index.
-    /// /params undoLabel Label used in undo names.
-    /// /returns Row containing duplicate, move and delete buttons.
     /// </summary>
+    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
+    /// <param name="arrayProperty">Serialized array containing the element.</param>
+    /// <param name="index">Element index.</param>
+    /// <param name="undoLabel">Label used in undo names.</param>
+    /// <returns>Row containing duplicate, move and delete buttons.</returns>
     public static VisualElement CreateArrayActionsRow(EnemyBossPatternPresetsPanel panel,
                                                       SerializedProperty arrayProperty,
                                                       int index,
@@ -404,10 +396,9 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Records the selected preset for undo when available.
-    /// /params panel Owning panel.
-    /// /params actionName Undo action name.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="actionName">Undo action name.</param>
     public static void RecordSelectedPreset(EnemyBossPatternPresetsPanel panel, string actionName)
     {
         if (panel == null)
@@ -421,9 +412,8 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Marks the draft session dirty and rebuilds the active boss preset section.
-    /// /params panel Owning panel.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
     public static void MarkDirtyAndRebuild(EnemyBossPatternPresetsPanel panel)
     {
         EnemyManagementDraftSession.MarkDirty();
@@ -433,12 +423,11 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Duplicates one serialized array element and rebuilds the panel section.
-    /// /params panel Owning panel.
-    /// /params arrayProperty Serialized array.
-    /// /params index Source index.
-    /// /params undoLabel Undo label suffix.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="arrayProperty">Serialized array.</param>
+    /// <param name="index">Source index.</param>
+    /// <param name="undoLabel">Undo label suffix.</param>
     private static void DuplicateArrayElement(EnemyBossPatternPresetsPanel panel,
                                               SerializedProperty arrayProperty,
                                               int index,
@@ -457,13 +446,12 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Moves one serialized array element and rebuilds the panel section.
-    /// /params panel Owning panel.
-    /// /params arrayProperty Serialized array.
-    /// /params sourceIndex Current index.
-    /// /params destinationIndex Target index.
-    /// /params undoLabel Undo label suffix.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="arrayProperty">Serialized array.</param>
+    /// <param name="sourceIndex">Current index.</param>
+    /// <param name="destinationIndex">Target index.</param>
+    /// <param name="undoLabel">Undo label suffix.</param>
     private static void MoveArrayElement(EnemyBossPatternPresetsPanel panel,
                                          SerializedProperty arrayProperty,
                                          int sourceIndex,
@@ -486,12 +474,11 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
 
     /// <summary>
     /// Deletes one serialized array element and rebuilds the panel section.
-    /// /params panel Owning panel.
-    /// /params arrayProperty Serialized array.
-    /// /params index Element index.
-    /// /params undoLabel Undo label suffix.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel.</param>
+    /// <param name="arrayProperty">Serialized array.</param>
+    /// <param name="index">Element index.</param>
+    /// <param name="undoLabel">Undo label suffix.</param>
     private static void DeleteArrayElement(EnemyBossPatternPresetsPanel panel,
                                            SerializedProperty arrayProperty,
                                            int index,
@@ -512,9 +499,9 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
     #region Enum Helpers
     /// <summary>
     /// Resolves one minion trigger property to a typed enum value.
-    /// /params triggerProperty Serialized trigger property.
-    /// /returns Typed minion trigger.
     /// </summary>
+    /// <param name="triggerProperty">Serialized trigger property.</param>
+    /// <returns>Typed minion trigger.</returns>
     public static EnemyBossMinionSpawnTrigger ResolveMinionTrigger(SerializedProperty triggerProperty)
     {
         if (triggerProperty == null)

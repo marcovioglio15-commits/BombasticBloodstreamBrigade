@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores boss-specific screen-space UI presentation settings.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossVisualUiSettings
@@ -134,8 +132,6 @@ public sealed class EnemyBossVisualUiSettings
     #region Public Methods
     /// <summary>
     /// Validates color alpha channels while leaving prefab-authored boss bar layout untouched.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Updates enemy damage flash presentation and offensive engagement feedback for both managed companion renderers and ECS-rendered visuals.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(EnemyVisualDistanceCullingSystem))]
@@ -151,9 +149,9 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     #region Helpers
     /// <summary>
     /// Resolves the current main camera transform with a small retry interval so presentation systems do not repeatedly scan cameras every frame.
-    /// /params elapsedTime Current world elapsed time.
-    /// /returns The resolved main camera transform, or null when no active camera is currently available.
     /// </summary>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <returns>The resolved main camera transform, or null when no active camera is currently available.</returns>
     private static Transform ResolveMainCameraTransform(float elapsedTime)
     {
         if (cachedMainCameraTransform != null)
@@ -204,10 +202,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     /// <summary>
     /// Resolves which offensive color should currently be remembered for fade-out continuity.
-    /// /params currentPresentationState Current stored presentation state.
-    /// /params offensiveBlendResult Strongest active offensive blend result for the current frame.
-    /// /returns Offensive color that should be used for the current frame and stored back into runtime state.
     /// </summary>
+    /// <param name="currentPresentationState">Current stored presentation state.</param>
+    /// <param name="offensiveBlendResult">Strongest active offensive blend result for the current frame.</param>
+    /// <returns>Offensive color that should be used for the current frame and stored back into runtime state.</returns>
     private static float4 ResolveOffensiveColor(EnemyVisualFlashPresentationState currentPresentationState,
                                                 EnemyOffensiveEngagementBlendResult offensiveBlendResult)
     {
@@ -226,17 +224,16 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     /// <summary>
     /// Updates the managed offensive billboard view when one is available on the current enemy entity.
-    /// /params entityManager Entity manager used to resolve the managed billboard companion component.
-    /// /params enemyEntity Current enemy entity.
-    /// /params enemyVisible Whether the enemy is currently visible after distance culling.
-    /// /params enemyPosition Current enemy world position.
-    /// /params cameraTransform Active camera transform used for billboarding.
-    /// /params offensiveEngagementConfigs Baked offensive engagement configs for the current enemy.
-    /// /params shooterRuntime Current shooter runtime buffer used by weapon timing evaluation.
-    /// /params patternConfig Current compiled pattern config used by short-range timing evaluation.
-    /// /params patternRuntimeState Current mutable pattern runtime state used by short-range timing evaluation.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to resolve the managed billboard companion component.</param>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="enemyVisible">Whether the enemy is currently visible after distance culling.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
+    /// <param name="offensiveEngagementConfigs">Baked offensive engagement configs for the current enemy.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
     private static void SyncOffensiveBillboard(EntityManager entityManager,
                                                Entity enemyEntity,
                                                bool enemyVisible,
@@ -286,14 +283,14 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     /// <summary>
     /// Returns whether the currently computed presentation values match the state already applied to renderers.
-    /// /params currentPresentationState Current stored presentation state.
-    /// /params targetBlend Final composed blend that would be applied this frame.
-    /// /params targetColor Final composed color that would be applied this frame.
-    /// /params offensiveBlend Current offensive-only displayed blend.
-    /// /params offensiveColor Current offensive-only remembered color.
-    /// /params rememberedFadeOutSeconds Current remembered offensive fade-out duration.
-    /// /returns True when renderers already match the requested frame state.
     /// </summary>
+    /// <param name="currentPresentationState">Current stored presentation state.</param>
+    /// <param name="targetBlend">Final composed blend that would be applied this frame.</param>
+    /// <param name="targetColor">Final composed color that would be applied this frame.</param>
+    /// <param name="offensiveBlend">Current offensive-only displayed blend.</param>
+    /// <param name="offensiveColor">Current offensive-only remembered color.</param>
+    /// <param name="rememberedFadeOutSeconds">Current remembered offensive fade-out duration.</param>
+    /// <returns>True when renderers already match the requested frame state.</returns>
     private static bool HasUnchangedPresentationState(EnemyVisualFlashPresentationState currentPresentationState,
                                                       float targetBlend,
                                                       float4 targetColor,
@@ -326,12 +323,11 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     /// <summary>
     /// Applies the resolved flash values to a managed Animator-based visual companion.
-    /// /params entityManager Entity manager used to resolve the Animator component object.
-    /// /params enemyEntity Current enemy entity.
-    /// /params flashColor Final flash color resolved for this frame.
-    /// /params targetBlend Final flash blend resolved for this frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to resolve the Animator component object.</param>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="flashColor">Final flash color resolved for this frame.</param>
+    /// <param name="targetBlend">Final flash blend resolved for this frame.</param>
     private static void ApplyCompanionFlash(EntityManager entityManager,
                                             Entity enemyEntity,
                                             Color flashColor,
@@ -354,10 +350,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     /// <summary>
     /// Checks whether two linear colors are approximately equal using the shared presentation epsilon.
-    /// /params left Left-hand color.
-    /// /params right Right-hand color.
-    /// /returns True when the largest component delta stays below the configured epsilon.
     /// </summary>
+    /// <param name="left">Left-hand color.</param>
+    /// <param name="right">Right-hand color.</param>
+    /// <returns>True when the largest component delta stays below the configured epsilon.</returns>
     private static bool HasApproximatelyEqualColor(float4 left, float4 right)
     {
         float4 absoluteDelta = math.abs(left - right);

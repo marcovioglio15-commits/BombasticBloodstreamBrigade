@@ -12,46 +12,45 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     #region Public Methods
     /// <summary>
     /// Processes the per-frame runtime for one charge-shot slot, including stored charge, release execution, and optional released-state gain or decay.
-    /// slotConfig: Slot configuration compiled for a charge-shot active.
-    /// isPressed: True while the bound slot input remains held.
-    /// pressedThisFrame: True when the bound slot input was pressed during the current frame.
-    /// releasedThisFrame: True when the bound slot input was released during the current frame.
-    /// deltaTime: Current frame delta time.
-    /// localTransform: Player transform used to emit the projectile burst.
-    /// lookState: Player look state used to resolve the firing direction.
-    /// movementState: Player movement state used when a Dash module is chained to the release.
-    /// runtimeMovementConfig: Movement config used to resolve movement-relative chained dash directions.
-    /// controllerConfig: Player controller config used to resolve projectile defaults.
-    /// passiveToolsState: Aggregated passive state used to augment spawned projectiles.
-    /// slotEnergy: Mutable slot resource state.
-    /// cooldownRemaining: Mutable cooldown state reused to block charge-shot input while cooling down.
-    /// charge: Mutable stored charge amount.
-    /// isCharging: Mutable charging flag for the slot.
-    /// isActive: Mutable active flag reset because charge shots are not persistent toggles.
-    /// maintenanceTickTimer: Mutable maintenance timer reset because charge shots do not use toggle maintenance.
-    /// hasOtherSlotDefinition: True when the opposite slot currently contains one defined power-up.
-    /// otherSlotCharge: Mutable opposite-slot charge state that can be interrupted.
-    /// otherSlotCooldownRemaining: Mutable opposite-slot cooldown state that can be cleared on hard interruption.
-    /// otherSlotIsCharging: Mutable opposite-slot charging flag that can be interrupted.
-    /// otherSlotIsActive: Mutable opposite-slot active flag that can be interrupted.
-    /// otherSlotMaintenanceTickTimer: Mutable opposite-slot maintenance accumulator that can be interrupted.
-    /// isShootingSuppressed: Shared per-frame shooting suppression flag updated while charging.
-    /// shootRequests: Output shoot-request buffer used to spawn the charge-shot burst.
-    /// playerEntity: Player entity used to resolve activation resources.
-    /// healthLookup: Health lookup used when the activation resource is Health.
-    /// updatedHealth: Cached mutable health state reused by the caller.
-    /// healthChanged: True when updatedHealth already contains a fetched runtime value.
-    /// shieldLookup: Shield lookup used when the activation resource is Shield.
-    /// updatedShield: Cached mutable shield state reused by the caller.
-    /// shieldChanged: True when updatedShield already contains a fetched runtime value.
-    /// dashState: Mutable dash state interrupted by hard slot interruption rules.
-    /// bulletTimeState: Mutable bullet-time state interrupted by hard slot interruption rules.
-    /// moveInput: Raw movement input used as final fallback for chained Dash modules.
-    /// lastValidMovementDirection: Cached movement direction used as fallback for chained Dash modules.
-    /// audioRequests: Optional audio request buffer used when a Game Audio singleton exists.
-    /// canEnqueueAudioRequests: True when audioRequests points to a valid buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration compiled for a charge-shot active.</param>
+    /// <param name="isPressed">True while the bound slot input remains held.</param>
+    /// <param name="pressedThisFrame">True when the bound slot input was pressed during the current frame.</param>
+    /// <param name="releasedThisFrame">True when the bound slot input was released during the current frame.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    /// <param name="localTransform">Player transform used to emit the projectile burst.</param>
+    /// <param name="lookState">Player look state used to resolve the firing direction.</param>
+    /// <param name="movementState">Player movement state used when a Dash module is chained to the release.</param>
+    /// <param name="runtimeMovementConfig">Movement config used to resolve movement-relative chained dash directions.</param>
+    /// <param name="controllerConfig">Player controller config used to resolve projectile defaults.</param>
+    /// <param name="passiveToolsState">Aggregated passive state used to augment spawned projectiles.</param>
+    /// <param name="slotEnergy">Mutable slot resource state.</param>
+    /// <param name="cooldownRemaining">Mutable cooldown state reused to block charge-shot input while cooling down.</param>
+    /// <param name="charge">Mutable stored charge amount.</param>
+    /// <param name="isCharging">Mutable charging flag for the slot.</param>
+    /// <param name="isActive">Mutable active flag reset because charge shots are not persistent toggles.</param>
+    /// <param name="maintenanceTickTimer">Mutable maintenance timer reset because charge shots do not use toggle maintenance.</param>
+    /// <param name="hasOtherSlotDefinition">True when the opposite slot currently contains one defined power-up.</param>
+    /// <param name="otherSlotCharge">Mutable opposite-slot charge state that can be interrupted.</param>
+    /// <param name="otherSlotCooldownRemaining">Mutable opposite-slot cooldown state that can be cleared on hard interruption.</param>
+    /// <param name="otherSlotIsCharging">Mutable opposite-slot charging flag that can be interrupted.</param>
+    /// <param name="otherSlotIsActive">Mutable opposite-slot active flag that can be interrupted.</param>
+    /// <param name="otherSlotMaintenanceTickTimer">Mutable opposite-slot maintenance accumulator that can be interrupted.</param>
+    /// <param name="isShootingSuppressed">Shared per-frame shooting suppression flag updated while charging.</param>
+    /// <param name="shootRequests">Output shoot-request buffer used to spawn the charge-shot burst.</param>
+    /// <param name="playerEntity">Player entity used to resolve activation resources.</param>
+    /// <param name="healthLookup">Health lookup used when the activation resource is Health.</param>
+    /// <param name="updatedHealth">Cached mutable health state reused by the caller.</param>
+    /// <param name="healthChanged">True when updatedHealth already contains a fetched runtime value.</param>
+    /// <param name="shieldLookup">Shield lookup used when the activation resource is Shield.</param>
+    /// <param name="updatedShield">Cached mutable shield state reused by the caller.</param>
+    /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
+    /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
+    /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
+    /// <param name="moveInput">Raw movement input used as final fallback for chained Dash modules.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction used as fallback for chained Dash modules.</param>
+    /// <param name="audioRequests">Optional audio request buffer used when a Game Audio singleton exists.</param>
+    /// <param name="canEnqueueAudioRequests">True when audioRequests points to a valid buffer.</param>
     public static void ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
                                              bool isPressed,
                                              bool pressedThisFrame,
@@ -229,36 +228,35 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
     /// <summary>
     /// Processes one press-to-toggle passive slot, handling activation, deactivation, and cross-slot interruption.
-    /// slotConfig: Slot configuration compiled as a passive toggle active tool.
-    /// pressedThisFrame: True when the bound slot input was pressed during the current frame.
-    /// slotEnergy: Mutable slot resource state.
-    /// cooldownRemaining: Mutable startup-lock timer reused from the slot cooldown state.
-    /// isActive: Mutable active flag tracking whether the passive effect is currently enabled.
-    /// maintenanceTickTimer: Mutable maintenance accumulator reset on activation and deactivation.
-    /// hasOtherSlotDefinition: True when the opposite slot currently contains one defined power-up.
-    /// otherSlotCharge: Mutable opposite-slot charge state that can be interrupted.
-    /// otherSlotCooldownRemaining: Mutable opposite-slot cooldown state that can be cleared on hard interruption.
-    /// otherSlotIsCharging: Mutable opposite-slot charging flag that can be interrupted.
-    /// otherSlotIsActive: Mutable opposite-slot active flag that can be interrupted.
-    /// otherSlotMaintenanceTickTimer: Mutable opposite-slot maintenance accumulator that can be interrupted.
-    /// isShootingSuppressed: Shared per-frame shooting suppression flag updated when the toggle remains active.
-    /// playerEntity: Player entity used to resolve activation resources.
-    /// healthLookup: Health lookup used when the activation resource is Health.
-    /// updatedHealth: Cached mutable health state reused by the caller.
-    /// healthChanged: True when updatedHealth already contains a fetched runtime value.
-    /// shieldLookup: Shield lookup used when the activation resource is Shield.
-    /// updatedShield: Cached mutable shield state reused by the caller.
-    /// shieldChanged: True when updatedShield already contains a fetched runtime value.
-    /// lookState: Player look state used by optional Dash payloads.
-    /// movementState: Player movement state used by optional Dash payloads.
-    /// runtimeMovementConfig: Runtime movement config used by optional Dash payloads.
-    /// localTransform: Player transform used by optional Dash payloads.
-    /// moveInput: Raw movement input used by optional Dash payloads.
-    /// lastValidMovementDirection: Cached movement direction used by optional Dash payloads.
-    /// dashState: Mutable dash state interrupted by hard slot interruption rules.
-    /// bulletTimeState: Mutable bullet-time state interrupted by hard slot interruption rules.
-    /// returns void.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration compiled as a passive toggle active tool.</param>
+    /// <param name="pressedThisFrame">True when the bound slot input was pressed during the current frame.</param>
+    /// <param name="slotEnergy">Mutable slot resource state.</param>
+    /// <param name="cooldownRemaining">Mutable startup-lock timer reused from the slot cooldown state.</param>
+    /// <param name="isActive">Mutable active flag tracking whether the passive effect is currently enabled.</param>
+    /// <param name="maintenanceTickTimer">Mutable maintenance accumulator reset on activation and deactivation.</param>
+    /// <param name="hasOtherSlotDefinition">True when the opposite slot currently contains one defined power-up.</param>
+    /// <param name="otherSlotCharge">Mutable opposite-slot charge state that can be interrupted.</param>
+    /// <param name="otherSlotCooldownRemaining">Mutable opposite-slot cooldown state that can be cleared on hard interruption.</param>
+    /// <param name="otherSlotIsCharging">Mutable opposite-slot charging flag that can be interrupted.</param>
+    /// <param name="otherSlotIsActive">Mutable opposite-slot active flag that can be interrupted.</param>
+    /// <param name="otherSlotMaintenanceTickTimer">Mutable opposite-slot maintenance accumulator that can be interrupted.</param>
+    /// <param name="isShootingSuppressed">Shared per-frame shooting suppression flag updated when the toggle remains active.</param>
+    /// <param name="playerEntity">Player entity used to resolve activation resources.</param>
+    /// <param name="healthLookup">Health lookup used when the activation resource is Health.</param>
+    /// <param name="updatedHealth">Cached mutable health state reused by the caller.</param>
+    /// <param name="healthChanged">True when updatedHealth already contains a fetched runtime value.</param>
+    /// <param name="shieldLookup">Shield lookup used when the activation resource is Shield.</param>
+    /// <param name="updatedShield">Cached mutable shield state reused by the caller.</param>
+    /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
+    /// <param name="lookState">Player look state used by optional Dash payloads.</param>
+    /// <param name="movementState">Player movement state used by optional Dash payloads.</param>
+    /// <param name="runtimeMovementConfig">Runtime movement config used by optional Dash payloads.</param>
+    /// <param name="localTransform">Player transform used by optional Dash payloads.</param>
+    /// <param name="moveInput">Raw movement input used by optional Dash payloads.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction used by optional Dash payloads.</param>
+    /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
+    /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     public static void ProcessPassiveToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                 bool pressedThisFrame,
                                                 ref float slotEnergy,
@@ -356,16 +354,15 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
     /// <summary>
     /// Interrupts opposite-slot charging or, when configured, the full active runtime state.
-    /// slotConfig: Slot configuration driving the interruption rules.
-    /// otherSlotCharge: Mutable opposite-slot charge state.
-    /// otherSlotCooldownRemaining: Mutable opposite-slot cooldown state.
-    /// otherSlotIsCharging: Mutable opposite-slot charging flag.
-    /// otherSlotIsActive: Mutable opposite-slot active flag.
-    /// otherSlotMaintenanceTickTimer: Mutable opposite-slot maintenance accumulator.
-    /// dashState: Mutable dash state interrupted by hard slot interruption rules.
-    /// bulletTimeState: Mutable bullet-time state interrupted by hard slot interruption rules.
-    /// returns void.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration driving the interruption rules.</param>
+    /// <param name="otherSlotCharge">Mutable opposite-slot charge state.</param>
+    /// <param name="otherSlotCooldownRemaining">Mutable opposite-slot cooldown state.</param>
+    /// <param name="otherSlotIsCharging">Mutable opposite-slot charging flag.</param>
+    /// <param name="otherSlotIsActive">Mutable opposite-slot active flag.</param>
+    /// <param name="otherSlotMaintenanceTickTimer">Mutable opposite-slot maintenance accumulator.</param>
+    /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
+    /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     public static void InterruptOtherSlot(in PlayerPowerUpSlotConfig slotConfig,
                                           ref float otherSlotCharge,
                                           ref float otherSlotCooldownRemaining,
@@ -406,11 +403,11 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     #region Private Methods
     /// <summary>
     /// Resolves the normalized charge fraction above the minimum release threshold.
-    /// slotCharge: Stored charge sampled at release time.
-    /// requiredCharge: Minimum charge required to fire.
-    /// maximumCharge: Maximum charge supported by the slot.
-    /// returns Normalized charge ratio in the 0-1 range.
     /// </summary>
+    /// <param name="slotCharge">Stored charge sampled at release time.</param>
+    /// <param name="requiredCharge">Minimum charge required to fire.</param>
+    /// <param name="maximumCharge">Maximum charge supported by the slot.</param>
+    /// <returns>Normalized charge ratio in the 0-1 range.</returns>
     private static float ResolveNormalizedChargeRatio(float slotCharge,
                                                       float requiredCharge,
                                                       float maximumCharge)
@@ -425,12 +422,11 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
     /// <summary>
     /// Updates released charge storage using the optional passive gain and decay settings.
-    /// chargeShotConfig: Charge-shot payload containing released-state gain and decay options.
-    /// deltaTime: Current frame delta time.
-    /// maximumCharge: Maximum charge cap used to convert percentages into absolute amounts.
-    /// charge: Mutable stored charge amount.
-    /// returns void.
     /// </summary>
+    /// <param name="chargeShotConfig">Charge-shot payload containing released-state gain and decay options.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    /// <param name="maximumCharge">Maximum charge cap used to convert percentages into absolute amounts.</param>
+    /// <param name="charge">Mutable stored charge amount.</param>
     private static void TickReleasedChargeState(in ChargeShotPowerUpConfig chargeShotConfig,
                                                 float deltaTime,
                                                 float maximumCharge,

@@ -228,7 +228,7 @@ public partial struct PlayerShootingIntentSystem : ISystem
     /// <param name="triggerMode"></param>
     /// <param name="isShootPressed"></param>
     /// <param name="shootPressedThisFrame"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static bool ResolveShootingTrigger(ref PlayerShootingState shootingState,
                                                ShootingTriggerMode triggerMode,
                                                bool isShootPressed,
@@ -262,7 +262,7 @@ public partial struct PlayerShootingIntentSystem : ISystem
     /// <param name="triggerMode"></param>
     /// <param name="elapsedTime"></param>
     /// <param name="shotInterval"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static int ComputeShotsToFire(ref PlayerShootingState shootingState, ShootingTriggerMode triggerMode, float elapsedTime, float shotInterval)
     {
         float nextShotTime = shootingState.NextShotTime;
@@ -304,10 +304,9 @@ public partial struct PlayerShootingIntentSystem : ISystem
     /// <summary>
     /// Resets the next-shot schedule to the current frame so idle or temporarily disabled fire does not accumulate
     /// deferred automatic shots.
-    /// shootingState: Mutable firing state that stores the next scheduled shot time.
-    /// elapsedTime: Current world elapsed time used as the new schedule anchor.
-    /// returns None.
     /// </summary>
+    /// <param name="shootingState">Mutable firing state that stores the next scheduled shot time.</param>
+    /// <param name="elapsedTime">Current world elapsed time used as the new schedule anchor.</param>
     private static void ResetShotSchedule(ref PlayerShootingState shootingState,
                                           float elapsedTime)
     {
@@ -316,11 +315,10 @@ public partial struct PlayerShootingIntentSystem : ISystem
 
     /// <summary>
     /// Refreshes the animator-facing shooting flag from input intent and short-lived projectile spawn pulses.
-    /// shootingState: Mutable player shooting state that stores visual pulse timing.
-    /// inputRequestsShootingVisual: True when current input or automatic latch should keep shooting visuals active.
-    /// elapsedTime: Current world elapsed time used to expire short projectile pulses.
-    /// returns void.
     /// </summary>
+    /// <param name="shootingState">Mutable player shooting state that stores visual pulse timing.</param>
+    /// <param name="inputRequestsShootingVisual">True when current input or automatic latch should keep shooting visuals active.</param>
+    /// <param name="elapsedTime">Current world elapsed time used to expire short projectile pulses.</param>
     private static void RefreshVisualShootingState(ref PlayerShootingState shootingState,
                                                    bool inputRequestsShootingVisual,
                                                    float elapsedTime)

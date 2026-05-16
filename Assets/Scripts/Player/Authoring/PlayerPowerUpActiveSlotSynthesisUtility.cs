@@ -83,6 +83,27 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
         cooldownSeconds = math.min(cooldownSeconds, candidateCooldownSeconds);
     }
 
+    /// <summary>
+    /// Accumulates SpawnObject bomb payload values into the active slot aggregation state.
+    /// </summary>
+    /// <param name="bombModuleData">Bomb payload selected for the current module binding.</param>
+    /// <param name="hasBomb">Aggregation flag set when a bomb payload contributes to the slot.</param>
+    /// <param name="bombPrefab">Accumulated bomb prefab reference.</param>
+    /// <param name="bombSpawnOffset">Accumulated bomb spawn offset.</param>
+    /// <param name="bombSpawnOffsetOrientation">Accumulated spawn-offset orientation mode.</param>
+    /// <param name="bombDeploySpeed">Accumulated bomb deploy speed.</param>
+    /// <param name="bombCollisionRadius">Accumulated bomb collision radius.</param>
+    /// <param name="bombBounceOnWalls">Accumulated wall-bounce flag.</param>
+    /// <param name="bombBounceDamping">Accumulated bounce damping.</param>
+    /// <param name="bombLinearDampingPerSecond">Accumulated movement damping.</param>
+    /// <param name="bombFuseSeconds">Accumulated fuse duration.</param>
+    /// <param name="bombDamagePayloadEnabled">Accumulated damage payload flag.</param>
+    /// <param name="bombPayloadRadius">Accumulated explosion radius.</param>
+    /// <param name="bombPayloadDamage">Accumulated explosion damage.</param>
+    /// <param name="bombPayloadAffectAllEnemies">Accumulated radius target selection flag.</param>
+    /// <param name="bombExplosionVfxPrefab">Accumulated explosion VFX prefab.</param>
+    /// <param name="bombScaleVfxToRadius">Accumulated explosion VFX radius-scaling flag.</param>
+    /// <param name="bombVfxScaleMultiplier">Accumulated explosion VFX scale multiplier.</param>
     public static void AccumulateBombData(BombToolData bombModuleData,
                                           ref bool hasBomb,
                                           ref GameObject bombPrefab,
@@ -102,35 +123,105 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                           ref bool bombScaleVfxToRadius,
                                           ref float bombVfxScaleMultiplier)
     {
-        if (bombModuleData == null)
+        AccumulateBombData(bombModuleData,
+                           null,
+                           ref hasBomb,
+                           ref bombPrefab,
+                           ref bombSpawnOffset,
+                           ref bombSpawnOffsetOrientation,
+                           ref bombDeploySpeed,
+                           ref bombCollisionRadius,
+                           ref bombBounceOnWalls,
+                           ref bombBounceDamping,
+                           ref bombLinearDampingPerSecond,
+                           ref bombFuseSeconds,
+                           ref bombDamagePayloadEnabled,
+                           ref bombPayloadRadius,
+                           ref bombPayloadDamage,
+                           ref bombPayloadAffectAllEnemies,
+                           ref bombExplosionVfxPrefab,
+                           ref bombScaleVfxToRadius,
+                           ref bombVfxScaleMultiplier);
+    }
+
+    /// <summary>
+    /// Accumulates SpawnObject bomb payload values while inheriting required object references from module defaults.
+    /// </summary>
+    /// <param name="bombModuleData">Override or default bomb payload selected for the current module binding.</param>
+    /// <param name="fallbackBombModuleData">Module-default bomb payload used for missing prefab and VFX references.</param>
+    /// <param name="hasBomb">Aggregation flag set when a bomb payload contributes to the slot.</param>
+    /// <param name="bombPrefab">Accumulated bomb prefab reference.</param>
+    /// <param name="bombSpawnOffset">Accumulated bomb spawn offset.</param>
+    /// <param name="bombSpawnOffsetOrientation">Accumulated spawn-offset orientation mode.</param>
+    /// <param name="bombDeploySpeed">Accumulated bomb deploy speed.</param>
+    /// <param name="bombCollisionRadius">Accumulated bomb collision radius.</param>
+    /// <param name="bombBounceOnWalls">Accumulated wall-bounce flag.</param>
+    /// <param name="bombBounceDamping">Accumulated bounce damping.</param>
+    /// <param name="bombLinearDampingPerSecond">Accumulated movement damping.</param>
+    /// <param name="bombFuseSeconds">Accumulated fuse duration.</param>
+    /// <param name="bombDamagePayloadEnabled">Accumulated damage payload flag.</param>
+    /// <param name="bombPayloadRadius">Accumulated explosion radius.</param>
+    /// <param name="bombPayloadDamage">Accumulated explosion damage.</param>
+    /// <param name="bombPayloadAffectAllEnemies">Accumulated radius target selection flag.</param>
+    /// <param name="bombExplosionVfxPrefab">Accumulated explosion VFX prefab.</param>
+    /// <param name="bombScaleVfxToRadius">Accumulated explosion VFX radius-scaling flag.</param>
+    /// <param name="bombVfxScaleMultiplier">Accumulated explosion VFX scale multiplier.</param>
+    public static void AccumulateBombData(BombToolData bombModuleData,
+                                          BombToolData fallbackBombModuleData,
+                                          ref bool hasBomb,
+                                          ref GameObject bombPrefab,
+                                          ref float3 bombSpawnOffset,
+                                          ref SpawnOffsetOrientationMode bombSpawnOffsetOrientation,
+                                          ref float bombDeploySpeed,
+                                          ref float bombCollisionRadius,
+                                          ref bool bombBounceOnWalls,
+                                          ref float bombBounceDamping,
+                                          ref float bombLinearDampingPerSecond,
+                                          ref float bombFuseSeconds,
+                                          ref bool bombDamagePayloadEnabled,
+                                          ref float bombPayloadRadius,
+                                          ref float bombPayloadDamage,
+                                          ref bool bombPayloadAffectAllEnemies,
+                                          ref GameObject bombExplosionVfxPrefab,
+                                          ref bool bombScaleVfxToRadius,
+                                          ref float bombVfxScaleMultiplier)
+    {
+        BombToolData resolvedBombModuleData = ResolveBombData(bombModuleData, fallbackBombModuleData);
+
+        if (resolvedBombModuleData == null)
             return;
 
         hasBomb = true;
 
-        if (bombPrefab == null && bombModuleData.BombPrefab != null)
-            bombPrefab = bombModuleData.BombPrefab;
+        GameObject resolvedBombPrefab = ResolvePrefab(resolvedBombModuleData.BombPrefab,
+                                                      fallbackBombModuleData != null ? fallbackBombModuleData.BombPrefab : null);
+
+        if (bombPrefab == null && resolvedBombPrefab != null)
+            bombPrefab = resolvedBombPrefab;
 
         if (math.lengthsq(bombSpawnOffset) <= 0f)
-            bombSpawnOffset = new float3(bombModuleData.SpawnOffset.x, bombModuleData.SpawnOffset.y, bombModuleData.SpawnOffset.z);
+            bombSpawnOffset = new float3(resolvedBombModuleData.SpawnOffset.x, resolvedBombModuleData.SpawnOffset.y, resolvedBombModuleData.SpawnOffset.z);
 
-        bombSpawnOffsetOrientation = bombModuleData.SpawnOffsetOrientation;
-        bombDeploySpeed = math.max(bombDeploySpeed, math.max(0f, bombModuleData.DeploySpeed));
-        bombCollisionRadius = math.max(bombCollisionRadius, math.max(0.01f, bombModuleData.CollisionRadius));
-        bombBounceOnWalls = bombBounceOnWalls || bombModuleData.BounceOnWalls;
-        bombBounceDamping = math.max(bombBounceDamping, math.clamp(bombModuleData.BounceDamping, 0f, 1f));
-        bombLinearDampingPerSecond = math.max(bombLinearDampingPerSecond, math.max(0f, bombModuleData.LinearDampingPerSecond));
-        bombFuseSeconds = math.min(bombFuseSeconds, math.max(0.05f, bombModuleData.FuseSeconds));
-        bombDamagePayloadEnabled = bombDamagePayloadEnabled || bombModuleData.EnableDamagePayload;
-        bombPayloadRadius = math.max(bombPayloadRadius, math.max(0.1f, bombModuleData.Radius));
-        bombPayloadDamage += math.max(0f, bombModuleData.Damage);
-        bombPayloadAffectAllEnemies = bombPayloadAffectAllEnemies || bombModuleData.AffectAllEnemiesInRadius;
+        bombSpawnOffsetOrientation = resolvedBombModuleData.SpawnOffsetOrientation;
+        bombDeploySpeed = math.max(bombDeploySpeed, math.max(0f, resolvedBombModuleData.DeploySpeed));
+        bombCollisionRadius = math.max(bombCollisionRadius, math.max(0.01f, resolvedBombModuleData.CollisionRadius));
+        bombBounceOnWalls = bombBounceOnWalls || resolvedBombModuleData.BounceOnWalls;
+        bombBounceDamping = math.max(bombBounceDamping, math.clamp(resolvedBombModuleData.BounceDamping, 0f, 1f));
+        bombLinearDampingPerSecond = math.max(bombLinearDampingPerSecond, math.max(0f, resolvedBombModuleData.LinearDampingPerSecond));
+        bombFuseSeconds = math.min(bombFuseSeconds, math.max(0.05f, resolvedBombModuleData.FuseSeconds));
+        bombDamagePayloadEnabled = bombDamagePayloadEnabled || resolvedBombModuleData.EnableDamagePayload;
+        bombPayloadRadius = math.max(bombPayloadRadius, math.max(0.1f, resolvedBombModuleData.Radius));
+        bombPayloadDamage += math.max(0f, resolvedBombModuleData.Damage);
+        bombPayloadAffectAllEnemies = bombPayloadAffectAllEnemies || resolvedBombModuleData.AffectAllEnemiesInRadius;
 
-        if (bombExplosionVfxPrefab != null || bombModuleData.ExplosionVfxPrefab == null)
+        BombToolData resolvedVfxModuleData = ResolveVfxData(resolvedBombModuleData, fallbackBombModuleData);
+
+        if (bombExplosionVfxPrefab != null || resolvedVfxModuleData == null || resolvedVfxModuleData.ExplosionVfxPrefab == null)
             return;
 
-        bombExplosionVfxPrefab = bombModuleData.ExplosionVfxPrefab;
-        bombScaleVfxToRadius = bombModuleData.ScaleVfxToRadius;
-        bombVfxScaleMultiplier = math.max(0.01f, bombModuleData.VfxScaleMultiplier);
+        bombExplosionVfxPrefab = resolvedVfxModuleData.ExplosionVfxPrefab;
+        bombScaleVfxToRadius = resolvedVfxModuleData.ScaleVfxToRadius;
+        bombVfxScaleMultiplier = math.max(0.01f, resolvedVfxModuleData.VfxScaleMultiplier);
     }
 
     public static ActiveToolKind ResolveModularToolKind(bool hasHoldCharge,
@@ -397,9 +488,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
     /// <summary>
     /// Resolves the stable power-up identifier embedded in one modular active definition.
-    /// powerUp: Modular active power-up definition being compiled.
-    /// returns Stable power-up identifier or an empty fixed string when unavailable.
     /// </summary>
+    /// <param name="powerUp">Modular active power-up definition being compiled.</param>
+    /// <returns>Stable power-up identifier or an empty fixed string when unavailable.</returns>
     private static FixedString64Bytes ResolvePowerUpId(ModularPowerUpDefinition powerUp)
     {
         if (powerUp == null || powerUp.CommonData == null || string.IsNullOrWhiteSpace(powerUp.CommonData.PowerUpId))
@@ -420,6 +511,51 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             return PowerUpActivationInputMode.OnRelease;
 
         return PowerUpActivationInputMode.OnPress;
+    }
+
+    /// <summary>
+    /// Resolves the bomb payload that contributes numeric SpawnObject values.
+    /// </summary>
+    /// <param name="bombModuleData">Primary payload selected for the binding.</param>
+    /// <param name="fallbackBombModuleData">Fallback module-default payload.</param>
+    /// <returns>Primary payload when available; otherwise the fallback payload.</returns>
+    private static BombToolData ResolveBombData(BombToolData bombModuleData, BombToolData fallbackBombModuleData)
+    {
+        if (bombModuleData != null)
+            return bombModuleData;
+
+        return fallbackBombModuleData;
+    }
+
+    /// <summary>
+    /// Resolves the payload that owns the effective explosion VFX reference and scale settings.
+    /// </summary>
+    /// <param name="bombModuleData">Primary payload selected for the binding.</param>
+    /// <param name="fallbackBombModuleData">Fallback module-default payload.</param>
+    /// <returns>Payload with an explosion VFX prefab, or null when neither payload has one.</returns>
+    private static BombToolData ResolveVfxData(BombToolData bombModuleData, BombToolData fallbackBombModuleData)
+    {
+        if (bombModuleData != null && bombModuleData.ExplosionVfxPrefab != null)
+            return bombModuleData;
+
+        if (fallbackBombModuleData != null && fallbackBombModuleData.ExplosionVfxPrefab != null)
+            return fallbackBombModuleData;
+
+        return null;
+    }
+
+    /// <summary>
+    /// Resolves an object reference with a module-default fallback.
+    /// </summary>
+    /// <param name="primaryPrefab">Primary prefab reference.</param>
+    /// <param name="fallbackPrefab">Fallback prefab reference.</param>
+    /// <returns>Primary prefab when assigned; otherwise fallback prefab.</returns>
+    private static GameObject ResolvePrefab(GameObject primaryPrefab, GameObject fallbackPrefab)
+    {
+        if (primaryPrefab != null)
+            return primaryPrefab;
+
+        return fallbackPrefab;
     }
     #endregion
 

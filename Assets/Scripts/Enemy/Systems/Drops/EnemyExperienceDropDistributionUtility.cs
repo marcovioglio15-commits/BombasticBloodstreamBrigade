@@ -29,7 +29,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="definitionIndex">Resolved definition index when successful.</param>
     /// <param name="definitionExperienceAmount">Resolved definition experience amount when successful.</param>
     /// <param name="fitsRemaining">True when selected amount is lower or equal to remaining budget.</param>
-    /// <returns>True when a valid definition is selected, otherwise false.<returns>
+    /// <returns>True when a valid definition is selected, otherwise false.</returns>
     public static bool TryResolveNextDefinition(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                 float remainingExperience,
                                                 float distribution,
@@ -58,7 +58,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="definitionIndex">Resolved absolute definition index when successful.</param>
     /// <param name="definitionExperienceAmount">Resolved definition experience amount when successful.</param>
     /// <param name="fitsRemaining">True when selected amount is lower or equal to remaining budget.</param>
-    /// <returns>True when a valid definition is selected, otherwise false.<returns>
+    /// <returns>True when a valid definition is selected, otherwise false.</returns>
     public static bool TryResolveNextDefinition(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                 int definitionStartIndex,
                                                 int definitionCount,
@@ -277,7 +277,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="deliveredExperience">Estimated delivered experience by planned drops.</param>
     /// <param name="absoluteError">Absolute difference between requested and delivered experience.</param>
-    /// <returns>Estimated planned drop count.<returns>
+    /// <returns>Estimated planned drop count.</returns>
     public static int EstimateDropsPerDeath(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                             float totalExperienceDrop,
                                             float distribution,
@@ -303,7 +303,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="deliveredExperience">Estimated delivered experience by planned drops.</param>
     /// <param name="absoluteError">Absolute difference between requested and delivered experience.</param>
-    /// <returns>Estimated planned drop count.<returns>
+    /// <returns>Estimated planned drop count.</returns>
     public static int EstimateDropsPerDeath(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                             int definitionStartIndex,
                                             int definitionCount,
@@ -436,7 +436,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="deliveredExperience">Estimated delivered experience by planned drops.</param>
     /// <param name="absoluteError">Absolute difference between requested and delivered experience.</param>
-    /// <returns>Estimated planned drop count.<returns>
+    /// <returns>Estimated planned drop count.</returns>
     public static int EstimateDropsForPreview(IReadOnlyList<float> definitionExperienceValues,
                                               float totalExperienceDrop,
                                               float distribution,
@@ -501,7 +501,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="resolvedMinimumTotal">Resolved compatible minimum total inside the requested range.</param>
     /// <param name="resolvedMaximumTotal">Resolved compatible maximum total inside the requested range.</param>
-    /// <returns>True when at least one compatible value exists in the requested range.<returns>
+    /// <returns>True when at least one compatible value exists in the requested range.</returns>
     public static bool TryResolveCompatiblePreviewRange(IReadOnlyList<float> definitionExperienceValues,
                                                         float requestedMinimumTotal,
                                                         float requestedMaximumTotal,
@@ -526,7 +526,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="suggestedMinimumTotal">Suggested compatible minimum total.</param>
     /// <param name="suggestedMaximumTotal">Suggested compatible maximum total.</param>
-    /// <returns>True when a nearby compatible range is found, otherwise false.<returns>
+    /// <returns>True when a nearby compatible range is found, otherwise false.</returns>
     public static bool TryResolveSuggestedPreviewRange(IReadOnlyList<float> definitionExperienceValues,
                                                        float requestedMinimumTotal,
                                                        float requestedMaximumTotal,
@@ -551,7 +551,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="randomSeed">Deterministic random seed used for total-value selection.</param>
     /// <param name="resolvedTotal">Resolved compatible random total when successful.</param>
-    /// <returns>True when a compatible random total is resolved, otherwise false.<returns>
+    /// <returns>True when a compatible random total is resolved, otherwise false.</returns>
     public static bool TryResolveRandomCompatibleTotal(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                        float minimumTotal,
                                                        float maximumTotal,
@@ -580,7 +580,7 @@ public static class EnemyExperienceDropDistributionUtility
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
     /// <param name="randomSeed">Deterministic random seed used for total-value selection.</param>
     /// <param name="resolvedTotal">Resolved compatible random total when successful.</param>
-    /// <returns>True when a compatible random total is resolved, otherwise false.<returns>
+    /// <returns>True when a compatible random total is resolved, otherwise false.</returns>
     public static bool TryResolveRandomCompatibleTotal(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                        int definitionStartIndex,
                                                        int definitionCount,

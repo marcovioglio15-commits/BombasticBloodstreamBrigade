@@ -4,7 +4,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Centralizes deterministic sampling and direction helpers shared by Coward movement.
 /// none.
-/// returns none.
 /// </summary>
 public static class EnemyPatternCowardSharedUtility
 {
@@ -19,12 +18,12 @@ public static class EnemyPatternCowardSharedUtility
     #region Public Methods
     /// <summary>
     /// Resolves the preferred retreat direction opposite to the player, with a deterministic fallback when both overlap.
-    /// enemyEntity Current enemy entity.
-    /// enemyPosition Current enemy position.
-    /// playerPosition Current player position.
-    /// elapsedTime Elapsed world time.
-    /// returns Normalized planar retreat direction.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="enemyPosition">Current enemy position.</param>
+    /// <param name="playerPosition">Current player position.</param>
+    /// <param name="elapsedTime">Elapsed world time.</param>
+    /// <returns>Normalized planar retreat direction.</returns>
     public static float3 ResolveRetreatDirection(Entity enemyEntity,
                                                  float3 enemyPosition,
                                                  float3 playerPosition,
@@ -41,11 +40,11 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves a deterministic planar direction from entity identity and an optional time seed.
-    /// enemyEntity Current enemy entity.
-    /// elapsedTime Elapsed world time.
-    /// extraSeed Extra hash salt used to decorrelate callers.
-    /// returns Normalized deterministic planar direction.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="elapsedTime">Elapsed world time.</param>
+    /// <param name="extraSeed">Extra hash salt used to decorrelate callers.</param>
+    /// <returns>Normalized deterministic planar direction.</returns>
     public static float3 ResolveDeterministicPlanarDirection(Entity enemyEntity, float elapsedTime, int extraSeed)
     {
         uint angleSeed = math.hash(new int4(enemyEntity.Index, enemyEntity.Version, extraSeed, (int)(elapsedTime * 19f)));
@@ -55,9 +54,9 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves one stable orbit sign per entity so nearby Cowards separate into opposite circulation directions.
-    /// enemyEntity Current enemy entity.
-    /// returns Signed scalar equal to -1 or +1.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <returns>Signed scalar equal to -1 or +1.</returns>
     public static float ResolveOrbitSign(Entity enemyEntity)
     {
         uint orbitHash = math.hash(new int2(enemyEntity.Index, enemyEntity.Version));
@@ -70,11 +69,11 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves the number of angular samples for the current picker mode.
-    /// patternConfig Compiled pattern config.
-    /// useInfiniteDirectionSampling Whether infinite angular sampling is enabled.
-    /// minimumSampleCount Minimum sample count enforced by the caller.
-    /// returns Effective sample count.
     /// </summary>
+    /// <param name="patternConfig">Compiled pattern config.</param>
+    /// <param name="useInfiniteDirectionSampling">Whether infinite angular sampling is enabled.</param>
+    /// <param name="minimumSampleCount">Minimum sample count enforced by the caller.</param>
+    /// <returns>Effective sample count.</returns>
     public static int ResolveSampleCount(in EnemyPatternConfig patternConfig,
                                          bool useInfiniteDirectionSampling,
                                          int minimumSampleCount)
@@ -90,12 +89,12 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves the phase angle used when a full 360° sweep is sampled.
-    /// enemyEntity Current enemy entity.
-    /// elapsedTime Elapsed world time.
-    /// useInfiniteDirectionSampling Whether infinite angular sampling is enabled.
-    /// seedOffset Extra hash salt used by the caller.
-    /// returns Starting phase angle in radians.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="elapsedTime">Elapsed world time.</param>
+    /// <param name="useInfiniteDirectionSampling">Whether infinite angular sampling is enabled.</param>
+    /// <param name="seedOffset">Extra hash salt used by the caller.</param>
+    /// <returns>Starting phase angle in radians.</returns>
     public static float ResolvePhaseAngleRadians(Entity enemyEntity,
                                                  float elapsedTime,
                                                  bool useInfiniteDirectionSampling,
@@ -110,14 +109,14 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves one candidate angle either from the infinite sweep or from per-sample hash noise.
-    /// enemyEntity Current enemy entity.
-    /// sampleIndex Current sample index.
-    /// elapsedTime Elapsed world time.
-    /// useInfiniteDirectionSampling Whether infinite angular sampling is enabled.
-    /// phaseAngleRadians Sweep phase angle in radians.
-    /// stepRadians Angular step used by infinite sampling.
-    /// returns Candidate angle in radians.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="sampleIndex">Current sample index.</param>
+    /// <param name="elapsedTime">Elapsed world time.</param>
+    /// <param name="useInfiniteDirectionSampling">Whether infinite angular sampling is enabled.</param>
+    /// <param name="phaseAngleRadians">Sweep phase angle in radians.</param>
+    /// <param name="stepRadians">Angular step used by infinite sampling.</param>
+    /// <returns>Candidate angle in radians.</returns>
     public static float ResolveSampleAngleRadians(Entity enemyEntity,
                                                   int sampleIndex,
                                                   float elapsedTime,
@@ -134,14 +133,14 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves one sample distance inside the requested min/max travel band.
-    /// enemyEntity Current enemy entity.
-    /// sampleIndex Current sample index.
-    /// elapsedTime Elapsed world time.
-    /// minimumDistance Minimum allowed distance.
-    /// maximumDistance Maximum allowed distance.
-    /// searchRadius Search radius cap.
-    /// returns Candidate travel distance.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="sampleIndex">Current sample index.</param>
+    /// <param name="elapsedTime">Elapsed world time.</param>
+    /// <param name="minimumDistance">Minimum allowed distance.</param>
+    /// <param name="maximumDistance">Maximum allowed distance.</param>
+    /// <param name="searchRadius">Search radius cap.</param>
+    /// <returns>Candidate travel distance.</returns>
     public static float ResolveSampleDistance(Entity enemyEntity,
                                               int sampleIndex,
                                               float elapsedTime,
@@ -157,11 +156,11 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves a small stable decision cooldown used to stagger Coward repath requests across frames.
-    /// enemyEntity Current enemy entity.
-    /// minimumSeconds Minimum cooldown in seconds.
-    /// maximumSeconds Maximum cooldown in seconds.
-    /// returns Stable cooldown value for this entity.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="minimumSeconds">Minimum cooldown in seconds.</param>
+    /// <param name="maximumSeconds">Maximum cooldown in seconds.</param>
+    /// <returns>Stable cooldown value for this entity.</returns>
     public static float ResolveDecisionCooldown(Entity enemyEntity, float minimumSeconds, float maximumSeconds)
     {
         float clampedMinimumSeconds = math.max(0f, minimumSeconds);
@@ -173,10 +172,10 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves the effective enemy-clearance budget used by Cowards while retreating.
-    /// enemyBodyRadius Current enemy body radius.
-    /// baseMinimumEnemyClearance Authored minimum enemy clearance.
-    /// returns Effective retreat-time clearance budget.
     /// </summary>
+    /// <param name="enemyBodyRadius">Current enemy body radius.</param>
+    /// <param name="baseMinimumEnemyClearance">Authored minimum enemy clearance.</param>
+    /// <returns>Effective retreat-time clearance budget.</returns>
     public static float ResolveRetreatEnemyClearance(float enemyBodyRadius, float baseMinimumEnemyClearance)
     {
         float clampedBodyRadius = math.max(0f, enemyBodyRadius);
@@ -186,10 +185,10 @@ public static class EnemyPatternCowardSharedUtility
 
     /// <summary>
     /// Resolves a stable tangent direction along a wall normal so Cowards slide away from corners instead of pinning in place.
-    /// enemyEntity Current enemy entity.
-    /// wallNormal Surface normal of the nearby wall.
-    /// returns Normalized planar tangent direction.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="wallNormal">Surface normal of the nearby wall.</param>
+    /// <returns>Normalized planar tangent direction.</returns>
     public static float3 ResolveWallTangentDirection(Entity enemyEntity, float3 wallNormal)
     {
         float3 planarWallNormal = math.normalizesafe(new float3(wallNormal.x, 0f, wallNormal.z), float3.zero);

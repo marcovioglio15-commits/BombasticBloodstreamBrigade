@@ -2,8 +2,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides shared visibility checks for management-tool browser discovery and editor-only element traversal.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ManagementToolVisualElementVisibilityUtility
 {
@@ -12,9 +10,9 @@ internal static class ManagementToolVisualElementVisibilityUtility
     #region Public Methods
     /// <summary>
     /// Returns whether the provided element is attached and currently visible for browser discovery.
-    /// /params targetElement Candidate element being inspected.
-    /// /returns True when the element should be traversed by the browser collector.
     /// </summary>
+    /// <param name="targetElement">Candidate element being inspected.</param>
+    /// <returns>True when the element should be traversed by the browser collector.</returns>
     public static bool IsBrowsable(VisualElement targetElement)
     {
         if (targetElement == null)

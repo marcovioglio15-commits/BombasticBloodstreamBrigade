@@ -18,7 +18,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// </summary>
     /// <param name="scalableStats">Runtime scalable-stat buffer.</param>
     /// <param name="variableContext">Destination dictionary receiving the current typed stat values.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public static void FillVariableContext(DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                            Dictionary<string, PlayerFormulaValue> variableContext)
     {
@@ -48,7 +48,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// </summary>
     /// <param name="scalableStats">Managed scalable-stat list used by temporary runtime overlays.</param>
     /// <param name="variableContext">Destination dictionary receiving the current typed stat values.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public static void FillVariableContext(IReadOnlyList<PlayerScalableStatElement> scalableStats,
                                            Dictionary<string, PlayerFormulaValue> variableContext)
     {
@@ -81,7 +81,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// </summary>
     /// <param name="scalableStats">Runtime scalable-stat buffer.</param>
     /// <param name="variableContext">Destination dictionary receiving numeric projections of the current stat values.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public static void FillVariableContext(DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                            Dictionary<string, float> variableContext)
     {
@@ -114,7 +114,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="variableContext">Current typed scalable-stat dictionary.</param>
     /// <param name="evaluatedValue">Resolved typed value when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded; otherwise false.<returns>
+    /// <returns>True when evaluation succeeded; otherwise false.</returns>
     public static bool TryEvaluateFormula(string formula,
                                           PlayerFormulaValue thisValue,
                                           IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
@@ -144,7 +144,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="variableContext">Current typed scalable-stat dictionary.</param>
     /// <param name="evaluatedValue">Resolved numeric value when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded; otherwise false.<returns>
+    /// <returns>True when evaluation succeeded; otherwise false.</returns>
     public static bool TryEvaluateFormula(string formula,
                                           float thisValue,
                                           IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
@@ -175,7 +175,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="variableContext">Current numeric scalable-stat dictionary.</param>
     /// <param name="evaluatedValue">Resolved numeric value when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded; otherwise false.<returns>
+    /// <returns>True when evaluation succeeded; otherwise false.</returns>
     public static bool TryEvaluateFormula(string formula,
                                           float thisValue,
                                           IReadOnlyDictionary<string, float> variableContext,
@@ -204,7 +204,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="formula">Raw formula string.</param>
     /// <param name="variableContext">Current typed scalable-stat dictionary.</param>
     /// <param name="thisValue">Typed base value mapped to [this].</param>
-    /// <returns>Readable translated expression suitable for logs.<returns>
+    /// <returns>Readable translated expression suitable for logs.</returns>
     public static string TranslateFormula(string formula,
                                           IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
                                           PlayerFormulaValue thisValue)
@@ -267,7 +267,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="formula">Raw formula string.</param>
     /// <param name="variableContext">Current numeric scalable-stat dictionary.</param>
     /// <param name="thisValue">Numeric base value mapped to [this].</param>
-    /// <returns>Readable translated expression suitable for logs.<returns>
+    /// <returns>Readable translated expression suitable for logs.</returns>
     public static string TranslateFormula(string formula,
                                           IReadOnlyDictionary<string, float> variableContext,
                                           float thisValue)
@@ -281,7 +281,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// Formats one typed value for concise debug output.
     /// </summary>
     /// <param name="value">Typed value to format.</param>
-    /// <returns>Compact invariant string representation.<returns>
+    /// <returns>Compact invariant string representation.</returns>
     public static string FormatValue(PlayerFormulaValue value)
     {
         switch (value.Type)
@@ -301,7 +301,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// Formats numeric values for concise debug output.
     /// </summary>
     /// <param name="value">Value to format.</param>
-    /// <returns>Compact invariant string representation.<returns>
+    /// <returns>Compact invariant string representation.</returns>
     public static string FormatNumber(float value)
     {
         float roundedInteger = Mathf.Round(value);
@@ -318,7 +318,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// Converts a numeric-only runtime dictionary into a typed dictionary used by shared translation helpers.
     /// </summary>
     /// <param name="variableContext">Numeric variable dictionary.</param>
-    /// <returns>Typed dictionary mirroring the numeric values.<returns>
+    /// <returns>Typed dictionary mirroring the numeric values.</returns>
     private static Dictionary<string, PlayerFormulaValue> BuildTypedContext(IReadOnlyDictionary<string, float> variableContext)
     {
         Dictionary<string, PlayerFormulaValue> typedContext = new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
@@ -338,7 +338,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="variableContext">Current typed scalable-stat dictionary.</param>
     /// <param name="variableName">Variable to resolve.</param>
     /// <param name="resolvedValue">Resolved variable value when found.</param>
-    /// <returns>True when the variable exists; otherwise false.<returns>
+    /// <returns>True when the variable exists; otherwise false.</returns>
     private static bool TryResolveVariableValue(IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
                                                 string variableName,
                                                 out PlayerFormulaValue resolvedValue)
@@ -357,7 +357,7 @@ internal static class PlayerScalingRuntimeFormulaUtility
     /// <param name="variableContext">Current numeric scalable-stat dictionary.</param>
     /// <param name="variableName">Variable to resolve.</param>
     /// <param name="resolvedValue">Resolved variable value when found.</param>
-    /// <returns>True when the variable exists; otherwise false.<returns>
+    /// <returns>True when the variable exists; otherwise false.</returns>
     private static bool TryResolveVariableValue(IReadOnlyDictionary<string, float> variableContext,
                                                 string variableName,
                                                 out float resolvedValue)

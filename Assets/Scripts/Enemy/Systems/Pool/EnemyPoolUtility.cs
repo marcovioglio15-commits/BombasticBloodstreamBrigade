@@ -20,13 +20,12 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Expands one concrete enemy pool by instantiating the provided prefab entity.
     /// Called by pool initialization and by runtime fallback expansion when a wave needs more instances.
-    /// entityManager: Entity manager used to create and initialize pooled instances.
-    /// poolEntity: Pool entity that receives the new pooled enemies.
-    /// spawnerEntity: Spawner that owns the pool and spawned instances.
-    /// enemyPrefab: Enemy prefab entity to instantiate.
-    /// count: Number of pooled enemies to create.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to create and initialize pooled instances.</param>
+    /// <param name="poolEntity">Pool entity that receives the new pooled enemies.</param>
+    /// <param name="spawnerEntity">Spawner that owns the pool and spawned instances.</param>
+    /// <param name="enemyPrefab">Enemy prefab entity to instantiate.</param>
+    /// <param name="count">Number of pooled enemies to create.</param>
     public static void ExpandPool(EntityManager entityManager,
                                   Entity poolEntity,
                                   Entity spawnerEntity,
@@ -76,10 +75,9 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Ensures core pooled-enemy components exist on the provided entity.
     /// Mostly acts as a defensive safety net for prefab authoring inconsistencies.
-    /// entityManager: Entity manager used to add missing components.
-    /// enemyEntity: Enemy instance that must expose the expected pooled runtime components.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to add missing components.</param>
+    /// <param name="enemyEntity">Enemy instance that must expose the expected pooled runtime components.</param>
     public static void EnsureEnemyComponents(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.HasComponent<EnemyPoolValidated>(enemyEntity))
@@ -208,14 +206,13 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Resets one pooled enemy for activation and places it at the provided world position.
     /// Called immediately before the instance is enabled as part of a baked wave event.
-    /// entityManager: Entity manager used to mutate runtime state.
-    /// enemyEntity: Enemy instance being activated.
-    /// spawnerEntity: Spawner that owns the enemy.
-    /// poolEntity: Pool entity that must receive the enemy back on despawn.
-    /// waveIndex: Wave index that emitted the enemy.
-    /// worldPosition: Resolved world position for the spawn event.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate runtime state.</param>
+    /// <param name="enemyEntity">Enemy instance being activated.</param>
+    /// <param name="spawnerEntity">Spawner that owns the enemy.</param>
+    /// <param name="poolEntity">Pool entity that must receive the enemy back on despawn.</param>
+    /// <param name="waveIndex">Wave index that emitted the enemy.</param>
+    /// <param name="worldPosition">Resolved world position for the spawn event.</param>
     public static void ActivateEnemy(EntityManager entityManager,
                                      Entity enemyEntity,
                                      Entity spawnerEntity,
@@ -240,12 +237,11 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Resets one pooled enemy for inactive parking inside its owning pool.
     /// Called during prewarm and on final despawn.
-    /// entityManager: Entity manager used to mutate runtime state.
-    /// enemyEntity: Enemy instance being returned to pool.
-    /// spawnerEntity: Spawner that owns the enemy pool.
-    /// poolEntity: Pool that receives the enemy.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate runtime state.</param>
+    /// <param name="enemyEntity">Enemy instance being returned to pool.</param>
+    /// <param name="spawnerEntity">Spawner that owns the enemy pool.</param>
+    /// <param name="poolEntity">Pool that receives the enemy.</param>
     public static void PrepareEnemyForPool(EntityManager entityManager,
                                            Entity enemyEntity,
                                            Entity spawnerEntity,
@@ -264,15 +260,14 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Reserves one pooled enemy at its exact future spawn position before activation time is reached.
     /// Called by EnemySpawnSystem as soon as the warning lead window opens for one wave event.
-    /// entityManager: Entity manager used to mutate runtime state.
-    /// enemyEntity: Enemy instance being reserved for an upcoming spawn.
-    /// spawnerEntity: Spawner that owns the enemy.
-    /// poolEntity: Pool that provided the enemy instance.
-    /// waveIndex: Wave index that will own the enemy once activated.
-    /// worldPosition: Final world-space spawn position that must match the warning ring.
-    /// warningState: Fully resolved warning state used by presentation until fade-out completion.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate runtime state.</param>
+    /// <param name="enemyEntity">Enemy instance being reserved for an upcoming spawn.</param>
+    /// <param name="spawnerEntity">Spawner that owns the enemy.</param>
+    /// <param name="poolEntity">Pool that provided the enemy instance.</param>
+    /// <param name="waveIndex">Wave index that will own the enemy once activated.</param>
+    /// <param name="worldPosition">Final world-space spawn position that must match the warning ring.</param>
+    /// <param name="warningState">Fully resolved warning state used by presentation until fade-out completion.</param>
     public static void ReserveEnemyForSpawn(EntityManager entityManager,
                                             Entity enemyEntity,
                                             Entity spawnerEntity,
@@ -298,11 +293,10 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Activates an enemy that was already reserved at its exact spawn point during the warning phase.
     /// Called by EnemySpawnSystem when the reserved spawn time becomes due.
-    /// entityManager: Entity manager used to mutate runtime state.
-    /// enemyEntity: Reserved enemy instance being activated.
-    /// worldPosition: Final world-space spawn position enforced again at activation time.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate runtime state.</param>
+    /// <param name="enemyEntity">Reserved enemy instance being activated.</param>
+    /// <param name="worldPosition">Final world-space spawn position enforced again at activation time.</param>
     public static void ActivateReservedEnemy(EntityManager entityManager,
                                              Entity enemyEntity,
                                              float3 worldPosition)
@@ -321,10 +315,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Parks the enemy far below the playable area so inactive pooled instances stay hidden.
-    /// entityManager: Entity manager used to mutate LocalTransform.
-    /// enemyEntity: Enemy instance to park.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate LocalTransform.</param>
+    /// <param name="enemyEntity">Enemy instance to park.</param>
     public static void ParkEnemy(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.HasComponent<LocalTransform>(enemyEntity))
@@ -346,11 +339,10 @@ public static class EnemyPoolUtility
     /// <summary>
     /// Resets presentation runtime state for one enemy instance.
     /// Called when entering or leaving the active simulation set.
-    /// entityManager: Entity manager used to mutate visual runtime state.
-    /// enemyEntity: Enemy instance to reset.
-    /// isVisible: Target visibility flag after reset.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate visual runtime state.</param>
+    /// <param name="enemyEntity">Enemy instance to reset.</param>
+    /// <param name="isVisible">Target visibility flag after reset.</param>
     public static void ResetVisualRuntimeState(EntityManager entityManager, Entity enemyEntity, byte isVisible)
     {
         if (!entityManager.HasComponent<EnemyVisualRuntimeState>(enemyEntity))
@@ -369,8 +361,8 @@ public static class EnemyPoolUtility
     #region Private Methods
     /// <summary>
     /// Creates the default fallback pattern config used when instantiated prefabs miss it.
-    /// returns Default EnemyPatternConfig value.
     /// </summary>
+    /// <returns>Default EnemyPatternConfig value.</returns>
     private static EnemyPatternConfig CreateDefaultPatternConfig()
     {
         return EnemyPatternDefaultsUtility.CreatePatternConfig();
@@ -378,10 +370,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Ensures the custom movement tag matches the baked movement pattern kind.
-    /// entityManager: Entity manager used to add or remove the tag.
-    /// enemyEntity: Enemy instance to inspect.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to add or remove the tag.</param>
+    /// <param name="enemyEntity">Enemy instance to inspect.</param>
     private static void EnsureCustomMovementTag(EntityManager entityManager, Entity enemyEntity)
     {
         bool shouldUseCustomMovement = false;
@@ -410,10 +401,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Ensures the visual-mode tag set matches the resolved visual configuration.
-    /// entityManager: Entity manager used to add or remove visual tags.
-    /// enemyEntity: Enemy instance to inspect.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to add or remove visual tags.</param>
+    /// <param name="enemyEntity">Enemy instance to inspect.</param>
     private static void EnsureVisualModeTags(EntityManager entityManager, Entity enemyEntity)
     {
         bool hasCompanionVisualTag = entityManager.HasComponent<EnemyVisualCompanionAnimator>(enemyEntity);
@@ -449,10 +439,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Resets gameplay runtime state that must start clean every time an enemy is reused.
-    /// entityManager: Entity manager used to mutate components and buffers.
-    /// enemyEntity: Enemy instance to reset.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate components and buffers.</param>
+    /// <param name="enemyEntity">Enemy instance to reset.</param>
     private static void ResetEnemySimulationState(EntityManager entityManager, Entity enemyEntity)
     {
         if (entityManager.HasComponent<EnemyRuntimeState>(enemyEntity))
@@ -559,8 +548,8 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Returns the default runtime pattern state for a freshly activated pooled enemy.
-    /// returns Default EnemyPatternRuntimeState value.
     /// </summary>
+    /// <returns>Default EnemyPatternRuntimeState value.</returns>
     private static EnemyPatternRuntimeState CreateDefaultPatternRuntimeState()
     {
         return EnemyPatternDefaultsUtility.CreatePatternRuntimeState();
@@ -568,9 +557,8 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Returns the default boss pattern runtime state for a freshly activated pooled boss.
-    /// /params None.
-    /// /returns Default boss pattern runtime state value.
     /// </summary>
+    /// <returns>Default boss pattern runtime state value.</returns>
     private static EnemyBossPatternRuntimeState CreateDefaultBossPatternRuntimeState()
     {
         return new EnemyBossPatternRuntimeState
@@ -587,10 +575,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Resets per-activation boss minion spawn counters while preserving any already created pools.
-    /// /params entityManager Entity manager used to mutate the minion spawn buffer.
-    /// /params enemyEntity Boss entity whose minion rules are reset.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the minion spawn buffer.</param>
+    /// <param name="enemyEntity">Boss entity whose minion rules are reset.</param>
     private static void ResetBossMinionRuntime(EntityManager entityManager, Entity enemyEntity)
     {
         EnemyBossMinionPendingSpawnUtility.RecycleAndClearPendingSpawns(entityManager, enemyEntity);
@@ -610,10 +597,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Resets shooter runtime elements from the baked shooter config count.
-    /// entityManager: Entity manager used to access shooter buffers.
-    /// enemyEntity: Enemy instance whose shooter runtime must be rebuilt.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access shooter buffers.</param>
+    /// <param name="enemyEntity">Enemy instance whose shooter runtime must be rebuilt.</param>
     private static void ResetShooterRuntime(EntityManager entityManager, Entity enemyEntity)
     {
         DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = entityManager.GetBuffer<EnemyShooterRuntimeElement>(enemyEntity);
@@ -643,10 +629,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Restores health and shield values to their baked maxima.
-    /// entityManager: Entity manager used to mutate EnemyHealth.
-    /// enemyEntity: Enemy instance whose health must be reset.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate EnemyHealth.</param>
+    /// <param name="enemyEntity">Enemy instance whose health must be reset.</param>
     private static void ResetHealth(EntityManager entityManager, Entity enemyEntity)
     {
         EnemyHealth enemyHealth = entityManager.GetComponentData<EnemyHealth>(enemyEntity);
@@ -664,13 +649,12 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Writes current ownership metadata onto the pooled enemy instance.
-    /// entityManager: Entity manager used to mutate owner components.
-    /// enemyEntity: Enemy instance whose ownership must be updated.
-    /// spawnerEntity: Owning spawner entity.
-    /// poolEntity: Owning concrete pool entity.
-    /// waveIndex: Wave index that currently owns the enemy, or -1 when pooled.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate owner components.</param>
+    /// <param name="enemyEntity">Enemy instance whose ownership must be updated.</param>
+    /// <param name="spawnerEntity">Owning spawner entity.</param>
+    /// <param name="poolEntity">Owning concrete pool entity.</param>
+    /// <param name="waveIndex">Wave index that currently owns the enemy, or -1 when pooled.</param>
     private static void SetEnemyOwnership(EntityManager entityManager,
                                           Entity enemyEntity,
                                           Entity spawnerEntity,
@@ -701,11 +685,10 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Updates LocalTransform position without altering existing rotation or scale.
-    /// entityManager: Entity manager used to mutate LocalTransform.
-    /// enemyEntity: Enemy instance to move.
-    /// worldPosition: Target world position.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate LocalTransform.</param>
+    /// <param name="enemyEntity">Enemy instance to move.</param>
+    /// <param name="worldPosition">Target world position.</param>
     private static void SetEnemyTransformPosition(EntityManager entityManager, Entity enemyEntity, float3 worldPosition)
     {
         if (!entityManager.HasComponent<LocalTransform>(enemyEntity))
@@ -718,10 +701,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Applies the authored inactivity timer and corresponding runtime lock after a spawn becomes active.
-    /// entityManager: Entity manager used to mutate EnemyRuntimeState and EnemySpawnInactivityLock.
-    /// enemyEntity: Enemy instance that has just become active.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate EnemyRuntimeState and EnemySpawnInactivityLock.</param>
+    /// <param name="enemyEntity">Enemy instance that has just become active.</param>
     private static void ApplySpawnInactivityState(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.HasComponent<EnemyRuntimeState>(enemyEntity))
@@ -740,11 +722,10 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Enables or disables the spawn inactivity lock without assuming the component already exists.
-    /// entityManager: Entity manager used to mutate the enableable component state.
-    /// enemyEntity: Enemy instance whose post-spawn lock must be updated.
-    /// enabled: True to lock behaviour modules, false to release them.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the enableable component state.</param>
+    /// <param name="enemyEntity">Enemy instance whose post-spawn lock must be updated.</param>
+    /// <param name="enabled">True to lock behaviour modules, false to release them.</param>
     private static void SetSpawnInactivityLock(EntityManager entityManager,
                                                Entity enemyEntity,
                                                bool enabled)
@@ -757,11 +738,10 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Writes the active warning state used by presentation for one reserved enemy.
-    /// entityManager: Entity manager used to mutate EnemySpawnWarningState.
-    /// enemyEntity: Enemy instance that owns the warning.
-    /// warningState: Fully resolved warning payload.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate EnemySpawnWarningState.</param>
+    /// <param name="enemyEntity">Enemy instance that owns the warning.</param>
+    /// <param name="warningState">Fully resolved warning payload.</param>
     private static void ArmSpawnWarningState(EntityManager entityManager,
                                              Entity enemyEntity,
                                              EnemySpawnWarningState warningState)
@@ -775,10 +755,9 @@ public static class EnemyPoolUtility
 
     /// <summary>
     /// Clears the warning state so pooled enemies never keep stale ring data across reuses.
-    /// entityManager: Entity manager used to mutate EnemySpawnWarningState.
-    /// enemyEntity: Enemy instance whose warning state must be cleared.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate EnemySpawnWarningState.</param>
+    /// <param name="enemyEntity">Enemy instance whose warning state must be cleared.</param>
     private static void ClearSpawnWarningState(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.HasComponent<EnemySpawnWarningState>(enemyEntity))

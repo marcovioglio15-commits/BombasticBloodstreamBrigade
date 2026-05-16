@@ -1,7 +1,5 @@
 /// <summary>
 /// Immutable setup data used to write one default scene definition.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct GameSceneDefinitionSetup
 {
@@ -17,14 +15,13 @@ internal readonly struct GameSceneDefinitionSetup
     #region Constructors
     /// <summary>
     /// Creates setup data for one managed scene entry.
-    /// /params sceneId Stable Scene Manager scene ID.
-    /// /params sceneName Unity scene name.
-    /// /params scenePath Project-relative scene path.
-    /// /params sceneKind High-level scene role.
-    /// /params unloadPolicy Automatic unload policy.
-    /// /params companionUiSceneId Optional scene ID loaded additively with this scene.
-    /// /returns None.
     /// </summary>
+    /// <param name="sceneId">Stable Scene Manager scene ID.</param>
+    /// <param name="sceneName">Unity scene name.</param>
+    /// <param name="scenePath">Project-relative scene path.</param>
+    /// <param name="sceneKind">High-level scene role.</param>
+    /// <param name="unloadPolicy">Automatic unload policy.</param>
+    /// <param name="companionUiSceneId">Optional scene ID loaded additively with this scene.</param>
     public GameSceneDefinitionSetup(string sceneId,
                                     string sceneName,
                                     string scenePath,
@@ -44,8 +41,6 @@ internal readonly struct GameSceneDefinitionSetup
 
 /// <summary>
 /// Immutable setup data used to write one default transition definition.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct GameSceneTransitionDefinitionSetup
 {
@@ -59,12 +54,11 @@ internal readonly struct GameSceneTransitionDefinitionSetup
     #region Constructors
     /// <summary>
     /// Creates setup data for one scene transition entry.
-    /// /params transitionId Stable transition ID.
-    /// /params fromSceneId Source scene ID.
-    /// /params toSceneId Target scene ID.
-    /// /params transitionMode Request mode expected to start the transition.
-    /// /returns None.
     /// </summary>
+    /// <param name="transitionId">Stable transition ID.</param>
+    /// <param name="fromSceneId">Source scene ID.</param>
+    /// <param name="toSceneId">Target scene ID.</param>
+    /// <param name="transitionMode">Request mode expected to start the transition.</param>
     public GameSceneTransitionDefinitionSetup(string transitionId,
                                               string fromSceneId,
                                               string toSceneId,

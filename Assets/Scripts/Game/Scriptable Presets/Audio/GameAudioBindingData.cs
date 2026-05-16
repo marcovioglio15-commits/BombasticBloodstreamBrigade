@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Global playback options applied by the Game Audio playback system before dispatching FMOD events.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class GameAudioPlaybackSettings
@@ -76,8 +74,6 @@ public sealed class GameAudioPlaybackSettings
 
 /// <summary>
 /// FMOD bus path and routing values stored in the audio manager preset for project-level mixing control.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class GameAudioRoutingSettings
@@ -149,8 +145,6 @@ public sealed class GameAudioRoutingSettings
 
 /// <summary>
 /// Background music settings baked into the global audio singleton.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class GameAudioBackgroundMusicSettings
@@ -245,8 +239,6 @@ public sealed class GameAudioBackgroundMusicSettings
 
 /// <summary>
 /// Per-event cap used to avoid flooding FMOD with dense ECS gameplay events.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class GameAudioRateLimitSettings
@@ -295,10 +287,9 @@ public sealed class GameAudioRateLimitSettings
     #region Methods
     /// <summary>
     /// Writes the rate-limit values used by default enemy projectile audio to prevent burst spam.
-    /// /params maxPlays Maximum allowed plays in one window.
-    /// /params seconds Window length in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="maxPlays">Maximum allowed plays in one window.</param>
+    /// <param name="seconds">Window length in seconds.</param>
     public void Configure(int maxPlays, float seconds)
     {
         enabled = true;
@@ -308,8 +299,6 @@ public sealed class GameAudioRateLimitSettings
 
     /// <summary>
     /// Disables the cap while keeping the authored numeric values visible in the inspector.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Disable()
     {
@@ -320,8 +309,6 @@ public sealed class GameAudioRateLimitSettings
 
 /// <summary>
 /// One FMOD event binding exposed in the Audio Manager section and baked into ECS for runtime lookup.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class GameAudioEventBinding
@@ -461,9 +448,8 @@ public sealed class GameAudioEventBinding
     #region Methods
     /// <summary>
     /// Applies stable default identity metadata without touching user-authored FMOD event paths.
-    /// /params definition Default descriptor used by the preset factory.
-    /// /returns None.
     /// </summary>
+    /// <param name="definition">Default descriptor used by the preset factory.</param>
     public void ConfigureIdentity(GameAudioDefaultEventDefinition definition)
     {
         eventId = definition.EventId;
@@ -477,10 +463,9 @@ public sealed class GameAudioEventBinding
 
     /// <summary>
     /// Applies the default enemy projectile cap used by newly created presets.
-    /// /params maxPlays Maximum allowed plays in one window.
-    /// /params seconds Window length in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="maxPlays">Maximum allowed plays in one window.</param>
+    /// <param name="seconds">Window length in seconds.</param>
     public void ConfigureEnemyProjectileCap(int maxPlays, float seconds)
     {
         if (rateLimit == null)

@@ -336,7 +336,7 @@ internal static class PlayerPowerUpsPresetValidationUtility
     /// <param name="visitedTierIds">Already reserved tier IDs for the current preset validation pass.</param>
     /// <param name="tierId">Requested tier ID coming from serialized data.</param>
     /// <param name="fallbackTierIndex">1-based fallback index used when the serialized value is empty.</param>
-    /// <returns>Unique tier ID safe to persist on the validated tier.<returns>
+    /// <returns>Unique tier ID safe to persist on the validated tier.</returns>
     private static string BuildUniqueTierId(HashSet<string> visitedTierIds, string tierId, int fallbackTierIndex)
     {
         string normalizedTierId = string.IsNullOrWhiteSpace(tierId)

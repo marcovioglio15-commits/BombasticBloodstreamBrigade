@@ -15,7 +15,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit inspector for the milestone HUD selection section.
     /// </summary>
     /// <param name="property">Serialized milestone HUD section property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -119,7 +119,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// <param name="suspendEventSystemNavigationProperty">Serialized EventSystem navigation suppression property.</param>
     /// <param name="autoSelectFallbackProperty">Serialized auto-select fallback property.</param>
     /// <param name="lockButtonsAfterSelectionClickProperty">Serialized post-command input lock property.</param>
-    /// <returns>True when every required serialized field exists; otherwise false.<returns>
+    /// <returns>True when every required serialized field exists; otherwise false.</returns>
     private static bool AreRequiredPropertiesValid(SerializedProperty panelRootProperty,
                                                    SerializedProperty headerTextProperty,
                                                    SerializedProperty skipButtonProperty,
@@ -158,7 +158,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="property">Serialized property bound to the field.</param>
     /// <param name="label">Inspector label shown for the bound field.</param>
-    /// <returns>Configured property field bound to the serialized property.<returns>
+    /// <returns>Configured property field bound to the serialized property.</returns>
     private static PropertyField CreateBoundField(SerializedProperty property, string label)
     {
         PropertyField propertyField = new PropertyField(property, label);

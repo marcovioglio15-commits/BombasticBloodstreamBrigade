@@ -22,9 +22,8 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Ensures the internal LineRenderer exists and is configured for runtime warning rendering.
-    /// sharedMaterial: Shared material assigned to the pooled LineRenderer.
-    /// returns None.
     /// </summary>
+    /// <param name="sharedMaterial">Shared material assigned to the pooled LineRenderer.</param>
     public void Initialize(Material sharedMaterial)
     {
         EnsureLineRenderer();
@@ -35,14 +34,13 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
 
     /// <summary>
     /// Renders the warning ring using externally resolved position, scale and opacity.
-    /// worldPosition: World position where the warning ring should be displayed.
-    /// radius: Target ring radius in world units.
-    /// ringWidth: Base ring width in world units.
-    /// ringColor: Base ring tint without the final opacity applied.
-    /// opacity: Final alpha applied during this frame.
-    /// widthScale: Additional width multiplier applied during this frame.
-    /// returns None.
     /// </summary>
+    /// <param name="worldPosition">World position where the warning ring should be displayed.</param>
+    /// <param name="radius">Target ring radius in world units.</param>
+    /// <param name="ringWidth">Base ring width in world units.</param>
+    /// <param name="ringColor">Base ring tint without the final opacity applied.</param>
+    /// <param name="opacity">Final alpha applied during this frame.</param>
+    /// <param name="widthScale">Additional width multiplier applied during this frame.</param>
     public void Render(Vector3 worldPosition,
                        float radius,
                        float ringWidth,
@@ -64,7 +62,6 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
 
     /// <summary>
     /// Hides the pooled view without destroying its cached renderer.
-    /// returns None.
     /// </summary>
     public void Deactivate()
     {
@@ -76,7 +73,6 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
     #region Private Methods
     /// <summary>
     /// Creates and configures the internal LineRenderer the first time the pooled view is used.
-    /// returns None.
     /// </summary>
     private void EnsureLineRenderer()
     {
@@ -105,9 +101,8 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
 
     /// <summary>
     /// Rebuilds the ring geometry only when the target radius actually changes.
-    /// radius: Target circle radius in world units.
-    /// returns None.
     /// </summary>
+    /// <param name="radius">Target circle radius in world units.</param>
     private void UpdateCircleGeometry(float radius)
     {
         if (Mathf.Abs(currentRadius - radius) <= RadiusRebuildEpsilon)
@@ -127,12 +122,11 @@ public sealed class EnemySpawnWarningRingView : MonoBehaviour
 
     /// <summary>
     /// Applies the final width and opacity for the current frame.
-    /// ringWidth: Base ring width in world units.
-    /// ringColor: Base ring tint without the final opacity applied.
-    /// opacity: Final alpha applied during this frame.
-    /// widthScale: Additional width multiplier applied during this frame.
-    /// returns None.
     /// </summary>
+    /// <param name="ringWidth">Base ring width in world units.</param>
+    /// <param name="ringColor">Base ring tint without the final opacity applied.</param>
+    /// <param name="opacity">Final alpha applied during this frame.</param>
+    /// <param name="widthScale">Additional width multiplier applied during this frame.</param>
     private void ApplyVisualState(float ringWidth,
                                   Color ringColor,
                                   float opacity,

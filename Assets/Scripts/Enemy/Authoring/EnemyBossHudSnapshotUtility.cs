@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Resolves active boss HUD entities into summed health and shield snapshots.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossHudSnapshotUtility
 {
@@ -14,15 +12,15 @@ internal static class EnemyBossHudSnapshotUtility
     #region Public Methods
     /// <summary>
     /// Resolves all active boss HUD entities into one summed health/shield snapshot.
-    /// /params entityManager Entity manager used to read boss components.
-    /// /params bossQuery Query containing potential boss HUD entities.
-    /// /params cachedBossEntity Primary boss cache used to avoid needless throttled misses.
-    /// /params nextBossResolveTime Next unscaled time at which a missed lookup may run again.
-    /// /params currentTime Current unscaled time used to throttle lookup attempts.
-    /// /params resolveIntervalSeconds Seconds between lookup attempts when no cached boss is valid.
-    /// /params bossSnapshot Resolved aggregate snapshot when at least one boss is active.
-    /// /returns True when at least one valid boss entity is available.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read boss components.</param>
+    /// <param name="bossQuery">Query containing potential boss HUD entities.</param>
+    /// <param name="cachedBossEntity">Primary boss cache used to avoid needless throttled misses.</param>
+    /// <param name="nextBossResolveTime">Next unscaled time at which a missed lookup may run again.</param>
+    /// <param name="currentTime">Current unscaled time used to throttle lookup attempts.</param>
+    /// <param name="resolveIntervalSeconds">Seconds between lookup attempts when no cached boss is valid.</param>
+    /// <param name="bossSnapshot">Resolved aggregate snapshot when at least one boss is active.</param>
+    /// <returns>True when at least one valid boss entity is available.</returns>
     public static bool TryResolveSnapshot(EntityManager entityManager,
                                           EntityQuery bossQuery,
                                           ref Entity cachedBossEntity,
@@ -101,10 +99,10 @@ internal static class EnemyBossHudSnapshotUtility
     #region Private Methods
     /// <summary>
     /// Returns whether the cached primary boss can still be used to skip resolve throttling.
-    /// /params entityManager Entity manager used to inspect the cached boss.
-    /// /params cachedBossEntity Cached primary boss entity.
-    /// /returns True when the cached boss is still active and has an enabled HUD config.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect the cached boss.</param>
+    /// <param name="cachedBossEntity">Cached primary boss entity.</param>
+    /// <returns>True when the cached boss is still active and has an enabled HUD config.</returns>
     private static bool IsCachedBossValid(EntityManager entityManager, Entity cachedBossEntity)
     {
         if (cachedBossEntity == Entity.Null)
@@ -131,12 +129,12 @@ internal static class EnemyBossHudSnapshotUtility
 
     /// <summary>
     /// Reads HUD config and health data only from active boss entities that should contribute to the aggregate bar.
-    /// /params entityManager Entity manager used to read candidate components.
-    /// /params candidateEntity Entity inspected for active boss HUD data.
-    /// /params hudConfig Resolved HUD config when the candidate is valid.
-    /// /params health Resolved health data when the candidate is valid.
-    /// /returns True when the candidate contributes to the boss HUD aggregate.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read candidate components.</param>
+    /// <param name="candidateEntity">Entity inspected for active boss HUD data.</param>
+    /// <param name="hudConfig">Resolved HUD config when the candidate is valid.</param>
+    /// <param name="health">Resolved health data when the candidate is valid.</param>
+    /// <returns>True when the candidate contributes to the boss HUD aggregate.</returns>
     private static bool TryReadActiveBossHudData(EntityManager entityManager,
                                                  Entity candidateEntity,
                                                  out EnemyBossHudConfig hudConfig,

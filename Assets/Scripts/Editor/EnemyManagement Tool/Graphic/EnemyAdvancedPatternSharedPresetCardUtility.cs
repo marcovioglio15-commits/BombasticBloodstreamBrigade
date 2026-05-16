@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Provides shared visual helpers for shared Modules and Patterns preset card lists.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetCardUtility
 {
@@ -18,9 +16,9 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
     #region Public Methods
     /// <summary>
     /// Creates one horizontal row used by filters or section actions.
-    /// /params alignToBottom True when children should align to their bottom edge.
-    /// /returns Created row element.
     /// </summary>
+    /// <param name="alignToBottom">True when children should align to their bottom edge.</param>
+    /// <returns>Created row element.</returns>
     public static VisualElement CreateHorizontalRow(bool alignToBottom)
     {
         VisualElement row = new VisualElement();
@@ -33,9 +31,8 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one italic count label used below filter and action rows.
-    /// /params None.
-    /// /returns Created count label.
     /// </summary>
+    /// <returns>Created count label.</returns>
     public static Label CreateCountLabel()
     {
         Label countLabel = new Label();
@@ -46,9 +43,9 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one italic status label used for empty or unavailable list states.
-    /// /params text Visible status text.
-    /// /returns Created status label.
     /// </summary>
+    /// <param name="text">Visible status text.</param>
+    /// <returns>Created status label.</returns>
     public static Label CreateStatusLabel(string text)
     {
         Label statusLabel = new Label(text);
@@ -58,9 +55,8 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one scroll view used by card collections.
-    /// /params None.
-    /// /returns Created scroll view.
     /// </summary>
+    /// <returns>Created scroll view.</returns>
     public static ScrollView CreateCardsScrollView()
     {
         ScrollView cardsContainer = new ScrollView();
@@ -72,9 +68,8 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one styled card container used by module and pattern entries.
-    /// /params None.
-    /// /returns Created card container.
     /// </summary>
+    /// <returns>Created card container.</returns>
     public static VisualElement CreateCardContainer()
     {
         VisualElement card = new VisualElement();
@@ -97,9 +92,8 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one card-local actions row indented below the foldout header.
-    /// /params None.
-    /// /returns Created actions row.
     /// </summary>
+    /// <returns>Created actions row.</returns>
     public static VisualElement CreateCardActionsRow()
     {
         VisualElement actionsRow = new VisualElement();
@@ -113,12 +107,12 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one action button with optional left margin.
-    /// /params buttonText Visible button label.
-    /// /params tooltip Tooltip shown on the button.
-    /// /params onClick Click callback.
-    /// /params leftMargin Left margin applied after creation.
-    /// /returns Created button.
     /// </summary>
+    /// <param name="buttonText">Visible button label.</param>
+    /// <param name="tooltip">Tooltip shown on the button.</param>
+    /// <param name="onClick">Click callback.</param>
+    /// <param name="leftMargin">Left margin applied after creation.</param>
+    /// <returns>Created button.</returns>
     public static Button CreateActionButton(string buttonText,
                                             string tooltip,
                                             Action onClick,
@@ -136,12 +130,12 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one delayed text field used by shared preset filters.
-    /// /params label Visible field label.
-    /// /params tooltip Tooltip shown on the field.
-    /// /params value Current field value.
-    /// /params rightMargin Right margin applied after creation.
-    /// /returns Created filter field.
     /// </summary>
+    /// <param name="label">Visible field label.</param>
+    /// <param name="tooltip">Tooltip shown on the field.</param>
+    /// <param name="value">Current field value.</param>
+    /// <param name="rightMargin">Right margin applied after creation.</param>
+    /// <returns>Created filter field.</returns>
     public static TextField CreateDelayedFilterField(string label,
                                                      string tooltip,
                                                      string value,
@@ -161,10 +155,10 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one lightweight subsection header label.
-    /// /params title Visible label text.
-    /// /params tooltip Tooltip shown on the subsection label.
-    /// /returns Created label.
     /// </summary>
+    /// <param name="title">Visible label text.</param>
+    /// <param name="tooltip">Tooltip shown on the subsection label.</param>
+    /// <returns>Created label.</returns>
     public static Label CreateSubSectionHeader(string title, string tooltip)
     {
         Label header = new Label(title);
@@ -177,9 +171,9 @@ internal static class EnemyAdvancedPatternSharedPresetCardUtility
 
     /// <summary>
     /// Creates one subdued description label for section guidance without using helper boxes.
-    /// /params text Visible description text.
-    /// /returns Created description label.
     /// </summary>
+    /// <param name="text">Visible description text.</param>
+    /// <returns>Created description label.</returns>
     public static Label CreateDescriptionLabel(string text)
     {
         Label descriptionLabel = new Label(text);

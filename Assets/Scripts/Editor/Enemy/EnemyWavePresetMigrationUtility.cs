@@ -5,7 +5,6 @@ using UnityEngine;
 /// <summary>
 /// Migrates legacy inline enemy-spawner wave data into dedicated EnemyWavePreset assets.
 /// None.
-/// returns None.
 /// </summary>
 public static class EnemyWavePresetMigrationUtility
 {
@@ -15,7 +14,6 @@ public static class EnemyWavePresetMigrationUtility
     /// <summary>
     /// Migrates every prefab-based EnemySpawnerAuthoring that still uses inline serialized waves and has no assigned preset.
     /// None.
-    /// returns None.
     /// </summary>
     //[MenuItem("Tools/NashCore/Enemy/Migrate Enemy Wave Presets")]
     public static void MigrateAllMissingWavePresets()
@@ -74,7 +72,6 @@ public static class EnemyWavePresetMigrationUtility
     /// <summary>
     /// Batch entry point used by command-line Unity automation.
     /// None.
-    /// returns None.
     /// </summary>
     public static void ExecuteBatchMigration()
     {
@@ -85,9 +82,9 @@ public static class EnemyWavePresetMigrationUtility
     #region Helpers
     /// <summary>
     /// Resolves a unique preset asset path inside the canonical wave-preset folder.
-    /// prefabPath: Source spawner prefab path.
-    /// returns Unique asset path where the migrated EnemyWavePreset should be saved.
     /// </summary>
+    /// <param name="prefabPath">Source spawner prefab path.</param>
+    /// <returns>Unique asset path where the migrated EnemyWavePreset should be saved.</returns>
     private static string ResolvePresetAssetPath(string prefabPath)
     {
         string prefabName = Path.GetFileNameWithoutExtension(prefabPath);

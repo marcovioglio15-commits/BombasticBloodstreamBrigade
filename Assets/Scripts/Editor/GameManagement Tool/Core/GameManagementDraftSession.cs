@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Tracks Game Management Tool draft edits, staged deletes, apply/rename operations and discard restoration.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameManagementDraftSession
 {
@@ -47,8 +45,6 @@ public static class GameManagementDraftSession
     #region Public Methods
     /// <summary>
     /// Captures the current editable asset baseline for the tool session.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void BeginSession()
     {
@@ -61,8 +57,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Clears all draft session state when the tool closes without pending changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void EndSession()
     {
@@ -74,9 +68,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Stages one asset for deletion on Apply while hiding it from tool lists.
-    /// /params asset Asset object to stage.
-    /// /returns None.
     /// </summary>
+    /// <param name="asset">Asset object to stage.</param>
     public static void StageDeleteAsset(UnityEngine.Object asset)
     {
         if (asset == null)
@@ -93,9 +86,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Checks whether an asset is currently staged for deletion.
-    /// /params asset Asset object to inspect.
-    /// /returns True when the asset path is staged.
     /// </summary>
+    /// <param name="asset">Asset object to inspect.</param>
+    /// <returns>True when the asset path is staged.</returns>
     public static bool IsAssetStagedForDeletion(UnityEngine.Object asset)
     {
         if (asset == null)
@@ -111,8 +104,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Performs one Unity Undo step and refreshes the pending-change flag.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void PerformUndo()
     {
@@ -122,8 +113,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Performs one Unity Redo step and refreshes the pending-change flag.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void PerformRedo()
     {
@@ -133,8 +122,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Marks the session dirty after a tool-side asset mutation.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void MarkDirty()
     {
@@ -143,8 +130,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Rebuilds the current state snapshot and compares it against the captured baseline.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void RecomputePendingChanges()
     {
@@ -190,8 +175,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Applies staged deletes, asset renames and saves the accepted baseline.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void Apply()
     {
@@ -206,8 +189,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Restores baseline JSON and removes newly created game assets from the draft session.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void Discard()
     {
@@ -225,9 +206,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Normalizes text into a file-safe asset name.
-    /// /params rawName Raw user-authored name.
-    /// /returns Safe filename text.
     /// </summary>
+    /// <param name="rawName">Raw user-authored name.</param>
+    /// <returns>Safe filename text.</returns>
     public static string NormalizeAssetName(string rawName)
     {
         return GameManagementAssetUtility.NormalizeAssetName(rawName);
@@ -237,8 +218,6 @@ public static class GameManagementDraftSession
     #region Session Helpers
     /// <summary>
     /// Captures the current tracked state as the clean draft baseline.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void CaptureBaseline()
     {
@@ -251,9 +230,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Builds a path-to-json dictionary for all tracked Game Management assets and authoring prefabs.
-    /// /params None.
-    /// /returns Current serialized state dictionary.
     /// </summary>
+    /// <returns>Current serialized state dictionary.</returns>
     private static Dictionary<string, string> BuildStateDictionary()
     {
         Dictionary<string, string> stateByPath = new Dictionary<string, string>();
@@ -279,9 +257,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Collects all assets that must participate in apply/discard tracking.
-    /// /params None.
-    /// /returns Sorted list of tracked asset paths.
     /// </summary>
+    /// <returns>Sorted list of tracked asset paths.</returns>
     private static List<string> CollectTrackedAssetPaths()
     {
         HashSet<string> uniquePaths = new HashSet<string>();
@@ -301,10 +278,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Adds all assets of one Unity type below a search root.
-    /// /params uniquePaths Output set receiving project-relative paths.
-    /// /params searchRoot Search folder.
-    /// /returns None.
     /// </summary>
+    /// <param name="uniquePaths">Output set receiving project-relative paths.</param>
+    /// <param name="searchRoot">Search folder.</param>
     private static void AddAssetPathsOfType<TAsset>(HashSet<string> uniquePaths, string searchRoot) where TAsset : UnityEngine.Object
     {
         if (string.IsNullOrWhiteSpace(searchRoot))
@@ -328,8 +304,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Creates the default Game Management asset roots and libraries before baseline tracking starts.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureTrackedDefaults()
     {
@@ -341,9 +315,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Adds prefab assets that contain a GameAudioManagerAuthoring component.
-    /// /params uniquePaths Output set receiving project-relative paths.
-    /// /returns None.
     /// </summary>
+    /// <param name="uniquePaths">Output set receiving project-relative paths.</param>
     private static void AddAudioManagerPrefabPaths(HashSet<string> uniquePaths)
     {
         AddPrefabPathsWithComponent<GameAudioManagerAuthoring>(uniquePaths);
@@ -351,9 +324,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Adds prefab assets that contain a GameSceneManagerAuthoring component.
-    /// /params uniquePaths Output set receiving project-relative paths.
-    /// /returns None.
     /// </summary>
+    /// <param name="uniquePaths">Output set receiving project-relative paths.</param>
     private static void AddSceneManagerPrefabPaths(HashSet<string> uniquePaths)
     {
         AddPrefabPathsWithComponent<GameSceneManagerAuthoring>(uniquePaths);
@@ -361,9 +333,8 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Adds prefab assets that contain one component type to the tracked path set.
-    /// /params uniquePaths Output set receiving project-relative paths.
-    /// /returns None.
     /// </summary>
+    /// <param name="uniquePaths">Output set receiving project-relative paths.</param>
     private static void AddPrefabPathsWithComponent<TComponent>(HashSet<string> uniquePaths) where TComponent : Component
     {
         List<GameObject> prefabs = ManagementToolPrefabUtility.FindPrefabsWithComponentInHierarchy<TComponent>(new string[] { TrackedProjectRoot });
@@ -386,8 +357,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Restores all baseline assets through Unity JSON overwrite.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void RestoreBaselineAssets()
     {
@@ -405,8 +374,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Deletes newly created Game ScriptableObject assets that were not part of the baseline.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void DeleteAssetsCreatedAfterBaseline()
     {
@@ -428,8 +395,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Deletes assets that were staged and no longer referenced by libraries.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void ExecuteStagedDeletions()
     {
@@ -451,8 +416,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Renames preset assets according to their serialized presetName fields during Apply.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void ExecuteRenames()
     {
@@ -476,9 +439,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Checks whether an asset should be filename-synchronized on Apply.
-    /// /params assetObject Candidate asset object.
-    /// /returns True for Game Management preset asset types.
     /// </summary>
+    /// <param name="assetObject">Candidate asset object.</param>
+    /// <returns>True for Game Management preset asset types.</returns>
     private static bool IsRenamablePresetAsset(UnityEngine.Object assetObject)
     {
         return assetObject is GameMasterPreset ||
@@ -488,10 +451,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Applies one asset rename when the serialized preset name differs from the current filename.
-    /// /params assetObject Preset asset being renamed.
-    /// /params assetPath Current asset path.
-    /// /returns None.
     /// </summary>
+    /// <param name="assetObject">Preset asset being renamed.</param>
+    /// <param name="assetPath">Current asset path.</param>
     private static void RenamePresetAssetIfNeeded(UnityEngine.Object assetObject, string assetPath)
     {
         string currentFileName = Path.GetFileNameWithoutExtension(assetPath);
@@ -534,9 +496,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Resolves the requested filename from presetName, falling back to asset object name.
-    /// /params assetObject Preset asset being inspected.
-    /// /returns Normalized requested filename.
     /// </summary>
+    /// <param name="assetObject">Preset asset being inspected.</param>
+    /// <returns>Normalized requested filename.</returns>
     private static string ResolveRequestedPresetFileName(UnityEngine.Object assetObject)
     {
         SerializedObject serializedObject = new SerializedObject(assetObject);
@@ -556,10 +518,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Synchronizes asset object name and serialized presetName after an Apply rename.
-    /// /params assetObject Preset asset to synchronize.
-    /// /params fileName Filename without extension.
-    /// /returns None.
     /// </summary>
+    /// <param name="assetObject">Preset asset to synchronize.</param>
+    /// <param name="fileName">Filename without extension.</param>
     private static void SyncPresetAssetNameToFileName(UnityEngine.Object assetObject, string fileName)
     {
         if (assetObject == null || string.IsNullOrWhiteSpace(fileName))
@@ -581,8 +542,6 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Removes staged deletes that became referenced again by a library.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void SyncStagedDeletePaths()
     {
@@ -602,9 +561,9 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Checks whether one asset path is still referenced by a Game Management library.
-    /// /params assetPath Project-relative asset path.
-    /// /returns True when the path is referenced.
     /// </summary>
+    /// <param name="assetPath">Project-relative asset path.</param>
+    /// <returns>True when the path is referenced.</returns>
     private static bool IsPathReferencedByLibraries(string assetPath)
     {
         if (string.IsNullOrWhiteSpace(assetPath))
@@ -626,10 +585,10 @@ public static class GameManagementDraftSession
 
     /// <summary>
     /// Checks whether a typed library list contains an asset at one path.
-    /// /params presets Preset list to inspect.
-    /// /params assetPath Project-relative asset path.
-    /// /returns True when any listed preset resolves to the path.
     /// </summary>
+    /// <param name="presets">Preset list to inspect.</param>
+    /// <param name="assetPath">Project-relative asset path.</param>
+    /// <returns>True when any listed preset resolves to the path.</returns>
     private static bool LibraryContainsPath<TAsset>(IReadOnlyList<TAsset> presets, string assetPath) where TAsset : UnityEngine.Object
     {
         for (int index = 0; index < presets.Count; index++)

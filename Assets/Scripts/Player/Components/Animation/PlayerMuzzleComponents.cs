@@ -5,7 +5,6 @@ using Unity.Mathematics;
 /// Stores the current animated muzzle pose plus a root-local offset that can be reconstructed against the latest ECS player transform.
 /// Used by gameplay systems that need projectile origins aligned with animated weapon motion without inheriting stale world-space drift.
 /// None.
-/// returns None.
 /// </summary>
 public struct PlayerAnimatedMuzzleWorldPose : IComponentData
 {

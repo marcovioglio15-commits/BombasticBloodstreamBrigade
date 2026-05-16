@@ -1,7 +1,5 @@
 /// <summary>
 /// Immutable editor/runtime descriptor used to seed audio manager presets with every supported gameplay event.
-/// /params None.
-/// /returns None.
 /// </summary>
 public readonly struct GameAudioDefaultEventDefinition
 {
@@ -15,12 +13,11 @@ public readonly struct GameAudioDefaultEventDefinition
     #region Constructors
     /// <summary>
     /// Creates one default audio event descriptor.
-    /// /params eventId Stable gameplay event identifier.
-    /// /params eventCode Production-facing event code shown in the tool.
-    /// /params displayName Human-readable section label.
-    /// /params description Short explanation of when this event is requested.
-    /// /returns None.
     /// </summary>
+    /// <param name="eventId">Stable gameplay event identifier.</param>
+    /// <param name="eventCode">Production-facing event code shown in the tool.</param>
+    /// <param name="displayName">Human-readable section label.</param>
+    /// <param name="description">Short explanation of when this event is requested.</param>
     public GameAudioDefaultEventDefinition(GameAudioEventId eventId,
                                            string eventCode,
                                            string displayName,
@@ -36,8 +33,6 @@ public readonly struct GameAudioDefaultEventDefinition
 
 /// <summary>
 /// Central catalog of audio events that must exist in every GameAudioManagerPreset.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameAudioDefaultEventDefinitions
 {
@@ -160,10 +155,10 @@ public static class GameAudioDefaultEventDefinitions
     #region Methods
     /// <summary>
     /// Resolves one default event descriptor by stable event identifier.
-    /// /params eventId Identifier to search.
-    /// /params definition Output descriptor when found.
-    /// /returns True when a matching descriptor exists.
     /// </summary>
+    /// <param name="eventId">Identifier to search.</param>
+    /// <param name="definition">Output descriptor when found.</param>
+    /// <returns>True when a matching descriptor exists.</returns>
     public static bool TryGetDefinition(GameAudioEventId eventId, out GameAudioDefaultEventDefinition definition)
     {
         for (int index = 0; index < definitions.Length; index++)

@@ -91,7 +91,7 @@ public partial struct PlayerLookMultiplierSystem : ISystem
     /// <param name="angle">Angle used to determine which multipliers to sample.</param>
     /// <param name="offset">Offset applied to the angle before sampling.</param>
     /// <param name="sampling">Sampling mode that determines how the value is selected or interpolated.</param>
-    /// <returns>The sampled multiplier value based on the input parameters.<returns>
+    /// <returns>The sampled multiplier value based on the input parameters.</returns>
     private static float SampleDiscrete(ref BlobArray<float> multipliers, int count, float angle, float offset, LookMultiplierSampling sampling)
     {
         if (multipliers.Length == 0 || count <= 0)

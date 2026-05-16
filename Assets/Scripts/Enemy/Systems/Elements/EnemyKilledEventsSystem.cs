@@ -89,7 +89,7 @@ public partial struct EnemyKilledEventsSystem : ISystem
     /// </summary>
     /// <param name="enemyPosition">Enemy transform position sampled before pooled finalize-despawn.</param>
     /// <param name="bodyRadius">Enemy body radius used to add a small upward safety offset.</param>
-    /// <returns>Adjusted kill-event world position with vertical lift to avoid floor clipping.<returns>
+    /// <returns>Adjusted kill-event world position with vertical lift to avoid floor clipping.</returns>
     private static float3 ResolveKilledEventPosition(float3 enemyPosition, float bodyRadius)
     {
         float3 resolvedPosition = enemyPosition;
@@ -107,7 +107,7 @@ public partial struct EnemyKilledEventsSystem : ISystem
     /// <param name="rewardMultiplierLookup">Lookup used to read optional special reward multipliers.</param>
     /// <param name="extraComboPointsModuleLookup">Lookup used to read Extra Combo Points module buffers.</param>
     /// <param name="extraComboPointsConditionLookup">Lookup used to read Extra Combo Points condition buffers.</param>
-    /// <returns>Resolved combo-points multiplier granted by the kill.<returns>
+    /// <returns>Resolved combo-points multiplier granted by the kill.</returns>
     private static float ResolveComboPointMultiplier(Entity enemyEntity,
                                                      in ComponentLookup<EnemyRuntimeState> runtimeStateLookup,
                                                      in ComponentLookup<EnemyDropItemsConfig> dropItemsConfigLookup,

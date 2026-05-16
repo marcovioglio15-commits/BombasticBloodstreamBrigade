@@ -14,8 +14,6 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
     #region Nested Types
     /// <summary>
     /// Declares the UI context in which one module binding is currently being edited.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private enum BindingPresentationContext
     {
@@ -34,7 +32,7 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
     /// Creates the binding editor UI with module resolution and optional override payload.
     /// </summary>
     /// <param name="property">Serialized module binding property.</param>
-    /// <returns>Returns the built root visual element.<returns>
+    /// <returns>Returns the built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -222,11 +220,10 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Updates the warning help box shown below the module popup.
-    /// /params moduleWarningBox Warning help box.
-    /// /params selectedModuleId Currently authored module ID.
-    /// /params moduleResolved True when the selected module can be resolved.
-    /// /returns None.
     /// </summary>
+    /// <param name="moduleWarningBox">Warning help box.</param>
+    /// <param name="selectedModuleId">Currently authored module ID.</param>
+    /// <param name="moduleResolved">True when the selected module can be resolved.</param>
     private static void UpdateModuleWarningBox(HelpBox moduleWarningBox,
                                                string selectedModuleId,
                                                bool moduleResolved)
@@ -293,10 +290,10 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Builds the popup choices while preserving one currently invalid or empty authored module ID.
-    /// /params bindingProperty Serialized binding property used to resolve available module IDs.
-    /// /params currentModuleId Currently authored module ID.
-    /// /returns Ordered popup choices.
     /// </summary>
+    /// <param name="bindingProperty">Serialized binding property used to resolve available module IDs.</param>
+    /// <param name="currentModuleId">Currently authored module ID.</param>
+    /// <returns>Ordered popup choices.</returns>
     private static List<string> BuildModulePopupOptions(SerializedProperty bindingProperty, string currentModuleId)
     {
         List<string> moduleOptions = EnemyAdvancedPatternDrawerUtility.BuildModuleIdOptions(bindingProperty);
@@ -316,10 +313,10 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Returns whether one popup options list already contains the requested module ID.
-    /// /params moduleOptions Candidate popup options.
-    /// /params moduleId Module ID to search.
-    /// /returns True when the value already exists.
     /// </summary>
+    /// <param name="moduleOptions">Candidate popup options.</param>
+    /// <param name="moduleId">Module ID to search.</param>
+    /// <returns>True when the value already exists.</returns>
     private static bool ContainsOption(List<string> moduleOptions, string moduleId)
     {
         if (moduleOptions == null)
@@ -339,9 +336,9 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
     /// <summary>
     /// Resolves whether the internal module-binding enabled toggle should be shown in the current presentation context.
     /// Shared assemblies use their own category enable state, so the binding-level toggle is hidden there.
-    /// /params presentationContext Resolved binding presentation context.
-    /// /returns True when the binding enabled toggle should remain visible.
     /// </summary>
+    /// <param name="presentationContext">Resolved binding presentation context.</param>
+    /// <returns>True when the binding enabled toggle should remain visible.</returns>
     private static bool ShouldShowBindingEnabledToggle(BindingPresentationContext presentationContext)
     {
         return presentationContext == BindingPresentationContext.Generic;
@@ -349,9 +346,9 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves the current binding presentation context from the serialized property path.
-    /// /params property Serialized binding property currently being drawn.
-    /// /returns The resolved binding presentation context.
     /// </summary>
+    /// <param name="property">Serialized binding property currently being drawn.</param>
+    /// <returns>The resolved binding presentation context.</returns>
     private static BindingPresentationContext ResolvePresentationContext(SerializedProperty property)
     {
         if (property == null)
@@ -379,11 +376,10 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Updates the visibility of the override-payload header and content container.
-    /// /params payloadHeader Header label displayed above the payload editor.
-    /// /params overridePayloadContainer Container that hosts the payload editor.
-    /// /params isVisible True when both elements should be shown.
-    /// /returns None.
     /// </summary>
+    /// <param name="payloadHeader">Header label displayed above the payload editor.</param>
+    /// <param name="overridePayloadContainer">Container that hosts the payload editor.</param>
+    /// <param name="isVisible">True when both elements should be shown.</param>
     private static void SetPayloadVisibility(Label payloadHeader,
                                              VisualElement overridePayloadContainer,
                                              bool isVisible)

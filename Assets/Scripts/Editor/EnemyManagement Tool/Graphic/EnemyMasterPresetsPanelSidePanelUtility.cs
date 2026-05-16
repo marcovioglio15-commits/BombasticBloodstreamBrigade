@@ -88,7 +88,7 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     /// Resolves the visible title for one panel type.
     /// </summary>
     /// <param name="panelType">Panel type to resolve.</param>
-    /// <returns>Returns the display title used by tab headers.<returns>
+    /// <returns>Returns the display title used by tab headers.</returns>
     public static string GetPanelTitle(EnemyManagementWindow.PanelType panelType)
     {
         if (panelType == EnemyManagementWindow.PanelType.EnemyBrainPresets)
@@ -160,7 +160,7 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     /// <param name="panelType">Panel type to build.</param>
     /// <param name="brainPanel">Resolved brain panel controller when built.</param>
     /// <param name="advancedPatternPanel">Resolved advanced pattern panel controller when built.</param>
-    /// <returns>Returns the panel root shown in the content host.<returns>
+    /// <returns>Returns the panel root shown in the content host.</returns>
     public static VisualElement BuildSidePanelContent(EnemyMasterPresetsPanel panel,
                                                       EnemyManagementWindow.PanelType panelType,
                                                       out EnemyBrainPresetsPanel brainPanel,

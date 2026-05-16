@@ -2,8 +2,6 @@ using Unity.Entities;
 
 /// <summary>
 /// Removes transient gameplay entities that are created at runtime and therefore are not owned by scene streaming.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
 {
@@ -12,9 +10,8 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     #region Public Methods
     /// <summary>
     /// Destroys runtime-only gameplay entities after the old gameplay scene has been unloaded and before the new run loads.
-    /// /params entityManager Default world entity manager.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
     public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
     {
         PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
@@ -38,9 +35,8 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     #region Helpers
     /// <summary>
     /// Destroys every entity with a runtime marker component, excluding prefab entities.
-    /// /params entityManager Entity manager used for destruction.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for destruction.</param>
     private static void DestroyNonPrefabEntitiesWith<TComponent>(EntityManager entityManager)
         where TComponent : unmanaged, IComponentData
     {
@@ -62,9 +58,8 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
 
     /// <summary>
     /// Destroys every runtime singleton or pool entity with the provided component.
-    /// /params entityManager Entity manager used for destruction.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for destruction.</param>
     private static void DestroyEntitiesWith<TComponent>(EntityManager entityManager)
         where TComponent : unmanaged, IComponentData
     {
@@ -81,10 +76,9 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
 
     /// <summary>
     /// Executes and disposes one cleanup query.
-    /// /params entityManager Entity manager used for destruction.
-    /// /params query Query selecting cleanup candidates.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for destruction.</param>
+    /// <param name="query">Query selecting cleanup candidates.</param>
     private static void DestroyQuery(EntityManager entityManager, EntityQuery query)
     {
         try

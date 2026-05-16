@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one sampled point used by the managed Elemental Trail ribbon mesh.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerElementalTrailRibbonPoint
 {
@@ -15,8 +13,6 @@ internal struct PlayerElementalTrailRibbonPoint
 
 /// <summary>
 /// Stores visual settings read from the authored TrailRenderer prefab template.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerElementalTrailRibbonTemplate
 {
@@ -33,8 +29,6 @@ internal struct PlayerElementalTrailRibbonTemplate
 
 /// <summary>
 /// Holds managed objects and reusable buffers for one player-owned Elemental Trail ribbon mesh.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerElementalTrailRibbonInstance
 {

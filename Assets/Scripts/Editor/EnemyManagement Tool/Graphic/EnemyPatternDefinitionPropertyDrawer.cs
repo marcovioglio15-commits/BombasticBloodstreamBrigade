@@ -14,9 +14,9 @@ public sealed class EnemyPatternDefinitionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Creates the assembled-pattern editor UI with delayed text input so section refreshes happen only after commit.
-    /// property: Serialized assembled pattern property.
-    /// returns Built root visual element.
     /// </summary>
+    /// <param name="property">Serialized assembled pattern property.</param>
+    /// <returns>Built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -60,13 +60,12 @@ public sealed class EnemyPatternDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Adds one delayed bound text field so serialized changes are committed only when editing is confirmed.
-    /// parent: Parent visual element that receives the field.
-    /// property: Serialized string property bound to the field.
-    /// label: UI label shown above the field.
-    /// tooltip: Tooltip shown on the field.
-    /// multiline: True when the field should accept multiline input.
-    /// returns None.
     /// </summary>
+    /// <param name="parent">Parent visual element that receives the field.</param>
+    /// <param name="property">Serialized string property bound to the field.</param>
+    /// <param name="label">UI label shown above the field.</param>
+    /// <param name="tooltip">Tooltip shown on the field.</param>
+    /// <param name="multiline">True when the field should accept multiline input.</param>
     private static void AddDelayedTextField(VisualElement parent,
                                             SerializedProperty property,
                                             string label,

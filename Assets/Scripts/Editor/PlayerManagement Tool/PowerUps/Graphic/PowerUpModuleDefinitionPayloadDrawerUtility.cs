@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds module payload forms that are primarily field-driven and delegates chart-heavy payloads to visualization utilities.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PowerUpModuleDefinitionPayloadDrawerUtility
 {
@@ -26,12 +24,11 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     #region Public Methods
     /// <summary>
     /// Builds the payload editor for the provided module kind.
-    /// payloadContainer Container that will host the payload controls.
-    /// payloadProperty Serialized payload property to edit.
-    /// moduleKind Module kind that selects the UI variant.
-    /// payloadLabel Optional label used by the generic payload fallback.
-    /// returns void
     /// </summary>
+    /// <param name="payloadContainer">Container that will host the payload controls.</param>
+    /// <param name="payloadProperty">Serialized payload property to edit.</param>
+    /// <param name="moduleKind">Module kind that selects the UI variant.</param>
+    /// <param name="payloadLabel">Optional label used by the generic payload fallback.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
@@ -85,11 +82,11 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
     /// <summary>
     /// Creates a serialized field using the shared scaling-aware element factory.
-    /// parent Parent visual element that receives the field.
-    /// property Serialized property to draw.
-    /// label Visible label for the created field.
-    /// returns Created field root, or null when the input is invalid.
     /// </summary>
+    /// <param name="parent">Parent visual element that receives the field.</param>
+    /// <param name="property">Serialized property to draw.</param>
+    /// <param name="label">Visible label for the created field.</param>
+    /// <returns>Created field root, or null when the input is invalid.</returns>
     public static VisualElement AddField(VisualElement parent, SerializedProperty property, string label)
     {
         if (parent == null)
@@ -1464,11 +1461,10 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
     /// <summary>
     /// Registers one warning refresh callback for every provided Laser Beam payload property.
-    /// payloadContainer Container used to observe serialized-property edits.
-    /// refreshWarnings Callback that recomputes the current warning text.
-    /// watchedProperties Properties that should trigger a warning refresh when edited.
-    /// returns void
     /// </summary>
+    /// <param name="payloadContainer">Container used to observe serialized-property edits.</param>
+    /// <param name="refreshWarnings">Callback that recomputes the current warning text.</param>
+    /// <param name="watchedProperties">Properties that should trigger a warning refresh when edited.</param>
     private static void RegisterLaserBeamWarningRefresh(VisualElement payloadContainer,
                                                         Action refreshWarnings,
                                                         params SerializedProperty[] watchedProperties)
@@ -1507,12 +1503,11 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
     /// <summary>
     /// Refreshes Character Tuning helper UI only when the local formulas payload changes, avoiding global serialized-object watchers on reorderable cards.
-    /// payloadContainer Parent element that receives bubbled serialized change events.
-    /// serializedObject Serialized object that owns the formulas payload.
-    /// formulasPropertyPath Property path of the formulas array to re-resolve after local edits.
-    /// refreshUi Callback that rebinds helper text and warnings after a local formulas edit.
-    /// returns void
     /// </summary>
+    /// <param name="payloadContainer">Parent element that receives bubbled serialized change events.</param>
+    /// <param name="serializedObject">Serialized object that owns the formulas payload.</param>
+    /// <param name="formulasPropertyPath">Property path of the formulas array to re-resolve after local edits.</param>
+    /// <param name="refreshUi">Callback that rebinds helper text and warnings after a local formulas edit.</param>
     private static void RegisterCharacterTuningFormulaRefresh(VisualElement payloadContainer,
                                                               SerializedObject serializedObject,
                                                               string formulasPropertyPath,

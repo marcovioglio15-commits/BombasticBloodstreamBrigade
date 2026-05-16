@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// UI Toolkit drawer that shows loading-progress options only when the parent toggle makes them useful.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(GameSceneLoadingProgressSettings))]
 public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDrawer
@@ -15,9 +13,9 @@ public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDra
     #region UI
     /// <summary>
     /// Builds the Scene Manager loading-progress settings editor UI.
-    /// /params property Serialized GameSceneLoadingProgressSettings property.
-    /// /returns Configured loading-progress settings visual tree.
     /// </summary>
+    /// <param name="property">Serialized GameSceneLoadingProgressSettings property.</param>
+    /// <returns>Configured loading-progress settings visual tree.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -50,9 +48,9 @@ public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDra
     #region Private Methods
     /// <summary>
     /// Builds settings that are only relevant while the loading-progress indicator is enabled.
-    /// /params property Serialized loading-progress settings property.
-    /// /returns Container with enabled-state-dependent fields.
     /// </summary>
+    /// <param name="property">Serialized loading-progress settings property.</param>
+    /// <returns>Container with enabled-state-dependent fields.</returns>
     private static VisualElement BuildProgressOptions(SerializedProperty property)
     {
         VisualElement container = new VisualElement();
@@ -70,9 +68,9 @@ public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDra
 
     /// <summary>
     /// Builds status-text fields that are only relevant while status text is enabled.
-    /// /params property Serialized loading-progress settings property.
-    /// /returns Container with status-text fields.
     /// </summary>
+    /// <param name="property">Serialized loading-progress settings property.</param>
+    /// <returns>Container with status-text fields.</returns>
     private static VisualElement BuildStatusOptions(SerializedProperty property)
     {
         VisualElement container = new VisualElement();
@@ -85,12 +83,12 @@ public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDra
 
     /// <summary>
     /// Adds one relative property field with an explicit tooltip.
-    /// /params root Parent visual element.
-    /// /params parentProperty Serialized loading-progress settings property.
-    /// /params propertyName Relative property name.
-    /// /params tooltip Field tooltip.
-    /// /returns Created property field, or null when the property is missing.
     /// </summary>
+    /// <param name="root">Parent visual element.</param>
+    /// <param name="parentProperty">Serialized loading-progress settings property.</param>
+    /// <param name="propertyName">Relative property name.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <returns>Created property field, or null when the property is missing.</returns>
     private static PropertyField AddProperty(VisualElement root, SerializedProperty parentProperty, string propertyName, string tooltip)
     {
         SerializedProperty childProperty = parentProperty.FindPropertyRelative(propertyName);
@@ -108,12 +106,11 @@ public sealed class GameSceneLoadingProgressSettingsPropertyDrawer : PropertyDra
 
     /// <summary>
     /// Applies dependent display state for the loading-progress fields.
-    /// /params showProgressProperty Toggle that controls all progress options.
-    /// /params showStatusTextProperty Toggle that controls status text options.
-    /// /params progressOptions Container with progress options.
-    /// /params statusOptions Container with status text options.
-    /// /returns None.
     /// </summary>
+    /// <param name="showProgressProperty">Toggle that controls all progress options.</param>
+    /// <param name="showStatusTextProperty">Toggle that controls status text options.</param>
+    /// <param name="progressOptions">Container with progress options.</param>
+    /// <param name="statusOptions">Container with status text options.</param>
     private static void RefreshVisibility(SerializedProperty showProgressProperty,
                                           SerializedProperty showStatusTextProperty,
                                           VisualElement progressOptions,

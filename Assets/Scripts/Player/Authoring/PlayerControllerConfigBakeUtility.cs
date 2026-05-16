@@ -15,9 +15,9 @@ public static class PlayerControllerConfigBakeUtility
     /// <summary>
     /// Creates the player controller blob from one preset at bake time.
     /// Used by PlayerAuthoringBaker before the blob is attached to the player entity.
-    /// preset: Source controller preset that contains movement, look, camera, shooting and health data.
-    /// returns Persistent blob asset reference ready to be added to the baked entity.
     /// </summary>
+    /// <param name="preset">Source controller preset that contains movement, look, camera, shooting and health data.</param>
+    /// <returns>Persistent blob asset reference ready to be added to the baked entity.</returns>
     public static BlobAssetReference<PlayerControllerConfigBlob> BuildConfigBlob(PlayerControllerPreset preset)
     {
         BlobBuilder builder = new BlobBuilder(Unity.Collections.Allocator.Temp);
@@ -37,9 +37,9 @@ public static class PlayerControllerConfigBakeUtility
     /// <summary>
     /// Builds the world collision layer config resolved from the master preset.
     /// Used during baking so runtime systems do not need to resolve layer names every frame.
-    /// masterPreset: Master preset that may override the default walls layer name.
-    /// returns Runtime-safe world layers config with a resolved walls layer mask.
     /// </summary>
+    /// <param name="masterPreset">Master preset that may override the default walls layer name.</param>
+    /// <returns>Runtime-safe world layers config with a resolved walls layer mask.</returns>
     public static PlayerWorldLayersConfig BuildWorldLayersConfig(PlayerMasterPreset masterPreset)
     {
         string wallsLayerName = ResolveWallsLayerName(masterPreset);
@@ -57,9 +57,9 @@ public static class PlayerControllerConfigBakeUtility
     /// <summary>
     /// Builds the animator parameter hash config from the selected animation bindings preset.
     /// Called by PlayerAuthoringBaker before ECS animation runtime state is added.
-    /// preset: Optional animation bindings preset. Null falls back to default parameter names.
-    /// returns Hash-based animator parameter config used by runtime animator sync systems.
     /// </summary>
+    /// <param name="preset">Optional animation bindings preset. Null falls back to default parameter names.</param>
+    /// <returns>Hash-based animator parameter config used by runtime animator sync systems.</returns>
     public static PlayerAnimatorParameterConfig BuildAnimatorParameterConfig(PlayerAnimationBindingsPreset preset)
     {
         string moveXParameter = preset != null ? preset.MoveXParameter : "MoveX";
@@ -131,9 +131,9 @@ public static class PlayerControllerConfigBakeUtility
     #region Private Methods
     /// <summary>
     /// Resolves the walls layer name configured by the master preset.
-    /// masterPreset: Optional master preset that may override the default walls layer.
-    /// returns Trimmed layer name or the project default when not configured.
     /// </summary>
+    /// <param name="masterPreset">Optional master preset that may override the default walls layer.</param>
+    /// <returns>Trimmed layer name or the project default when not configured.</returns>
     private static string ResolveWallsLayerName(PlayerMasterPreset masterPreset)
     {
         if (masterPreset == null)
@@ -149,9 +149,9 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Resolves a layer name to a bitmask value.
-    /// layerName: Unity layer name to convert.
-    /// returns Bitmask for the resolved layer or zero when the layer does not exist.
     /// </summary>
+    /// <param name="layerName">Unity layer name to convert.</param>
+    /// <returns>Bitmask for the resolved layer or zero when the layer does not exist.</returns>
     private static int ResolveLayerMaskByName(string layerName)
     {
         if (string.IsNullOrWhiteSpace(layerName))
@@ -167,9 +167,9 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Hashes one animator parameter name while also reporting whether the parameter is defined.
-    /// parameterName: Animator parameter name to hash.
-    /// returns Hash of the trimmed parameter name, or zero when the parameter is missing.
     /// </summary>
+    /// <param name="parameterName">Animator parameter name to hash.</param>
+    /// <returns>Hash of the trimmed parameter name, or zero when the parameter is missing.</returns>
     private static int ResolveParameterHash(string parameterName, out byte hasParameter)
     {
         if (string.IsNullOrWhiteSpace(parameterName))
@@ -184,9 +184,8 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Writes movement settings into the controller blob.
-    /// root: Controller blob root being populated.
-    /// returns void.
     /// </summary>
+    /// <param name="root">Controller blob root being populated.</param>
     private static void FillMovementConfig(ref PlayerControllerConfigBlob root, MovementSettings movementSettings)
     {
         int resolvedDiscreteDirectionCount = Mathf.Max(1, movementSettings.DiscreteDirectionCount);
@@ -215,9 +214,8 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Writes look settings and discrete direction multipliers into the controller blob.
-    /// root: Controller blob root being populated.
-    /// returns void.
     /// </summary>
+    /// <param name="root">Controller blob root being populated.</param>
     private static void FillLookConfig(ref PlayerControllerConfigBlob root, LookSettings lookSettings, ref BlobBuilder builder)
     {
         ref LookConfig lookConfig = ref root.Look;
@@ -284,9 +282,8 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Writes camera follow settings into the controller blob.
-    /// root: Controller blob root being populated.
-    /// returns void.
     /// </summary>
+    /// <param name="root">Controller blob root being populated.</param>
     private static void FillCameraConfig(ref PlayerControllerConfigBlob root, CameraSettings cameraSettings)
     {
         CameraConfig cameraConfig = new CameraConfig
@@ -308,9 +305,8 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Writes shooting settings into the controller blob.
-    /// root: Controller blob root being populated.
-    /// returns void.
     /// </summary>
+    /// <param name="root">Controller blob root being populated.</param>
     private static void FillShootingConfig(ref PlayerControllerConfigBlob root, ShootingSettings shootingSettings)
     {
         if (shootingSettings == null)
@@ -332,9 +328,8 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Writes health and shield values into the controller blob.
-    /// root: Controller blob root being populated.
-    /// returns void.
     /// </summary>
+    /// <param name="root">Controller blob root being populated.</param>
     private static void FillHealthStatisticsConfig(ref PlayerControllerConfigBlob root, PlayerHealthStatisticsSettings healthStatistics)
     {
         if (healthStatistics == null)

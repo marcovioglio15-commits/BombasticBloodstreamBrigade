@@ -60,7 +60,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #region Unity Methods
     /// <summary>
     /// Caches serialized property handles when the editor becomes active.
-    /// returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -94,7 +93,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the complete custom inspector layout.
-    /// returns None.
     /// </summary>
     public override void OnInspectorGUI()
     {
@@ -131,7 +129,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws scene overlays for the currently selected painted cell.
-    /// returns None.
     /// </summary>
     private void OnSceneGUI()
     {
@@ -164,7 +161,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #region Inspector Sections
     /// <summary>
     /// Draws the grid configuration section.
-    /// returns None.
     /// </summary>
     private void DrawGridSection()
     {
@@ -178,7 +174,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws pool and lifecycle configuration fields.
-    /// returns None.
     /// </summary>
     private void DrawPoolSection()
     {
@@ -189,7 +184,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws lifecycle-related configuration fields.
-    /// returns None.
     /// </summary>
     private void DrawLifecycleSection()
     {
@@ -199,7 +193,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws spawn-warning settings exposed directly on the spawner authoring component.
-    /// returns None.
     /// </summary>
     private void DrawSpawnWarningSection()
     {
@@ -222,7 +215,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the wave-preset reference field and helper actions used to create or inspect the assigned preset asset.
-    /// returns None.
     /// </summary>
     private void DrawWavePresetSection()
     {
@@ -254,7 +246,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the current paint brush controls.
-    /// returns None.
     /// </summary>
     private void DrawPainterSection()
     {
@@ -288,7 +279,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the authored waves section including grid painters for each wave.
-    /// returns None.
     /// </summary>
     private void DrawWavesSection()
     {
@@ -319,7 +309,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the selected-cell inspector when a painted cell is currently selected.
-    /// returns None.
     /// </summary>
     private void DrawSelectedCellSection()
     {
@@ -411,7 +400,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the debug/gizmo configuration fields.
-    /// returns None.
     /// </summary>
     private void DrawDebugSection()
     {
@@ -425,7 +413,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #region Wave Drawing
     /// <summary>
     /// Draws top-level controls for adding new waves.
-    /// returns None.
     /// </summary>
     private void DrawWaveToolbar()
     {
@@ -446,7 +433,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the zoom control used by the inspector button grid.
-    /// returns None.
     /// </summary>
     private void DrawGridZoomSection()
     {
@@ -465,10 +451,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws one wave foldout and its editable content.
-    /// waveIndex: Index of the wave being drawn.
-    /// waveProperty: Serialized property representing the wave.
-    /// returns None.
     /// </summary>
+    /// <param name="waveIndex">Index of the wave being drawn.</param>
+    /// <param name="waveProperty">Serialized property representing the wave.</param>
     private void DrawWaveElement(int waveIndex, SerializedProperty waveProperty)
     {
         if (waveProperty == null)
@@ -519,9 +504,8 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws a short summary of the current wave composition.
-    /// waveIndex: Index of the wave being summarized.
-    /// returns None.
     /// </summary>
+    /// <param name="waveIndex">Index of the wave being summarized.</param>
     private void DrawWaveSummary(int waveIndex)
     {
         EnemySpawnerAuthoring authoring = target as EnemySpawnerAuthoring;
@@ -542,9 +526,8 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws per-wave action buttons.
-    /// waveIndex: Index of the wave receiving the actions.
-    /// returns None.
     /// </summary>
+    /// <param name="waveIndex">Index of the wave receiving the actions.</param>
     private void DrawWaveActionButtons(int waveIndex)
     {
         EditorGUILayout.BeginHorizontal();
@@ -588,10 +571,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws the paintable button grid for one wave and handles left/right mouse interaction.
-    /// waveIndex: Wave index currently being edited.
-    /// waveProperty: Serialized property representing the wave.
-    /// returns None.
     /// </summary>
+    /// <param name="waveIndex">Wave index currently being edited.</param>
+    /// <param name="waveProperty">Serialized property representing the wave.</param>
     private void DrawWaveGrid(int waveIndex, SerializedProperty waveProperty)
     {
         int gridSizeX = Mathf.Max(1, gridSizeXProperty.intValue);
@@ -628,12 +610,11 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Draws one button cell and handles mouse painting logic.
-    /// cellRect: Screen-space rect of the button.
-    /// waveIndex: Wave index owning the cell.
-    /// coordinate: Grid coordinate represented by the rect.
-    /// cellPropertyByCoordinate: Lookup of existing painted cells for the current wave.
-    /// returns None.
     /// </summary>
+    /// <param name="cellRect">Screen-space rect of the button.</param>
+    /// <param name="waveIndex">Wave index owning the cell.</param>
+    /// <param name="coordinate">Grid coordinate represented by the rect.</param>
+    /// <param name="cellPropertyByCoordinate">Lookup of existing painted cells for the current wave.</param>
     private void DrawGridCellButton(Rect cellRect,
                                     int waveIndex,
                                     Vector2Int coordinate,
@@ -741,9 +722,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #region Local Utility Methods
     /// <summary>
     /// Returns the persisted foldout state of one wave.
-    /// waveIndex: Wave index to inspect.
-    /// returns True when the foldout is expanded, otherwise false.
     /// </summary>
+    /// <param name="waveIndex">Wave index to inspect.</param>
+    /// <returns>True when the foldout is expanded, otherwise false.</returns>
     private bool GetWaveFoldoutState(int waveIndex)
     {
         bool isExpanded;
@@ -756,10 +737,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Stores the foldout state of one wave.
-    /// waveIndex: Wave index to update.
-    /// isExpanded: New foldout state.
-    /// returns None.
     /// </summary>
+    /// <param name="waveIndex">Wave index to update.</param>
+    /// <param name="isExpanded">New foldout state.</param>
     private void SetWaveFoldoutState(int waveIndex, bool isExpanded)
     {
         waveFoldoutState[waveIndex] = isExpanded;
@@ -767,9 +747,8 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Enforces the single-preview rule after toggling a preview checkbox manually.
-    /// previewWaveIndex: Wave index that remains previewed.
-    /// returns None.
     /// </summary>
+    /// <param name="previewWaveIndex">Wave index that remains previewed.</param>
     private void EnforceSinglePreviewWave(int previewWaveIndex)
     {
         EnemySpawnerAuthoringEditorWaveUtility.SetWavePreview(wavePresetSerializedObject,
@@ -780,7 +759,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Refreshes the cached SerializedObject used to edit the currently assigned EnemyWavePreset asset.
-    /// returns None.
     /// </summary>
     private void RefreshWavePresetBinding()
     {
@@ -805,7 +783,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Creates a new EnemyWavePreset asset in the canonical wave-preset folder and assigns it immediately.
-    /// returns None.
     /// </summary>
     private void CreateAndAssignWavePreset()
     {
@@ -831,12 +808,12 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Creates one cached label style used by the grid-button overlays.
-    /// alignment: Text alignment inside the cell overlay rect.
-    /// fontSize: Overlay font size in points.
-    /// fontStyle: Overlay font style.
-    /// textColor: Overlay text color.
-    /// returns Configured GUIStyle instance.
     /// </summary>
+    /// <param name="alignment">Text alignment inside the cell overlay rect.</param>
+    /// <param name="fontSize">Overlay font size in points.</param>
+    /// <param name="fontStyle">Overlay font style.</param>
+    /// <param name="textColor">Overlay text color.</param>
+    /// <returns>Configured GUIStyle instance.</returns>
     private static GUIStyle CreateGridLabelStyle(TextAnchor alignment, int fontSize, FontStyle fontStyle, Color textColor)
     {
         GUIStyle baseStyle = EditorStyles.miniLabel;
@@ -860,7 +837,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Lazily creates the grid overlay styles only when the editor skin is fully ready.
-    /// returns None.
     /// </summary>
     private void EnsureGridLabelStyles()
     {
@@ -883,7 +859,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     /// <summary>
     /// Updates cached grid label styles to stay readable across zoom levels.
-    /// returns None.
     /// </summary>
     private void SyncGridLabelStyles()
     {

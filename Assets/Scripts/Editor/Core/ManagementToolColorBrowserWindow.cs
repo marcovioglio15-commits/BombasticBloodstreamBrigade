@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Displays a stable list-based browser for currently visible management-tool color targets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 {
@@ -28,10 +26,9 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
     #region Public Methods
     /// <summary>
     /// Opens the color browser for one management-tool editor window.
-    /// /params targetToolWindow Tool window whose currently visible recolorable targets should be listed.
-    /// /params targetToolDisplayName Readable tool title shown in the browser header.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetToolWindow">Tool window whose currently visible recolorable targets should be listed.</param>
+    /// <param name="targetToolDisplayName">Readable tool title shown in the browser header.</param>
     public static void Open(EditorWindow targetToolWindow, string targetToolDisplayName)
     {
         ManagementToolColorBrowserWindow window = GetWindow<ManagementToolColorBrowserWindow>(false,
@@ -49,8 +46,6 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
     #region Unity Methods
     /// <summary>
     /// Draws the list browser UI.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnGUI()
     {
@@ -71,8 +66,6 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
     #region Private Methods
     /// <summary>
     /// Refreshes the currently visible entry list from the live management-tool window.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RefreshEntries()
     {
@@ -93,8 +86,6 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Draws the static browser header.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawHeader()
     {
@@ -106,8 +97,6 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Draws the search and refresh controls above the entry list.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawToolbar()
     {
@@ -124,8 +113,6 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Draws the currently visible entry rows.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DrawEntries()
     {
@@ -152,9 +139,8 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Draws one browser row for one recolorable target.
-    /// /params entry Live browser entry being rendered.
-    /// /returns None.
     /// </summary>
+    /// <param name="entry">Live browser entry being rendered.</param>
     private void DrawEntryRow(ManagementToolColorBrowserEntry entry)
     {
         if (entry == null)
@@ -182,9 +168,9 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Returns whether the provided entry matches the current browser filter.
-    /// /params entry Browser entry being tested.
-    /// /returns True when the entry should be displayed.
     /// </summary>
+    /// <param name="entry">Browser entry being tested.</param>
+    /// <returns>True when the entry should be displayed.</returns>
     private bool ShouldDisplayEntry(ManagementToolColorBrowserEntry entry)
     {
         if (entry == null)
@@ -211,9 +197,8 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Opens the dedicated color inspector for the provided browser entry.
-    /// /params entry Browser entry whose target should be edited.
-    /// /returns None.
     /// </summary>
+    /// <param name="entry">Browser entry whose target should be edited.</param>
     private static void OpenEntry(ManagementToolColorBrowserEntry entry)
     {
         if (entry == null)
@@ -235,9 +220,8 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Resets the provided browser entry to its default colors.
-    /// /params entry Browser entry whose persisted state should be removed.
-    /// /returns None.
     /// </summary>
+    /// <param name="entry">Browser entry whose persisted state should be removed.</param>
     private static void ResetEntry(ManagementToolColorBrowserEntry entry)
     {
         if (entry == null)
@@ -254,9 +238,9 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Returns one readable type label for the provided entry.
-    /// /params entry Browser entry being described.
-    /// /returns One readable type label.
     /// </summary>
+    /// <param name="entry">Browser entry being described.</param>
+    /// <returns>One readable type label.</returns>
     private static string ResolveTypeName(ManagementToolColorBrowserEntry entry)
     {
         if (entry == null)
@@ -280,10 +264,10 @@ internal sealed class ManagementToolColorBrowserWindow : EditorWindow
 
     /// <summary>
     /// Sorts browser entries by type and then by display name.
-    /// /params left First entry being compared.
-    /// /params right Second entry being compared.
-    /// /returns Standard comparison result used by List.Sort.
     /// </summary>
+    /// <param name="left">First entry being compared.</param>
+    /// <param name="right">Second entry being compared.</param>
+    /// <returns>Standard comparison result used by List.Sort.</returns>
     private static int CompareEntries(ManagementToolColorBrowserEntry left, ManagementToolColorBrowserEntry right)
     {
         if (left == null && right == null)

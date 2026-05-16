@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes runtime phase handling and path sampling for the short-range dash movement override.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyPatternShortRangeDashUtility
 {
@@ -20,9 +18,9 @@ internal static class EnemyPatternShortRangeDashUtility
     #region Public Methods
     /// <summary>
     /// Returns whether the dash override is currently in its committed dash phase.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns True when the dash is currently executing its committed motion.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>True when the dash is currently executing its committed motion.</returns>
     public static bool IsCommitted(in EnemyPatternRuntimeState patternRuntimeState)
     {
         return patternRuntimeState.ShortRangeDashPhase == EnemyShortRangeDashPhase.Dashing;
@@ -30,9 +28,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Returns whether the dash override is currently aiming or dashing.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns True when the dash owns short-range runtime state.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>True when the dash owns short-range runtime state.</returns>
     public static bool IsActive(in EnemyPatternRuntimeState patternRuntimeState)
     {
         return patternRuntimeState.ShortRangeDashPhase != EnemyShortRangeDashPhase.Idle;
@@ -40,9 +38,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Returns whether the short-range dash is currently in its post-dash recovery cooldown.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns True when the dash cannot start a new aim cycle yet.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>True when the dash cannot start a new aim cycle yet.</returns>
     public static bool IsCoolingDown(in EnemyPatternRuntimeState patternRuntimeState)
     {
         return patternRuntimeState.ShortRangeDashCooldownRemaining > 0f;
@@ -50,9 +48,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Returns whether the short-range dash can currently take over movement or continue an already-started dash phase.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns True when the dash override is allowed to drive movement.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>True when the dash override is allowed to drive movement.</returns>
     public static bool IsAvailableForTakeover(in EnemyPatternRuntimeState patternRuntimeState)
     {
         if (patternRuntimeState.ShortRangeDashPhase != EnemyShortRangeDashPhase.Idle)
@@ -63,10 +61,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Advances the post-dash recovery cooldown while the enemy is back on its core movement module.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params deltaTime Frame delta time.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="deltaTime">Frame delta time.</param>
     public static void UpdateCooldown(ref EnemyPatternRuntimeState patternRuntimeState, float deltaTime)
     {
         if (patternRuntimeState.ShortRangeDashCooldownRemaining <= 0f)
@@ -78,9 +75,8 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Clears non-committed dash state after the player leaves the short-range band.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
     public static void HandleShortRangeBandReleased(ref EnemyPatternRuntimeState patternRuntimeState)
     {
         if (patternRuntimeState.ShortRangeDashPhase != EnemyShortRangeDashPhase.Aiming)
@@ -91,9 +87,8 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Aborts the committed dash after a strong wall block so the enemy can restart the telegraph cleanly.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
     public static void HandleWallHit(in EnemyPatternConfig patternConfig, ref EnemyPatternRuntimeState patternRuntimeState)
     {
         switch (patternRuntimeState.ShortRangeDashPhase)
@@ -114,17 +109,17 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves the dash-owned desired velocity for the current frame and advances internal dash phases.
-    /// /params enemyEntity Current enemy entity used for deterministic random-side selection.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params enemyPosition Current enemy world position.
-    /// /params playerPosition Current player world position.
-    /// /params moveSpeed Current resolved enemy move speed after external slow modifiers.
-    /// /params deltaTime Frame delta time.
-    /// /params elapsedTime Current world elapsed time in seconds.
-    /// /params resolvedPhase Active dash phase that produced the returned velocity for this frame.
-    /// /returns Desired planar velocity for the current frame.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity used for deterministic random-side selection.</param>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="playerPosition">Current player world position.</param>
+    /// <param name="moveSpeed">Current resolved enemy move speed after external slow modifiers.</param>
+    /// <param name="deltaTime">Frame delta time.</param>
+    /// <param name="elapsedTime">Current world elapsed time in seconds.</param>
+    /// <param name="resolvedPhase">Active dash phase that produced the returned velocity for this frame.</param>
+    /// <returns>Desired planar velocity for the current frame.</returns>
     public static float3 ResolveVelocity(Entity enemyEntity,
                                          in EnemyPatternConfig patternConfig,
                                          ref EnemyPatternRuntimeState patternRuntimeState,
@@ -213,10 +208,10 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves the current facing direction used by aim and dash phases.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params lookDirection Resolved planar look direction.
-    /// /returns True when a dash-owned look direction is currently available.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="lookDirection">Resolved planar look direction.</param>
+    /// <returns>True when a dash-owned look direction is currently available.</returns>
     public static bool TryResolveLookDirection(in EnemyPatternRuntimeState patternRuntimeState, out float3 lookDirection)
     {
         lookDirection = math.normalizesafe(patternRuntimeState.ShortRangeDashAimDirection, ForwardAxis);
@@ -229,11 +224,11 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves one world-space point along the sampled dash path for debug drawing and runtime previews.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params normalizedProgress Requested normalized progress in the 0-1 range.
-    /// /returns World-space point on the authored dash path.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="normalizedProgress">Requested normalized progress in the 0-1 range.</param>
+    /// <returns>World-space point on the authored dash path.</returns>
     public static float3 ResolvePathPoint(in EnemyPatternConfig patternConfig,
                                           in EnemyPatternRuntimeState patternRuntimeState,
                                           float normalizedProgress)
@@ -254,11 +249,10 @@ internal static class EnemyPatternShortRangeDashUtility
     #region Private Methods
     /// <summary>
     /// Starts the short telegraph phase for the short-range dash.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params aimDirection Current player-facing aim direction.
-    /// /params travelDistance Current resolved travel distance preview.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="aimDirection">Current player-facing aim direction.</param>
+    /// <param name="travelDistance">Current resolved travel distance preview.</param>
     private static void BeginAim(ref EnemyPatternRuntimeState patternRuntimeState,
                                  float3 enemyPosition,
                                  float3 aimDirection,
@@ -273,15 +267,14 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Starts the committed dash phase by locking origin, direction, travel distance and lateral side.
-    /// /params enemyEntity Current enemy entity used for deterministic random-side selection.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params enemyPosition Current enemy world position.
-    /// /params playerDirection Current player-facing aim direction.
-    /// /params playerDistance Current planar player distance.
-    /// /params elapsedTime Current world elapsed time in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity used for deterministic random-side selection.</param>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="playerDirection">Current player-facing aim direction.</param>
+    /// <param name="playerDistance">Current planar player distance.</param>
+    /// <param name="elapsedTime">Current world elapsed time in seconds.</param>
     private static void BeginDash(Entity enemyEntity,
                                   in EnemyPatternConfig patternConfig,
                                   ref EnemyPatternRuntimeState patternRuntimeState,
@@ -304,13 +297,13 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves one desired velocity step along the sampled dash path and advances dash time.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params enemyPosition Current enemy world position.
-    /// /params deltaTime Frame delta time.
-    /// /params startedThisFrame True when the dash phase started on the current frame.
-    /// /returns Desired planar velocity for the current dash step.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="deltaTime">Frame delta time.</param>
+    /// <param name="startedThisFrame">True when the dash phase started on the current frame.</param>
+    /// <returns>Desired planar velocity for the current dash step.</returns>
     private static float3 ResolveDashStepVelocity(in EnemyPatternConfig patternConfig,
                                                   ref EnemyPatternRuntimeState patternRuntimeState,
                                                   float3 enemyPosition,
@@ -335,11 +328,11 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Returns whether the telegraph phase should transition into a committed dash on this frame.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params deltaTime Frame delta time.
-    /// /returns True when the aim phase has reached its release threshold.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="deltaTime">Frame delta time.</param>
+    /// <returns>True when the aim phase has reached its release threshold.</returns>
     private static bool ShouldStartDash(in EnemyPatternConfig patternConfig,
                                         in EnemyPatternRuntimeState patternRuntimeState,
                                         float deltaTime)
@@ -354,11 +347,11 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves the authored movement speed used while the enemy is still taking aim.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params aimDirection Current player-facing aim direction.
-    /// /params moveSpeed Current resolved enemy move speed.
-    /// /returns Desired telegraph velocity.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="aimDirection">Current player-facing aim direction.</param>
+    /// <param name="moveSpeed">Current resolved enemy move speed.</param>
+    /// <returns>Desired telegraph velocity.</returns>
     private static float3 ResolveAimVelocity(in EnemyPatternConfig patternConfig,
                                              float3 aimDirection,
                                              float moveSpeed)
@@ -369,10 +362,10 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves one dash travel distance from the current player distance and the authored distance model.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params playerDistance Current planar player distance.
-    /// /returns Resolved dash travel distance.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="playerDistance">Current planar player distance.</param>
+    /// <returns>Resolved dash travel distance.</returns>
     private static float ResolveTravelDistance(in EnemyPatternConfig patternConfig, float playerDistance)
     {
         float resolvedTravelDistance;
@@ -396,12 +389,12 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves the lateral side sign used for the next committed dash.
-    /// /params enemyEntity Current enemy entity used for deterministic random-side selection.
-    /// /params mirrorMode Authored mirror mode.
-    /// /params previousSign Previously used lateral sign.
-    /// /params elapsedTime Current world elapsed time in seconds.
-    /// /returns Lateral sign in the -1 or +1 range.
     /// </summary>
+    /// <param name="enemyEntity">Current enemy entity used for deterministic random-side selection.</param>
+    /// <param name="mirrorMode">Authored mirror mode.</param>
+    /// <param name="previousSign">Previously used lateral sign.</param>
+    /// <param name="elapsedTime">Current world elapsed time in seconds.</param>
+    /// <returns>Lateral sign in the -1 or +1 range.</returns>
     private static float ResolveMirrorSign(Entity enemyEntity,
                                            EnemyShortRangeDashMirrorMode mirrorMode,
                                            float previousSign,
@@ -431,10 +424,10 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Samples one normalized local path point from the baked dash path samples.
-    /// /params pathSamples Baked dash path samples.
-    /// /params normalizedProgress Requested normalized progress in the 0-1 range.
-    /// /returns Sampled normalized local path point.
     /// </summary>
+    /// <param name="pathSamples">Baked dash path samples.</param>
+    /// <param name="normalizedProgress">Requested normalized progress in the 0-1 range.</param>
+    /// <returns>Sampled normalized local path point.</returns>
     private static float2 SamplePath(in FixedList128Bytes<float2> pathSamples, float normalizedProgress)
     {
         int sampleCount = pathSamples.Length;
@@ -459,9 +452,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves a stable fallback forward direction when the player is exactly on top of the enemy.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns Safe normalized fallback direction.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>Safe normalized fallback direction.</returns>
     private static float3 ResolveFallbackDirection(in EnemyPatternRuntimeState patternRuntimeState)
     {
         return math.normalizesafe(patternRuntimeState.ShortRangeDashAimDirection, ForwardAxis);
@@ -469,9 +462,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves one planar right vector from the current forward direction.
-    /// /params forwardDirection Current normalized forward direction.
-    /// /returns Normalized planar right direction.
     /// </summary>
+    /// <param name="forwardDirection">Current normalized forward direction.</param>
+    /// <returns>Normalized planar right direction.</returns>
     private static float3 ResolveRightDirection(float3 forwardDirection)
     {
         float3 rightDirection = new float3(forwardDirection.z, 0f, -forwardDirection.x);
@@ -480,9 +473,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resolves the stored dash side sign while guaranteeing a usable magnitude.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /returns Stable -1 or +1 sign.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <returns>Stable -1 or +1 sign.</returns>
     private static float ResolveMirrorSignMagnitude(in EnemyPatternConfig patternConfig,
                                                     in EnemyPatternRuntimeState patternRuntimeState)
     {
@@ -503,10 +496,9 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Resets transient dash phase data while optionally keeping the last used lateral side for alternating paths.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params preserveLateralSign True to keep the last side for the next alternating dash.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="preserveLateralSign">True to keep the last side for the next alternating dash.</param>
     private static void ResetPhase(ref EnemyPatternRuntimeState patternRuntimeState, bool preserveLateralSign)
     {
         float previousLateralSign = preserveLateralSign ? patternRuntimeState.ShortRangeDashLateralSign : 0f;
@@ -520,11 +512,10 @@ internal static class EnemyPatternShortRangeDashUtility
 
     /// <summary>
     /// Ends a committed dash, restores idle phase state and starts the authored recovery cooldown.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params preserveLateralSign True to keep the last side for the next alternating dash.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="preserveLateralSign">True to keep the last side for the next alternating dash.</param>
     private static void EndCommittedDash(in EnemyPatternConfig patternConfig,
                                          ref EnemyPatternRuntimeState patternRuntimeState,
                                          bool preserveLateralSign)

@@ -24,7 +24,7 @@ public static class PlayerProgressionPhaseUtility
     /// <param name="activeGamePhaseIndex">Resolved index of the active game phase.</param>
     /// <param name="isMilestoneRequirement">True when the next level-up reaches a milestone with a custom requirement.</param>
     /// <param name="milestoneLevel">Target milestone level reached by the next level-up, or 0 when not used.</param>
-    /// <returns>Required experience for the next level-up attempt.<returns>
+    /// <returns>Required experience for the next level-up attempt.</returns>
     public static float ResolveRequiredExperienceForLevel(PlayerProgressionConfig progressionConfig,
                                                           int levelValue,
                                                           out int activeGamePhaseIndex,
@@ -59,7 +59,7 @@ public static class PlayerProgressionPhaseUtility
     /// <param name="activeGamePhaseIndex">Resolved index of the active game phase.</param>
     /// <param name="isMilestoneRequirement">True when the next level-up reaches a milestone with a custom requirement.</param>
     /// <param name="milestoneLevel">Target milestone level reached by the next level-up, or 0 when not used.</param>
-    /// <returns>Required experience for the next level-up attempt.<returns>
+    /// <returns>Required experience for the next level-up attempt.</returns>
     public static float ResolveRequiredExperienceForLevel(PlayerProgressionConfig progressionConfig,
                                                           DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                           int levelValue,
@@ -87,9 +87,9 @@ public static class PlayerProgressionPhaseUtility
 
     /// <summary>
     /// Resolves the configured runtime level cap using a safe fallback when progression data is missing.
-    /// progressionConfig Runtime progression configuration component.
-    /// returns Maximum reachable player level for this configuration.
     /// </summary>
+    /// <param name="progressionConfig">Runtime progression configuration component.</param>
+    /// <returns>Maximum reachable player level for this configuration.</returns>
     public static int ResolveLevelCap(PlayerProgressionConfig progressionConfig)
     {
         if (!progressionConfig.Config.IsCreated)
@@ -103,10 +103,10 @@ public static class PlayerProgressionPhaseUtility
 
     /// <summary>
     /// Checks whether the specified player level has already reached or exceeded the configured level cap.
-    /// progressionConfig Runtime progression configuration component.
-    /// levelValue Current player level to evaluate.
-    /// returns True when the level is capped and should stop receiving more experience.
     /// </summary>
+    /// <param name="progressionConfig">Runtime progression configuration component.</param>
+    /// <param name="levelValue">Current player level to evaluate.</param>
+    /// <returns>True when the level is capped and should stop receiving more experience.</returns>
     public static bool HasReachedLevelCap(PlayerProgressionConfig progressionConfig, int levelValue)
     {
         if (levelValue < 0)
@@ -119,11 +119,11 @@ public static class PlayerProgressionPhaseUtility
 
     /// <summary>
     /// Resolves how much additional experience the player can still receive before reaching the configured level cap.
-    /// progressionConfig Runtime progression configuration component.
-    /// levelValue Current player level.
-    /// currentExperience Current stored progress toward the next level-up.
-    /// returns Remaining experience capacity until the level cap is reached.
     /// </summary>
+    /// <param name="progressionConfig">Runtime progression configuration component.</param>
+    /// <param name="levelValue">Current player level.</param>
+    /// <param name="currentExperience">Current stored progress toward the next level-up.</param>
+    /// <returns>Remaining experience capacity until the level cap is reached.</returns>
     public static float ResolveRemainingExperienceUntilLevelCap(PlayerProgressionConfig progressionConfig,
                                                                 int levelValue,
                                                                 float currentExperience)
@@ -173,12 +173,12 @@ public static class PlayerProgressionPhaseUtility
 
     /// <summary>
     /// Resolves how much additional experience the player can still receive before reaching the configured level cap using runtime-scaled phase values.
-    /// progressionConfig Runtime progression configuration component.
-    /// runtimeGamePhases Runtime-scaled phase buffer.
-    /// levelValue Current player level.
-    /// currentExperience Current stored progress toward the next level-up.
-    /// returns Remaining experience capacity until the level cap is reached.
     /// </summary>
+    /// <param name="progressionConfig">Runtime progression configuration component.</param>
+    /// <param name="runtimeGamePhases">Runtime-scaled phase buffer.</param>
+    /// <param name="levelValue">Current player level.</param>
+    /// <param name="currentExperience">Current stored progress toward the next level-up.</param>
+    /// <returns>Remaining experience capacity until the level cap is reached.</returns>
     public static float ResolveRemainingExperienceUntilLevelCap(PlayerProgressionConfig progressionConfig,
                                                                 DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                                 int levelValue,
@@ -227,7 +227,7 @@ public static class PlayerProgressionPhaseUtility
     /// </summary>
     /// <param name="progressionConfig">Runtime progression configuration component.</param>
     /// <param name="levelValue">Player level used to select the phase.</param>
-    /// <returns>Index of the active game phase, or 0 when data is missing.<returns>
+    /// <returns>Index of the active game phase, or 0 when data is missing.</returns>
     public static int ResolveActiveGamePhaseIndex(PlayerProgressionConfig progressionConfig, int levelValue)
     {
         if (!progressionConfig.Config.IsCreated)
@@ -244,7 +244,7 @@ public static class PlayerProgressionPhaseUtility
     /// </summary>
     /// <param name="progressionConfig">Runtime progression configuration component.</param>
     /// <param name="phaseIndex">Phase index to resolve.</param>
-    /// <returns>Phase ID string with safe fallback when index/data is invalid.<returns>
+    /// <returns>Phase ID string with safe fallback when index/data is invalid.</returns>
     public static string ResolvePhaseID(PlayerProgressionConfig progressionConfig, int phaseIndex)
     {
         if (!progressionConfig.Config.IsCreated)
@@ -276,7 +276,7 @@ public static class PlayerProgressionPhaseUtility
     /// <param name="gamePhaseIndex">Game phase index expected to contain the milestone.</param>
     /// <param name="milestoneLevel">Milestone level to resolve.</param>
     /// <param name="milestoneIndex">Resolved milestone index when found.</param>
-    /// <returns>True when the milestone exists in the specified phase; otherwise false.<returns>
+    /// <returns>True when the milestone exists in the specified phase; otherwise false.</returns>
     public static bool TryResolveMilestoneIndex(PlayerProgressionConfig progressionConfig,
                                                 int gamePhaseIndex,
                                                 int milestoneLevel,

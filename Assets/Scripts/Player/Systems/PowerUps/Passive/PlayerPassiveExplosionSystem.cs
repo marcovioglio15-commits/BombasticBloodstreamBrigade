@@ -122,9 +122,9 @@ public partial struct PlayerPassiveExplosionSystem : ISystem
 
     /// <summary>
     /// Maps passive explosion triggers to the audio event that should be played by the resolver.
-    /// /params triggerMode Configured passive explosion trigger mode.
-    /// /returns Audio event reserved for this explosion source.
     /// </summary>
+    /// <param name="triggerMode">Configured passive explosion trigger mode.</param>
+    /// <returns>Audio event reserved for this explosion source.</returns>
     private static GameAudioEventId ResolveExplosionAudioEventId(PassiveExplosionTriggerMode triggerMode)
     {
         switch (triggerMode)
@@ -143,7 +143,7 @@ public partial struct PlayerPassiveExplosionSystem : ISystem
     /// </summary>
     /// <param name="killedEventPosition">Position captured by EnemyKilledEventsSystem for the killed target.</param>
     /// <param name="playerFloorReferenceY">Current player Y used as local floor reference in flat/near-flat arenas.</param>
-    /// <returns>Sanitized trigger position with a minimum Y floor safeguard.<returns>
+    /// <returns>Sanitized trigger position with a minimum Y floor safeguard.</returns>
     private static float3 ResolveKilledTriggerPosition(float3 killedEventPosition, float playerFloorReferenceY)
     {
         float3 resolvedPosition = killedEventPosition;

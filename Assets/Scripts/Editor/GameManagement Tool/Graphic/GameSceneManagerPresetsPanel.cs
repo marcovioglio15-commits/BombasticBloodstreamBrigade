@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Root orchestration panel for Scene Manager presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameSceneManagerPresetsPanel
 {
@@ -167,8 +165,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Constructors
     /// <summary>
     /// Initializes the Scene Manager panel and restores its active details section.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public GameSceneManagerPresetsPanel()
     {
@@ -187,8 +183,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Public Methods
     /// <summary>
     /// Rebinds the panel from current Scene Manager assets after draft session changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void RefreshFromSessionChange()
     {
@@ -202,9 +196,8 @@ public sealed class GameSceneManagerPresetsPanel
 
     /// <summary>
     /// Selects a preset assigned by the parent Game Master panel.
-    /// /params preset Scene Manager preset to select.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene Manager preset to select.</param>
     public void SelectPresetFromExternal(GameSceneManagerPreset preset)
     {
         if (preset == null)
@@ -220,8 +213,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Layout
     /// <summary>
     /// Builds the split preset browser and details panel.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildUI()
     {
@@ -232,8 +223,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Preset List
     /// <summary>
     /// Refreshes visible Scene Manager presets from the current library and search filter.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void RefreshPresetList()
     {
@@ -244,8 +233,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Preset Actions
     /// <summary>
     /// Creates and selects a new Scene Manager preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void CreatePreset()
     {
@@ -254,9 +241,8 @@ public sealed class GameSceneManagerPresetsPanel
 
     /// <summary>
     /// Duplicates one Scene Manager preset asset and registers it.
-    /// /params preset Source preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source preset to duplicate.</param>
     internal void DuplicatePreset(GameSceneManagerPreset preset)
     {
         GameSceneManagerPresetsPanelPresetUtility.DuplicatePreset(this, preset);
@@ -264,9 +250,8 @@ public sealed class GameSceneManagerPresetsPanel
 
     /// <summary>
     /// Stages one Scene Manager preset for deletion after confirmation.
-    /// /params preset Preset to delete.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to delete.</param>
     internal void DeletePreset(GameSceneManagerPreset preset)
     {
         GameSceneManagerPresetsPanelPresetUtility.DeletePreset(this, preset);
@@ -276,9 +261,8 @@ public sealed class GameSceneManagerPresetsPanel
     #region Details
     /// <summary>
     /// Selects one Scene Manager preset and rebuilds details.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     internal void SelectPreset(GameSceneManagerPreset preset)
     {
         GameSceneManagerPresetsPanelSectionsUtility.SelectPreset(this, preset);
@@ -286,8 +270,6 @@ public sealed class GameSceneManagerPresetsPanel
 
     /// <summary>
     /// Rebuilds the active Scene Manager details section.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void BuildActiveSection()
     {
@@ -296,8 +278,6 @@ public sealed class GameSceneManagerPresetsPanel
 
     /// <summary>
     /// Marks the selected Scene Manager preset dirty in the draft session.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal void MarkSelectedPresetDirty()
     {
@@ -308,9 +288,9 @@ public sealed class GameSceneManagerPresetsPanel
     #region Helpers
     /// <summary>
     /// Resolves display text for one Scene Manager preset.
-    /// /params preset Preset to display.
-    /// /returns Display text for list rows.
     /// </summary>
+    /// <param name="preset">Preset to display.</param>
+    /// <returns>Display text for list rows.</returns>
     internal string GetPresetDisplayName(GameSceneManagerPreset preset)
     {
         if (preset == null)
@@ -330,8 +310,6 @@ public sealed class GameSceneManagerPresetsPanel
     #region Nested Types
     /// <summary>
     /// Detail sections shown for a Scene Manager preset.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     internal enum DetailsSectionType
     {

@@ -48,7 +48,7 @@ internal static class EnemySteeringUtility
     /// </summary>
     /// <param name="playerPosition">Current player world position.</param>
     /// <param name="enemyPosition">Current enemy world position.</param>
-    /// <returns>Returns the steering LOD bucket used for cadence gating.<returns>
+    /// <returns>Returns the steering LOD bucket used for cadence gating.</returns>
     internal static SteeringLodLevel EvaluateLod(float3 playerPosition, float3 enemyPosition)
     {
         float3 delta = enemyPosition - playerPosition;
@@ -74,7 +74,7 @@ internal static class EnemySteeringUtility
     /// <param name="lodLevel">Resolved LOD level for the enemy.</param>
     /// <param name="frameCount">Current engine frame count.</param>
     /// <param name="stableIndex">Stable integer used to stagger update cadence.</param>
-    /// <returns>Returns true when steering should run this frame.<returns>
+    /// <returns>Returns true when steering should run this frame.</returns>
     internal static bool ShouldEvaluateLod(SteeringLodLevel lodLevel, int frameCount, int stableIndex)
     {
         if (lodLevel == SteeringLodLevel.High)
@@ -89,7 +89,7 @@ internal static class EnemySteeringUtility
     /// Resolves one steering aggressiveness value with safe defaults and clamps.
     /// </summary>
     /// <param name="rawAggressiveness">Serialized aggressiveness value.</param>
-    /// <returns>Returns the runtime-safe aggressiveness value.<returns>
+    /// <returns>Returns the runtime-safe aggressiveness value.</returns>
     internal static float ResolveSteeringAggressiveness(float rawAggressiveness)
     {
         if (rawAggressiveness < 0f)
@@ -104,7 +104,7 @@ internal static class EnemySteeringUtility
     /// <param name="aggressiveness">Resolved aggressiveness value.</param>
     /// <param name="minimumScale">Output scale at minimum aggressiveness.</param>
     /// <param name="maximumScale">Output scale at maximum aggressiveness.</param>
-    /// <returns>Returns one interpolated scalar value.<returns>
+    /// <returns>Returns one interpolated scalar value.</returns>
     internal static float ResolveAggressivenessScale(float aggressiveness, float minimumScale, float maximumScale)
     {
         float normalizedAggressiveness = math.saturate((aggressiveness - MinimumSteeringAggressiveness) /
@@ -118,7 +118,7 @@ internal static class EnemySteeringUtility
     /// <param name="yieldUrgency">Yield urgency in the [0..1] range.</param>
     /// <param name="priorityGapNormalized">Normalized priority gap in the [0..1] range.</param>
     /// <param name="aggressiveness">Resolved steering aggressiveness.</param>
-    /// <returns>Returns one additive speed ratio.<returns>
+    /// <returns>Returns one additive speed ratio.</returns>
     internal static float ResolvePriorityYieldSpeedBoost(float yieldUrgency, float priorityGapNormalized, float aggressiveness)
     {
         float normalizedUrgency = math.saturate(yieldUrgency);
@@ -139,7 +139,7 @@ internal static class EnemySteeringUtility
     /// <param name="yieldUrgency">Yield urgency in the [0..1] range.</param>
     /// <param name="priorityGapNormalized">Normalized priority gap in the [0..1] range.</param>
     /// <param name="aggressiveness">Resolved steering aggressiveness.</param>
-    /// <returns>Returns one additive acceleration ratio.<returns>
+    /// <returns>Returns one additive acceleration ratio.</returns>
     internal static float ResolvePriorityYieldAccelerationBoost(float yieldUrgency, float priorityGapNormalized, float aggressiveness)
     {
         float normalizedUrgency = math.saturate(yieldUrgency);
@@ -158,7 +158,7 @@ internal static class EnemySteeringUtility
     /// Resolves one planar speed threshold used to skip noisy look updates.
     /// </summary>
     /// <param name="maxSpeed">Current movement max speed after modifiers.</param>
-    /// <returns>Returns the planar speed threshold for look rotation.<returns>
+    /// <returns>Returns the planar speed threshold for look rotation.</returns>
     internal static float ResolveLookSpeedThreshold(float maxSpeed)
     {
         float normalizedMaxSpeed = math.max(0f, maxSpeed);
@@ -176,7 +176,7 @@ internal static class EnemySteeringUtility
     /// <param name="velocityMaxSpeed">Current movement max speed used to filter noisy velocity look updates.</param>
     /// <param name="shooterControlState">Current shooter control state that may expose an active aim direction.</param>
     /// <param name="facingDirection">Resolved planar facing direction when available.</param>
-    /// <returns>Returns true when a valid facing direction is available.<returns>
+    /// <returns>Returns true when a valid facing direction is available.</returns>
     internal static bool TryResolveFacingDirection(float3 velocity,
                                                    float velocityMaxSpeed,
                                                    in EnemyShooterControlState shooterControlState,
@@ -224,7 +224,7 @@ internal static class EnemySteeringUtility
     /// <param name="shooterControlState">Current shooter control state that may expose an active aim direction.</param>
     /// <param name="steeringAggressiveness">Resolved steering aggressiveness used to determine turn speed.</param>
     /// <param name="deltaTime">Current frame delta time.</param>
-    /// <returns>Returns the updated world rotation.<returns>
+    /// <returns>Returns the updated world rotation.</returns>
     internal static quaternion ResolveDynamicLookRotation(quaternion currentRotation,
                                                           float3 velocity,
                                                           float velocityMaxSpeed,
@@ -250,7 +250,7 @@ internal static class EnemySteeringUtility
     /// <param name="currentRotation">Current world rotation.</param>
     /// <param name="targetForward">Target planar forward direction.</param>
     /// <param name="maxRadiansDelta">Maximum radians allowed this frame.</param>
-    /// <returns>Returns the smoothed rotation result.<returns>
+    /// <returns>Returns the smoothed rotation result.</returns>
     internal static quaternion RotateTowardsPlanar(quaternion currentRotation, float3 targetForward, float maxRadiansDelta)
     {
         float normalizedDelta = math.max(0f, maxRadiansDelta);
@@ -280,7 +280,7 @@ internal static class EnemySteeringUtility
     /// <param name="desiredVelocity">Target planar velocity.</param>
     /// <param name="acceleration">Configured acceleration.</param>
     /// <param name="deceleration">Configured deceleration.</param>
-    /// <returns>Returns the velocity delta rate in units per second.<returns>
+    /// <returns>Returns the velocity delta rate in units per second.</returns>
     internal static float ResolveVelocityChangeRate(float3 currentVelocity,
                                                     float3 desiredVelocity,
                                                     float acceleration,

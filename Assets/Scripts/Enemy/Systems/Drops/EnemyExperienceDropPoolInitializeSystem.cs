@@ -131,7 +131,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// Tries to resolve the singleton registry entity from the cached registry query.
     /// </summary>
     /// <param name="registryEntity">Resolved registry entity when present; Entity.Null otherwise.</param>
-    /// <returns>True when the registry exists; otherwise false.<returns>
+    /// <returns>True when the registry exists; otherwise false.</returns>
     private bool TryGetRegistryEntity(out Entity registryEntity)
     {
         if (registryQuery.IsEmptyIgnoreFilter)
@@ -150,7 +150,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// Builds the current per-prefab drop-pool settings from every active enemy spawner in the world.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
-    /// <returns>Current per-prefab build settings keyed by experience-drop prefab entity.<returns>
+    /// <returns>Current per-prefab build settings keyed by experience-drop prefab entity.</returns>
     private Dictionary<Entity, PoolBuildSettings> BuildPoolSettingsByPrefab(ref SystemState state)
     {
         int spawnerCount = spawnerQuery.CalculateEntityCountWithoutFiltering();
@@ -287,7 +287,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// </summary>
     /// <param name="plannedEnemyCount">Maximum planned instances of the enemy prefab for the spawner.</param>
     /// <param name="estimatedDropsPerDeath">Estimated drop instances generated per enemy death.</param>
-    /// <returns>Resolved initial pool capacity clamped to a safe runtime range.<returns>
+    /// <returns>Resolved initial pool capacity clamped to a safe runtime range.</returns>
     private static int EstimateInitialCapacity(int plannedEnemyCount, int estimatedDropsPerDeath)
     {
         int sanitizedPlannedEnemyCount = math.max(1, plannedEnemyCount);
@@ -303,7 +303,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// </summary>
     /// <param name="expandBatchPerPrefab">Enemy pool expansion batch configured on the spawner.</param>
     /// <param name="estimatedDropsPerDeath">Estimated drop instances generated per enemy death.</param>
-    /// <returns>Resolved expansion batch size clamped to a safe runtime range.<returns>
+    /// <returns>Resolved expansion batch size clamped to a safe runtime range.</returns>
     private static int EstimateExpandBatch(int expandBatchPerPrefab, int estimatedDropsPerDeath)
     {
         int sanitizedExpandBatch = math.max(1, expandBatchPerPrefab);
@@ -319,7 +319,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// Returns an order-independent hash of the current pool-build settings so scene reloads can invalidate stale registries.
     /// </summary>
     /// <param name="poolSettingsByPrefab">Resolved pool sizing settings grouped by prefab entity.</param>
-    /// <returns>Order-independent signature of the current pool settings.<returns>
+    /// <returns>Order-independent signature of the current pool settings.</returns>
     private static uint ComputePoolSettingsHash(Dictionary<Entity, PoolBuildSettings> poolSettingsByPrefab)
     {
         uint xorHash = 0u;
@@ -348,7 +348,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// <param name="entityManager">Entity manager used to inspect existing pool entities.</param>
     /// <param name="registryEntity">Registry singleton entity that stores the pool map buffer.</param>
     /// <param name="poolSettingsByPrefab">Current pool build settings grouped by prefab entity.</param>
-    /// <returns>True when the registry fully matches the current spawner-derived settings, otherwise false.<returns>
+    /// <returns>True when the registry fully matches the current spawner-derived settings, otherwise false.</returns>
     private static bool RegistryMatchesPoolSettings(EntityManager entityManager,
                                                     Entity registryEntity,
                                                     Dictionary<Entity, PoolBuildSettings> poolSettingsByPrefab)
@@ -396,7 +396,6 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// <param name="registryEntity">Registry singleton entity that stores the pool map buffer.</param>
     /// <param name="dropPoolQuery">Query selecting every experience-drop pool entity.</param>
     /// <param name="dropEntityQuery">Query selecting every spawned experience-drop entity.</param>
-    /// <returns>None.<returns>
     private static void ResetRegistry(EntityManager entityManager,
                                       Entity registryEntity,
                                       EntityQuery dropPoolQuery,
@@ -488,7 +487,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     /// <param name="entityManager">Entity manager used to read and mutate pool entities.</param>
     /// <param name="registryEntity">Registry singleton entity that stores the pool map buffer.</param>
     /// <param name="frameBudget">Maximum pooled instances that can be prewarmed in the current frame.</param>
-    /// <returns>True when all pools are initialized; otherwise false.<returns>
+    /// <returns>True when all pools are initialized; otherwise false.</returns>
     private static bool InitializePools(EntityManager entityManager, Entity registryEntity, int frameBudget)
     {
         int remainingBudget = math.max(0, frameBudget);

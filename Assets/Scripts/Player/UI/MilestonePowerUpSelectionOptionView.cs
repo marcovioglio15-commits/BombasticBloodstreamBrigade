@@ -236,7 +236,7 @@ public sealed class MilestonePowerUpSelectionOptionView : MonoBehaviour, IPointe
     /// </summary>
     /// <param name="rootTransform">Root transform used for descendant lookup.</param>
     /// <param name="childName">Expected descendant GameObject name.</param>
-    /// <returns>Resolved TMP text when found; otherwise null.<returns>
+    /// <returns>Resolved TMP text when found; otherwise null.</returns>
     private static TMP_Text ResolveText(Transform rootTransform, string childName)
     {
         Transform childTransform = HUDMilestoneSelectionOptionUtility.FindDescendantByName(rootTransform, childName);
@@ -252,7 +252,7 @@ public sealed class MilestonePowerUpSelectionOptionView : MonoBehaviour, IPointe
     /// </summary>
     /// <param name="rootTransform">Root transform used for descendant lookup.</param>
     /// <param name="childName">Expected descendant GameObject name.</param>
-    /// <returns>Resolved Image when found; otherwise null.<returns>
+    /// <returns>Resolved Image when found; otherwise null.</returns>
     private static Image ResolveImage(Transform rootTransform, string childName)
     {
         Transform childTransform = HUDMilestoneSelectionOptionUtility.FindDescendantByName(rootTransform, childName);
@@ -268,7 +268,7 @@ public sealed class MilestonePowerUpSelectionOptionView : MonoBehaviour, IPointe
     /// </summary>
     /// <param name="rootTransform">Root transform used for descendant lookup.</param>
     /// <param name="childName">Expected descendant GameObject name.</param>
-    /// <returns>Resolved Graphic when found; otherwise null.<returns>
+    /// <returns>Resolved Graphic when found; otherwise null.</returns>
     private static Graphic ResolveGraphic(Transform rootTransform, string childName)
     {
         Transform childTransform = HUDMilestoneSelectionOptionUtility.FindDescendantByName(rootTransform, childName);
@@ -283,7 +283,7 @@ public sealed class MilestonePowerUpSelectionOptionView : MonoBehaviour, IPointe
     /// Validates whether the current pointer event can be forwarded to the milestone HUD controller.
     /// </summary>
     /// <param name="eventData">Pointer event raised by the current EventSystem.</param>
-    /// <returns>True when the callbacks can be invoked; otherwise false.<returns>
+    /// <returns>True when the callbacks can be invoked; otherwise false.</returns>
     private bool CanForwardPointerInput(PointerEventData eventData)
     {
         if (!isActiveAndEnabled)

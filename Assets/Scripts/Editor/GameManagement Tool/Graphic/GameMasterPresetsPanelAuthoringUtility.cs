@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Handles prefab discovery and active GameAudioManagerAuthoring assignment for Game Management presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameMasterPresetsPanelAuthoringUtility
 {
@@ -14,9 +12,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
     #region Public Methods
     /// <summary>
     /// Finds the first prefab containing GameAudioManagerAuthoring and stores it on the panel.
-    /// /params panel Owning panel that receives the selected prefab.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the selected prefab.</param>
     public static void FindAudioManagerPrefab(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -38,9 +35,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Finds the first prefab containing GameSceneManagerAuthoring and stores it on the panel.
-    /// /params panel Owning panel that receives the selected prefab.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the selected prefab.</param>
     public static void FindSceneManagerPrefab(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -62,9 +58,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Assigns the selected master preset to the selected GameAudioManagerAuthoring prefab.
-    /// /params panel Owning panel with selected preset and prefab context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset and prefab context.</param>
     public static void AssignPresetToAuthoringPrefab(GameMasterPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null || panel.SelectedAudioPrefab == null)
@@ -81,9 +76,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Assigns the selected master preset to the selected GameSceneManagerAuthoring prefab.
-    /// /params panel Owning panel with selected preset and prefab context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset and prefab context.</param>
     public static void AssignPresetToSceneAuthoringPrefab(GameMasterPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null || panel.SelectedScenePrefab == null)
@@ -100,9 +94,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Updates the active authoring status label for the selected prefab.
-    /// /params panel Owning panel with selected preset and status label.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset and status label.</param>
     public static void RefreshActiveStatus(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -116,11 +109,10 @@ internal static class GameMasterPresetsPanelAuthoringUtility
     #region Private Methods
     /// <summary>
     /// Assigns the selected master preset to a serialized authoring component masterPreset field.
-    /// /params panel Owning panel with selected master preset context.
-    /// /params authoring Authoring component containing a masterPreset field.
-    /// /params prefab Prefab asset that owns the authoring component.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    /// <param name="authoring">Authoring component containing a masterPreset field.</param>
+    /// <param name="prefab">Prefab asset that owns the authoring component.</param>
     private static void AssignMasterPresetToAuthoring(GameMasterPresetsPanel panel, UnityEngine.Object authoring, GameObject prefab)
     {
         Undo.RecordObject(authoring, "Set Active Game Master Preset");
@@ -141,9 +133,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Updates the Audio Manager active authoring status label.
-    /// /params panel Owning panel with selected audio prefab context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected audio prefab context.</param>
     private static void RefreshAudioActiveStatus(GameMasterPresetsPanel panel)
     {
         if (panel.ActiveStatusLabel == null)
@@ -168,9 +159,8 @@ internal static class GameMasterPresetsPanelAuthoringUtility
 
     /// <summary>
     /// Updates the Scene Manager active authoring status label.
-    /// /params panel Owning panel with selected scene prefab context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected scene prefab context.</param>
     private static void RefreshSceneActiveStatus(GameMasterPresetsPanel panel)
     {
         if (panel.SceneActiveStatusLabel == null)

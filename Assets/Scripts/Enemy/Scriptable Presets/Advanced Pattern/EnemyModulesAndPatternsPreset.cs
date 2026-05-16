@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores reusable module catalogs and assembled patterns shared by multiple enemy advanced-pattern presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyModulesAndPatternsPreset", menuName = "Enemy/Modules And Patterns Preset", order = 11)]
 public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
@@ -137,16 +135,15 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Replaces the editable contents of this shared preset with caller-provided metadata, catalogs and patterns.
-    /// /params presetNameValue New preset display name.
-    /// /params descriptionValue New description text.
-    /// /params versionValue New semantic version string.
-    /// /params coreMovementDefinitionsValue Replacement core-movement catalog.
-    /// /params shortRangeInteractionDefinitionsValue Replacement short-range catalog.
-    /// /params weaponInteractionDefinitionsValue Replacement weapon catalog.
-    /// /params dropItemsDefinitionsValue Replacement drop-items catalog.
-    /// /params patternsValue Replacement shared assembled patterns.
-    /// /returns None.
     /// </summary>
+    /// <param name="presetNameValue">New preset display name.</param>
+    /// <param name="descriptionValue">New description text.</param>
+    /// <param name="versionValue">New semantic version string.</param>
+    /// <param name="coreMovementDefinitionsValue">Replacement core-movement catalog.</param>
+    /// <param name="shortRangeInteractionDefinitionsValue">Replacement short-range catalog.</param>
+    /// <param name="weaponInteractionDefinitionsValue">Replacement weapon catalog.</param>
+    /// <param name="dropItemsDefinitionsValue">Replacement drop-items catalog.</param>
+    /// <param name="patternsValue">Replacement shared assembled patterns.</param>
     public void ReplaceContents(string presetNameValue,
                                 string descriptionValue,
                                 string versionValue,
@@ -169,9 +166,9 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one shared module definition by module ID across every catalog subsection.
-    /// /params moduleId Target module identifier.
-    /// /returns The resolved module definition, or null when not found.
     /// </summary>
+    /// <param name="moduleId">Target module identifier.</param>
+    /// <returns>The resolved module definition, or null when not found.</returns>
     public EnemyPatternModuleDefinition ResolveModuleDefinitionById(string moduleId)
     {
         if (string.IsNullOrWhiteSpace(moduleId))
@@ -197,9 +194,9 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one shared pattern definition by pattern ID.
-    /// /params patternId Target pattern identifier.
-    /// /returns The resolved shared pattern definition, or null when not found.
     /// </summary>
+    /// <param name="patternId">Target pattern identifier.</param>
+    /// <returns>The resolved shared pattern definition, or null when not found.</returns>
     public EnemyModulesPatternDefinition ResolvePatternById(string patternId)
     {
         if (string.IsNullOrWhiteSpace(patternId))
@@ -225,9 +222,9 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Returns the module-definition list that matches one catalog section.
-    /// /params section Requested catalog section.
-    /// /returns The matching module-definition list.
     /// </summary>
+    /// <param name="section">Requested catalog section.</param>
+    /// <returns>The matching module-definition list.</returns>
     public IReadOnlyList<EnemyPatternModuleDefinition> GetDefinitions(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -248,8 +245,6 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Validates metadata, shared module catalogs and assembled patterns.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -296,8 +291,6 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     #region Private Methods
     /// <summary>
     /// Ensures all serialized lists always exist before validation and editor drawing.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void EnsureLists()
     {
@@ -319,9 +312,8 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Checks whether every catalog subsection is currently empty.
-    /// /params None.
-    /// /returns True when no shared module definition exists.
     /// </summary>
+    /// <returns>True when no shared module definition exists.</returns>
     private bool IsCatalogEmpty()
     {
         if (coreMovementDefinitions.Count > 0)
@@ -338,8 +330,6 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Fills the shared preset with a baseline module catalog used by freshly created presets.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildDefaultCatalog()
     {
@@ -387,12 +377,12 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Creates a new default module definition and validates its payload containers.
-    /// /params moduleIdValue Default module identifier.
-    /// /params displayNameValue Default display name.
-    /// /params moduleKindValue Default module kind.
-    /// /params notesValue Default notes string.
-    /// /returns The created module definition instance.
     /// </summary>
+    /// <param name="moduleIdValue">Default module identifier.</param>
+    /// <param name="displayNameValue">Default display name.</param>
+    /// <param name="moduleKindValue">Default module kind.</param>
+    /// <param name="notesValue">Default notes string.</param>
+    /// <returns>The created module definition instance.</returns>
     private static EnemyPatternModuleDefinition CreateDefaultModule(string moduleIdValue,
                                                                     string displayNameValue,
                                                                     EnemyPatternModuleKind moduleKindValue,
@@ -407,9 +397,8 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Builds the default shared pattern list used by freshly created presets.
-    /// /params None.
-    /// /returns The default shared pattern list.
     /// </summary>
+    /// <returns>The default shared pattern list.</returns>
     private static List<EnemyModulesPatternDefinition> BuildDefaultPatternDefinitions()
     {
         List<EnemyModulesPatternDefinition> definitions = new List<EnemyModulesPatternDefinition>();
@@ -426,11 +415,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Validates one catalog subsection, enforcing unique module IDs and legal module-kind values for that subsection.
-    /// /params definitions Definition list to validate.
-    /// /params section Catalog section that owns the list.
-    /// /params usedIds Case-insensitive set of module IDs already consumed by previous sections.
-    /// /returns None.
     /// </summary>
+    /// <param name="definitions">Definition list to validate.</param>
+    /// <param name="section">Catalog section that owns the list.</param>
+    /// <param name="usedIds">Case-insensitive set of module IDs already consumed by previous sections.</param>
     private static void ValidateDefinitionList(List<EnemyPatternModuleDefinition> definitions,
                                                EnemyPatternModuleCatalogSection section,
                                                HashSet<string> usedIds)
@@ -471,8 +459,6 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Validates the shared pattern list, ensuring identity stability and nested slot integrity.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidatePatternDefinitions()
     {
@@ -508,10 +494,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves the legal module kind for one catalog section.
-    /// /params section Catalog section being validated.
-    /// /params candidateKind Authored module kind candidate.
-    /// /returns A legal module kind for the requested section.
     /// </summary>
+    /// <param name="section">Catalog section being validated.</param>
+    /// <param name="candidateKind">Authored module kind candidate.</param>
+    /// <returns>A legal module kind for the requested section.</returns>
     private static EnemyPatternModuleKind ResolveCatalogModuleKind(EnemyPatternModuleCatalogSection section,
                                                                    EnemyPatternModuleKind candidateKind)
     {
@@ -543,10 +529,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves the fallback module ID prefix used by one catalog section and module kind.
-    /// /params section Catalog section being validated.
-    /// /params moduleKind Resolved module kind.
-    /// /returns A stable fallback module ID.
     /// </summary>
+    /// <param name="section">Catalog section being validated.</param>
+    /// <param name="moduleKind">Resolved module kind.</param>
+    /// <returns>A stable fallback module ID.</returns>
     private static string ResolveCatalogFallbackId(EnemyPatternModuleCatalogSection section, EnemyPatternModuleKind moduleKind)
     {
         switch (section)
@@ -583,9 +569,9 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Collects every module ID already used by the provided definition lists.
-    /// /params definitionLists Any number of definition lists.
-    /// /returns A case-insensitive set containing every non-empty module ID.
     /// </summary>
+    /// <param name="definitionLists">Any number of definition lists.</param>
+    /// <returns>A case-insensitive set containing every non-empty module ID.</returns>
     private static HashSet<string> CollectUsedModuleIds(params List<EnemyPatternModuleDefinition>[] definitionLists)
     {
         HashSet<string> usedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -616,10 +602,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one module definition by ID from one specific list.
-    /// /params moduleId Target module identifier.
-    /// /params definitions Definition list to search.
-    /// /returns The matching module definition, or null when not found.
     /// </summary>
+    /// <param name="moduleId">Target module identifier.</param>
+    /// <param name="definitions">Definition list to search.</param>
+    /// <returns>The matching module definition, or null when not found.</returns>
     private static EnemyPatternModuleDefinition ResolveModuleDefinitionById(string moduleId,
                                                                            List<EnemyPatternModuleDefinition> definitions)
     {
@@ -649,10 +635,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Normalizes one identifier while preserving author intent whenever possible.
-    /// /params rawId Raw authored identifier string.
-    /// /params fallback Fallback identifier used when the authored value is empty.
-    /// /returns The normalized identifier.
     /// </summary>
+    /// <param name="rawId">Raw authored identifier string.</param>
+    /// <param name="fallback">Fallback identifier used when the authored value is empty.</param>
+    /// <returns>The normalized identifier.</returns>
     private static string NormalizeId(string rawId, string fallback)
     {
         if (string.IsNullOrWhiteSpace(rawId))
@@ -668,11 +654,11 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
 
     /// <summary>
     /// Resolves one unique identifier against a set of already-used values.
-    /// /params baseId Requested base identifier.
-    /// /params usedIds Already-used identifier set.
-    /// /params fallbackBaseId Fallback identifier used when the base ID is invalid.
-    /// /returns A unique identifier string.
     /// </summary>
+    /// <param name="baseId">Requested base identifier.</param>
+    /// <param name="usedIds">Already-used identifier set.</param>
+    /// <param name="fallbackBaseId">Fallback identifier used when the base ID is invalid.</param>
+    /// <returns>A unique identifier string.</returns>
     private static string ResolveUniqueId(string baseId,
                                           HashSet<string> usedIds,
                                           string fallbackBaseId)

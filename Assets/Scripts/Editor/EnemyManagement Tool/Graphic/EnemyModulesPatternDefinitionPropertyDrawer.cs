@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyModulesPatternDefinition.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyModulesPatternDefinition))]
 public sealed class EnemyModulesPatternDefinitionPropertyDrawer : PropertyDrawer
@@ -16,9 +14,9 @@ public sealed class EnemyModulesPatternDefinitionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Creates the shared pattern-definition UI with category-specific assembly slots.
-    /// /params property Serialized shared pattern-definition property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized shared pattern-definition property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -74,13 +72,12 @@ public sealed class EnemyModulesPatternDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Adds one delayed bound text field so serialized changes are committed only after edit confirmation.
-    /// /params parent Parent visual element that receives the field.
-    /// /params property Serialized string property bound to the field.
-    /// /params label UI label shown above the field.
-    /// /params tooltip Tooltip shown on the field.
-    /// /params multiline True when the field should accept multiline input.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent visual element that receives the field.</param>
+    /// <param name="property">Serialized string property bound to the field.</param>
+    /// <param name="label">UI label shown above the field.</param>
+    /// <param name="tooltip">Tooltip shown on the field.</param>
+    /// <param name="multiline">True when the field should accept multiline input.</param>
     private static void AddDelayedTextField(VisualElement parent,
                                             SerializedProperty property,
                                             string label,
@@ -107,12 +104,12 @@ public sealed class EnemyModulesPatternDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Creates one foldout that hosts a full assembly property block with a short explanatory helper.
-    /// /params property Serialized assembly property to draw inside the foldout.
-    /// /params title Foldout title shown to the user.
-    /// /params helperText Explanatory helper text shown above the assembly content.
-    /// /params isExpanded Initial foldout open state.
-    /// /returns The created foldout, or an empty element when the property is missing.
     /// </summary>
+    /// <param name="property">Serialized assembly property to draw inside the foldout.</param>
+    /// <param name="title">Foldout title shown to the user.</param>
+    /// <param name="helperText">Explanatory helper text shown above the assembly content.</param>
+    /// <param name="isExpanded">Initial foldout open state.</param>
+    /// <returns>The created foldout, or an empty element when the property is missing.</returns>
     private static VisualElement CreateAssemblyFoldout(SerializedProperty property,
                                                        string title,
                                                        string helperText,

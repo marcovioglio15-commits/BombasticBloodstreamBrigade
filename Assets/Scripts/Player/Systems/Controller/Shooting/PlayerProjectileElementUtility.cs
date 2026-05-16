@@ -3,8 +3,6 @@ using Unity.Entities;
 
 /// <summary>
 /// Builds the default multi-element payload emitted by base player projectiles from controller-authored shooting values.
-/// /params none.
-/// /returns none.
 /// </summary>
 internal static class PlayerProjectileElementUtility
 {
@@ -13,11 +11,11 @@ internal static class PlayerProjectileElementUtility
     #region Public Methods
     /// <summary>
     /// Resolves whether the provided controller element selections should emit at least one projectile elemental payload entry.
-    /// /params appliedElements Runtime applied-element slot buffer resolved from authoring and scaling.
-    /// /params shootingValues Controller-side shooting values containing per-element behaviours.
-    /// /params payload Default projectile payload when at least one element is enabled and valid.
-    /// /returns True when the projectile should carry at least one elemental payload entry.
     /// </summary>
+    /// <param name="appliedElements">Runtime applied-element slot buffer resolved from authoring and scaling.</param>
+    /// <param name="shootingValues">Controller-side shooting values containing per-element behaviours.</param>
+    /// <param name="payload">Default projectile payload when at least one element is enabled and valid.</param>
+    /// <returns>True when the projectile should carry at least one elemental payload entry.</returns>
     public static bool TryBuildDefaultPayload(DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElements,
                                               in ShootingValuesBlob shootingValues,
                                               out ProjectileElementalPayload payload)
@@ -62,9 +60,9 @@ internal static class PlayerProjectileElementUtility
     #region Private Methods
     /// <summary>
     /// Resolves the bit mask used to track whether one applied element already emitted a payload entry in the current projectile.
-    /// /params appliedElement Current runtime applied-element selection.
-    /// /returns Non-zero bit mask for supported gameplay elements, or zero when the element should be ignored.
     /// </summary>
+    /// <param name="appliedElement">Current runtime applied-element selection.</param>
+    /// <returns>Non-zero bit mask for supported gameplay elements, or zero when the element should be ignored.</returns>
     private static uint ResolveAppliedElementMask(PlayerProjectileAppliedElement appliedElement)
     {
         switch (appliedElement)

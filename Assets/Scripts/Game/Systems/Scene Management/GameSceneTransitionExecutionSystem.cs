@@ -4,8 +4,6 @@ using Unity.Entities;
 using UnityEngine;
 
 /// <summary>Executes queued scene transition requests through Unity's managed scene loading API.</summary>
-/// /params None.
-/// /returns None.
 [UpdateInGroup(typeof(GameSceneManagementSystemGroup))]
 [UpdateAfter(typeof(GameSceneTransitionTriggerSystem))]
 public partial class GameSceneTransitionExecutionSystem : SystemBase
@@ -34,8 +32,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
 
     #region Lifecycle
     /// <summary>Creates the manager singleton query required by transition execution.</summary>
-    /// /params None.
-    /// /returns None.
     protected override void OnCreate()
     {
         managerQuery = GetEntityQuery(typeof(GameSceneManagerConfig),
@@ -48,16 +44,12 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Restores time scale if the system is destroyed during a transition.</summary>
-    /// /params None.
-    /// /returns None.
     protected override void OnDestroy()
     {
         GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
     }
 
     /// <summary>Starts pending transitions or advances the active asynchronous scene operation.</summary>
-    /// /params None.
-    /// /returns None.
     protected override void OnUpdate()
     {
         int managerCount = managerQuery.CalculateEntityCount();
@@ -118,9 +110,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
 
     #region Start
     /// <summary>Starts the configured initial scene transition after bootstrap when required.</summary>
-    /// /params config/scenes/transitions Runtime scene manager data and transition definitions.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /returns True when the initial transition started.
+    /// <param name="config">/scenes/transitions Runtime scene manager data and transition definitions.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <returns>True when the initial transition started.</returns>
     private bool TryStartInitialTransition(GameSceneManagerConfig config,
                                            DynamicBuffer<GameSceneDefinitionElement> scenes,
                                            DynamicBuffer<GameSceneTransitionElement> transitions,
@@ -150,10 +142,10 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Resolves and starts one transition request.</summary>
-    /// /params config/scenes/transitions Runtime scene manager data and transition definitions.
-    /// /params request Transition request to start.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /returns True when the transition started.
+    /// <param name="config">/scenes/transitions Runtime scene manager data and transition definitions.</param>
+    /// <param name="request">Transition request to start.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <returns>True when the transition started.</returns>
     private bool TryStartTransition(GameSceneManagerConfig config,
                                     DynamicBuffer<GameSceneDefinitionElement> scenes,
                                     DynamicBuffer<GameSceneTransitionElement> transitions,
@@ -230,9 +222,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
 
     #region Tick
     /// <summary>Advances the active transition state machine.</summary>
-    /// /params managerEntity/config Scene manager entity and runtime config.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /returns None.
+    /// <param name="managerEntity">/config Scene manager entity and runtime config.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
     private void TickActiveTransition(Entity managerEntity,
                                       GameSceneManagerConfig config,
                                       ref GameSceneTransitionState transitionState,
@@ -268,9 +259,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Advances the fade-out phase until the overlay is fully black.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config/deltaTime Runtime config and clamped unscaled frame delta.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">/deltaTime Runtime config and clamped unscaled frame delta.</param>
     private void TickFadeOut(ref GameSceneTransitionState transitionState,
                              ref GameSceneFadePresentationState fadeState,
                              ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -289,9 +279,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Unloads the active scene before reload transitions load the new instance.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     private void TickPreUnload(ref GameSceneTransitionState transitionState,
                                ref GameSceneFadePresentationState fadeState,
                                ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -326,9 +315,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Loads the target scene additively and activates it when the asynchronous operation completes.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     private void TickLoading(ref GameSceneTransitionState transitionState,
                              ref GameSceneFadePresentationState fadeState,
                              ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -421,9 +409,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Unloads the previous non-persistent scene after the target scene is active.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     private void TickPostUnload(ref GameSceneTransitionState transitionState,
                                 ref GameSceneFadePresentationState fadeState,
                                 ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -490,9 +477,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Holds the fade overlay fully opaque for the configured post-readiness bonus before fade-in.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config/deltaTime Runtime config and clamped unscaled frame delta.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">/deltaTime Runtime config and clamped unscaled frame delta.</param>
     private void TickHoldBlack(ref GameSceneTransitionState transitionState,
                                ref GameSceneFadePresentationState fadeState,
                                ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -513,10 +499,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Advances the fade-in phase and completes the transition at transparent alpha.</summary>
-    /// /params managerEntity/config Scene manager entity and runtime config.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params deltaTime Clamped unscaled frame delta.
-    /// /returns None.
+    /// <param name="managerEntity">/config Scene manager entity and runtime config.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="deltaTime">Clamped unscaled frame delta.</param>
     private void TickFadeIn(Entity managerEntity,
                             GameSceneManagerConfig config,
                             ref GameSceneTransitionState transitionState,
@@ -538,8 +523,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
 
     #region Helpers
     /// <summary>Clears per-transition load and unload progress flags before a new transition starts.</summary>
-    /// /params None.
-    /// /returns None.
     private void ResetOperationProgress()
     {
         targetSceneLoaded = false;
@@ -554,9 +537,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Moves from fade out to source unload or target load depending on reload policy.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     private void AdvanceAfterFadeOut(ref GameSceneTransitionState transitionState,
                                      ref GameSceneFadePresentationState fadeState,
                                      ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -572,9 +554,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Starts the hold-black phase when configured, otherwise starts fade-in.</summary>
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /params config Scene manager runtime config.
-    /// /returns None.
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
+    /// <param name="config">Scene manager runtime config.</param>
     private void BeginHoldOrFadeIn(ref GameSceneTransitionState transitionState,
                                    ref GameSceneFadePresentationState fadeState,
                                    ref GameSceneLoadingProgressPresentationState loadingProgressState,
@@ -593,9 +574,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Applies loading-progress visibility and status when a transition phase starts.</summary>
-    /// /params phase/config Transition phase and runtime config.
-    /// /params loadingProgressState Mutable loading-progress presentation component.
-    /// /returns None.
+    /// <param name="phase">/config Transition phase and runtime config.</param>
+    /// <param name="loadingProgressState">Mutable loading-progress presentation component.</param>
     private void ApplyLoadingProgressForPhase(GameSceneTransitionPhase phase,
                                               ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                               GameSceneManagerConfig config)
@@ -607,9 +587,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Applies aggregate loading progress for the current operation step.</summary>
-    /// /params loadingProgressState/config Mutable progress state and runtime config.
-    /// /params operationKind/sceneDefinition Status mode and processed scene definition.
-    /// /returns None.
+    /// <param name="loadingProgressState">/config Mutable progress state and runtime config.</param>
+    /// <param name="operationKind">/sceneDefinition Status mode and processed scene definition.</param>
     private void ApplyCurrentLoadingProgress(ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                              GameSceneManagerConfig config,
                                              GameSceneLoadingProgressOperationKind operationKind,
@@ -623,8 +602,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Builds an immutable snapshot of the counters used by loading-progress calculations.</summary>
-    /// /params None.
-    /// /returns Current transition progress snapshot.
+    /// <returns>Current transition progress snapshot.</returns>
     private GameSceneTransitionProgressSnapshot BuildLoadingProgressSnapshot()
     {
         return new GameSceneTransitionProgressSnapshot(reloadActiveScene, hasSourceScene,
@@ -640,9 +618,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Updates managed and ECS phase fields and resets the phase timer.</summary>
-    /// /params phase/config New transition phase and runtime config.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /returns None.
+    /// <param name="phase">/config New transition phase and runtime config.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
     private void BeginPhase(GameSceneTransitionPhase phase,
                             ref GameSceneTransitionState transitionState,
                             ref GameSceneFadePresentationState fadeState,
@@ -663,9 +640,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     }
 
     /// <summary>Completes the active transition and restores idle state.</summary>
-    /// /params managerEntity/config Scene manager entity and runtime config.
-    /// /params transitionState/fadeState/loadingProgressState Mutable ECS presentation state.
-    /// /returns None.
+    /// <param name="managerEntity">/config Scene manager entity and runtime config.</param>
+    /// <param name="transitionState">/fadeState/loadingProgressState Mutable ECS presentation state.</param>
     private void CompleteTransition(Entity managerEntity,
                                     GameSceneManagerConfig config,
                                     ref GameSceneTransitionState transitionState,

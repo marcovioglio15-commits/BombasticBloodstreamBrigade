@@ -1,7 +1,5 @@
 /// <summary>
 /// Tracks stable aggregate max values for a boss HUD encounter so bars do not refill when one boss leaves the active set.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct EnemyBossHudAggregateBaseline
 {
@@ -15,9 +13,9 @@ internal struct EnemyBossHudAggregateBaseline
     #region Public Methods
     /// <summary>
     /// Resolves the health denominator for the current aggregate, preserving the highest observed active-boss max.
-    /// /params currentMaxHealth Current summed max health from active boss HUD entities.
-    /// /returns Stable non-decreasing max health used as the bar denominator.
     /// </summary>
+    /// <param name="currentMaxHealth">Current summed max health from active boss HUD entities.</param>
+    /// <returns>Stable non-decreasing max health used as the bar denominator.</returns>
     public float ResolveHealthMax(float currentMaxHealth)
     {
         if (currentMaxHealth > healthMax)
@@ -28,9 +26,9 @@ internal struct EnemyBossHudAggregateBaseline
 
     /// <summary>
     /// Resolves the shield denominator for the current aggregate, preserving the highest observed active-boss max.
-    /// /params currentMaxShield Current summed max shield from active boss HUD entities.
-    /// /returns Stable non-decreasing max shield used as the bar denominator.
     /// </summary>
+    /// <param name="currentMaxShield">Current summed max shield from active boss HUD entities.</param>
+    /// <returns>Stable non-decreasing max shield used as the bar denominator.</returns>
     public float ResolveShieldMax(float currentMaxShield)
     {
         if (currentMaxShield > shieldMax)
@@ -41,8 +39,6 @@ internal struct EnemyBossHudAggregateBaseline
 
     /// <summary>
     /// Clears encounter baseline data when no boss HUD entity remains active.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Reset()
     {

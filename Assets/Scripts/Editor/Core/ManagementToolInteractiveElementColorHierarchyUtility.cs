@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Resolves supported interactive controls, hierarchy paths and persistence keys for management-tool color customization.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ManagementToolInteractiveElementColorHierarchyUtility
 {
@@ -21,11 +19,10 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
     #region Public Methods
     /// <summary>
     /// Traverses the supplied hierarchy and registers every supported interactive control exactly once.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params currentElement Current node being inspected.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /returns None.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="currentElement">Current node being inspected.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
     public static void RegisterHierarchyElements(VisualElement hierarchyRoot,
                                                  VisualElement currentElement,
                                                  string stateKeyPrefix)
@@ -41,13 +38,12 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Traverses the currently visible hierarchy and appends one browser entry for each supported interactive control.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params currentElement Current node being inspected.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /params results Target list that receives the collected entries.
-    /// /params registeredStateKeys Deduplication set for already collected state keys.
-    /// /returns None.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="currentElement">Current node being inspected.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
+    /// <param name="results">Target list that receives the collected entries.</param>
+    /// <param name="registeredStateKeys">Deduplication set for already collected state keys.</param>
     public static void AppendBrowserEntries(VisualElement hierarchyRoot,
                                             VisualElement currentElement,
                                             string stateKeyPrefix,
@@ -71,12 +67,12 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves the nearest supported interactive ancestor of the clicked element, ensures it is registered and opens the color inspector.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params startElement Clicked visual element where the ancestor walk begins.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /params evt Mouse event emitted by UI Toolkit.
-    /// /returns True when one supported interactive control handled the right click.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="startElement">Clicked visual element where the ancestor walk begins.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
+    /// <param name="evt">Mouse event emitted by UI Toolkit.</param>
+    /// <returns>True when one supported interactive control handled the right click.</returns>
     public static bool TryOpenRightClickFallback(VisualElement hierarchyRoot,
                                                  VisualElement startElement,
                                                  string stateKeyPrefix,
@@ -118,9 +114,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves one readable display name for the supplied interactive control.
-    /// /params targetElement Element whose user-facing title must be resolved.
-    /// /returns One readable display name for inspector and debugging UI.
     /// </summary>
+    /// <param name="targetElement">Element whose user-facing title must be resolved.</param>
+    /// <returns>One readable display name for inspector and debugging UI.</returns>
     public static string ResolveDisplayName(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -154,11 +150,10 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
     #region Private Methods
     /// <summary>
     /// Registers one interactive control when it is supported and was not registered before.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params targetElement Candidate control to register.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /returns None.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="targetElement">Candidate control to register.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
     private static void TryRegisterInteractiveElement(VisualElement hierarchyRoot,
                                                       VisualElement targetElement,
                                                       string stateKeyPrefix)
@@ -179,13 +174,12 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Appends one browser entry for the provided visible control when it is supported and not yet collected.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params targetElement Candidate control being inspected.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /params results Target list that receives the collected entries.
-    /// /params registeredStateKeys Deduplication set for already collected state keys.
-    /// /returns None.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="targetElement">Candidate control being inspected.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
+    /// <param name="results">Target list that receives the collected entries.</param>
+    /// <param name="registeredStateKeys">Deduplication set for already collected state keys.</param>
     private static void TryAppendBrowserEntry(VisualElement hierarchyRoot,
                                               VisualElement targetElement,
                                               string stateKeyPrefix,
@@ -217,11 +211,10 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Registers one supported control when needed and reapplies any saved colors to the live instance.
-    /// /params targetElement Supported interactive control being synchronized.
-    /// /params stateKey Stable persistence key used by EditorPrefs.
-    /// /params elementKind Interactive control kind used to apply colors correctly.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Supported interactive control being synchronized.</param>
+    /// <param name="stateKey">Stable persistence key used by EditorPrefs.</param>
+    /// <param name="elementKind">Interactive control kind used to apply colors correctly.</param>
     private static void EnsureInteractiveElementRegistered(VisualElement targetElement,
                                                            string stateKey,
                                                            ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
@@ -237,10 +230,10 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves the interactive-control kind for one candidate element.
-    /// /params targetElement Candidate control being inspected.
-    /// /params elementKind Resolved interactive-control kind.
-    /// /returns True when the element is supported.
     /// </summary>
+    /// <param name="targetElement">Candidate control being inspected.</param>
+    /// <param name="elementKind">Resolved interactive-control kind.</param>
+    /// <returns>True when the element is supported.</returns>
     private static bool TryResolveInteractiveKind(VisualElement targetElement,
                                                   out ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
@@ -269,9 +262,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Returns whether one element should be treated as a popup-like control.
-    /// /params targetElement Candidate control being inspected.
-    /// /returns True when the element is a popup-like control.
     /// </summary>
+    /// <param name="targetElement">Candidate control being inspected.</param>
+    /// <returns>True when the element is a popup-like control.</returns>
     private static bool IsPopupLikeElement(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -286,12 +279,12 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Builds the persisted state key used by one interactive control.
-    /// /params hierarchyRoot Root used to build stable hierarchical state keys.
-    /// /params targetElement Target control whose key is being built.
-    /// /params stateKeyPrefix Stable state-key prefix used for all controls under the root.
-    /// /params elementKind Interactive control kind used to build the terminal segment.
-    /// /returns One persisted state key for the target control.
     /// </summary>
+    /// <param name="hierarchyRoot">Root used to build stable hierarchical state keys.</param>
+    /// <param name="targetElement">Target control whose key is being built.</param>
+    /// <param name="stateKeyPrefix">Stable state-key prefix used for all controls under the root.</param>
+    /// <param name="elementKind">Interactive control kind used to build the terminal segment.</param>
+    /// <returns>One persisted state key for the target control.</returns>
     private static string BuildElementStateKey(VisualElement hierarchyRoot,
                                                VisualElement targetElement,
                                                string stateKeyPrefix,
@@ -328,9 +321,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves the leaf-prefix segment used to separate persisted keys by interactive kind.
-    /// /params elementKind Interactive control kind used by the target element.
-    /// /returns Stable persisted-key prefix for the leaf segment.
     /// </summary>
+    /// <param name="elementKind">Interactive control kind used by the target element.</param>
+    /// <returns>Stable persisted-key prefix for the leaf segment.</returns>
     private static string ResolveLeafPrefix(ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
         switch (elementKind)
@@ -348,9 +341,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves one stable path token for the supplied element.
-    /// /params targetElement Element whose token must be resolved.
-    /// /returns One sanitized path token.
     /// </summary>
+    /// <param name="targetElement">Element whose token must be resolved.</param>
+    /// <returns>One sanitized path token.</returns>
     private static string ResolvePathToken(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -369,9 +362,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves one user-facing token for the supplied element whenever possible.
-    /// /params targetElement Element whose user-facing text must be resolved.
-    /// /returns One sanitized display token, or an empty string when unavailable.
     /// </summary>
+    /// <param name="targetElement">Element whose user-facing text must be resolved.</param>
+    /// <returns>One sanitized display token, or an empty string when unavailable.</returns>
     private static string ResolveDisplayToken(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -399,10 +392,10 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Resolves the ordinal of one element among siblings that share the same path token.
-    /// /params targetElement Target element whose ordinal must be resolved.
-    /// /params pathToken Token used to compare siblings.
-    /// /returns One zero-based ordinal for the target element.
     /// </summary>
+    /// <param name="targetElement">Target element whose ordinal must be resolved.</param>
+    /// <param name="pathToken">Token used to compare siblings.</param>
+    /// <returns>One zero-based ordinal for the target element.</returns>
     private static int ResolveSiblingOrdinal(VisualElement targetElement, string pathToken)
     {
         VisualElement parentElement = targetElement.parent;
@@ -428,9 +421,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
     /// <summary>
     /// Sanitizes one free-form token so it is stable and EditorPrefs-safe.
-    /// /params rawToken Raw token text to sanitize.
-    /// /returns One sanitized token.
     /// </summary>
+    /// <param name="rawToken">Raw token text to sanitize.</param>
+    /// <returns>One sanitized token.</returns>
     private static string SanitizeToken(string rawToken)
     {
         if (string.IsNullOrWhiteSpace(rawToken))

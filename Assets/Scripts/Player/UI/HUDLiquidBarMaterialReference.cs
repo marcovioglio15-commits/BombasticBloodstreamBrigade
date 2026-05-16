@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// References the default liquid-bar materials used by the HUD runtime when no per-bar override is assigned.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "HUDLiquidBarMaterialReference", menuName = "UI/HUD Liquid Bar Material Reference")]
 public sealed class HUDLiquidBarMaterialReference : ScriptableObject
@@ -56,9 +54,8 @@ public sealed class HUDLiquidBarMaterialReference : ScriptableObject
     #region Editor Methods
     /// <summary>
     /// Assigns the default health liquid-bar material referenced by the HUD runtime.
-    /// /params materialValue Material used for health bars.
-    /// /returns None.
     /// </summary>
+    /// <param name="materialValue">Material used for health bars.</param>
     public void SetHealthMaterial(Material materialValue)
     {
         healthMaterial = materialValue;
@@ -66,9 +63,8 @@ public sealed class HUDLiquidBarMaterialReference : ScriptableObject
 
     /// <summary>
     /// Assigns the default shield liquid-bar material referenced by the HUD runtime.
-    /// /params materialValue Material used for shield bars.
-    /// /returns None.
     /// </summary>
+    /// <param name="materialValue">Material used for shield bars.</param>
     public void SetShieldMaterial(Material materialValue)
     {
         shieldMaterial = materialValue;
@@ -76,9 +72,8 @@ public sealed class HUDLiquidBarMaterialReference : ScriptableObject
 
     /// <summary>
     /// Assigns the default experience liquid-bar material referenced by the HUD runtime.
-    /// /params materialValue Material used for experience bars.
-    /// /returns None.
     /// </summary>
+    /// <param name="materialValue">Material used for experience bars.</param>
     public void SetExperienceMaterial(Material materialValue)
     {
         experienceMaterial = materialValue;

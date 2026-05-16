@@ -186,9 +186,9 @@ public partial struct ProjectileSimulationSystem : ISystem
         #region Inherited Velocity
         /// <summary>
         /// Resolves the full shooter velocity used by non-linear projectile trajectories.
-        /// /params owner Projectile owner containing the shooter entity reference.
-        /// /returns Shooter velocity, or zero when the shooter has no movement state.
         /// </summary>
+        /// <param name="owner">Projectile owner containing the shooter entity reference.</param>
+        /// <returns>Shooter velocity, or zero when the shooter has no movement state.</returns>
         private float3 ResolveFullInheritedVelocity(in ProjectileOwner owner)
         {
             return ProjectileKinematicsUtility.ResolveInheritedVelocity(owner.ShooterEntity, in MovementStateLookup);

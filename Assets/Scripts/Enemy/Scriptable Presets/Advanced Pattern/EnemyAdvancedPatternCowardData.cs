@@ -4,7 +4,6 @@ using UnityEngine;
 /// <summary>
 /// Contains payload values for Coward flee movement.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class EnemyCowardModuleData
@@ -280,7 +279,6 @@ public sealed class EnemyCowardModuleData
     /// <summary>
     /// Ensures Coward payload references remain structurally valid without snapping authored settings.
     /// none.
-    /// returns void.
     /// </summary>
     public void Validate()
     {

@@ -63,7 +63,7 @@ internal static class EnemyMasterPresetsPanelPrefabActivationUtility
     /// Resolves the selected prefab index inside the currently available enemy prefab list.
     /// </summary>
     /// <param name="panel">Owning panel that stores prefab candidates and selected prefab state.</param>
-    /// <returns>Returns the popup index for the current selection, or zero when no valid selection exists.<returns>
+    /// <returns>Returns the popup index for the current selection, or zero when no valid selection exists.</returns>
     public static int ResolveSelectedEnemyPrefabIndex(EnemyMasterPresetsPanel panel)
     {
         if (panel.SelectedEnemyPrefab == null)

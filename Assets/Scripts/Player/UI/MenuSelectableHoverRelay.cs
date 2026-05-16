@@ -5,7 +5,6 @@ using UnityEngine.UI;
 /// <summary>
 /// Forwards pointer enter and exit events from one menu button to a shared MenuSelectionController.
 /// None.
-/// returns None.
 /// </summary>
 [RequireComponent(typeof(Selectable))]
 [DisallowMultipleComponent]
@@ -55,9 +54,8 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
     #region Event Methods
     /// <summary>
     /// Transfers active selection to this button while the pointer is hovering it.
-    /// eventData: Pointer event reported by the Unity EventSystem.
-    /// returns None.
     /// </summary>
+    /// <param name="eventData">Pointer event reported by the Unity EventSystem.</param>
     public void OnPointerEnter(PointerEventData eventData)
     {
         // Ignore missing selection infrastructure.
@@ -69,9 +67,8 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
 
     /// <summary>
     /// Restores the previous menu selection when the pointer leaves this button.
-    /// eventData: Pointer event reported by the Unity EventSystem.
-    /// returns None.
     /// </summary>
+    /// <param name="eventData">Pointer event reported by the Unity EventSystem.</param>
     public void OnPointerExit(PointerEventData eventData)
     {
         // Ignore missing selection infrastructure.
@@ -86,7 +83,6 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
     /// <summary>
     /// Resolves the shared MenuSelectionController used by this button.
     /// None.
-    /// returns None.
     /// </summary>
     private void ResolveSelectionController()
     {

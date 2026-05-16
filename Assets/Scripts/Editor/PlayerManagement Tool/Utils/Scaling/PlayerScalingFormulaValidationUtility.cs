@@ -28,7 +28,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// <param name="formula">Formula text entered by designers.</param>
     /// <param name="allowedVariables">Optional variable whitelist (case-insensitive). Null skips unknown-variable checks.</param>
     /// <param name="warningMessage">Validation warning text when formula is invalid.</param>
-    /// <returns>True when formula is valid, otherwise false.<returns>
+    /// <returns>True when formula is valid, otherwise false.</returns>
     public static bool TryValidateFormula(string formula,
                                           ISet<string> allowedVariables,
                                           out string warningMessage,
@@ -52,7 +52,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// <param name="thisType">Type bound to the reserved [this] token.</param>
     /// <param name="requiredResultType">Expected formula result type for the current authoring context.</param>
     /// <param name="warningMessage">Validation warning text when formula is invalid.</param>
-    /// <returns>True when formula is valid, otherwise false.<returns>
+    /// <returns>True when formula is valid, otherwise false.</returns>
     public static bool TryValidateFormula(string formula,
                                           ISet<string> allowedVariables,
                                           IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes,
@@ -117,7 +117,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Collects scalable stat names from progression serialized list into a case-insensitive set.
     /// </summary>
     /// <param name="scalableStatsProperty">Serialized List&lt;PlayerScalableStatDefinition&gt; property.</param>
-    /// <returns>Case-insensitive set of scalable stat names.<returns>
+    /// <returns>Case-insensitive set of scalable stat names.</returns>
     public static HashSet<string> BuildVariableSet(SerializedProperty scalableStatsProperty)
     {
         HashSet<string> variableSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -161,7 +161,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Collects scalable stat names and types from progression serialized list into a case-insensitive dictionary.
     /// </summary>
     /// <param name="scalableStatsProperty">Serialized List&lt;PlayerScalableStatDefinition&gt; property.</param>
-    /// <returns>Case-insensitive dictionary of scalable stat types keyed by stat name.<returns>
+    /// <returns>Case-insensitive dictionary of scalable stat types keyed by stat name.</returns>
     public static Dictionary<string, PlayerFormulaValueType> BuildVariableTypeMap(SerializedProperty scalableStatsProperty)
     {
         Dictionary<string, PlayerFormulaValueType> variableTypes = new Dictionary<string, PlayerFormulaValueType>(StringComparer.OrdinalIgnoreCase);
@@ -209,7 +209,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Collects scalable stat names and authoring types from progression serialized list into a case-insensitive dictionary.
     /// </summary>
     /// <param name="scalableStatsProperty">Serialized List&lt;PlayerScalableStatDefinition&gt; property.</param>
-    /// <returns>Case-insensitive dictionary of scalable-stat types keyed by stat name.<returns>
+    /// <returns>Case-insensitive dictionary of scalable-stat types keyed by stat name.</returns>
     public static Dictionary<string, PlayerScalableStatType> BuildScalableStatTypeMap(SerializedProperty scalableStatsProperty)
     {
         Dictionary<string, PlayerScalableStatType> variableTypes = new Dictionary<string, PlayerScalableStatType>(StringComparer.OrdinalIgnoreCase);
@@ -256,7 +256,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Builds a scalable variable scope for the current edited preset, constrained by the active master preset context.
     /// </summary>
     /// <param name="serializedObject">Serialized object that owns the currently edited scaling rules.</param>
-    /// <returns>Case-insensitive set of scoped scalable stat names valid for this preset context.<returns>
+    /// <returns>Case-insensitive set of scoped scalable stat names valid for this preset context.</returns>
     public static HashSet<string> BuildScopedVariableSet(SerializedObject serializedObject)
     {
         HashSet<string> variableSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -289,7 +289,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Builds a typed scalable variable scope for the current edited preset, constrained by the active master preset context.
     /// </summary>
     /// <param name="serializedObject">Serialized object that owns the currently edited scaling rules.</param>
-    /// <returns>Case-insensitive dictionary of typed scalable stat names valid for this preset context.<returns>
+    /// <returns>Case-insensitive dictionary of typed scalable stat names valid for this preset context.</returns>
     public static Dictionary<string, PlayerFormulaValueType> BuildScopedVariableTypeMap(SerializedObject serializedObject)
     {
         Dictionary<string, PlayerFormulaValueType> variableTypes = new Dictionary<string, PlayerFormulaValueType>(StringComparer.OrdinalIgnoreCase);
@@ -317,7 +317,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Builds a scalable-stat-type scope for the current edited preset, constrained by the active master preset context.
     /// </summary>
     /// <param name="serializedObject">Serialized object that owns the currently edited scaling rules.</param>
-    /// <returns>Case-insensitive dictionary of scalable-stat types keyed by stat name.<returns>
+    /// <returns>Case-insensitive dictionary of scalable-stat types keyed by stat name.</returns>
     public static Dictionary<string, PlayerScalableStatType> BuildScopedScalableStatTypeMap(SerializedObject serializedObject)
     {
         Dictionary<string, PlayerScalableStatType> variableTypes = new Dictionary<string, PlayerScalableStatType>(StringComparer.OrdinalIgnoreCase);
@@ -345,7 +345,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// Formats the helper label that lists the variables available to one scaling or assignment formula.
     /// </summary>
     /// <param name="allowedVariables">Case-insensitive variable set available in the current editor scope.</param>
-    /// <returns>User-facing label text describing the available variables.<returns>
+    /// <returns>User-facing label text describing the available variables.</returns>
     public static string BuildAvailableVariablesLabelText(ISet<string> allowedVariables,
                                                           IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes = null)
     {
@@ -392,7 +392,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// </summary>
     /// <param name="allowedVariables">Case-insensitive variable set available in the current editor scope.</param>
     /// <param name="variableTypes">Optional scalable-stat type map used to print precise subtype labels.</param>
-    /// <returns>User-facing label text describing the available variables.<returns>
+    /// <returns>User-facing label text describing the available variables.</returns>
     public static string BuildAvailableVariablesLabelText(ISet<string> allowedVariables,
                                                           IReadOnlyDictionary<string, PlayerScalableStatType> variableTypes)
     {

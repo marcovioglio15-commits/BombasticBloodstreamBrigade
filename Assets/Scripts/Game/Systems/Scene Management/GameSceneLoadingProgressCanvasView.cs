@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Authored loading-progress overlay view controlled by the Game Scene Manager presentation system.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
@@ -73,9 +71,9 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Applies the latest loading-progress state to the active authored view when one exists.
-    /// /params state Loading-progress presentation state produced by ECS.
-    /// /returns True when a loading-progress view received the state.
     /// </summary>
+    /// <param name="state">Loading-progress presentation state produced by ECS.</param>
+    /// <returns>True when a loading-progress view received the state.</returns>
     public static bool TryApply(GameSceneLoadingProgressPresentationState state)
     {
         if (activeView == null)
@@ -89,8 +87,6 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Caches references and registers this authored loading-progress view as the active bridge.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -104,8 +100,6 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Clears the active view reference when this overlay is disabled or unloaded.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -115,8 +109,6 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Rotates the spinner root only while the indicator is visible.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Update()
     {
@@ -136,9 +128,8 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Apply
     /// <summary>
     /// Applies all presentation fields from ECS to authored UI references.
-    /// /params state Loading-progress presentation state produced by ECS.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Loading-progress presentation state produced by ECS.</param>
     private void Apply(GameSceneLoadingProgressPresentationState state)
     {
         bool nextVisible = state.Visible != 0;
@@ -155,8 +146,6 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Applies hidden UI state without requiring an ECS singleton.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyHidden()
     {
@@ -168,9 +157,8 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Applies visibility to the root and CanvasGroup without disabling this bridge component.
-    /// /params nextVisible True when loading-progress UI should be visible.
-    /// /returns None.
     /// </summary>
+    /// <param name="nextVisible">True when loading-progress UI should be visible.</param>
     private void ApplyVisibility(bool nextVisible)
     {
         visible = nextVisible;
@@ -191,12 +179,11 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Applies segmented ring visuals and geometry settings.
-    /// /params progress Normalized loading progress.
-    /// /params state Loading-progress presentation state.
-    /// /params ringColor Color for the progress fill ring.
-    /// /params trackColor Color for the background track ring.
-    /// /returns None.
     /// </summary>
+    /// <param name="progress">Normalized loading progress.</param>
+    /// <param name="state">Loading-progress presentation state.</param>
+    /// <param name="ringColor">Color for the progress fill ring.</param>
+    /// <param name="trackColor">Color for the background track ring.</param>
     private void ApplyRings(float progress,
                             GameSceneLoadingProgressPresentationState state,
                             Color ringColor,
@@ -225,11 +212,10 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Applies the optional centered percentage label.
-    /// /params progress Normalized loading progress.
-    /// /params showPercentage True when the percentage text should be visible.
-    /// /params textColor Color applied to the label.
-    /// /returns None.
     /// </summary>
+    /// <param name="progress">Normalized loading progress.</param>
+    /// <param name="showPercentage">True when the percentage text should be visible.</param>
+    /// <param name="textColor">Color applied to the label.</param>
     private void ApplyPercentage(float progress, bool showPercentage, Color textColor)
     {
         if (percentageText == null)
@@ -258,11 +244,10 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
 
     /// <summary>
     /// Applies the optional operation status label.
-    /// /params status Status text produced by ECS.
-    /// /params showStatusText True when the status text should be visible.
-    /// /params textColor Color applied to the label.
-    /// /returns None.
     /// </summary>
+    /// <param name="status">Status text produced by ECS.</param>
+    /// <param name="showStatusText">True when the status text should be visible.</param>
+    /// <param name="textColor">Color applied to the label.</param>
     private void ApplyStatus(FixedString128Bytes status, bool showStatusText, Color textColor)
     {
         if (statusText == null)
@@ -291,9 +276,8 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Runtime State
     /// <summary>
     /// Reads the current ECS loading-progress singleton so enabling the view during a transition preserves state.
-    /// /params None.
-    /// /returns True when an ECS loading-progress state was applied.
     /// </summary>
+    /// <returns>True when an ECS loading-progress state was applied.</returns>
     private bool TryApplyCurrentRuntimeState()
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -322,8 +306,6 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Reference Resolution
     /// <summary>
     /// Resolves missing authored references from the local hierarchy without creating UI at runtime.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResolveReferences()
     {
@@ -344,9 +326,9 @@ public sealed class GameSceneLoadingProgressCanvasView : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Converts a DOTS float4 color into a UnityEngine Color value.
-    /// /params value DOTS color value.
-    /// /returns Unity color value.
     /// </summary>
+    /// <param name="value">DOTS color value.</param>
+    /// <returns>Unity color value.</returns>
     private static Color ToColor(float4 value)
     {
         return new Color(value.x, value.y, value.z, value.w);

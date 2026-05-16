@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes math helpers and tuning scalars used by enemy pattern movement runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyPatternMovementMathUtility
 {
@@ -26,9 +24,9 @@ internal static class EnemyPatternMovementMathUtility
     #region Public Methods
     /// <summary>
     /// Resolves whether current movement pattern ignores steering and priority interactions.
-    /// /params patternConfig Current compiled pattern configuration.
-    /// /returns True when the active movement explicitly requests steering and priority bypass.
     /// </summary>
+    /// <param name="patternConfig">Current compiled pattern configuration.</param>
+    /// <returns>True when the active movement explicitly requests steering and priority bypass.</returns>
     public static bool ShouldIgnoreSteeringAndPriority(in EnemyPatternConfig patternConfig)
     {
         if (patternConfig.MovementKind == EnemyCompiledMovementPatternKind.ShortRangeDash)
@@ -42,12 +40,12 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Blends clearance with the current desired velocity while preserving stable forward speed.
-    /// /params baseVelocity Current desired planar velocity before clearance.
-    /// /params clearanceVelocity Planar clearance contribution.
-    /// /params clearanceBlend Clearance blend scalar.
-    /// /params minimumForwardSpeedRatio Minimum retained forward speed ratio in [0..1].
-    /// /returns Blended desired velocity.
     /// </summary>
+    /// <param name="baseVelocity">Current desired planar velocity before clearance.</param>
+    /// <param name="clearanceVelocity">Planar clearance contribution.</param>
+    /// <param name="clearanceBlend">Clearance blend scalar.</param>
+    /// <param name="minimumForwardSpeedRatio">Minimum retained forward speed ratio in [0..1].</param>
+    /// <returns>Blended desired velocity.</returns>
     public static float3 ComposeDesiredVelocityWithClearance(float3 baseVelocity,
                                                             float3 clearanceVelocity,
                                                             float clearanceBlend,
@@ -76,12 +74,12 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Resolves per-frame velocity change rate using acceleration for speed-up and deceleration for slow-down.
-    /// /params currentVelocity Current planar velocity.
-    /// /params desiredVelocity Target planar velocity.
-    /// /params acceleration Configured acceleration.
-    /// /params deceleration Configured deceleration.
-    /// /returns Velocity delta rate in units per second.
     /// </summary>
+    /// <param name="currentVelocity">Current planar velocity.</param>
+    /// <param name="desiredVelocity">Target planar velocity.</param>
+    /// <param name="acceleration">Configured acceleration.</param>
+    /// <param name="deceleration">Configured deceleration.</param>
+    /// <returns>Velocity delta rate in units per second.</returns>
     public static float ResolveVelocityChangeRate(float3 currentVelocity,
                                                   float3 desiredVelocity,
                                                   float acceleration,
@@ -101,9 +99,9 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Resolves one steering aggressiveness value with safe defaults and clamps.
-    /// /params rawAggressiveness Serialized aggressiveness value.
-    /// /returns Resolved aggressiveness value ready for runtime use.
     /// </summary>
+    /// <param name="rawAggressiveness">Serialized aggressiveness value.</param>
+    /// <returns>Resolved aggressiveness value ready for runtime use.</returns>
     public static float ResolveSteeringAggressiveness(float rawAggressiveness)
     {
         if (rawAggressiveness < 0f)
@@ -114,11 +112,11 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Maps steering aggressiveness to a configurable scalar range.
-    /// /params aggressiveness Resolved aggressiveness value.
-    /// /params minimumScale Output scale at minimum aggressiveness.
-    /// /params maximumScale Output scale at maximum aggressiveness.
-    /// /returns Interpolated scalar in the requested range.
     /// </summary>
+    /// <param name="aggressiveness">Resolved aggressiveness value.</param>
+    /// <param name="minimumScale">Output scale at minimum aggressiveness.</param>
+    /// <param name="maximumScale">Output scale at maximum aggressiveness.</param>
+    /// <returns>Interpolated scalar in the requested range.</returns>
     public static float ResolveAggressivenessScale(float aggressiveness, float minimumScale, float maximumScale)
     {
         float normalizedAggressiveness = math.saturate((aggressiveness - MinimumSteeringAggressiveness) /
@@ -128,11 +126,11 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Resolves temporary max-speed boost applied while yielding to higher-priority neighbors.
-    /// /params yieldUrgency Yield urgency in [0..1].
-    /// /params priorityGapNormalized Normalized priority-tier gap in [0..1].
-    /// /params aggressiveness Resolved steering aggressiveness.
-    /// /returns Additional speed ratio in [0..+].
     /// </summary>
+    /// <param name="yieldUrgency">Yield urgency in [0..1].</param>
+    /// <param name="priorityGapNormalized">Normalized priority-tier gap in [0..1].</param>
+    /// <param name="aggressiveness">Resolved steering aggressiveness.</param>
+    /// <returns>Additional speed ratio in [0..+].</returns>
     public static float ResolvePriorityYieldSpeedBoost(float yieldUrgency, float priorityGapNormalized, float aggressiveness)
     {
         float normalizedUrgency = math.saturate(yieldUrgency);
@@ -149,11 +147,11 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Resolves temporary acceleration boost applied while yielding to higher-priority neighbors.
-    /// /params yieldUrgency Yield urgency in [0..1].
-    /// /params priorityGapNormalized Normalized priority-tier gap in [0..1].
-    /// /params aggressiveness Resolved steering aggressiveness.
-    /// /returns Additional acceleration ratio in [0..+].
     /// </summary>
+    /// <param name="yieldUrgency">Yield urgency in [0..1].</param>
+    /// <param name="priorityGapNormalized">Normalized priority-tier gap in [0..1].</param>
+    /// <param name="aggressiveness">Resolved steering aggressiveness.</param>
+    /// <returns>Additional acceleration ratio in [0..+].</returns>
     public static float ResolvePriorityYieldAccelerationBoost(float yieldUrgency, float priorityGapNormalized, float aggressiveness)
     {
         float normalizedUrgency = math.saturate(yieldUrgency);
@@ -170,9 +168,9 @@ internal static class EnemyPatternMovementMathUtility
 
     /// <summary>
     /// Resolves the acceleration multiplier used when a short-range interaction is currently driving movement.
-    /// /params shortRangeTakeoverThisFrame True when the short-range interaction took over on the current frame.
-    /// /returns Acceleration multiplier applied to the pattern movement update.
     /// </summary>
+    /// <param name="shortRangeTakeoverThisFrame">True when the short-range interaction took over on the current frame.</param>
+    /// <returns>Acceleration multiplier applied to the pattern movement update.</returns>
     public static float ResolveShortRangePriorityAccelerationMultiplier(bool shortRangeTakeoverThisFrame)
     {
         if (shortRangeTakeoverThisFrame)

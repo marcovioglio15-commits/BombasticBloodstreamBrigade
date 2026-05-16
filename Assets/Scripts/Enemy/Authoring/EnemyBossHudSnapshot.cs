@@ -2,8 +2,6 @@ using Unity.Entities;
 
 /// <summary>
 /// Stores one aggregated snapshot of all active boss HUD entities for a single presentation update.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct EnemyBossHudSnapshot
 {
@@ -22,15 +20,14 @@ internal readonly struct EnemyBossHudSnapshot
     #region Public Methods
     /// <summary>
     /// Creates one immutable boss HUD aggregation snapshot.
-    /// /params primaryEntity Boss entity used for name, colors and offscreen projection.
-    /// /params primaryConfig Boss HUD config used for name, colors and indicator settings.
-    /// /params currentHealth Summed current health across active boss HUD entities.
-    /// /params maxHealth Summed max health across active boss HUD entities.
-    /// /params currentShield Summed current shield across active boss HUD entities.
-    /// /params maxShield Summed max shield across active boss HUD entities.
-    /// /params bossCount Number of active boss HUD entities included in the sums.
-    /// /returns None.
     /// </summary>
+    /// <param name="primaryEntity">Boss entity used for name, colors and offscreen projection.</param>
+    /// <param name="primaryConfig">Boss HUD config used for name, colors and indicator settings.</param>
+    /// <param name="currentHealth">Summed current health across active boss HUD entities.</param>
+    /// <param name="maxHealth">Summed max health across active boss HUD entities.</param>
+    /// <param name="currentShield">Summed current shield across active boss HUD entities.</param>
+    /// <param name="maxShield">Summed max shield across active boss HUD entities.</param>
+    /// <param name="bossCount">Number of active boss HUD entities included in the sums.</param>
     public EnemyBossHudSnapshot(Entity primaryEntity,
                                 in EnemyBossHudConfig primaryConfig,
                                 float currentHealth,

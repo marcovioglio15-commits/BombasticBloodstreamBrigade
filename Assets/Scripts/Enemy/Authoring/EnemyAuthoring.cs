@@ -5,7 +5,6 @@ using UnityEngine.Serialization;
 /// <summary>
 /// Authoring component that defines ECS enemy movement, combat and presentation settings.
 /// Main configuration is sourced from EnemyMasterPreset and its linked sub-presets.
-/// returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class EnemyAuthoring : MonoBehaviour
@@ -741,7 +740,6 @@ public sealed class EnemyAuthoring : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Sanitizes fallback values and validates linked presets after inspector edits.
-    /// returns None.
     /// </summary>
     private void OnValidate()
     {
@@ -783,8 +781,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Resolves the active movement settings source.
-    /// returns Resolved movement settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved movement settings or null when no preset source is available.</returns>
     private EnemyBrainMovementSettings ResolveMovementSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveMovementSettings(masterPreset, brainPreset);
@@ -792,8 +790,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active steering settings source.
-    /// returns Resolved steering settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved steering settings or null when no preset source is available.</returns>
     private EnemyBrainSteeringSettings ResolveSteeringSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveSteeringSettings(masterPreset, brainPreset);
@@ -801,8 +799,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active damage settings source.
-    /// returns Resolved damage settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved damage settings or null when no preset source is available.</returns>
     private EnemyBrainDamageSettings ResolveDamageSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveDamageSettings(masterPreset, brainPreset);
@@ -810,8 +808,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active health settings source.
-    /// returns Resolved health settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved health settings or null when no preset source is available.</returns>
     private EnemyBrainHealthStatisticsSettings ResolveHealthSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveHealthStatisticsSettings(masterPreset, brainPreset);
@@ -819,8 +817,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active visual visibility settings source.
-    /// returns Resolved visibility settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved visibility settings or null when no preset source is available.</returns>
     private EnemyVisualVisibilitySettings ResolveVisibilitySettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveVisibilitySettings(masterPreset, visualPreset);
@@ -828,8 +826,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active visual prefab settings source.
-    /// returns Resolved prefab settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved prefab settings or null when no preset source is available.</returns>
     private EnemyVisualPrefabSettings ResolveVisualPrefabSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveVisualPrefabSettings(masterPreset, visualPreset);
@@ -837,8 +835,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active damage flash settings source.
-    /// returns Resolved damage flash settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved damage flash settings or null when no preset source is available.</returns>
     private EnemyVisualDamageFeedbackSettings ResolveDamageFeedbackSettings()
     {
         EnemyVisualPreset resolvedVisualPreset = EnemyAuthoringPresetResolverUtility.ResolveVisualPreset(masterPreset, visualPreset);
@@ -851,8 +849,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active outline settings source.
-    /// returns Resolved outline settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved outline settings or null when no preset source is available.</returns>
     private EnemyVisualOutlineSettings ResolveOutlineSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveOutlineSettings(masterPreset, visualPreset);
@@ -860,8 +858,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the active offensive engagement feedback settings source.
-    /// returns Resolved offensive engagement feedback settings or null when no preset source is available.
     /// </summary>
+    /// <returns>Resolved offensive engagement feedback settings or null when no preset source is available.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveOffensiveEngagementFeedbackSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveOffensiveEngagementFeedbackSettings(masterPreset, visualPreset);

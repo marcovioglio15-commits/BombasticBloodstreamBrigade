@@ -12,13 +12,12 @@ public static class EnemyDamageFlashRenderUtility
     #region Public Methods
     /// <summary>
     /// Ensures one render entity exposes the component set required by GPU hit-flash presentation.
-    /// entityManager: Entity manager used to query current component presence.
-    /// entityCommandBuffer: Deferred writer used to avoid structural changes while iterating ECS queries.
-    /// renderEntity: Concrete render entity to initialize.
-    /// baseColor: Original material color restored when the flash ends.
-    /// flashColor: Flash color written into shader overrides.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to query current component presence.</param>
+    /// <param name="entityCommandBuffer">Deferred writer used to avoid structural changes while iterating ECS queries.</param>
+    /// <param name="renderEntity">Concrete render entity to initialize.</param>
+    /// <param name="baseColor">Original material color restored when the flash ends.</param>
+    /// <param name="flashColor">Flash color written into shader overrides.</param>
     public static void EnsureGpuFlashComponents(EntityManager entityManager,
                                                 EntityCommandBuffer entityCommandBuffer,
                                                 Entity renderEntity,
@@ -67,13 +66,12 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Ensures one render entity exposes the component set required by GPU outline presentation.
-    /// entityManager: Entity manager used to query current component presence.
-    /// entityCommandBuffer: Deferred writer used to avoid structural changes while iterating ECS queries.
-    /// renderEntity: Concrete render entity to initialize.
-    /// outlineColor: Outline color written into shader overrides.
-    /// outlineThickness: Outline thickness written into shader overrides.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to query current component presence.</param>
+    /// <param name="entityCommandBuffer">Deferred writer used to avoid structural changes while iterating ECS queries.</param>
+    /// <param name="renderEntity">Concrete render entity to initialize.</param>
+    /// <param name="outlineColor">Outline color written into shader overrides.</param>
+    /// <param name="outlineThickness">Outline thickness written into shader overrides.</param>
     public static void EnsureGpuOutlineComponents(EntityManager entityManager,
                                                   EntityCommandBuffer entityCommandBuffer,
                                                   Entity renderEntity,
@@ -101,12 +99,11 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Writes the current flash blend to all registered renderer entities of one enemy.
-    /// entityManager: Entity manager used to access flash render targets.
-    /// enemyEntity: Enemy root entity that owns the flash config and render target buffer.
-    /// flashColor: Linear-space overlay tint selected for the current frame.
-    /// targetBlend: Flash blend to write this frame.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access flash render targets.</param>
+    /// <param name="enemyEntity">Enemy root entity that owns the flash config and render target buffer.</param>
+    /// <param name="flashColor">Linear-space overlay tint selected for the current frame.</param>
+    /// <param name="targetBlend">Flash blend to write this frame.</param>
     public static void ApplyGpuFlash(EntityManager entityManager,
                                      Entity enemyEntity,
                                      float4 flashColor,
@@ -132,10 +129,9 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Restores all registered renderer entities to their baked non-flashing state.
-    /// entityManager: Entity manager used to access flash render targets.
-    /// enemyEntity: Enemy root entity that owns the flash render target buffer.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access flash render targets.</param>
+    /// <param name="enemyEntity">Enemy root entity that owns the flash render target buffer.</param>
     public static void ResetGpuFlash(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.Exists(enemyEntity))
@@ -158,12 +154,11 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Writes the current outline color and thickness to all registered renderer entities of one enemy.
-    /// entityManager: Entity manager used to access outline render targets.
-    /// enemyEntity: Enemy root entity that owns the outline config and render target buffer.
-    /// outlineColor: Linear-space outline color selected for the current state.
-    /// outlineThickness: Outline thickness selected for the current state.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access outline render targets.</param>
+    /// <param name="enemyEntity">Enemy root entity that owns the outline config and render target buffer.</param>
+    /// <param name="outlineColor">Linear-space outline color selected for the current state.</param>
+    /// <param name="outlineThickness">Outline thickness selected for the current state.</param>
     public static void ApplyGpuOutline(EntityManager entityManager,
                                        Entity enemyEntity,
                                        float4 outlineColor,
@@ -191,12 +186,12 @@ public static class EnemyDamageFlashRenderUtility
     #region Private Methods
     /// <summary>
     /// Writes per-instance material overrides for one concrete render entity.
-    /// entityManager: Entity manager used to write component data.
-    /// renderEntity: Concrete renderer entity to update.
-    /// flashColor: Linear-space overlay tint selected for the current frame.
-    /// targetBlend: Flash blend to write this frame.
-    /// returns True when at least one material override component was written.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to write component data.</param>
+    /// <param name="renderEntity">Concrete renderer entity to update.</param>
+    /// <param name="flashColor">Linear-space overlay tint selected for the current frame.</param>
+    /// <param name="targetBlend">Flash blend to write this frame.</param>
+    /// <returns>True when at least one material override component was written.</returns>
     private static bool ApplyGpuFlashToEntity(EntityManager entityManager,
                                               Entity renderEntity,
                                               float4 flashColor,
@@ -256,10 +251,10 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Restores one concrete render entity to its baked base color and zero flash blend.
-    /// entityManager: Entity manager used to write component data.
-    /// renderEntity: Concrete renderer entity to reset.
-    /// returns True when at least one material override component was restored.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to write component data.</param>
+    /// <param name="renderEntity">Concrete renderer entity to reset.</param>
+    /// <returns>True when at least one material override component was restored.</returns>
     private static bool ResetGpuFlashOnEntity(EntityManager entityManager, Entity renderEntity)
     {
         if (!entityManager.Exists(renderEntity))
@@ -304,12 +299,12 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Writes outline property overrides to one concrete render entity.
-    /// entityManager: Entity manager used to write component data.
-    /// renderEntity: Concrete renderer entity to update.
-    /// outlineColor: Linear-space outline color selected for the current state.
-    /// outlineThickness: Outline thickness selected for the current state.
-    /// returns True when at least one outline material override component was written.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to write component data.</param>
+    /// <param name="renderEntity">Concrete renderer entity to update.</param>
+    /// <param name="outlineColor">Linear-space outline color selected for the current state.</param>
+    /// <param name="outlineThickness">Outline thickness selected for the current state.</param>
+    /// <returns>True when at least one outline material override component was written.</returns>
     private static bool ApplyGpuOutlineToEntity(EntityManager entityManager,
                                                 Entity renderEntity,
                                                 float4 outlineColor,
@@ -343,12 +338,11 @@ public static class EnemyDamageFlashRenderUtility
 
     /// <summary>
     /// Writes one component value, adding the component first when it is still missing on the target entity.
-    /// entityManager: Entity manager used to inspect current component presence.
-    /// entityCommandBuffer: Deferred writer used to record add/set operations safely.
-    /// entity: Target entity that must receive the component value.
-    /// componentData: Value to write.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect current component presence.</param>
+    /// <param name="entityCommandBuffer">Deferred writer used to record add/set operations safely.</param>
+    /// <param name="entity">Target entity that must receive the component value.</param>
+    /// <param name="componentData">Value to write.</param>
     private static void SetOrAddComponentData<T>(EntityManager entityManager,
                                                  EntityCommandBuffer entityCommandBuffer,
                                                  Entity entity,

@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides allocation-free helpers to build, merge and inspect multi-element projectile payloads.
-/// /params none.
-/// /returns none.
 /// </summary>
 public static class ProjectileElementalPayloadUtility
 {
@@ -16,9 +14,9 @@ public static class ProjectileElementalPayloadUtility
     #region Public Methods
     /// <summary>
     /// Reports whether a projectile payload contains at least one valid entry.
-    /// /params payload Payload to inspect.
-    /// /returns True when at least one entry is present.
     /// </summary>
+    /// <param name="payload">Payload to inspect.</param>
+    /// <returns>True when at least one entry is present.</returns>
     public static bool HasAnyPayload(in ProjectileElementalPayload payload)
     {
         return GetEntryCount(in payload) > 0;
@@ -26,9 +24,9 @@ public static class ProjectileElementalPayloadUtility
 
     /// <summary>
     /// Returns the sanitized number of elemental entries stored in a compact projectile payload.
-    /// /params payload Payload to inspect.
-    /// /returns Entry count clamped to the supported inline capacity.
     /// </summary>
+    /// <param name="payload">Payload to inspect.</param>
+    /// <returns>Entry count clamped to the supported inline capacity.</returns>
     public static int GetEntryCount(in ProjectileElementalPayload payload)
     {
         return math.min(payload.EntryCount, MaximumEntryCount);
@@ -36,10 +34,10 @@ public static class ProjectileElementalPayloadUtility
 
     /// <summary>
     /// Reads one compact payload entry.
-    /// /params payload Payload to read.
-    /// /params index Entry index in the compact payload.
-    /// /returns The stored entry, or default when the index is outside the active range.
     /// </summary>
+    /// <param name="payload">Payload to read.</param>
+    /// <param name="index">Entry index in the compact payload.</param>
+    /// <returns>The stored entry, or default when the index is outside the active range.</returns>
     public static ProjectileElementalPayloadEntry GetEntry(in ProjectileElementalPayload payload, int index)
     {
         if (index < 0 || index >= GetEntryCount(in payload))
@@ -62,10 +60,10 @@ public static class ProjectileElementalPayloadUtility
 
     /// <summary>
     /// Builds a payload containing exactly one elemental entry when the authored stack count is valid.
-    /// /params effect Effect definition captured at projectile creation.
-    /// /params stacksPerHit Stacks applied by the entry on each valid hit.
-    /// /returns Payload containing the requested entry, or an empty payload when stacks are not valid.
     /// </summary>
+    /// <param name="effect">Effect definition captured at projectile creation.</param>
+    /// <param name="stacksPerHit">Stacks applied by the entry on each valid hit.</param>
+    /// <returns>Payload containing the requested entry, or an empty payload when stacks are not valid.</returns>
     public static ProjectileElementalPayload BuildSingle(in ElementalEffectConfig effect, float stacksPerHit)
     {
         ProjectileElementalPayload payload = default;
@@ -75,11 +73,11 @@ public static class ProjectileElementalPayloadUtility
 
     /// <summary>
     /// Appends or merges one elemental entry into the payload, combining duplicate element types by stack count.
-    /// /params payload Mutable payload to extend.
-    /// /params effect Effect definition captured at projectile creation.
-    /// /params stacksPerHit Stacks applied by the entry on each valid hit.
-    /// /returns True when a new or merged entry was written into the payload.
     /// </summary>
+    /// <param name="payload">Mutable payload to extend.</param>
+    /// <param name="effect">Effect definition captured at projectile creation.</param>
+    /// <param name="stacksPerHit">Stacks applied by the entry on each valid hit.</param>
+    /// <returns>True when a new or merged entry was written into the payload.</returns>
     public static bool TryAddOrMerge(ref ProjectileElementalPayload payload,
                                      in ElementalEffectConfig effect,
                                      float stacksPerHit)
@@ -120,10 +118,9 @@ public static class ProjectileElementalPayloadUtility
 
     /// <summary>
     /// Merges all entries from another payload into the destination while preserving first-writer effect settings on duplicates.
-    /// /params destination Payload that receives the merged entries.
-    /// /params source Source payload whose entries should be appended.
-    /// /returns void.
     /// </summary>
+    /// <param name="destination">Payload that receives the merged entries.</param>
+    /// <param name="source">Source payload whose entries should be appended.</param>
     public static void MergePayload(ref ProjectileElementalPayload destination, in ProjectileElementalPayload source)
     {
         int sourceEntryCount = GetEntryCount(in source);
@@ -140,11 +137,10 @@ public static class ProjectileElementalPayloadUtility
     #region Private Methods
     /// <summary>
     /// Writes one compact payload entry without growing beyond the fixed inline capacity.
-    /// /params payload Payload to mutate.
-    /// /params index Entry index to write.
-    /// /params entry Entry data to store.
-    /// /returns None.
     /// </summary>
+    /// <param name="payload">Payload to mutate.</param>
+    /// <param name="index">Entry index to write.</param>
+    /// <param name="entry">Entry data to store.</param>
     private static void SetEntry(ref ProjectileElementalPayload payload,
                                  int index,
                                  in ProjectileElementalPayloadEntry entry)

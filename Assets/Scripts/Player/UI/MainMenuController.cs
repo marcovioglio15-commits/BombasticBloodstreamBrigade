@@ -4,8 +4,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Handles the simple front-end scene flow for the authored main menu.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class MainMenuController : MonoBehaviour
@@ -36,8 +34,6 @@ public sealed class MainMenuController : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Caches optional local menu selection helpers before UI binding.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Awake()
     {
@@ -46,8 +42,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     /// <summary>
     /// Registers menu callbacks and restores menu cursor state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -60,8 +54,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes menu callbacks when the controller leaves the active scene.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -72,8 +64,6 @@ public sealed class MainMenuController : MonoBehaviour
     #region Wiring
     /// <summary>
     /// Registers click handlers for the authored menu buttons.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RegisterButtons()
     {
@@ -86,8 +76,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes click handlers from the authored menu buttons.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UnregisterButtons()
     {
@@ -102,8 +90,6 @@ public sealed class MainMenuController : MonoBehaviour
     #region Callbacks
     /// <summary>
     /// Requests the configured default gameplay scene through the ECS Scene Manager.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandlePlayPressed()
     {
@@ -117,8 +103,6 @@ public sealed class MainMenuController : MonoBehaviour
 
     /// <summary>
     /// Requests application shutdown through the shared helper.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleQuitPressed()
     {
@@ -129,8 +113,6 @@ public sealed class MainMenuController : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Selects the first non-null authored menu button so keyboard and controller navigation work immediately.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void SelectDefaultButton()
     {

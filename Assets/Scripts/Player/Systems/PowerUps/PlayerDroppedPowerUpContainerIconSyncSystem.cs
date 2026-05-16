@@ -4,7 +4,6 @@ using Unity.Transforms;
 /// <summary>
 /// Synchronizes dropped-container world-space icons from cached power-up presentation metadata.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
@@ -14,9 +13,8 @@ public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime components required to update dropped-container companion views.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerDroppedPowerUpContainerContent>();
@@ -24,9 +22,8 @@ public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
 
     /// <summary>
     /// Releases pooled runtime fallback views when the world is destroyed.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnDestroy(ref SystemState state)
     {
         PlayerDroppedPowerUpContainerViewRuntimeUtility.Shutdown();
@@ -34,9 +31,8 @@ public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
 
     /// <summary>
     /// Pushes the current icon sprite and transform pose into each dropped-container runtime view when available.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;

@@ -4,7 +4,6 @@ using UnityEngine;
 /// Marks the animated transform that should drive the player's projectile origin at runtime.
 /// Attach this component to the visual prefab root and assign one transform that follows the animated weapon.
 /// None.
-/// returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class PlayerVisualMuzzleAnchor : MonoBehaviour

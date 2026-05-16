@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Builds authored Laser Beam visual runtime data from the active player visual preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerLaserBeamVisualBakeUtility
 {
@@ -15,9 +13,9 @@ public static class PlayerLaserBeamVisualBakeUtility
     #region Public Methods
     /// <summary>
     /// Builds the shared Laser Beam visual config baked on the player entity.
-    /// /params authoring Player authoring used to resolve the active visual preset.
-    /// /returns Baked Laser Beam visual config.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the active visual preset.</param>
+    /// <returns>Baked Laser Beam visual config.</returns>
     public static PlayerLaserBeamVisualConfig BuildConfig(PlayerAuthoring authoring)
     {
         PlayerLaserBeamVisualSettings visualSettings = ResolveVisualSettings(authoring);
@@ -57,10 +55,9 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Populates the baked source prefab variants resolved from the active visual rig authoring component.
-    /// /params authoring Player authoring used to resolve the active visual rig.
-    /// /params variantBuffer Destination buffer written in-place.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the active visual rig.</param>
+    /// <param name="variantBuffer">Destination buffer written in-place.</param>
     public static void PopulateSourceVariantBuffer(PlayerAuthoring authoring, DynamicBuffer<PlayerLaserBeamSourceVariantElement> variantBuffer)
     {
         variantBuffer.Clear();
@@ -79,10 +76,9 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Populates the baked impact prefab variants resolved from the active visual rig authoring component.
-    /// /params authoring Player authoring used to resolve the active visual rig.
-    /// /params variantBuffer Destination buffer written in-place.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the active visual rig.</param>
+    /// <param name="variantBuffer">Destination buffer written in-place.</param>
     public static void PopulateImpactVariantBuffer(PlayerAuthoring authoring, DynamicBuffer<PlayerLaserBeamImpactVariantElement> variantBuffer)
     {
         variantBuffer.Clear();
@@ -101,10 +97,9 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Populates the baked visual preset buffer used by the Laser Beam managed renderer path.
-    /// /params authoring Player authoring used to resolve the active visual preset.
-    /// /params visualPresetBuffer Destination buffer written in-place.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the active visual preset.</param>
+    /// <param name="visualPresetBuffer">Destination buffer written in-place.</param>
     public static void PopulateVisualPresetBuffer(PlayerAuthoring authoring, DynamicBuffer<PlayerLaserBeamVisualPresetElement> visualPresetBuffer)
     {
         visualPresetBuffer.Clear();
@@ -167,9 +162,9 @@ public static class PlayerLaserBeamVisualBakeUtility
     #region Private Methods
     /// <summary>
     /// Resolves the active authored Laser Beam visual settings from the current player master preset.
-    /// /params authoring Player authoring used to resolve the current master preset.
-    /// /returns Resolved visual settings asset, or null when unavailable.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the current master preset.</param>
+    /// <returns>Resolved visual settings asset, or null when unavailable.</returns>
     private static PlayerLaserBeamVisualSettings ResolveVisualSettings(PlayerAuthoring authoring)
     {
         if (authoring == null)
@@ -180,9 +175,9 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Resolves the active runtime visual rig authoring component from the player visual bridge prefab.
-    /// /params authoring Player authoring used to resolve the current runtime visual bridge prefab.
-    /// /returns Resolved rig authoring component, or null when unavailable.
     /// </summary>
+    /// <param name="authoring">Player authoring used to resolve the current runtime visual bridge prefab.</param>
+    /// <returns>Resolved rig authoring component, or null when unavailable.</returns>
     private static PlayerLaserBeamVisualRigAuthoring ResolveRigAuthoring(PlayerAuthoring authoring)
     {
         if (authoring == null)
@@ -199,11 +194,10 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Adds one baked source variant entry to the destination buffer.
-    /// /params variantBuffer Destination buffer written in-place.
-    /// /params shape Runtime cap-shape selector stored by the entry.
-    /// /params prefab Authored prefab reference stored by the entry.
-    /// /returns None.
     /// </summary>
+    /// <param name="variantBuffer">Destination buffer written in-place.</param>
+    /// <param name="shape">Runtime cap-shape selector stored by the entry.</param>
+    /// <param name="prefab">Authored prefab reference stored by the entry.</param>
     private static void AddSourceVariant(DynamicBuffer<PlayerLaserBeamSourceVariantElement> variantBuffer,
                                          LaserBeamCapShape shape,
                                          GameObject prefab)
@@ -217,11 +211,10 @@ public static class PlayerLaserBeamVisualBakeUtility
 
     /// <summary>
     /// Adds one baked impact variant entry to the destination buffer.
-    /// /params variantBuffer Destination buffer written in-place.
-    /// /params shape Runtime cap-shape selector stored by the entry.
-    /// /params prefab Authored prefab reference stored by the entry.
-    /// /returns None.
     /// </summary>
+    /// <param name="variantBuffer">Destination buffer written in-place.</param>
+    /// <param name="shape">Runtime cap-shape selector stored by the entry.</param>
+    /// <param name="prefab">Authored prefab reference stored by the entry.</param>
     private static void AddImpactVariant(DynamicBuffer<PlayerLaserBeamImpactVariantElement> variantBuffer,
                                          LaserBeamCapShape shape,
                                          GameObject prefab)

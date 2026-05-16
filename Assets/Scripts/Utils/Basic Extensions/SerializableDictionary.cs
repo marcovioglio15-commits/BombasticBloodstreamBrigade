@@ -34,7 +34,7 @@ public class SerializableDictionary<TKey, TValue>
     /// <summary>
     /// Returns the runtime dictionary, populating it from serialized data when required.
     /// </summary>
-    /// <returns>Dictionary view backed by serialized keys and values.<returns>
+    /// <returns>Dictionary view backed by serialized keys and values.</returns>
     public Dictionary<TKey, TValue> GetDictionary()
     {
         PopulateDictionaryIfEmpty();

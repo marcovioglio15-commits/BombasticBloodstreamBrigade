@@ -52,8 +52,6 @@ public enum PowerUpChargeType
 
 /// <summary>
 /// Selects the runtime direction source used when a Dash active module starts.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum DashDirectionMode
 {

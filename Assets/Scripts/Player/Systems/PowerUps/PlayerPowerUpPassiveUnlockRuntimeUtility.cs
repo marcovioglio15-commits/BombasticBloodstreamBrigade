@@ -5,7 +5,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Shares runtime acquisition helpers for passive power-ups granted by milestone selections and combo rank rewards.
 /// none.
-/// returns none.
 /// </summary>
 internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 {
@@ -14,11 +13,11 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Finds one passive unlock catalog entry by PowerUpId.
-    /// /params passivePowerUpId Passive PowerUpId requested by the caller.
-    /// /params unlockCatalog Runtime unlock catalog scanned for a passive entry.
-    /// /params catalogIndex Resolved catalog index when a matching passive entry is found.
-    /// /returns True when the catalog contains the requested passive PowerUpId.
     /// </summary>
+    /// <param name="passivePowerUpId">Passive PowerUpId requested by the caller.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog scanned for a passive entry.</param>
+    /// <param name="catalogIndex">Resolved catalog index when a matching passive entry is found.</param>
+    /// <returns>True when the catalog contains the requested passive PowerUpId.</returns>
     public static bool TryFindPassiveCatalogIndex(FixedString64Bytes passivePowerUpId,
                                                   DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                   out int catalogIndex)
@@ -53,13 +52,13 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Acquires one passive catalog entry and equips its passive tool on first acquisition when possible.
-    /// /params catalogIndex Runtime unlock catalog index to acquire.
-    /// /params unlockCatalog Mutable runtime unlock catalog updated with unlock ownership.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregated passive state rebuilt when a tool is equipped.
-    /// /params applyTarget Debug label describing the passive apply result.
-    /// /returns True when the catalog entry ownership changed; otherwise false.
     /// </summary>
+    /// <param name="catalogIndex">Runtime unlock catalog index to acquire.</param>
+    /// <param name="unlockCatalog">Mutable runtime unlock catalog updated with unlock ownership.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregated passive state rebuilt when a tool is equipped.</param>
+    /// <param name="applyTarget">Debug label describing the passive apply result.</param>
+    /// <returns>True when the catalog entry ownership changed; otherwise false.</returns>
     public static bool TryAcquirePassiveCatalogEntry(int catalogIndex,
                                                      DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                      DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
@@ -76,14 +75,14 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Acquires one passive catalog entry and reports whether this acquisition equipped the passive tool.
-    /// /params catalogIndex Runtime unlock catalog index to acquire.
-    /// /params unlockCatalog Mutable runtime unlock catalog updated with unlock ownership.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregated passive state rebuilt when a tool is equipped.
-    /// /params applyTarget Debug label describing the passive apply result.
-    /// /params equippedOnGrant True when this acquisition added the passive tool to the equipped buffer.
-    /// /returns True when the catalog entry ownership changed; otherwise false.
     /// </summary>
+    /// <param name="catalogIndex">Runtime unlock catalog index to acquire.</param>
+    /// <param name="unlockCatalog">Mutable runtime unlock catalog updated with unlock ownership.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregated passive state rebuilt when a tool is equipped.</param>
+    /// <param name="applyTarget">Debug label describing the passive apply result.</param>
+    /// <param name="equippedOnGrant">True when this acquisition added the passive tool to the equipped buffer.</param>
+    /// <returns>True when the catalog entry ownership changed; otherwise false.</returns>
     public static bool TryAcquirePassiveCatalogEntry(int catalogIndex,
                                                      DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                      DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
@@ -136,12 +135,12 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Releases one passive catalog stack previously granted by combo rank-up and removes the equipped tool only when that grant equipped it.
-    /// /params grant Combo passive grant entry being revoked.
-    /// /params unlockCatalog Mutable runtime unlock catalog updated with reduced ownership.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /params passiveToolsState Mutable aggregated passive state rebuilt when a tool is removed.
-    /// /returns True when catalog ownership or equipped passive state changed.
     /// </summary>
+    /// <param name="grant">Combo passive grant entry being revoked.</param>
+    /// <param name="unlockCatalog">Mutable runtime unlock catalog updated with reduced ownership.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregated passive state rebuilt when a tool is removed.</param>
+    /// <returns>True when catalog ownership or equipped passive state changed.</returns>
     public static bool TryReleaseComboPassiveGrant(in PlayerComboPassivePowerUpGrantElement grant,
                                                    DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                    DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
@@ -185,12 +184,12 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Equips one passive tool into the passive buffer and rebuilds aggregated passive runtime state.
-    /// /params selectedCatalogEntry Passive unlock catalog entry containing the passive tool payload.
-    /// /params equippedPassiveTools Runtime equipped-passive tool buffer.
-    /// /params passiveToolsState Aggregated passive runtime state updated when a tool is added.
-    /// /params applyTarget Debug label describing the passive-apply result.
-    /// /returns True when a passive tool was added; otherwise false.
     /// </summary>
+    /// <param name="selectedCatalogEntry">Passive unlock catalog entry containing the passive tool payload.</param>
+    /// <param name="equippedPassiveTools">Runtime equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Aggregated passive runtime state updated when a tool is added.</param>
+    /// <param name="applyTarget">Debug label describing the passive-apply result.</param>
+    /// <returns>True when a passive tool was added; otherwise false.</returns>
     public static bool TryEquipPassiveTool(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
                                            DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                            ref PlayerPassiveToolsState passiveToolsState,
@@ -225,10 +224,10 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Checks whether one passive tool kind is already present in the equipped buffer.
-    /// /params equippedPassiveTools Runtime equipped-passive tool buffer.
-    /// /params toolKind Passive tool kind to test.
-    /// /returns True when at least one matching passive tool kind exists.
     /// </summary>
+    /// <param name="equippedPassiveTools">Runtime equipped-passive tool buffer.</param>
+    /// <param name="toolKind">Passive tool kind to test.</param>
+    /// <returns>True when at least one matching passive tool kind exists.</returns>
     private static bool ContainsPassiveToolKind(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                 PassiveToolKind toolKind)
     {
@@ -259,11 +258,11 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Resolves the catalog entry targeted by one combo passive grant using its cached index first, then PowerUpId fallback.
-    /// /params grant Combo passive grant entry being revoked.
-    /// /params unlockCatalog Runtime unlock catalog scanned for the grant target.
-    /// /params catalogIndex Resolved catalog index.
-    /// /returns True when a matching passive catalog entry exists.
     /// </summary>
+    /// <param name="grant">Combo passive grant entry being revoked.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog scanned for the grant target.</param>
+    /// <param name="catalogIndex">Resolved catalog index.</param>
+    /// <returns>True when a matching passive catalog entry exists.</returns>
     private static bool TryResolveGrantCatalogIndex(in PlayerComboPassivePowerUpGrantElement grant,
                                                     DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                     out int catalogIndex)
@@ -291,10 +290,10 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
     /// <summary>
     /// Removes one equipped passive tool by PowerUpId.
-    /// /params passivePowerUpId Passive PowerUpId to remove.
-    /// /params equippedPassiveTools Mutable equipped-passive tool buffer.
-    /// /returns True when one equipped passive entry was removed.
     /// </summary>
+    /// <param name="passivePowerUpId">Passive PowerUpId to remove.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <returns>True when one equipped passive entry was removed.</returns>
     private static bool TryRemoveEquippedPassiveTool(FixedString64Bytes passivePowerUpId,
                                                      DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
     {

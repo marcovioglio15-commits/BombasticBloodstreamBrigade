@@ -138,8 +138,6 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
     /// <summary>
     /// Clears camera offset caches when camera ownership or behavior changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResetCachedOffsets()
     {
@@ -149,10 +147,10 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
     /// <summary>
     /// Resolves a camera presentation delta that can settle during transition-owned time-scale pauses.
-    /// /params scaledDeltaTime DOTS scaled delta time for the current frame.
-    /// /params isSceneTransitioning True while the scene manager is loading or fading between scenes.
-    /// /returns Delta time suitable for presentation-only camera smoothing.
     /// </summary>
+    /// <param name="scaledDeltaTime">DOTS scaled delta time for the current frame.</param>
+    /// <param name="isSceneTransitioning">True while the scene manager is loading or fading between scenes.</param>
+    /// <returns>Delta time suitable for presentation-only camera smoothing.</returns>
     private static float ResolvePresentationDeltaTime(float scaledDeltaTime, bool isSceneTransitioning)
     {
         if (!isSceneTransitioning || scaledDeltaTime > 0f)

@@ -305,7 +305,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     /// </summary>
     /// <param name="selectionCommands">Queued HUD selection commands.</param>
     /// <param name="resolvedCommand">Resolved command payload when found.</param>
-    /// <returns>True when one actionable command exists; otherwise false.<returns>
+    /// <returns>True when one actionable command exists; otherwise false.</returns>
     private static bool TryResolveRequestedCommand(DynamicBuffer<PlayerMilestonePowerUpSelectionCommand> selectionCommands,
                                                    out ResolvedMilestoneSelectionCommand resolvedCommand)
     {
@@ -366,7 +366,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     /// <param name="equippedPassiveTools">Runtime passive-tools buffer.</param>
     /// <param name="passiveToolsState">Aggregated runtime passive state.</param>
     /// <param name="applyTarget">Debug-friendly destination where the unlock was applied.</param>
-    /// <returns>True when runtime state changed; otherwise false.<returns>
+    /// <returns>True when runtime state changed; otherwise false.</returns>
     private static bool ApplySelectedUnlock(PlayerPowerUpUnlockKind unlockKind,
                                             in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
                                             in PhysicsWorldSingleton physicsWorldSingleton,
@@ -416,7 +416,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     /// <param name="powerUpContainerConfigLookup">Read-only lookup of player-side dropped-container settings.</param>
     /// <param name="commandBuffer">ECB used to spawn dropped containers when one active is replaced.</param>
     /// <param name="applyTarget">Debug label of the slot where the unlock was applied.</param>
-    /// <returns>True when the active slot was applied; otherwise false.<returns>
+    /// <returns>True when the active slot was applied; otherwise false.</returns>
     private static bool TryEquipActiveUnlock(in PlayerPowerUpSlotConfig activeSlotConfig,
                                              in PhysicsWorldSingleton physicsWorldSingleton,
                                              ref PlayerPowerUpsConfig powerUpsConfig,
@@ -484,15 +484,14 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     #region Audio
     /// <summary>
     /// Enqueues recharge sounds produced by skip-compensation resources.
-    /// /params entity Player entity receiving compensation.
-    /// /params previousHealth Health before compensation.
-    /// /params currentHealth Health after compensation.
-    /// /params previousShield Shield before compensation.
-    /// /params currentShield Shield after compensation.
-    /// /params localTransformLookup Lookup used to resolve positioned audio.
-    /// /params audioRequests Audio request buffer on the game audio singleton.
-    /// /returns None.
     /// </summary>
+    /// <param name="entity">Player entity receiving compensation.</param>
+    /// <param name="previousHealth">Health before compensation.</param>
+    /// <param name="currentHealth">Health after compensation.</param>
+    /// <param name="previousShield">Shield before compensation.</param>
+    /// <param name="currentShield">Shield after compensation.</param>
+    /// <param name="localTransformLookup">Lookup used to resolve positioned audio.</param>
+    /// <param name="audioRequests">Audio request buffer on the game audio singleton.</param>
     private static void EnqueueSkipCompensationAudio(Entity entity,
                                                      PlayerHealth previousHealth,
                                                      PlayerHealth currentHealth,
@@ -510,12 +509,11 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
 
     /// <summary>
     /// Enqueues a player-scoped audio event with position when a transform is available.
-    /// /params entity Player entity used for optional position lookup.
-    /// /params eventId Audio event to request.
-    /// /params localTransformLookup Lookup used to resolve player position.
-    /// /params audioRequests Audio request buffer on the game audio singleton.
-    /// /returns None.
     /// </summary>
+    /// <param name="entity">Player entity used for optional position lookup.</param>
+    /// <param name="eventId">Audio event to request.</param>
+    /// <param name="localTransformLookup">Lookup used to resolve player position.</param>
+    /// <param name="audioRequests">Audio request buffer on the game audio singleton.</param>
     private static void EnqueuePlayerAudio(Entity entity,
                                            GameAudioEventId eventId,
                                            in ComponentLookup<LocalTransform> localTransformLookup,
@@ -539,7 +537,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     /// <param name="equippedPassiveTools">Runtime equipped passives buffer.</param>
     /// <param name="passiveToolsState">Aggregated passive runtime state to update.</param>
     /// <param name="applyTarget">Debug label describing the passive-apply result.</param>
-    /// <returns>True when a passive tool was added; otherwise false.<returns>
+    /// <returns>True when a passive tool was added; otherwise false.</returns>
     private static bool TryEquipPassiveUnlock(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
                                               DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                               ref PlayerPassiveToolsState passiveToolsState,

@@ -146,7 +146,7 @@ internal static class EnemyAdvancedPatternDropDistributionWarningUtility
     /// <param name="requestedMaximumTotal">Requested maximum total experience.</param>
     /// <param name="resolvedMinimumTotal">Resolved compatible minimum total experience.</param>
     /// <param name="resolvedMaximumTotal">Resolved compatible maximum total experience.</param>
-    /// <returns>Returns true when both endpoints are compatible.<returns>
+    /// <returns>Returns true when both endpoints are compatible.</returns>
     private static bool AreRangeEndpointsCompatible(float requestedMinimumTotal,
                                                     float requestedMaximumTotal,
                                                     float resolvedMinimumTotal,
@@ -165,7 +165,7 @@ internal static class EnemyAdvancedPatternDropDistributionWarningUtility
     /// <param name="requestedMaximumTotal">Requested maximum total experience.</param>
     /// <param name="resolvedMinimumTotal">Resolved compatible minimum total experience.</param>
     /// <param name="resolvedMaximumTotal">Resolved compatible maximum total experience.</param>
-    /// <returns>Returns one warning string describing which endpoint is incompatible.<returns>
+    /// <returns>Returns one warning string describing which endpoint is incompatible.</returns>
     private static string BuildRangeNotOptimalWarning(float requestedMinimumTotal,
                                                       float requestedMaximumTotal,
                                                       float resolvedMinimumTotal,
@@ -197,7 +197,7 @@ internal static class EnemyAdvancedPatternDropDistributionWarningUtility
     /// <param name="requestedMinimumTotal">Requested minimum total experience.</param>
     /// <param name="requestedMaximumTotal">Requested maximum total experience.</param>
     /// <param name="distribution">Distribution bias where 0 favors low values and 1 favors high values.</param>
-    /// <returns>Suggested range suffix text, or empty when unavailable.<returns>
+    /// <returns>Suggested range suffix text, or empty when unavailable.</returns>
     private static string BuildSuggestedRangeSuffix(IReadOnlyList<float> definitionValues,
                                                     float requestedMinimumTotal,
                                                     float requestedMaximumTotal,
@@ -226,7 +226,7 @@ internal static class EnemyAdvancedPatternDropDistributionWarningUtility
     /// Builds a list of positive Experience Amount values from serialized drop definitions.
     /// </summary>
     /// <param name="dropDefinitionsProperty">Drop definitions serialized array.</param>
-    /// <returns>Returns positive definition values used by warning estimation.<returns>
+    /// <returns>Returns positive definition values used by warning estimation.</returns>
     private static List<float> BuildDropDefinitionValues(SerializedProperty dropDefinitionsProperty)
     {
         List<float> values = new List<float>();

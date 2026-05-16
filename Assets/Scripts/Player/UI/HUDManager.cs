@@ -521,7 +521,7 @@ public sealed class HUDManager : MonoBehaviour
     /// Returns the configured shield fill image only when it belongs to a screen-space HUD canvas.
     /// </summary>
     /// <param name="shieldFillImage">Resolved shield image safe to update from HUDManager.</param>
-    /// <returns>True when the shield image is available and not bound to a world-space canvas; otherwise false.<returns>
+    /// <returns>True when the shield image is available and not bound to a world-space canvas; otherwise false.</returns>
     private bool TryResolveShieldFillImage(out Image shieldFillImage)
     {
         shieldFillImage = playerShieldFillImage;
@@ -542,7 +542,7 @@ public sealed class HUDManager : MonoBehaviour
     /// Returns whether health and shield bars should snap to their exact runtime values.
     /// </summary>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    /// <returns>True when the run outcome is finalized and the ending screen should bypass smoothing.<returns>
+    /// <returns>True when the run outcome is finalized and the ending screen should bypass smoothing.</returns>
     private bool ShouldSnapCoreBars(Entity playerEntity)
     {
         if (!entityManager.HasComponent<PlayerRunOutcomeState>(playerEntity))
@@ -575,8 +575,6 @@ public sealed class HUDManager : MonoBehaviour
 
     /// <summary>
     /// Ensures the core-bar presentation settings exist even on scenes authored before the liquid-bar extension was added.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void EnsureCoreBarPresentationSettings()
     {
@@ -592,8 +590,6 @@ public sealed class HUDManager : MonoBehaviour
 
     /// <summary>
     /// Builds the reusable runtime visuals for health, shield and experience bars when their bindings become available.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void EnsureCoreBarVisualsInitialized()
     {
@@ -614,8 +610,6 @@ public sealed class HUDManager : MonoBehaviour
 
     /// <summary>
     /// Releases runtime materials created for the liquid-bar visuals.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void DisposeCoreBarVisuals()
     {
@@ -631,13 +625,12 @@ public sealed class HUDManager : MonoBehaviour
 
     /// <summary>
     /// Applies smoothing and visual updates shared by health, shield and experience bars.
-    /// /params barRuntime Reusable runtime visual that owns fill, plunger and shader state.
-    /// /params displayedNormalizedValue Cached displayed normalized value updated in place.
-    /// /params targetNormalizedValue Raw normalized target computed from ECS data.
-    /// /params snapImmediately When true smoothing is bypassed for this update.
-    /// /params smoothingSeconds Seconds used for the fill smoothing step.
-    /// /returns void.
     /// </summary>
+    /// <param name="barRuntime">Reusable runtime visual that owns fill, plunger and shader state.</param>
+    /// <param name="displayedNormalizedValue">Cached displayed normalized value updated in place.</param>
+    /// <param name="targetNormalizedValue">Raw normalized target computed from ECS data.</param>
+    /// <param name="snapImmediately">When true smoothing is bypassed for this update.</param>
+    /// <param name="smoothingSeconds">Seconds used for the fill smoothing step.</param>
     private void UpdateManagedBar(HUDLiquidBarRuntime barRuntime,
                                   ref float displayedNormalizedValue,
                                   float targetNormalizedValue,

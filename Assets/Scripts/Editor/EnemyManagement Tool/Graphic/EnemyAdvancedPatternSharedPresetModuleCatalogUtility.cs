@@ -1,7 +1,5 @@
 /// <summary>
 /// Resolves catalog metadata used by the shared module list UI.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 {
@@ -10,9 +8,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
     #region Public Methods
     /// <summary>
     /// Resolves the serialized property name that stores one module catalog section.
-    /// /params section Catalog section being queried.
-    /// /returns Serialized property name for that catalog.
     /// </summary>
+    /// <param name="section">Catalog section being queried.</param>
+    /// <returns>Serialized property name for that catalog.</returns>
     public static string ResolveDefinitionsPropertyName(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -33,9 +31,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the visible subsection title for one module catalog section.
-    /// /params section Catalog section being queried.
-    /// /returns Visible subsection title.
     /// </summary>
+    /// <param name="section">Catalog section being queried.</param>
+    /// <returns>Visible subsection title.</returns>
     public static string ResolveSectionTitle(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -56,9 +54,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the explanatory tooltip used by one module catalog subsection header.
-    /// /params section Catalog section being queried.
-    /// /returns Tooltip text.
     /// </summary>
+    /// <param name="section">Catalog section being queried.</param>
+    /// <returns>Tooltip text.</returns>
     public static string ResolveSectionTooltip(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -79,9 +77,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the subdued description label used below one module catalog subsection header.
-    /// /params section Catalog section being queried.
-    /// /returns Description text.
     /// </summary>
+    /// <param name="section">Catalog section being queried.</param>
+    /// <returns>Description text.</returns>
     public static string ResolveSectionDescription(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -102,9 +100,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the fallback module ID prefix used for one new module entry.
-    /// /params section Catalog section receiving the new definition.
-    /// /returns Default module ID prefix.
     /// </summary>
+    /// <param name="section">Catalog section receiving the new definition.</param>
+    /// <returns>Default module ID prefix.</returns>
     public static string ResolveDefaultModuleIdPrefix(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -125,9 +123,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the default display name used for one new module entry.
-    /// /params section Catalog section receiving the new definition.
-    /// /returns Default display name.
     /// </summary>
+    /// <param name="section">Catalog section receiving the new definition.</param>
+    /// <returns>Default display name.</returns>
     public static string ResolveDefaultModuleDisplayName(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -148,9 +146,9 @@ internal static class EnemyAdvancedPatternSharedPresetModuleCatalogUtility
 
     /// <summary>
     /// Resolves the default module kind for one new module entry.
-    /// /params section Catalog section receiving the new definition.
-    /// /returns Default module kind.
     /// </summary>
+    /// <param name="section">Catalog section receiving the new definition.</param>
+    /// <returns>Default module kind.</returns>
     public static EnemyPatternModuleKind ResolveDefaultModuleKind(EnemyPatternModuleCatalogSection section)
     {
         switch (section)

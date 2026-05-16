@@ -286,7 +286,7 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     /// Builds the detail section tab row.
     /// </summary>
     /// <param name="panel">Owning panel that provides section activation callbacks.</param>
-    /// <returns>Returns the constructed tab row.<returns>
+    /// <returns>Returns the constructed tab row.</returns>
     public static VisualElement BuildDetailsSectionButtons(EnemyMasterPresetsPanel panel)
     {
         VisualElement buttonsRoot = new VisualElement();
@@ -499,7 +499,7 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     /// </summary>
     /// <param name="panel">Owning panel that provides the content root.</param>
     /// <param name="sectionTitle">Section header text.</param>
-    /// <returns>Returns the created section container, or null when the panel is not ready.<returns>
+    /// <returns>Returns the created section container, or null when the panel is not ready.</returns>
     private static VisualElement CreateDetailsSectionContainer(EnemyMasterPresetsPanel panel, string sectionTitle)
     {
         if (panel == null)
@@ -554,7 +554,7 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     /// <param name="createAction">Callback used to create and assign a new sub preset.</param>
     /// <param name="openSectionAction">Callback used to open the related side panel.</param>
     /// <param name="panelType">Target side panel type associated with the sub preset.</param>
-    /// <returns>Returns the constructed row container.<returns>
+    /// <returns>Returns the constructed row container.</returns>
     private static VisualElement BuildSubPresetRow(EnemyMasterPresetsPanel panel,
                                                    string label,
                                                    Type presetType,

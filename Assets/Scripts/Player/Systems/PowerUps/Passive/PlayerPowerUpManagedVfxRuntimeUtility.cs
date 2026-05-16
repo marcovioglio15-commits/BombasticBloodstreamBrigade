@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Runtime GameObject pool for temporary power-up VFX that cannot safely use DOTS companion cloning in player builds.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerPowerUpManagedVfxRuntimeUtility
 {
@@ -28,10 +26,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Advances active managed VFX lifetimes, follow targets and velocity movement.
-    /// /params entityManager Entity manager used to read target transforms and enemy despawn state.
-    /// /params deltaTime Frame delta time used to consume lifetimes.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read target transforms and enemy despawn state.</param>
+    /// <param name="deltaTime">Frame delta time used to consume lifetimes.</param>
     public static void UpdateActiveInstances(EntityManager entityManager, float deltaTime)
     {
         for (int instanceIndex = activeInstances.Count - 1; instanceIndex >= 0; instanceIndex--)
@@ -53,12 +50,12 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Spawns or reuses one managed VFX instance for a queued power-up VFX request.
-    /// /params entityManager Entity manager used for cap validation against live targets.
-    /// /params prefabBindings Player-owned prefab entity to GameObject source bindings.
-    /// /params request VFX spawn request produced by gameplay systems.
-    /// /params capConfig Runtime cap settings for this player.
-    /// /returns True when a managed VFX instance was spawned or an existing capped instance was refreshed.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for cap validation against live targets.</param>
+    /// <param name="prefabBindings">Player-owned prefab entity to GameObject source bindings.</param>
+    /// <param name="request">VFX spawn request produced by gameplay systems.</param>
+    /// <param name="capConfig">Runtime cap settings for this player.</param>
+    /// <returns>True when a managed VFX instance was spawned or an existing capped instance was refreshed.</returns>
     public static bool TrySpawn(EntityManager entityManager,
                                 DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
                                 in PlayerPowerUpVfxSpawnRequest request,
@@ -86,8 +83,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Destroys every managed power-up VFX instance and clears the runtime pool.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void DestroyAll()
     {
@@ -105,10 +100,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Spawn
     /// <summary>
     /// Resolves the GameObject prefab mapped to one baked VFX prefab entity.
-    /// /params prefabBindings Player-owned prefab entity to GameObject source bindings.
-    /// /params prefabEntity Baked prefab entity referenced by the VFX request.
-    /// /returns Source GameObject prefab, or null when no binding exists.
     /// </summary>
+    /// <param name="prefabBindings">Player-owned prefab entity to GameObject source bindings.</param>
+    /// <param name="prefabEntity">Baked prefab entity referenced by the VFX request.</param>
+    /// <returns>Source GameObject prefab, or null when no binding exists.</returns>
     private static GameObject ResolveSourcePrefab(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
                                                   Entity prefabEntity)
     {
@@ -130,11 +125,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Checks configured VFX caps and refreshes an attached capped instance when requested.
-    /// /params request VFX request being evaluated.
-    /// /params capConfig Runtime cap settings for this player.
-    /// /params refreshedExistingInstance True when an existing attached instance lifetime was refreshed.
-    /// /returns True when a new instance can be spawned.
     /// </summary>
+    /// <param name="request">VFX request being evaluated.</param>
+    /// <param name="capConfig">Runtime cap settings for this player.</param>
+    /// <param name="refreshedExistingInstance">True when an existing attached instance lifetime was refreshed.</param>
+    /// <returns>True when a new instance can be spawned.</returns>
     private static bool CanSpawnUnderCaps(in PlayerPowerUpVfxSpawnRequest request,
                                           in PlayerPowerUpVfxCapConfig capConfig,
                                           out bool refreshedExistingInstance)
@@ -176,9 +171,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Reuses a pooled instance for the same source prefab or creates a new one.
-    /// /params sourcePrefab Source prefab asset requested by gameplay.
-    /// /returns Ready managed VFX instance, or null when instantiation fails.
     /// </summary>
+    /// <param name="sourcePrefab">Source prefab asset requested by gameplay.</param>
+    /// <returns>Ready managed VFX instance, or null when instantiation fails.</returns>
     private static PlayerPowerUpManagedVfxInstance AcquireInstance(GameObject sourcePrefab)
     {
         for (int instanceIndex = pooledInstances.Count - 1; instanceIndex >= 0; instanceIndex--)
@@ -203,9 +198,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Instantiates one managed VFX object and caches presentation components used during reuse.
-    /// /params sourcePrefab Source prefab asset requested by gameplay.
-    /// /returns Created managed VFX instance, or null when the prefab cannot be instantiated.
     /// </summary>
+    /// <param name="sourcePrefab">Source prefab asset requested by gameplay.</param>
+    /// <returns>Created managed VFX instance, or null when the prefab cannot be instantiated.</returns>
     private static PlayerPowerUpManagedVfxInstance CreateInstance(GameObject sourcePrefab)
     {
         if (sourcePrefab == null)
@@ -216,23 +211,48 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         if (instanceObject == null)
             return null;
 
+        ParticleSystem[] particleSystems = instanceObject.GetComponentsInChildren<ParticleSystem>(true);
+        TrailRenderer[] trailRenderers = instanceObject.GetComponentsInChildren<TrailRenderer>(true);
+
         instanceObject.name = string.Format("{0}_PowerUpVfx", sourcePrefab.name);
         return new PlayerPowerUpManagedVfxInstance
         {
             SourcePrefab = sourcePrefab,
             InstanceObject = instanceObject,
             InstanceTransform = instanceObject.transform,
-            ParticleSystems = instanceObject.GetComponentsInChildren<ParticleSystem>(true),
-            TrailRenderers = instanceObject.GetComponentsInChildren<TrailRenderer>(true)
+            RootBaseLocalScale = instanceObject.transform.localScale,
+            ParticleSystems = particleSystems,
+            TrailRenderers = trailRenderers,
+            TrailRendererBaseWidths = BuildTrailRendererBaseWidths(trailRenderers)
         };
     }
 
     /// <summary>
-    /// Applies request data to one newly active managed VFX instance.
-    /// /params instance Managed VFX instance being configured.
-    /// /params request VFX request produced by gameplay systems.
-    /// /returns None.
+    /// Caches authored trail widths so pooled VFX can be rescaled from stable prefab values.
     /// </summary>
+    /// <param name="trailRenderers">Trail renderers collected from the spawned VFX instance.</param>
+    /// <returns>Width multipliers matching the renderer array order.</returns>
+    private static float[] BuildTrailRendererBaseWidths(TrailRenderer[] trailRenderers)
+    {
+        if (trailRenderers == null || trailRenderers.Length <= 0)
+            return null;
+
+        float[] baseWidths = new float[trailRenderers.Length];
+
+        for (int trailIndex = 0; trailIndex < trailRenderers.Length; trailIndex++)
+        {
+            TrailRenderer trailRenderer = trailRenderers[trailIndex];
+            baseWidths[trailIndex] = trailRenderer != null ? trailRenderer.widthMultiplier : 1f;
+        }
+
+        return baseWidths;
+    }
+
+    /// <summary>
+    /// Applies request data to one newly active managed VFX instance.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance being configured.</param>
+    /// <param name="request">VFX request produced by gameplay systems.</param>
     private static void ConfigureInstance(PlayerPowerUpManagedVfxInstance instance,
                                           in PlayerPowerUpVfxSpawnRequest request)
     {
@@ -262,11 +282,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Update
     /// <summary>
     /// Updates one active managed VFX instance and reports whether it should remain active.
-    /// /params entityManager Entity manager used to read target transform and enemy lifecycle components.
-    /// /params instance Managed VFX instance being updated.
-    /// /params deltaTime Frame delta time used to consume lifetime.
-    /// /returns True while the instance remains valid and alive.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read target transform and enemy lifecycle components.</param>
+    /// <param name="instance">Managed VFX instance being updated.</param>
+    /// <param name="deltaTime">Frame delta time used to consume lifetime.</param>
+    /// <returns>True while the instance remains valid and alive.</returns>
     private static bool UpdateInstance(EntityManager entityManager,
                                        PlayerPowerUpManagedVfxInstance instance,
                                        float deltaTime)
@@ -293,11 +313,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Resolves and validates the current world position for a follow-target VFX instance.
-    /// /params entityManager Entity manager used to inspect target entities.
-    /// /params instance Managed VFX instance containing follow metadata.
-    /// /params targetPosition Current target position when the method succeeds.
-    /// /returns True when the target is alive and has a readable transform.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect target entities.</param>
+    /// <param name="instance">Managed VFX instance containing follow metadata.</param>
+    /// <param name="targetPosition">Current target position when the method succeeds.</param>
+    /// <returns>True when the target is alive and has a readable transform.</returns>
     private static bool TryResolveFollowPosition(EntityManager entityManager,
                                                  PlayerPowerUpManagedVfxInstance instance,
                                                  out float3 targetPosition)
@@ -329,10 +349,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Validates optional enemy spawn-version metadata for attached enemy VFX.
-    /// /params entityManager Entity manager used to inspect enemy lifecycle components.
-    /// /params instance Managed VFX instance containing validation metadata.
-    /// /returns True when no validation is required or the target enemy is still the same active spawn.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect enemy lifecycle components.</param>
+    /// <param name="instance">Managed VFX instance containing validation metadata.</param>
+    /// <returns>True when no validation is required or the target enemy is still the same active spawn.</returns>
     private static bool IsValidationTargetAlive(EntityManager entityManager,
                                                 PlayerPowerUpManagedVfxInstance instance)
     {
@@ -362,10 +382,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Caps
     /// <summary>
     /// Counts active attached instances matching the same prefab and enemy spawn-version key.
-    /// /params request VFX request being evaluated.
-    /// /params existingInstance First matching active instance found during the scan.
-    /// /returns Number of active matching attached instances.
     /// </summary>
+    /// <param name="request">VFX request being evaluated.</param>
+    /// <param name="existingInstance">First matching active instance found during the scan.</param>
+    /// <returns>Number of active matching attached instances.</returns>
     private static int CountAttachedInstances(in PlayerPowerUpVfxSpawnRequest request,
                                               out PlayerPowerUpManagedVfxInstance existingInstance)
     {
@@ -404,11 +424,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Counts active one-shot instances matching one prefab and area-cap cell.
-    /// /params prefabEntity VFX prefab entity used as the cap key.
-    /// /params position Requested spawn position.
-    /// /params cellSize Sanitized cap cell size.
-    /// /returns Number of active matching one-shot instances in the same cell.
     /// </summary>
+    /// <param name="prefabEntity">VFX prefab entity used as the cap key.</param>
+    /// <param name="position">Requested spawn position.</param>
+    /// <param name="cellSize">Sanitized cap cell size.</param>
+    /// <returns>Number of active matching one-shot instances in the same cell.</returns>
     private static int CountAreaInstances(Entity prefabEntity,
                                           float3 position,
                                           float cellSize)
@@ -444,10 +464,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Extends an existing attached VFX lifetime when cap refresh is enabled.
-    /// /params instance Existing attached VFX instance.
-    /// /params requestedLifetimeSeconds Lifetime requested by the rejected spawn request.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Existing attached VFX instance.</param>
+    /// <param name="requestedLifetimeSeconds">Lifetime requested by the rejected spawn request.</param>
     private static void RefreshLifetime(PlayerPowerUpManagedVfxInstance instance,
                                         float requestedLifetimeSeconds)
     {
@@ -463,9 +482,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Release
     /// <summary>
     /// Releases one active instance and removes it from the active list.
-    /// /params instanceIndex Active list index to release.
-    /// /returns None.
     /// </summary>
+    /// <param name="instanceIndex">Active list index to release.</param>
     private static void ReleaseActiveInstanceAt(int instanceIndex)
     {
         PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
@@ -475,9 +493,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Returns one managed VFX instance to the pool when its GameObject is still alive.
-    /// /params instance Managed VFX instance being released.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed VFX instance being released.</param>
     private static void ReleaseInstance(PlayerPowerUpManagedVfxInstance instance)
     {
         if (!IsInstanceUsable(instance))
@@ -494,9 +511,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Clears runtime-only metadata before a managed VFX instance is pooled.
-    /// /params instance Managed VFX instance being reset.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed VFX instance being reset.</param>
     private static void ResetRuntimeState(PlayerPowerUpManagedVfxInstance instance)
     {
         instance.PrefabEntity = Entity.Null;
@@ -513,9 +529,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Destroys one managed VFX GameObject and clears cached component references.
-    /// /params instance Managed VFX instance being destroyed.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed VFX instance being destroyed.</param>
     private static void DestroyInstance(PlayerPowerUpManagedVfxInstance instance)
     {
         if (instance == null)
@@ -536,9 +551,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Collection Helpers
     /// <summary>
     /// Removes one active-list element without preserving order.
-    /// /params instanceIndex Active list index to remove.
-    /// /returns None.
     /// </summary>
+    /// <param name="instanceIndex">Active list index to remove.</param>
     private static void RemoveActiveInstanceAt(int instanceIndex)
     {
         int lastIndex = activeInstances.Count - 1;
@@ -548,9 +562,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Removes one pooled-list element without preserving order.
-    /// /params instanceIndex Pooled list index to remove.
-    /// /returns None.
     /// </summary>
+    /// <param name="instanceIndex">Pooled list index to remove.</param>
     private static void RemovePooledInstanceAt(int instanceIndex)
     {
         int lastIndex = pooledInstances.Count - 1;
@@ -562,9 +575,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #region Validation
     /// <summary>
     /// Checks whether a managed VFX instance still has a live GameObject and transform.
-    /// /params instance Managed VFX instance to validate.
-    /// /returns True when the instance can be updated or pooled.
     /// </summary>
+    /// <param name="instance">Managed VFX instance to validate.</param>
+    /// <returns>True when the instance can be updated or pooled.</returns>
     private static bool IsInstanceUsable(PlayerPowerUpManagedVfxInstance instance)
     {
         if (instance == null)
@@ -581,10 +594,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     /// <summary>
     /// Checks whether an entity can safely be inspected through EntityManager.
-    /// /params entityManager Entity manager used to test existence.
-    /// /params entity Entity to validate.
-    /// /returns True when the entity is non-null, non-deferred and still exists.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to test existence.</param>
+    /// <param name="entity">Entity to validate.</param>
+    /// <returns>True when the entity is non-null, non-deferred and still exists.</returns>
     private static bool IsEntityUsable(EntityManager entityManager, Entity entity)
     {
         if (entity == Entity.Null)

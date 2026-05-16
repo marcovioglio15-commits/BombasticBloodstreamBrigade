@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds top-level detail sections for the boss pattern preset panel.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelSectionsUtility
 {
@@ -14,9 +12,8 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
     #region Public Methods
     /// <summary>
     /// Builds the metadata subsection for one boss pattern preset.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildMetadataSection(EnemyBossPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -54,9 +51,8 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the source normal-pattern preset assignment subsection.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildSourcePatternsSection(EnemyBossPatternPresetsPanel panel)
     {
         if (panel == null)
@@ -107,9 +103,8 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the boss pattern assembly subsection.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildPatternAssembleSection(EnemyBossPatternPresetsPanel panel)
     {
         EnemyBossPatternPresetsPanelPatternUtility.BuildPatternAssembleSection(panel);
@@ -117,9 +112,8 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the minion spawning subsection for a boss pattern preset.
-    /// /params panel Owning panel that provides serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildMinionSpawnSection(EnemyBossPatternPresetsPanel panel)
     {
         EnemyBossPatternPresetsPanelMinionUtility.BuildMinionSpawnSection(panel);
@@ -129,11 +123,10 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
     #region Private Methods
     /// <summary>
     /// Adds the read-only preset ID row and regenerate action.
-    /// /params panel Owning panel that exposes the regenerate callback.
-    /// /params parent Parent section container.
-    /// /params idProperty Serialized ID property.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that exposes the regenerate callback.</param>
+    /// <param name="parent">Parent section container.</param>
+    /// <param name="idProperty">Serialized ID property.</param>
     private static void AddPresetIdRow(EnemyBossPatternPresetsPanel panel, VisualElement parent, SerializedProperty idProperty)
     {
         if (parent == null || idProperty == null)

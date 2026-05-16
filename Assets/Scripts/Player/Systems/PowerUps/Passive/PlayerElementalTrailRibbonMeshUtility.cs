@@ -4,8 +4,6 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// Builds and updates camera-independent managed mesh ribbons for the Elemental Trail passive presentation.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerElementalTrailRibbonMeshUtility
 {
@@ -25,9 +23,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region Creation
     /// <summary>
     /// Creates one managed ribbon mesh instance using the first TrailRenderer found on the authored prefab as visual template.
-    /// /params sourcePrefab Authored VFX prefab assigned by the visual preset or player authoring fallback.
-    /// /returns Created ribbon instance, or null when the prefab cannot provide a usable TrailRenderer material.
     /// </summary>
+    /// <param name="sourcePrefab">Authored VFX prefab assigned by the visual preset or player authoring fallback.</param>
+    /// <returns>Created ribbon instance, or null when the prefab cannot provide a usable TrailRenderer material.</returns>
     public static PlayerElementalTrailRibbonInstance CreateInstance(GameObject sourcePrefab)
     {
         if (sourcePrefab == null)
@@ -76,9 +74,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Destroys one managed ribbon instance and its runtime-only Unity objects.
-    /// /params instance Managed ribbon instance to release.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance to release.</param>
     public static void DestroyInstance(PlayerElementalTrailRibbonInstance instance)
     {
         if (instance == null)
@@ -100,9 +97,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region State
     /// <summary>
     /// Clears all ribbon samples and hides the managed renderer.
-    /// /params instance Managed ribbon instance being disabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance being disabled.</param>
     public static void SetInactive(PlayerElementalTrailRibbonInstance instance)
     {
         if (instance == null)
@@ -118,13 +114,12 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Advances sample age, appends new movement samples and rebuilds the visible ribbon mesh.
-    /// /params instance Managed ribbon instance owned by one player.
-    /// /params worldPosition Current world-space emission position.
-    /// /params desiredWidth Full ribbon width resolved from Elemental Trail gameplay radius and visual multiplier.
-    /// /params isEmitting True while the player is moving and the passive should add new samples.
-    /// /params deltaTime Frame delta time used to age and fade samples.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance owned by one player.</param>
+    /// <param name="worldPosition">Current world-space emission position.</param>
+    /// <param name="desiredWidth">Full ribbon width resolved from Elemental Trail gameplay radius and visual multiplier.</param>
+    /// <param name="isEmitting">True while the player is moving and the passive should add new samples.</param>
+    /// <param name="deltaTime">Frame delta time used to age and fade samples.</param>
     public static void UpdateInstance(PlayerElementalTrailRibbonInstance instance,
                                       float3 worldPosition,
                                       float desiredWidth,
@@ -154,10 +149,10 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region Template
     /// <summary>
     /// Reads the first authored TrailRenderer as a data template for the managed ribbon mesh.
-    /// /params sourcePrefab Source prefab containing a TrailRenderer template.
-    /// /params template Output template containing material, gradient and sampling settings.
-    /// /returns True when a usable template was found.
     /// </summary>
+    /// <param name="sourcePrefab">Source prefab containing a TrailRenderer template.</param>
+    /// <param name="template">Output template containing material, gradient and sampling settings.</param>
+    /// <returns>True when a usable template was found.</returns>
     private static bool TryBuildTemplate(GameObject sourcePrefab, out PlayerElementalTrailRibbonTemplate template)
     {
         template = default;
@@ -185,9 +180,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Finds the first valid TrailRenderer template inside a prefab hierarchy.
-    /// /params sourcePrefab Source prefab object used only for reading authored component settings.
-    /// /returns First TrailRenderer found in children, or null when none exists.
     /// </summary>
+    /// <param name="sourcePrefab">Source prefab object used only for reading authored component settings.</param>
+    /// <returns>First TrailRenderer found in children, or null when none exists.</returns>
     private static TrailRenderer ResolveTemplateRenderer(GameObject sourcePrefab)
     {
         if (sourcePrefab == null)
@@ -211,11 +206,10 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Applies renderer settings that keep the ribbon lightweight and independent from scene lighting.
-    /// /params meshRenderer Runtime MeshRenderer used by the ribbon instance.
-    /// /params materialInstance Runtime material instance assigned to the renderer.
-    /// /params template Authored sorting data copied from the TrailRenderer template.
-    /// /returns None.
     /// </summary>
+    /// <param name="meshRenderer">Runtime MeshRenderer used by the ribbon instance.</param>
+    /// <param name="materialInstance">Runtime material instance assigned to the renderer.</param>
+    /// <param name="template">Authored sorting data copied from the TrailRenderer template.</param>
     private static void ConfigureRenderer(MeshRenderer meshRenderer,
                                           Material materialInstance,
                                           in PlayerElementalTrailRibbonTemplate template)
@@ -235,10 +229,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region Sampling
     /// <summary>
     /// Ages samples and removes points that have exceeded the template lifetime.
-    /// /params instance Managed ribbon instance whose point list is being updated.
-    /// /params deltaTime Frame delta time in seconds.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose point list is being updated.</param>
+    /// <param name="deltaTime">Frame delta time in seconds.</param>
     private static void AgeAndPruneSamples(PlayerElementalTrailRibbonInstance instance,
                                            float deltaTime)
     {
@@ -264,10 +257,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Adds a new sample when the emitter moved far enough, otherwise keeps the newest sample locked to the player.
-    /// /params instance Managed ribbon instance receiving the movement sample.
-    /// /params worldPosition Current world-space emission position.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance receiving the movement sample.</param>
+    /// <param name="worldPosition">Current world-space emission position.</param>
     private static void AddOrMoveNewestSample(PlayerElementalTrailRibbonInstance instance,
                                               float3 worldPosition)
     {
@@ -306,10 +298,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region Mesh
     /// <summary>
     /// Rebuilds the ribbon mesh from current samples using a stable horizontal normal and explicit bounds.
-    /// /params instance Managed ribbon instance whose mesh buffers should be rebuilt.
-    /// /params desiredWidth Full ribbon width in world units.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose mesh buffers should be rebuilt.</param>
+    /// <param name="desiredWidth">Full ribbon width in world units.</param>
     private static void RebuildMesh(PlayerElementalTrailRibbonInstance instance,
                                     float desiredWidth)
     {
@@ -332,10 +323,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Fills reusable mesh buffers with one camera-independent quad strip.
-    /// /params instance Managed ribbon instance whose buffers receive generated geometry.
-    /// /params desiredWidth Full ribbon width in world units.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose buffers receive generated geometry.</param>
+    /// <param name="desiredWidth">Full ribbon width in world units.</param>
     private static void FillMeshBuffers(PlayerElementalTrailRibbonInstance instance,
                                         float desiredWidth)
     {
@@ -378,10 +368,10 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Resolves the planar tangent used to orient the ribbon width at one sample.
-    /// /params instance Managed ribbon instance containing the point list.
-    /// /params pointIndex Index of the point whose tangent is required.
-    /// /returns Normalized XZ tangent, or world forward when samples overlap.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance containing the point list.</param>
+    /// <param name="pointIndex">Index of the point whose tangent is required.</param>
+    /// <returns>Normalized XZ tangent, or world forward when samples overlap.</returns>
     private static float3 ResolvePlanarTangent(PlayerElementalTrailRibbonInstance instance,
                                                int pointIndex)
     {
@@ -405,9 +395,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Calculates padded mesh bounds from the generated vertex buffer.
-    /// /params vertices Generated mesh vertex buffer.
-    /// /returns Padded bounds used by Unity frustum culling.
     /// </summary>
+    /// <param name="vertices">Generated mesh vertex buffer.</param>
+    /// <returns>Padded bounds used by Unity frustum culling.</returns>
     private static Bounds ResolveBounds(System.Collections.Generic.List<Vector3> vertices)
     {
         Vector3 minimum = vertices[0];
@@ -427,9 +417,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Clears mesh data and reusable geometry buffers.
-    /// /params instance Managed ribbon instance whose mesh should be emptied.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose mesh should be emptied.</param>
     private static void ClearMesh(PlayerElementalTrailRibbonInstance instance)
     {
         ClearMeshBuffers(instance);
@@ -440,9 +429,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Clears reusable geometry buffers without releasing their allocated capacity.
-    /// /params instance Managed ribbon instance whose buffers should be cleared.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose buffers should be cleared.</param>
     private static void ClearMeshBuffers(PlayerElementalTrailRibbonInstance instance)
     {
         instance.Vertices.Clear();
@@ -454,9 +442,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Keeps reusable buffer capacity large enough for the common ribbon size.
-    /// /params instance Managed ribbon instance whose buffers should be pre-sized.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance whose buffers should be pre-sized.</param>
     private static void EnsureBufferCapacity(PlayerElementalTrailRibbonInstance instance)
     {
         if (instance.Vertices.Capacity < InitialVertexCapacity)
@@ -476,9 +463,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
     #region Helpers
     /// <summary>
     /// Clones a Gradient so runtime edits cannot mutate the authored prefab template.
-    /// /params source Source Gradient from the TrailRenderer template.
-    /// /returns Independent Gradient instance.
     /// </summary>
+    /// <param name="source">Source Gradient from the TrailRenderer template.</param>
+    /// <returns>Independent Gradient instance.</returns>
     private static Gradient CloneGradient(Gradient source)
     {
         Gradient gradient = new Gradient();
@@ -504,9 +491,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Clones a width curve so the managed mesh can evaluate authored width over trail lifetime.
-    /// /params source Source AnimationCurve from the TrailRenderer template.
-    /// /returns Independent width curve with a constant fallback.
     /// </summary>
+    /// <param name="source">Source AnimationCurve from the TrailRenderer template.</param>
+    /// <returns>Independent width curve with a constant fallback.</returns>
     private static AnimationCurve CloneWidthCurve(AnimationCurve source)
     {
         if (source == null || source.length <= 0)
@@ -517,9 +504,8 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Clears managed references after their Unity objects have been destroyed.
-    /// /params instance Managed ribbon instance being invalidated.
-    /// /returns None.
     /// </summary>
+    /// <param name="instance">Managed ribbon instance being invalidated.</param>
     private static void ClearManagedReferences(PlayerElementalTrailRibbonInstance instance)
     {
         instance.SourcePrefab = null;
@@ -536,9 +522,9 @@ internal static class PlayerElementalTrailRibbonMeshUtility
 
     /// <summary>
     /// Converts a DOTS float3 to a managed Vector3.
-    /// /params value Source DOTS vector.
-    /// /returns Managed Vector3 with matching components.
     /// </summary>
+    /// <param name="value">Source DOTS vector.</param>
+    /// <returns>Managed Vector3 with matching components.</returns>
     private static Vector3 ToVector3(float3 value)
     {
         return new Vector3(value.x, value.y, value.z);

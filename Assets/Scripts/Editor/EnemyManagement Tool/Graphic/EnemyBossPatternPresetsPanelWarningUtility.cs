@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds validation warnings for boss Pattern Assemble base slots and ordered interactions.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossPatternPresetsPanelWarningUtility
 {
@@ -16,12 +14,11 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     #region Public Methods
     /// <summary>
     /// Adds pattern assemble warnings based on base slots, boss interactions and source module catalog.
-    /// /params basePatternProperty Serialized base pattern root.
-    /// /params interactionsProperty Serialized interactions array.
-    /// /params sourcePreset Source module catalog.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="basePatternProperty">Serialized base pattern root.</param>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     public static void AddPatternWarnings(SerializedProperty basePatternProperty,
                                           SerializedProperty interactionsProperty,
                                           EnemyModulesAndPatternsPreset sourcePreset,
@@ -45,11 +42,10 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     #region Pattern Warnings
     /// <summary>
     /// Adds a warning when the base core movement binding is unavailable or unresolved.
-    /// /params basePatternProperty Serialized base pattern root.
-    /// /params sourcePreset Source module catalog.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="basePatternProperty">Serialized base pattern root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     private static void AddBaseCoreWarning(SerializedProperty basePatternProperty,
                                            EnemyModulesAndPatternsPreset sourcePreset,
                                            VisualElement parent)
@@ -64,10 +60,9 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Adds warnings for enabled interactions that do not override any pattern slot.
-    /// /params interactionsProperty Serialized interactions array.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     private static void AddEmptyInteractionWarnings(SerializedProperty interactionsProperty, VisualElement parent)
     {
         if (interactionsProperty == null)
@@ -89,12 +84,11 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Adds warnings for weapon runtime projectile payloads that cannot be represented by the current shared shooter pool.
-    /// /params basePatternProperty Serialized base pattern root.
-    /// /params interactionsProperty Serialized interactions array.
-    /// /params sourcePreset Source module catalog.
-    /// /params parent Parent receiving warnings.
-    /// /returns None.
     /// </summary>
+    /// <param name="basePatternProperty">Serialized base pattern root.</param>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
     private static void AddWeaponRuntimeProjectileWarnings(SerializedProperty basePatternProperty,
                                                            SerializedProperty interactionsProperty,
                                                            EnemyModulesAndPatternsPreset sourcePreset,
@@ -147,14 +141,13 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     #region Weapon Warnings
     /// <summary>
     /// Inspects one serialized weapon slot for projectile prefab availability and conflicts.
-    /// /params weaponSlotProperty Serialized weapon slot root.
-    /// /params sourcePreset Source module catalog.
-    /// /params firstProjectilePrefab First resolved projectile prefab.
-    /// /params hasWeaponSlot Tracks whether any weapon slot is enabled.
-    /// /params hasMissingProjectilePrefab Tracks missing prefab slots.
-    /// /params hasConflictingProjectilePrefab Tracks conflicting prefab slots.
-    /// /returns None.
     /// </summary>
+    /// <param name="weaponSlotProperty">Serialized weapon slot root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
+    /// <param name="hasWeaponSlot">Tracks whether any weapon slot is enabled.</param>
+    /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
+    /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
     private static void InspectWeaponSlot(SerializedProperty weaponSlotProperty,
                                           EnemyModulesAndPatternsPreset sourcePreset,
                                           ref GameObject firstProjectilePrefab,
@@ -186,11 +179,11 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Resolves the Runtime Projectile prefab used by one weapon binding, including payload overrides.
-    /// /params bindingProperty Serialized weapon binding.
-    /// /params sourcePreset Source module catalog.
-    /// /params projectilePrefab Output projectile prefab reference.
-    /// /returns True when a Shooter payload was resolved, even if the prefab reference is empty.
     /// </summary>
+    /// <param name="bindingProperty">Serialized weapon binding.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="projectilePrefab">Output projectile prefab reference.</param>
+    /// <returns>True when a Shooter payload was resolved, even if the prefab reference is empty.</returns>
     private static bool TryResolveWeaponRuntimeProjectile(SerializedProperty bindingProperty,
                                                           EnemyModulesAndPatternsPreset sourcePreset,
                                                           out GameObject projectilePrefab)
@@ -223,10 +216,10 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Reads the nested Runtime Projectile prefab from a serialized override payload.
-    /// /params overridePayloadProperty Serialized override payload root.
-    /// /params projectilePrefab Output projectile prefab reference.
-    /// /returns True when the override payload path exists.
     /// </summary>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="projectilePrefab">Output projectile prefab reference.</param>
+    /// <returns>True when the override payload path exists.</returns>
     private static bool TryReadOverrideRuntimeProjectile(SerializedProperty overridePayloadProperty,
                                                          out GameObject projectilePrefab)
     {
@@ -254,12 +247,12 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     #region Helpers
     /// <summary>
     /// Resolves one module option by ID within one catalog section.
-    /// /params sourcePreset Source module catalog.
-    /// /params section Catalog section to inspect.
-    /// /params moduleId Module ID to resolve.
-    /// /params option Output module option.
-    /// /returns True when the module exists in the requested section.
     /// </summary>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="section">Catalog section to inspect.</param>
+    /// <param name="moduleId">Module ID to resolve.</param>
+    /// <param name="option">Output module option.</param>
+    /// <returns>True when the module exists in the requested section.</returns>
     private static bool TryResolveModuleOption(EnemyModulesAndPatternsPreset sourcePreset,
                                                EnemyPatternModuleCatalogSection section,
                                                string moduleId,
@@ -286,9 +279,9 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Resolves whether one serialized interaction is enabled.
-    /// /params interactionProperty Serialized interaction property.
-    /// /returns True when the interaction contributes to runtime selection.
     /// </summary>
+    /// <param name="interactionProperty">Serialized interaction property.</param>
+    /// <returns>True when the interaction contributes to runtime selection.</returns>
     private static bool IsEnabledInteraction(SerializedProperty interactionProperty)
     {
         SerializedProperty enabledProperty = interactionProperty != null ? interactionProperty.FindPropertyRelative("enabled") : null;
@@ -297,9 +290,9 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Resolves whether one serialized slot has its enabled flag active.
-    /// /params slotProperty Serialized slot property.
-    /// /returns True when the slot is enabled.
     /// </summary>
+    /// <param name="slotProperty">Serialized slot property.</param>
+    /// <returns>True when the slot is enabled.</returns>
     private static bool IsEnabledSlot(SerializedProperty slotProperty)
     {
         SerializedProperty enabledProperty = slotProperty != null ? slotProperty.FindPropertyRelative("isEnabled") : null;
@@ -308,9 +301,9 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Resolves whether an interaction overrides at least one pattern slot.
-    /// /params interactionProperty Serialized interaction property.
-    /// /returns True when Core, Short-Range or Weapon override is enabled.
     /// </summary>
+    /// <param name="interactionProperty">Serialized interaction property.</param>
+    /// <returns>True when Core, Short-Range or Weapon override is enabled.</returns>
     private static bool HasAnyEnabledOverride(SerializedProperty interactionProperty)
     {
         if (interactionProperty == null)
@@ -330,10 +323,10 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Finds one nested slot property by name.
-    /// /params root Serialized root property.
-    /// /params slotName Child slot name.
-    /// /returns Serialized slot property, or null when missing.
     /// </summary>
+    /// <param name="root">Serialized root property.</param>
+    /// <param name="slotName">Child slot name.</param>
+    /// <returns>Serialized slot property, or null when missing.</returns>
     private static SerializedProperty FindNestedSlot(SerializedProperty root, string slotName)
     {
         if (root == null)
@@ -344,10 +337,10 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     /// <summary>
     /// Finds one nested slot binding by slot name.
-    /// /params root Serialized root property.
-    /// /params slotName Child slot name.
-    /// /returns Serialized binding property, or null when missing.
     /// </summary>
+    /// <param name="root">Serialized root property.</param>
+    /// <param name="slotName">Child slot name.</param>
+    /// <returns>Serialized binding property, or null when missing.</returns>
     private static SerializedProperty FindNestedBinding(SerializedProperty root, string slotName)
     {
         SerializedProperty slotProperty = FindNestedSlot(root, slotName);

@@ -6,7 +6,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Provides shared UI and preset helper methods for the animation bindings management panel.
 /// none.
-/// returns void.
 /// </summary>
 public static class PlayerAnimationBindingsPanelUtility
 {
@@ -16,10 +15,10 @@ public static class PlayerAnimationBindingsPanelUtility
     /// <summary>
     /// Checks whether one animation bindings preset matches the current search text.
     /// Used by the preset list refresh to keep filtering logic outside the panel container.
-    /// preset: Preset inspected by the filter.
-    /// searchText: Search text typed by the user.
-    /// returns True when the preset should remain visible in the list.
     /// </summary>
+    /// <param name="preset">Preset inspected by the filter.</param>
+    /// <param name="searchText">Search text typed by the user.</param>
+    /// <returns>True when the preset should remain visible in the list.</returns>
     public static bool MatchesSearch(PlayerAnimationBindingsPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))
@@ -44,10 +43,10 @@ public static class PlayerAnimationBindingsPanelUtility
 
     /// <summary>
     /// Creates one titled section and adds it to the details scroll view.
-    /// detailsRoot: Scroll view receiving the new section.
-    /// title: Visible title of the created section.
-    /// returns Root element of the created section.
     /// </summary>
+    /// <param name="detailsRoot">Scroll view receiving the new section.</param>
+    /// <param name="title">Visible title of the created section.</param>
+    /// <returns>Root element of the created section.</returns>
     public static VisualElement CreateSection(ScrollView detailsRoot, string title)
     {
         VisualElement section = new VisualElement();
@@ -67,11 +66,11 @@ public static class PlayerAnimationBindingsPanelUtility
 
     /// <summary>
     /// Builds one property field using the shared scaling-aware field factory.
-    /// serializedObject: Serialized preset currently edited by the panel.
-    /// propertyName: Serialized property path to resolve.
-    /// labelOverride: Custom label shown in the inspector row.
-    /// returns UI element bound to the requested property.
     /// </summary>
+    /// <param name="serializedObject">Serialized preset currently edited by the panel.</param>
+    /// <param name="propertyName">Serialized property path to resolve.</param>
+    /// <param name="labelOverride">Custom label shown in the inspector row.</param>
+    /// <returns>UI element bound to the requested property.</returns>
     public static VisualElement CreatePropertyField(SerializedObject serializedObject, string propertyName, string labelOverride)
     {
         if (serializedObject == null)
@@ -84,10 +83,10 @@ public static class PlayerAnimationBindingsPanelUtility
 
     /// <summary>
     /// Builds a simple read-only label row used for immutable preset metadata.
-    /// label: Static label displayed on the left.
-    /// value: Value displayed on the right.
-    /// returns One row element containing the label/value pair.
     /// </summary>
+    /// <param name="label">Static label displayed on the left.</param>
+    /// <param name="value">Value displayed on the right.</param>
+    /// <returns>One row element containing the label/value pair.</returns>
     public static VisualElement CreateReadOnlyText(string label, string value)
     {
         VisualElement row = new VisualElement();
@@ -104,10 +103,9 @@ public static class PlayerAnimationBindingsPanelUtility
 
     /// <summary>
     /// Renames one animation bindings preset and updates the draft session bookkeeping.
-    /// preset: Preset asset to rename.
-    /// newName: Requested display and asset name.
-    /// returns void.
     /// </summary>
+    /// <param name="preset">Preset asset to rename.</param>
+    /// <param name="newName">Requested display and asset name.</param>
     public static void RenamePreset(PlayerAnimationBindingsPreset preset, string newName)
     {
         if (preset == null)
@@ -133,9 +131,9 @@ public static class PlayerAnimationBindingsPanelUtility
 
     /// <summary>
     /// Resolves the compact display label shown inside the preset list.
-    /// preset: Preset converted to display text.
-    /// returns User-facing list label.
     /// </summary>
+    /// <param name="preset">Preset converted to display text.</param>
+    /// <returns>User-facing list label.</returns>
     public static string GetPresetDisplayName(PlayerAnimationBindingsPreset preset)
     {
         if (preset == null)
@@ -154,10 +152,10 @@ public static class PlayerAnimationBindingsPanelUtility
     #region Private Methods
     /// <summary>
     /// Checks whether one string contains another using case-insensitive comparison.
-    /// value: Source text to inspect.
-    /// search: Search fragment requested by the user.
-    /// returns True when the fragment exists inside the source text.
     /// </summary>
+    /// <param name="value">Source text to inspect.</param>
+    /// <param name="search">Search fragment requested by the user.</param>
+    /// <returns>True when the fragment exists inside the source text.</returns>
     private static bool ContainsIgnoreCase(string value, string search)
     {
         if (string.IsNullOrWhiteSpace(value) || string.IsNullOrWhiteSpace(search))

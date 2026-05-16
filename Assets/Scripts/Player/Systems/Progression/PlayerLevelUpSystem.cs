@@ -491,7 +491,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     /// <param name="scalableStats">Runtime scalable-stat buffer.</param>
     /// <param name="targetLevel">Newly reached player level.</param>
     /// <param name="scheduleDebugInfo">Debug payload describing the applied step.</param>
-    /// <returns>True when a step is applied; otherwise false.<returns>
+    /// <returns>True when a step is applied; otherwise false.</returns>
     private static bool TryApplyScheduleStep(PlayerProgressionConfig progressionConfig,
                                              DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                              int targetLevel,
@@ -567,7 +567,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     /// </summary>
     /// <param name="step">Baked schedule step being consumed.</param>
     /// <param name="scalableStats">Current runtime scalable-stat buffer used as formula variables.</param>
-    /// <returns>Runtime step value, or the pre-scaled baked value when no formula can be evaluated.<returns>
+    /// <returns>Runtime step value, or the pre-scaled baked value when no formula can be evaluated.</returns>
     private static float ResolveScheduleStepValue(ref PlayerLevelUpScheduleStepBlob step,
                                                   DynamicBuffer<PlayerScalableStatElement> scalableStats)
     {
@@ -593,7 +593,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     /// </summary>
     /// <param name="scalableStats">Runtime scalable-stat buffer.</param>
     /// <param name="statName">Requested scalable-stat name.</param>
-    /// <returns>Buffer index when found; otherwise -1.<returns>
+    /// <returns>Buffer index when found; otherwise -1.</returns>
     private static int FindScalableStatIndex(DynamicBuffer<PlayerScalableStatElement> scalableStats, string statName)
     {
         for (int statIndex = 0; statIndex < scalableStats.Length; statIndex++)

@@ -15,9 +15,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime data required by toggleable passive power-ups.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpsConfig>();
@@ -29,9 +28,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
 
     /// <summary>
     /// Updates toggle startup timers, maintenance ticks, and the aggregated passive state snapshot.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -135,23 +133,22 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     #region Helpers
     /// <summary>
     /// Applies one slot toggle runtime step including startup timing, maintenance, and passive aggregation.
-    /// slotConfig: Slot configuration inspected for toggle maintenance settings.
-    /// deltaTime: Current frame delta time.
-    /// playerEntity: Player entity used for health and shield resource access.
-    /// slotEnergy: Mutable slot energy state.
-    /// cooldownRemaining: Mutable slot timer used as toggle startup lock while active.
-    /// isActive: Mutable toggle-active flag for the slot.
-    /// maintenanceTickTimer: Mutable accumulated maintenance timer.
-    /// passiveToolsState: Aggregated passive state updated with the slot payload when active.
-    /// isShootingSuppressed: Mutable shared shooting suppression flag for the current player frame.
-    /// healthLookup: Health lookup used for non-energy maintenance costs.
-    /// updatedHealth: Cached mutable health value reused within the current caller.
-    /// healthChanged: True when updatedHealth already contains a fetched runtime value.
-    /// shieldLookup: Shield lookup used for shield maintenance costs.
-    /// updatedShield: Cached mutable shield value reused within the current caller.
-    /// shieldChanged: True when updatedShield already contains a fetched runtime value.
-    /// returns void.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration inspected for toggle maintenance settings.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    /// <param name="playerEntity">Player entity used for health and shield resource access.</param>
+    /// <param name="slotEnergy">Mutable slot energy state.</param>
+    /// <param name="cooldownRemaining">Mutable slot timer used as toggle startup lock while active.</param>
+    /// <param name="isActive">Mutable toggle-active flag for the slot.</param>
+    /// <param name="maintenanceTickTimer">Mutable accumulated maintenance timer.</param>
+    /// <param name="passiveToolsState">Aggregated passive state updated with the slot payload when active.</param>
+    /// <param name="isShootingSuppressed">Mutable shared shooting suppression flag for the current player frame.</param>
+    /// <param name="healthLookup">Health lookup used for non-energy maintenance costs.</param>
+    /// <param name="updatedHealth">Cached mutable health value reused within the current caller.</param>
+    /// <param name="healthChanged">True when updatedHealth already contains a fetched runtime value.</param>
+    /// <param name="shieldLookup">Shield lookup used for shield maintenance costs.</param>
+    /// <param name="updatedShield">Cached mutable shield value reused within the current caller.</param>
+    /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
     private static void ProcessTogglePassiveSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                  float deltaTime,
                                                  Entity playerEntity,
@@ -230,21 +227,20 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
 
     /// <summary>
     /// Applies maintenance ticks after the startup interval has elapsed and deactivates the slot when payment fails.
-    /// slotConfig: Slot configuration containing maintenance settings.
-    /// deltaTime: Current frame delta time.
-    /// playerEntity: Player entity used for health and shield resource access.
-    /// slotEnergy: Mutable slot energy state.
-    /// cooldownRemaining: Mutable startup timer reset when the slot deactivates.
-    /// isActive: Mutable toggle-active flag for the slot.
-    /// maintenanceTickTimer: Mutable accumulated maintenance timer.
-    /// healthLookup: Health lookup used for non-energy maintenance costs.
-    /// updatedHealth: Cached mutable health value reused within the current caller.
-    /// healthChanged: True when updatedHealth already contains a fetched runtime value.
-    /// shieldLookup: Shield lookup used for shield maintenance costs.
-    /// updatedShield: Cached mutable shield value reused within the current caller.
-    /// shieldChanged: True when updatedShield already contains a fetched runtime value.
-    /// returns void.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration containing maintenance settings.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    /// <param name="playerEntity">Player entity used for health and shield resource access.</param>
+    /// <param name="slotEnergy">Mutable slot energy state.</param>
+    /// <param name="cooldownRemaining">Mutable startup timer reset when the slot deactivates.</param>
+    /// <param name="isActive">Mutable toggle-active flag for the slot.</param>
+    /// <param name="maintenanceTickTimer">Mutable accumulated maintenance timer.</param>
+    /// <param name="healthLookup">Health lookup used for non-energy maintenance costs.</param>
+    /// <param name="updatedHealth">Cached mutable health value reused within the current caller.</param>
+    /// <param name="healthChanged">True when updatedHealth already contains a fetched runtime value.</param>
+    /// <param name="shieldLookup">Shield lookup used for shield maintenance costs.</param>
+    /// <param name="updatedShield">Cached mutable shield value reused within the current caller.</param>
+    /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
     private static void ApplyMaintenanceTicks(in PlayerPowerUpSlotConfig slotConfig,
                                               float deltaTime,
                                               Entity playerEntity,

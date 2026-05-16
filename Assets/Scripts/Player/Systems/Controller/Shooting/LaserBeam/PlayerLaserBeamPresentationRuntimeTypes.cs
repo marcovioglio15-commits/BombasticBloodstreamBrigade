@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one pooled root instance that owns all managed visuals for a single player beam.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerLaserBeamManagedInstance
 {
@@ -24,8 +22,6 @@ internal sealed class PlayerLaserBeamManagedInstance
 
 /// <summary>
 /// Stores one pooled mesh-based body ribbon visual instance.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerLaserBeamManagedBodyVisual
 {
@@ -39,8 +35,6 @@ internal sealed class PlayerLaserBeamManagedBodyVisual
 
 /// <summary>
 /// Stores one pooled mesh-renderer layer that shares the lane body mesh but renders a different visual role.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerLaserBeamManagedBodyLayerVisual
 {
@@ -55,8 +49,6 @@ internal sealed class PlayerLaserBeamManagedBodyLayerVisual
 
 /// <summary>
 /// Stores one pooled particle visual instance used for the beam source or impact.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class PlayerLaserBeamManagedParticleVisual
 {
@@ -71,8 +63,6 @@ internal sealed class PlayerLaserBeamManagedParticleVisual
 
 /// <summary>
 /// Stores one sampled ribbon point derived from the authoritative gameplay lanes.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerLaserBeamRibbonPoint
 {
@@ -86,8 +76,6 @@ internal struct PlayerLaserBeamRibbonPoint
 
 /// <summary>
 /// Stores one render-time ribbon lane built from the authoritative gameplay lanes.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerLaserBeamLaneVisual
 {
@@ -107,8 +95,6 @@ internal struct PlayerLaserBeamLaneVisual
 
 /// <summary>
 /// Stores the render-time start and end anchors of one beam lane.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerLaserBeamLaneEndpoint
 {
@@ -128,8 +114,6 @@ internal struct PlayerLaserBeamLaneEndpoint
 
 /// <summary>
 /// Stores the resolved managed flow and storm colors used by body and particle visuals.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct PlayerLaserBeamResolvedPalette
 {
@@ -143,8 +127,6 @@ internal struct PlayerLaserBeamResolvedPalette
 
 /// <summary>
 /// Identifies the shared mesh-renderer layer used to draw one portion of the beam body.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal enum PlayerLaserBeamBodyLayerRole : byte
 {
@@ -155,8 +137,6 @@ internal enum PlayerLaserBeamBodyLayerRole : byte
 
 /// <summary>
 /// Identifies the endpoint visual role rendered by the pooled particle prefabs.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal enum PlayerLaserBeamEndpointVisualRole : byte
 {

@@ -5,8 +5,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Declares the catalog subsection that owns one reusable enemy pattern module definition.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum EnemyPatternModuleCatalogSection
 {
@@ -18,8 +16,6 @@ public enum EnemyPatternModuleCatalogSection
 
 /// <summary>
 /// Stores the core movement selection assembled inside one shared enemy pattern.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyPatternCoreMovementAssembly
@@ -48,8 +44,6 @@ public sealed class EnemyPatternCoreMovementAssembly
     #region Public Methods
     /// <summary>
     /// Ensures the core movement assembly always owns one binding instance and keeps it enabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -68,8 +62,6 @@ public sealed class EnemyPatternCoreMovementAssembly
 
 /// <summary>
 /// Stores the optional short-range interaction selection and shared activation settings used by one pattern.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyPatternShortRangeInteractionAssembly
@@ -169,11 +161,10 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
     #region Public Methods
     /// <summary>
     /// Configures the short-range interaction activation gate.
-    /// /params isEnabledValue New enabled flag.
-    /// /params activationRangeValue New activation range.
-    /// /params releaseDistanceBufferValue New release distance buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="isEnabledValue">New enabled flag.</param>
+    /// <param name="activationRangeValue">New activation range.</param>
+    /// <param name="releaseDistanceBufferValue">New release distance buffer.</param>
     public void Configure(bool isEnabledValue, float activationRangeValue, float releaseDistanceBufferValue)
     {
         isEnabled = isEnabledValue;
@@ -183,8 +174,6 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
 
     /// <summary>
     /// Ensures the short-range interaction assembly keeps valid references without snapping authored numeric values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -204,8 +193,6 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
 
 /// <summary>
 /// Stores the optional weapon interaction selection and shared range gates used by one pattern.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyPatternWeaponInteractionAssembly
@@ -371,13 +358,12 @@ public sealed class EnemyPatternWeaponInteractionAssembly
     #region Public Methods
     /// <summary>
     /// Configures the weapon interaction range gate.
-    /// /params isEnabledValue New enabled flag.
-    /// /params useMinimumRangeValue New minimum-range gate toggle.
-    /// /params minimumRangeValue New minimum range.
-    /// /params useMaximumRangeValue New maximum-range gate toggle.
-    /// /params maximumRangeValue New maximum range.
-    /// /returns None.
     /// </summary>
+    /// <param name="isEnabledValue">New enabled flag.</param>
+    /// <param name="useMinimumRangeValue">New minimum-range gate toggle.</param>
+    /// <param name="minimumRangeValue">New minimum range.</param>
+    /// <param name="useMaximumRangeValue">New maximum-range gate toggle.</param>
+    /// <param name="maximumRangeValue">New maximum range.</param>
     public void Configure(bool isEnabledValue,
                           bool useMinimumRangeValue,
                           float minimumRangeValue,
@@ -393,8 +379,6 @@ public sealed class EnemyPatternWeaponInteractionAssembly
 
     /// <summary>
     /// Ensures the weapon interaction assembly keeps valid references without snapping authored numeric values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -415,8 +399,6 @@ public sealed class EnemyPatternWeaponInteractionAssembly
 /// <summary>
 /// Stores the optional drop-items selection used by one shared pattern.
 /// This remains separated so existing loot logic can be preserved while the movement and weapon flow is restructured.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyPatternDropItemsAssembly
@@ -461,9 +443,8 @@ public sealed class EnemyPatternDropItemsAssembly
     #region Public Methods
     /// <summary>
     /// Configures the drop-items assembly enabled state.
-    /// /params isEnabledValue New enabled flag.
-    /// /returns None.
     /// </summary>
+    /// <param name="isEnabledValue">New enabled flag.</param>
     public void Configure(bool isEnabledValue)
     {
         isEnabled = isEnabledValue;
@@ -471,8 +452,6 @@ public sealed class EnemyPatternDropItemsAssembly
 
     /// <summary>
     /// Ensures the drop-items assembly always owns a modules list and migrates the hidden legacy single-slot binding when needed.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -492,8 +471,6 @@ public sealed class EnemyPatternDropItemsAssembly
 
     /// <summary>
     /// Moves the hidden legacy single-slot binding into the new modules list the first time the pattern is validated after migration.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void MigrateLegacyBindingIfNeeded()
     {
@@ -512,8 +489,6 @@ public sealed class EnemyPatternDropItemsAssembly
 
 /// <summary>
 /// Declares one assembled shared pattern built from category-specific module selections.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyModulesPatternDefinition
@@ -619,12 +594,11 @@ public sealed class EnemyModulesPatternDefinition
     #region Public Methods
     /// <summary>
     /// Configures this shared pattern identity and editor-facing metadata.
-    /// /params patternIdValue New stable pattern identifier.
-    /// /params displayNameValue New display name.
-    /// /params descriptionValue New description text.
-    /// /params unreplaceableValue New unreplaceable flag.
-    /// /returns None.
     /// </summary>
+    /// <param name="patternIdValue">New stable pattern identifier.</param>
+    /// <param name="displayNameValue">New display name.</param>
+    /// <param name="descriptionValue">New description text.</param>
+    /// <param name="unreplaceableValue">New unreplaceable flag.</param>
     public void Configure(string patternIdValue,
                           string displayNameValue,
                           string descriptionValue,
@@ -638,8 +612,6 @@ public sealed class EnemyModulesPatternDefinition
 
     /// <summary>
     /// Ensures nested assemblies always exist before editor drawing, validation and bake-time compilation.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

@@ -439,9 +439,8 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Applies the currently selected player visual preset outline values to the runtime outline material preview used by the player renderer feature.
-    /// /params panel Owning player visual preset panel providing the selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning player visual preset panel providing the selected preset context.</param>
     private static void ApplySelectedPlayerOutlineMaterial(PlayerVisualPresetsPanel panel)
     {
         if (panel == null)

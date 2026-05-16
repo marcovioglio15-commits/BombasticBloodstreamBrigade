@@ -12,7 +12,7 @@ public static class PlayerProgressionTierOptionsUtility
     /// <summary>
     /// Collects distinct tier IDs from the power-ups preset currently relevant to the edited progression context.
     /// </summary>
-    /// <returns>Sorted list of available tier IDs.<returns>
+    /// <returns>Sorted list of available tier IDs.</returns>
     public static List<string> BuildTierIdOptionsFromPowerUpsLibrary()
     {
         List<string> tierIds = new List<string>();
@@ -42,7 +42,7 @@ public static class PlayerProgressionTierOptionsUtility
     /// <summary>
     /// Collects distinct drop-pool IDs from the power-ups preset currently relevant to the edited progression context.
     /// </summary>
-    /// <returns>Sorted list of available drop-pool IDs.<returns>
+    /// <returns>Sorted list of available drop-pool IDs.</returns>
     public static List<string> BuildDropPoolIdOptionsFromPowerUpsLibrary()
     {
         List<string> dropPoolIds = new List<string>();
@@ -73,7 +73,7 @@ public static class PlayerProgressionTierOptionsUtility
     /// Resolves the scoped power-ups preset used by progression milestone selectors in the current editor context.
     /// </summary>
     /// <param name="scopedPreset">Resolved power-ups preset when available.</param>
-    /// <returns>True when a scoped power-ups preset was found; otherwise false.<returns>
+    /// <returns>True when a scoped power-ups preset was found; otherwise false.</returns>
     public static bool TryResolveScopedPowerUpsPreset(out PlayerPowerUpsPreset scopedPreset)
     {
         scopedPreset = null;
@@ -110,7 +110,7 @@ public static class PlayerProgressionTierOptionsUtility
     /// </summary>
     /// <param name="progressionPreset">Progression preset currently edited.</param>
     /// <param name="powerUpsPreset">Resolved power-ups preset when a referencing master preset is found.</param>
-    /// <returns>True when a referencing master preset with a power-ups preset exists; otherwise false.<returns>
+    /// <returns>True when a referencing master preset with a power-ups preset exists; otherwise false.</returns>
     private static bool TryResolvePowerUpsPresetFromProgression(PlayerProgressionPreset progressionPreset, out PlayerPowerUpsPreset powerUpsPreset)
     {
         powerUpsPreset = null;

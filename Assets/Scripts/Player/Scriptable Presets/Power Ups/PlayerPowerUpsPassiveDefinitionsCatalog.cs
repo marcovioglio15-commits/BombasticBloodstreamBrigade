@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores the visual prefabs and scale multipliers used by one elemental effect when it spawns enemy-attached VFX.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ElementalVfxByElementData
@@ -102,9 +100,8 @@ public sealed class ElementalVfxByElementData
     #region Setup
     /// <summary>
     /// Assigns the element identifier stored by this entry.
-    /// /params value Element associated with this VFX assignment.
-    /// /returns void.
     /// </summary>
+    /// <param name="value">Element associated with this VFX assignment.</param>
     public void SetElementType(ElementType value)
     {
         elementType = value;
@@ -112,9 +109,8 @@ public sealed class ElementalVfxByElementData
 
     /// <summary>
     /// Copies every authored value from another entry while preserving this instance allocation.
-    /// /params source Source entry whose values should be mirrored.
-    /// /returns void.
     /// </summary>
+    /// <param name="source">Source entry whose values should be mirrored.</param>
     public void CopyFrom(ElementalVfxByElementData source)
     {
         if (source == null)
@@ -133,8 +129,6 @@ public sealed class ElementalVfxByElementData
     #region Validation
     /// <summary>
     /// Keeps the entry callable from legacy validation paths without snapping authored values.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {

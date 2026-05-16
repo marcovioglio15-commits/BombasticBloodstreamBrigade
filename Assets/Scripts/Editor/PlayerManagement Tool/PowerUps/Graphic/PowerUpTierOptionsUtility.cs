@@ -15,7 +15,7 @@ public static class PowerUpTierOptionsUtility
     /// </summary>
     /// <param name="serializedObject">Power-ups preset serialized object.</param>
     /// <param name="entryKind">Tier entry category used to choose the source collection.</param>
-    /// <returns>Ordered list of available modular power-up IDs.<returns>
+    /// <returns>Ordered list of available modular power-up IDs.</returns>
     public static List<string> BuildPowerUpIdOptions(SerializedObject serializedObject, PowerUpTierEntryKind entryKind)
     {
         List<string> options = new List<string>();
@@ -55,7 +55,7 @@ public static class PowerUpTierOptionsUtility
     /// Builds selectable tier IDs from the current power-ups preset.
     /// </summary>
     /// <param name="serializedObject">Power-ups preset serialized object.</param>
-    /// <returns>Ordered list of available tier IDs.<returns>
+    /// <returns>Ordered list of available tier IDs.</returns>
     public static List<string> BuildTierIdOptions(SerializedObject serializedObject)
     {
         List<string> options = new List<string>();
@@ -98,7 +98,7 @@ public static class PowerUpTierOptionsUtility
     /// Builds selectable drop-pool IDs from the current power-ups preset.
     /// </summary>
     /// <param name="serializedObject">Power-ups preset serialized object.</param>
-    /// <returns>Ordered list of available drop-pool IDs.<returns>
+    /// <returns>Ordered list of available drop-pool IDs.</returns>
     public static List<string> BuildDropPoolIdOptions(SerializedObject serializedObject)
     {
         List<string> options = new List<string>();

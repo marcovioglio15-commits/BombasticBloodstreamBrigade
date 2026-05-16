@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Authoring component that provides the active Game Scene Manager preset to ECS.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameSceneManagerAuthoring : MonoBehaviour
@@ -61,9 +59,8 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Resolves the effective Scene Manager preset used by baking or runtime bootstrap.
-    /// /params None.
-    /// /returns Scene Manager preset from MasterPreset or direct fallback.
     /// </summary>
+    /// <returns>Scene Manager preset from MasterPreset or direct fallback.</returns>
     public GameSceneManagerPreset ResolveSceneManagerPreset()
     {
         if (masterPreset != null && masterPreset.SceneManagerPreset != null)
@@ -76,8 +73,6 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Creates a runtime ECS singleton for regular bootstrap scenes that are not baked as SubScenes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Start()
     {
@@ -97,9 +92,8 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     #region Runtime Bootstrap
     /// <summary>
     /// Creates the scene manager singleton in the default world when no baked singleton exists.
-    /// /params None.
-    /// /returns True when a singleton exists or was created successfully.
     /// </summary>
+    /// <returns>True when a singleton exists or was created successfully.</returns>
     private bool TryCreateRuntimeSingleton()
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -162,8 +156,6 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
 
 /// <summary>
 /// Baker that converts GameSceneManagerAuthoring into an ECS scene manager singleton.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAuthoring>
 {
@@ -172,9 +164,8 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
     #region Bake
     /// <summary>
     /// Bakes scene manager config, scene definitions and transition definitions from the selected preset.
-    /// /params authoring Scene manager authoring component.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Scene manager authoring component.</param>
     public override void Bake(GameSceneManagerAuthoring authoring)
     {
         if (authoring == null)
@@ -209,9 +200,8 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
     #region Helpers
     /// <summary>
     /// Declares preset asset dependencies so scene manager data rebakes when referenced presets change.
-    /// /params authoring Authoring component with master and fallback preset references.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Authoring component with master and fallback preset references.</param>
     private void DeclarePresetDependencies(GameSceneManagerAuthoring authoring)
     {
         if (authoring.MasterPreset != null)

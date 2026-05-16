@@ -5,8 +5,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Applies shared enemy-hit payloads such as elemental stacks, knockback, and hit VFX for projectile-like damage sources.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class EnemyHitPayloadRuntimeUtility
 {
@@ -15,26 +13,26 @@ public static class EnemyHitPayloadRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Applies all secondary hit payloads for one enemy impact and returns whether knockback state changed.
-    /// /params enemyIndex Index of the impacted enemy inside the projected enemy arrays.
-    /// /params shooterEntity Shooter entity used to resolve player-authored elemental VFX definitions.
-    /// /params impactPosition World-space position used to spawn elemental and hit-react VFX for this impact.
-    /// /params projectileData Projectile payload data used for knockback and explosion-derived metadata.
-    /// /params projectileTransform Projectile transform used to resolve knockback direction.
-    /// /params elementalPayload Elemental payload applied on hit.
-    /// /params enemyEntities Enemy entity array indexed by the enemy query order.
-    /// /params enemyPositions Enemy world positions indexed by the enemy query order.
-    /// /params enemyRuntimeArray Enemy runtime state array indexed by the enemy query order.
-    /// /params enemyDataArray Enemy immutable data array indexed by the enemy query order.
-    /// /params projectedEnemyKnockback Mutable projected knockback state array.
-    /// /params elementalVfxConfigLookup Lookup used to resolve shooter-authored elemental VFX presets.
-    /// /params elementalVfxAnchorLookup Lookup used to resolve optional enemy follow anchors for elemental VFX.
-    /// /params enemyHitVfxConfigLookup Lookup used to resolve one-shot enemy hit-react VFX.
-    /// /params spawnInactivityLockLookup Lookup used to block knockback while enemies are spawn-locked.
-    /// /params canEnqueueVfxRequests True when the shooter has a writable VFX request buffer.
-    /// /params vfxRequests Writable shooter-side VFX request buffer.
-    /// /params elementalStackLookup Writable enemy elemental-stack lookup.
-    /// /returns True when the projected knockback state changed, otherwise false.
     /// </summary>
+    /// <param name="enemyIndex">Index of the impacted enemy inside the projected enemy arrays.</param>
+    /// <param name="shooterEntity">Shooter entity used to resolve player-authored elemental VFX definitions.</param>
+    /// <param name="impactPosition">World-space position used to spawn elemental and hit-react VFX for this impact.</param>
+    /// <param name="projectileData">Projectile payload data used for knockback and explosion-derived metadata.</param>
+    /// <param name="projectileTransform">Projectile transform used to resolve knockback direction.</param>
+    /// <param name="elementalPayload">Elemental payload applied on hit.</param>
+    /// <param name="enemyEntities">Enemy entity array indexed by the enemy query order.</param>
+    /// <param name="enemyPositions">Enemy world positions indexed by the enemy query order.</param>
+    /// <param name="enemyRuntimeArray">Enemy runtime state array indexed by the enemy query order.</param>
+    /// <param name="enemyDataArray">Enemy immutable data array indexed by the enemy query order.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback state array.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup used to resolve shooter-authored elemental VFX presets.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup used to resolve optional enemy follow anchors for elemental VFX.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup used to resolve one-shot enemy hit-react VFX.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used to block knockback while enemies are spawn-locked.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter has a writable VFX request buffer.</param>
+    /// <param name="vfxRequests">Writable shooter-side VFX request buffer.</param>
+    /// <param name="elementalStackLookup">Writable enemy elemental-stack lookup.</param>
+    /// <returns>True when the projected knockback state changed, otherwise false.</returns>
     public static bool ApplyEnemyHitPayloads(int enemyIndex,
                                              Entity shooterEntity,
                                              float3 impactPosition,
@@ -98,18 +96,17 @@ public static class EnemyHitPayloadRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Applies elemental stacks and queues any related stack or proc VFX for one enemy impact.
-    /// /params enemyEntity Impacted enemy entity.
-    /// /params enemyPosition World-space impact position used for elemental VFX requests.
-    /// /params shooterEntity Shooter entity used to resolve elemental VFX definitions.
-    /// /params elementalPayload Elemental payload applied on hit.
-    /// /params enemyRuntimeState Enemy runtime state used for follow-validation metadata.
-    /// /params elementalVfxConfigLookup Lookup used to resolve shooter-authored elemental VFX presets.
-    /// /params elementalVfxAnchorLookup Lookup used to resolve optional enemy follow anchors for elemental VFX.
-    /// /params canEnqueueVfxRequests True when the shooter has a writable VFX request buffer.
-    /// /params vfxRequests Writable shooter-side VFX request buffer.
-    /// /params elementalStackLookup Writable enemy elemental-stack lookup.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyEntity">Impacted enemy entity.</param>
+    /// <param name="enemyPosition">World-space impact position used for elemental VFX requests.</param>
+    /// <param name="shooterEntity">Shooter entity used to resolve elemental VFX definitions.</param>
+    /// <param name="elementalPayload">Elemental payload applied on hit.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used for follow-validation metadata.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup used to resolve shooter-authored elemental VFX presets.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup used to resolve optional enemy follow anchors for elemental VFX.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter has a writable VFX request buffer.</param>
+    /// <param name="vfxRequests">Writable shooter-side VFX request buffer.</param>
+    /// <param name="elementalStackLookup">Writable enemy elemental-stack lookup.</param>
     private static void TryApplyElementalPayloads(Entity enemyEntity,
                                                   float3 enemyPosition,
                                                   Entity shooterEntity,
@@ -185,16 +182,16 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Applies projectile-derived knockback to one projected enemy state when the enemy is eligible.
-    /// /params enemyIndex Index of the impacted enemy inside the projected knockback array.
-    /// /params enemyEntity Impacted enemy entity.
-    /// /params enemyPosition Enemy world position used by the knockback solver.
-    /// /params projectileData Projectile payload data used by the knockback solver.
-    /// /params projectileTransform Projectile transform used by the knockback solver.
-    /// /params enemyData Immutable target enemy data used to inspect knockback immunity.
-    /// /params projectedEnemyKnockback Mutable projected knockback state array.
-    /// /params spawnInactivityLockLookup Lookup used to block knockback while enemies are spawn-locked.
-    /// /returns True when the projected knockback state changed, otherwise false.
     /// </summary>
+    /// <param name="enemyIndex">Index of the impacted enemy inside the projected knockback array.</param>
+    /// <param name="enemyEntity">Impacted enemy entity.</param>
+    /// <param name="enemyPosition">Enemy world position used by the knockback solver.</param>
+    /// <param name="projectileData">Projectile payload data used by the knockback solver.</param>
+    /// <param name="projectileTransform">Projectile transform used by the knockback solver.</param>
+    /// <param name="enemyData">Immutable target enemy data used to inspect knockback immunity.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback state array.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used to block knockback while enemies are spawn-locked.</param>
+    /// <returns>True when the projected knockback state changed, otherwise false.</returns>
     private static bool TryApplyKnockbackPayload(int enemyIndex,
                                                  Entity enemyEntity,
                                                  float3 enemyPosition,
@@ -233,10 +230,10 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Compares two knockback states to determine whether the runtime payload path produced a meaningful change.
-    /// /params leftValue Previous projected knockback state.
-    /// /params rightValue Updated projected knockback state.
-    /// /returns True when any tracked field differs, otherwise false.
     /// </summary>
+    /// <param name="leftValue">Previous projected knockback state.</param>
+    /// <param name="rightValue">Updated projected knockback state.</param>
+    /// <returns>True when any tracked field differs, otherwise false.</returns>
     private static bool DidKnockbackStateChange(EnemyKnockbackState leftValue, EnemyKnockbackState rightValue)
     {
         return leftValue.RemainingTime != rightValue.RemainingTime ||
@@ -247,14 +244,13 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Queues the one-shot enemy hit-react VFX when the target enemy exposes a valid VFX configuration.
-    /// /params enemyEntity Impacted enemy entity.
-    /// /params enemyPosition World-space impact position used by the one-shot VFX.
-    /// /params enemyRuntimeState Enemy runtime state used for follow-validation metadata.
-    /// /params enemyHitVfxConfigLookup Lookup used to resolve baked hit-react VFX settings.
-    /// /params canEnqueueVfxRequests True when the shooter has a writable VFX request buffer.
-    /// /params vfxRequests Writable shooter-side VFX request buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyEntity">Impacted enemy entity.</param>
+    /// <param name="enemyPosition">World-space impact position used by the one-shot VFX.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used for follow-validation metadata.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup used to resolve baked hit-react VFX settings.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter has a writable VFX request buffer.</param>
+    /// <param name="vfxRequests">Writable shooter-side VFX request buffer.</param>
     private static void TryEnqueueEnemyHitVfx(Entity enemyEntity,
                                               float3 enemyPosition,
                                               in EnemyRuntimeState enemyRuntimeState,
@@ -287,11 +283,11 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Resolves the elemental VFX definition authored on the shooter for one elemental type.
-    /// /params shooterEntity Shooter entity used to resolve the authored elemental VFX config.
-    /// /params elementType Elemental type whose VFX definition should be resolved.
-    /// /params elementalVfxConfigLookup Lookup used to resolve shooter-authored elemental VFX presets.
-    /// /returns Resolved elemental VFX definition, or default when unavailable.
     /// </summary>
+    /// <param name="shooterEntity">Shooter entity used to resolve the authored elemental VFX config.</param>
+    /// <param name="elementType">Elemental type whose VFX definition should be resolved.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup used to resolve shooter-authored elemental VFX presets.</param>
+    /// <returns>Resolved elemental VFX definition, or default when unavailable.</returns>
     private static ElementalVfxDefinitionConfig ResolveElementalVfxDefinition(Entity shooterEntity,
                                                                               ElementType elementType,
                                                                               in ComponentLookup<PlayerElementalVfxConfig> elementalVfxConfigLookup)
@@ -319,16 +315,15 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Queues one elemental VFX spawn request when the prefab entity is valid.
-    /// /params vfxRequests Writable shooter-side VFX request buffer.
-    /// /params prefabEntity Prefab entity to spawn.
-    /// /params position World-space spawn position.
-    /// /params scaleMultiplier Uniform scale multiplier applied to the spawned VFX.
-    /// /params followTargetEntity Optional follow target used by looping elemental VFX.
-    /// /params followValidationEntity Entity used to validate the follow target.
-    /// /params followValidationSpawnVersion Spawn version used for follow validation.
-    /// /params lifetimeSeconds Requested VFX lifetime.
-    /// /returns None.
     /// </summary>
+    /// <param name="vfxRequests">Writable shooter-side VFX request buffer.</param>
+    /// <param name="prefabEntity">Prefab entity to spawn.</param>
+    /// <param name="position">World-space spawn position.</param>
+    /// <param name="scaleMultiplier">Uniform scale multiplier applied to the spawned VFX.</param>
+    /// <param name="followTargetEntity">Optional follow target used by looping elemental VFX.</param>
+    /// <param name="followValidationEntity">Entity used to validate the follow target.</param>
+    /// <param name="followValidationSpawnVersion">Spawn version used for follow validation.</param>
+    /// <param name="lifetimeSeconds">Requested VFX lifetime.</param>
     private static void EnqueueElementalVfx(ref DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests,
                                             Entity prefabEntity,
                                             float3 position,
@@ -358,9 +353,9 @@ public static class EnemyHitPayloadRuntimeUtility
 
     /// <summary>
     /// Resolves a stable lifetime for proc VFX based on the authored elemental effect kind.
-    /// /params effectConfig Authored elemental effect config.
-    /// /returns Stable proc VFX lifetime in seconds.
     /// </summary>
+    /// <param name="effectConfig">Authored elemental effect config.</param>
+    /// <returns>Stable proc VFX lifetime in seconds.</returns>
     private static float ResolveProcVfxLifetimeSeconds(in ElementalEffectConfig effectConfig)
     {
         switch (effectConfig.EffectKind)

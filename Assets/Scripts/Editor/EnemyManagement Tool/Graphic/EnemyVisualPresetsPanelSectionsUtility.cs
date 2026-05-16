@@ -6,8 +6,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds detail sections and subsection tabs for enemy visual preset panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyVisualPresetsPanelSectionsUtility
 {
@@ -333,9 +331,9 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the spawn override subsection with dependent offset and warning controls.
-    /// /params panel Visual preset panel that owns the serialized preset context.
-    /// /returns Spawn override subsection content.
     /// </summary>
+    /// <param name="panel">Visual preset panel that owns the serialized preset context.</param>
+    /// <returns>Spawn override subsection content.</returns>
     private static VisualElement BuildSpawnOverridesSubSection(EnemyVisualPresetsPanel panel)
     {
         // Resolve the optional override block before showing dependent controls.
@@ -455,10 +453,9 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds a compact section label used to separate dense boss UI controls inside the visual preset tool.
-    /// /params target Parent receiving the label.
-    /// /params label User-facing label text.
-    /// /returns None.
     /// </summary>
+    /// <param name="target">Parent receiving the label.</param>
+    /// <param name="label">User-facing label text.</param>
     private static void AddSectionLabel(VisualElement target, string label)
     {
         if (target == null)
@@ -508,13 +505,12 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds a toggle that rebuilds the active details section when dependent settings should appear or hide.
-    /// /params panel Visual preset panel that owns the serialized preset context.
-    /// /params target Parent element receiving the toggle.
-    /// /params property Serialized boolean property.
-    /// /params label Visible control label.
-    /// /params tooltip Tooltip explaining the setting.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Visual preset panel that owns the serialized preset context.</param>
+    /// <param name="target">Parent element receiving the toggle.</param>
+    /// <param name="property">Serialized boolean property.</param>
+    /// <param name="label">Visible control label.</param>
+    /// <param name="tooltip">Tooltip explaining the setting.</param>
     private static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
                                                VisualElement target,
                                                SerializedProperty property,
@@ -544,10 +540,9 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds authored-value warnings for spawn warning overrides without mutating the serialized values.
-    /// /params spawnOverridesProperty Serialized spawn override settings.
-    /// /params container Parent element receiving warning boxes.
-    /// /returns None.
     /// </summary>
+    /// <param name="spawnOverridesProperty">Serialized spawn override settings.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
     private static void AddSpawnOverrideWarnings(SerializedProperty spawnOverridesProperty, VisualElement container)
     {
         if (spawnOverridesProperty == null || container == null)
@@ -563,12 +558,11 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds a warning when a float property contains a negative value.
-    /// /params parentProperty Serialized parent object.
-    /// /params container Parent element receiving warning boxes.
-    /// /params relativePropertyName Relative float property name.
-    /// /params message Warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    /// <param name="relativePropertyName">Relative float property name.</param>
+    /// <param name="message">Warning text.</param>
     private static void AddNegativeValueWarning(SerializedProperty parentProperty,
                                                 VisualElement container,
                                                 string relativePropertyName,
@@ -582,12 +576,11 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds a warning when a float property contains a zero or negative value.
-    /// /params parentProperty Serialized parent object.
-    /// /params container Parent element receiving warning boxes.
-    /// /params relativePropertyName Relative float property name.
-    /// /params message Warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    /// <param name="relativePropertyName">Relative float property name.</param>
+    /// <param name="message">Warning text.</param>
     private static void AddNonPositiveValueWarning(SerializedProperty parentProperty,
                                                    VisualElement container,
                                                    string relativePropertyName,
@@ -601,14 +594,13 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds a warning when a float property falls outside the expected authored range.
-    /// /params parentProperty Serialized parent object.
-    /// /params container Parent element receiving warning boxes.
-    /// /params relativePropertyName Relative float property name.
-    /// /params minimum Expected inclusive minimum.
-    /// /params maximum Expected inclusive maximum.
-    /// /params message Warning text.
-    /// /returns None.
     /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    /// <param name="relativePropertyName">Relative float property name.</param>
+    /// <param name="minimum">Expected inclusive minimum.</param>
+    /// <param name="maximum">Expected inclusive maximum.</param>
+    /// <param name="message">Warning text.</param>
     private static void AddRangeWarning(SerializedProperty parentProperty,
                                         VisualElement container,
                                         string relativePropertyName,

@@ -63,7 +63,7 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
     /// Checks whether the runtime loadout currently exposes at least one active slot worth swapping.
     /// </summary>
     /// <param name="powerUpsConfig">Runtime active-slot configuration to inspect.</param>
-    /// <returns>True when at least one slot is defined; otherwise false.<returns>
+    /// <returns>True when at least one slot is defined; otherwise false.</returns>
     private static bool CanSwapSlots(in PlayerPowerUpsConfig powerUpsConfig)
     {
         return powerUpsConfig.PrimarySlot.IsDefined != 0 || powerUpsConfig.SecondarySlot.IsDefined != 0;

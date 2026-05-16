@@ -7,7 +7,6 @@ using UnityEngine.UI;
 /// <summary>
 /// Handles world-space prompts and overlay interactions for dropped active power-up containers.
 /// none.
-/// returns none.
 /// </summary>
 [System.Serializable]
 public sealed class HUDPowerUpContainerInteractionSection
@@ -66,7 +65,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Registers button listeners and applies the initial hidden state.
     /// none.
-    /// returns void.
     /// </summary>
     public void Initialize()
     {
@@ -79,7 +77,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Unregisters button listeners and restores a safe default Time.timeScale.
     /// none.
-    /// returns void.
     /// </summary>
     public void Dispose()
     {
@@ -104,7 +101,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Clears presentation state when no valid player entity is available.
     /// none.
-    /// returns void.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -124,10 +120,9 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Updates dropped-container prompts, overlay visibility, and swap command submission for the current player entity.
-    /// runtimeEntityManager: Entity manager used to read and write runtime ECS state.
-    /// playerEntity: Current local player entity driving the HUD.
-    /// returns void.
     /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to read and write runtime ECS state.</param>
+    /// <param name="playerEntity">Current local player entity driving the HUD.</param>
     public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         entityManager = runtimeEntityManager;
@@ -225,7 +220,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Registers the two overlay buttons used to pick the active slot replacement target.
     /// none.
-    /// returns void.
     /// </summary>
     private void RegisterButtons()
     {
@@ -257,7 +251,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Removes the listeners registered on the overlay action buttons.
     /// none.
-    /// returns void.
     /// </summary>
     private void UnregisterButtons()
     {
@@ -276,7 +269,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Auto-resolves button labels from the assigned button hierarchy when explicit references are missing.
     /// none.
-    /// returns void.
     /// </summary>
     private void CacheButtonTexts()
     {
@@ -291,11 +283,10 @@ public sealed class HUDPowerUpContainerInteractionSection
     #region Update
     /// <summary>
     /// Updates overlay-mode prompt text and opens the full-screen panel on a fresh interaction press.
-    /// playerEntity: Current player entity.
-    /// containerEntity: Nearest dropped container currently in range.
-    /// containerView: Companion view used to display the world-space prompt.
-    /// returns void.
     /// </summary>
+    /// <param name="playerEntity">Current player entity.</param>
+    /// <param name="containerEntity">Nearest dropped container currently in range.</param>
+    /// <param name="containerView">Companion view used to display the world-space prompt.</param>
     private void UpdateOverlayPrompt(Entity containerEntity, PlayerDroppedPowerUpContainerView containerView)
     {
         InputAction interactAction = PlayerInputRuntime.PowerUpContainerInteractAction;
@@ -317,11 +308,10 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Updates 3D Prompt mode and queues an authoritative swap command when one direct-replacement action is pressed.
-    /// playerEntity: Current player entity.
-    /// containerEntity: Nearest dropped container currently in range.
-    /// containerView: Companion view used to display the world-space prompt.
-    /// returns void.
     /// </summary>
+    /// <param name="playerEntity">Current player entity.</param>
+    /// <param name="containerEntity">Nearest dropped container currently in range.</param>
+    /// <param name="containerView">Companion view used to display the world-space prompt.</param>
     private void UpdateDirectSwapPrompt(Entity playerEntity, Entity containerEntity, PlayerDroppedPowerUpContainerView containerView)
     {
         InputAction replacePrimaryAction = PlayerInputRuntime.PowerUpContainerReplacePrimaryAction;
@@ -352,10 +342,9 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Updates the overlay state while it is open and closes it when canceled or invalidated.
-    /// playerEntity: Current player entity.
-    /// milestoneSelectionActive: True when a milestone selection is currently open and must keep gameplay paused.
-    /// returns void.
     /// </summary>
+    /// <param name="playerEntity">Current player entity.</param>
+    /// <param name="milestoneSelectionActive">True when a milestone selection is currently open and must keep gameplay paused.</param>
     private void HandleOverlayUpdate(bool milestoneSelectionActive)
     {
         HideTrackedPromptView();
@@ -385,9 +374,8 @@ public sealed class HUDPowerUpContainerInteractionSection
     #region Overlay
     /// <summary>
     /// Opens the full-screen overlay for the specified dropped container and pauses gameplay immediately.
-    /// containerEntity: Dropped container selected by the player.
-    /// returns void.
     /// </summary>
+    /// <param name="containerEntity">Dropped container selected by the player.</param>
     private void OpenOverlay(Entity containerEntity, PlayerDroppedPowerUpContainerView containerView)
     {
         if (overlayPanelRoot == null)
@@ -419,9 +407,8 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Updates overlay labels with the current dropped power-up metadata.
-    /// containerEntity: Dropped container currently shown by the overlay.
-    /// returns void.
     /// </summary>
+    /// <param name="containerEntity">Dropped container currently shown by the overlay.</param>
     private void UpdateOverlayContent(Entity containerEntity)
     {
         if (!entityManager.Exists(containerEntity) || !entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity))
@@ -464,9 +451,8 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Closes the overlay and starts the configured Time.timeScale resume.
-    /// resumeTimeScale: True to restore Time.timeScale using the configured duration; false to restore it immediately.
-    /// returns void.
     /// </summary>
+    /// <param name="resumeTimeScale">True to restore Time.timeScale using the configured duration; false to restore it immediately.</param>
     private void CloseOverlay(bool resumeTimeScale)
     {
         if (!overlayOpen)
@@ -505,7 +491,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Immediately hides the overlay panel without creating a Time.timeScale resume.
     /// none.
-    /// returns void.
     /// </summary>
     private void HideOverlayImmediate()
     {
@@ -530,7 +515,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Handles the overlay primary-slot button press by queuing one authoritative swap command.
     /// none.
-    /// returns void.
     /// </summary>
     private void HandleReplacePrimaryButtonPressed()
     {
@@ -540,7 +524,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Handles the overlay secondary-slot button press by queuing one authoritative swap command.
     /// none.
-    /// returns void.
     /// </summary>
     private void HandleReplaceSecondaryButtonPressed()
     {
@@ -549,9 +532,8 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Queues one authoritative swap command from the currently open overlay and closes it afterward.
-    /// targetSlotIndex: Selected active-slot index. 0 is primary and 1 is secondary.
-    /// returns void.
     /// </summary>
+    /// <param name="targetSlotIndex">Selected active-slot index. 0 is primary and 1 is secondary.</param>
     private void TryQueueOverlaySwapCommand(int targetSlotIndex)
     {
         if (!overlayOpen)
@@ -572,11 +554,11 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Queues one authoritative dropped-container swap command on the player entity buffer.
-    /// playerEntity: Player entity receiving the command.
-    /// containerEntity: Dropped container targeted by the swap.
-    /// targetSlotIndex: Selected active-slot index. 0 is primary and 1 is secondary.
-    /// returns True when the command was queued; otherwise false.
     /// </summary>
+    /// <param name="playerEntity">Player entity receiving the command.</param>
+    /// <param name="containerEntity">Dropped container targeted by the swap.</param>
+    /// <param name="targetSlotIndex">Selected active-slot index. 0 is primary and 1 is secondary.</param>
+    /// <returns>True when the command was queued; otherwise false.</returns>
     private bool TryQueueSwapCommand(Entity playerEntity, Entity containerEntity, int targetSlotIndex)
     {
         if (!entityManager.Exists(playerEntity) ||
@@ -602,7 +584,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Enables overlay buttons only after the opening input is released, preventing one gamepad press from opening and confirming the overlay.
     /// none.
-    /// returns void.
     /// </summary>
     private void TryArmOverlayButtons()
     {
@@ -624,9 +605,9 @@ public sealed class HUDPowerUpContainerInteractionSection
     #region Helpers
     /// <summary>
     /// Returns whether milestone selection is currently active on the player entity.
-    /// playerEntity: Player entity inspected for milestone selection state.
-    /// returns True when milestone selection is active; otherwise false.
     /// </summary>
+    /// <param name="playerEntity">Player entity inspected for milestone selection state.</param>
+    /// <returns>True when milestone selection is active; otherwise false.</returns>
     private bool IsMilestoneSelectionActive(Entity playerEntity)
     {
         if (!entityManager.Exists(playerEntity) || !entityManager.HasComponent<PlayerMilestonePowerUpSelectionState>(playerEntity))
@@ -637,9 +618,9 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Returns whether the target dropped container entity still exists and stores one valid power-up payload.
-    /// containerEntity: Dropped container entity inspected for usability.
-    /// returns True when the container can still be interacted with; otherwise false.
     /// </summary>
+    /// <param name="containerEntity">Dropped container entity inspected for usability.</param>
+    /// <returns>True when the container can still be interacted with; otherwise false.</returns>
     private bool IsContainerUsable(Entity containerEntity)
     {
         if (containerEntity == Entity.Null || !entityManager.Exists(containerEntity))
@@ -654,10 +635,10 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Resolves the companion view attached to one dropped container entity.
-    /// containerEntity: Dropped container entity inspected for a companion view.
-    /// containerView: Resolved companion view when available.
-    /// returns True when the view exists; otherwise false.
     /// </summary>
+    /// <param name="containerEntity">Dropped container entity inspected for a companion view.</param>
+    /// <param name="containerView">Resolved companion view when available.</param>
+    /// <returns>True when the view exists; otherwise false.</returns>
     private bool TryResolveContainerView(Entity containerEntity, out PlayerDroppedPowerUpContainerView containerView)
     {
         containerView = null;
@@ -673,7 +654,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <summary>
     /// Hides the currently tracked prompt view without touching ECS state, allowing safe teardown after the world is destroyed.
     /// none.
-    /// returns void.
     /// </summary>
     private void HideTrackedPromptView()
     {

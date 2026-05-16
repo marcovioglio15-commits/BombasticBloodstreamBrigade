@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Defines one Unity scene known to the Game Scene Manager.
-/// /params None.
-/// /returns None.
 /// </summary>
 [System.Serializable]
 public sealed class GameSceneDefinition

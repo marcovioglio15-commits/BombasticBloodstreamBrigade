@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides pooled boss-minion helpers shared by spawn scheduling and pending cleanup paths.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossMinionPoolUtility
 {
@@ -13,10 +11,10 @@ internal static class EnemyBossMinionPoolUtility
     #region Public Methods
     /// <summary>
     /// Creates and prewarms the pool entity required by one boss minion rule.
-    /// /params entityManager Entity manager used for structural changes.
-    /// /params rule Rule that owns pool sizing and prefab data.
-    /// /returns Created pool entity, or Entity.Null when no valid prefab exists.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for structural changes.</param>
+    /// <param name="rule">Rule that owns pool sizing and prefab data.</param>
+    /// <returns>Created pool entity, or Entity.Null when no valid prefab exists.</returns>
     public static Entity CreateAndPrewarmRulePool(EntityManager entityManager,
                                                   in EnemyBossMinionSpawnElement rule)
     {
@@ -50,12 +48,12 @@ internal static class EnemyBossMinionPoolUtility
 
     /// <summary>
     /// Acquires one inactive minion from a rule pool, expanding the pool when empty.
-    /// /params entityManager Entity manager used to access the pool.
-    /// /params poolEntity Pool entity.
-    /// /params prefabEntity Enemy prefab entity.
-    /// /params minionEntity Output acquired minion.
-    /// /returns True when a minion was acquired.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access the pool.</param>
+    /// <param name="poolEntity">Pool entity.</param>
+    /// <param name="prefabEntity">Enemy prefab entity.</param>
+    /// <param name="minionEntity">Output acquired minion.</param>
+    /// <returns>True when a minion was acquired.</returns>
     public static bool TryAcquireMinion(EntityManager entityManager,
                                         Entity poolEntity,
                                         Entity prefabEntity,
@@ -98,13 +96,13 @@ internal static class EnemyBossMinionPoolUtility
 
     /// <summary>
     /// Builds the standard spawn warning state used before a reserved boss minion becomes active.
-    /// /params entityManager Entity manager used to inspect prefab body data.
-    /// /params prefabEntity Prefab entity used for body-aware ring sizing.
-    /// /params spawnPosition World position where the minion will become active.
-    /// /params activationTime World time when the minion should be activated.
-    /// /params spawnWarningConfig Warning style used for this minion spawn feedback.
-    /// /returns Fully resolved spawn warning state.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect prefab body data.</param>
+    /// <param name="prefabEntity">Prefab entity used for body-aware ring sizing.</param>
+    /// <param name="spawnPosition">World position where the minion will become active.</param>
+    /// <param name="activationTime">World time when the minion should be activated.</param>
+    /// <param name="spawnWarningConfig">Warning style used for this minion spawn feedback.</param>
+    /// <returns>Fully resolved spawn warning state.</returns>
     public static EnemySpawnWarningState CreateSpawnWarningState(EntityManager entityManager,
                                                                  Entity prefabEntity,
                                                                  float3 spawnPosition,
@@ -120,13 +118,12 @@ internal static class EnemyBossMinionPoolUtility
 
     /// <summary>
     /// Writes boss ownership and reward multipliers onto one reserved minion.
-    /// /params entityManager Entity manager used to mutate the minion.
-    /// /params minionEntity Reserved minion.
-    /// /params bossEntity Boss that owns the minion.
-    /// /params ruleIndex Source rule index.
-    /// /params rule Rule data supplying reward multipliers.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the minion.</param>
+    /// <param name="minionEntity">Reserved minion.</param>
+    /// <param name="bossEntity">Boss that owns the minion.</param>
+    /// <param name="ruleIndex">Source rule index.</param>
+    /// <param name="rule">Rule data supplying reward multipliers.</param>
     public static void ApplyMinionMetadata(EntityManager entityManager,
                                            Entity minionEntity,
                                            Entity bossEntity,

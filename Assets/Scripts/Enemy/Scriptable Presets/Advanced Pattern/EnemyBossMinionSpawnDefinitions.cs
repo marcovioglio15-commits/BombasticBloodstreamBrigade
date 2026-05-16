@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Defines one minion spawn rule owned by a boss pattern preset.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossMinionSpawnRule
@@ -175,9 +173,8 @@ public sealed class EnemyBossMinionSpawnRule
     #region Public Methods
     /// <summary>
     /// Calculates the pool size required to satisfy the configured trigger cadence and active cap.
-    /// /params None.
-    /// /returns Automatic pool capacity for this minion rule.
     /// </summary>
+    /// <returns>Automatic pool capacity for this minion rule.</returns>
     public int CalculateAutomaticPoolSize()
     {
         int safeSpawnCount = Mathf.Max(0, spawnCount);
@@ -194,8 +191,6 @@ public sealed class EnemyBossMinionSpawnRule
 
     /// <summary>
     /// Keeps nested rule state structurally valid without snapping authored numeric settings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -207,8 +202,6 @@ public sealed class EnemyBossMinionSpawnRule
 
 /// <summary>
 /// Groups boss minion spawning rules and shared defaults.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossMinionSpawnSettings
@@ -292,8 +285,6 @@ public sealed class EnemyBossMinionSpawnSettings
     #region Public Methods
     /// <summary>
     /// Keeps the rules list allocated and validates each child rule.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

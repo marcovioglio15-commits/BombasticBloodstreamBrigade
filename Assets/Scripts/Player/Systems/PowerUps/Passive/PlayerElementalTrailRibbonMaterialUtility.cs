@@ -3,8 +3,6 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// Creates runtime materials for Elemental Trail ribbons and preserves authored texture/color data when possible.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerElementalTrailRibbonMaterialUtility
 {
@@ -26,9 +24,9 @@ internal static class PlayerElementalTrailRibbonMaterialUtility
     #region Public Methods
     /// <summary>
     /// Creates an independent transparent material configured to remain visible across the preserved environment depth pass.
-    /// /params sourceMaterial Authored template material read from the TrailRenderer prefab.
-    /// /returns Runtime material instance, or null when no source material is available.
     /// </summary>
+    /// <param name="sourceMaterial">Authored template material read from the TrailRenderer prefab.</param>
+    /// <returns>Runtime material instance, or null when no source material is available.</returns>
     public static Material CreateRuntimeMaterial(Material sourceMaterial)
     {
         if (sourceMaterial == null)
@@ -50,10 +48,9 @@ internal static class PlayerElementalTrailRibbonMaterialUtility
     #region Copy
     /// <summary>
     /// Copies the authored trail texture from either URP base-map or legacy main-texture slots.
-    /// /params sourceMaterial Authored material that may hold the texture reference.
-    /// /params targetMaterial Runtime material receiving the texture.
-    /// /returns None.
     /// </summary>
+    /// <param name="sourceMaterial">Authored material that may hold the texture reference.</param>
+    /// <param name="targetMaterial">Runtime material receiving the texture.</param>
     private static void CopyTexture(Material sourceMaterial, Material targetMaterial)
     {
         // Read from the common URP and legacy slots because older particle materials store the mask in _MainTex.
@@ -80,10 +77,9 @@ internal static class PlayerElementalTrailRibbonMaterialUtility
 
     /// <summary>
     /// Copies the authored tint into the runtime shader when both materials expose a base color.
-    /// /params sourceMaterial Authored material that may hold a base color.
-    /// /params targetMaterial Runtime material receiving the tint.
-    /// /returns None.
     /// </summary>
+    /// <param name="sourceMaterial">Authored material that may hold a base color.</param>
+    /// <param name="targetMaterial">Runtime material receiving the tint.</param>
     private static void CopyBaseColor(Material sourceMaterial, Material targetMaterial)
     {
         if (!sourceMaterial.HasProperty(BaseColorPropertyId) || !targetMaterial.HasProperty(BaseColorPropertyId))
@@ -97,9 +93,8 @@ internal static class PlayerElementalTrailRibbonMaterialUtility
     #region Render State
     /// <summary>
     /// Applies the render state required by a flat ground ribbon inside the gameplay overlay camera.
-    /// /params material Runtime material being configured.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material being configured.</param>
     private static void ConfigureRenderState(Material material)
     {
         material.renderQueue = UnderGameplayActorsRenderQueue;
@@ -113,11 +108,10 @@ internal static class PlayerElementalTrailRibbonMaterialUtility
 
     /// <summary>
     /// Writes a float shader property only when the material exposes it.
-    /// /params material Runtime material instance being configured.
-    /// /params propertyId Shader property identifier.
-    /// /params value Float value to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="material">Runtime material instance being configured.</param>
+    /// <param name="propertyId">Shader property identifier.</param>
+    /// <param name="value">Float value to assign.</param>
     private static void SetFloatIfPresent(Material material,
                                           int propertyId,
                                           float value)

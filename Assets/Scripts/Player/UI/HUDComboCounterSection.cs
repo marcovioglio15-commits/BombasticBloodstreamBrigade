@@ -8,8 +8,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Renders the runtime combo counter, current rank label, and progress toward the next combo rank from ECS data.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class HUDComboCounterSection
@@ -108,8 +106,6 @@ public sealed class HUDComboCounterSection
     #region Public Methods
     /// <summary>
     /// Applies the initial authored visual state before runtime ECS data becomes available.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Initialize()
     {
@@ -118,8 +114,6 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the initial visual state used before a valid player entity is resolved.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void ApplyInitialVisualState()
     {
@@ -146,8 +140,6 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the missing-player visual state and clears cached values so the next resolved player rebuilds the HUD.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -174,10 +166,9 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Updates the combo HUD from ECS combo components owned by the current player entity.
-    /// /params runtimeEntityManager Entity manager used to read combo runtime components.
-    /// /params playerEntity Player entity currently driving the HUD.
-    /// /returns void.
     /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to read combo runtime components.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
     public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!isEnabled)
@@ -227,14 +218,13 @@ public sealed class HUDComboCounterSection
     #region Private Methods
     /// <summary>
     /// Applies the current combo state to all authored UI bindings.
-    /// /params runtimeEntityManager Entity manager used to resolve baked combo-rank visuals.
-    /// /params playerEntity Player entity currently driving the HUD.
-    /// /params comboValue Current combo numeric value.
-    /// /params currentRankIndex Current combo-rank index.
-    /// /params currentRankId Current combo-rank identifier.
-    /// /params progressNormalized Current normalized progress toward the next rank.
-    /// /returns void.
     /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to resolve baked combo-rank visuals.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="currentRankIndex">Current combo-rank index.</param>
+    /// <param name="currentRankId">Current combo-rank identifier.</param>
+    /// <param name="progressNormalized">Current normalized progress toward the next rank.</param>
     private void ApplyVisibleState(EntityManager runtimeEntityManager,
                                    Entity playerEntity,
                                    int comboValue,
@@ -250,8 +240,6 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the fallback non-runtime visible state used when the HUD should remain visible without a player entity.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void ApplyFallbackVisibleState()
     {
@@ -268,10 +256,9 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Requests the target visible state while preserving the currently rendered visuals during fade-out.
-    /// /params visible True when the section should fade toward full visibility.
-    /// /params resetCachedStateAfterHide True when the cached presentation state should be invalidated once fully hidden.
-    /// /returns void.
     /// </summary>
+    /// <param name="visible">True when the section should fade toward full visibility.</param>
+    /// <param name="resetCachedStateAfterHide">True when the cached presentation state should be invalidated once fully hidden.</param>
     private void RequestVisibility(bool visible, bool resetCachedStateAfterHide)
     {
         EnsureFadeBindings();
@@ -299,9 +286,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Initializes the current and target visibility state without performing an animated transition.
-    /// /params visible True when the section should start visible.
-    /// /returns void.
     /// </summary>
+    /// <param name="visible">True when the section should start visible.</param>
     private void InitializeVisibility(bool visible)
     {
         currentVisibilityAlpha = visible ? 1f : 0f;
@@ -313,9 +299,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Advances the visibility fade toward the requested alpha target using unscaled time.
-    /// /params deltaTime Unscaled delta time used by the HUD fade.
-    /// /returns void.
     /// </summary>
+    /// <param name="deltaTime">Unscaled delta time used by the HUD fade.</param>
     private void AdvanceVisibilityFade(float deltaTime)
     {
         EnsureFadeBindings();
@@ -363,8 +348,6 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Ensures the root CanvasGroup used for alpha fades exists when a root object is assigned.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void EnsureFadeBindings()
     {
@@ -393,9 +376,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the current visibility alpha either through the root CanvasGroup or directly through individual graphics.
-    /// /params alpha Normalized visibility alpha in the 0..1 range.
-    /// /returns void.
     /// </summary>
+    /// <param name="alpha">Normalized visibility alpha in the 0..1 range.</param>
     private void ApplyVisibilityAlpha(float alpha)
     {
         float clampedAlpha = Mathf.Clamp01(alpha);
@@ -415,9 +397,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Shows or hides the bound visual elements while respecting optional badge and progress toggles.
-    /// /params visible True when the bound UI elements must stay active for rendering or fade.
-    /// /returns void.
     /// </summary>
+    /// <param name="visible">True when the bound UI elements must stay active for rendering or fade.</param>
     private void SetVisualPresence(bool visible)
     {
         if (rootObject != null)
@@ -455,12 +436,11 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the current combo-rank visual theme when the active rank changes.
-    /// /params runtimeEntityManager Entity manager used to resolve baked combo-rank visuals.
-    /// /params playerEntity Player entity currently driving the HUD.
-    /// /params currentRankIndex Current combo-rank index.
-    /// /params currentRankId Current combo-rank identifier.
-    /// /returns void.
     /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to resolve baked combo-rank visuals.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="currentRankIndex">Current combo-rank index.</param>
+    /// <param name="currentRankId">Current combo-rank identifier.</param>
     private void ApplyRankTheme(EntityManager runtimeEntityManager,
                                 Entity playerEntity,
                                 int currentRankIndex,
@@ -514,9 +494,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies one fully resolved visual theme to the bound HUD elements.
-    /// /params resolvedTheme Fully resolved theme to assign.
-    /// /returns void.
     /// </summary>
+    /// <param name="resolvedTheme">Fully resolved theme to assign.</param>
     private void ApplyResolvedTheme(HUDComboCounterResolvedVisualTheme resolvedTheme)
     {
         if (rankBadgeImage != null)
@@ -548,9 +527,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the displayed rank label only when it actually changed.
-    /// /params currentRankId Current combo-rank identifier.
-    /// /returns void.
     /// </summary>
+    /// <param name="currentRankId">Current combo-rank identifier.</param>
     private void ApplyRankLabel(FixedString64Bytes currentRankId)
     {
         if (rankText == null)
@@ -571,9 +549,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the displayed combo numeric label only when it actually changed.
-    /// /params comboValue Current combo numeric value.
-    /// /returns void.
     /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
     private void ApplyComboValue(int comboValue)
     {
         if (comboValueText == null)
@@ -594,9 +571,8 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies the displayed progress fill only when it actually changed.
-    /// /params progressNormalized Current normalized progress toward the next rank.
-    /// /returns void.
     /// </summary>
+    /// <param name="progressNormalized">Current normalized progress toward the next rank.</param>
     private void ApplyProgress(float progressNormalized)
     {
         if (progressFillImage == null)
@@ -617,8 +593,6 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Resets cached presentation values so the next applied state rebuilds every visual binding.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     private void ResetCachedPresentationState()
     {
@@ -632,10 +606,9 @@ public sealed class HUDComboCounterSection
 
     /// <summary>
     /// Applies one alpha value directly to one graphic canvas renderer.
-    /// /params graphic Graphic receiving the alpha.
-    /// /params alpha Alpha value applied to the canvas renderer.
-    /// /returns void.
     /// </summary>
+    /// <param name="graphic">Graphic receiving the alpha.</param>
+    /// <param name="alpha">Alpha value applied to the canvas renderer.</param>
     private static void ApplyGraphicAlpha(Graphic graphic, float alpha)
     {
         if (graphic == null)

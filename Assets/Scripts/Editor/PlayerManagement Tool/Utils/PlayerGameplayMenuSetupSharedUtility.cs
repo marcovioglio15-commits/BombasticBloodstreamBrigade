@@ -8,8 +8,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Shared editor helpers used by the authored player gameplay-menu setup workflow.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerGameplayMenuSetupSharedUtility
 {
@@ -18,9 +16,8 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region Project Assets
     /// <summary>
     /// Recursively creates a folder chain inside the Unity project when one or more path segments are missing.
-    /// /params folderPath Project-relative folder path that must exist.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Project-relative folder path that must exist.</param>
     public static void EnsureFolder(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath) || AssetDatabase.IsValidFolder(folderPath))
@@ -43,10 +40,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Adds one enabled scene entry only when it is not already present in the target list.
-    /// /params scenes Mutable build-settings scene list.
-    /// /params scenePath Scene path that should be present.
-    /// /returns None.
     /// </summary>
+    /// <param name="scenes">Mutable build-settings scene list.</param>
+    /// <param name="scenePath">Scene path that should be present.</param>
     public static void AddSceneIfMissing(List<EditorBuildSettingsScene> scenes, string scenePath)
     {
         for (int sceneIndex = 0; sceneIndex < scenes.Count; sceneIndex++)
@@ -62,9 +58,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region Components
     /// <summary>
     /// Returns the existing component on one GameObject or adds it when missing.
-    /// /params targetObject GameObject receiving the requested component.
-    /// /returns Existing or newly added component instance.
     /// </summary>
+    /// <param name="targetObject">GameObject receiving the requested component.</param>
+    /// <returns>Existing or newly added component instance.</returns>
     public static TComponent GetOrAddComponent<TComponent>(GameObject targetObject) where TComponent : Component
     {
         TComponent component = targetObject.GetComponent<TComponent>();
@@ -77,9 +73,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Ensures one GameObject has a RectTransform and returns it.
-    /// /params targetObject GameObject that should expose a RectTransform.
-    /// /returns Existing or newly added RectTransform.
     /// </summary>
+    /// <param name="targetObject">GameObject that should expose a RectTransform.</param>
+    /// <returns>Existing or newly added RectTransform.</returns>
     public static RectTransform EnsureRectTransform(GameObject targetObject)
     {
         RectTransform rectTransform = targetObject.GetComponent<RectTransform>();
@@ -94,9 +90,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region Scene Search
     /// <summary>
     /// Finds the first component of the requested type inside one opened scene.
-    /// /params scene Scene searched for the requested component.
-    /// /returns First matching component or null when not found.
     /// </summary>
+    /// <param name="scene">Scene searched for the requested component.</param>
+    /// <returns>First matching component or null when not found.</returns>
     public static TComponent FindComponentInScene<TComponent>(Scene scene) where TComponent : Component
     {
         List<TComponent> components = FindComponentsInScene<TComponent>(scene);
@@ -105,9 +101,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Finds all components of the requested type inside one opened scene.
-    /// /params scene Scene searched for the requested component type.
-    /// /returns List of matching components.
     /// </summary>
+    /// <param name="scene">Scene searched for the requested component type.</param>
+    /// <returns>List of matching components.</returns>
     public static List<TComponent> FindComponentsInScene<TComponent>(Scene scene) where TComponent : Component
     {
         List<TComponent> resolvedComponents = new List<TComponent>();
@@ -128,9 +124,8 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region UI Layout
     /// <summary>
     /// Stretches one RectTransform to the full extent of its parent.
-    /// /params rectTransform RectTransform that should occupy the full parent area.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">RectTransform that should occupy the full parent area.</param>
     public static void StretchToParent(RectTransform rectTransform)
     {
         rectTransform.anchorMin = Vector2.zero;
@@ -144,9 +139,8 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Ensures one transform uses a centered vertical-layout stack for menu content.
-    /// /params parent Menu panel transform that should host vertically stacked children.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Menu panel transform that should host vertically stacked children.</param>
     public static void EnsureLayout(Transform parent)
     {
         VerticalLayoutGroup layoutGroup = GetOrAddComponent<VerticalLayoutGroup>(parent.gameObject);
@@ -165,10 +159,9 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Ensures one UI object exposes a preferred-height layout element used by menu vertical layout.
-    /// /params targetObject UI object that should receive the preferred height.
-    /// /params preferredHeight Preferred layout height for the object.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetObject">UI object that should receive the preferred height.</param>
+    /// <param name="preferredHeight">Preferred layout height for the object.</param>
     public static void EnsureLayoutElement(GameObject targetObject, float preferredHeight)
     {
         LayoutElement layoutElement = GetOrAddComponent<LayoutElement>(targetObject);
@@ -177,10 +170,10 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Resolves the previous valid button in one cyclic navigation list.
-    /// /params buttons Ordered button list used for navigation.
-    /// /params startIndex Current button index.
-    /// /returns Previous valid button or null when none is available.
     /// </summary>
+    /// <param name="buttons">Ordered button list used for navigation.</param>
+    /// <param name="startIndex">Current button index.</param>
+    /// <returns>Previous valid button or null when none is available.</returns>
     public static Selectable ResolvePreviousButton(Button[] buttons, int startIndex)
     {
         if (buttons == null || buttons.Length <= 1)
@@ -200,10 +193,10 @@ internal static class PlayerGameplayMenuSetupSharedUtility
 
     /// <summary>
     /// Resolves the next valid button in one cyclic navigation list.
-    /// /params buttons Ordered button list used for navigation.
-    /// /params startIndex Current button index.
-    /// /returns Next valid button or null when none is available.
     /// </summary>
+    /// <param name="buttons">Ordered button list used for navigation.</param>
+    /// <param name="startIndex">Current button index.</param>
+    /// <returns>Next valid button or null when none is available.</returns>
     public static Selectable ResolveNextButton(Button[] buttons, int startIndex)
     {
         if (buttons == null || buttons.Length <= 1)
@@ -225,9 +218,8 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region Text
     /// <summary>
     /// Resolves the TMP font asset used by generated menu text elements.
-    /// /params None.
-    /// /returns TMP font asset or null when no font asset exists in the project.
     /// </summary>
+    /// <returns>TMP font asset or null when no font asset exists in the project.</returns>
     public static TMP_FontAsset ResolveFontAsset()
     {
         if (TMP_Settings.defaultFontAsset != null)
@@ -251,9 +243,8 @@ internal static class PlayerGameplayMenuSetupSharedUtility
     #region Cleanup
     /// <summary>
     /// Removes all direct children under one transform.
-    /// /params parent Parent transform whose full child list should be cleared.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent transform whose full child list should be cleared.</param>
     public static void DestroyAllChildren(Transform parent)
     {
         for (int childIndex = parent.childCount - 1; childIndex >= 0; childIndex--)

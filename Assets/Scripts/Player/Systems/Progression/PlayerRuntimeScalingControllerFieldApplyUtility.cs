@@ -11,17 +11,16 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
     #region Public Methods
     /// <summary>
     /// Applies one numeric controller scaling result to the matching runtime controller field.
-    /// /params fieldId Runtime controller field identifier.
-    /// /params slotIndex Resolved applied-element slot index for dynamic slot rewrites.
-    /// /params resolvedValue Numeric result already evaluated from the formula.
-    /// /params runtimeMovement Mutable runtime movement config.
-    /// /params runtimeLook Mutable runtime look config.
-    /// /params runtimeCamera Mutable runtime camera config.
-    /// /params runtimeShooting Mutable runtime shooting config.
-    /// /params runtimeAppliedElementSlots Mutable runtime applied-element slot buffer.
-    /// /params runtimeHealth Mutable runtime health config.
-    /// /returns void.
     /// </summary>
+    /// <param name="fieldId">Runtime controller field identifier.</param>
+    /// <param name="slotIndex">Resolved applied-element slot index for dynamic slot rewrites.</param>
+    /// <param name="resolvedValue">Numeric result already evaluated from the formula.</param>
+    /// <param name="runtimeMovement">Mutable runtime movement config.</param>
+    /// <param name="runtimeLook">Mutable runtime look config.</param>
+    /// <param name="runtimeCamera">Mutable runtime camera config.</param>
+    /// <param name="runtimeShooting">Mutable runtime shooting config.</param>
+    /// <param name="runtimeAppliedElementSlots">Mutable runtime applied-element slot buffer.</param>
+    /// <param name="runtimeHealth">Mutable runtime health config.</param>
     public static void ApplyValue(PlayerRuntimeControllerFieldId fieldId,
                                   int slotIndex,
                                   float resolvedValue,
@@ -291,15 +290,14 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Applies one boolean controller scaling result to the matching runtime controller field.
-    /// /params fieldId Runtime controller field identifier.
-    /// /params resolvedValue Boolean result already evaluated from the formula.
-    /// /params runtimeMovement Mutable runtime movement config.
-    /// /params runtimeLook Mutable runtime look config.
-    /// /params runtimeCamera Mutable runtime camera config.
-    /// /params runtimeShooting Mutable runtime shooting config.
-    /// /params runtimeHealth Mutable runtime health config.
-    /// /returns void.
     /// </summary>
+    /// <param name="fieldId">Runtime controller field identifier.</param>
+    /// <param name="resolvedValue">Boolean result already evaluated from the formula.</param>
+    /// <param name="runtimeMovement">Mutable runtime movement config.</param>
+    /// <param name="runtimeLook">Mutable runtime look config.</param>
+    /// <param name="runtimeCamera">Mutable runtime camera config.</param>
+    /// <param name="runtimeShooting">Mutable runtime shooting config.</param>
+    /// <param name="runtimeHealth">Mutable runtime health config.</param>
     public static void ApplyBooleanValue(PlayerRuntimeControllerFieldId fieldId,
                                          bool resolvedValue,
                                          ref PlayerRuntimeMovementConfig runtimeMovement,
@@ -339,9 +337,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Copies the immutable movement baseline into the mutable runtime movement config.
-    /// /params baseMovement Immutable baseline movement config.
-    /// /returns Runtime movement config copied from the baseline.
     /// </summary>
+    /// <param name="baseMovement">Immutable baseline movement config.</param>
+    /// <returns>Runtime movement config copied from the baseline.</returns>
     public static PlayerRuntimeMovementConfig CopyMovement(in PlayerBaseMovementConfig baseMovement)
     {
         return new PlayerRuntimeMovementConfig
@@ -356,9 +354,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Copies the immutable look baseline into the mutable runtime look config.
-    /// /params baseLook Immutable baseline look config.
-    /// /returns Runtime look config copied from the baseline.
     /// </summary>
+    /// <param name="baseLook">Immutable baseline look config.</param>
+    /// <returns>Runtime look config copied from the baseline.</returns>
     public static PlayerRuntimeLookConfig CopyLook(in PlayerBaseLookConfig baseLook)
     {
         return new PlayerRuntimeLookConfig
@@ -379,9 +377,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Copies the immutable camera baseline into the mutable runtime camera config.
-    /// /params baseCamera Immutable baseline camera config.
-    /// /returns Runtime camera config copied from the baseline.
     /// </summary>
+    /// <param name="baseCamera">Immutable baseline camera config.</param>
+    /// <returns>Runtime camera config copied from the baseline.</returns>
     public static PlayerRuntimeCameraConfig CopyCamera(in PlayerBaseCameraConfig baseCamera)
     {
         return new PlayerRuntimeCameraConfig
@@ -394,9 +392,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Copies the immutable shooting baseline into the mutable runtime shooting config.
-    /// /params baseShooting Immutable baseline shooting config.
-    /// /returns Runtime shooting config copied from the baseline.
     /// </summary>
+    /// <param name="baseShooting">Immutable baseline shooting config.</param>
+    /// <returns>Runtime shooting config copied from the baseline.</returns>
     public static PlayerRuntimeShootingConfig CopyShooting(in PlayerBaseShootingConfig baseShooting)
     {
         return new PlayerRuntimeShootingConfig
@@ -410,9 +408,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
 
     /// <summary>
     /// Copies the immutable health baseline into the mutable runtime health config.
-    /// /params baseHealth Immutable baseline health config.
-    /// /returns Runtime health config copied from the baseline.
     /// </summary>
+    /// <param name="baseHealth">Immutable baseline health config.</param>
+    /// <returns>Runtime health config copied from the baseline.</returns>
     public static PlayerRuntimeHealthStatisticsConfig CopyHealth(in PlayerBaseHealthStatisticsConfig baseHealth)
     {
         return new PlayerRuntimeHealthStatisticsConfig

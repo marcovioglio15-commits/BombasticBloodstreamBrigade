@@ -86,7 +86,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <param name="powerUpsConfig">Runtime power-up config to mutate.</param>
     /// <param name="powerUpsState">Runtime power-up state to reset.</param>
     /// <param name="equippedPassiveTools">Runtime equipped passives buffer to replace.</param>
-    /// <returns>True when runtime loadout was changed, otherwise false.<returns>
+    /// <returns>True when runtime loadout was changed, otherwise false.</returns>
     private static bool ProcessCheatCommand(in PlayerPowerUpCheatCommand cheatCommand,
                                             DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
                                             DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
@@ -117,7 +117,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <param name="powerUpsConfig">Runtime power-up config to mutate.</param>
     /// <param name="powerUpsState">Runtime state to reset after replacement.</param>
     /// <param name="equippedPassiveTools">Runtime equipped passives buffer to replace.</param>
-    /// <returns>True when the preset was found and applied, otherwise false.<returns>
+    /// <returns>True when the preset was found and applied, otherwise false.</returns>
     private static bool TryApplyPresetByIndex(int presetIndex,
                                               DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
                                               DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,

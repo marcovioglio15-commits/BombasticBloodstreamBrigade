@@ -9,8 +9,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Resolves whether managed Unity scenes and DOTS SubScenes are ready to be revealed after loading.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneTransitionReadinessUtility
 {
@@ -24,12 +22,12 @@ internal static class GameSceneTransitionReadinessUtility
     #region Public Methods
     /// <summary>
     /// Checks every loaded scene surface that must be ready before fade-in can start.
-    /// /params targetScene Main transition target scene.
-    /// /params hasTargetCompanionScene True when a companion scene was loaded with the target.
-    /// /params targetCompanionScene Companion scene definition.
-    /// /params persistentPlayerScenes Direct DOTS player scenes required by the target.
-    /// /returns True when Unity scene activation and DOTS streaming are complete.
     /// </summary>
+    /// <param name="targetScene">Main transition target scene.</param>
+    /// <param name="hasTargetCompanionScene">True when a companion scene was loaded with the target.</param>
+    /// <param name="targetCompanionScene">Companion scene definition.</param>
+    /// <param name="persistentPlayerScenes">Direct DOTS player scenes required by the target.</param>
+    /// <returns>True when Unity scene activation and DOTS streaming are complete.</returns>
     public static bool AreTransitionScenesReady(GameSceneDefinitionElement targetScene,
                                                 bool hasTargetCompanionScene,
                                                 GameSceneDefinitionElement targetCompanionScene,
@@ -51,9 +49,9 @@ internal static class GameSceneTransitionReadinessUtility
     #region Managed Scene Readiness
     /// <summary>
     /// Checks whether one loaded Unity scene and its auto-loaded SubScenes are ready.
-    /// /params sceneDefinition Scene definition to inspect.
-    /// /returns True when the Unity scene is loaded and all auto SubScenes report loaded.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition to inspect.</param>
+    /// <returns>True when the Unity scene is loaded and all auto SubScenes report loaded.</returns>
     private static bool IsManagedUnitySceneReady(GameSceneDefinitionElement sceneDefinition)
     {
         Scene loadedScene = GameSceneLoadBackendUtility.ResolveLoadedScene(sceneDefinition);
@@ -85,9 +83,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Resolves whether a SubScene should block transition reveal.
-    /// /params subScene SubScene component found in a loaded Unity scene.
-    /// /returns True when the SubScene has a valid GUID and auto-loads content.
     /// </summary>
+    /// <param name="subScene">SubScene component found in a loaded Unity scene.</param>
+    /// <returns>True when the SubScene has a valid GUID and auto-loads content.</returns>
     private static bool ShouldWaitForSubScene(SubScene subScene)
     {
         if (subScene == null)
@@ -101,9 +99,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks SceneSystem load state for one SubScene component.
-    /// /params subScene SubScene component with a SceneSystem GUID.
-    /// /returns True when SceneSystem reports the scene entity as loaded.
     /// </summary>
+    /// <param name="subScene">SubScene component with a SceneSystem GUID.</param>
+    /// <returns>True when SceneSystem reports the scene entity as loaded.</returns>
     private static bool IsSubSceneLoaded(SubScene subScene)
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -123,9 +121,9 @@ internal static class GameSceneTransitionReadinessUtility
     #region Persistent Player Readiness
     /// <summary>
     /// Checks direct DOTS persistent player scenes required by the target scene.
-    /// /params persistentPlayerScenes Persistent player scene definitions loaded for gameplay.
-    /// /returns True when every required persistent player scene is loaded.
     /// </summary>
+    /// <param name="persistentPlayerScenes">Persistent player scene definitions loaded for gameplay.</param>
+    /// <returns>True when every required persistent player scene is loaded.</returns>
     private static bool ArePersistentPlayerScenesReady(List<GameSceneDefinitionElement> persistentPlayerScenes)
     {
         for (int index = 0; index < persistentPlayerScenes.Count; index++)
@@ -141,9 +139,8 @@ internal static class GameSceneTransitionReadinessUtility
     #region Gameplay Runtime Readiness
     /// <summary>
     /// Checks gameplay runtime surfaces that are created after scene load callbacks, before revealing gameplay.
-    /// /params None.
-    /// /returns True when input, camera and the single player entity are ready for the first visible frame.
     /// </summary>
+    /// <returns>True when input, camera and the single player entity are ready for the first visible frame.</returns>
     private static bool IsGameplayRuntimeReady()
     {
         if (!PlayerInputRuntime.IsReady)
@@ -181,9 +178,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks every known gameplay pool that can expose prefab positions while prewarming.
-    /// /params entityManager Default world entity manager.
-    /// /returns True when player, enemy and experience-drop pools are initialized and parked.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <returns>True when player, enemy and experience-drop pools are initialized and parked.</returns>
     private static bool AreGameplayPoolsReady(EntityManager entityManager)
     {
         return AreProjectilePoolsReady(entityManager) &&
@@ -193,9 +190,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks whether active shooter projectile pools have finished prewarming and all pooled visuals are parked.
-    /// /params entityManager Default world entity manager.
-    /// /returns True when no prewarm projectile can still render at its prefab/world origin.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <returns>True when no prewarm projectile can still render at its prefab/world origin.</returns>
     private static bool AreProjectilePoolsReady(EntityManager entityManager)
     {
         EntityQuery poolQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<ShooterProjectilePrefab>(),
@@ -246,10 +243,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Resolves whether a shooter belongs to an inactive pooled enemy whose projectile pool is intentionally lazy.
-    /// /params entityManager Default world entity manager.
-    /// /params shooterEntity Shooter entity to inspect.
-    /// /returns True when the shooter is an inactive enemy instance.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="shooterEntity">Shooter entity to inspect.</param>
+    /// <returns>True when the shooter is an inactive enemy instance.</returns>
     private static bool IsInactiveEnemyShooter(EntityManager entityManager, Entity shooterEntity)
     {
         return entityManager.HasComponent<EnemyActive>(shooterEntity) &&
@@ -258,10 +255,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Resolves whether an enemy shooter belongs to a stale runtime entity from a previous scene instance.
-    /// /params entityManager Default world entity manager.
-    /// /params shooterEntity Shooter entity to inspect.
-    /// /returns True when the shooter is an enemy whose owner spawner or pool is no longer alive.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="shooterEntity">Shooter entity to inspect.</param>
+    /// <returns>True when the shooter is an enemy whose owner spawner or pool is no longer alive.</returns>
     private static bool IsOrphanedEnemyShooter(EntityManager entityManager, Entity shooterEntity)
     {
         if (!entityManager.HasComponent<EnemyActive>(shooterEntity))
@@ -284,10 +281,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks one pooled projectile's runtime and render transforms.
-    /// /params entityManager Default world entity manager.
-    /// /params projectileEntity Pooled projectile entity to inspect.
-    /// /returns True when the projectile is inactive and parked far below the gameplay floor.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="projectileEntity">Pooled projectile entity to inspect.</param>
+    /// <returns>True when the projectile is inactive and parked far below the gameplay floor.</returns>
     private static bool IsPooledProjectileParked(EntityManager entityManager, Entity projectileEntity)
     {
         if (projectileEntity == Entity.Null || !entityManager.Exists(projectileEntity))
@@ -316,9 +313,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks whether wave enemy pools have completed prewarm and all inactive instances are parked.
-    /// /params entityManager Default world entity manager.
-    /// /returns True when enemy spawners and their pool entities are ready.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <returns>True when enemy spawners and their pool entities are ready.</returns>
     private static bool AreEnemyPoolsReady(EntityManager entityManager)
     {
         EntityQuery spawnerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemySpawnerState>(),
@@ -365,11 +362,11 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Resolves the runtime pool entity associated with one enemy prefab in a spawner map.
-    /// /params poolMap Spawner prefab-to-pool map.
-    /// /params prefabEntity Enemy prefab entity to resolve.
-    /// /params poolEntity Resolved pool entity when present.
-    /// /returns True when the map contains the prefab.
     /// </summary>
+    /// <param name="poolMap">Spawner prefab-to-pool map.</param>
+    /// <param name="prefabEntity">Enemy prefab entity to resolve.</param>
+    /// <param name="poolEntity">Resolved pool entity when present.</param>
+    /// <returns>True when the map contains the prefab.</returns>
     private static bool TryResolveEnemyPool(DynamicBuffer<EnemySpawnerPrefabPoolMapElement> poolMap,
                                             Entity prefabEntity,
                                             out Entity poolEntity)
@@ -391,10 +388,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks one enemy pool referenced by a currently loaded spawner.
-    /// /params entityManager Default world entity manager.
-    /// /params poolEntity Runtime pool entity to inspect.
-    /// /returns True when the pool is initialized, filled to initial capacity and parked.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="poolEntity">Runtime pool entity to inspect.</param>
+    /// <returns>True when the pool is initialized, filled to initial capacity and parked.</returns>
     private static bool IsEnemyPoolReady(EntityManager entityManager, Entity poolEntity)
     {
         if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
@@ -427,10 +424,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks one pooled enemy's active flag and render transforms.
-    /// /params entityManager Default world entity manager.
-    /// /params enemyEntity Pooled enemy entity to inspect.
-    /// /returns True when the enemy is inactive and parked.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="enemyEntity">Pooled enemy entity to inspect.</param>
+    /// <returns>True when the enemy is inactive and parked.</returns>
     private static bool IsPooledEnemyParked(EntityManager entityManager, Entity enemyEntity)
     {
         if (enemyEntity == Entity.Null || !entityManager.Exists(enemyEntity))
@@ -447,9 +444,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks whether experience-drop pools have completed prewarm and all inactive drops are parked.
-    /// /params entityManager Default world entity manager.
-    /// /returns True when every experience-drop pool registry and pool entity is ready.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <returns>True when every experience-drop pool registry and pool entity is ready.</returns>
     private static bool AreExperienceDropPoolsReady(EntityManager entityManager)
     {
         EntityQuery registryQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemyExperienceDropPoolRegistry>());
@@ -515,9 +512,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks whether the loaded gameplay world contains authored sources that should build experience-drop pools.
-    /// /params entityManager Default world entity manager.
-    /// /returns True when enemy spawners can contribute experience-drop pool requirements.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <returns>True when enemy spawners can contribute experience-drop pool requirements.</returns>
     private static bool HasExperienceDropPoolSources(EntityManager entityManager)
     {
         EntityQuery sourceQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemySpawner>(),
@@ -535,10 +532,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks one pooled experience drop's active flag and render transforms.
-    /// /params entityManager Default world entity manager.
-    /// /params dropEntity Pooled drop entity to inspect.
-    /// /returns True when the drop is inactive and parked.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="dropEntity">Pooled drop entity to inspect.</param>
+    /// <returns>True when the drop is inactive and parked.</returns>
     private static bool IsPooledExperienceDropParked(EntityManager entityManager, Entity dropEntity)
     {
         if (dropEntity == Entity.Null || !entityManager.Exists(dropEntity))
@@ -555,10 +552,10 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Checks both LocalTransform and LocalToWorld when present so render state cannot lag behind runtime parking.
-    /// /params entityManager Default world entity manager.
-    /// /params entity Entity to inspect.
-    /// /returns True when all present transform surfaces are parked.
     /// </summary>
+    /// <param name="entityManager">Default world entity manager.</param>
+    /// <param name="entity">Entity to inspect.</param>
+    /// <returns>True when all present transform surfaces are parked.</returns>
     private static bool HasParkedRuntimeAndRenderTransform(EntityManager entityManager, Entity entity)
     {
         if (entityManager.HasComponent<LocalTransform>(entity) &&
@@ -578,9 +575,9 @@ internal static class GameSceneTransitionReadinessUtility
 
     /// <summary>
     /// Resolves whether a transform position is safely outside the visible gameplay space.
-    /// /params position Transform position to inspect.
-    /// /returns True when the position is below the projectile parking threshold.
     /// </summary>
+    /// <param name="position">Transform position to inspect.</param>
+    /// <returns>True when the position is below the projectile parking threshold.</returns>
     private static bool IsParkedPosition(float3 position)
     {
         return position.y <= ParkedProjectileHeightThreshold;

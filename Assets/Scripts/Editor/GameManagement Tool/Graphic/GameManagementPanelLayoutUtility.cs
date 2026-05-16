@@ -3,8 +3,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Centralizes responsive layout rules shared by Game Management editor panels.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameManagementPanelLayoutUtility
 {
@@ -19,9 +17,9 @@ internal static class GameManagementPanelLayoutUtility
     #region Public Methods
     /// <summary>
     /// Creates a horizontal split view that allows both panes to shrink with the window.
-    /// /params fixedPaneWidth Initial width for the left fixed pane.
-    /// /returns Configured two-pane split view.
     /// </summary>
+    /// <param name="fixedPaneWidth">Initial width for the left fixed pane.</param>
+    /// <returns>Configured two-pane split view.</returns>
     public static TwoPaneSplitView CreateHorizontalSplitView(float fixedPaneWidth)
     {
         TwoPaneSplitView splitView = new TwoPaneSplitView(0, fixedPaneWidth, TwoPaneSplitViewOrientation.Horizontal);
@@ -33,9 +31,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Applies responsive spacing rules to a preset browser pane.
-    /// /params pane Browser pane visual root.
-    /// /returns None.
     /// </summary>
+    /// <param name="pane">Browser pane visual root.</param>
     public static void ConfigureBrowserPane(VisualElement pane)
     {
         if (pane == null)
@@ -51,9 +48,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Applies responsive spacing rules to a details pane.
-    /// /params pane Details pane visual root.
-    /// /returns None.
     /// </summary>
+    /// <param name="pane">Details pane visual root.</param>
     public static void ConfigureDetailsPane(VisualElement pane)
     {
         if (pane == null)
@@ -69,9 +65,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Configures a toolbar so buttons wrap instead of forcing the pane wider.
-    /// /params toolbar Toolbar containing pane actions.
-    /// /returns None.
     /// </summary>
+    /// <param name="toolbar">Toolbar containing pane actions.</param>
     public static void ConfigureWrappingToolbar(Toolbar toolbar)
     {
         if (toolbar == null)
@@ -85,10 +80,9 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Configures a toolbar button so it can share narrow rows cleanly.
-    /// /params button Button to configure.
-    /// /params minimumWidth Minimum readable width before the toolbar wraps.
-    /// /returns None.
     /// </summary>
+    /// <param name="button">Button to configure.</param>
+    /// <param name="minimumWidth">Minimum readable width before the toolbar wraps.</param>
     public static void ConfigureToolbarButton(Button button, float minimumWidth)
     {
         if (button == null)
@@ -103,9 +97,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Configures a search field with an explicit readable starting width.
-    /// /params searchField Search field to configure.
-    /// /returns None.
     /// </summary>
+    /// <param name="searchField">Search field to configure.</param>
     public static void ConfigureSearchField(ToolbarSearchField searchField)
     {
         if (searchField == null)
@@ -120,10 +113,9 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Binds a search field width to its browser pane so split-view resizing updates the field reliably.
-    /// /params browserPane Pane whose content width drives the search field.
-    /// /params searchField Search field that should fill the browser pane.
-    /// /returns None.
     /// </summary>
+    /// <param name="browserPane">Pane whose content width drives the search field.</param>
+    /// <param name="searchField">Search field that should fill the browser pane.</param>
     public static void BindSearchFieldToBrowserPane(VisualElement browserPane, ToolbarSearchField searchField)
     {
         if (browserPane == null || searchField == null)
@@ -135,9 +127,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Configures a list view so row content cannot keep the browser pane from shrinking.
-    /// /params listView Preset list view.
-    /// /returns None.
     /// </summary>
+    /// <param name="listView">Preset list view.</param>
     public static void ConfigureListView(ListView listView)
     {
         if (listView == null)
@@ -150,9 +141,8 @@ internal static class GameManagementPanelLayoutUtility
 
     /// <summary>
     /// Configures a list row label for narrow panes.
-    /// /params label Row label to configure.
-    /// /returns None.
     /// </summary>
+    /// <param name="label">Row label to configure.</param>
     public static void ConfigureListRowLabel(Label label)
     {
         if (label == null)
@@ -167,10 +157,9 @@ internal static class GameManagementPanelLayoutUtility
     #region Private Methods
     /// <summary>
     /// Updates a search field width from its browser pane while keeping a readable lower bound.
-    /// /params browserPane Pane whose content width drives the search field.
-    /// /params searchField Search field attached to the browser pane.
-    /// /returns None.
     /// </summary>
+    /// <param name="browserPane">Pane whose content width drives the search field.</param>
+    /// <param name="searchField">Search field attached to the browser pane.</param>
     private static void UpdateSearchFieldWidth(VisualElement browserPane, ToolbarSearchField searchField)
     {
         if (browserPane == null || searchField == null)

@@ -5,8 +5,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides timing and readiness helpers for the managed scene transition executor.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneTransitionExecutionTimingUtility
 {
@@ -21,10 +19,10 @@ internal static class GameSceneTransitionExecutionTimingUtility
     #region Fade Timing
     /// <summary>
     /// Resolves active transition fade timings from transition override or preset defaults.
-    /// /params config Scene manager runtime config.
-    /// /params transition Transition override data.
-    /// /returns Fade timings used by the current transition.
     /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="transition">Transition override data.</param>
+    /// <returns>Fade timings used by the current transition.</returns>
     public static GameSceneTransitionFadeTimings ResolveFadeTimings(GameSceneManagerConfig config, GameSceneTransitionElement transition)
     {
         if (transition.OverrideFadeSettings != 0)
@@ -41,9 +39,9 @@ internal static class GameSceneTransitionExecutionTimingUtility
 
     /// <summary>
     /// Caps visual transition steps so a loading hitch cannot consume an entire fade-in in one frame.
-    /// /params unscaledDeltaTime Raw Unity unscaled frame delta.
-    /// /returns Clamped presentation delta for fade phases.
     /// </summary>
+    /// <param name="unscaledDeltaTime">Raw Unity unscaled frame delta.</param>
+    /// <returns>Clamped presentation delta for fade phases.</returns>
     public static float ResolveFadeStepDeltaTime(float unscaledDeltaTime)
     {
         return Mathf.Min(Mathf.Max(0f, unscaledDeltaTime), MaximumFadeStepSeconds);
@@ -53,15 +51,15 @@ internal static class GameSceneTransitionExecutionTimingUtility
     #region Readiness
     /// <summary>
     /// Waits until loaded scenes, gameplay runtime and a short hidden warm-up have completed before fade-in.
-    /// /params entityManager EntityManager used to flush LocalToWorld before readiness checks.
-    /// /params targetScene Main transition target scene.
-    /// /params hasTargetCompanionScene True when a companion scene was loaded with the target.
-    /// /params targetCompanionScene Companion scene definition.
-    /// /params persistentPlayerLoadScenes Persistent player scenes loaded for the target.
-    /// /params readinessWarmupFrames Mutable warm-up frame counter.
-    /// /params readinessWarmupSeconds Mutable warm-up duration counter.
-    /// /returns True when the transition can reveal the target scene.
     /// </summary>
+    /// <param name="entityManager">EntityManager used to flush LocalToWorld before readiness checks.</param>
+    /// <param name="targetScene">Main transition target scene.</param>
+    /// <param name="hasTargetCompanionScene">True when a companion scene was loaded with the target.</param>
+    /// <param name="targetCompanionScene">Companion scene definition.</param>
+    /// <param name="persistentPlayerLoadScenes">Persistent player scenes loaded for the target.</param>
+    /// <param name="readinessWarmupFrames">Mutable warm-up frame counter.</param>
+    /// <param name="readinessWarmupSeconds">Mutable warm-up duration counter.</param>
+    /// <returns>True when the transition can reveal the target scene.</returns>
     public static bool TryCompleteReadinessWarmup(EntityManager entityManager,
                                                   GameSceneDefinitionElement targetScene,
                                                   bool hasTargetCompanionScene,
@@ -92,10 +90,9 @@ internal static class GameSceneTransitionExecutionTimingUtility
 
     /// <summary>
     /// Clears hidden warm-up progress when a new transition starts or readiness drops.
-    /// /params readinessWarmupFrames Mutable warm-up frame counter.
-    /// /params readinessWarmupSeconds Mutable warm-up duration counter.
-    /// /returns None.
     /// </summary>
+    /// <param name="readinessWarmupFrames">Mutable warm-up frame counter.</param>
+    /// <param name="readinessWarmupSeconds">Mutable warm-up duration counter.</param>
     public static void ResetReadinessWarmup(ref int readinessWarmupFrames, ref float readinessWarmupSeconds)
     {
         readinessWarmupFrames = 0;
@@ -108,8 +105,6 @@ internal static class GameSceneTransitionExecutionTimingUtility
 
 /// <summary>
 /// Stores resolved fade timings for one transition request.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct GameSceneTransitionFadeTimings
 {
@@ -124,11 +119,10 @@ internal readonly struct GameSceneTransitionFadeTimings
     #region Constructor
     /// <summary>
     /// Creates immutable fade timing data for the transition executor.
-    /// /params fadeOutSeconds Seconds used by fade-out.
-    /// /params postLoadReadyExtraSeconds Seconds spent fully black after readiness.
-    /// /params fadeInSeconds Seconds used by fade-in.
-    /// /returns None.
     /// </summary>
+    /// <param name="fadeOutSeconds">Seconds used by fade-out.</param>
+    /// <param name="postLoadReadyExtraSeconds">Seconds spent fully black after readiness.</param>
+    /// <param name="fadeInSeconds">Seconds used by fade-in.</param>
     public GameSceneTransitionFadeTimings(float fadeOutSeconds, float postLoadReadyExtraSeconds, float fadeInSeconds)
     {
         FadeOutSeconds = fadeOutSeconds;

@@ -4,7 +4,6 @@ using UnityEngine;
 /// <summary>
 /// Stores one legacy combo-rank HUD visual entry kept only to preserve backward-compatible scene data.
 /// none.
-/// returns none.
 /// </summary>
 [Serializable]
 public sealed class HUDComboCounterRankVisualDefinition

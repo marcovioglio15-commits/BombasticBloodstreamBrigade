@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws the combo-counter preset module with scalable global settings and list-level validation warnings.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerComboCounterDefinition))]
 public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
@@ -17,9 +16,9 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for the combo-counter definition.
-    /// property Serialized combo-counter property.
-    /// returns Root UI element used by the inspector.
     /// </summary>
+    /// <param name="property">Serialized combo-counter property.</param>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -94,14 +93,13 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Rebuilds the warning message shown for the combo-counter module.
-    /// isEnabledProperty Serialized combo enabled property.
-    /// comboGainPerKillProperty Serialized kill gain property.
-    /// damageBreakModeProperty Serialized damage-break mode property.
-    /// preventDecayIntoNonDecayingRanksProperty Serialized decay-floor preservation property.
-    /// rankDefinitionsProperty Serialized combo-rank list property.
-    /// warningBox Warning help box refreshed in place.
-    /// returns void.
     /// </summary>
+    /// <param name="isEnabledProperty">Serialized combo enabled property.</param>
+    /// <param name="comboGainPerKillProperty">Serialized kill gain property.</param>
+    /// <param name="damageBreakModeProperty">Serialized damage-break mode property.</param>
+    /// <param name="preventDecayIntoNonDecayingRanksProperty">Serialized decay-floor preservation property.</param>
+    /// <param name="rankDefinitionsProperty">Serialized combo-rank list property.</param>
+    /// <param name="warningBox">Warning help box refreshed in place.</param>
     private static void RefreshWarnings(SerializedProperty isEnabledProperty,
                                         SerializedProperty comboGainPerKillProperty,
                                         SerializedProperty damageBreakModeProperty,
@@ -222,9 +220,9 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves the authored combo damage-break mode with a safe enum fallback.
-    /// damageBreakModeProperty Serialized damage-break mode property.
-    /// returns Resolved authored damage-break mode.
     /// </summary>
+    /// <param name="damageBreakModeProperty">Serialized damage-break mode property.</param>
+    /// <returns>Resolved authored damage-break mode.</returns>
     private static PlayerComboDamageBreakMode ResolveDamageBreakMode(SerializedProperty damageBreakModeProperty)
     {
         if (damageBreakModeProperty == null || damageBreakModeProperty.propertyType != SerializedPropertyType.Enum)

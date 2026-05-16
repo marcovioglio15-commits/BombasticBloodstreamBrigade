@@ -4,8 +4,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Contains execution helpers for active power-up runtime effects such as projectiles, bombs, dash and bullet time.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerPowerUpActivationExecutionUtility
 {
@@ -14,27 +12,26 @@ public static class PlayerPowerUpActivationExecutionUtility
     #region Execute
     /// <summary>
     /// Executes one active slot's primary tool and any non-primary Dash payload chained to the same activation.
-    /// /params slotConfig Runtime active slot configuration.
-    /// /params localTransform Player transform used by projectiles, bombs and dash fallback direction.
-    /// /params lookState Player look state used by projectile and dash direction resolution.
-    /// /params movementState Player movement state used by dash and bomb direction resolution.
-    /// /params runtimeMovementConfig Runtime movement config used by movement-relative dash direction resolution.
-    /// /params runtimeShootingConfig Runtime shooting config used by projectile request creation.
-    /// /params appliedElementSlots Runtime elemental slots applied to emitted projectiles.
-    /// /params passiveToolsState Aggregated passive tool state applied to projectile-style tools.
-    /// /params muzzleLookup Shooter muzzle lookup used to resolve projectile spawn positions.
-    /// /params transformLookup Transform lookup used to resolve projectile spawn positions.
-    /// /params localToWorldLookup LocalToWorld lookup used to resolve projectile spawn positions.
-    /// /params moveInput Raw movement input used as dash direction fallback.
-    /// /params lastValidMovementDirection Cached movement direction used as dash direction fallback.
-    /// /params playerEntity Player entity that owns spawned requests.
-    /// /params laserBeamState Mutable laser-beam state for triggered active beams.
-    /// /params dashState Mutable dash state for primary or chained dash execution.
-    /// /params bulletTimeState Mutable bullet-time state for timed slow effects.
-    /// /params bombRequests Output bomb-spawn request buffer.
-    /// /params shootRequests Output projectile-spawn request buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Runtime active slot configuration.</param>
+    /// <param name="localTransform">Player transform used by projectiles, bombs and dash fallback direction.</param>
+    /// <param name="lookState">Player look state used by projectile and dash direction resolution.</param>
+    /// <param name="movementState">Player movement state used by dash direction resolution.</param>
+    /// <param name="runtimeMovementConfig">Runtime movement config used by movement-relative dash direction resolution.</param>
+    /// <param name="runtimeShootingConfig">Runtime shooting config used by projectile request creation.</param>
+    /// <param name="appliedElementSlots">Runtime elemental slots applied to emitted projectiles.</param>
+    /// <param name="passiveToolsState">Aggregated passive tool state applied to projectile-style tools.</param>
+    /// <param name="muzzleLookup">Shooter muzzle lookup used to resolve projectile spawn positions.</param>
+    /// <param name="transformLookup">Transform lookup used to resolve projectile spawn positions.</param>
+    /// <param name="localToWorldLookup">LocalToWorld lookup used to resolve projectile spawn positions.</param>
+    /// <param name="moveInput">Raw movement input used as dash direction fallback.</param>
+    /// <param name="lastValidMovementDirection">Cached movement direction used as dash direction fallback.</param>
+    /// <param name="playerEntity">Player entity that owns spawned requests.</param>
+    /// <param name="laserBeamState">Mutable laser-beam state for triggered active beams.</param>
+    /// <param name="dashState">Mutable dash state for primary or chained dash execution.</param>
+    /// <param name="bulletTimeState">Mutable bullet-time state for timed slow effects.</param>
+    /// <param name="bombRequests">Output bomb-spawn request buffer.</param>
+    /// <param name="shootRequests">Output projectile-spawn request buffer.</param>
     public static void ExecuteTool(in PlayerPowerUpSlotConfig slotConfig,
                                    in LocalTransform localTransform,
                                    in PlayerLookState lookState,
@@ -61,7 +58,7 @@ public static class PlayerPowerUpActivationExecutionUtility
         switch (slotConfig.ToolKind)
         {
             case ActiveToolKind.Bomb:
-                ExecuteBomb(in slotConfig, in localTransform, in lookState, in movementState, playerEntity, bombRequests);
+                ExecuteBomb(in slotConfig, in localTransform, in lookState, playerEntity, bombRequests);
                 break;
             case ActiveToolKind.Dash:
                 PlayerPowerUpDashActivationUtility.ExecuteDash(in slotConfig,
@@ -113,21 +110,20 @@ public static class PlayerPowerUpActivationExecutionUtility
 
     /// <summary>
     /// Executes a charged shot after a valid charge release, including charged lasers and projectile bursts.
-    /// /params slotConfig Runtime active slot configuration.
-    /// /params localTransform Player transform used for projectile direction fallback.
-    /// /params lookState Player look state used to resolve firing direction.
-    /// /params runtimeShootingConfig Runtime shooting config used by projectile request creation.
-    /// /params appliedElementSlots Runtime elemental slots applied to emitted projectiles.
-    /// /params passiveToolsState Aggregated passive tool state applied to projectile-style tools.
-    /// /params playerEntity Player entity that owns spawned requests.
-    /// /params muzzleLookup Shooter muzzle lookup used to resolve projectile spawn positions.
-    /// /params transformLookup Transform lookup used to resolve projectile spawn positions.
-    /// /params localToWorldLookup LocalToWorld lookup used to resolve projectile spawn positions.
-    /// /params laserBeamState Mutable laser-beam state for charged active beams.
-    /// /params normalizedCharge Charge amount normalized above the required release threshold.
-    /// /params shootRequests Output projectile-spawn request buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Runtime active slot configuration.</param>
+    /// <param name="localTransform">Player transform used for projectile direction fallback.</param>
+    /// <param name="lookState">Player look state used to resolve firing direction.</param>
+    /// <param name="runtimeShootingConfig">Runtime shooting config used by projectile request creation.</param>
+    /// <param name="appliedElementSlots">Runtime elemental slots applied to emitted projectiles.</param>
+    /// <param name="passiveToolsState">Aggregated passive tool state applied to projectile-style tools.</param>
+    /// <param name="playerEntity">Player entity that owns spawned requests.</param>
+    /// <param name="muzzleLookup">Shooter muzzle lookup used to resolve projectile spawn positions.</param>
+    /// <param name="transformLookup">Transform lookup used to resolve projectile spawn positions.</param>
+    /// <param name="localToWorldLookup">LocalToWorld lookup used to resolve projectile spawn positions.</param>
+    /// <param name="laserBeamState">Mutable laser-beam state for charged active beams.</param>
+    /// <param name="normalizedCharge">Charge amount normalized above the required release threshold.</param>
+    /// <param name="shootRequests">Output projectile-spawn request buffer.</param>
     public static void ExecuteChargeShot(in PlayerPowerUpSlotConfig slotConfig,
                                          in LocalTransform localTransform,
                                          in PlayerLookState lookState,
@@ -234,17 +230,16 @@ public static class PlayerPowerUpActivationExecutionUtility
 
     /// <summary>
     /// Fires the hold-charge-owned Laser Beam using a neutral passive snapshot so equipped passives and other power-up hooks do not leak into the shot.
-    /// /params slotConfig Active slot that owns the charge-shot payload.
-    /// /params runtimeShootingConfig Current shooting config used as the base projectile template source.
-    /// /params appliedElementSlots Runtime default elemental slots used only when the charge shot has no override payload.
-    /// /params laserBeamState Mutable Laser Beam state receiving the timed active snapshot.
-    /// /params resolvedSizeMultiplier Charge-scaled size multiplier.
-    /// /params resolvedDamageMultiplier Charge-scaled damage multiplier.
-    /// /params resolvedSpeedMultiplier Charge-scaled speed multiplier.
-    /// /params resolvedRangeMultiplier Charge-scaled range multiplier.
-    /// /params resolvedLifetimeMultiplier Charge-scaled lifetime multiplier.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Active slot that owns the charge-shot payload.</param>
+    /// <param name="runtimeShootingConfig">Current shooting config used as the base projectile template source.</param>
+    /// <param name="appliedElementSlots">Runtime default elemental slots used only when the charge shot has no override payload.</param>
+    /// <param name="laserBeamState">Mutable Laser Beam state receiving the timed active snapshot.</param>
+    /// <param name="resolvedSizeMultiplier">Charge-scaled size multiplier.</param>
+    /// <param name="resolvedDamageMultiplier">Charge-scaled damage multiplier.</param>
+    /// <param name="resolvedSpeedMultiplier">Charge-scaled speed multiplier.</param>
+    /// <param name="resolvedRangeMultiplier">Charge-scaled range multiplier.</param>
+    /// <param name="resolvedLifetimeMultiplier">Charge-scaled lifetime multiplier.</param>
     private static void ExecuteIndependentChargedLaser(in PlayerPowerUpSlotConfig slotConfig,
                                                        in PlayerRuntimeShootingConfig runtimeShootingConfig,
                                                        DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
@@ -286,24 +281,31 @@ public static class PlayerPowerUpActivationExecutionUtility
 
     /// <summary>
     /// Resolves one charge-scaled projectile multiplier so charge-shot projectiles and triggered lasers share the same growth curve.
-    /// /params authoredMultiplier Authored multiplier resolved from the active slot config.
-    /// /params chargeFactor Normalized charge ratio in the 0-1 range.
-    /// /returns Charge-scaled multiplier applied to the emitted projectile template.
     /// </summary>
+    /// <param name="authoredMultiplier">Authored multiplier resolved from the active slot config.</param>
+    /// <param name="chargeFactor">Normalized charge ratio in the 0-1 range.</param>
+    /// <returns>Charge-scaled multiplier applied to the emitted projectile template.</returns>
     private static float ResolveChargeScaledMultiplier(float authoredMultiplier, float chargeFactor)
     {
         return math.lerp(1f, math.max(1f, authoredMultiplier), math.saturate(chargeFactor));
     }
 
+    /// <summary>
+    /// Queues one bomb spawn request using a single authored orientation for spawn offset, initial velocity and visual rotation.
+    /// </summary>
+    /// <param name="slotConfig">Runtime active slot configuration that contains Bomb payload values.</param>
+    /// <param name="localTransform">Current player transform used as the spawn origin and forward fallback.</param>
+    /// <param name="lookState">Current player look state used when Spawn Offset Orientation is PlayerLookDirection.</param>
+    /// <param name="playerEntity">Player entity that owns the spawned bomb and VFX requests.</param>
+    /// <param name="bombRequests">Mutable buffer that receives the bomb spawn request.</param>
     private static void ExecuteBomb(in PlayerPowerUpSlotConfig slotConfig,
                                     in LocalTransform localTransform,
                                     in PlayerLookState lookState,
-                                    in PlayerMovementState movementState,
                                     Entity playerEntity,
                                     DynamicBuffer<PlayerBombSpawnRequest> bombRequests)
     {
-        float3 bombDirection = ResolveBombActivationDirection(in movementState, in localTransform);
-        quaternion spawnOffsetRotation = ResolveSpawnOffsetRotation(in slotConfig.Bomb, in localTransform, in lookState);
+        float3 bombDirection = ResolveBombActivationDirection(in slotConfig.Bomb, in localTransform, in lookState);
+        quaternion spawnOffsetRotation = quaternion.LookRotationSafe(bombDirection, new float3(0f, 1f, 0f));
         float3 worldSpawnOffset = math.rotate(spawnOffsetRotation, slotConfig.Bomb.SpawnOffset);
         float3 spawnPosition = localTransform.Position + worldSpawnOffset;
         float deploySpeed = math.max(0f, slotConfig.Bomb.DeploySpeed);
@@ -468,47 +470,28 @@ public static class PlayerPowerUpActivationExecutionUtility
     #endregion
 
     #region Movement Helpers
-    private static quaternion ResolveSpawnOffsetRotation(in BombPowerUpConfig bombConfig,
+    /// <summary>
+    /// Resolves the planar direction used by Bomb spawn offset rotation, deployment velocity and initial bomb rotation.
+    /// </summary>
+    /// <param name="bombConfig">Runtime Bomb payload that selects the orientation reference.</param>
+    /// <param name="localTransform">Current player transform used for PlayerForward and fallback orientation.</param>
+    /// <param name="lookState">Current player look state used for PlayerLookDirection.</param>
+    /// <returns>Normalized planar bomb activation direction.</returns>
+    private static float3 ResolveBombActivationDirection(in BombPowerUpConfig bombConfig,
                                                          in LocalTransform localTransform,
                                                          in PlayerLookState lookState)
     {
         switch (bombConfig.SpawnOffsetOrientation)
         {
             case SpawnOffsetOrientationMode.PlayerLookDirection:
-                float3 lookDirection = lookState.DesiredDirection;
-                lookDirection.y = 0f;
-
-                if (math.lengthsq(lookDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-                {
-                    float3 normalizedLook = math.normalizesafe(lookDirection, new float3(0f, 0f, 1f));
-                    return quaternion.LookRotationSafe(normalizedLook, new float3(0f, 1f, 0f));
-                }
-
-                return localTransform.Rotation;
+                return PlayerProjectileRequestUtility.ResolveShootDirection(in lookState, in localTransform);
             case SpawnOffsetOrientationMode.WorldForward:
-                return quaternion.identity;
+                return new float3(0f, 0f, 1f);
             default:
-                return localTransform.Rotation;
+                float3 forwardDirection = math.forward(localTransform.Rotation);
+                forwardDirection.y = 0f;
+                return math.normalizesafe(forwardDirection, new float3(0f, 0f, 1f));
         }
-    }
-
-    private static float3 ResolveBombActivationDirection(in PlayerMovementState movementState, in LocalTransform localTransform)
-    {
-        float3 movementDirection = movementState.Velocity;
-        movementDirection.y = 0f;
-
-        if (math.lengthsq(movementDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-            return math.normalizesafe(-movementDirection, new float3(0f, 0f, -1f));
-
-        movementDirection = movementState.DesiredDirection;
-        movementDirection.y = 0f;
-
-        if (math.lengthsq(movementDirection) > PlayerPowerUpActivationUtilityConstants.DirectionLengthEpsilon)
-            return math.normalizesafe(-movementDirection, new float3(0f, 0f, -1f));
-
-        float3 backwardDirection = -math.forward(localTransform.Rotation);
-        backwardDirection.y = 0f;
-        return math.normalizesafe(backwardDirection, new float3(0f, 0f, -1f));
     }
 
     #endregion

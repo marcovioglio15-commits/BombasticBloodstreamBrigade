@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Singleton runtime configuration baked from GameAudioManagerPreset.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameAudioRuntimeConfig : IComponentData
 {
@@ -25,8 +23,6 @@ public struct GameAudioRuntimeConfig : IComponentData
 
 /// <summary>
 /// Baked FMOD event binding used by runtime audio request playback.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameAudioEventBindingElement : IBufferElementData
 {
@@ -45,8 +41,6 @@ public struct GameAudioEventBindingElement : IBufferElementData
 
 /// <summary>
 /// Runtime request emitted by gameplay systems and consumed by GameAudioPlaybackSystem.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameAudioEventRequest : IBufferElementData
 {
@@ -59,8 +53,6 @@ public struct GameAudioEventRequest : IBufferElementData
 
 /// <summary>
 /// Runtime rate-limit state tracked per event ID by the playback system.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameAudioRateLimitStateElement : IBufferElementData
 {

@@ -182,7 +182,7 @@ public partial struct PlayerLookRotationSystem : ISystem
     /// </summary>
     /// <param name="left">First direction vector.</param>
     /// <param name="right">Second direction vector.</param>
-    /// <returns>True when the directions are meaningfully different.<returns>
+    /// <returns>True when the directions are meaningfully different.</returns>
     private static bool IsDirectionDifferent(in float3 left, in float3 right)
     {
         float3 delta = left - right;
@@ -194,7 +194,7 @@ public partial struct PlayerLookRotationSystem : ISystem
     /// </summary>
     /// <param name="from">Current planar forward direction.</param>
     /// <param name="to">Target planar forward direction.</param>
-    /// <returns>Signed angle in radians in [-PI, PI].<returns>
+    /// <returns>Signed angle in radians in [-PI, PI].</returns>
     private static float SignedAngleRadians(float3 from, float3 to)
     {
         float clampedDot = math.clamp(math.dot(from, to), -1f, 1f);

@@ -4,8 +4,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Provides stateless UI helpers used by the boss HUD presenter.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossHudPresentationUtility
 {
@@ -18,10 +16,10 @@ internal static class EnemyBossHudPresentationUtility
     #region Public Methods
     /// <summary>
     /// Converts a projected viewport point to a clamped screen-edge position.
-    /// /params viewportPosition Boss viewport position from camera projection.
-    /// /params paddingPixels Edge padding in screen pixels.
-    /// /returns Screen-space indicator position.
     /// </summary>
+    /// <param name="viewportPosition">Boss viewport position from camera projection.</param>
+    /// <param name="paddingPixels">Edge padding in screen pixels.</param>
+    /// <returns>Screen-space indicator position.</returns>
     public static Vector2 ResolveEdgePosition(Vector3 viewportPosition, float paddingPixels)
     {
         Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
@@ -49,9 +47,8 @@ internal static class EnemyBossHudPresentationUtility
 
     /// <summary>
     /// Configures one boss HUD image for horizontal fill display.
-    /// /params fillImage Image to configure.
-    /// /returns None.
     /// </summary>
+    /// <param name="fillImage">Image to configure.</param>
     public static void ConfigureFillImage(Image fillImage)
     {
         if (fillImage == null)
@@ -65,10 +62,9 @@ internal static class EnemyBossHudPresentationUtility
 
     /// <summary>
     /// Applies a color only when the image reference is available.
-    /// /params image Target image.
-    /// /params color Color to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="image">Target image.</param>
+    /// <param name="color">Color to apply.</param>
     public static void ApplyImageColor(Image image, Color color)
     {
         if (image == null)
@@ -79,9 +75,9 @@ internal static class EnemyBossHudPresentationUtility
 
     /// <summary>
     /// Converts ECS float4 color data into UnityEngine Color.
-    /// /params value ECS color value.
-    /// /returns Unity color.
     /// </summary>
+    /// <param name="value">ECS color value.</param>
+    /// <returns>Unity color.</returns>
     public static Color ToColor(float4 value)
     {
         return new Color(value.x, value.y, value.z, value.w);
@@ -89,10 +85,10 @@ internal static class EnemyBossHudPresentationUtility
 
     /// <summary>
     /// Finds a child image by GameObject name.
-    /// /params root Root transform whose children are searched.
-    /// /params childName Child GameObject name.
-    /// /returns Matching image, or null when missing.
     /// </summary>
+    /// <param name="root">Root transform whose children are searched.</param>
+    /// <param name="childName">Child GameObject name.</param>
+    /// <returns>Matching image, or null when missing.</returns>
     public static Image ResolveImage(Transform root, string childName)
     {
         if (root == null)

@@ -4,7 +4,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores visibility-related presentation settings shared by one enemy type.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualVisibilitySettings
@@ -88,7 +87,6 @@ public sealed class EnemyVisualVisibilitySettings
     #region Public Methods
     /// <summary>
     /// Sanitizes visibility settings after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -122,7 +120,6 @@ public sealed class EnemyVisualVisibilitySettings
 
 /// <summary>
 /// Stores short hit-flash presentation tuning used when this enemy receives damage.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualDamageFeedbackSettings
@@ -173,7 +170,6 @@ public sealed class EnemyVisualDamageFeedbackSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes damage flash values after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -195,7 +191,6 @@ public sealed class EnemyVisualDamageFeedbackSettings
 
 /// <summary>
 /// Stores outline presentation settings applied to enemy renderers across companion and GPU-baked paths.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualOutlineSettings
@@ -252,7 +247,6 @@ public sealed class EnemyVisualOutlineSettings
     #region Public Methods
     /// <summary>
     /// Validates outline authored values after inspector edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -265,7 +259,6 @@ public sealed class EnemyVisualOutlineSettings
 
 /// <summary>
 /// Stores prefab references and paint color metadata used by one enemy type.
-/// returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualPrefabSettings
@@ -338,7 +331,6 @@ public sealed class EnemyVisualPrefabSettings
     #region Public Methods
     /// <summary>
     /// Sanitizes prefab settings after asset edits.
-    /// returns None.
     /// </summary>
     public void Validate()
     {
@@ -357,7 +349,6 @@ public sealed class EnemyVisualPrefabSettings
 
 /// <summary>
 /// Stores presentation settings resolved by enemy master presets and wave tools.
-/// returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyVisualPreset", menuName = "Enemy/Visual Preset", order = 11)]
 public sealed class EnemyVisualPreset : ScriptableObject
@@ -499,7 +490,6 @@ public sealed class EnemyVisualPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Validates nested settings and guarantees stable metadata defaults.
-    /// returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -540,7 +530,6 @@ public sealed class EnemyVisualPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Revalidates the asset after inspector changes.
-    /// returns None.
     /// </summary>
     private void OnValidate()
     {

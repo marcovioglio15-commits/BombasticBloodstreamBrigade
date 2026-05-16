@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws dropped power-up container settings with interaction-mode specific controls and binding pickers.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerPowerUpContainerInteractionSettings))]
 public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : PropertyDrawer
@@ -17,9 +16,9 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for dropped power-up container settings.
-    /// property: Serialized settings property shown in the Player Management Tool.
-    /// returns Root visual element used by the custom drawer.
     /// </summary>
+    /// <param name="property">Serialized settings property shown in the Player Management Tool.</param>
+    /// <returns>Root visual element used by the custom drawer.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -129,10 +128,10 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
     #region Private Methods
     /// <summary>
     /// Creates one standard property field already bound to the target serialized property.
-    /// property: Serialized property backing the field.
-    /// label: Label shown in the tool.
-    /// returns Bound property field.
     /// </summary>
+    /// <param name="property">Serialized property backing the field.</param>
+    /// <param name="label">Label shown in the tool.</param>
+    /// <returns>Bound property field.</returns>
     private static PropertyField CreateBoundPropertyField(SerializedProperty property, string label)
     {
         PropertyField field = new PropertyField(property, label);
@@ -146,11 +145,11 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Creates a scaling-aware numeric field for container settings.
-    /// /params property Serialized numeric property backing the field.
-    /// /params scalingRulesProperty Progression preset scaling rules used by Add Scaling.
-    /// /params label Label shown in the tool.
-    /// /returns Visual element bound to the property and its optional scaling rule.
     /// </summary>
+    /// <param name="property">Serialized numeric property backing the field.</param>
+    /// <param name="scalingRulesProperty">Progression preset scaling rules used by Add Scaling.</param>
+    /// <param name="label">Label shown in the tool.</param>
+    /// <returns>Visual element bound to the property and its optional scaling rule.</returns>
     private static VisualElement CreateScalingField(SerializedProperty property,
                                                     SerializedProperty scalingRulesProperty,
                                                     string label)
@@ -162,12 +161,11 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Adds one non-mutating warning for settings that must remain non-negative at runtime.
-    /// /params warningsRoot UI container receiving warning boxes.
-    /// /params property Serialized float property inspected.
-    /// /params label Human-readable field label.
-    /// /params message Warning text describing runtime handling.
-    /// /returns void.
     /// </summary>
+    /// <param name="warningsRoot">UI container receiving warning boxes.</param>
+    /// <param name="property">Serialized float property inspected.</param>
+    /// <param name="label">Human-readable field label.</param>
+    /// <param name="message">Warning text describing runtime handling.</param>
     private static void AddNonNegativeWarning(VisualElement warningsRoot,
                                               SerializedProperty property,
                                               string label,
@@ -187,8 +185,8 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
     /// <summary>
     /// Creates the main foldout that groups every dropped-container setting under one compact entry point.
     /// none.
-    /// returns Foldout used as the root of the settings drawer.
     /// </summary>
+    /// <returns>Foldout used as the root of the settings drawer.</returns>
     private static Foldout CreateContainerFoldout()
     {
         Foldout foldout = new Foldout();
@@ -201,12 +199,12 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Builds the field group shown only in Overlay Panel mode.
-    /// serializedObject: Serialized object that owns the target preset.
-    /// inputAsset: Input asset used by the binding picker.
-    /// overlayResumeDurationProperty: Resume-duration property shown for overlay mode.
-    /// interactActionIdProperty: Input binding property used to open the overlay.
-    /// returns Visual element containing the overlay-only controls.
     /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the target preset.</param>
+    /// <param name="inputAsset">Input asset used by the binding picker.</param>
+    /// <param name="overlayResumeDurationProperty">Resume-duration property shown for overlay mode.</param>
+    /// <param name="interactActionIdProperty">Input binding property used to open the overlay.</param>
+    /// <returns>Visual element containing the overlay-only controls.</returns>
     private static VisualElement CreateOverlayFields(SerializedObject serializedObject,
                                                      InputActionAsset inputAsset,
                                                      SerializedProperty scalingRulesProperty,
@@ -225,12 +223,12 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Builds the field group shown only in 3D Prompt mode.
-    /// serializedObject: Serialized object that owns the target preset.
-    /// inputAsset: Input asset used by the binding pickers.
-    /// replacePrimaryActionIdProperty: Binding property used to replace the primary active slot.
-    /// replaceSecondaryActionIdProperty: Binding property used to replace the secondary active slot.
-    /// returns Visual element containing the prompt-only controls.
     /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the target preset.</param>
+    /// <param name="inputAsset">Input asset used by the binding pickers.</param>
+    /// <param name="replacePrimaryActionIdProperty">Binding property used to replace the primary active slot.</param>
+    /// <param name="replaceSecondaryActionIdProperty">Binding property used to replace the secondary active slot.</param>
+    /// <returns>Visual element containing the prompt-only controls.</returns>
     private static VisualElement CreatePromptFields(SerializedObject serializedObject,
                                                     InputActionAsset inputAsset,
                                                     SerializedProperty replacePrimaryActionIdProperty,
@@ -252,9 +250,9 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Creates a compact labeled section root used by interaction-mode specific controls.
-    /// title: Section title shown above the grouped controls.
-    /// returns Visual element used as section root.
     /// </summary>
+    /// <param name="title">Section title shown above the grouped controls.</param>
+    /// <returns>Visual element used as section root.</returns>
     private static VisualElement CreateModeSectionRoot(string title)
     {
         VisualElement root = new VisualElement();
@@ -270,13 +268,13 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
 
     /// <summary>
     /// Creates one labeled input binding picker with the same filtering UI used elsewhere in the Player Management Tool.
-    /// inputAsset: Input asset used to enumerate available actions.
-    /// serializedObject: Serialized object that owns the target property.
-    /// actionIdProperty: Property storing the selected action id or name.
-    /// label: Descriptive label shown above the picker.
-    /// tooltip: Tooltip shown on the descriptive label.
-    /// returns Visual element containing the labeled picker or a warning when no asset is available.
     /// </summary>
+    /// <param name="inputAsset">Input asset used to enumerate available actions.</param>
+    /// <param name="serializedObject">Serialized object that owns the target property.</param>
+    /// <param name="actionIdProperty">Property storing the selected action id or name.</param>
+    /// <param name="label">Descriptive label shown above the picker.</param>
+    /// <param name="tooltip">Tooltip shown on the descriptive label.</param>
+    /// <returns>Visual element containing the labeled picker or a warning when no asset is available.</returns>
     private static VisualElement CreateBindingPicker(InputActionAsset inputAsset,
                                                      SerializedObject serializedObject,
                                                      SerializedProperty actionIdProperty,

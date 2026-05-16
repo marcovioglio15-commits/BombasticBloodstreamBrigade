@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Renders the billboard sprite used by offensive engagement feedback before supported enemy behaviours commit.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
@@ -117,16 +115,15 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Renders the billboard for the currently selected offensive interaction.
-    /// /params enemyPosition Current enemy world position.
-    /// /params cameraTransform Active camera transform used for billboarding.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /params visualSettingsKey Boss visual override key baked for the active config, or -1 for base and normal patterns.
-    /// /params useOverrideVisualSettings Whether the source interaction resolved its own override settings block.
-    /// /params color Final billboard tint to apply for the current frame.
-    /// /params worldOffset World-space offset from the enemy pivot.
-    /// /params uniformScale Final uniform billboard scale for the current frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked for the active config, or -1 for base and normal patterns.</param>
+    /// <param name="useOverrideVisualSettings">Whether the source interaction resolved its own override settings block.</param>
+    /// <param name="color">Final billboard tint to apply for the current frame.</param>
+    /// <param name="worldOffset">World-space offset from the enemy pivot.</param>
+    /// <param name="uniformScale">Final uniform billboard scale for the current frame.</param>
     public void Render(Vector3 enemyPosition,
                        Transform cameraTransform,
                        EnemyOffensiveEngagementTriggerSource source,
@@ -161,8 +158,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Hides the billboard and clears per-frame transient visual state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Hide()
     {
@@ -181,9 +176,8 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Synchronizes the serialized preset sources used by runtime billboard resolution from the provided enemy authoring component.
-    /// /params authoring Source authoring component that owns the billboard view.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source authoring component that owns the billboard view.</param>
     public void SyncPresetSources(EnemyAuthoring authoring)
     {
         if (authoring == null)
@@ -200,9 +194,8 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Synchronizes serialized preset sources from another baked billboard view when a pooled runtime clone is reused.
-    /// /params sourceView Source billboard view that owns the baked preset references.
-    /// /returns None.
     /// </summary>
+    /// <param name="sourceView">Source billboard view that owns the baked preset references.</param>
     public void SyncPresetSources(EnemyOffensiveEngagementBillboardView sourceView)
     {
         if (sourceView == null)
@@ -221,8 +214,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Ensures serialized references are resolved after prefab edits or runtime instantiation.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateSerializedFields()
     {
@@ -241,8 +232,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves the owning EnemyAuthoring while editing prefabs and mirrors its preset sources into this billboard view.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void TrySyncPresetSourcesFromParentAuthoring()
     {
@@ -258,8 +247,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Clears editor preview state after prefab changes without toggling the authored GameObject active state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResetEditorPreview()
     {
@@ -277,8 +264,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Clears cached authoring context so the next resolve pass re-reads presets and shared pattern data.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void InvalidateResolvedContext()
     {
@@ -297,9 +282,8 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves the global visual settings block used as the default billboard source for this enemy prefab.
-    /// /params None.
-    /// /returns The resolved global offensive engagement settings, or null when authoring data is unavailable.
     /// </summary>
+    /// <returns>The resolved global offensive engagement settings, or null when authoring data is unavailable.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveGlobalSettings()
     {
         EnsureResolvedContext();
@@ -309,11 +293,11 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     /// <summary>
     /// Resolves the sprite that should be displayed for the provided interaction source.
     /// The per-interaction override falls back to the generic preset sprite when its billboard sprite is left empty.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /params visualSettingsKey Boss visual override key baked for the active config.
-    /// /params useOverrideVisualSettings Whether the source interaction resolved its own override settings block.
-    /// /returns The resolved sprite, or null when no sprite is configured.
     /// </summary>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked for the active config.</param>
+    /// <param name="useOverrideVisualSettings">Whether the source interaction resolved its own override settings block.</param>
+    /// <returns>The resolved sprite, or null when no sprite is configured.</returns>
     private Sprite ResolveBillboardSprite(EnemyOffensiveEngagementTriggerSource source,
                                           int visualSettingsKey,
                                           bool useOverrideVisualSettings)
@@ -353,11 +337,11 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves the settings block currently associated with the provided interaction source.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /params visualSettingsKey Boss visual override key baked for the active config.
-    /// /params useOverrideVisualSettings Whether the source interaction resolved its own override settings block.
-    /// /returns The settings block associated with the provided source, or the generic preset settings when no override applies.
     /// </summary>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked for the active config.</param>
+    /// <param name="useOverrideVisualSettings">Whether the source interaction resolved its own override settings block.</param>
+    /// <returns>The settings block associated with the provided source, or the generic preset settings when no override applies.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveSettings(EnemyOffensiveEngagementTriggerSource source,
                                                                      int visualSettingsKey,
                                                                      bool useOverrideVisualSettings)
@@ -402,10 +386,10 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves the boss-specific override settings associated with the baked visual settings key.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /params visualSettingsKey Boss visual override key baked for the active config.
-    /// /returns Boss override settings, or null when the active config uses global or normal-pattern settings.
     /// </summary>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <param name="visualSettingsKey">Boss visual override key baked for the active config.</param>
+    /// <returns>Boss override settings, or null when the active config uses global or normal-pattern settings.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveBossOverrideSettings(EnemyOffensiveEngagementTriggerSource source,
                                                                                 int visualSettingsKey)
     {
@@ -419,9 +403,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves an override settings block from the base boss pattern.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /returns Base boss override settings, or null when unavailable.
     /// </summary>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <returns>Base boss override settings, or null when unavailable.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveBossBaseOverrideSettings(EnemyOffensiveEngagementTriggerSource source)
     {
         if (bossBasePattern == null)
@@ -444,10 +428,10 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves an override settings block from one authored boss interaction.
-    /// /params source Source interaction that currently owns the billboard.
-    /// /params visualSettingsKey Authored interaction index baked into the active config.
-    /// /returns Boss interaction override settings, or null when unavailable.
     /// </summary>
+    /// <param name="source">Source interaction that currently owns the billboard.</param>
+    /// <param name="visualSettingsKey">Authored interaction index baked into the active config.</param>
+    /// <returns>Boss interaction override settings, or null when unavailable.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveBossInteractionOverrideSettings(EnemyOffensiveEngagementTriggerSource source,
                                                                                            int visualSettingsKey)
     {
@@ -478,9 +462,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves a short-range slot override settings block when the slot authored one.
-    /// /params interaction Short-range slot to inspect.
-    /// /returns Override settings, or null when the slot should use global settings.
     /// </summary>
+    /// <param name="interaction">Short-range slot to inspect.</param>
+    /// <returns>Override settings, or null when the slot should use global settings.</returns>
     private static EnemyOffensiveEngagementFeedbackSettings ResolveShortRangeOverrideSettings(EnemyPatternShortRangeInteractionAssembly interaction)
     {
         if (interaction == null ||
@@ -495,9 +479,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Resolves a weapon slot override settings block when the slot authored one.
-    /// /params interaction Weapon slot to inspect.
-    /// /returns Override settings, or null when the slot should use global settings.
     /// </summary>
+    /// <param name="interaction">Weapon slot to inspect.</param>
+    /// <returns>Override settings, or null when the slot should use global settings.</returns>
     private static EnemyOffensiveEngagementFeedbackSettings ResolveWeaponOverrideSettings(EnemyPatternWeaponInteractionAssembly interaction)
     {
         if (interaction == null ||
@@ -512,8 +496,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Caches the authoring component and the currently selected shared pattern so sprite resolution stays allocation free during presentation updates.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void EnsureResolvedContext()
     {
@@ -559,10 +541,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Applies the final sprite asset and tint used by the billboard for the current frame.
-    /// /params targetSprite Resolved sprite for the current engagement source.
-    /// /params color Final tint color.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetSprite">Resolved sprite for the current engagement source.</param>
+    /// <param name="color">Final tint color.</param>
     private void ApplySprite(Sprite targetSprite, Color color)
     {
         if (spriteRenderer.sprite != targetSprite)
@@ -583,10 +564,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Applies the current uniform billboard scale only when it changed meaningfully from the last frame.
-    /// /params selfTransform Transform that owns the billboard renderer.
-    /// /params uniformScale Final uniform world scale for the current frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="selfTransform">Transform that owns the billboard renderer.</param>
+    /// <param name="uniformScale">Final uniform world scale for the current frame.</param>
     private void ApplyScale(Transform selfTransform, float uniformScale)
     {
         float clampedScale = Mathf.Max(0f, uniformScale);
@@ -602,10 +582,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Rotates the billboard toward the active camera using either full billboarding or yaw-only billboarding.
-    /// /params selfTransform Transform that owns the billboard renderer.
-    /// /params cameraTransform Active camera transform used for billboarding.
-    /// /returns None.
     /// </summary>
+    /// <param name="selfTransform">Transform that owns the billboard renderer.</param>
+    /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
     private void ApplyBillboardRotation(Transform selfTransform, Transform cameraTransform)
     {
         if (!billboardToCamera)
@@ -636,9 +615,8 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
 
     /// <summary>
     /// Applies the current visibility state without toggling the hierarchy unnecessarily every frame.
-    /// /params shouldBeVisible Whether the billboard should be visible after the update.
-    /// /returns None.
     /// </summary>
+    /// <param name="shouldBeVisible">Whether the billboard should be visible after the update.</param>
     private void ApplyVisibility(bool shouldBeVisible)
     {
         if (!visibilityStateInitialized)

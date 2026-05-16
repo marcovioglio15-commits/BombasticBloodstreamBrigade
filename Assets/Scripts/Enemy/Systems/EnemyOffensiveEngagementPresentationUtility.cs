@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes predictive timing, color-blend composition, and billboard pulse evaluation for offensive engagement feedback.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyOffensiveEngagementPresentationUtility
 {
@@ -17,12 +15,12 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     #region Public Methods
     /// <summary>
     /// Resolves the strongest currently active offensive color-blend warning across every baked interaction config.
-    /// /params configs Baked offensive engagement configs for the current enemy.
-    /// /params shooterRuntime Current shooter runtime buffer used by weapon timing evaluation.
-    /// /params patternConfig Current compiled pattern config used by short-range timing evaluation.
-    /// /params patternRuntimeState Current mutable pattern runtime state used by short-range timing evaluation.
-    /// /returns The strongest active color-blend result, or an inactive result when no warning window is currently open.
     /// </summary>
+    /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <returns>The strongest active color-blend result, or an inactive result when no warning window is currently open.</returns>
     public static EnemyOffensiveEngagementBlendResult ResolveBlendResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                          DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
                                                                          in EnemyPatternConfig patternConfig,
@@ -68,12 +66,12 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     /// <summary>
     /// Resolves the billboard request with the strongest active engagement progress across every baked interaction config.
-    /// /params configs Baked offensive engagement configs for the current enemy.
-    /// /params shooterRuntime Current shooter runtime buffer used by weapon timing evaluation.
-    /// /params patternConfig Current compiled pattern config used by short-range timing evaluation.
-    /// /params patternRuntimeState Current mutable pattern runtime state used by short-range timing evaluation.
-    /// /returns The strongest active billboard result, or an inactive result when no billboard window is currently open.
     /// </summary>
+    /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <returns>The strongest active billboard result, or an inactive result when no billboard window is currently open.</returns>
     public static EnemyOffensiveEngagementBillboardResult ResolveBillboardResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
                                                                                  in EnemyPatternConfig patternConfig,
@@ -124,13 +122,13 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     /// <summary>
     /// Resolves the displayed offensive engagement blend for the current frame, preserving fade-out continuity after the active warning loses priority.
-    /// /params currentBlend Blend value applied during the previous frame.
-    /// /params currentFadeOutSeconds Fade-out duration remembered from the previously dominant offensive warning.
-    /// /params targetResult Strongest active offensive blend result for the current frame.
-    /// /params deltaTime Presentation delta time.
-    /// /params rememberedFadeOutSeconds Updated fade-out duration that should be stored back into presentation state.
-    /// /returns Displayed offensive engagement blend for the current frame.
     /// </summary>
+    /// <param name="currentBlend">Blend value applied during the previous frame.</param>
+    /// <param name="currentFadeOutSeconds">Fade-out duration remembered from the previously dominant offensive warning.</param>
+    /// <param name="targetResult">Strongest active offensive blend result for the current frame.</param>
+    /// <param name="deltaTime">Presentation delta time.</param>
+    /// <param name="rememberedFadeOutSeconds">Updated fade-out duration that should be stored back into presentation state.</param>
+    /// <returns>Displayed offensive engagement blend for the current frame.</returns>
     public static float ResolveDisplayedBlend(float currentBlend,
                                               float currentFadeOutSeconds,
                                               EnemyOffensiveEngagementBlendResult targetResult,
@@ -172,14 +170,14 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     #region Private Methods
     /// <summary>
     /// Evaluates one predictive warning window for the requested timing mode and lead time.
-    /// /params timingMode Timing model used by the current baked config.
-    /// /params leadTimeSeconds Requested lead time for the current visual channel.
-    /// /params shooterRuntime Current shooter runtime buffer used by weapon timing evaluation.
-    /// /params patternConfig Current compiled pattern config used by short-range timing evaluation.
-    /// /params patternRuntimeState Current mutable pattern runtime state used by short-range timing evaluation.
-    /// /params window Active warning window data when evaluation succeeds.
-    /// /returns True when a warning window is currently active for the requested config.
     /// </summary>
+    /// <param name="timingMode">Timing model used by the current baked config.</param>
+    /// <param name="leadTimeSeconds">Requested lead time for the current visual channel.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <param name="window">Active warning window data when evaluation succeeds.</param>
+    /// <returns>True when a warning window is currently active for the requested config.</returns>
     private static bool TryEvaluateWindow(EnemyOffensiveEngagementTimingMode timingMode,
                                           float leadTimeSeconds,
                                           DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
@@ -203,12 +201,12 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     /// <summary>
     /// Evaluates the active warning window for a short-range dash release.
-    /// /params leadTimeSeconds Requested visual lead time for the current channel.
-    /// /params patternConfig Current compiled pattern config.
-    /// /params patternRuntimeState Current mutable pattern runtime state.
-    /// /params window Active warning window data when evaluation succeeds.
-    /// /returns True when the dash is currently inside a valid warning window.
     /// </summary>
+    /// <param name="leadTimeSeconds">Requested visual lead time for the current channel.</param>
+    /// <param name="patternConfig">Current compiled pattern config.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state.</param>
+    /// <param name="window">Active warning window data when evaluation succeeds.</param>
+    /// <returns>True when the dash is currently inside a valid warning window.</returns>
     private static bool TryEvaluateShortRangeDashWindow(float leadTimeSeconds,
                                                         in EnemyPatternConfig patternConfig,
                                                         in EnemyPatternRuntimeState patternRuntimeState,
@@ -245,11 +243,11 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     /// <summary>
     /// Evaluates the active warning window for the next shooter shot using the same burst-start logic already used by the legacy color warning.
-    /// /params leadTimeSeconds Requested visual lead time for idle pre-burst windows.
-    /// /params shooterRuntime Current shooter runtime buffer.
-    /// /params window Active warning window data when evaluation succeeds.
-    /// /returns True when at least one shooter slot is currently inside a valid warning window.
     /// </summary>
+    /// <param name="leadTimeSeconds">Requested visual lead time for idle pre-burst windows.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer.</param>
+    /// <param name="window">Active warning window data when evaluation succeeds.</param>
+    /// <returns>True when at least one shooter slot is currently inside a valid warning window.</returns>
     private static bool TryEvaluateWeaponShotWindow(float leadTimeSeconds,
                                                     DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
                                                     out EnemyOffensiveEngagementWindow window)
@@ -324,10 +322,10 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     /// <summary>
     /// Resolves the current billboard scale produced by the configured pulse cycle.
-    /// /params config Baked billboard config currently being rendered.
-    /// /params elapsedWindowSeconds Seconds elapsed since the current warning window opened.
-    /// /returns Final uniform billboard scale for the current frame.
     /// </summary>
+    /// <param name="config">Baked billboard config currently being rendered.</param>
+    /// <param name="elapsedWindowSeconds">Seconds elapsed since the current warning window opened.</param>
+    /// <returns>Final uniform billboard scale for the current frame.</returns>
     private static float ResolvePulseScale(EnemyOffensiveEngagementConfigElement config, float elapsedWindowSeconds)
     {
         float baseScale = math.max(0f, config.BillboardBaseScale);
@@ -372,8 +370,6 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
 /// <summary>
 /// Stores one currently active predictive warning window resolved for a single offensive config.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct EnemyOffensiveEngagementWindow
 {
@@ -383,8 +379,6 @@ internal struct EnemyOffensiveEngagementWindow
 
 /// <summary>
 /// Stores the strongest currently active offensive color-blend result.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct EnemyOffensiveEngagementBlendResult
 {
@@ -396,8 +390,6 @@ internal struct EnemyOffensiveEngagementBlendResult
 
 /// <summary>
 /// Stores the strongest currently active offensive billboard result.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct EnemyOffensiveEngagementBillboardResult
 {

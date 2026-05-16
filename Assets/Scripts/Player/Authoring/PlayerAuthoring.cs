@@ -319,7 +319,7 @@ public sealed class PlayerAuthoring : MonoBehaviour
     /// <summary>
     /// Retrieves the controller preset from the master preset.
     /// </summary>
-    /// <returns>The PlayerControllerPreset from the master preset, or null if the master preset is not set.<returns>
+    /// <returns>The PlayerControllerPreset from the master preset, or null if the master preset is not set.</returns>
     public PlayerControllerPreset GetControllerPreset()
     {
         if (masterPreset == null)
@@ -331,7 +331,7 @@ public sealed class PlayerAuthoring : MonoBehaviour
     /// <summary>
     /// Retrieves the progression preset from the master preset.
     /// </summary>
-    /// <returns>The PlayerProgressionPreset from the master preset, or null if the master preset is not set.<returns>
+    /// <returns>The PlayerProgressionPreset from the master preset, or null if the master preset is not set.</returns>
     public PlayerProgressionPreset GetProgressionPreset()
     {
         if (masterPreset == null)
@@ -343,7 +343,7 @@ public sealed class PlayerAuthoring : MonoBehaviour
     /// <summary>
     /// Retrieves the power-ups preset from the master preset.
     /// </summary>
-    /// <returns>The PlayerPowerUpsPreset from the master preset, or null if the master preset is not set.<returns>
+    /// <returns>The PlayerPowerUpsPreset from the master preset, or null if the master preset is not set.</returns>
     public PlayerPowerUpsPreset GetPowerUpsPreset()
     {
         if (masterPreset == null)
@@ -810,9 +810,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
     #region Bake Helpers
     /// <summary>
     /// Declares preset dependencies consumed by this baker so editing preset assets triggers a player rebake.
-    /// /params authoring Source authoring component used to resolve all preset references.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source authoring component used to resolve all preset references.</param>
     private void DeclarePresetDependencies(PlayerAuthoring authoring)
     {
         if (authoring == null)
@@ -846,9 +845,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
     /// <summary>
     /// Declares prefab dependencies consumed by the Laser Beam visual rig so prefab edits trigger a rebake.
-    /// /params runtimeVisualBridgePrefab Resolved visual bridge prefab that may host the rig authoring component.
-    /// /returns None.
     /// </summary>
+    /// <param name="runtimeVisualBridgePrefab">Resolved visual bridge prefab that may host the rig authoring component.</param>
     private void DeclareLaserBeamVisualRigDependencies(GameObject runtimeVisualBridgePrefab)
     {
         if (runtimeVisualBridgePrefab == null)
@@ -870,9 +868,9 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
     /// <summary>
     /// Resolves one prefab asset as a dynamic ECS prefab entity for power-up bake helpers.
-    /// prefab: Prefab asset to resolve.
-    /// returns ECS prefab entity or Entity.Null when the prefab is missing.
     /// </summary>
+    /// <param name="prefab">Prefab asset to resolve.</param>
+    /// <returns>ECS prefab entity or Entity.Null when the prefab is missing.</returns>
     private Entity ResolveDynamicPrefabEntity(GameObject prefab)
     {
         if (prefab == null)
@@ -883,10 +881,10 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
     /// <summary>
     /// Resolves one power-up VFX prefab and stores the source prefab reference beside the baked entity reference.
-    /// /params prefab Prefab asset to resolve.
-    /// /params bindingsBuffer Player-owned buffer receiving the prefab-to-entity VFX binding.
-    /// /returns ECS prefab entity or Entity.Null when the prefab is missing.
     /// </summary>
+    /// <param name="prefab">Prefab asset to resolve.</param>
+    /// <param name="bindingsBuffer">Player-owned buffer receiving the prefab-to-entity VFX binding.</param>
+    /// <returns>ECS prefab entity or Entity.Null when the prefab is missing.</returns>
     private Entity ResolveDynamicPowerUpVfxPrefabEntity(GameObject prefab,
                                                         DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> bindingsBuffer)
     {

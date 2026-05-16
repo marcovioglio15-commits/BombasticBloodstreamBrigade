@@ -7,8 +7,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Coordinates pause and ending menus for gameplay scenes while reading the authoritative run outcome from ECS.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameplayMenuController : MonoBehaviour
@@ -79,8 +77,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Caches local menu helpers and applies the authored startup visibility.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Awake()
     {
@@ -90,8 +86,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Registers UI and input callbacks while restoring gameplay cursor and time state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -108,8 +102,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes callbacks and resets transient menu state when the scene unloads.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -126,8 +118,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Polls the ECS run outcome and opens the ending menu once the run is finalized.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Update()
     {
@@ -155,8 +145,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Lifecycle
     /// <summary>
     /// Applies the authored startup visibility for pause and ending menus.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyInitialVisualState()
     {
@@ -171,8 +159,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Buttons
     /// <summary>
     /// Registers authored button callbacks for pause and ending menus.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RegisterButtons()
     {
@@ -200,8 +186,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes authored button callbacks from pause and ending menus.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UnregisterButtons()
     {
@@ -231,8 +215,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Runtime Input
     /// <summary>
     /// Registers runtime input lifecycle events so pause input can follow PlayerInputRuntime reinitialization.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RegisterRuntimeEvents()
     {
@@ -242,8 +224,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes runtime input lifecycle event subscriptions.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UnregisterRuntimeEvents()
     {
@@ -253,8 +233,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Rebinds the pause toggle action whenever the shared input runtime is recreated.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleInputRuntimeInitialized()
     {
@@ -263,8 +241,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Clears the current pause-toggle action subscription when the shared input runtime shuts down.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleInputRuntimeShutdown()
     {
@@ -273,8 +249,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Refreshes the pause-toggle binding from PlayerInputRuntime.PauseAction with UI cancel fallback.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RefreshPauseActionBinding()
     {
@@ -297,8 +271,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Removes the current pause-toggle subscription from the cached gameplay pause action.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UnregisterPauseActionBinding()
     {
@@ -311,9 +283,8 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Toggles pause only when gameplay is not already owned by another pause-capable overlay or ending screen.
-    /// /params context Input callback context for the performed cancel action.
-    /// /returns None.
     /// </summary>
+    /// <param name="context">Input callback context for the performed cancel action.</param>
     private void HandlePausePerformed(InputAction.CallbackContext context)
     {
         if (endingMenuVisible)
@@ -335,9 +306,8 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region ECS
     /// <summary>
     /// Initializes world and player-query state once a valid default world exists.
-    /// /params None.
-    /// /returns True when ECS bindings are ready, otherwise false.
     /// </summary>
+    /// <returns>True when ECS bindings are ready, otherwise false.</returns>
     private bool TryInitializeEcsBindings()
     {
         World currentWorld = World.DefaultGameObjectInjectionWorld;
@@ -378,9 +348,9 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Resolves the single local player entity used to drive gameplay menu state.
-    /// /params playerEntity Resolved player entity when available.
-    /// /returns True when exactly one valid player entity exists, otherwise false.
     /// </summary>
+    /// <param name="playerEntity">Resolved player entity when available.</param>
+    /// <returns>True when exactly one valid player entity exists, otherwise false.</returns>
     private bool TryResolvePlayerEntity(out Entity playerEntity)
     {
         if (cachedPlayerEntity != Entity.Null &&
@@ -424,8 +394,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Menu Flow
     /// <summary>
     /// Shows the authored pause menu and freezes gameplay time.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ShowPauseMenu()
     {
@@ -442,8 +410,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Hides the authored pause menu and restores gameplay time.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ResumeGameplay()
     {
@@ -462,9 +428,8 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Shows the authored ending menu using the resolved terminal run outcome.
-    /// /params outcome Finalized outcome computed by ECS.
-    /// /returns None.
     /// </summary>
+    /// <param name="outcome">Finalized outcome computed by ECS.</param>
     private void ShowEndingMenu(PlayerRunOutcome outcome)
     {
         if (pauseMenuVisible)
@@ -501,8 +466,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Button Callbacks
     /// <summary>
     /// Handles the Resume button from the pause menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleResumePressed()
     {
@@ -511,8 +474,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Reloads the active gameplay scene from the pause menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleRestartPressed()
     {
@@ -521,8 +482,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Returns to the main menu scene from the pause menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleMainMenuPressed()
     {
@@ -531,8 +490,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Requests application shutdown from the pause menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleQuitPressed()
     {
@@ -542,8 +499,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Reloads the active gameplay scene from the ending menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandlePlayAgainPressed()
     {
@@ -552,8 +507,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Returns to the main menu scene from the ending menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleEndingMainMenuPressed()
     {
@@ -562,8 +515,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Requests application shutdown from the ending menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleEndingQuitPressed()
     {
@@ -575,8 +526,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Scene Flow
     /// <summary>
     /// Requests an ECS Scene Manager restart for the active gameplay scene.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ReloadActiveScene()
     {
@@ -588,8 +537,6 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     /// <summary>
     /// Requests the configured main menu through the ECS Scene Manager.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void LoadMainMenuScene()
     {
@@ -603,9 +550,8 @@ public sealed class GameplayMenuController : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Selects the first non-null button from the provided authored button order.
-    /// /params preferredButtons Ordered button candidates for UI selection.
-    /// /returns None.
     /// </summary>
+    /// <param name="preferredButtons">Ordered button candidates for UI selection.</param>
     private void SelectDefaultButton(params Button[] preferredButtons)
     {
         if (selectionController != null)

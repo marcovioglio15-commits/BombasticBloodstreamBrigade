@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides shared validation, copy and lookup helpers for per-element enemy VFX assignments.
-/// /params none.
-/// /returns none.
 /// </summary>
 public static class PlayerElementalVfxAssignmentUtility
 {
@@ -13,9 +11,8 @@ public static class PlayerElementalVfxAssignmentUtility
     #region Public Methods
     /// <summary>
     /// Ensures the authored list contains one unique entry for every supported gameplay element.
-    /// /params assignments Mutable assignment list owned by a preset.
-    /// /returns void.
     /// </summary>
+    /// <param name="assignments">Mutable assignment list owned by a preset.</param>
     public static void ValidateAssignments(List<ElementalVfxByElementData> assignments)
     {
         if (assignments == null)
@@ -50,10 +47,10 @@ public static class PlayerElementalVfxAssignmentUtility
 
     /// <summary>
     /// Deep-copies one assignment catalog into another list while preserving element ordering.
-    /// /params source Source assignment list.
-    /// /params destination Destination assignment list that will be overwritten.
-    /// /returns True when at least one destination entry changed.
     /// </summary>
+    /// <param name="source">Source assignment list.</param>
+    /// <param name="destination">Destination assignment list that will be overwritten.</param>
+    /// <returns>True when at least one destination entry changed.</returns>
     public static bool CopyAssignments(IReadOnlyList<ElementalVfxByElementData> source, List<ElementalVfxByElementData> destination)
     {
         if (destination == null)
@@ -85,9 +82,9 @@ public static class PlayerElementalVfxAssignmentUtility
 
     /// <summary>
     /// Reports whether any entry in the catalog is configured to spawn at least one VFX prefab.
-    /// /params assignments Source assignment list to inspect.
-    /// /returns True when the list contains at least one active stack or proc VFX assignment.
     /// </summary>
+    /// <param name="assignments">Source assignment list to inspect.</param>
+    /// <returns>True when the list contains at least one active stack or proc VFX assignment.</returns>
     public static bool HasAnyConfiguredVfx(IReadOnlyList<ElementalVfxByElementData> assignments)
     {
         if (assignments == null)
@@ -114,10 +111,9 @@ public static class PlayerElementalVfxAssignmentUtility
     #region Private Methods
     /// <summary>
     /// Adds a missing entry for one supported element.
-    /// /params assignments Mutable assignment list.
-    /// /params elementType Element that must exist in the list.
-    /// /returns void.
     /// </summary>
+    /// <param name="assignments">Mutable assignment list.</param>
+    /// <param name="elementType">Element that must exist in the list.</param>
     private static void EnsureEntry(List<ElementalVfxByElementData> assignments, ElementType elementType)
     {
         if (assignments == null)

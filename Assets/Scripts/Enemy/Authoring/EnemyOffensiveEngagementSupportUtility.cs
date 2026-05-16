@@ -1,7 +1,5 @@
 /// <summary>
 /// Resolves which offensive module kinds can emit predictive engagement feedback and which timing model they use.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class EnemyOffensiveEngagementSupportUtility
 {
@@ -10,10 +8,10 @@ public static class EnemyOffensiveEngagementSupportUtility
     #region Public Methods
     /// <summary>
     /// Resolves the predictive engagement timing mode supported by one module inside the provided catalog section.
-    /// /params section Catalog section that owns the module binding.
-    /// /params moduleKind Resolved module kind selected in that section.
-    /// /returns Supported timing mode, or None when predictive engagement feedback is not implemented for that module kind.
     /// </summary>
+    /// <param name="section">Catalog section that owns the module binding.</param>
+    /// <param name="moduleKind">Resolved module kind selected in that section.</param>
+    /// <returns>Supported timing mode, or None when predictive engagement feedback is not implemented for that module kind.</returns>
     public static EnemyOffensiveEngagementTimingMode ResolveTimingMode(EnemyPatternModuleCatalogSection section,
                                                                        EnemyPatternModuleKind moduleKind)
     {
@@ -32,10 +30,10 @@ public static class EnemyOffensiveEngagementSupportUtility
 
     /// <summary>
     /// Returns whether the provided module kind currently supports predictive engagement feedback inside the provided catalog section.
-    /// /params section Catalog section that owns the module binding.
-    /// /params moduleKind Resolved module kind selected in that section.
-    /// /returns True when the module kind currently maps to a supported timing mode.
     /// </summary>
+    /// <param name="section">Catalog section that owns the module binding.</param>
+    /// <param name="moduleKind">Resolved module kind selected in that section.</param>
+    /// <returns>True when the module kind currently maps to a supported timing mode.</returns>
     public static bool SupportsTimingMode(EnemyPatternModuleCatalogSection section,
                                           EnemyPatternModuleKind moduleKind)
     {
@@ -46,9 +44,9 @@ public static class EnemyOffensiveEngagementSupportUtility
     #region Private Methods
     /// <summary>
     /// Resolves the predictive engagement timing mode supported by one short-range module kind.
-    /// /params moduleKind Selected short-range module kind.
-    /// /returns Supported timing mode, or None when no predictive trigger is currently implemented.
     /// </summary>
+    /// <param name="moduleKind">Selected short-range module kind.</param>
+    /// <returns>Supported timing mode, or None when no predictive trigger is currently implemented.</returns>
     private static EnemyOffensiveEngagementTimingMode ResolveShortRangeTimingMode(EnemyPatternModuleKind moduleKind)
     {
         switch (moduleKind)
@@ -63,9 +61,9 @@ public static class EnemyOffensiveEngagementSupportUtility
 
     /// <summary>
     /// Resolves the predictive engagement timing mode supported by one weapon module kind.
-    /// /params moduleKind Selected weapon module kind.
-    /// /returns Supported timing mode, or None when no predictive trigger is currently implemented.
     /// </summary>
+    /// <param name="moduleKind">Selected weapon module kind.</param>
+    /// <returns>Supported timing mode, or None when no predictive trigger is currently implemented.</returns>
     private static EnemyOffensiveEngagementTimingMode ResolveWeaponTimingMode(EnemyPatternModuleKind moduleKind)
     {
         switch (moduleKind)

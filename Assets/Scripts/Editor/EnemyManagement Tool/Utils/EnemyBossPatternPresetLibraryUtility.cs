@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides utility methods for creating and loading EnemyBossPatternPreset assets and their library.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class EnemyBossPatternPresetLibraryUtility
 {
@@ -19,9 +17,8 @@ public static class EnemyBossPatternPresetLibraryUtility
     #region Public Methods
     /// <summary>
     /// Loads the boss pattern preset library or creates one at the default path.
-    /// /params None.
-    /// /returns Boss pattern preset library asset.
     /// </summary>
+    /// <returns>Boss pattern preset library asset.</returns>
     public static EnemyBossPatternPresetLibrary GetOrCreateLibrary()
     {
         EnemyBossPatternPresetLibrary library = AssetDatabase.LoadAssetAtPath<EnemyBossPatternPresetLibrary>(DefaultLibraryPath);
@@ -37,9 +34,9 @@ public static class EnemyBossPatternPresetLibraryUtility
 
     /// <summary>
     /// Creates one boss pattern preset asset with normalized name metadata.
-    /// /params presetName Requested asset and display name.
-    /// /returns Created boss pattern preset asset.
     /// </summary>
+    /// <param name="presetName">Requested asset and display name.</param>
+    /// <returns>Created boss pattern preset asset.</returns>
     public static EnemyBossPatternPreset CreatePresetAsset(string presetName)
     {
         EnsureFolder(DefaultPresetsFolder);
@@ -71,9 +68,8 @@ public static class EnemyBossPatternPresetLibraryUtility
     #region Private Methods
     /// <summary>
     /// Creates the folder path required by boss pattern preset assets.
-    /// /params folderPath Project-relative folder path.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Project-relative folder path.</param>
     private static void EnsureFolder(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))

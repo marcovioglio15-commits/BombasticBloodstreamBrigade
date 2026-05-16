@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Editor asset factory for GameSceneManagerPresetLibrary and GameSceneManagerPreset assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneManagerPresetLibraryUtility
 {
@@ -19,9 +17,8 @@ public static class GameSceneManagerPresetLibraryUtility
     #region Public Methods
     /// <summary>
     /// Loads the scene manager preset library or creates it at the default path.
-    /// /params None.
-    /// /returns Existing or newly created library asset.
     /// </summary>
+    /// <returns>Existing or newly created library asset.</returns>
     public static GameSceneManagerPresetLibrary GetOrCreateLibrary()
     {
         GameSceneManagerPresetLibrary library = AssetDatabase.LoadAssetAtPath<GameSceneManagerPresetLibrary>(DefaultLibraryPath);
@@ -38,9 +35,9 @@ public static class GameSceneManagerPresetLibraryUtility
 
     /// <summary>
     /// Creates one scene manager preset asset in the default preset folder.
-    /// /params presetName Requested preset display name.
-    /// /returns Created preset asset or null when asset creation fails.
     /// </summary>
+    /// <param name="presetName">Requested preset display name.</param>
+    /// <returns>Created preset asset or null when asset creation fails.</returns>
     public static GameSceneManagerPreset CreatePresetAsset(string presetName)
     {
         GameManagementAssetUtility.EnsureFolder(DefaultPresetsFolder);
@@ -62,10 +59,9 @@ public static class GameSceneManagerPresetLibraryUtility
     #region Private Methods
     /// <summary>
     /// Writes the serialized preset name so list display and asset filename start synchronized.
-    /// /params preset Preset asset to update.
-    /// /params finalName Asset filename without extension.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to update.</param>
+    /// <param name="finalName">Asset filename without extension.</param>
     private static void SynchronizePresetName(GameSceneManagerPreset preset, string finalName)
     {
         if (preset == null)

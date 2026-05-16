@@ -21,14 +21,14 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
     #region Public Methods
     /// <summary>
     /// Resolves the nearest compatible preview range that fits inside the requested interval.
-    /// definitionExperienceValues Preview drop values collected from serialized data.
-    /// requestedMinimumTotal Requested inclusive minimum total experience.
-    /// requestedMaximumTotal Requested inclusive maximum total experience.
-    /// distribution Distribution bias where 0 favors lower definitions and 1 favors higher ones.
-    /// resolvedMinimumTotal Resolved compatible minimum total.
-    /// resolvedMaximumTotal Resolved compatible maximum total.
-    /// returns True when at least one compatible total exists inside the requested range.
     /// </summary>
+    /// <param name="definitionExperienceValues">Preview drop values collected from serialized data.</param>
+    /// <param name="requestedMinimumTotal">Requested inclusive minimum total experience.</param>
+    /// <param name="requestedMaximumTotal">Requested inclusive maximum total experience.</param>
+    /// <param name="distribution">Distribution bias where 0 favors lower definitions and 1 favors higher ones.</param>
+    /// <param name="resolvedMinimumTotal">Resolved compatible minimum total.</param>
+    /// <param name="resolvedMaximumTotal">Resolved compatible maximum total.</param>
+    /// <returns>True when at least one compatible total exists inside the requested range.</returns>
     public static bool TryResolveCompatiblePreviewRange(IReadOnlyList<float> definitionExperienceValues,
                                                         float requestedMinimumTotal,
                                                         float requestedMaximumTotal,
@@ -90,14 +90,14 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
 
     /// <summary>
     /// Suggests a nearby compatible preview range when the requested range is not already compatible.
-    /// definitionExperienceValues Preview drop values collected from serialized data.
-    /// requestedMinimumTotal Requested inclusive minimum total experience.
-    /// requestedMaximumTotal Requested inclusive maximum total experience.
-    /// distribution Distribution bias where 0 favors lower definitions and 1 favors higher ones.
-    /// suggestedMinimumTotal Suggested compatible minimum total.
-    /// suggestedMaximumTotal Suggested compatible maximum total.
-    /// returns True when a compatible range is found near the requested interval.
     /// </summary>
+    /// <param name="definitionExperienceValues">Preview drop values collected from serialized data.</param>
+    /// <param name="requestedMinimumTotal">Requested inclusive minimum total experience.</param>
+    /// <param name="requestedMaximumTotal">Requested inclusive maximum total experience.</param>
+    /// <param name="distribution">Distribution bias where 0 favors lower definitions and 1 favors higher ones.</param>
+    /// <param name="suggestedMinimumTotal">Suggested compatible minimum total.</param>
+    /// <param name="suggestedMaximumTotal">Suggested compatible maximum total.</param>
+    /// <returns>True when a compatible range is found near the requested interval.</returns>
     public static bool TryResolveSuggestedPreviewRange(IReadOnlyList<float> definitionExperienceValues,
                                                        float requestedMinimumTotal,
                                                        float requestedMaximumTotal,
@@ -158,14 +158,14 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
 
     /// <summary>
     /// Picks a random compatible runtime total inside the requested interval.
-    /// definitions Runtime drop definitions.
-    /// minimumTotal Requested inclusive minimum total experience.
-    /// maximumTotal Requested inclusive maximum total experience.
-    /// distribution Distribution bias where 0 favors lower definitions and 1 favors higher ones.
-    /// randomSeed Deterministic seed used for the target pick.
-    /// resolvedTotal Resolved compatible total experience.
-    /// returns True when a compatible runtime total is found.
     /// </summary>
+    /// <param name="definitions">Runtime drop definitions.</param>
+    /// <param name="minimumTotal">Requested inclusive minimum total experience.</param>
+    /// <param name="maximumTotal">Requested inclusive maximum total experience.</param>
+    /// <param name="distribution">Distribution bias where 0 favors lower definitions and 1 favors higher ones.</param>
+    /// <param name="randomSeed">Deterministic seed used for the target pick.</param>
+    /// <param name="resolvedTotal">Resolved compatible total experience.</param>
+    /// <returns>True when a compatible runtime total is found.</returns>
     public static bool TryResolveRandomCompatibleTotal(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                        float minimumTotal,
                                                        float maximumTotal,
@@ -185,16 +185,16 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
 
     /// <summary>
     /// Resolves one compatible total inside the requested runtime range for one module slice.
-    /// definitions Shared runtime drop definitions buffer.
-    /// definitionStartIndex Inclusive module-slice start index.
-    /// definitionCount Definition count owned by the module slice.
-    /// minimumTotal Requested inclusive minimum total experience.
-    /// maximumTotal Requested inclusive maximum total experience.
-    /// distribution Distribution bias where 0 favors lower definitions and 1 favors higher ones.
-    /// randomSeed Deterministic seed used for the target pick.
-    /// resolvedTotal Resolved compatible total experience.
-    /// returns True when a compatible runtime total is found.
     /// </summary>
+    /// <param name="definitions">Shared runtime drop definitions buffer.</param>
+    /// <param name="definitionStartIndex">Inclusive module-slice start index.</param>
+    /// <param name="definitionCount">Definition count owned by the module slice.</param>
+    /// <param name="minimumTotal">Requested inclusive minimum total experience.</param>
+    /// <param name="maximumTotal">Requested inclusive maximum total experience.</param>
+    /// <param name="distribution">Distribution bias where 0 favors lower definitions and 1 favors higher ones.</param>
+    /// <param name="randomSeed">Deterministic seed used for the target pick.</param>
+    /// <param name="resolvedTotal">Resolved compatible total experience.</param>
+    /// <returns>True when a compatible runtime total is found.</returns>
     public static bool TryResolveRandomCompatibleTotal(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                        int definitionStartIndex,
                                                        int definitionCount,
@@ -321,11 +321,11 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
 
     /// <summary>
     /// Resolves valid runtime bounds from authored runtime definitions.
-    /// definitions Runtime drop definitions.
-    /// minimumValue Minimum valid amount.
-    /// maximumValue Maximum valid amount.
-    /// returns True when at least one valid runtime definition exists.
     /// </summary>
+    /// <param name="definitions">Runtime drop definitions.</param>
+    /// <param name="minimumValue">Minimum valid amount.</param>
+    /// <param name="maximumValue">Maximum valid amount.</param>
+    /// <returns>True when at least one valid runtime definition exists.</returns>
     public static bool TryResolveRuntimeBounds(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                out float minimumValue,
                                                out float maximumValue)
@@ -339,13 +339,13 @@ public static class EnemyExperienceDropDistributionCompatibilityUtility
 
     /// <summary>
     /// Resolves valid runtime bounds from authored runtime definitions contained in one module slice.
-    /// definitions Shared runtime drop definitions buffer.
-    /// definitionStartIndex Inclusive module-slice start index.
-    /// definitionCount Definition count owned by the module slice.
-    /// minimumValue Minimum valid amount.
-    /// maximumValue Maximum valid amount.
-    /// returns True when at least one valid runtime definition exists.
     /// </summary>
+    /// <param name="definitions">Shared runtime drop definitions buffer.</param>
+    /// <param name="definitionStartIndex">Inclusive module-slice start index.</param>
+    /// <param name="definitionCount">Definition count owned by the module slice.</param>
+    /// <param name="minimumValue">Minimum valid amount.</param>
+    /// <param name="maximumValue">Maximum valid amount.</param>
+    /// <returns>True when at least one valid runtime definition exists.</returns>
     public static bool TryResolveRuntimeBounds(DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions,
                                                int definitionStartIndex,
                                                int definitionCount,

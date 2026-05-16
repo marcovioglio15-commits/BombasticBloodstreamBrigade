@@ -23,9 +23,8 @@ public partial struct EnemyPoolInitializeSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Caches the query used to find spawners that still need pool setup.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         initializeQuery = new EntityQueryBuilder(Allocator.Temp)
@@ -36,9 +35,8 @@ public partial struct EnemyPoolInitializeSystem : ISystem
 
     /// <summary>
     /// Creates missing pool entities and progressively prewarms them within a fixed frame budget.
-    /// state: Current ECS system state.
-    /// returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -167,12 +165,11 @@ public partial struct EnemyPoolInitializeSystem : ISystem
     #region Helpers
     /// <summary>
     /// Creates missing runtime pool entities for each unique prefab requirement of the spawner.
-    /// entityManager: Entity manager used to create pool entities.
-    /// spawnerEntity: Spawner that owns the requirements.
-    /// spawner: Spawner configuration containing generic pool settings.
-    /// requirementCount: Stable requirement count snapshot used while structural changes are occurring.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to create pool entities.</param>
+    /// <param name="spawnerEntity">Spawner that owns the requirements.</param>
+    /// <param name="spawner">Spawner configuration containing generic pool settings.</param>
+    /// <param name="requirementCount">Stable requirement count snapshot used while structural changes are occurring.</param>
     private static void EnsurePoolEntities(EntityManager entityManager,
                                            Entity spawnerEntity,
                                            EnemySpawner spawner,
@@ -217,11 +214,11 @@ public partial struct EnemyPoolInitializeSystem : ISystem
 
     /// <summary>
     /// Resolves the pool entity associated with one prefab in the spawner map buffer.
-    /// poolMap: Prefab-to-pool map buffer stored on the spawner.
-    /// prefabEntity: Referenced prefab to resolve.
-    /// poolEntity: Resolved pool entity when found.
-    /// returns True when a mapping exists, otherwise false.
     /// </summary>
+    /// <param name="poolMap">Prefab-to-pool map buffer stored on the spawner.</param>
+    /// <param name="prefabEntity">Referenced prefab to resolve.</param>
+    /// <param name="poolEntity">Resolved pool entity when found.</param>
+    /// <returns>True when a mapping exists, otherwise false.</returns>
     private static bool TryGetPoolEntity(DynamicBuffer<EnemySpawnerPrefabPoolMapElement> poolMap,
                                          Entity prefabEntity,
                                          out Entity poolEntity)
@@ -243,12 +240,11 @@ public partial struct EnemyPoolInitializeSystem : ISystem
 
     /// <summary>
     /// Marks one spawner as fully initialized and records the logical spawner start time.
-    /// entityManager: Entity manager used to write the state.
-    /// spawnerEntity: Spawner whose initialization is complete.
-    /// spawnerState: Current mutable spawner state.
-    /// elapsedTime: Current elapsed world time.
-    /// returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to write the state.</param>
+    /// <param name="spawnerEntity">Spawner whose initialization is complete.</param>
+    /// <param name="spawnerState">Current mutable spawner state.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
     private static void FinalizeSpawnerInitialization(EntityManager entityManager,
                                                       Entity spawnerEntity,
                                                       EnemySpawnerState spawnerState,

@@ -8,8 +8,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds list/detail shell controls and preset mutations for Game Management master presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameMasterPresetsPanelPresetUtility
 {
@@ -18,10 +16,10 @@ internal static class GameMasterPresetsPanelPresetUtility
     #region Public Methods
     /// <summary>
     /// Builds the main split view containing the master preset list and selected preset details.
-    /// /params panel Owning panel that stores UI state.
-    /// /params leftPaneWidth Fixed width used by the preset browser.
-    /// /returns Main content visual root.
     /// </summary>
+    /// <param name="panel">Owning panel that stores UI state.</param>
+    /// <param name="leftPaneWidth">Fixed width used by the preset browser.</param>
+    /// <returns>Main content visual root.</returns>
     public static VisualElement BuildMainContent(GameMasterPresetsPanel panel, float leftPaneWidth)
     {
         VisualElement container = new VisualElement();
@@ -38,9 +36,8 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Refreshes filtered preset rows while keeping a valid selection active.
-    /// /params panel Owning panel with library, search and list state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with library, search and list state.</param>
     public static void RefreshPresetList(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -67,9 +64,8 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Creates and registers a new game master preset asset.
-    /// /params panel Owning panel that receives the new selection.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the new selection.</param>
     public static void CreatePreset(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -91,10 +87,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Duplicates one game master preset and registers the copy in the library.
-    /// /params panel Owning panel that receives the duplicate selection.
-    /// /params preset Source preset to duplicate.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the duplicate selection.</param>
+    /// <param name="preset">Source preset to duplicate.</param>
     public static void DuplicatePreset(GameMasterPresetsPanel panel, GameMasterPreset preset)
     {
         if (panel == null || preset == null)
@@ -134,10 +129,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Stages one master preset asset for deletion after confirmation.
-    /// /params panel Owning panel that stores the library.
-    /// /params preset Preset to remove from the visible library list.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the library.</param>
+    /// <param name="preset">Preset to remove from the visible library list.</param>
     public static void DeletePreset(GameMasterPresetsPanel panel, GameMasterPreset preset)
     {
         if (panel == null || preset == null)
@@ -162,9 +156,9 @@ internal static class GameMasterPresetsPanelPresetUtility
     #region Private Methods
     /// <summary>
     /// Builds the left browser pane with toolbar, search and list view.
-    /// /params panel Owning panel whose list state is bound.
-    /// /returns Left pane visual element.
     /// </summary>
+    /// <param name="panel">Owning panel whose list state is bound.</param>
+    /// <returns>Left pane visual element.</returns>
     private static VisualElement BuildLeftPane(GameMasterPresetsPanel panel)
     {
         VisualElement leftPane = new VisualElement();
@@ -194,9 +188,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Builds preset creation and deletion controls.
-    /// /params panel Owning panel used by button callbacks.
-    /// /returns Toolbar visual element.
     /// </summary>
+    /// <param name="panel">Owning panel used by button callbacks.</param>
+    /// <returns>Toolbar visual element.</returns>
     private static Toolbar BuildToolbar(GameMasterPresetsPanel panel)
     {
         Toolbar toolbar = new Toolbar();
@@ -224,9 +218,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Builds the selected preset detail scroll root.
-    /// /params panel Owning panel receiving the details root.
-    /// /returns Right pane visual element.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the details root.</param>
+    /// <returns>Right pane visual element.</returns>
     private static VisualElement BuildRightPane(GameMasterPresetsPanel panel)
     {
         VisualElement rightPane = new VisualElement();
@@ -243,10 +237,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Adds library presets that pass the current search and staging filters.
-    /// /params panel Owning panel that stores the filtered output list.
-    /// /params searchText Current search text.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the filtered output list.</param>
+    /// <param name="searchText">Current search text.</param>
     private static void AddMatchingPresets(GameMasterPresetsPanel panel, string searchText)
     {
         for (int index = 0; index < panel.Library.Presets.Count; index++)
@@ -266,9 +259,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Creates one list item label with row-level context actions.
-    /// /params panel Owning panel used by context actions.
-    /// /returns List item label.
     /// </summary>
+    /// <param name="panel">Owning panel used by context actions.</param>
+    /// <returns>List item label.</returns>
     private static VisualElement MakePresetItem(GameMasterPresetsPanel panel)
     {
         Label label = new Label();
@@ -289,11 +282,10 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Binds one list row to the filtered preset at the requested index.
-    /// /params panel Owning panel with filtered presets.
-    /// /params element Row visual element.
-    /// /params index Filtered preset index.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with filtered presets.</param>
+    /// <param name="element">Row visual element.</param>
+    /// <param name="index">Filtered preset index.</param>
     private static void BindPresetItem(GameMasterPresetsPanel panel, VisualElement element, int index)
     {
         Label label = element as Label;
@@ -316,10 +308,9 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Selects the first preset included in the ListView selection event.
-    /// /params panel Owning panel receiving the selected preset.
-    /// /params selection Current ListView selection.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the selected preset.</param>
+    /// <param name="selection">Current ListView selection.</param>
     private static void OnPresetSelectionChanged(GameMasterPresetsPanel panel, IEnumerable<object> selection)
     {
         foreach (object item in selection)
@@ -338,10 +329,10 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Checks whether one preset matches the current search text.
-    /// /params preset Preset to inspect.
-    /// /params searchText Current search text.
-    /// /returns True when visible.
     /// </summary>
+    /// <param name="preset">Preset to inspect.</param>
+    /// <param name="searchText">Current search text.</param>
+    /// <returns>True when visible.</returns>
     private static bool MatchesSearch(GameMasterPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))
@@ -355,11 +346,10 @@ internal static class GameMasterPresetsPanelPresetUtility
 
     /// <summary>
     /// Writes duplicated preset metadata after a copy operation.
-    /// /params preset Preset to update.
-    /// /params name New preset name.
-    /// /params regenerateId True when a fresh ID should be assigned.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset to update.</param>
+    /// <param name="name">New preset name.</param>
+    /// <param name="regenerateId">True when a fresh ID should be assigned.</param>
     private static void SynchronizePresetMetadata(GameMasterPreset preset, string name, bool regenerateId)
     {
         SerializedObject serializedObject = new SerializedObject(preset);

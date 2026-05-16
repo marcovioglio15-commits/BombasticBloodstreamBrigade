@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the card-based shared module catalog editors used by the enemy Modules and Patterns preset flow.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 {
@@ -15,12 +13,11 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
     #region Public Methods
     /// <summary>
     /// Builds every shared module catalog subsection with filter and card controls.
-    /// /params panel Owning panel that stores transient filter state and rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent foldout that receives the catalog subsections.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores transient filter state and rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent foldout that receives the catalog subsections.</param>
     public static void BuildModuleCatalogSections(EnemyAdvancedPatternPresetsPanel panel,
                                                   SerializedObject sharedPresetSerializedObject,
                                                   EnemyModulesAndPatternsPreset sharedPreset,
@@ -53,12 +50,12 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 
     /// <summary>
     /// Returns whether one module matches the current catalog filters.
-    /// /params panel Owning panel that stores filter text.
-    /// /params section Catalog section that owns the filters.
-    /// /params moduleId Candidate module ID.
-    /// /params displayName Candidate module display name.
-    /// /returns True when the module should remain visible.
     /// </summary>
+    /// <param name="panel">Owning panel that stores filter text.</param>
+    /// <param name="section">Catalog section that owns the filters.</param>
+    /// <param name="moduleId">Candidate module ID.</param>
+    /// <param name="displayName">Candidate module display name.</param>
+    /// <returns>True when the module should remain visible.</returns>
     internal static bool IsMatchingModuleFilters(EnemyAdvancedPatternPresetsPanel panel,
                                                  EnemyPatternModuleCatalogSection section,
                                                  string moduleId,
@@ -94,13 +91,12 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
     #region Private Methods
     /// <summary>
     /// Builds one shared module catalog subsection.
-    /// /params panel Owning panel that stores transient filter state and rebuild callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params parent Parent foldout that receives the subsection.
-    /// /params section Catalog section being drawn.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores transient filter state and rebuild callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="parent">Parent foldout that receives the subsection.</param>
+    /// <param name="section">Catalog section being drawn.</param>
     private static void BuildModuleCatalogSection(EnemyAdvancedPatternPresetsPanel panel,
                                                   SerializedObject sharedPresetSerializedObject,
                                                   EnemyModulesAndPatternsPreset sharedPreset,
@@ -246,14 +242,13 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 
     /// <summary>
     /// Rebuilds the visible module cards for one catalog section.
-    /// /params panel Owning panel that stores filter state.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params section Catalog section being rebuilt.
-    /// /params cardsContainer Container that receives the generated cards.
-    /// /params countLabel Count label updated with visible and total entries.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores filter state.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="section">Catalog section being rebuilt.</param>
+    /// <param name="cardsContainer">Container that receives the generated cards.</param>
+    /// <param name="countLabel">Count label updated with visible and total entries.</param>
     private static void RebuildModuleCards(EnemyAdvancedPatternPresetsPanel panel,
                                            SerializedObject sharedPresetSerializedObject,
                                            EnemyModulesAndPatternsPreset sharedPreset,
@@ -314,18 +309,18 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 
     /// <summary>
     /// Creates one module card with foldout, actions and bound property field.
-    /// /params panel Owning panel that provides callbacks.
-    /// /params sharedPresetSerializedObject Serialized shared preset.
-    /// /params sharedPreset Shared preset asset being edited.
-    /// /params definitionsProperty Serialized definitions array that owns the card.
-    /// /params moduleProperty Serialized module property displayed by the card.
-    /// /params section Catalog section being edited.
-    /// /params moduleIndex Current module index.
-    /// /params moduleId Resolved module ID.
-    /// /params displayName Resolved display name.
-    /// /params moduleKind Resolved module kind.
-    /// /returns Created card element.
     /// </summary>
+    /// <param name="panel">Owning panel that provides callbacks.</param>
+    /// <param name="sharedPresetSerializedObject">Serialized shared preset.</param>
+    /// <param name="sharedPreset">Shared preset asset being edited.</param>
+    /// <param name="definitionsProperty">Serialized definitions array that owns the card.</param>
+    /// <param name="moduleProperty">Serialized module property displayed by the card.</param>
+    /// <param name="section">Catalog section being edited.</param>
+    /// <param name="moduleIndex">Current module index.</param>
+    /// <param name="moduleId">Resolved module ID.</param>
+    /// <param name="displayName">Resolved display name.</param>
+    /// <param name="moduleKind">Resolved module kind.</param>
+    /// <returns>Created card element.</returns>
     private static VisualElement CreateModuleCard(EnemyAdvancedPatternPresetsPanel panel,
                                                   SerializedObject sharedPresetSerializedObject,
                                                   EnemyModulesAndPatternsPreset sharedPreset,
@@ -452,10 +447,9 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 
     /// <summary>
     /// Registers the foldout title label of one shared module subsection for contextual recoloring.
-    /// /params sectionFoldout Foldout whose header label should expose the recolor menu.
-    /// /params stateKey Stable persistence key used by the label.
-    /// /returns None.
     /// </summary>
+    /// <param name="sectionFoldout">Foldout whose header label should expose the recolor menu.</param>
+    /// <param name="stateKey">Stable persistence key used by the label.</param>
     private static void RegisterSectionFoldoutColorContextMenu(Foldout sectionFoldout, string stateKey)
     {
         if (sectionFoldout == null || string.IsNullOrWhiteSpace(stateKey))
@@ -474,11 +468,10 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
 
     /// <summary>
     /// Updates the foldout title of one module card after an identity field changes.
-    /// /params foldout Foldout whose title must be refreshed.
-    /// /params moduleIndex Current module index.
-    /// /params moduleProperty Serialized module definition property.
-    /// /returns None.
     /// </summary>
+    /// <param name="foldout">Foldout whose title must be refreshed.</param>
+    /// <param name="moduleIndex">Current module index.</param>
+    /// <param name="moduleProperty">Serialized module definition property.</param>
     private static void UpdateModuleCardTitle(Foldout foldout,
                                               int moduleIndex,
                                               SerializedProperty moduleProperty)

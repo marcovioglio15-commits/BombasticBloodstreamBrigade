@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides focused steering helpers that make boss-spawned minions yield quickly to their owning boss.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossMinionSteeringUtility
 {
@@ -22,13 +20,13 @@ internal static class EnemyBossMinionSteeringUtility
     #region Public Methods
     /// <summary>
     /// Resolves whether a minion should bypass normal LOD cadence because its boss is close enough to require yielding.
-    /// /params minionPosition Current minion world position.
-    /// /params bossPosition Current owning boss world position.
-    /// /params bodyRadius Minion body radius.
-    /// /params separationRadius Minion authored separation radius.
-    /// /params steeringAggressiveness Minion steering aggressiveness.
-    /// /returns True when the minion should evaluate steering this frame.
     /// </summary>
+    /// <param name="minionPosition">Current minion world position.</param>
+    /// <param name="bossPosition">Current owning boss world position.</param>
+    /// <param name="bodyRadius">Minion body radius.</param>
+    /// <param name="separationRadius">Minion authored separation radius.</param>
+    /// <param name="steeringAggressiveness">Minion steering aggressiveness.</param>
+    /// <returns>True when the minion should evaluate steering this frame.</returns>
     public static bool ShouldForceBossAvoidanceEvaluation(float3 minionPosition,
                                                          float3 bossPosition,
                                                          float bodyRadius,
@@ -46,21 +44,21 @@ internal static class EnemyBossMinionSteeringUtility
 
     /// <summary>
     /// Resolves a strong avoidance vector and urgency values for one minion yielding to its owning boss.
-    /// /params enemyIndex Current minion index in steering arrays.
-    /// /params bossIndex Owning boss index in steering arrays.
-    /// /params minionPosition Current minion world position.
-    /// /params minionVelocity Current minion planar velocity.
-    /// /params minionBodyRadius Minion body radius.
-    /// /params minionSeparationRadius Minion authored separation radius.
-    /// /params minionSteeringAggressiveness Minion steering aggressiveness.
-    /// /params bossPosition Current boss world position.
-    /// /params bossVelocity Current boss planar velocity.
-    /// /params bossBodyRadius Boss body radius.
-    /// /params avoidance Output avoidance vector to add to normal separation.
-    /// /params urgency Output separation urgency.
-    /// /params yieldUrgency Output priority-yield urgency.
-    /// /returns True when boss avoidance contributes this frame.
     /// </summary>
+    /// <param name="enemyIndex">Current minion index in steering arrays.</param>
+    /// <param name="bossIndex">Owning boss index in steering arrays.</param>
+    /// <param name="minionPosition">Current minion world position.</param>
+    /// <param name="minionVelocity">Current minion planar velocity.</param>
+    /// <param name="minionBodyRadius">Minion body radius.</param>
+    /// <param name="minionSeparationRadius">Minion authored separation radius.</param>
+    /// <param name="minionSteeringAggressiveness">Minion steering aggressiveness.</param>
+    /// <param name="bossPosition">Current boss world position.</param>
+    /// <param name="bossVelocity">Current boss planar velocity.</param>
+    /// <param name="bossBodyRadius">Boss body radius.</param>
+    /// <param name="avoidance">Output avoidance vector to add to normal separation.</param>
+    /// <param name="urgency">Output separation urgency.</param>
+    /// <param name="yieldUrgency">Output priority-yield urgency.</param>
+    /// <returns>True when boss avoidance contributes this frame.</returns>
     public static bool TryResolveBossAvoidance(int enemyIndex,
                                                int bossIndex,
                                                float3 minionPosition,
@@ -125,13 +123,13 @@ internal static class EnemyBossMinionSteeringUtility
     #region Private Methods
     /// <summary>
     /// Resolves a lateral side-step direction that prefers moving out of the boss travel lane.
-    /// /params awayDirection Direction from boss to minion.
-    /// /params minionVelocity Current minion planar velocity.
-    /// /params bossVelocity Current boss planar velocity.
-    /// /params enemyIndex Current minion index.
-    /// /params bossIndex Owning boss index.
-    /// /returns Normalized lateral avoidance direction.
     /// </summary>
+    /// <param name="awayDirection">Direction from boss to minion.</param>
+    /// <param name="minionVelocity">Current minion planar velocity.</param>
+    /// <param name="bossVelocity">Current boss planar velocity.</param>
+    /// <param name="enemyIndex">Current minion index.</param>
+    /// <param name="bossIndex">Owning boss index.</param>
+    /// <returns>Normalized lateral avoidance direction.</returns>
     private static float3 ResolveLateralDirection(float3 awayDirection,
                                                   float3 minionVelocity,
                                                   float3 bossVelocity,
@@ -167,10 +165,10 @@ internal static class EnemyBossMinionSteeringUtility
 
     /// <summary>
     /// Resolves a deterministic planar direction for exact overlaps.
-    /// /params enemyIndex Current minion index.
-    /// /params bossIndex Owning boss index.
-    /// /returns Normalized fallback direction.
     /// </summary>
+    /// <param name="enemyIndex">Current minion index.</param>
+    /// <param name="bossIndex">Owning boss index.</param>
+    /// <returns>Normalized fallback direction.</returns>
     private static float3 ResolveDeterministicDirection(int enemyIndex, int bossIndex)
     {
         uint hash = math.hash(new int2(enemyIndex * 13 + 5, bossIndex * 17 + 9));

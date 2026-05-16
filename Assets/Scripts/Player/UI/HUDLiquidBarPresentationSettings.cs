@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores inspector-facing presentation options used by HUDManager to render one liquid HUD bar.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class HUDLiquidBarPresentationSettings
@@ -128,9 +126,8 @@ public sealed class HUDLiquidBarPresentationSettings
     #region Public Methods
     /// <summary>
     /// Builds default presentation settings tuned for the health syringe bar.
-    /// /params None.
-    /// /returns Default health-bar presentation settings.
     /// </summary>
+    /// <returns>Default health-bar presentation settings.</returns>
     public static HUDLiquidBarPresentationSettings CreateHealthDefaults()
     {
         return new HUDLiquidBarPresentationSettings
@@ -146,9 +143,8 @@ public sealed class HUDLiquidBarPresentationSettings
 
     /// <summary>
     /// Builds default presentation settings tuned for the shield syringe bar.
-    /// /params None.
-    /// /returns Default shield-bar presentation settings.
     /// </summary>
+    /// <returns>Default shield-bar presentation settings.</returns>
     public static HUDLiquidBarPresentationSettings CreateShieldDefaults()
     {
         return new HUDLiquidBarPresentationSettings
@@ -164,9 +160,8 @@ public sealed class HUDLiquidBarPresentationSettings
 
     /// <summary>
     /// Builds default presentation settings tuned for the experience bar.
-    /// /params None.
-    /// /returns Default experience-bar presentation settings.
     /// </summary>
+    /// <returns>Default experience-bar presentation settings.</returns>
     public static HUDLiquidBarPresentationSettings CreateExperienceDefaults()
     {
         return new HUDLiquidBarPresentationSettings

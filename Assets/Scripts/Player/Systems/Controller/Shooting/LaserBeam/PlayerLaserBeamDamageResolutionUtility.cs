@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides shared hit collection and low-level damage helpers used by the Laser Beam damage system.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamDamageResolutionUtility
 {
@@ -24,18 +22,17 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     #region Public Methods
     /// <summary>
     /// Collects all enemies intersecting the requested lane and sorts them by travel distance from the lane origin.
-    /// /params laserBeamLanes Resolved lane-segment buffer for the current player.
-    /// /params segmentStartIndex First segment index belonging to the lane.
-    /// /params segmentEndIndex Exclusive end index of the lane.
-    /// /params enemyCount Number of projected enemies.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyBodyRadii Cached body radii of projected enemies.
-    /// /params enemyCellMap Spatial hash map used to cull enemy lookups.
-    /// /params inverseCellSize Reciprocal cell size used by the spatial hash.
-    /// /params maximumEnemyRadius Largest enemy radius stored in the current enemy cache.
-    /// /params hitCandidates Output list reused across lane evaluations.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamLanes">Resolved lane-segment buffer for the current player.</param>
+    /// <param name="segmentStartIndex">First segment index belonging to the lane.</param>
+    /// <param name="segmentEndIndex">Exclusive end index of the lane.</param>
+    /// <param name="enemyCount">Number of projected enemies.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyBodyRadii">Cached body radii of projected enemies.</param>
+    /// <param name="enemyCellMap">Spatial hash map used to cull enemy lookups.</param>
+    /// <param name="inverseCellSize">Reciprocal cell size used by the spatial hash.</param>
+    /// <param name="maximumEnemyRadius">Largest enemy radius stored in the current enemy cache.</param>
+    /// <param name="hitCandidates">Output list reused across lane evaluations.</param>
     public static void CollectHitCandidates(DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                             int segmentStartIndex,
                                             int segmentEndIndex,
@@ -104,12 +101,11 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Filters one sorted hit-candidate list down to the candidates crossed by the traveling tick packet during the current frame.
-    /// /params hitCandidates Sorted lane hit candidates.
-    /// /params startDistance Packet center distance at the start of the frame.
-    /// /params endDistance Packet center distance at the end of the frame.
-    /// /params traversedHitCandidates Output list reused by the caller.
-    /// /returns None.
     /// </summary>
+    /// <param name="hitCandidates">Sorted lane hit candidates.</param>
+    /// <param name="startDistance">Packet center distance at the start of the frame.</param>
+    /// <param name="endDistance">Packet center distance at the end of the frame.</param>
+    /// <param name="traversedHitCandidates">Output list reused by the caller.</param>
     public static void CollectTraversedHitCandidates(in NativeList<LaserBeamHitCandidate> hitCandidates,
                                                      float startDistance,
                                                      float endDistance,
@@ -138,16 +134,15 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Applies one continuous-damage budget slice to every enemy currently intersecting one lane.
-    /// /params laneDamageBudget Damage budget emitted by the lane for the current application slice before lane multipliers.
-    /// /params referenceSegment First segment of the lane, used to inherit lane-local damage scaling.
-    /// /params hitCandidates Sorted lane hit candidates.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="laneDamageBudget">Damage budget emitted by the lane for the current application slice before lane multipliers.</param>
+    /// <param name="referenceSegment">First segment of the lane, used to inherit lane-local damage scaling.</param>
+    /// <param name="hitCandidates">Sorted lane hit candidates.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     public static void ApplyContinuousLaneDamageBudget(float laneDamageBudget,
                                                        in PlayerLaserBeamLaneElement referenceSegment,
                                                        in NativeList<LaserBeamHitCandidate> hitCandidates,
@@ -184,33 +179,32 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Applies one traveling tick packet against the filtered lane candidates using the projectile penetration rules inherited by the beam.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Damage budget carried by the packet before lane multipliers.
-    /// /params penetrationMode Projectile penetration mode inherited from the current shooting config.
-    /// /params maximumPenetrations Maximum penetration budget inherited from the current shooting config.
-    /// /params projectileTemplate Projectile template used to resolve knockback, elemental and VFX payloads.
-    /// /params laserBeamLanes Resolved lane buffer of the current player.
-    /// /params segmentStartIndex First segment index belonging to the lane.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params enemyDataArray Cached immutable data of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Damage budget carried by the packet before lane multipliers.</param>
+    /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
+    /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve knockback, elemental and VFX payloads.</param>
+    /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
+    /// <param name="segmentStartIndex">First segment index belonging to the lane.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="enemyDataArray">Cached immutable data of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     public static void ResolveLaneHits(Entity shooterEntity,
                                        float laneDamagePerTick,
                                        ProjectilePenetrationMode penetrationMode,
@@ -268,12 +262,12 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Applies flat damage to one enemy when it is still alive.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyIndex Enemy index receiving damage.
-    /// /params damage Flat damage amount to apply.
-    /// /params enemyKilled True when the damage reduced the enemy health to zero.
-    /// /returns True when damage was applied.
     /// </summary>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyIndex">Enemy index receiving damage.</param>
+    /// <param name="damage">Flat damage amount to apply.</param>
+    /// <param name="enemyKilled">True when the damage reduced the enemy health to zero.</param>
+    /// <returns>True when damage was applied.</returns>
     internal static bool TryApplyFlatDamageHit(ref NativeArray<EnemyHealth> projectedEnemyHealth,
                                                int enemyIndex,
                                                float damage,
@@ -297,12 +291,12 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Consumes flat damage against one enemy and returns the leftover budget that can continue through the lane.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyIndex Enemy index receiving damage.
-    /// /params damage Incoming flat damage amount to consume.
-    /// /params enemyKilled True when the damage reduced the enemy health to zero.
-    /// /returns Remaining unspent damage.
     /// </summary>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyIndex">Enemy index receiving damage.</param>
+    /// <param name="damage">Incoming flat damage amount to consume.</param>
+    /// <param name="enemyKilled">True when the damage reduced the enemy health to zero.</param>
+    /// <returns>Remaining unspent damage.</returns>
     internal static float ApplyDamageBasedHit(ref NativeArray<EnemyHealth> projectedEnemyHealth,
                                               int enemyIndex,
                                               float damage,
@@ -326,12 +320,11 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Enqueues a kill-despawn request when the enemy has no remaining health.
-    /// /params enemyEntity Enemy entity to despawn.
-    /// /params enemyHealth Current projected health of the enemy.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="enemyEntity">Enemy entity to despawn.</param>
+    /// <param name="enemyHealth">Current projected health of the enemy.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     internal static void TryScheduleDespawn(Entity enemyEntity,
                                             EnemyHealth enemyHealth,
                                             in ComponentLookup<EnemyDespawnRequest> despawnRequestLookup,
@@ -353,13 +346,12 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     #region Private Methods
     /// <summary>
     /// Inserts or updates one lane hit candidate while keeping the list sorted by travel distance.
-    /// /params hitCandidates Output list reused across lane evaluations.
-    /// /params enemyIndex Enemy index associated with the candidate.
-    /// /params distanceAlongLane Distance from the lane origin to the candidate hit point.
-    /// /params hitPoint World-space hit point stored for payload application.
-    /// /params hitDirection World-space forward direction stored for payload application.
-    /// /returns None.
     /// </summary>
+    /// <param name="hitCandidates">Output list reused across lane evaluations.</param>
+    /// <param name="enemyIndex">Enemy index associated with the candidate.</param>
+    /// <param name="distanceAlongLane">Distance from the lane origin to the candidate hit point.</param>
+    /// <param name="hitPoint">World-space hit point stored for payload application.</param>
+    /// <param name="hitDirection">World-space forward direction stored for payload application.</param>
     private static void AddHitCandidate(ref NativeList<LaserBeamHitCandidate> hitCandidates,
                                         int enemyIndex,
                                         float distanceAlongLane,
@@ -397,9 +389,8 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Keeps one candidate list sorted by travel distance using insertion-sort semantics on the most recent write.
-    /// /params hitCandidates Output list reused across lane evaluations.
-    /// /returns None.
     /// </summary>
+    /// <param name="hitCandidates">Output list reused across lane evaluations.</param>
     private static void SortCandidates(ref NativeList<LaserBeamHitCandidate> hitCandidates)
     {
         for (int candidateIndex = hitCandidates.Length - 1; candidateIndex > 0; candidateIndex--)
@@ -417,11 +408,11 @@ internal static class PlayerLaserBeamDamageResolutionUtility
 
     /// <summary>
     /// Resolves the closest point on a finite 3D segment to the requested point.
-    /// /params point Query point.
-    /// /params segmentStart Segment start point.
-    /// /params segmentEnd Segment end point.
-    /// /returns Closest point on the segment.
     /// </summary>
+    /// <param name="point">Query point.</param>
+    /// <param name="segmentStart">Segment start point.</param>
+    /// <param name="segmentEnd">Segment end point.</param>
+    /// <returns>Closest point on the segment.</returns>
     private static float3 ClosestPointOnSegment(float3 point,
                                                 float3 segmentStart,
                                                 float3 segmentEnd)

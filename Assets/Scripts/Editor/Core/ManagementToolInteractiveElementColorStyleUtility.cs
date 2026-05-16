@@ -3,8 +3,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Applies, clears and resolves visual colors for management-tool interactive controls.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ManagementToolInteractiveElementColorStyleUtility
 {
@@ -22,12 +20,11 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
     #region Public Methods
     /// <summary>
     /// Applies the provided colors to the target interactive control.
-    /// /params targetElement Target control that should receive the inline colors.
-    /// /params elementKind Interactive control kind used to target the correct visual nodes.
-    /// /params textColor Text color to apply.
-    /// /params backgroundColor Background color to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should receive the inline colors.</param>
+    /// <param name="elementKind">Interactive control kind used to target the correct visual nodes.</param>
+    /// <param name="textColor">Text color to apply.</param>
+    /// <param name="backgroundColor">Background color to apply.</param>
     public static void ApplyColors(VisualElement targetElement,
                                    ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind,
                                    Color textColor,
@@ -56,10 +53,9 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Clears all inline colors from the target interactive control.
-    /// /params targetElement Target control that should be restored.
-    /// /params elementKind Interactive control kind used to clear the correct visual nodes.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target control that should be restored.</param>
+    /// <param name="elementKind">Interactive control kind used to clear the correct visual nodes.</param>
     public static void ClearColors(VisualElement targetElement,
                                    ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
@@ -86,10 +82,10 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Resolves the current visible text color of the provided interactive control.
-    /// /params targetElement Target control being inspected.
-    /// /params elementKind Interactive control kind used to read the correct visual node.
-    /// /returns The currently resolved text color.
     /// </summary>
+    /// <param name="targetElement">Target control being inspected.</param>
+    /// <param name="elementKind">Interactive control kind used to read the correct visual node.</param>
+    /// <returns>The currently resolved text color.</returns>
     public static Color ResolveCurrentTextColor(VisualElement targetElement,
                                                 ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
@@ -132,10 +128,10 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Resolves the current visible background color of the provided interactive control.
-    /// /params targetElement Target control being inspected.
-    /// /params elementKind Interactive control kind used to read the correct visual node.
-    /// /returns The currently resolved background color.
     /// </summary>
+    /// <param name="targetElement">Target control being inspected.</param>
+    /// <param name="elementKind">Interactive control kind used to read the correct visual node.</param>
+    /// <returns>The currently resolved background color.</returns>
     public static Color ResolveCurrentBackgroundColor(VisualElement targetElement,
                                                       ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind)
     {
@@ -160,11 +156,10 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
     #region Private Methods
     /// <summary>
     /// Applies colors to one button-like control.
-    /// /params targetElement Target button-like control.
-    /// /params textColor Text color to apply.
-    /// /params backgroundColor Background color to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target button-like control.</param>
+    /// <param name="textColor">Text color to apply.</param>
+    /// <param name="backgroundColor">Background color to apply.</param>
     private static void ApplyButtonLikeColors(VisualElement targetElement, Color textColor, Color backgroundColor)
     {
         targetElement.style.color = textColor;
@@ -182,9 +177,8 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Clears colors from one button-like control.
-    /// /params targetElement Target button-like control.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target button-like control.</param>
     private static void ClearButtonLikeColors(VisualElement targetElement)
     {
         targetElement.style.color = StyleKeyword.Null;
@@ -202,10 +196,9 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Applies colors to one foldout-like control while leaving unsupported background styling hidden from the menu.
-    /// /params targetElement Target foldout-like control.
-    /// /params textColor Text color to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target foldout-like control.</param>
+    /// <param name="textColor">Text color to apply.</param>
     private static void ApplyFoldoutColors(VisualElement targetElement, Color textColor)
     {
         targetElement.style.color = textColor;
@@ -228,9 +221,8 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Clears colors from one foldout-like control.
-    /// /params targetElement Target foldout-like control.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target foldout-like control.</param>
     private static void ClearFoldoutColors(VisualElement targetElement)
     {
         targetElement.style.color = StyleKeyword.Null;
@@ -253,11 +245,10 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Applies colors to one popup-like control and its important child visuals.
-    /// /params targetElement Target popup-like control.
-    /// /params textColor Text color to apply.
-    /// /params backgroundColor Background color to apply.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target popup-like control.</param>
+    /// <param name="textColor">Text color to apply.</param>
+    /// <param name="backgroundColor">Background color to apply.</param>
     private static void ApplyPopupColors(VisualElement targetElement, Color textColor, Color backgroundColor)
     {
         targetElement.style.color = textColor;
@@ -305,9 +296,8 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Clears colors from one popup-like control and its important child visuals.
-    /// /params targetElement Target popup-like control.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Target popup-like control.</param>
     private static void ClearPopupColors(VisualElement targetElement)
     {
         targetElement.style.color = StyleKeyword.Null;
@@ -355,9 +345,9 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Resolves the main popup input element used by popup-like controls.
-    /// /params targetElement Popup-like control being inspected.
-    /// /returns The resolved popup input element, or null when unavailable.
     /// </summary>
+    /// <param name="targetElement">Popup-like control being inspected.</param>
+    /// <returns>The resolved popup input element, or null when unavailable.</returns>
     private static VisualElement ResolvePopupInputElement(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -373,9 +363,9 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Resolves the main text element used by foldout-like controls.
-    /// /params targetElement Foldout-like control being inspected.
-    /// /returns Resolved text element, or null when unavailable.
     /// </summary>
+    /// <param name="targetElement">Foldout-like control being inspected.</param>
+    /// <returns>Resolved text element, or null when unavailable.</returns>
     private static TextElement ResolveFoldoutTextElement(VisualElement targetElement)
     {
         if (targetElement == null)
@@ -386,9 +376,9 @@ internal static class ManagementToolInteractiveElementColorStyleUtility
 
     /// <summary>
     /// Resolves the visible text element used by button-like controls.
-    /// /params targetElement Button-like control being inspected.
-    /// /returns Resolved text element, or null when unavailable.
     /// </summary>
+    /// <param name="targetElement">Button-like control being inspected.</param>
+    /// <returns>Resolved text element, or null when unavailable.</returns>
     private static TextElement ResolveButtonTextElement(VisualElement targetElement)
     {
         if (targetElement == null)

@@ -32,7 +32,7 @@ public static class PlayerControllerMath
     /// <param name="current">Current vector.</param>
     /// <param name="target">Target vector.</param>
     /// <param name="maxDelta">Maximum allowed delta magnitude.</param>
-    /// <returns>Moved vector clamped by the specified delta.<returns>
+    /// <returns>Moved vector clamped by the specified delta.</returns>
     public static float3 MoveTowards(float3 current, float3 target, float maxDelta)
     {
         if (maxDelta <= 0f)
@@ -87,7 +87,7 @@ public static class PlayerControllerMath
     /// ensuring a consistent representation of angles for calculations and comparisons.
     /// </summary>
     /// <param name="angle"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float WrapAngleRadians(float angle)
     {
         return math.atan2(math.sin(angle), math.cos(angle));
@@ -97,7 +97,7 @@ public static class PlayerControllerMath
     /// Wraps an angle in radians to the range [0, 2π], ensuring a positive representation of the angle.
     /// </summary>
     /// <param name="angle"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float WrapAnglePositive(float angle)
     {
         float wrapped = WrapAngleRadians(angle);
@@ -133,7 +133,7 @@ public static class PlayerControllerMath
     /// <param name="previousQuantizedAngle"></param>
     /// <param name="hasPrevious"></param>
     /// <param name="hysteresisRadians"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float QuantizeAngleWithHysteresis(float angle,
                                                     float step,
                                                     float offset,
@@ -163,7 +163,7 @@ public static class PlayerControllerMath
     /// Converts an angle in radians to a directional vector on the horizontal plane.
     /// </summary>
     /// <param name="angle"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float3 DirectionFromAngle(float angle)
     {
         return new float3(math.sin(angle), 0f, math.cos(angle));
@@ -174,7 +174,7 @@ public static class PlayerControllerMath
     /// preventing issues with near-zero vectors.
     /// </summary>
     /// <param name="value"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float2 NormalizeSafe(float2 value)
     {
         if (math.lengthsq(value) < 1e-6f)
@@ -213,7 +213,7 @@ public static class PlayerControllerMath
     /// Snaps a 2D input vector to the nearest digital values (-1, 0, or 1) for each component,
     /// </summary>
     /// <param name="value"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float2 SnapToDigital(float2 value)
     {
         return new float2(math.round(value.x), math.round(value.y));
@@ -225,7 +225,7 @@ public static class PlayerControllerMath
     /// </summary>
     /// <param name="value"></param>
     /// <param name="tolerance"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static bool IsDigitalLike(float2 value, float tolerance)
     {
         float absX = math.abs(value.x);
@@ -250,7 +250,7 @@ public static class PlayerControllerMath
     /// </summary>
     /// <param name="input"></param>
     /// <param name="threshold"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static byte BuildDigitalMask(float2 input, float threshold)
     {
         byte mask = 0;
@@ -297,7 +297,7 @@ public static class PlayerControllerMath
     /// </summary>
     /// <param name="mask"></param>
     /// <param name="pressTimes"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static float2 ResolveDigitalMask(byte mask, float4 pressTimes)
     {
         int horizontal = 0;
@@ -342,7 +342,7 @@ public static class PlayerControllerMath
     /// meaning it has both horizontal and vertical components active simultaneously.
     /// </summary>
     /// <param name="mask"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static bool IsDiagonalMask(byte mask)
     {
         if (HasHorizontal(mask) == false)
@@ -359,7 +359,7 @@ public static class PlayerControllerMath
     /// a single axis input (either horizontal or vertical) without any diagonal components.
     /// </summary>
     /// <param name="mask"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static bool IsSingleAxisMask(byte mask)
     {
         if (mask == 0)
@@ -377,7 +377,7 @@ public static class PlayerControllerMath
     /// </summary>
     /// <param name="prevMask"></param>
     /// <param name="currMask"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static bool IsReleaseOnly(byte prevMask, byte currMask)
     {
         if (prevMask == currMask)
@@ -398,7 +398,7 @@ public static class PlayerControllerMath
     /// <param name="offset"></param>
     /// <param name="epsilon"></param>
     /// <param name="alignedAngle"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     public static bool TryGetAlignedDiscreteAngle(float angle, float step, float offset, float epsilon, out float alignedAngle)
     {
         alignedAngle = QuantizeAngle(angle, step, offset);
@@ -417,7 +417,7 @@ public static class PlayerControllerMath
     /// </summary>
     /// <param name="value"></param>
     /// <param name="tolerance"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static bool IsDigitalAxisValue(float value, float tolerance)
     {
         if (value <= tolerance)
@@ -440,7 +440,7 @@ public static class PlayerControllerMath
     /// <param name="prevMask"></param>
     /// <param name="currMask"></param>
     /// <param name="flag"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static bool WasPressed(byte prevMask, byte currMask, byte flag)
     {
         if ((prevMask & flag) != 0)
@@ -456,7 +456,7 @@ public static class PlayerControllerMath
     /// Determines if the given directional input mask has any horizontal components active (left or right),
     /// </summary>
     /// <param name="mask"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static bool HasHorizontal(byte mask)
     {
         if ((mask & DigitalLeftFlag) != 0)
@@ -472,7 +472,7 @@ public static class PlayerControllerMath
     /// Determines if the given directional input mask has any vertical components active (up or down),
     /// </summary>
     /// <param name="mask"></param>
-    /// <returns><returns>
+    /// <returns></returns>
     private static bool HasVertical(byte mask)
     {
         if ((mask & DigitalUpFlag) != 0)
@@ -496,7 +496,7 @@ public static class PlayerControllerMath
     /// <param name="target"></param>
     /// <param name="values"></param>
     /// <param name="deltaTime"></param>
-    /// <returns> The new smoothed camera position after applying the interpolation and constraints.<returns>
+    /// <returns> The new smoothed camera position after applying the interpolation and constraints.</returns>
     public static float3 SmoothCameraPosition(float3 current, float3 target, in CameraValuesBlob values, float deltaTime)
     {
         float3 toTarget = target - current;

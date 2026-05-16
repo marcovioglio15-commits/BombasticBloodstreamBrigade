@@ -3,7 +3,6 @@ using Unity.Entities;
 /// <summary>
 /// Provides shared helpers used by runtime systems that must react to finalized player-run outcomes.
 /// None.
-/// returns None.
 /// </summary>
 public static class PlayerRunOutcomeRuntimeUtility
 {
@@ -13,10 +12,10 @@ public static class PlayerRunOutcomeRuntimeUtility
     /// <summary>
     /// Returns whether the requested entity owns a finalized run outcome.
     /// Used by gameplay systems that must stop consuming live state after victory or defeat.
-    /// entity: Entity whose run-outcome state should be inspected.
-    /// runOutcomeLookup: Component lookup used to read PlayerRunOutcomeState.
-    /// returns True when the entity has a finalized run outcome, otherwise false.
     /// </summary>
+    /// <param name="entity">Entity whose run-outcome state should be inspected.</param>
+    /// <param name="runOutcomeLookup">Component lookup used to read PlayerRunOutcomeState.</param>
+    /// <returns>True when the entity has a finalized run outcome, otherwise false.</returns>
     public static bool IsFinalized(Entity entity, in ComponentLookup<PlayerRunOutcomeState> runOutcomeLookup)
     {
         if (!runOutcomeLookup.HasComponent(entity))

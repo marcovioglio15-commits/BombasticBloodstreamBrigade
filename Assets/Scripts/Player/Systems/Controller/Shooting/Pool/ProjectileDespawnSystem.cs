@@ -102,7 +102,7 @@ public partial struct ProjectileDespawnSystem : ISystem
     /// <param name="projectileEntity">Projectile entity to evaluate.</param>
     /// <param name="currentScale">Current runtime transform scale.</param>
     /// <param name="projectileBaseScaleLookup">Lookup used to read base scale components.</param>
-    /// <returns>Multiplier used by split spawn logic.<returns>
+    /// <returns>Multiplier used by split spawn logic.</returns>
     private static float ResolveCurrentScaleMultiplier(Entity projectileEntity,
                                                        float currentScale,
                                                        in ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup)

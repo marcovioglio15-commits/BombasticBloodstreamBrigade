@@ -5,8 +5,6 @@ using Unity.Physics;
 
 /// <summary>
 /// Centralizes mutable Laser Beam runtime-state operations shared by simulation, damage and presentation paths.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamStateUtility
 {
@@ -15,9 +13,8 @@ internal static class PlayerLaserBeamStateUtility
     #region Public Methods
     /// <summary>
     /// Resets all transient Laser Beam runtime timers and flags to their idle state.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     public static void ResetBeamState(ref PlayerLaserBeamState laserBeamState)
     {
         laserBeamState.IsActive = 0;
@@ -36,11 +33,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Synchronizes the transient electrical-storm burst timer with the currently started storm pulse.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params laserBeamConfig Runtime Laser Beam config that provides pulse travel and hold timing.
-    /// /params deltaTime Unused frame delta kept to preserve the shared update-call shape.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="laserBeamConfig">Runtime Laser Beam config that provides pulse travel and hold timing.</param>
+    /// <param name="deltaTime">Unused frame delta kept to preserve the shared update-call shape.</param>
     public static void UpdateStormBurstTimer(ref PlayerLaserBeamState laserBeamState,
                                              in LaserBeamPassiveConfig laserBeamConfig,
                                              float deltaTime)
@@ -52,9 +48,8 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Clears the transient electrical-storm burst state when the beam stops or resets.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     public static void ClearStormBurst(ref PlayerLaserBeamState laserBeamState)
     {
         laserBeamState.StormBurstRemainingSeconds = 0f;
@@ -62,11 +57,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Advances every active traveling damage packet while preserving its previous progress for the current frame.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /params deltaTime Frame delta used to advance packet travel.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <param name="deltaTime">Frame delta used to advance packet travel.</param>
     public static void AdvanceStormTickPulses(ref PlayerLaserBeamState laserBeamState,
                                               in LaserBeamPassiveConfig laserBeamConfig,
                                               float deltaTime)
@@ -96,10 +90,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Removes completed traveling damage packets once their travel and post-travel hold have fully elapsed.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
     public static void RemoveCompletedStormTickPulses(ref PlayerLaserBeamState laserBeamState,
                                                       in LaserBeamPassiveConfig laserBeamConfig)
     {
@@ -127,9 +120,8 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Clears the transient tick-highlight packet queue stored on the Laser Beam runtime state.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     public static void ClearStormTickPulses(ref PlayerLaserBeamState laserBeamState)
     {
         laserBeamState.StormTickPulses.Clear();
@@ -137,10 +129,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Advances the active timed Laser Beam snapshot triggered by non-toggle projectile actives.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params deltaTime Frame delta used to decrease the remaining active time.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="deltaTime">Frame delta used to decrease the remaining active time.</param>
     public static void UpdateTriggeredActiveLaser(ref PlayerLaserBeamState laserBeamState,
                                                   float deltaTime)
     {
@@ -158,14 +149,13 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Stores one timed Laser Beam snapshot emitted by a non-toggle projectile active.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params durationSeconds Authored active duration in seconds.
-    /// /params penetrationMode Projectile penetration mode resolved at trigger time.
-    /// /params maximumPenetrations Maximum penetration budget resolved at trigger time.
-    /// /params projectileTemplate Projectile snapshot resolved at trigger time.
-    /// /params passiveToolsSnapshot Aggregated passive snapshot resolved at trigger time.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="durationSeconds">Authored active duration in seconds.</param>
+    /// <param name="penetrationMode">Projectile penetration mode resolved at trigger time.</param>
+    /// <param name="maximumPenetrations">Maximum penetration budget resolved at trigger time.</param>
+    /// <param name="projectileTemplate">Projectile snapshot resolved at trigger time.</param>
+    /// <param name="passiveToolsSnapshot">Aggregated passive snapshot resolved at trigger time.</param>
     public static void ActivateTriggeredActiveLaser(ref PlayerLaserBeamState laserBeamState,
                                                     float durationSeconds,
                                                     ProjectilePenetrationMode penetrationMode,
@@ -185,9 +175,8 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Clears the timed Laser Beam snapshot emitted by non-toggle projectile actives.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     public static void ClearTriggeredActiveLaser(ref PlayerLaserBeamState laserBeamState)
     {
         laserBeamState.TriggeredActiveRemainingSeconds = 0f;
@@ -199,11 +188,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Queues one or more serialized traveling damage packets after consuming Laser Beam tick budget.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params laserBeamConfig Runtime Laser Beam config that provides pulse travel and post-travel hold timing.
-    /// /params pendingTickCount Number of damage ticks consumed during the current frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="laserBeamConfig">Runtime Laser Beam config that provides pulse travel and post-travel hold timing.</param>
+    /// <param name="pendingTickCount">Number of damage ticks consumed during the current frame.</param>
     public static void EnqueueStormTickPulses(ref PlayerLaserBeamState laserBeamState,
                                               in LaserBeamPassiveConfig laserBeamConfig,
                                               int pendingTickCount)
@@ -237,10 +225,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Converts one pulse elapsed time into normalized beam-length progress.
-    /// /params elapsedSeconds Pulse travel time in seconds.
-    /// /params travelSpeed Authored normalized travel speed.
-    /// /returns Normalized pulse progress in the 0-1 range.
     /// </summary>
+    /// <param name="elapsedSeconds">Pulse travel time in seconds.</param>
+    /// <param name="travelSpeed">Authored normalized travel speed.</param>
+    /// <returns>Normalized pulse progress in the 0-1 range.</returns>
     public static float ResolveNormalizedStormTickProgress(float elapsedSeconds,
                                                            float travelSpeed)
     {
@@ -254,9 +242,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the travel duration required by one storm packet to cross the full beam length.
-    /// /params travelSpeed Authored normalized travel speed.
-    /// /returns Packet travel duration in seconds.
     /// </summary>
+    /// <param name="travelSpeed">Authored normalized travel speed.</param>
+    /// <returns>Packet travel duration in seconds.</returns>
     public static float ResolveStormTickTravelDurationSeconds(float travelSpeed)
     {
         return 1f / math.max(0.0001f, travelSpeed);
@@ -264,9 +252,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the total lifetime of one storm pulse, including travel and post-travel hold.
-    /// /params laserBeamConfig Runtime Laser Beam config that provides travel speed and hold time.
-    /// /returns Total pulse lifetime in seconds.
     /// </summary>
+    /// <param name="laserBeamConfig">Runtime Laser Beam config that provides travel speed and hold time.</param>
+    /// <returns>Total pulse lifetime in seconds.</returns>
     public static float ResolveStormTickTotalDurationSeconds(in LaserBeamPassiveConfig laserBeamConfig)
     {
         if (laserBeamConfig.StormTickTravelSpeed <= 0f)
@@ -278,9 +266,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves whether a timed Laser Beam snapshot emitted by a non-toggle projectile active is currently alive.
-    /// /params laserBeamState Runtime Laser Beam state.
-    /// /returns True when the triggered active snapshot is still active.
     /// </summary>
+    /// <param name="laserBeamState">Runtime Laser Beam state.</param>
+    /// <returns>True when the triggered active snapshot is still active.</returns>
     public static bool HasTriggeredActiveLaser(in PlayerLaserBeamState laserBeamState)
     {
         return laserBeamState.TriggeredActiveRemainingSeconds > 0f &&
@@ -289,10 +277,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the passive snapshot that should drive the current Laser Beam frame.
-    /// /params passiveToolsState Aggregated always-on passive state.
-    /// /params laserBeamState Runtime Laser Beam state.
-    /// /returns Effective passive snapshot for the current frame.
     /// </summary>
+    /// <param name="passiveToolsState">Aggregated always-on passive state.</param>
+    /// <param name="laserBeamState">Runtime Laser Beam state.</param>
+    /// <returns>Effective passive snapshot for the current frame.</returns>
     public static PlayerPassiveToolsState ResolveEffectivePassiveToolsState(in PlayerPassiveToolsState passiveToolsState,
                                                                             in PlayerLaserBeamState laserBeamState)
     {
@@ -304,10 +292,9 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Advances the transient Charge Shot impulse timer carried by the Laser Beam runtime state.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params deltaTime Frame delta used to decrease timers.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="deltaTime">Frame delta used to decrease timers.</param>
     public static void UpdateChargeImpulse(ref PlayerLaserBeamState laserBeamState,
                                            float deltaTime)
     {
@@ -322,9 +309,8 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Clears the transient Charge Shot impulse modifiers applied to the current beam.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     public static void ClearChargeImpulse(ref PlayerLaserBeamState laserBeamState)
     {
         laserBeamState.ChargeImpulseRemainingSeconds = 0f;
@@ -335,11 +321,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Advances Laser Beam cooldown timers and clears the overheated state once cooldown expires.
-    /// /params laserBeamState Mutable Laser Beam runtime state.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /params deltaTime Frame delta used to decrease timers.
-    /// /returns None.
     /// </summary>
+    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <param name="deltaTime">Frame delta used to decrease timers.</param>
     public static void UpdateCooldown(ref PlayerLaserBeamState laserBeamState,
                                       in LaserBeamPassiveConfig laserBeamConfig,
                                       float deltaTime)
@@ -356,10 +341,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Evaluates whether the current uninterrupted activation window has reached the configured overheating threshold.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /params consecutiveActiveElapsed Current uninterrupted active time.
-    /// /returns True when Laser Beam must enter cooldown.
     /// </summary>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <param name="consecutiveActiveElapsed">Current uninterrupted active time.</param>
+    /// <returns>True when Laser Beam must enter cooldown.</returns>
     public static bool ShouldOverheat(in LaserBeamPassiveConfig laserBeamConfig,
                                       float consecutiveActiveElapsed)
     {
@@ -376,10 +361,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the effective bounce budget inherited by the beam from the projectile bounce passive.
-    /// /params passiveToolsState Aggregated passive runtime state.
-    /// /params laserBeamConfig Aggregated Laser Beam passive configuration.
-    /// /returns Effective bounce count used to build reflected segments.
     /// </summary>
+    /// <param name="passiveToolsState">Aggregated passive runtime state.</param>
+    /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <returns>Effective bounce count used to build reflected segments.</returns>
     public static int ResolveMaximumBounceSegments(in PlayerPassiveToolsState passiveToolsState,
                                                    in LaserBeamPassiveConfig laserBeamConfig)
     {
@@ -397,11 +382,11 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the last segment currently stored for one lane index.
-    /// /params laserBeamLanes Current lane buffer.
-    /// /params laneIndex Lane index to inspect.
-    /// /params terminalSegment Last segment found for the requested lane.
-    /// /returns True when the requested lane exists in the buffer.
     /// </summary>
+    /// <param name="laserBeamLanes">Current lane buffer.</param>
+    /// <param name="laneIndex">Lane index to inspect.</param>
+    /// <param name="terminalSegment">Last segment found for the requested lane.</param>
+    /// <returns>True when the requested lane exists in the buffer.</returns>
     public static bool TryResolveTerminalSegment(DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                                  int laneIndex,
                                                  out PlayerLaserBeamLaneElement terminalSegment)
@@ -425,10 +410,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Rotates one planar forward direction around the world up axis by the requested angle in degrees.
-    /// /params direction Source forward direction.
-    /// /params angleDegrees Signed planar angle in degrees.
-    /// /returns The normalized rotated planar direction.
     /// </summary>
+    /// <param name="direction">Source forward direction.</param>
+    /// <param name="angleDegrees">Signed planar angle in degrees.</param>
+    /// <returns>The normalized rotated planar direction.</returns>
     public static float3 RotatePlanarDirection(float3 direction,
                                                float angleDegrees)
     {
@@ -442,10 +427,10 @@ internal static class PlayerLaserBeamStateUtility
     #region Private Methods
     /// <summary>
     /// Resolves the elapsed-time seed assigned to the next queued pulse so pulses remain serialized without overlap.
-    /// /params laserBeamState Runtime beam state containing the existing pulse queue.
-    /// /params totalDurationSeconds Total duration of one pulse including travel and hold.
-    /// /returns Initial elapsed time assigned to the newly queued pulse.
     /// </summary>
+    /// <param name="laserBeamState">Runtime beam state containing the existing pulse queue.</param>
+    /// <param name="totalDurationSeconds">Total duration of one pulse including travel and hold.</param>
+    /// <returns>Initial elapsed time assigned to the newly queued pulse.</returns>
     private static float ResolveQueuedStormTickInitialElapsedSeconds(in PlayerLaserBeamState laserBeamState,
                                                                      float totalDurationSeconds)
     {
@@ -458,10 +443,10 @@ internal static class PlayerLaserBeamStateUtility
 
     /// <summary>
     /// Resolves the remaining burst lifetime of the oldest started pulse currently driving the storm visuals.
-    /// /params laserBeamState Runtime beam state containing the pulse queue.
-    /// /params totalDurationSeconds Total duration of one pulse including travel and hold.
-    /// /returns Remaining burst lifetime in seconds, or 0 when no pulse is currently started.
     /// </summary>
+    /// <param name="laserBeamState">Runtime beam state containing the pulse queue.</param>
+    /// <param name="totalDurationSeconds">Total duration of one pulse including travel and hold.</param>
+    /// <returns>Remaining burst lifetime in seconds, or 0 when no pulse is currently started.</returns>
     private static float ResolveCurrentStormBurstRemainingSeconds(in PlayerLaserBeamState laserBeamState,
                                                                   float totalDurationSeconds)
     {

@@ -6,8 +6,6 @@ using static GameSceneManagementProjectSetupSerializedUtility;
 
 /// <summary>
 /// Creates and synchronizes authored loading-progress UI used by the Scene Manager fade canvas.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 {
@@ -25,9 +23,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
     #region Preset Defaults
     /// <summary>
     /// Writes default loading-progress settings used by bootstrap transitions.
-    /// /params serializedPreset Serialized Scene Manager preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
     public static void SynchronizeLoadingProgressSettings(SerializedObject serializedPreset)
     {
         SerializedProperty loadingProgressProperty = serializedPreset.FindProperty("loadingProgressSettings");
@@ -55,9 +52,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
     #region View Setup
     /// <summary>
     /// Ensures the fade canvas owns the authored loading-progress view hierarchy and serialized references.
-    /// /params fadeCanvasObject Fade canvas root GameObject.
-    /// /returns None.
     /// </summary>
+    /// <param name="fadeCanvasObject">Fade canvas root GameObject.</param>
     public static void EnsureLoadingProgressView(GameObject fadeCanvasObject)
     {
         if (fadeCanvasObject == null)
@@ -102,16 +98,15 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Writes loading-progress view references through serialized properties.
-    /// /params view Loading-progress bridge component.
-    /// /params progressRoot Root GameObject toggled by the bridge.
-    /// /params progressCanvasGroup CanvasGroup used for visibility.
-    /// /params spinnerRoot Spinner RectTransform rotated while visible.
-    /// /params progressRing Filled segmented progress ring.
-    /// /params trackRing Background segmented track ring.
-    /// /params percentageText Center percentage label.
-    /// /params statusText Side status label.
-    /// /returns None.
     /// </summary>
+    /// <param name="view">Loading-progress bridge component.</param>
+    /// <param name="progressRoot">Root GameObject toggled by the bridge.</param>
+    /// <param name="progressCanvasGroup">CanvasGroup used for visibility.</param>
+    /// <param name="spinnerRoot">Spinner RectTransform rotated while visible.</param>
+    /// <param name="progressRing">Filled segmented progress ring.</param>
+    /// <param name="trackRing">Background segmented track ring.</param>
+    /// <param name="percentageText">Center percentage label.</param>
+    /// <param name="statusText">Side status label.</param>
     private static void ApplyViewReferences(GameSceneLoadingProgressCanvasView view,
                                             GameObject progressRoot,
                                             CanvasGroup progressCanvasGroup,
@@ -139,11 +134,11 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
     #region Object Setup
     /// <summary>
     /// Ensures one direct child GameObject exists with the requested component set.
-    /// /params parent Parent transform.
-    /// /params objectName Child object name.
-    /// /params componentTypes Components required on newly created objects.
-    /// /returns Existing or newly created child object.
     /// </summary>
+    /// <param name="parent">Parent transform.</param>
+    /// <param name="objectName">Child object name.</param>
+    /// <param name="componentTypes">Components required on newly created objects.</param>
+    /// <returns>Existing or newly created child object.</returns>
     private static GameObject EnsureChild(Transform parent, string objectName, params System.Type[] componentTypes)
     {
         Transform child = parent.Find(objectName);
@@ -158,10 +153,10 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Ensures one segmented ring child exists and fills its parent.
-    /// /params parent Parent transform.
-    /// /params objectName Ring object name.
-    /// /returns Segmented ring graphic component.
     /// </summary>
+    /// <param name="parent">Parent transform.</param>
+    /// <param name="objectName">Ring object name.</param>
+    /// <returns>Segmented ring graphic component.</returns>
     private static GameSceneLoadingProgressRingGraphic EnsureRing(Transform parent, string objectName)
     {
         GameObject ringObject = EnsureChild(parent, objectName, typeof(RectTransform), typeof(CanvasRenderer), typeof(GameSceneLoadingProgressRingGraphic));
@@ -176,13 +171,13 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Ensures one TextMeshProUGUI child exists.
-    /// /params parent Parent transform.
-    /// /params objectName Text object name.
-    /// /params defaultText Initial text assigned to new and existing labels.
-    /// /params alignment Text alignment.
-    /// /params fontSize Text font size.
-    /// /returns TextMeshProUGUI component.
     /// </summary>
+    /// <param name="parent">Parent transform.</param>
+    /// <param name="objectName">Text object name.</param>
+    /// <param name="defaultText">Initial text assigned to new and existing labels.</param>
+    /// <param name="alignment">Text alignment.</param>
+    /// <param name="fontSize">Text font size.</param>
+    /// <returns>TextMeshProUGUI component.</returns>
     private static TextMeshProUGUI EnsureText(Transform parent,
                                               string objectName,
                                               string defaultText,
@@ -200,9 +195,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
     #region Layout
     /// <summary>
     /// Configures the centered loading-progress root.
-    /// /params rectTransform Root RectTransform.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">Root RectTransform.</param>
     private static void ConfigureProgressRoot(RectTransform rectTransform)
     {
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -215,9 +209,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Configures the spinner root that holds the segmented rings and percentage text.
-    /// /params rectTransform Spinner RectTransform.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">Spinner RectTransform.</param>
     private static void ConfigureSpinnerRoot(RectTransform rectTransform)
     {
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -230,9 +223,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Configures the non-rotating percentage text over the spinner center.
-    /// /params rectTransform Percentage text RectTransform.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">Percentage text RectTransform.</param>
     private static void ConfigurePercentageTextRect(RectTransform rectTransform)
     {
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -245,9 +237,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Configures the status text location next to the spinner.
-    /// /params rectTransform Status text RectTransform.
-    /// /returns None.
     /// </summary>
+    /// <param name="rectTransform">Status text RectTransform.</param>
     private static void ConfigureStatusTextRect(RectTransform rectTransform)
     {
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -260,9 +251,8 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Configures the CanvasGroup used by the loading-progress root.
-    /// /params canvasGroup CanvasGroup to configure.
-    /// /returns None.
     /// </summary>
+    /// <param name="canvasGroup">CanvasGroup to configure.</param>
     private static void ConfigureCanvasGroup(CanvasGroup canvasGroup)
     {
         canvasGroup.alpha = 0f;
@@ -272,11 +262,10 @@ internal static class GameSceneManagementProjectSetupLoadingProgressUtility
 
     /// <summary>
     /// Applies common TMP presentation values for loading-progress labels.
-    /// /params text Text component to configure.
-    /// /params fontSize Text font size.
-    /// /params alignment Text alignment.
-    /// /returns None.
     /// </summary>
+    /// <param name="text">Text component to configure.</param>
+    /// <param name="fontSize">Text font size.</param>
+    /// <param name="alignment">Text alignment.</param>
     private static void ConfigureText(TextMeshProUGUI text, float fontSize, TextAlignmentOptions alignment)
     {
         text.fontSize = fontSize;

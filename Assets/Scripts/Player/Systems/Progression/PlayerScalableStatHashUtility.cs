@@ -16,9 +16,9 @@ internal static class PlayerScalableStatHashUtility
     #region Public Methods
     /// <summary>
     /// Computes one FNV-1a hash from all current scalable-stat names and values.
-    /// scalableStats: Runtime scalable-stat buffer to hash.
-    /// returns Stable hash representing the current variable context.
     /// </summary>
+    /// <param name="scalableStats">Runtime scalable-stat buffer to hash.</param>
+    /// <returns>Stable hash representing the current variable context.</returns>
     public static uint ComputeHash(DynamicBuffer<PlayerScalableStatElement> scalableStats)
     {
         uint rollingHash = FnvOffsetBasis;

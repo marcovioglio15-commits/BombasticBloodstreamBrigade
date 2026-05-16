@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Stores singleton runtime settings for the Game Scene Manager.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneManagerConfig : IComponentData
 {
@@ -44,8 +42,6 @@ public struct GameSceneManagerConfig : IComponentData
 
 /// <summary>
 /// Stores one baked scene definition available to the runtime scene manager.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneDefinitionElement : IBufferElementData
 {
@@ -63,8 +59,6 @@ public struct GameSceneDefinitionElement : IBufferElementData
 
 /// <summary>
 /// Stores one baked transition definition available to runtime requests and triggers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneTransitionElement : IBufferElementData
 {
@@ -86,8 +80,6 @@ public struct GameSceneTransitionElement : IBufferElementData
 
 /// <summary>
 /// Stores scene transition requests submitted by UI, triggers or gameplay systems.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneTransitionRequest : IBufferElementData
 {
@@ -98,8 +90,6 @@ public struct GameSceneTransitionRequest : IBufferElementData
 
 /// <summary>
 /// Stores current transition lifecycle state for tools, UI and runtime guards.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneTransitionState : IComponentData
 {
@@ -113,8 +103,6 @@ public struct GameSceneTransitionState : IComponentData
 
 /// <summary>
 /// Stores fade overlay state consumed by the managed presentation bridge.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneFadePresentationState : IComponentData
 {
@@ -125,8 +113,6 @@ public struct GameSceneFadePresentationState : IComponentData
 
 /// <summary>
 /// Stores loading-progress overlay state consumed by the managed presentation bridge.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneLoadingProgressPresentationState : IComponentData
 {
@@ -146,8 +132,6 @@ public struct GameSceneLoadingProgressPresentationState : IComponentData
 
 /// <summary>
 /// Stores one baked scene transition trigger volume in world space.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneTransitionTrigger : IComponentData
 {
@@ -163,8 +147,6 @@ public struct GameSceneTransitionTrigger : IComponentData
 
 /// <summary>
 /// Stores mutable cooldown and activation state for one scene transition trigger.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct GameSceneTransitionTriggerRuntimeState : IComponentData
 {

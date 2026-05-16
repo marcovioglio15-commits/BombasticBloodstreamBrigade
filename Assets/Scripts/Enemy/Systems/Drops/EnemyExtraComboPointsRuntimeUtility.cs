@@ -16,9 +16,8 @@ internal static class EnemyExtraComboPointsRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Marks one enemy runtime state as damaged at its current lifetime timestamp.
-    /// /params runtimeState Mutable runtime state updated in place.
-    /// /returns None.
     /// </summary>
+    /// <param name="runtimeState">Mutable runtime state updated in place.</param>
     public static void MarkEnemyDamaged(ref EnemyRuntimeState runtimeState)
     {
         float currentLifetimeSeconds = math.max(0f, runtimeState.LifetimeSeconds);
@@ -34,12 +33,12 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the final combo-points multiplier granted by the killed enemy.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params dropItemsConfig Summary drop-items flags baked on the enemy.
-    /// /params extraComboPointModules Compiled Extra Combo Points module buffer owned by the enemy.
-    /// /params extraComboPointConditions Compiled Extra Combo Points condition buffer owned by the enemy.
-    /// /returns Final non-negative combo-points multiplier granted by the kill.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="dropItemsConfig">Summary drop-items flags baked on the enemy.</param>
+    /// <param name="extraComboPointModules">Compiled Extra Combo Points module buffer owned by the enemy.</param>
+    /// <param name="extraComboPointConditions">Compiled Extra Combo Points condition buffer owned by the enemy.</param>
+    /// <returns>Final non-negative combo-points multiplier granted by the kill.</returns>
     public static float ResolveKillComboPointMultiplier(in EnemyRuntimeState runtimeState,
                                                         in EnemyDropItemsConfig dropItemsConfig,
                                                         DynamicBuffer<EnemyExtraComboPointsModuleElement> extraComboPointModules,
@@ -65,11 +64,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Resolves one module-local multiplier from the provided condition slice.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params module Compiled Extra Combo Points module currently being evaluated.
-    /// /params extraComboPointConditions Shared condition buffer that owns the module slice.
-    /// /returns Final non-negative multiplier produced by the module.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="module">Compiled Extra Combo Points module currently being evaluated.</param>
+    /// <param name="extraComboPointConditions">Shared condition buffer that owns the module slice.</param>
+    /// <returns>Final non-negative multiplier produced by the module.</returns>
     private static float ResolveModuleMultiplier(in EnemyRuntimeState runtimeState,
                                                  EnemyExtraComboPointsModuleElement module,
                                                  DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions)
@@ -114,12 +113,12 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the product of every matching condition multiplier in one module slice.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params extraComboPointConditions Shared condition buffer that owns the module slice.
-    /// /params conditionStartIndex Inclusive slice start index.
-    /// /params conditionEndIndex Exclusive slice end index.
-    /// /returns Product of every matching multiplier, or 1 when none match.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="extraComboPointConditions">Shared condition buffer that owns the module slice.</param>
+    /// <param name="conditionStartIndex">Inclusive slice start index.</param>
+    /// <param name="conditionEndIndex">Exclusive slice end index.</param>
+    /// <returns>Product of every matching multiplier, or 1 when none match.</returns>
     private static float ResolveProductOfMatchingMultipliers(in EnemyRuntimeState runtimeState,
                                                              DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions,
                                                              int conditionStartIndex,
@@ -142,12 +141,12 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the highest matching condition multiplier in one module slice.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params extraComboPointConditions Shared condition buffer that owns the module slice.
-    /// /params conditionStartIndex Inclusive slice start index.
-    /// /params conditionEndIndex Exclusive slice end index.
-    /// /returns Highest matching multiplier, or 1 when none match.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="extraComboPointConditions">Shared condition buffer that owns the module slice.</param>
+    /// <param name="conditionStartIndex">Inclusive slice start index.</param>
+    /// <param name="conditionEndIndex">Exclusive slice end index.</param>
+    /// <returns>Highest matching multiplier, or 1 when none match.</returns>
     private static float ResolveHighestMatchingMultiplier(in EnemyRuntimeState runtimeState,
                                                           DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions,
                                                           int conditionStartIndex,
@@ -174,12 +173,12 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the lowest matching condition multiplier in one module slice.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params extraComboPointConditions Shared condition buffer that owns the module slice.
-    /// /params conditionStartIndex Inclusive slice start index.
-    /// /params conditionEndIndex Exclusive slice end index.
-    /// /returns Lowest matching multiplier, or 1 when none match.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="extraComboPointConditions">Shared condition buffer that owns the module slice.</param>
+    /// <param name="conditionStartIndex">Inclusive slice start index.</param>
+    /// <param name="conditionEndIndex">Exclusive slice end index.</param>
+    /// <returns>Lowest matching multiplier, or 1 when none match.</returns>
     private static float ResolveLowestMatchingMultiplier(in EnemyRuntimeState runtimeState,
                                                          DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions,
                                                          int conditionStartIndex,
@@ -206,11 +205,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Evaluates whether one condition matches the runtime metric sampled at kill time.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params condition Compiled condition currently being evaluated.
-    /// /params resolvedMultiplier Evaluated multiplier when the condition matches.
-    /// /returns True when the condition matches.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="condition">Compiled condition currently being evaluated.</param>
+    /// <param name="resolvedMultiplier">Evaluated multiplier when the condition matches.</param>
+    /// <returns>True when the condition matches.</returns>
     private static bool TryResolveConditionMultiplier(in EnemyRuntimeState runtimeState,
                                                       EnemyExtraComboPointsConditionElement condition,
                                                       out float resolvedMultiplier)
@@ -238,11 +237,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves one metric value from the current enemy runtime state.
-    /// /params runtimeState Enemy lifetime and damage timing state sampled at kill time.
-    /// /params metric Requested metric kind.
-    /// /params metricValue Resolved metric value when available.
-    /// /returns True when the metric is available for the current enemy state.
     /// </summary>
+    /// <param name="runtimeState">Enemy lifetime and damage timing state sampled at kill time.</param>
+    /// <param name="metric">Requested metric kind.</param>
+    /// <param name="metricValue">Resolved metric value when available.</param>
+    /// <returns>True when the metric is available for the current enemy state.</returns>
     private static bool TryResolveMetricValue(in EnemyRuntimeState runtimeState,
                                               EnemyExtraComboPointsMetric metric,
                                               out float metricValue)
@@ -287,11 +286,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Clamps one module-local multiplier inside the authored minimum and maximum range.
-    /// /params multiplier Raw module-local multiplier.
-    /// /params minimumValue Authored minimum final multiplier.
-    /// /params maximumValue Authored maximum final multiplier.
-    /// /returns Clamped non-negative module-local multiplier.
     /// </summary>
+    /// <param name="multiplier">Raw module-local multiplier.</param>
+    /// <param name="minimumValue">Authored minimum final multiplier.</param>
+    /// <param name="maximumValue">Authored maximum final multiplier.</param>
+    /// <returns>Clamped non-negative module-local multiplier.</returns>
     private static float ClampModuleMultiplier(float multiplier, float minimumValue, float maximumValue)
     {
         float resolvedMinimumValue = math.max(0f, math.min(minimumValue, maximumValue));
@@ -301,11 +300,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the normalized metric position sampled against the authored condition range.
-    /// /params metricValue Runtime metric sampled at kill time.
-    /// /params minimumValue Authored curve-start metric value.
-    /// /params maximumValue Authored curve-end metric value.
-    /// /returns Normalized metric position in the 0..1 range.
     /// </summary>
+    /// <param name="metricValue">Runtime metric sampled at kill time.</param>
+    /// <param name="minimumValue">Authored curve-start metric value.</param>
+    /// <param name="maximumValue">Authored curve-end metric value.</param>
+    /// <returns>Normalized metric position in the 0..1 range.</returns>
     private static float ResolveNormalizedMetric(float metricValue, float minimumValue, float maximumValue)
     {
         float resolvedRange = maximumValue - minimumValue;
@@ -320,10 +319,10 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Evaluates one baked normalized multiplier curve from uniformly sampled values.
-    /// /params normalizedCurveSamples Authored response curve sampled during bake.
-    /// /params normalizedMetric Normalized metric position in the 0..1 range.
-    /// /returns Saturated normalized curve value.
     /// </summary>
+    /// <param name="normalizedCurveSamples">Authored response curve sampled during bake.</param>
+    /// <param name="normalizedMetric">Normalized metric position in the 0..1 range.</param>
+    /// <returns>Saturated normalized curve value.</returns>
     private static float EvaluateNormalizedCurveSamples(FixedList64Bytes<float> normalizedCurveSamples, float normalizedMetric)
     {
         int sampleCount = normalizedCurveSamples.Length;
@@ -349,11 +348,11 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
     /// <summary>
     /// Resolves the final condition multiplier by interpolating inside the authored multiplier range.
-    /// /params minimumMultiplier Multiplier returned when the normalized curve evaluates to 0.
-    /// /params maximumMultiplier Multiplier returned when the normalized curve evaluates to 1.
-    /// /params normalizedCurveValue Saturated normalized response sampled from the baked curve.
-    /// /returns Non-negative condition multiplier.
     /// </summary>
+    /// <param name="minimumMultiplier">Multiplier returned when the normalized curve evaluates to 0.</param>
+    /// <param name="maximumMultiplier">Multiplier returned when the normalized curve evaluates to 1.</param>
+    /// <param name="normalizedCurveValue">Saturated normalized response sampled from the baked curve.</param>
+    /// <returns>Non-negative condition multiplier.</returns>
     private static float ResolveConditionMultiplierRangeValue(float minimumMultiplier,
                                                               float maximumMultiplier,
                                                               float normalizedCurveValue)

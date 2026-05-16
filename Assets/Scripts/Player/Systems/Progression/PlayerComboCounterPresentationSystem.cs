@@ -3,7 +3,6 @@ using Unity.Entities;
 /// <summary>
 /// Resolves combo rank HUD data after runtime combo thresholds have been rebuilt.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerRuntimeScalingSyncSystem))]
@@ -15,9 +14,8 @@ public partial struct PlayerComboCounterPresentationSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime components required to publish combo presentation data.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerComboCounterState>();
@@ -27,9 +25,8 @@ public partial struct PlayerComboCounterPresentationSystem : ISystem
 
     /// <summary>
     /// Refreshes rank identifiers, thresholds, and progress normalized values for HUD consumers.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         foreach ((RefRW<PlayerComboCounterState> comboCounterState,

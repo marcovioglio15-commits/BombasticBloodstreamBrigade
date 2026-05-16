@@ -4,8 +4,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// UI Toolkit drawer that presents fade timing as load coverage plus a small post-readiness bonus.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(GameSceneFadeSettings))]
 public sealed class GameSceneFadeSettingsPropertyDrawer : PropertyDrawer
@@ -15,9 +13,9 @@ public sealed class GameSceneFadeSettingsPropertyDrawer : PropertyDrawer
     #region UI
     /// <summary>
     /// Builds the Scene Manager fade settings editor UI.
-    /// /params property Serialized GameSceneFadeSettings property.
-    /// /returns Configured fade settings visual tree.
     /// </summary>
+    /// <param name="property">Serialized GameSceneFadeSettings property.</param>
+    /// <returns>Configured fade settings visual tree.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -35,12 +33,11 @@ public sealed class GameSceneFadeSettingsPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Adds one relative property field with an explicit tooltip.
-    /// /params root Parent visual element.
-    /// /params parentProperty Serialized fade settings property.
-    /// /params propertyName Relative property name.
-    /// /params tooltip Field tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="root">Parent visual element.</param>
+    /// <param name="parentProperty">Serialized fade settings property.</param>
+    /// <param name="propertyName">Relative property name.</param>
+    /// <param name="tooltip">Field tooltip.</param>
     private static void AddProperty(VisualElement root, SerializedProperty parentProperty, string propertyName, string tooltip)
     {
         SerializedProperty childProperty = parentProperty.FindPropertyRelative(propertyName);

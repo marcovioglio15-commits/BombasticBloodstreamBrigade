@@ -2,8 +2,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Stores one live recolorable management-tool target for the color browser window.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal sealed class ManagementToolColorBrowserEntry
 {

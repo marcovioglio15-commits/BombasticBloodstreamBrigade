@@ -543,7 +543,7 @@ public sealed class PieChartElement : VisualElement
     /// Determines whether the specified angle is within 0.5 degrees of the forward angle.
     /// </summary>
     /// <param name="angle">The angle to compare, in degrees.</param>
-    /// <returns>True if the angle is within 0.5 degrees of the forward angle; otherwise, false.<returns>
+    /// <returns>True if the angle is within 0.5 degrees of the forward angle; otherwise, false.</returns>
     private bool IsForwardAngle(float angle)
     {
         return Mathf.Abs(Mathf.DeltaAngle(angle, m_ForwardAngle)) < 0.5f;
@@ -555,7 +555,7 @@ public sealed class PieChartElement : VisualElement
     /// Calculates a scaled integer key based on the normalized angle value.
     /// </summary>
     /// <param name="angle">The angle in degrees to be normalized and converted.</param>
-    /// <returns>An integer key representing the scaled normalized angle.<returns>
+    /// <returns>An integer key representing the scaled normalized angle.</returns>
     private int GetAngleKey(float angle)
     {
         float normalized = Mathf.Repeat(angle, 360f);
@@ -566,7 +566,7 @@ public sealed class PieChartElement : VisualElement
     /// Calculates a 2D unit vector representing the direction of the given angle in degrees.
     /// </summary>
     /// <param name="angle">Angle in degrees to convert to a direction vector.</param>
-    /// <returns>A Vector2 representing the direction of the specified angle.<returns>
+    /// <returns>A Vector2 representing the direction of the specified angle.</returns>
     private Vector2 GetDirectionVector(float angle)
     {
         float radians = (angle - 90f) * Mathf.Deg2Rad;
@@ -578,7 +578,7 @@ public sealed class PieChartElement : VisualElement
     /// within the 0 to 360 degree range.
     /// </summary>
     /// <param name="angle">The original angle in degrees.</param>
-    /// <returns>The adjusted and wrapped angle in degrees.<returns>
+    /// <returns>The adjusted and wrapped angle in degrees.</returns>
     private float GetPainterStartAngle(float angle)
     {
         float adjusted = angle - 90f;
@@ -590,7 +590,7 @@ public sealed class PieChartElement : VisualElement
     /// vector.
     /// </summary>
     /// <param name="tangent">The tangent vector used to determine the projection direction for spacing calculation.</param>
-    /// <returns>The computed overlay group spacing as a float value.<returns>
+    /// <returns>The computed overlay group spacing as a float value.</returns>
     private float GetOverlayGroupSpacing(Vector2 tangent)
     {
         float halfWidth = FieldWidth * 0.5f;
@@ -605,7 +605,7 @@ public sealed class PieChartElement : VisualElement
     /// </summary>
     /// <param name="left">The first OverlayBinding to compare.</param>
     /// <param name="right">The second OverlayBinding to compare.</param>
-    /// <returns>A signed integer indicating the relative order of the bindings by RadiusOffset.<returns>
+    /// <returns>A signed integer indicating the relative order of the bindings by RadiusOffset.</returns>
     private static int CompareBindingsByRadiusOffset(OverlayBinding left, OverlayBinding right)
     {
         // Handle null cases to ensure consistent sorting when radius offsets are not defined.

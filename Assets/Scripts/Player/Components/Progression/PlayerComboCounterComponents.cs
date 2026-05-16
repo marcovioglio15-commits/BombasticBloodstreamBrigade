@@ -4,7 +4,6 @@ using Unity.Entities;
 /// <summary>
 /// Stores the current combo value, damage observations, time-decay carry, and presentation data resolved from the active combo rank.
 /// none.
-/// returns none.
 /// </summary>
 public struct PlayerComboCounterState : IComponentData
 {
@@ -26,7 +25,6 @@ public struct PlayerComboCounterState : IComponentData
 /// <summary>
 /// Tracks one passive power-up catalog stack currently granted by a combo rank so derank/reset can remove only combo-owned stacks.
 /// none.
-/// returns none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerComboPassivePowerUpGrantElement : IBufferElementData

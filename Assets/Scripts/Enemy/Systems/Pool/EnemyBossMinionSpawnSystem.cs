@@ -6,8 +6,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Maintains boss-owned minion pools and activates normal enemy minions from boss spawn rules.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyBossPatternRuntimeSystem))]
@@ -17,8 +15,6 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     #region Nested Types
     /// <summary>
     /// Stores one pool initialization request collected while iterating boss entities.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private struct RuleInitializationRequest
     {
@@ -29,8 +25,6 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Stores one minion spawn request collected while iterating boss entities.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private struct MinionSpawnRequest
     {
@@ -42,8 +36,6 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Stores one pending minion activation collected before structural changes are applied.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private struct PendingMinionActivationRequest
     {
@@ -53,8 +45,6 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Identifies one boss minion rule for active and warning-pending count throttling.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private struct BossMinionRuleKey : System.IEquatable<BossMinionRuleKey>
     {
@@ -63,9 +53,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
         /// <summary>
         /// Compares two boss rule keys using their owning boss entity and rule index.
-        /// /params other Key to compare against.
-        /// /returns True when both keys address the same boss rule.
         /// </summary>
+        /// <param name="other">Key to compare against.</param>
+        /// <returns>True when both keys address the same boss rule.</returns>
         public bool Equals(BossMinionRuleKey other)
         {
             return BossEntity == other.BossEntity && RuleIndex == other.RuleIndex;
@@ -73,9 +63,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
         /// <summary>
         /// Builds a stable hash for use in native hash maps during the current frame.
-        /// /params None.
-        /// /returns Hash code derived from entity identity and rule index.
         /// </summary>
+        /// <returns>Hash code derived from entity identity and rule index.</returns>
         public override int GetHashCode()
         {
             return (int)math.hash(new int3(BossEntity.Index, BossEntity.Version, RuleIndex));
@@ -92,9 +81,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Declares boss minion spawn buffers as runtime dependencies.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnCreate(ref SystemState state)
     {
         activeMinionQuery = SystemAPI.QueryBuilder()
@@ -105,9 +93,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Initializes missing pools and evaluates minion spawn triggers.
-    /// /params state Mutable system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -223,10 +210,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
     #region Private Methods
     /// <summary>
     /// Activates reserved minions whose warning lead time has completed, or recycles them if the source boss is no longer valid.
-    /// /params state Mutable system state used to query pending buffers.
-    /// /params elapsedTime Current world elapsed time.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state used to query pending buffers.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
     private void ProcessPendingMinionActivations(ref SystemState state, float elapsedTime)
     {
         EntityManager entityManager = state.EntityManager;
@@ -272,9 +258,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Resolves a safe hash-map capacity that can hold active and warning-pending minion rule counters.
-    /// /params state Mutable system state required by SystemAPI query generation.
-    /// /returns Capacity used by the per-rule minion count map.
     /// </summary>
+    /// <param name="state">Mutable system state required by SystemAPI query generation.</param>
+    /// <returns>Capacity used by the per-rule minion count map.</returns>
     private int ResolveAliveMinionCountCapacity(ref SystemState state)
     {
         int capacity = math.max(1, activeMinionQuery.CalculateEntityCount());
@@ -287,10 +273,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Builds the current per-rule minion counts from active minions and still-pending spawn reservations.
-    /// /params state Mutable system state required by SystemAPI query generation.
-    /// /params aliveMinionCounts Mutable count map filled during the current frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable system state required by SystemAPI query generation.</param>
+    /// <param name="aliveMinionCounts">Mutable count map filled during the current frame.</param>
     private void BuildAliveMinionCounts(ref SystemState state,
                                         ref NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts)
     {
@@ -330,10 +315,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Adds one active or pending minion to the per-rule count map.
-    /// /params aliveMinionCounts Mutable count map.
-    /// /params key Boss and rule key to increment.
-    /// /returns None.
     /// </summary>
+    /// <param name="aliveMinionCounts">Mutable count map.</param>
+    /// <param name="key">Boss and rule key to increment.</param>
     private static void IncrementAliveMinionCount(ref NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
                                                  in BossMinionRuleKey key)
     {
@@ -348,11 +332,11 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Reads the current active-or-pending minion count for one boss rule.
-    /// /params aliveMinionCounts Count map built for the current frame.
-    /// /params bossEntity Boss that owns the rule.
-    /// /params ruleIndex Rule index to inspect.
-    /// /returns Current minion count, or zero when no entry exists.
     /// </summary>
+    /// <param name="aliveMinionCounts">Count map built for the current frame.</param>
+    /// <param name="bossEntity">Boss that owns the rule.</param>
+    /// <param name="ruleIndex">Rule index to inspect.</param>
+    /// <returns>Current minion count, or zero when no entry exists.</returns>
     private static int ResolveAliveMinionCount(in NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
                                                Entity bossEntity,
                                                int ruleIndex)
@@ -368,14 +352,13 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Queues pool initialization for one boss minion rule without performing structural changes during query iteration.
-    /// /params initializationRequests Request list filled by the current update.
-    /// /params bossEntity Boss that owns the rule.
-    /// /params ruleIndex Rule index on the boss buffer.
-    /// /params rule Mutable rule state.
-    /// /params bossRuntime Boss runtime state used by damage-trigger cooldowns.
-    /// /params elapsedTime Current world elapsed time.
-    /// /returns None.
     /// </summary>
+    /// <param name="initializationRequests">Request list filled by the current update.</param>
+    /// <param name="bossEntity">Boss that owns the rule.</param>
+    /// <param name="ruleIndex">Rule index on the boss buffer.</param>
+    /// <param name="rule">Mutable rule state.</param>
+    /// <param name="bossRuntime">Boss runtime state used by damage-trigger cooldowns.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
     private static void QueueRuleInitialization(NativeList<RuleInitializationRequest> initializationRequests,
                                                 Entity bossEntity,
                                                 int ruleIndex,
@@ -397,13 +380,12 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Queues one spawn request so pooled minions are activated after query iteration has completed.
-    /// /params spawnRequests Request list filled by the current update.
-    /// /params bossEntity Boss that owns the minions.
-    /// /params ruleIndex Rule index on the boss buffer.
-    /// /params bossPosition Current boss world position.
-    /// /params rule Rule data used for spawning.
-    /// /returns None.
     /// </summary>
+    /// <param name="spawnRequests">Request list filled by the current update.</param>
+    /// <param name="bossEntity">Boss that owns the minions.</param>
+    /// <param name="ruleIndex">Rule index on the boss buffer.</param>
+    /// <param name="bossPosition">Current boss world position.</param>
+    /// <param name="rule">Rule data used for spawning.</param>
     private static void QueueMinionSpawn(NativeList<MinionSpawnRequest> spawnRequests,
                                          Entity bossEntity,
                                          int ruleIndex,
@@ -421,10 +403,9 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Performs queued pool creation and prewarming after boss entity iteration has completed.
-    /// /params entityManager Entity manager used for structural changes.
-    /// /params initializationRequests Requests collected during the simulation pass.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used for structural changes.</param>
+    /// <param name="initializationRequests">Requests collected during the simulation pass.</param>
     private static void ProcessRuleInitializationRequests(EntityManager entityManager,
                                                          NativeList<RuleInitializationRequest> initializationRequests)
     {
@@ -454,20 +435,19 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Performs queued minion reservations after boss entity iteration has completed.
-    /// /params entityManager Entity manager used to mutate pooled minions.
-    /// /params spawnRequests Requests collected during the simulation pass.
-    /// /params aliveMinionCounts Current per-rule alive counts captured before spawning.
-    /// /params elapsedTime Current world elapsed time used for spawn feedback.
-    /// /params hasPhysicsWorld True when wall queries can be evaluated.
-    /// /params physicsWorldSingleton Physics world used for spawn safety checks.
-    /// /params wallsLayerMask Wall layer mask used by spawn safety checks.
-    /// /params navigationReady True when the shared navigation grid can project spawn positions.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /params hasReferenceSpawnPlaneHeight True when the player supplied a reliable room height.
-    /// /params referenceSpawnPlaneHeight Player-derived world-space Y coordinate used for minion placement.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate pooled minions.</param>
+    /// <param name="spawnRequests">Requests collected during the simulation pass.</param>
+    /// <param name="aliveMinionCounts">Current per-rule alive counts captured before spawning.</param>
+    /// <param name="elapsedTime">Current world elapsed time used for spawn feedback.</param>
+    /// <param name="hasPhysicsWorld">True when wall queries can be evaluated.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for spawn safety checks.</param>
+    /// <param name="wallsLayerMask">Wall layer mask used by spawn safety checks.</param>
+    /// <param name="navigationReady">True when the shared navigation grid can project spawn positions.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <param name="hasReferenceSpawnPlaneHeight">True when the player supplied a reliable room height.</param>
+    /// <param name="referenceSpawnPlaneHeight">Player-derived world-space Y coordinate used for minion placement.</param>
     private static void ProcessMinionSpawnRequests(EntityManager entityManager,
                                                    NativeList<MinionSpawnRequest> spawnRequests,
                                                    in NativeParallelHashMap<BossMinionRuleKey, int> aliveMinionCounts,
@@ -523,12 +503,12 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Reads the current rule from the boss buffer without keeping the buffer alive across structural changes.
-    /// /params entityManager Entity manager used to access the boss buffer.
-    /// /params bossEntity Boss that owns the rule.
-    /// /params ruleIndex Rule index inside the boss buffer.
-    /// /params fallbackRule Request-time rule used when the buffer index is no longer valid.
-    /// /returns Current rule data.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access the boss buffer.</param>
+    /// <param name="bossEntity">Boss that owns the rule.</param>
+    /// <param name="ruleIndex">Rule index inside the boss buffer.</param>
+    /// <param name="fallbackRule">Request-time rule used when the buffer index is no longer valid.</param>
+    /// <returns>Current rule data.</returns>
     private static EnemyBossMinionSpawnElement ResolveCurrentRule(EntityManager entityManager,
                                                                   Entity bossEntity,
                                                                   int ruleIndex,
@@ -544,12 +524,11 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Writes an updated rule back after structural changes have completed, reacquiring the buffer handle.
-    /// /params entityManager Entity manager used to access the boss buffer.
-    /// /params bossEntity Boss that owns the rule.
-    /// /params ruleIndex Rule index inside the boss buffer.
-    /// /params rule Updated rule data.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to access the boss buffer.</param>
+    /// <param name="bossEntity">Boss that owns the rule.</param>
+    /// <param name="ruleIndex">Rule index inside the boss buffer.</param>
+    /// <param name="rule">Updated rule data.</param>
     private static void WriteCurrentRule(EntityManager entityManager,
                                          Entity bossEntity,
                                          int ruleIndex,
@@ -571,23 +550,22 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
 
     /// <summary>
     /// Reserves up to the configured spawn count from the rule pool and arms warning rings before activation.
-    /// /params entityManager Entity manager used to mutate pooled minions.
-    /// /params bossEntity Boss that owns the minions.
-    /// /params ruleIndex Rule index being spawned.
-    /// /params bossPosition Current boss position.
-    /// /params rule Mutable rule runtime data.
-    /// /params aliveMinionCount Current count for active and pending minions owned by this rule.
-    /// /params elapsedTime Current world elapsed time used to arm spawn feedback.
-    /// /params hasPhysicsWorld True when wall queries can be evaluated.
-    /// /params physicsWorldSingleton Physics world used for spawn safety checks.
-    /// /params wallsLayerMask Wall layer mask used by spawn safety checks.
-    /// /params navigationReady True when the shared navigation grid can project spawn positions.
-    /// /params navigationGridState Shared navigation grid state.
-    /// /params navigationCells Stable navigation cell snapshot safe across structural changes.
-    /// /params hasReferenceSpawnPlaneHeight True when the player supplied a reliable room height.
-    /// /params referenceSpawnPlaneHeight Player-derived world-space Y coordinate used for minion placement.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate pooled minions.</param>
+    /// <param name="bossEntity">Boss that owns the minions.</param>
+    /// <param name="ruleIndex">Rule index being spawned.</param>
+    /// <param name="bossPosition">Current boss position.</param>
+    /// <param name="rule">Mutable rule runtime data.</param>
+    /// <param name="aliveMinionCount">Current count for active and pending minions owned by this rule.</param>
+    /// <param name="elapsedTime">Current world elapsed time used to arm spawn feedback.</param>
+    /// <param name="hasPhysicsWorld">True when wall queries can be evaluated.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for spawn safety checks.</param>
+    /// <param name="wallsLayerMask">Wall layer mask used by spawn safety checks.</param>
+    /// <param name="navigationReady">True when the shared navigation grid can project spawn positions.</param>
+    /// <param name="navigationGridState">Shared navigation grid state.</param>
+    /// <param name="navigationCells">Stable navigation cell snapshot safe across structural changes.</param>
+    /// <param name="hasReferenceSpawnPlaneHeight">True when the player supplied a reliable room height.</param>
+    /// <param name="referenceSpawnPlaneHeight">Player-derived world-space Y coordinate used for minion placement.</param>
     private static void ReserveMinionsForSpawn(EntityManager entityManager,
                                                Entity bossEntity,
                                                int ruleIndex,

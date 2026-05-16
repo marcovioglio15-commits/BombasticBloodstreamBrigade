@@ -4,8 +4,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Reconnects an additive UI camera to the active URP base camera without serialized cross-scene references.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Camera))]
@@ -36,8 +34,6 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Registers scene-change callbacks and applies the camera stack once the additive UI scene is enabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -51,8 +47,6 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Removes transient stack wiring and unregisters scene callbacks before the UI scene unloads.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -67,10 +61,9 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     #region Events
     /// <summary>
     /// Re-applies stacking when the active gameplay scene changes.
-    /// /params previousScene Scene that was active before the change.
-    /// /params nextScene Scene that became active.
-    /// /returns None.
     /// </summary>
+    /// <param name="previousScene">Scene that was active before the change.</param>
+    /// <param name="nextScene">Scene that became active.</param>
     private void HandleActiveSceneChanged(Scene previousScene, Scene nextScene)
     {
         ApplyCameraStack();
@@ -78,10 +71,9 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Re-applies stacking when a scene load may have introduced the gameplay base camera.
-    /// /params loadedScene Scene loaded by Unity.
-    /// /params loadMode Mode used for the scene load.
-    /// /returns None.
     /// </summary>
+    /// <param name="loadedScene">Scene loaded by Unity.</param>
+    /// <param name="loadMode">Mode used for the scene load.</param>
     private void HandleSceneLoaded(Scene loadedScene, LoadSceneMode loadMode)
     {
         ApplyCameraStack();
@@ -91,8 +83,6 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     #region Stack Management
     /// <summary>
     /// Adds the UI overlay camera to the resolved base camera stack when URP camera data is available.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyCameraStack()
     {
@@ -119,8 +109,6 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Removes the UI overlay camera from the last resolved base camera stack.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RemoveCameraStack()
     {
@@ -135,9 +123,8 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     #region Camera Resolution
     /// <summary>
     /// Resolves the gameplay base camera by tag first and then by enabled URP base camera data.
-    /// /params None.
-    /// /returns Base camera that should render the UI overlay camera, or null when unavailable.
     /// </summary>
+    /// <returns>Base camera that should render the UI overlay camera, or null when unavailable.</returns>
     private Camera ResolveBaseCamera()
     {
         Scene activeScene = SceneManager.GetActiveScene();
@@ -176,11 +163,11 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Resolves a valid base camera from a specific loaded scene before falling back to global tag lookup.
-    /// /params scene Scene whose root hierarchy should be searched.
-    /// /params requireTag True when the camera must match the configured base camera tag.
-    /// /params resolvedCamera Base camera found in the scene when available.
-    /// /returns True when a valid camera was found.
     /// </summary>
+    /// <param name="scene">Scene whose root hierarchy should be searched.</param>
+    /// <param name="requireTag">True when the camera must match the configured base camera tag.</param>
+    /// <param name="resolvedCamera">Base camera found in the scene when available.</param>
+    /// <returns>True when a valid camera was found.</returns>
     private bool TryResolveSceneCamera(Scene scene, bool requireTag, out Camera resolvedCamera)
     {
         resolvedCamera = null;
@@ -214,9 +201,9 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Checks whether one camera carries the configured base camera tag.
-    /// /params candidateCamera Camera being inspected.
-    /// /returns True when tag filtering is disabled or the camera has the configured tag.
     /// </summary>
+    /// <param name="candidateCamera">Camera being inspected.</param>
+    /// <returns>True when tag filtering is disabled or the camera has the configured tag.</returns>
     private bool CameraMatchesBaseTag(Camera candidateCamera)
     {
         if (candidateCamera == null)
@@ -230,9 +217,9 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     /// <summary>
     /// Checks whether one camera can be used as the URP base camera for additive UI stacking.
-    /// /params candidateCamera Camera being inspected.
-    /// /returns True when the camera is enabled, distinct from the UI camera and marked as a base camera.
     /// </summary>
+    /// <param name="candidateCamera">Camera being inspected.</param>
+    /// <returns>True when the camera is enabled, distinct from the UI camera and marked as a base camera.</returns>
     private bool IsValidBaseCamera(Camera candidateCamera)
     {
         if (candidateCamera == null)

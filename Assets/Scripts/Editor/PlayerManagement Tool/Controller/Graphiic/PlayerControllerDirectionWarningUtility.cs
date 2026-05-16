@@ -16,12 +16,11 @@ internal static class PlayerControllerDirectionWarningUtility
     #region Public Methods
     /// <summary>
     /// Refreshes discrete-direction warnings without mutating the serialized settings.
-    /// warningsRoot Container that receives warning HelpBoxes.
-    /// showWarnings True when the current section is using discrete directions.
-    /// discreteDirectionCount Configured discrete direction count.
-    /// directionOffsetDegrees Configured direction offset in degrees.
-    /// returns void
     /// </summary>
+    /// <param name="warningsRoot">Container that receives warning HelpBoxes.</param>
+    /// <param name="showWarnings">True when the current section is using discrete directions.</param>
+    /// <param name="discreteDirectionCount">Configured discrete direction count.</param>
+    /// <param name="directionOffsetDegrees">Configured direction offset in degrees.</param>
     public static void RefreshOffsetWarnings(VisualElement warningsRoot,
                                              bool showWarnings,
                                              int discreteDirectionCount,
@@ -58,10 +57,10 @@ internal static class PlayerControllerDirectionWarningUtility
 
     /// <summary>
     /// Checks whether one discrete direction offset lands exactly on the current step grid.
-    /// directionOffsetDegrees Offset value to inspect.
-    /// discreteDirectionCount Configured discrete direction count.
-    /// returns True when the offset already matches the discrete step grid; otherwise false.
     /// </summary>
+    /// <param name="directionOffsetDegrees">Offset value to inspect.</param>
+    /// <param name="discreteDirectionCount">Configured discrete direction count.</param>
+    /// <returns>True when the offset already matches the discrete step grid; otherwise false.</returns>
     public static bool IsAlignedToDiscreteStep(float directionOffsetDegrees, int discreteDirectionCount)
     {
         if (discreteDirectionCount <= 1)

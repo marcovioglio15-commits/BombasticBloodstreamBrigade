@@ -5,7 +5,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws the run timer HUD section and conditionally exposes countdown-only settings.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(HUDRunTimerSection))]
 public sealed class HUDRunTimerSectionPropertyDrawer : PropertyDrawer
@@ -15,9 +14,9 @@ public sealed class HUDRunTimerSectionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for the run timer HUD section.
-    /// property Serialized run timer HUD section property.
-    /// returns Root UI element used by the inspector.
     /// </summary>
+    /// <param name="property">Serialized run timer HUD section property.</param>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -76,10 +75,10 @@ public sealed class HUDRunTimerSectionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Creates one bound property field with the requested display label.
-    /// property Serialized property bound to the field.
-    /// label Inspector label shown for the bound field.
-    /// returns Configured property field bound to the serialized property.
     /// </summary>
+    /// <param name="property">Serialized property bound to the field.</param>
+    /// <param name="label">Inspector label shown for the bound field.</param>
+    /// <returns>Configured property field bound to the serialized property.</returns>
     private static PropertyField CreateBoundField(SerializedProperty property, string label)
     {
         PropertyField propertyField = new PropertyField(property, label);
@@ -89,9 +88,9 @@ public sealed class HUDRunTimerSectionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Resolves the serialized timer direction with a safe fallback.
-    /// directionProperty Serialized direction property.
-    /// returns Resolved timer direction.
     /// </summary>
+    /// <param name="directionProperty">Serialized direction property.</param>
+    /// <returns>Resolved timer direction.</returns>
     private static PlayerRunTimerDirection ResolveDirection(SerializedProperty directionProperty)
     {
         if (directionProperty == null || directionProperty.propertyType != SerializedPropertyType.Enum)

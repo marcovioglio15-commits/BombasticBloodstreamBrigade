@@ -3,8 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Evaluates boss minion spawn trigger state and shared runtime bookkeeping for spawn rules.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class EnemyBossMinionSpawnTriggerUtility
 {
@@ -13,13 +11,13 @@ internal static class EnemyBossMinionSpawnTriggerUtility
     #region Trigger Evaluation
     /// <summary>
     /// Evaluates the configured trigger and alive cap for one minion rule.
-    /// /params aliveMinionCount Current active minions for the source boss rule.
-    /// /params rule Rule runtime data, mutated to consume non-spawnable damage-hit triggers.
-    /// /params bossHealth Boss health state.
-    /// /params bossRuntime Boss runtime state.
-    /// /params elapsedTime Current world elapsed time. Damage-trigger rules use boss lifetime for cooldown timestamps.
-    /// /returns True when the rule should spawn minions now.
     /// </summary>
+    /// <param name="aliveMinionCount">Current active minions for the source boss rule.</param>
+    /// <param name="rule">Rule runtime data, mutated to consume non-spawnable damage-hit triggers.</param>
+    /// <param name="bossHealth">Boss health state.</param>
+    /// <param name="bossRuntime">Boss runtime state.</param>
+    /// <param name="elapsedTime">Current world elapsed time. Damage-trigger rules use boss lifetime for cooldown timestamps.</param>
+    /// <returns>True when the rule should spawn minions now.</returns>
     public static bool ShouldTriggerRule(int aliveMinionCount,
                                          ref EnemyBossMinionSpawnElement rule,
                                          in EnemyHealth bossHealth,
@@ -59,11 +57,10 @@ internal static class EnemyBossMinionSpawnTriggerUtility
     #region Trigger State
     /// <summary>
     /// Updates trigger bookkeeping after a rule spawns.
-    /// /params rule Mutable rule state.
-    /// /params bossRuntime Boss runtime state.
-    /// /params elapsedTime Current world elapsed time. Damage-trigger cooldowns are resolved from boss lifetime instead.
-    /// /returns None.
     /// </summary>
+    /// <param name="rule">Mutable rule state.</param>
+    /// <param name="bossRuntime">Boss runtime state.</param>
+    /// <param name="elapsedTime">Current world elapsed time. Damage-trigger cooldowns are resolved from boss lifetime instead.</param>
     public static void MarkRuleTriggered(ref EnemyBossMinionSpawnElement rule,
                                          in EnemyRuntimeState bossRuntime,
                                          float elapsedTime)
@@ -77,11 +74,11 @@ internal static class EnemyBossMinionSpawnTriggerUtility
 
     /// <summary>
     /// Resolves the first allowed spawn time for one freshly initialized rule.
-    /// /params rule Rule being initialized.
-    /// /params bossRuntime Boss runtime state used by damage-trigger rules.
-    /// /params elapsedTime Current world elapsed time.
-    /// /returns Initial spawn-ready timestamp.
     /// </summary>
+    /// <param name="rule">Rule being initialized.</param>
+    /// <param name="bossRuntime">Boss runtime state used by damage-trigger rules.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <returns>Initial spawn-ready timestamp.</returns>
     public static float ResolveInitialNextSpawnTime(in EnemyBossMinionSpawnElement rule,
                                                     in EnemyRuntimeState bossRuntime,
                                                     float elapsedTime)
@@ -101,11 +98,11 @@ internal static class EnemyBossMinionSpawnTriggerUtility
 
     /// <summary>
     /// Resolves the next allowed spawn time after one trigger activation.
-    /// /params rule Rule that just spawned minions.
-    /// /params bossRuntime Boss runtime state used by damage-trigger rules.
-    /// /params elapsedTime Current world elapsed time.
-    /// /returns Next spawn-ready timestamp.
     /// </summary>
+    /// <param name="rule">Rule that just spawned minions.</param>
+    /// <param name="bossRuntime">Boss runtime state used by damage-trigger rules.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <returns>Next spawn-ready timestamp.</returns>
     private static float ResolveNextSpawnTime(in EnemyBossMinionSpawnElement rule,
                                               in EnemyRuntimeState bossRuntime,
                                               float elapsedTime)
@@ -124,10 +121,10 @@ internal static class EnemyBossMinionSpawnTriggerUtility
     #region Private Methods
     /// <summary>
     /// Evaluates the boss-damaged trigger and consumes hits that happen while the rule is blocked by cooldown.
-    /// /params rule Mutable minion rule runtime state.
-    /// /params bossRuntime Boss runtime state carrying hit timestamps.
-    /// /returns True when an unobserved hit is allowed to spawn immediately.
     /// </summary>
+    /// <param name="rule">Mutable minion rule runtime state.</param>
+    /// <param name="bossRuntime">Boss runtime state carrying hit timestamps.</param>
+    /// <returns>True when an unobserved hit is allowed to spawn immediately.</returns>
     private static bool ShouldTriggerBossDamagedRule(ref EnemyBossMinionSpawnElement rule,
                                                      in EnemyRuntimeState bossRuntime)
     {
@@ -144,10 +141,10 @@ internal static class EnemyBossMinionSpawnTriggerUtility
 
     /// <summary>
     /// Evaluates the one-shot health threshold trigger for rules that spawn below a boss health percentage.
-    /// /params rule Minion rule runtime state.
-    /// /params bossHealth Boss health state.
-    /// /returns True when the boss crossed the configured health threshold and the rule has not fired yet.
     /// </summary>
+    /// <param name="rule">Minion rule runtime state.</param>
+    /// <param name="bossHealth">Boss health state.</param>
+    /// <returns>True when the boss crossed the configured health threshold and the rule has not fired yet.</returns>
     private static bool ShouldTriggerHealthBelowPercentRule(in EnemyBossMinionSpawnElement rule,
                                                             in EnemyHealth bossHealth)
     {
@@ -162,10 +159,9 @@ internal static class EnemyBossMinionSpawnTriggerUtility
 
     /// <summary>
     /// Consumes a boss-damaged trigger when another gate prevents the rule from spawning this frame.
-    /// /params rule Mutable minion rule runtime state.
-    /// /params bossRuntime Boss runtime state carrying hit timestamps.
-    /// /returns None.
     /// </summary>
+    /// <param name="rule">Mutable minion rule runtime state.</param>
+    /// <param name="bossRuntime">Boss runtime state carrying hit timestamps.</param>
     private static void ConsumeBlockedBossDamageTrigger(ref EnemyBossMinionSpawnElement rule, in EnemyRuntimeState bossRuntime)
     {
         if (rule.Trigger != EnemyBossMinionSpawnTrigger.BossDamaged)
@@ -179,11 +175,11 @@ internal static class EnemyBossMinionSpawnTriggerUtility
 
     /// <summary>
     /// Resolves whether the boss has taken damage that this rule has not observed yet.
-    /// /params rule Minion rule runtime state.
-    /// /params bossRuntime Boss runtime state carrying hit timestamps.
-    /// /params damageLifetimeSeconds Output unobserved damage timestamp.
-    /// /returns True when the latest boss hit is newer than the rule observation cursor.
     /// </summary>
+    /// <param name="rule">Minion rule runtime state.</param>
+    /// <param name="bossRuntime">Boss runtime state carrying hit timestamps.</param>
+    /// <param name="damageLifetimeSeconds">Output unobserved damage timestamp.</param>
+    /// <returns>True when the latest boss hit is newer than the rule observation cursor.</returns>
     private static bool TryResolveUnobservedBossDamage(in EnemyBossMinionSpawnElement rule,
                                                        in EnemyRuntimeState bossRuntime,
                                                        out float damageLifetimeSeconds)

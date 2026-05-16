@@ -22,11 +22,10 @@ public static class ManagedDamageFlashRendererUtility
     #region Public Methods
     /// <summary>
     /// Applies one hit-flash state to every renderer under the provided animator hierarchy.
-    /// animator: Root animator whose child renderers should receive the flash.
-    /// flashColor: Linear-space target flash color.
-    /// blend: Current flash blend in the [0..1] range.
-    /// returns None.
     /// </summary>
+    /// <param name="animator">Root animator whose child renderers should receive the flash.</param>
+    /// <param name="flashColor">Linear-space target flash color.</param>
+    /// <param name="blend">Current flash blend in the [0..1] range.</param>
     public static void ApplyToAnimator(Animator animator, Color flashColor, float blend)
     {
         if (animator == null)

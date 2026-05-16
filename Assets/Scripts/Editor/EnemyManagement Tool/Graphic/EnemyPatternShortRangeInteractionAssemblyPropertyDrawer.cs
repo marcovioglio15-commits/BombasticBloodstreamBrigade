@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Custom UI Toolkit drawer for EnemyPatternShortRangeInteractionAssembly.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CustomPropertyDrawer(typeof(EnemyPatternShortRangeInteractionAssembly))]
 public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : PropertyDrawer
@@ -16,9 +14,9 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
     #region Public Methods
     /// <summary>
     /// Creates the short-range interaction assembly UI.
-    /// /params property Serialized short-range assembly property.
-    /// /returns The built root visual element.
     /// </summary>
+    /// <param name="property">Serialized short-range assembly property.</param>
+    /// <returns>The built root visual element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -141,16 +139,15 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
     #region Private Methods
     /// <summary>
     /// Updates nested settings visibility and unsupported-module warnings from the current toggle state.
-    /// /params enabledProperty Serialized enabled property.
-    /// /params displayTriggerProperty Serialized trigger toggle.
-    /// /params useOverrideProperty Serialized override toggle.
-    /// /params bindingProperty Serialized module binding.
-    /// /params settingsContainer Main nested settings container.
-    /// /params feedbackOptionsContainer Nested feedback options container.
-    /// /params feedbackOverrideContainer Nested override settings container.
-    /// /params unsupportedModuleBox Warning box shown for unsupported module kinds.
-    /// /returns None.
     /// </summary>
+    /// <param name="enabledProperty">Serialized enabled property.</param>
+    /// <param name="displayTriggerProperty">Serialized trigger toggle.</param>
+    /// <param name="useOverrideProperty">Serialized override toggle.</param>
+    /// <param name="bindingProperty">Serialized module binding.</param>
+    /// <param name="settingsContainer">Main nested settings container.</param>
+    /// <param name="feedbackOptionsContainer">Nested feedback options container.</param>
+    /// <param name="feedbackOverrideContainer">Nested override settings container.</param>
+    /// <param name="unsupportedModuleBox">Warning box shown for unsupported module kinds.</param>
     private static void UpdateVisibility(SerializedProperty enabledProperty,
                                          SerializedProperty displayTriggerProperty,
                                          SerializedProperty useOverrideProperty,

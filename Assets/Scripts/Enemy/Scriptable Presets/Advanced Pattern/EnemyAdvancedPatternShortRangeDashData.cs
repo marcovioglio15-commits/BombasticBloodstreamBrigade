@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Contains telegraph settings used before a short-range dash starts.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyShortRangeDashAimPayload
@@ -47,8 +45,6 @@ public sealed class EnemyShortRangeDashAimPayload
     #region Public Methods
     /// <summary>
     /// Keeps nested references structurally valid without snapping authored values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -60,8 +56,6 @@ public sealed class EnemyShortRangeDashAimPayload
 
 /// <summary>
 /// Contains recovery settings used after one committed short-range dash finishes.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyShortRangeDashRecoveryPayload
@@ -92,8 +86,6 @@ public sealed class EnemyShortRangeDashRecoveryPayload
     #region Public Methods
     /// <summary>
     /// Keeps nested references structurally valid without snapping authored values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -105,8 +97,6 @@ public sealed class EnemyShortRangeDashRecoveryPayload
 
 /// <summary>
 /// Contains distance-resolution settings used to convert current player distance into one dash travel distance.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyShortRangeDashDistancePayload
@@ -195,8 +185,6 @@ public sealed class EnemyShortRangeDashDistancePayload
     #region Public Methods
     /// <summary>
     /// Keeps nested references structurally valid without snapping authored values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -208,8 +196,6 @@ public sealed class EnemyShortRangeDashDistancePayload
 
 /// <summary>
 /// Contains authored path-shaping settings used to sample one ECS-friendly dash path.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyShortRangeDashPathPayload
@@ -285,8 +271,6 @@ public sealed class EnemyShortRangeDashPathPayload
     #region Public Methods
     /// <summary>
     /// Ensures the path curves always exist without snapping authored keys.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {
@@ -303,8 +287,6 @@ public sealed class EnemyShortRangeDashPathPayload
 
 /// <summary>
 /// Groups all authoring blocks used by the short-range dash module.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyShortRangeDashModuleData
@@ -366,8 +348,6 @@ public sealed class EnemyShortRangeDashModuleData
     #region Public Methods
     /// <summary>
     /// Ensures nested authoring blocks always exist without snapping authored values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Pushes ECS loading-progress presentation state into the authored loading-progress canvas view.
-/// /params None.
-/// /returns None.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class GameSceneLoadingProgressPresentationSystem : SystemBase
@@ -32,8 +30,6 @@ public partial class GameSceneLoadingProgressPresentationSystem : SystemBase
     #region Lifecycle
     /// <summary>
     /// Creates the singleton query used to read loading-progress presentation state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnCreate()
     {
@@ -42,8 +38,6 @@ public partial class GameSceneLoadingProgressPresentationSystem : SystemBase
 
     /// <summary>
     /// Applies changed loading-progress state to the active authored canvas view.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     protected override void OnUpdate()
     {
@@ -67,9 +61,9 @@ public partial class GameSceneLoadingProgressPresentationSystem : SystemBase
     #region Helpers
     /// <summary>
     /// Resolves whether the current state differs from the last view application.
-    /// /params state Current loading-progress state.
-    /// /returns True when the view should receive a new state payload.
     /// </summary>
+    /// <param name="state">Current loading-progress state.</param>
+    /// <returns>True when the view should receive a new state payload.</returns>
     private bool HasStateChanged(GameSceneLoadingProgressPresentationState state)
     {
         if (GameSceneLoadingProgressCanvasView.ActiveViewVersion != lastAppliedViewVersion)
@@ -113,9 +107,8 @@ public partial class GameSceneLoadingProgressPresentationSystem : SystemBase
 
     /// <summary>
     /// Stores the last state payload applied to the authored view.
-    /// /params state Applied loading-progress state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Applied loading-progress state.</param>
     private void CacheState(GameSceneLoadingProgressPresentationState state)
     {
         lastStatusText = state.StatusText;

@@ -228,7 +228,7 @@ public static class PlayerManagementDraftSession
     /// Builds a dictionary that maps asset paths to their serialized JSON representations
     /// for all relevant player assets.
     /// </summary>
-    /// <returns><returns>
+    /// <returns></returns>
     private static Dictionary<string, string> BuildStateDictionary()
     {
         Dictionary<string, string> stateByPath = new Dictionary<string, string>();
@@ -256,7 +256,7 @@ public static class PlayerManagementDraftSession
     /// <summary>
     /// Collects the asset paths of all relevant player assets that should be tracked during the draft session.
     /// </summary>
-    /// <returns><returns>
+    /// <returns></returns>
     private static List<string> CollectTrackedAssetPaths()
     {
         HashSet<string> uniquePaths = new HashSet<string>();
@@ -463,7 +463,7 @@ public static class PlayerManagementDraftSession
     /// based on its name during the apply phase of the draft session.
     /// </summary>
     /// <param name="assetObject"></param>
-    /// <returns> True if the asset object is a player preset asset that should be renamed; otherwise, false.<returns>
+    /// <returns> True if the asset object is a player preset asset that should be renamed; otherwise, false.</returns>
     private static bool IsRenamablePresetAsset(UnityEngine.Object assetObject)
     {
         if (assetObject == null)
@@ -520,7 +520,7 @@ public static class PlayerManagementDraftSession
     /// placing underscores in place of invalid file name characters, and removing trailing dots.
     /// </summary>
     /// <param name="rawName"></param>
-    /// <returns> A normalized asset name that can be used as a file name in the Unity project.<returns>
+    /// <returns> A normalized asset name that can be used as a file name in the Unity project.</returns>
     public static string NormalizeAssetName(string rawName)
     {
         if (string.IsNullOrWhiteSpace(rawName))
@@ -593,7 +593,7 @@ public static class PlayerManagementDraftSession
     /// Checks if the specified asset path is referenced by any of the player preset libraries.
     /// </summary>
     /// <param name="assetPath"></param>
-    /// <returns> True if the asset path is referenced by any of the player preset libraries; otherwise, false.<returns>
+    /// <returns> True if the asset path is referenced by any of the player preset libraries; otherwise, false.</returns>
     private static bool IsPathReferencedByLibraries(string assetPath)
     {
         if (string.IsNullOrWhiteSpace(assetPath))
@@ -633,7 +633,7 @@ public static class PlayerManagementDraftSession
     /// <typeparam name="TAsset"></typeparam>
     /// <param name="presets"></param>
     /// <param name="assetPath"></param>
-    /// <returns> True if the asset path is referenced by any preset in the library; otherwise, false.<returns>
+    /// <returns> True if the asset path is referenced by any preset in the library; otherwise, false.</returns>
     private static bool LibraryContainsPath<TAsset>(IReadOnlyList<TAsset> presets, string assetPath) where TAsset : UnityEngine.Object
     {
         for (int index = 0; index < presets.Count; index++)

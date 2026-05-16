@@ -354,11 +354,10 @@ public static class PlayerPowerUpActivationSlotUtility
     #region Audio
     /// <summary>
     /// Enqueues the active-tool audio event matching a successfully executed non-charge slot.
-    /// /params slotConfig Runtime active-tool slot configuration.
-    /// /params position Player position used for positioned one-shot audio.
-    /// /params audioRequests Audio request buffer on the game audio singleton.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Runtime active-tool slot configuration.</param>
+    /// <param name="position">Player position used for positioned one-shot audio.</param>
+    /// <param name="audioRequests">Audio request buffer on the game audio singleton.</param>
     private static void EnqueueActiveToolAudio(in PlayerPowerUpSlotConfig slotConfig,
                                                float3 position,
                                                DynamicBuffer<GameAudioEventRequest> audioRequests)
@@ -381,17 +380,16 @@ public static class PlayerPowerUpActivationSlotUtility
     #region Side Effects
     /// <summary>
     /// Applies an instant or over-time portable health pack payload and emits immediate recharge audio when health is restored now.
-    /// /params slotConfig Runtime active-tool slot configuration.
-    /// /params playerEntity Player entity receiving the healing payload.
-    /// /params position Player position used for positioned recharge audio.
-    /// /params healthLookup Mutable health lookup used to fetch current health.
-    /// /params updatedHealth Cached mutable health value returned to the caller.
-    /// /params healthChanged True when updatedHealth contains a valid fetched value.
-    /// /params healOverTimeState Mutable heal-over-time state for delayed payloads.
-    /// /params audioRequests Optional audio request buffer.
-    /// /params canEnqueueAudioRequests True when audioRequests is valid.
-    /// /returns None.
     /// </summary>
+    /// <param name="slotConfig">Runtime active-tool slot configuration.</param>
+    /// <param name="playerEntity">Player entity receiving the healing payload.</param>
+    /// <param name="position">Player position used for positioned recharge audio.</param>
+    /// <param name="healthLookup">Mutable health lookup used to fetch current health.</param>
+    /// <param name="updatedHealth">Cached mutable health value returned to the caller.</param>
+    /// <param name="healthChanged">True when updatedHealth contains a valid fetched value.</param>
+    /// <param name="healOverTimeState">Mutable heal-over-time state for delayed payloads.</param>
+    /// <param name="audioRequests">Optional audio request buffer.</param>
+    /// <param name="canEnqueueAudioRequests">True when audioRequests is valid.</param>
     private static void ExecutePortableHealthPack(in PlayerPowerUpSlotConfig slotConfig,
                                                   Entity playerEntity,
                                                   float3 position,

@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one per-element gameplay behaviour block used by default player bullet elemental payloads.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ElementBulletSettings
@@ -190,9 +188,8 @@ public sealed class ElementBulletSettings
     #region Public Methods
     /// <summary>
     /// Copies every authored gameplay value from another behaviour block while preserving this instance allocation.
-    /// /params source Source behaviour block.
-    /// /returns void.
     /// </summary>
+    /// <param name="source">Source behaviour block.</param>
     public void CopyFrom(ElementBulletSettings source)
     {
         if (source == null)
@@ -219,8 +216,6 @@ public sealed class ElementBulletSettings
     #region Validation
     /// <summary>
     /// Keeps the behaviour block available to legacy validation paths without mutating authored gameplay values.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {

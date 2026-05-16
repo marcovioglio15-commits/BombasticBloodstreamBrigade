@@ -3,8 +3,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Centralizes lightweight repaint helpers used by management-tool color customization.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ManagementToolColorRefreshUtility
 {
@@ -13,9 +11,8 @@ internal static class ManagementToolColorRefreshUtility
     #region Public Methods
     /// <summary>
     /// Marks one element and its ancestors dirty so inline style changes repaint immediately.
-    /// /params targetElement Lowest visual element whose hierarchy should be repainted.
-    /// /returns None.
     /// </summary>
+    /// <param name="targetElement">Lowest visual element whose hierarchy should be repainted.</param>
     public static void MarkElementHierarchyDirty(VisualElement targetElement)
     {
         VisualElement currentElement = targetElement;
@@ -29,8 +26,6 @@ internal static class ManagementToolColorRefreshUtility
 
     /// <summary>
     /// Repaints every open management-tool editor window after one color change.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void RepaintOpenManagementToolWindows()
     {

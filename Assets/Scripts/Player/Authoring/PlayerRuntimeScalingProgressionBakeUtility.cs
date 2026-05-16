@@ -16,10 +16,9 @@ internal static class PlayerRuntimeScalingProgressionBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Populates progression scaling metadata from the unscaled progression preset.
-    /// sourcePreset: Unscaled source progression preset.
-    /// scalingBuffer: Destination scaling metadata buffer.
-    /// returns void.
     /// </summary>
+    /// <param name="sourcePreset">Unscaled source progression preset.</param>
+    /// <param name="scalingBuffer">Destination scaling metadata buffer.</param>
     public static void PopulateProgressionScalingMetadata(PlayerProgressionPreset sourcePreset,
                                                           DynamicBuffer<PlayerRuntimeProgressionScalingElement> scalingBuffer)
     {
@@ -64,11 +63,11 @@ internal static class PlayerRuntimeScalingProgressionBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Maps one serialized progression stat key to the runtime progression field id plus the target phase index.
-    /// statKey: Serialized stat key baked by Add Scaling.
-    /// phaseIndex: Resolved phase index when the mapping succeeds.
-    /// fieldId: Resolved runtime progression field id.
-    /// returns True when the key targets a supported progression field.
     /// </summary>
+    /// <param name="statKey">Serialized stat key baked by Add Scaling.</param>
+    /// <param name="phaseIndex">Resolved phase index when the mapping succeeds.</param>
+    /// <param name="fieldId">Resolved runtime progression field id.</param>
+    /// <returns>True when the key targets a supported progression field.</returns>
     private static bool TryMapProgressionFieldId(string statKey,
                                                  out int phaseIndex,
                                                  out PlayerRuntimeProgressionFieldId fieldId)

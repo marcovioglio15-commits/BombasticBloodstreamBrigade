@@ -77,7 +77,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="playerLevel">Current player level state used to resolve experience percentages.</param>
     /// <param name="powerUpsConfig">Current active-slot configs used to clamp energy compensation.</param>
     /// <param name="powerUpsState">Mutable active-slot runtime state.</param>
-    /// <returns>Number of compensation entries that effectively changed runtime state.<returns>
+    /// <returns>Number of compensation entries that effectively changed runtime state.</returns>
     public static int ApplySkipCompensations(PlayerProgressionConfig progressionConfig,
                                              DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                              in PlayerMilestonePowerUpSelectionState selectionState,
@@ -125,7 +125,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <summary>
     /// Creates the inactive default state used when no Time.timeScale resume is pending.
     /// </summary>
-    /// <returns>Inactive milestone Time.timeScale resume state.<returns>
+    /// <returns>Inactive milestone Time.timeScale resume state.</returns>
     public static PlayerMilestoneTimeScaleResumeState CreateInactiveResumeState()
     {
         return new PlayerMilestoneTimeScaleResumeState
@@ -151,7 +151,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="playerLevel">Current player level state.</param>
     /// <param name="powerUpsConfig">Current active-slot configs.</param>
     /// <param name="powerUpsState">Mutable active-slot runtime state.</param>
-    /// <returns>True when runtime state changed; otherwise false.<returns>
+    /// <returns>True when runtime state changed; otherwise false.</returns>
     private static bool TryApplySkipCompensation(PlayerProgressionConfig progressionConfig,
                                                  DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                  in PlayerMilestoneSkipCompensationBlob compensation,
@@ -201,7 +201,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="applyMode">Value interpretation mode.</param>
     /// <param name="rawValue">Flat amount or percentage value.</param>
     /// <param name="playerHealth">Mutable player health state.</param>
-    /// <returns>True when health changed; otherwise false.<returns>
+    /// <returns>True when health changed; otherwise false.</returns>
     private static bool TryApplyHealthCompensation(PlayerMilestoneCompensationApplyMode applyMode,
                                                    float rawValue,
                                                    ref PlayerHealth playerHealth)
@@ -232,7 +232,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="applyMode">Value interpretation mode.</param>
     /// <param name="rawValue">Flat amount or percentage value.</param>
     /// <param name="playerShield">Mutable player shield state.</param>
-    /// <returns>True when shield changed; otherwise false.<returns>
+    /// <returns>True when shield changed; otherwise false.</returns>
     private static bool TryApplyShieldCompensation(PlayerMilestoneCompensationApplyMode applyMode,
                                                    float rawValue,
                                                    ref PlayerShield playerShield)
@@ -264,7 +264,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="rawValue">Flat amount or percentage value.</param>
     /// <param name="slotConfig">Active-slot config used to resolve the maximum energy.</param>
     /// <param name="currentEnergy">Mutable slot energy.</param>
-    /// <returns>True when slot energy changed; otherwise false.<returns>
+    /// <returns>True when slot energy changed; otherwise false.</returns>
     private static bool TryApplyEnergyCompensation(PlayerMilestoneCompensationApplyMode applyMode,
                                                    float rawValue,
                                                    in PlayerPowerUpSlotConfig slotConfig,
@@ -301,7 +301,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="rawValue">Flat amount or percentage value.</param>
     /// <param name="playerExperience">Mutable player experience state.</param>
     /// <param name="playerLevel">Current player level state used to resolve the next required experience.</param>
-    /// <returns>True when experience changed; otherwise false.<returns>
+    /// <returns>True when experience changed; otherwise false.</returns>
     private static bool TryApplyExperienceCompensation(PlayerProgressionConfig progressionConfig,
                                                        DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                        PlayerMilestoneCompensationApplyMode applyMode,
@@ -338,7 +338,7 @@ public static class PlayerMilestoneSelectionOutcomeUtility
     /// <param name="applyMode">Value interpretation mode.</param>
     /// <param name="rawValue">Flat amount or percentage value.</param>
     /// <param name="currentValue">Current resource value used as percentage base when needed.</param>
-    /// <returns>Resolved additive amount.<returns>
+    /// <returns>Resolved additive amount.</returns>
     private static float ResolveResourceCompensationAmount(PlayerMilestoneCompensationApplyMode applyMode,
                                                            float rawValue,
                                                            float currentValue)

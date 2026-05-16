@@ -18,7 +18,7 @@ internal static class EnemyMasterPresetsPanelPresetUtility
     /// Builds the left pane that hosts toolbar actions, search and preset list.
     /// </summary>
     /// <param name="panel">Owning panel that stores preset list state and callbacks.</param>
-    /// <returns>Returns the constructed left pane visual element.<returns>
+    /// <returns>Returns the constructed left pane visual element.</returns>
     public static VisualElement BuildLeftPane(EnemyMasterPresetsPanel panel)
     {
         VisualElement leftPane = new VisualElement();
@@ -75,7 +75,7 @@ internal static class EnemyMasterPresetsPanelPresetUtility
     /// </summary>
     /// <param name="panel">Owning panel that provides left and right pane builders.</param>
     /// <param name="leftPaneWidth">Initial split width for the preset list pane.</param>
-    /// <returns>Returns the constructed main content root.<returns>
+    /// <returns>Returns the constructed main content root.</returns>
     public static VisualElement BuildMainContent(EnemyMasterPresetsPanel panel, float leftPaneWidth)
     {
         VisualElement container = new VisualElement();
@@ -93,7 +93,7 @@ internal static class EnemyMasterPresetsPanelPresetUtility
     /// Builds the right pane that hosts the preset detail scroll view.
     /// </summary>
     /// <param name="panel">Owning panel that stores the detail root reference.</param>
-    /// <returns>Returns the constructed right pane visual element.<returns>
+    /// <returns>Returns the constructed right pane visual element.</returns>
     public static VisualElement BuildRightPane(EnemyMasterPresetsPanel panel)
     {
         VisualElement rightPane = new VisualElement();
@@ -113,7 +113,7 @@ internal static class EnemyMasterPresetsPanelPresetUtility
     /// Creates one preset list item visual element with contextual menu actions.
     /// </summary>
     /// <param name="panel">Owning panel that provides preset actions.</param>
-    /// <returns>Returns the reusable preset item visual element.<returns>
+    /// <returns>Returns the reusable preset item visual element.</returns>
     public static VisualElement MakePresetItem(EnemyMasterPresetsPanel panel)
     {
         Label label = new Label();
@@ -411,7 +411,7 @@ internal static class EnemyMasterPresetsPanelPresetUtility
     /// </summary>
     /// <param name="preset">Preset to test.</param>
     /// <param name="searchText">Search string entered by the user.</param>
-    /// <returns>Returns true when the preset matches or when the search string is empty.<returns>
+    /// <returns>Returns true when the preset matches or when the search string is empty.</returns>
     private static bool IsMatchingSearch(EnemyMasterPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))

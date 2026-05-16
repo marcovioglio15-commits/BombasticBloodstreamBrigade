@@ -5,7 +5,6 @@ using UnityEngine;
 /// <summary>
 /// Entry point used to refresh the authored player gameplay integration from the Editor or Unity batch mode.
 /// None.
-/// returns None.
 /// </summary>
 public static class PlayerGameplayIntegrationSetupUtility
 {
@@ -13,7 +12,6 @@ public static class PlayerGameplayIntegrationSetupUtility
     /// <summary>
     /// Runs the authored gameplay integration setup from the Unity Editor menu.
     /// None.
-    /// returns None.
     /// </summary>
     //[MenuItem("Tools/Player/Setup Gameplay Integration")]
     public static void SetupFromMenu()
@@ -24,7 +22,6 @@ public static class PlayerGameplayIntegrationSetupUtility
     /// <summary>
     /// Runs the authored gameplay integration setup from Unity batch mode.
     /// None.
-    /// returns None.
     /// </summary>
     public static void ExecuteBatchSetup()
     {
@@ -35,9 +32,8 @@ public static class PlayerGameplayIntegrationSetupUtility
     #region Methods
     /// <summary>
     /// Runs the full authored setup pipeline and optionally exits the Unity process for batch workflows.
-    /// exitOnCompletion: True when the method should terminate Unity with a success or failure exit code.
-    /// returns None.
     /// </summary>
+    /// <param name="exitOnCompletion">True when the method should terminate Unity with a success or failure exit code.</param>
     private static void ExecuteSetup(bool exitOnCompletion)
     {
         try

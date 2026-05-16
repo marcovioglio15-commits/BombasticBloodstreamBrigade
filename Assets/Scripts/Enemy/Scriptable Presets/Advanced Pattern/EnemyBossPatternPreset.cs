@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Boss-only preset that reuses normal pattern assemble slots and layers ordered boss interactions above them.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyBossPatternPreset", menuName = "Enemy/Boss Pattern Preset", order = 13)]
 public sealed class EnemyBossPatternPreset : ScriptableObject
@@ -116,8 +114,6 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Validates metadata and nested interaction containers without clamping authored gameplay thresholds.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void ValidateValues()
     {
@@ -153,8 +149,6 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Keeps the asset structurally valid after inspector edits.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnValidate()
     {

@@ -2,7 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes fallback-value sanitization for enemy authoring data.
-/// returns None.
 /// </summary>
 public static class EnemyAuthoringFallbackValidationUtility
 {
@@ -12,28 +11,27 @@ public static class EnemyAuthoringFallbackValidationUtility
     /// <summary>
     /// Sanitizes fallback values used only when no preset source is assigned on EnemyAuthoring.
     /// Called by EnemyAuthoring.OnValidate to keep hidden fallback data in a safe range.
-    /// moveSpeed: Fallback movement speed value.
-    /// maxSpeed: Fallback maximum movement speed value.
-    /// acceleration: Fallback acceleration value.
-    /// deceleration: Fallback deceleration value.
-    /// inactivityTime: Fallback post-spawn inactivity duration.
-    /// rotationSpeedDegreesPerSecond: Fallback self-rotation speed.
-    /// minimumWallDistance: Fallback extra distance kept from static walls.
-    /// separationRadius: Fallback neighbor separation radius.
-    /// separationWeight: Fallback neighbor separation weight.
-    /// bodyRadius: Fallback body radius.
-    /// contactRadius: Fallback contact damage radius.
-    /// contactAmountPerTick: Fallback contact damage amount.
-    /// contactTickInterval: Fallback contact damage interval.
-    /// areaRadius: Fallback area damage radius.
-    /// areaAmountPerTickPercent: Fallback area damage percentage amount.
-    /// areaTickInterval: Fallback area damage interval.
-    /// maxHealth: Fallback maximum health.
-    /// maxShield: Fallback maximum shield.
-    /// priorityTier: Fallback priority tier.
-    /// steeringAggressiveness: Fallback steering aggressiveness.
-    /// returns None.
     /// </summary>
+    /// <param name="moveSpeed">Fallback movement speed value.</param>
+    /// <param name="maxSpeed">Fallback maximum movement speed value.</param>
+    /// <param name="acceleration">Fallback acceleration value.</param>
+    /// <param name="deceleration">Fallback deceleration value.</param>
+    /// <param name="inactivityTime">Fallback post-spawn inactivity duration.</param>
+    /// <param name="rotationSpeedDegreesPerSecond">Fallback self-rotation speed.</param>
+    /// <param name="minimumWallDistance">Fallback extra distance kept from static walls.</param>
+    /// <param name="separationRadius">Fallback neighbor separation radius.</param>
+    /// <param name="separationWeight">Fallback neighbor separation weight.</param>
+    /// <param name="bodyRadius">Fallback body radius.</param>
+    /// <param name="contactRadius">Fallback contact damage radius.</param>
+    /// <param name="contactAmountPerTick">Fallback contact damage amount.</param>
+    /// <param name="contactTickInterval">Fallback contact damage interval.</param>
+    /// <param name="areaRadius">Fallback area damage radius.</param>
+    /// <param name="areaAmountPerTickPercent">Fallback area damage percentage amount.</param>
+    /// <param name="areaTickInterval">Fallback area damage interval.</param>
+    /// <param name="maxHealth">Fallback maximum health.</param>
+    /// <param name="maxShield">Fallback maximum shield.</param>
+    /// <param name="priorityTier">Fallback priority tier.</param>
+    /// <param name="steeringAggressiveness">Fallback steering aggressiveness.</param>
     public static void ValidateFallbackValues(ref float moveSpeed,
                                               ref float maxSpeed,
                                               ref float acceleration,

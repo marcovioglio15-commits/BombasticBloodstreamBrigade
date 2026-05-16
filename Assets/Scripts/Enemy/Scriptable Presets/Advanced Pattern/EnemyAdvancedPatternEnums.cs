@@ -43,8 +43,6 @@ public enum EnemyShooterMovementPolicy
 
 /// <summary>
 /// Declares how one Shooter activation distributes its projectile group.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum EnemyShooterShotPattern
 {
@@ -128,8 +126,6 @@ public enum EnemyExtraComboPointsConditionCombineMode
 
 /// <summary>
 /// Declares optional runtime gates that can further restrict Weapon Interaction activation.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Flags]
 public enum EnemyWeaponInteractionActivationGate
@@ -142,8 +138,6 @@ public enum EnemyWeaponInteractionActivationGate
 
 /// <summary>
 /// Declares boss-only interaction triggers layered above the base pattern assemble.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum EnemyBossPatternInteractionType
 {
@@ -156,8 +150,6 @@ public enum EnemyBossPatternInteractionType
 
 /// <summary>
 /// Declares how one boss minion spawn rule is activated at runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum EnemyBossMinionSpawnTrigger
 {

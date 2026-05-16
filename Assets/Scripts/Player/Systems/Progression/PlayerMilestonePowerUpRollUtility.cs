@@ -21,7 +21,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalogLookup">Unlock catalog buffer lookup.</param>
     /// <param name="tierDefinitionsLookup">Tier definitions buffer lookup.</param>
     /// <param name="tierEntriesLookup">Tier entries buffer lookup.</param>
-    /// <returns>True when all required components/buffers are available; otherwise false.<returns>
+    /// <returns>True when all required components/buffers are available; otherwise false.</returns>
     public static bool HasMilestoneSelectionData(Entity entity,
                                                  in ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionStateLookup,
                                                  in BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneSelectionOffersLookup,
@@ -59,7 +59,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="selectionOffers">Selection-offers destination buffer.</param>
     /// <param name="selectionState">Selection-state component updated in place.</param>
     /// <param name="rolledOfferCount">Number of offers rolled for this milestone selection.</param>
-    /// <returns>True when at least one offer is rolled and selection is activated; otherwise false.<returns>
+    /// <returns>True when at least one offer is rolled and selection is activated; otherwise false.</returns>
     public static bool TryOpenMilestoneSelection(PlayerProgressionConfig progressionConfig,
                                                  int activeGamePhaseIndex,
                                                  int milestoneLevel,
@@ -186,7 +186,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="selectedTierId">Tier ID selected for the current roll.</param>
     /// <param name="selectedTierPercentage">Percentage assigned to the selected milestone tier candidate.</param>
     /// <param name="selectedEntryWeight">Weight of the selected power-up entry inside the selected tier.</param>
-    /// <returns>True when an entry is successfully rolled; otherwise false.<returns>
+    /// <returns>True when an entry is successfully rolled; otherwise false.</returns>
     private static bool TryRollMilestoneOffer(ref PlayerMilestonePowerUpUnlockBlob powerUpUnlockBlob,
                                               IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
                                               DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
@@ -266,7 +266,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="tierDefinitions">Tier definitions buffer.</param>
     /// <param name="tierId">Requested tier ID.</param>
     /// <param name="tierDefinition">Resolved tier definition when found.</param>
-    /// <returns>True when tier exists; otherwise false.<returns>
+    /// <returns>True when tier exists; otherwise false.</returns>
     private static bool TryResolveTierDefinition(DynamicBuffer<PlayerPowerUpTierDefinitionElement> tierDefinitions,
                                                  string tierId,
                                                  out PlayerPowerUpTierDefinitionElement tierDefinition)
@@ -300,7 +300,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalog">Unlock catalog buffer.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in current milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
-    /// <returns>True when at least one rollable candidate is available; otherwise false.<returns>
+    /// <returns>True when at least one rollable candidate is available; otherwise false.</returns>
     private static bool HasAnyRollableEntry(in PlayerPowerUpTierDefinitionElement tierDefinition,
                                             DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
                                             DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
@@ -356,7 +356,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
     /// <param name="catalogIndex">Resolved catalog index when successful.</param>
     /// <param name="entryWeight">Weight of the selected power-up entry.</param>
-    /// <returns>True when a candidate is rolled; otherwise false.<returns>
+    /// <returns>True when a candidate is rolled; otherwise false.</returns>
     private static bool TryRollCatalogFromTier(in PlayerPowerUpTierDefinitionElement tierDefinition,
                                                DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
                                                DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
@@ -536,7 +536,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// Resolves one weighted random index.
     /// </summary>
     /// <param name="weights">Weight list where each element maps to one candidate index.</param>
-    /// <returns>Rolled candidate index, or -1 when no valid weight exists.<returns>
+    /// <returns>Rolled candidate index, or -1 when no valid weight exists.</returns>
     private static int RollWeightedIndex(List<float> weights)
     {
         if (weights == null || weights.Count <= 0)

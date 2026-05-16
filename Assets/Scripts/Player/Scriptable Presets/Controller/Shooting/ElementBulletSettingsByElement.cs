@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one independently authored bullet-behaviour block for every supported default projectile element.
-/// /params none.
-/// /returns none.
 /// </summary>
 [Serializable]
 public sealed class ElementBulletSettingsByElement
@@ -67,9 +65,9 @@ public sealed class ElementBulletSettingsByElement
     #region Public Methods
     /// <summary>
     /// Resolves the authored behaviour block for one gameplay element selection.
-    /// /params appliedElement Element whose behaviour should be returned.
-    /// /returns Matching behaviour block, or null when the selection is None.
     /// </summary>
+    /// <param name="appliedElement">Element whose behaviour should be returned.</param>
+    /// <returns>Matching behaviour block, or null when the selection is None.</returns>
     public ElementBulletSettings ResolveSettings(PlayerProjectileAppliedElement appliedElement)
     {
         switch (appliedElement)
@@ -89,9 +87,8 @@ public sealed class ElementBulletSettingsByElement
 
     /// <summary>
     /// Copies one legacy generic behaviour block into every per-element slot.
-    /// /params source Source behaviour block to duplicate.
-    /// /returns void.
     /// </summary>
+    /// <param name="source">Source behaviour block to duplicate.</param>
     public void CopyAllFrom(ElementBulletSettings source)
     {
         ResolveMutableSettings(PlayerProjectileAppliedElement.Fire).CopyFrom(source);
@@ -102,8 +99,6 @@ public sealed class ElementBulletSettingsByElement
 
     /// <summary>
     /// Validates the per-element behaviour container and keeps all nested blocks initialized.
-    /// /params none.
-    /// /returns void.
     /// </summary>
     public void Validate()
     {
@@ -129,9 +124,9 @@ public sealed class ElementBulletSettingsByElement
     #region Internal Methods
     /// <summary>
     /// Resolves a writable behaviour block for one gameplay element selection.
-    /// /params appliedElement Element whose writable settings should be returned.
-    /// /returns Matching writable behaviour block, or the Fire block as a safe fallback.
     /// </summary>
+    /// <param name="appliedElement">Element whose writable settings should be returned.</param>
+    /// <returns>Matching writable behaviour block, or the Fire block as a safe fallback.</returns>
     internal ElementBulletSettings ResolveMutableSettings(PlayerProjectileAppliedElement appliedElement)
     {
         switch (appliedElement)

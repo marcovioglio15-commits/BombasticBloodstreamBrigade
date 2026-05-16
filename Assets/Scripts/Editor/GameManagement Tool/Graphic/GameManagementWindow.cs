@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Main editor window for Game Management Tool, hosting game-level preset panels and draft session actions.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameManagementWindow : EditorWindow
 {
@@ -23,8 +21,6 @@ public sealed class GameManagementWindow : EditorWindow
     #region Menu
     /// <summary>
     /// Opens and focuses the Game Management Tool window from Unity menu.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [MenuItem("Tools/Game Management Tool")]
     public static void ShowWindow()
@@ -41,8 +37,6 @@ public sealed class GameManagementWindow : EditorWindow
     #region Unity Methods
     /// <summary>
     /// Initializes the draft session and restores the active top-level panel.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -61,8 +55,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Builds the UI Toolkit visual tree for the window.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void CreateGUI()
     {
@@ -71,8 +63,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Stops pending-change polling while the window is disabled.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -82,8 +72,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Ends the draft session when the window is destroyed with no pending changes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDestroy()
     {
@@ -93,8 +81,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Applies pending draft changes from Unity's save flow.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public override void SaveChanges()
     {
@@ -103,8 +89,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Discards pending draft changes from Unity's discard flow.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public override void DiscardChanges()
     {
@@ -115,8 +99,6 @@ public sealed class GameManagementWindow : EditorWindow
     #region Layout
     /// <summary>
     /// Rebuilds the complete window layout and restarts status polling.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildWindowLayout()
     {
@@ -140,9 +122,8 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Builds the top toolbar with panel toggle, session buttons and status label.
-    /// /params None.
-    /// /returns Toolbar visual element.
     /// </summary>
+    /// <returns>Toolbar visual element.</returns>
     private VisualElement BuildToolbar()
     {
         Toolbar toolbar = new Toolbar();
@@ -197,11 +178,11 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Creates a toolbar toggle bound to one top-level panel.
-    /// /params label Display label.
-    /// /params panelType Target panel.
-    /// /params isDefault Initial toggle value.
-    /// /returns Configured toolbar toggle.
     /// </summary>
+    /// <param name="label">Display label.</param>
+    /// <param name="panelType">Target panel.</param>
+    /// <param name="isDefault">Initial toggle value.</param>
+    /// <returns>Configured toolbar toggle.</returns>
     private ToolbarToggle CreatePanelToggle(string label, PanelType panelType, bool isDefault)
     {
         ToolbarToggle toggle = new ToolbarToggle();
@@ -220,8 +201,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Instantiates hosted panel controllers.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void BuildPanels()
     {
@@ -230,9 +209,8 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Shows one top-level panel and persists the selection.
-    /// /params panelType Panel to display.
-    /// /returns None.
     /// </summary>
+    /// <param name="panelType">Panel to display.</param>
     private void ShowPanel(PanelType panelType)
     {
         activePanel = panelType;
@@ -251,9 +229,8 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Synchronizes toolbar toggles with the active top-level panel.
-    /// /params panelType Active panel type.
-    /// /returns None.
     /// </summary>
+    /// <param name="panelType">Active panel type.</param>
     private void UpdateToolbarSelection(PanelType panelType)
     {
         Toolbar toolbar = rootVisualElement.Q<Toolbar>();
@@ -277,8 +254,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Opens the shared color browser for this tool.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OpenColorBrowser()
     {
@@ -289,8 +264,6 @@ public sealed class GameManagementWindow : EditorWindow
     #region Session Actions
     /// <summary>
     /// Performs one Undo operation and refreshes panel bindings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UndoLastChange()
     {
@@ -300,8 +273,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Performs one Redo operation and refreshes panel bindings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RedoLastChange()
     {
@@ -311,8 +282,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Applies draft changes and refreshes panel state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyChanges()
     {
@@ -322,8 +291,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Discards draft changes and refreshes panel state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DiscardChangesAndRebuild()
     {
@@ -333,8 +300,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Recomputes draft session state and updates the toolbar status label.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RefreshSessionStatus()
     {
@@ -349,8 +314,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Refreshes hosted panels after draft session mutations.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RefreshPanelsAfterSessionChange()
     {
@@ -362,8 +325,6 @@ public sealed class GameManagementWindow : EditorWindow
 
     /// <summary>
     /// Synchronizes EditorWindow unsaved state with the draft session.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void UpdateUnsavedState()
     {
@@ -376,8 +337,6 @@ public sealed class GameManagementWindow : EditorWindow
     #region Nested Types
     /// <summary>
     /// Top-level Game Management Tool panels.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public enum PanelType
     {

@@ -96,7 +96,7 @@ public static class EnemyExperienceDropPoolUtility
     /// <param name="entityManager">EntityManager used for pool reads and writes.</param>
     /// <param name="poolEntity">Pool entity that stores pooled drop references.</param>
     /// <param name="dropEntity">Acquired drop entity when successful.</param>
-    /// <returns>True when one drop entity is acquired, otherwise false.<returns>
+    /// <returns>True when one drop entity is acquired, otherwise false.</returns>
     public static bool TryAcquireDrop(EntityManager entityManager, Entity poolEntity, out Entity dropEntity)
     {
         int unrestrictedRuntimeExpandBudget = int.MaxValue;
@@ -224,7 +224,7 @@ public static class EnemyExperienceDropPoolUtility
     /// <param name="poolMap">Registry map buffer containing prefab-pool pairs.</param>
     /// <param name="prefabEntity">Drop prefab entity key.</param>
     /// <param name="poolEntity">Resolved pool entity when found.</param>
-    /// <returns>True when a matching pool is found, otherwise false.<returns>
+    /// <returns>True when a matching pool is found, otherwise false.</returns>
     public static bool TryResolvePoolEntity(DynamicBuffer<EnemyExperienceDropPoolMapElement> poolMap,
                                             Entity prefabEntity,
                                             out Entity poolEntity)
@@ -254,7 +254,7 @@ public static class EnemyExperienceDropPoolUtility
     /// <param name="poolMap">Snapshot map containing prefab-pool pairs.</param>
     /// <param name="prefabEntity">Drop prefab entity key.</param>
     /// <param name="poolEntity">Resolved pool entity when found.</param>
-    /// <returns>True when a matching pool is found, otherwise false.<returns>
+    /// <returns>True when a matching pool is found, otherwise false.</returns>
     public static bool TryResolvePoolEntity(NativeArray<EnemyExperienceDropPoolMapElement> poolMap,
                                             Entity prefabEntity,
                                             out Entity poolEntity)

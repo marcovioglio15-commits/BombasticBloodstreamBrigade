@@ -118,7 +118,7 @@ public sealed class PlayerMilestonePowerUpUnlockDefinition
     /// Builds a deep-cloned list of tier-roll definitions for migration from legacy milestone data.
     /// </summary>
     /// <param name="sourceTierRolls">Source tier-roll list to clone.</param>
-    /// <returns>Cloned tier-roll definitions, never null.<returns>
+    /// <returns>Cloned tier-roll definitions, never null.</returns>
     public static List<PlayerMilestoneTierRollDefinition> CloneTierRolls(IReadOnlyList<PlayerMilestoneTierRollDefinition> sourceTierRolls)
     {
         List<PlayerMilestoneTierRollDefinition> clonedTierRolls = new List<PlayerMilestoneTierRollDefinition>();

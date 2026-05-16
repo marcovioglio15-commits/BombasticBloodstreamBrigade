@@ -145,7 +145,6 @@ public sealed class PlayerPowerUpContainerInteractionSettings
     /// <summary>
     /// Sanitizes serialized interaction settings so runtime ECS and HUD code can consume them safely.
     /// none.
-    /// returns void.
     /// </summary>
     public void Validate()
     {
@@ -165,9 +164,9 @@ public sealed class PlayerPowerUpContainerInteractionSettings
 
     /// <summary>
     /// Trims one serialized input action identifier and normalizes empty values to an empty string.
-    /// actionIdValue: Serialized action identifier to sanitize.
-    /// returns Sanitized action identifier.
     /// </summary>
+    /// <param name="actionIdValue">Serialized action identifier to sanitize.</param>
+    /// <returns>Sanitized action identifier.</returns>
     private static string SanitizeActionId(string actionIdValue)
     {
         if (string.IsNullOrWhiteSpace(actionIdValue))

@@ -4,8 +4,6 @@ using UnityEngine.Serialization;
 
 /// <summary>
 /// Stores generic visual feedback authored for offensive enemy behaviour engagements.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class EnemyOffensiveEngagementFeedbackSettings
@@ -195,8 +193,6 @@ public sealed class EnemyOffensiveEngagementFeedbackSettings
     #region Public Methods
     /// <summary>
     /// Keeps the serialized feedback block structurally valid after asset edits without mutating authored numeric tuning.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void Validate()
     {

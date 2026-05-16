@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores one deterministic mesh-body prefab definition for the Laser Beam visual rig builder.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct PlayerLaserBeamBodyPrefabDefinition
 {
@@ -19,14 +17,13 @@ internal readonly struct PlayerLaserBeamBodyPrefabDefinition
     #region Methods
     /// <summary>
     /// Stores one deterministic mesh-body prefab definition.
-    /// /params prefabPath Asset path used when saving the prefab.
-    /// /params rootName Root GameObject name stored in the prefab.
-    /// /params outerScale Local scale of the outer liquid shell.
-    /// /params outerPosition Local offset of the outer liquid shell.
-    /// /params innerScale Local scale of the bright inner core.
-    /// /params innerPosition Local offset of the bright inner core.
-    /// /returns None.
     /// </summary>
+    /// <param name="prefabPath">Asset path used when saving the prefab.</param>
+    /// <param name="rootName">Root GameObject name stored in the prefab.</param>
+    /// <param name="outerScale">Local scale of the outer liquid shell.</param>
+    /// <param name="outerPosition">Local offset of the outer liquid shell.</param>
+    /// <param name="innerScale">Local scale of the bright inner core.</param>
+    /// <param name="innerPosition">Local offset of the bright inner core.</param>
     public PlayerLaserBeamBodyPrefabDefinition(string prefabPath,
                                                string rootName,
                                                Vector3 outerScale,
@@ -46,8 +43,6 @@ internal readonly struct PlayerLaserBeamBodyPrefabDefinition
 
 /// <summary>
 /// Stores one deterministic particle-emitter definition used by a Laser Beam source or impact prefab.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct PlayerLaserBeamParticleEmitterDefinition
 {
@@ -79,30 +74,29 @@ internal readonly struct PlayerLaserBeamParticleEmitterDefinition
     #region Methods
     /// <summary>
     /// Stores one deterministic particle-emitter definition used by a Laser Beam source or impact prefab.
-    /// /params childName Emitter child name stored in the prefab.
-    /// /params localPosition Local emitter offset under the prefab root.
-    /// /params localEulerAngles Local emitter orientation under the prefab root.
-    /// /params localScale Local emitter scale used to sculpt the volumetric silhouette.
-    /// /params shapeType Particle shape module type.
-    /// /params shapeRadius Particle shape radius.
-    /// /params shapeAngle Particle cone angle when applicable.
-    /// /params shapeLength Particle cone or box length when applicable.
-    /// /params looping True when the emitter should keep producing particles while the beam stays active.
-    /// /params duration Particle system duration.
-    /// /params maxParticles Maximum live particles allowed for the emitter.
-    /// /params emissionRate Continuous emission rate.
-    /// /params burstMinimum Minimum burst count spawned at activation.
-    /// /params burstMaximum Maximum burst count spawned at activation.
-    /// /params lifetimeRange Constant min and max particle lifetime.
-    /// /params speedRange Constant min and max particle start speed.
-    /// /params sizeRange Constant min and max particle start size.
-    /// /params noiseStrength Strength of the procedural wobble applied to particles.
-    /// /params noiseFrequency Frequency of the procedural wobble applied to particles.
-    /// /params velocityLinearZ Forward velocity applied over lifetime in local space.
-    /// /params velocityOrbitalY Orbital twist applied around local up.
-    /// /params randomDirectionAmount Random direction blend used by the shape module.
-    /// /returns None.
     /// </summary>
+    /// <param name="childName">Emitter child name stored in the prefab.</param>
+    /// <param name="localPosition">Local emitter offset under the prefab root.</param>
+    /// <param name="localEulerAngles">Local emitter orientation under the prefab root.</param>
+    /// <param name="localScale">Local emitter scale used to sculpt the volumetric silhouette.</param>
+    /// <param name="shapeType">Particle shape module type.</param>
+    /// <param name="shapeRadius">Particle shape radius.</param>
+    /// <param name="shapeAngle">Particle cone angle when applicable.</param>
+    /// <param name="shapeLength">Particle cone or box length when applicable.</param>
+    /// <param name="looping">True when the emitter should keep producing particles while the beam stays active.</param>
+    /// <param name="duration">Particle system duration.</param>
+    /// <param name="maxParticles">Maximum live particles allowed for the emitter.</param>
+    /// <param name="emissionRate">Continuous emission rate.</param>
+    /// <param name="burstMinimum">Minimum burst count spawned at activation.</param>
+    /// <param name="burstMaximum">Maximum burst count spawned at activation.</param>
+    /// <param name="lifetimeRange">Constant min and max particle lifetime.</param>
+    /// <param name="speedRange">Constant min and max particle start speed.</param>
+    /// <param name="sizeRange">Constant min and max particle start size.</param>
+    /// <param name="noiseStrength">Strength of the procedural wobble applied to particles.</param>
+    /// <param name="noiseFrequency">Frequency of the procedural wobble applied to particles.</param>
+    /// <param name="velocityLinearZ">Forward velocity applied over lifetime in local space.</param>
+    /// <param name="velocityOrbitalY">Orbital twist applied around local up.</param>
+    /// <param name="randomDirectionAmount">Random direction blend used by the shape module.</param>
     public PlayerLaserBeamParticleEmitterDefinition(string childName,
                                                     Vector3 localPosition,
                                                     Vector3 localEulerAngles,
@@ -154,8 +148,6 @@ internal readonly struct PlayerLaserBeamParticleEmitterDefinition
 
 /// <summary>
 /// Stores one deterministic particle-prefab definition composed of two layered emitters.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal readonly struct PlayerLaserBeamParticlePrefabDefinition
 {
@@ -169,12 +161,11 @@ internal readonly struct PlayerLaserBeamParticlePrefabDefinition
     #region Methods
     /// <summary>
     /// Stores one deterministic particle-prefab definition composed of two layered emitters.
-    /// /params prefabPath Asset path used when saving the prefab.
-    /// /params rootName Root GameObject name stored in the prefab.
-    /// /params primaryEmitter First emitter definition, usually the dense liquid core.
-    /// /params secondaryEmitter Second emitter definition, usually the bloom or splash layer.
-    /// /returns None.
     /// </summary>
+    /// <param name="prefabPath">Asset path used when saving the prefab.</param>
+    /// <param name="rootName">Root GameObject name stored in the prefab.</param>
+    /// <param name="primaryEmitter">First emitter definition, usually the dense liquid core.</param>
+    /// <param name="secondaryEmitter">Second emitter definition, usually the bloom or splash layer.</param>
     public PlayerLaserBeamParticlePrefabDefinition(string prefabPath,
                                                    string rootName,
                                                    PlayerLaserBeamParticleEmitterDefinition primaryEmitter,
@@ -190,8 +181,6 @@ internal readonly struct PlayerLaserBeamParticlePrefabDefinition
 
 /// <summary>
 /// Provides deterministic authored prefab definitions used by the Laser Beam visual rig builder.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 {
@@ -200,9 +189,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
     #region Public Methods
     /// <summary>
     /// Creates the rounded tube body prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Rounded tube body definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Rounded tube body definition.</returns>
     public static PlayerLaserBeamBodyPrefabDefinition CreateRoundedTubeBodyDefinition(string prefabPath)
     {
         return new PlayerLaserBeamBodyPrefabDefinition(prefabPath,
@@ -215,9 +204,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the tapered jet body prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Tapered jet body definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Tapered jet body definition.</returns>
     public static PlayerLaserBeamBodyPrefabDefinition CreateTaperedJetBodyDefinition(string prefabPath)
     {
         return new PlayerLaserBeamBodyPrefabDefinition(prefabPath,
@@ -230,9 +219,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the dense ribbon body prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Dense ribbon body definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Dense ribbon body definition.</returns>
     public static PlayerLaserBeamBodyPrefabDefinition CreateDenseRibbonBodyDefinition(string prefabPath)
     {
         return new PlayerLaserBeamBodyPrefabDefinition(prefabPath,
@@ -245,9 +234,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the bubble-burst source prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Bubble-burst source prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Bubble-burst source prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateBubbleBurstSourceDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,
@@ -300,9 +289,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the star-bloom source prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Star-bloom source prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Star-bloom source prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateStarBloomSourceDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,
@@ -355,9 +344,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the soft-disc source prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Soft-disc source prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Soft-disc source prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateSoftDiscSourceDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,
@@ -410,9 +399,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the bubble-burst impact prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Bubble-burst impact prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Bubble-burst impact prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateBubbleBurstImpactDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,
@@ -465,9 +454,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the star-bloom impact prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Star-bloom impact prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Star-bloom impact prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateStarBloomImpactDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,
@@ -520,9 +509,9 @@ internal static class PlayerLaserBeamVisualRigPrefabDefinitions
 
     /// <summary>
     /// Creates the soft-disc impact prefab definition.
-    /// /params prefabPath Target prefab asset path.
-    /// /returns Soft-disc impact prefab definition.
     /// </summary>
+    /// <param name="prefabPath">Target prefab asset path.</param>
+    /// <returns>Soft-disc impact prefab definition.</returns>
     public static PlayerLaserBeamParticlePrefabDefinition CreateSoftDiscImpactDefinition(string prefabPath)
     {
         return new PlayerLaserBeamParticlePrefabDefinition(prefabPath,

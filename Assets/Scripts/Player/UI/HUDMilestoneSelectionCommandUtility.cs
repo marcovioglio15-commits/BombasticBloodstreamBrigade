@@ -15,7 +15,7 @@ public static class HUDMilestoneSelectionCommandUtility
     /// <param name="playerEntity">Player entity that owns milestone selection state and command buffers.</param>
     /// <param name="commandType">Command kind requested by the HUD.</param>
     /// <param name="offerIndex">Offer index used by selection commands, or -1 for skip.</param>
-    /// <returns>True when the command is queued; otherwise false.<returns>
+    /// <returns>True when the command is queued; otherwise false.</returns>
     public static bool TryQueueCommand(EntityManager entityManager,
                                        Entity playerEntity,
                                        PlayerMilestoneSelectionCommandType commandType,

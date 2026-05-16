@@ -6,8 +6,6 @@ using UnityEngine;
 
 /// <summary>
 /// Forces Play Mode to start from the bootstrap scene in editor, then restores the previous scene setup afterward.
-/// /params None.
-/// /returns None.
 /// </summary>
 [InitializeOnLoad]
 public static class GameSceneManagementPlayModeSceneGuard
@@ -22,8 +20,6 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Constructors
     /// <summary>
     /// Registers Play Mode callbacks once when editor assemblies load.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     static GameSceneManagementPlayModeSceneGuard()
     {
@@ -37,8 +33,6 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Menu
     /// <summary>
     /// Toggles forced bootstrap Play Mode scene setup for local editor sessions.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     //[MenuItem(MenuPath)]
     private static void ToggleForcedBootstrapPlayMode()
@@ -48,9 +42,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Validates the Play Mode guard menu item and keeps its check mark synchronized.
-    /// /params None.
-    /// /returns True because the menu item is always available in editor.
     /// </summary>
+    /// <returns>True because the menu item is always available in editor.</returns>
     //[MenuItem(MenuPath, true)]
     private static bool ValidateForcedBootstrapPlayMode()
     {
@@ -62,9 +55,8 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Play Mode Events
     /// <summary>
     /// Applies bootstrap setup before entering Play Mode and restores the previous scene setup after exit.
-    /// /params state Current Play Mode state transition.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current Play Mode state transition.</param>
     private static void HandlePlayModeStateChanged(PlayModeStateChange state)
     {
         switch (state)
@@ -82,8 +74,6 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Preparation
     /// <summary>
     /// Captures the current scene setup and opens only the bootstrap scene before Play Mode starts.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void PrepareBootstrapPlayMode()
     {
@@ -114,9 +104,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Verifies that all open scenes can be restored after Play Mode.
-    /// /params None.
-    /// /returns True when every loaded scene has a persistent asset path.
     /// </summary>
+    /// <returns>True when every loaded scene has a persistent asset path.</returns>
     private static bool CanCaptureCurrentSceneSetup()
     {
         SceneSetup[] currentSetup = EditorSceneManager.GetSceneManagerSetup();
@@ -142,9 +131,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Opens the authored bootstrap scene as the only loaded scene for Play Mode.
-    /// /params None.
-    /// /returns True when the bootstrap scene was opened successfully.
     /// </summary>
+    /// <returns>True when the bootstrap scene was opened successfully.</returns>
     private static bool OpenBootstrapScene()
     {
         string bootstrapPath = GameSceneManagementProjectSetupUtility.BootstrapScenePath;
@@ -163,8 +151,6 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Restoration
     /// <summary>
     /// Restores the scene setup captured before Play Mode, when a restore is pending.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void RestorePreviousSceneSetup()
     {
@@ -186,9 +172,8 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Persistence
     /// <summary>
     /// Stores a serializable copy of the current editor scene setup in SessionState.
-    /// /params sceneSetup Scene setup captured before Play Mode.
-    /// /returns None.
     /// </summary>
+    /// <param name="sceneSetup">Scene setup captured before Play Mode.</param>
     private static void StoreSceneSetup(SceneSetup[] sceneSetup)
     {
         StoredSceneSetupCollection collection = new StoredSceneSetupCollection();
@@ -205,9 +190,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Loads the previously stored editor scene setup from SessionState.
-    /// /params None.
-    /// /returns Scene setup array ready for EditorSceneManager.RestoreSceneManagerSetup.
     /// </summary>
+    /// <returns>Scene setup array ready for EditorSceneManager.RestoreSceneManagerSetup.</returns>
     private static SceneSetup[] LoadSceneSetup()
     {
         string serializedSetup = SessionState.GetString(SerializedSetupKey, string.Empty);
@@ -239,9 +223,8 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Preferences
     /// <summary>
     /// Resolves whether forced bootstrap Play Mode is enabled for the local editor.
-    /// /params None.
-    /// /returns True when Play Mode should open SCN_Bootstrap automatically.
     /// </summary>
+    /// <returns>True when Play Mode should open SCN_Bootstrap automatically.</returns>
     private static bool IsEnabled()
     {
         return EditorPrefs.GetBool(EnabledPreferenceKey, true);
@@ -249,9 +232,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Stores the local editor preference that controls forced bootstrap Play Mode.
-    /// /params enabled True to force bootstrap scene setup before Play Mode.
-    /// /returns None.
     /// </summary>
+    /// <param name="enabled">True to force bootstrap scene setup before Play Mode.</param>
     private static void SetEnabled(bool enabled)
     {
         EditorPrefs.SetBool(EnabledPreferenceKey, enabled);
@@ -263,8 +245,6 @@ public static class GameSceneManagementPlayModeSceneGuard
     #region Types
     /// <summary>
     /// Serializable collection wrapper used by SessionState JSON storage.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [Serializable]
     private sealed class StoredSceneSetupCollection
@@ -274,8 +254,6 @@ public static class GameSceneManagementPlayModeSceneGuard
 
     /// <summary>
     /// Serializable scene setup entry used to survive Play Mode domain reloads.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [Serializable]
     private sealed class StoredSceneSetup
@@ -286,9 +264,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
         /// <summary>
         /// Creates a JSON-serializable scene setup entry.
-        /// /params sceneSetup Source editor scene setup.
-        /// /returns None.
         /// </summary>
+        /// <param name="sceneSetup">Source editor scene setup.</param>
         public StoredSceneSetup(SceneSetup sceneSetup)
         {
             Path = sceneSetup.path;
@@ -298,9 +275,8 @@ public static class GameSceneManagementPlayModeSceneGuard
 
         /// <summary>
         /// Converts this stored entry back into Unity's editor scene setup type.
-        /// /params None.
-        /// /returns SceneSetup value compatible with EditorSceneManager.RestoreSceneManagerSetup.
         /// </summary>
+        /// <returns>SceneSetup value compatible with EditorSceneManager.RestoreSceneManagerSetup.</returns>
         public SceneSetup ToSceneSetup()
         {
             return new SceneSetup

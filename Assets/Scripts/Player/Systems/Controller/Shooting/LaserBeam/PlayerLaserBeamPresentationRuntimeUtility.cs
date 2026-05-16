@@ -6,8 +6,6 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// Owns pooled managed Laser Beam body and particle instances for the 3D presentation path.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamPresentationRuntimeUtility
 {
@@ -25,11 +23,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
     #region Public Methods
     /// <summary>
     /// Removes pooled managed instances owned by destroyed ECS entities.
-    /// /params entityManager World entity manager used to validate owner entities.
-    /// /params managedInstances Mutable runtime instance dictionary.
-    /// /params invalidOwnerEntities Reusable list that receives dead owners before cleanup.
-    /// /returns None.
     /// </summary>
+    /// <param name="entityManager">World entity manager used to validate owner entities.</param>
+    /// <param name="managedInstances">Mutable runtime instance dictionary.</param>
+    /// <param name="invalidOwnerEntities">Reusable list that receives dead owners before cleanup.</param>
     public static void CleanupInvalidOwnerInstances(EntityManager entityManager,
                                                     Dictionary<Entity, PlayerLaserBeamManagedInstance> managedInstances,
                                                     List<Entity> invalidOwnerEntities)
@@ -72,10 +69,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Creates or reuses the pooled managed instance that owns all visuals for one player beam.
-    /// /params playerEntity Owner entity used to key the pooled dictionary.
-    /// /params managedInstances Mutable runtime instance dictionary.
-    /// /returns Managed instance ready for rendering.
     /// </summary>
+    /// <param name="playerEntity">Owner entity used to key the pooled dictionary.</param>
+    /// <param name="managedInstances">Mutable runtime instance dictionary.</param>
+    /// <returns>Managed instance ready for rendering.</returns>
     public static PlayerLaserBeamManagedInstance GetOrCreateManagedInstance(Entity playerEntity,
                                                                             Dictionary<Entity, PlayerLaserBeamManagedInstance> managedInstances)
     {
@@ -102,10 +99,9 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Starts a short dissipation tail for one pooled beam instance without destroying its owned visuals.
-    /// /params playerEntity Owner entity used to resolve the pooled instance.
-    /// /params managedInstances Runtime instance dictionary.
-    /// /returns None.
     /// </summary>
+    /// <param name="playerEntity">Owner entity used to resolve the pooled instance.</param>
+    /// <param name="managedInstances">Runtime instance dictionary.</param>
     public static void DisableManagedInstance(Entity playerEntity,
                                               Dictionary<Entity, PlayerLaserBeamManagedInstance> managedInstances)
     {
@@ -138,9 +134,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Cancels the dissipation tail of one managed beam instance because the beam became active again.
-    /// /params managedInstance Managed beam instance that should resume full rendering.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstance">Managed beam instance that should resume full rendering.</param>
     public static void CancelManagedInstanceShutdown(PlayerLaserBeamManagedInstance managedInstance)
     {
         if (managedInstance == null)
@@ -153,10 +148,9 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Advances every active dissipation tail and hard-disables pooled instances whose fade reached zero.
-    /// /params managedInstances Runtime instance dictionary.
-    /// /params deltaTimeSeconds Frame delta time used to advance the fade.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstances">Runtime instance dictionary.</param>
+    /// <param name="deltaTimeSeconds">Frame delta time used to advance the fade.</param>
     public static void AdvanceManagedInstanceShutdownTails(Dictionary<Entity, PlayerLaserBeamManagedInstance> managedInstances,
                                                            float deltaTimeSeconds)
     {
@@ -200,9 +194,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys one pooled managed instance and all visuals owned by it.
-    /// /params managedInstance Instance to destroy.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstance">Instance to destroy.</param>
     public static void DestroyManagedInstance(PlayerLaserBeamManagedInstance managedInstance)
     {
         if (managedInstance == null)
@@ -220,10 +213,9 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Ensures the pooled body visual list can render the requested lane count.
-    /// /params managedInstance Instance owning the pooled visuals.
-    /// /params requiredCount Number of lane visuals required this frame.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstance">Instance owning the pooled visuals.</param>
+    /// <param name="requiredCount">Number of lane visuals required this frame.</param>
     public static void EnsureBodyVisualCount(PlayerLaserBeamManagedInstance managedInstance,
                                              int requiredCount)
     {
@@ -250,13 +242,12 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Ensures the pooled particle visual list can render the requested lane count using the selected prefab.
-    /// /params visuals Mutable pooled visual list.
-    /// /params requiredCount Number of lane endpoint visuals required this frame.
-    /// /params prefab Resolved particle prefab that should back the pooled visuals.
-    /// /params parentTransform Parent transform that receives new pooled instances.
-    /// /params label Prefix used when renaming created instances.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Mutable pooled visual list.</param>
+    /// <param name="requiredCount">Number of lane endpoint visuals required this frame.</param>
+    /// <param name="prefab">Resolved particle prefab that should back the pooled visuals.</param>
+    /// <param name="parentTransform">Parent transform that receives new pooled instances.</param>
+    /// <param name="label">Prefix used when renaming created instances.</param>
     public static void EnsureParticleVisualCount(List<PlayerLaserBeamManagedParticleVisual> visuals,
                                                  int requiredCount,
                                                  GameObject prefab,
@@ -287,9 +278,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Restarts all particle systems owned by one pooled particle visual.
-    /// /params visual Pooled particle visual to restart.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to restart.</param>
     public static void RestartParticleVisual(PlayerLaserBeamManagedParticleVisual visual)
     {
         if (visual == null || visual.ParticleSystems == null)
@@ -311,13 +301,12 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
     #region Private Methods
     /// <summary>
     /// Ensures the particle visual pool matches the required count and prefab source.
-    /// /params visuals Mutable pooled particle visual list.
-    /// /params requiredCount Required number of pooled particle visuals.
-    /// /params prefab Prefab that should back every pooled particle visual.
-    /// /params parentTransform Parent transform that receives new pooled instances.
-    /// /params label Prefix used when renaming created instances.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Mutable pooled particle visual list.</param>
+    /// <param name="requiredCount">Required number of pooled particle visuals.</param>
+    /// <param name="prefab">Prefab that should back every pooled particle visual.</param>
+    /// <param name="parentTransform">Parent transform that receives new pooled instances.</param>
+    /// <param name="label">Prefix used when renaming created instances.</param>
     private static void EnsureParticleVisualCapacity(List<PlayerLaserBeamManagedParticleVisual> visuals,
                                                      int requiredCount,
                                                      GameObject prefab,
@@ -348,10 +337,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Creates one pooled ribbon body visual backed by a dedicated dynamic mesh.
-    /// /params parentTransform Parent transform that receives the pooled instance.
-    /// /params visualIndex Stable index used to name the created GameObject.
-    /// /returns Newly created pooled body visual, or null when creation fails.
     /// </summary>
+    /// <param name="parentTransform">Parent transform that receives the pooled instance.</param>
+    /// <param name="visualIndex">Stable index used to name the created GameObject.</param>
+    /// <returns>Newly created pooled body visual, or null when creation fails.</returns>
     private static PlayerLaserBeamManagedBodyVisual CreateBodyVisual(Transform parentTransform,
                                                                      int visualIndex)
     {
@@ -393,11 +382,11 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Instantiates one pooled particle visual from the resolved source or impact prefab.
-    /// /params prefab Resolved particle prefab to instantiate.
-    /// /params parentTransform Parent transform that receives the pooled instance.
-    /// /params label Prefix used when renaming the created instance.
-    /// /returns Newly created pooled particle visual, or null when creation fails.
     /// </summary>
+    /// <param name="prefab">Resolved particle prefab to instantiate.</param>
+    /// <param name="parentTransform">Parent transform that receives the pooled instance.</param>
+    /// <param name="label">Prefix used when renaming the created instance.</param>
+    /// <returns>Newly created pooled particle visual, or null when creation fails.</returns>
     private static PlayerLaserBeamManagedParticleVisual CreateParticleVisual(GameObject prefab,
                                                                              Transform parentTransform,
                                                                              string label)
@@ -425,9 +414,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys all pooled body visuals stored in one list.
-    /// /params visuals Mutable pooled body visual list.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Mutable pooled body visual list.</param>
     private static void DestroyBodyVisuals(List<PlayerLaserBeamManagedBodyVisual> visuals)
     {
         if (visuals == null)
@@ -441,9 +429,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys all pooled particle visuals stored in one list.
-    /// /params visuals Mutable pooled particle visual list.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Mutable pooled particle visual list.</param>
     private static void DestroyParticleVisuals(List<PlayerLaserBeamManagedParticleVisual> visuals)
     {
         if (visuals == null)
@@ -457,9 +444,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys one pooled body visual instance and its owned dynamic mesh.
-    /// /params visual Pooled body visual to destroy.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled body visual to destroy.</param>
     private static void DestroyBodyVisual(PlayerLaserBeamManagedBodyVisual visual)
     {
         if (visual == null)
@@ -476,9 +462,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys one pooled particle visual instance.
-    /// /params visual Pooled particle visual to destroy.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to destroy.</param>
     private static void DestroyParticleVisual(PlayerLaserBeamManagedParticleVisual visual)
     {
         if (visual == null || visual.InstanceObject == null)
@@ -489,10 +474,9 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Stops every pooled particle visual in one list and optionally clears already spawned particles.
-    /// /params visuals Mutable pooled particle visual list.
-    /// /params clearParticles True to clear spawned particles immediately, false to let them fade naturally.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Mutable pooled particle visual list.</param>
+    /// <param name="clearParticles">True to clear spawned particles immediately, false to let them fade naturally.</param>
     private static void StopParticleVisuals(List<PlayerLaserBeamManagedParticleVisual> visuals,
                                             bool clearParticles)
     {
@@ -512,10 +496,9 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Stops every particle system owned by one pooled particle visual and optionally clears already spawned particles.
-    /// /params visual Pooled particle visual to stop.
-    /// /params clearParticles True to clear spawned particles immediately, false to preserve a short residual tail.
-    /// /returns None.
     /// </summary>
+    /// <param name="visual">Pooled particle visual to stop.</param>
+    /// <param name="clearParticles">True to clear spawned particles immediately, false to preserve a short residual tail.</param>
     private static void StopParticleVisual(PlayerLaserBeamManagedParticleVisual visual,
                                            bool clearParticles)
     {
@@ -538,9 +521,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Hard-disables one managed instance after its dissipation tail finishes or before destruction.
-    /// /params managedInstance Managed beam instance to disable.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstance">Managed beam instance to disable.</param>
     private static void HardDisableManagedInstance(PlayerLaserBeamManagedInstance managedInstance)
     {
         if (managedInstance == null || managedInstance.RootObject == null)
@@ -559,11 +541,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Applies the shutdown fade multiplier to all active renderers owned by one managed instance.
-    /// /params managedInstance Managed beam instance that owns the active renderers.
-    /// /params previousFadeNormalized Previously applied remaining fade amount in the 0-1 range.
-    /// /params currentFadeNormalized Current remaining fade amount in the 0-1 range.
-    /// /returns None.
     /// </summary>
+    /// <param name="managedInstance">Managed beam instance that owns the active renderers.</param>
+    /// <param name="previousFadeNormalized">Previously applied remaining fade amount in the 0-1 range.</param>
+    /// <param name="currentFadeNormalized">Current remaining fade amount in the 0-1 range.</param>
     private static void ApplyManagedInstanceDissipationFade(PlayerLaserBeamManagedInstance managedInstance,
                                                             float previousFadeNormalized,
                                                             float currentFadeNormalized)
@@ -576,11 +557,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Applies the shutdown fade multiplier to every active body renderer in the provided list.
-    /// /params visuals Body visual list to fade.
-    /// /params previousFadeNormalized Previously applied remaining fade amount in the 0-1 range.
-    /// /params currentFadeNormalized Current remaining fade amount in the 0-1 range.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Body visual list to fade.</param>
+    /// <param name="previousFadeNormalized">Previously applied remaining fade amount in the 0-1 range.</param>
+    /// <param name="currentFadeNormalized">Current remaining fade amount in the 0-1 range.</param>
     private static void ApplyBodyVisualDissipationFade(List<PlayerLaserBeamManagedBodyVisual> visuals,
                                                        float previousFadeNormalized,
                                                        float currentFadeNormalized)
@@ -609,11 +589,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Applies the shutdown fade multiplier to every active particle renderer in the provided list.
-    /// /params visuals Particle visual list to fade.
-    /// /params previousFadeNormalized Previously applied remaining fade amount in the 0-1 range.
-    /// /params currentFadeNormalized Current remaining fade amount in the 0-1 range.
-    /// /returns None.
     /// </summary>
+    /// <param name="visuals">Particle visual list to fade.</param>
+    /// <param name="previousFadeNormalized">Previously applied remaining fade amount in the 0-1 range.</param>
+    /// <param name="currentFadeNormalized">Current remaining fade amount in the 0-1 range.</param>
     private static void ApplyParticleVisualDissipationFade(List<PlayerLaserBeamManagedParticleVisual> visuals,
                                                            float previousFadeNormalized,
                                                            float currentFadeNormalized)
@@ -635,11 +614,10 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Applies the shutdown fade multiplier to one active renderer property block.
-    /// /params renderer Renderer that owns the property block.
-    /// /params previousFadeNormalized Previously applied remaining fade amount in the 0-1 range.
-    /// /params currentFadeNormalized Current remaining fade amount in the 0-1 range.
-    /// /returns None.
     /// </summary>
+    /// <param name="renderer">Renderer that owns the property block.</param>
+    /// <param name="previousFadeNormalized">Previously applied remaining fade amount in the 0-1 range.</param>
+    /// <param name="currentFadeNormalized">Current remaining fade amount in the 0-1 range.</param>
     private static void ApplyRendererDissipationFade(Renderer renderer,
                                                      float previousFadeNormalized,
                                                      float currentFadeNormalized)
@@ -657,13 +635,13 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Creates one mesh-renderer child that shares the lane body mesh and renders one visual layer role.
-    /// /params parentTransform Parent transform that receives the new child.
-    /// /params sharedMesh Dynamic lane mesh shared across all body layers.
-    /// /params layerRole Visual role rendered by the created child.
-    /// /params childName Readable name appended to the child GameObject.
-    /// /params sortingOrder Renderer sorting order used for the layer.
-    /// /returns Newly created body-layer visual, or null when creation fails.
     /// </summary>
+    /// <param name="parentTransform">Parent transform that receives the new child.</param>
+    /// <param name="sharedMesh">Dynamic lane mesh shared across all body layers.</param>
+    /// <param name="layerRole">Visual role rendered by the created child.</param>
+    /// <param name="childName">Readable name appended to the child GameObject.</param>
+    /// <param name="sortingOrder">Renderer sorting order used for the layer.</param>
+    /// <returns>Newly created body-layer visual, or null when creation fails.</returns>
     private static PlayerLaserBeamManagedBodyLayerVisual CreateBodyLayerVisual(Transform parentTransform,
                                                                                Mesh sharedMesh,
                                                                                PlayerLaserBeamBodyLayerRole layerRole,
@@ -697,9 +675,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys all child mesh-renderer layers owned by one body visual.
-    /// /params layerVisuals Mutable layer list to destroy and clear.
-    /// /returns None.
     /// </summary>
+    /// <param name="layerVisuals">Mutable layer list to destroy and clear.</param>
     private static void DestroyBodyLayerVisuals(List<PlayerLaserBeamManagedBodyLayerVisual> layerVisuals)
     {
         if (layerVisuals == null)
@@ -713,9 +690,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 
     /// <summary>
     /// Destroys one child mesh-renderer layer owned by a lane body visual.
-    /// /params layerVisual Layer visual to destroy.
-    /// /returns None.
     /// </summary>
+    /// <param name="layerVisual">Layer visual to destroy.</param>
     private static void DestroyBodyLayerVisual(PlayerLaserBeamManagedBodyLayerVisual layerVisual)
     {
         if (layerVisual == null || layerVisual.InstanceObject == null)

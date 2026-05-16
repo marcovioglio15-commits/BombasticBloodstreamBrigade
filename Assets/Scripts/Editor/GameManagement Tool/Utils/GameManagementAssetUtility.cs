@@ -5,8 +5,6 @@ using UnityEditor;
 
 /// <summary>
 /// Shared editor helpers for Game Management Tool asset paths and file-safe names.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameManagementAssetUtility
 {
@@ -15,9 +13,8 @@ public static class GameManagementAssetUtility
     #region Public Methods
     /// <summary>
     /// Ensures a Unity asset folder exists, including missing parent folders.
-    /// /params folderPath Project-relative folder path.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Project-relative folder path.</param>
     public static void EnsureFolder(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))
@@ -37,9 +34,9 @@ public static class GameManagementAssetUtility
 
     /// <summary>
     /// Converts arbitrary preset display text into a safe Unity asset filename.
-    /// /params rawName Raw user-authored name.
-    /// /returns Safe filename or an empty string when no valid characters remain.
     /// </summary>
+    /// <param name="rawName">Raw user-authored name.</param>
+    /// <returns>Safe filename or an empty string when no valid characters remain.</returns>
     public static string NormalizeAssetName(string rawName)
     {
         if (string.IsNullOrWhiteSpace(rawName))

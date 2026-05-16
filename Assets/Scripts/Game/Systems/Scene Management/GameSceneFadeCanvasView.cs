@@ -5,8 +5,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Authored full-screen fade overlay view controlled by the Game Scene Manager presentation system.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameSceneFadeCanvasView : MonoBehaviour
@@ -41,11 +39,11 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Applies the latest fade state to the active authored view when one exists.
-    /// /params alpha Fade alpha in the 0..1 range.
-    /// /params visible True when the overlay GameObject should stay active.
-    /// /params color Fade surface color.
-    /// /returns True when a fade view received the state.
     /// </summary>
+    /// <param name="alpha">Fade alpha in the 0..1 range.</param>
+    /// <param name="visible">True when the overlay GameObject should stay active.</param>
+    /// <param name="color">Fade surface color.</param>
+    /// <returns>True when a fade view received the state.</returns>
     public static bool TryApply(float alpha, bool visible, Color color)
     {
         if (activeView == null)
@@ -57,9 +55,8 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
     /// <summary>
     /// Version number incremented whenever a fade view registers, allowing ECS presentation to reapply unchanged state.
-    /// /params None.
-    /// /returns Active view version.
     /// </summary>
+    /// <returns>Active view version.</returns>
     public static int ActiveViewVersion
     {
         get
@@ -72,8 +69,6 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Caches component references and registers this authored overlay as the active fade view.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -96,8 +91,6 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
     /// <summary>
     /// Clears the active view reference when this overlay is disabled or unloaded.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -109,11 +102,10 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     #region Private Methods
     /// <summary>
     /// Writes alpha, color and raycast state to the authored overlay components.
-    /// /params alpha Fade alpha in the 0..1 range.
-    /// /params visible True when the overlay should be enabled.
-    /// /params color Fade surface color.
-    /// /returns None.
     /// </summary>
+    /// <param name="alpha">Fade alpha in the 0..1 range.</param>
+    /// <param name="visible">True when the overlay should be enabled.</param>
+    /// <param name="color">Fade surface color.</param>
     private void Apply(float alpha, bool visible, Color color)
     {
         float clampedAlpha = Mathf.Clamp01(alpha);
@@ -134,9 +126,8 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
     /// <summary>
     /// Reads the current ECS fade singleton so enabling the view during a transition never resets it to transparent.
-    /// /params None.
-    /// /returns True when an ECS fade state was applied.
     /// </summary>
+    /// <returns>True when an ECS fade state was applied.</returns>
     private bool TryApplyCurrentRuntimeState()
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -166,8 +157,6 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
     /// <summary>
     /// Normalizes the authored overlay canvas so additive scene UI cannot render above the fade.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ConfigureCanvas()
     {

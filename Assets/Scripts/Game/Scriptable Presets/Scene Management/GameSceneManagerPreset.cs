@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Scriptable preset that defines the project-wide scene flow, transition graph and fade settings.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "GameSceneManagerPreset", menuName = "Game/Scene Manager Preset", order = 23)]
 public sealed class GameSceneManagerPreset : ScriptableObject
@@ -207,8 +205,6 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Ensures required reference objects and stable metadata exist without clamping authored tuning values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public void EnsureInitialized()
     {
@@ -233,10 +229,10 @@ public sealed class GameSceneManagerPreset : ScriptableObject
 
     /// <summary>
     /// Finds a scene definition by stable scene ID.
-    /// /params sceneId Stable scene ID to find.
-    /// /params sceneDefinition Matching scene definition when available.
-    /// /returns True when a matching scene definition exists.
     /// </summary>
+    /// <param name="sceneId">Stable scene ID to find.</param>
+    /// <param name="sceneDefinition">Matching scene definition when available.</param>
+    /// <returns>True when a matching scene definition exists.</returns>
     public bool TryFindScene(string sceneId, out GameSceneDefinition sceneDefinition)
     {
         sceneDefinition = null;
@@ -263,10 +259,10 @@ public sealed class GameSceneManagerPreset : ScriptableObject
 
     /// <summary>
     /// Finds a transition by stable transition ID.
-    /// /params transitionId Stable transition ID to find.
-    /// /params transitionDefinition Matching transition definition when available.
-    /// /returns True when a matching transition definition exists.
     /// </summary>
+    /// <param name="transitionId">Stable transition ID to find.</param>
+    /// <param name="transitionDefinition">Matching transition definition when available.</param>
+    /// <returns>True when a matching transition definition exists.</returns>
     public bool TryFindTransition(string transitionId, out GameSceneTransitionDefinition transitionDefinition)
     {
         transitionDefinition = null;
@@ -295,8 +291,6 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     #region Unity Methods
     /// <summary>
     /// Keeps editor-only required metadata initialized while preserving authored values for validation warnings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnValidate()
     {

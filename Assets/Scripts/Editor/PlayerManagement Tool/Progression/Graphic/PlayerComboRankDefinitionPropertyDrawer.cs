@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Draws one combo-rank entry with scalable threshold editing and Character Tuning validation feedback.
 /// none.
-/// returns none.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerComboRankDefinition))]
 public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
@@ -21,9 +20,9 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit inspector for one combo-rank entry.
-    /// property Serialized combo-rank property.
-    /// returns Root UI element used by the inspector.
     /// </summary>
+    /// <param name="property">Serialized combo-rank property.</param>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -111,10 +110,10 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
     #region Private Methods
     /// <summary>
     /// Creates one bound property field with the requested display label.
-    /// property Serialized property bound to the field.
-    /// label Inspector label shown for the bound field.
-    /// returns Configured property field bound to the serialized property.
     /// </summary>
+    /// <param name="property">Serialized property bound to the field.</param>
+    /// <param name="label">Inspector label shown for the bound field.</param>
+    /// <returns>Configured property field bound to the serialized property.</returns>
     private static PropertyField CreateBoundField(SerializedProperty property, string label)
     {
         PropertyField propertyField = new PropertyField(property, label);
@@ -125,8 +124,8 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
     /// <summary>
     /// Builds the scroll view that hosts the Available Variables helper text for combo rank formulas.
     /// none.
-    /// returns Configured scroll view used by the inspector.
     /// </summary>
+    /// <returns>Configured scroll view used by the inspector.</returns>
     private static ScrollView CreateAvailableVariablesScrollView()
     {
         ScrollView scrollView = new ScrollView(ScrollViewMode.Vertical);
@@ -140,8 +139,8 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
     /// <summary>
     /// Builds the label that shows the currently available scalable-stat variables for combo rank formulas.
     /// none.
-    /// returns Configured label used by the inspector.
     /// </summary>
+    /// <returns>Configured label used by the inspector.</returns>
     private static Label CreateAvailableVariablesLabel()
     {
         Label label = new Label(string.Empty);
@@ -153,10 +152,9 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Refreshes the helper label that lists the scalable-stat variables available to combo rank formulas.
-    /// serializedObject Serialized object owning the combo rank.
-    /// availableVariablesLabel Label refreshed in place.
-    /// returns void.
     /// </summary>
+    /// <param name="serializedObject">Serialized object owning the combo rank.</param>
+    /// <param name="availableVariablesLabel">Label refreshed in place.</param>
     private static void RefreshAvailableVariables(SerializedObject serializedObject, Label availableVariablesLabel)
     {
         if (availableVariablesLabel == null)
@@ -175,16 +173,15 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Rebuilds the warning message shown for one combo rank.
-    /// serializedObject Serialized object owning the combo rank.
-    /// rankIdProperty Serialized rank identifier property.
-    /// requiredComboValueProperty Serialized combo threshold property.
-    /// pointsDecayPerSecondProperty Serialized time-based combo point decay property.
-    /// progressiveBoostPercentProperty Serialized progressive boost distribution percentage.
-    /// rankBonusesProperty Serialized Character Tuning payload property.
-    /// passivePowerUpUnlocksProperty Serialized passive power-up unlock list property.
-    /// warningBox Warning help box refreshed in place.
-    /// returns void.
     /// </summary>
+    /// <param name="serializedObject">Serialized object owning the combo rank.</param>
+    /// <param name="rankIdProperty">Serialized rank identifier property.</param>
+    /// <param name="requiredComboValueProperty">Serialized combo threshold property.</param>
+    /// <param name="pointsDecayPerSecondProperty">Serialized time-based combo point decay property.</param>
+    /// <param name="progressiveBoostPercentProperty">Serialized progressive boost distribution percentage.</param>
+    /// <param name="rankBonusesProperty">Serialized Character Tuning payload property.</param>
+    /// <param name="passivePowerUpUnlocksProperty">Serialized passive power-up unlock list property.</param>
+    /// <param name="warningBox">Warning help box refreshed in place.</param>
     private static void RefreshWarnings(SerializedObject serializedObject,
                                         SerializedProperty rankIdProperty,
                                         SerializedProperty requiredComboValueProperty,
@@ -312,10 +309,9 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
 
     /// <summary>
     /// Adds warnings for passive unlock entries that cannot resolve against the scoped Power-Ups preset.
-    /// passivePowerUpUnlocksProperty Serialized passive unlock list property.
-    /// warningLines Destination warning line list.
-    /// returns void.
     /// </summary>
+    /// <param name="passivePowerUpUnlocksProperty">Serialized passive unlock list property.</param>
+    /// <param name="warningLines">Destination warning line list.</param>
     private static void AppendPassiveUnlockWarnings(SerializedProperty passivePowerUpUnlocksProperty, List<string> warningLines)
     {
         if (passivePowerUpUnlocksProperty == null || !passivePowerUpUnlocksProperty.isArray)
@@ -367,8 +363,8 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
     /// <summary>
     /// Builds the passive PowerUpId set from the currently scoped Power-Ups preset.
     /// none.
-    /// returns Case-insensitive passive PowerUpId set.
     /// </summary>
+    /// <returns>Case-insensitive passive PowerUpId set.</returns>
     private static HashSet<string> BuildScopedPassivePowerUpIdSet()
     {
         HashSet<string> passivePowerUpIds = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);

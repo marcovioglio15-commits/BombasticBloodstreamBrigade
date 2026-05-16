@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Scene authoring component that bakes the selected Game Audio Manager preset into an ECS audio singleton.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameAudioManagerAuthoring : MonoBehaviour
@@ -46,9 +44,8 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Resolves the effective Audio Manager preset used by baking.
-    /// /params None.
-    /// /returns Audio Manager preset from MasterPreset or direct fallback.
     /// </summary>
+    /// <returns>Audio Manager preset from MasterPreset or direct fallback.</returns>
     public GameAudioManagerPreset ResolveAudioManagerPreset()
     {
         if (masterPreset != null && masterPreset.AudioManagerPreset != null)
@@ -63,8 +60,6 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
 
 /// <summary>
 /// Baker that converts GameAudioManagerAuthoring into singleton audio config and event binding buffers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAuthoring>
 {
@@ -73,9 +68,8 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
     #region Bake
     /// <summary>
     /// Bakes global audio config and all event mappings from the selected preset.
-    /// /params authoring Scene authoring component that chooses the preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Scene authoring component that chooses the preset.</param>
     public override void Bake(GameAudioManagerAuthoring authoring)
     {
         if (authoring == null)
@@ -101,9 +95,8 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
     #region Helpers
     /// <summary>
     /// Declares asset dependencies so the audio singleton rebakes when presets change.
-    /// /params authoring Authoring component that contains the preset references.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Authoring component that contains the preset references.</param>
     private void DeclarePresetDependencies(GameAudioManagerAuthoring authoring)
     {
         if (authoring.MasterPreset != null)
@@ -120,9 +113,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
     /// <summary>
     /// Builds the runtime singleton config from playback settings.
-    /// /params preset Source audio preset.
-    /// /returns Baked runtime config component.
     /// </summary>
+    /// <param name="preset">Source audio preset.</param>
+    /// <returns>Baked runtime config component.</returns>
     private static GameAudioRuntimeConfig BuildRuntimeConfig(GameAudioManagerPreset preset)
     {
         GameAudioPlaybackSettings playbackSettings = preset.PlaybackSettings;
@@ -172,10 +165,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
     /// <summary>
     /// Populates the baked binding buffer while skipping null or None bindings.
-    /// /params preset Source audio preset.
-    /// /params bindingBuffer Output buffer on the audio singleton.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source audio preset.</param>
+    /// <param name="bindingBuffer">Output buffer on the audio singleton.</param>
     private static void PopulateBindingBuffer(GameAudioManagerPreset preset, DynamicBuffer<GameAudioEventBindingElement> bindingBuffer)
     {
         bindingBuffer.Clear();
@@ -200,9 +192,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
     /// <summary>
     /// Converts one ScriptableObject binding into an ECS buffer element.
-    /// /params binding Source event binding.
-    /// /returns Baked buffer element.
     /// </summary>
+    /// <param name="binding">Source event binding.</param>
+    /// <returns>Baked buffer element.</returns>
     private static GameAudioEventBindingElement BuildBindingElement(GameAudioEventBinding binding)
     {
         GameAudioRateLimitSettings rateLimit = binding.RateLimit;

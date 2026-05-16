@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Library asset that lists all GameMasterPreset assets visible in Game Management Tool.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "GameMasterPresetLibrary", menuName = "Game/Master Preset Library", order = 21)]
 public sealed class GameMasterPresetLibrary : ScriptableObject
@@ -34,9 +32,8 @@ public sealed class GameMasterPresetLibrary : ScriptableObject
     #region Public Methods
     /// <summary>
     /// Adds one master preset reference if it is not already registered.
-    /// /params preset Preset asset to register.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to register.</param>
     public void AddPreset(GameMasterPreset preset)
     {
         if (preset == null)
@@ -50,9 +47,8 @@ public sealed class GameMasterPresetLibrary : ScriptableObject
 
     /// <summary>
     /// Removes one master preset reference from this library.
-    /// /params preset Preset asset to unregister.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to unregister.</param>
     public void RemovePreset(GameMasterPreset preset)
     {
         if (preset == null)

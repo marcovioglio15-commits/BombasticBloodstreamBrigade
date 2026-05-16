@@ -17,7 +17,7 @@ public sealed class PlayerScalableStatDefinitionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit tree used to edit one scalable stat entry inside progression presets.
     /// </summary>
     /// <param name="property">Serialized scalable stat entry.</param>
-    /// <returns>Configured visual tree for the scalable stat entry.<returns>
+    /// <returns>Configured visual tree for the scalable stat entry.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -94,7 +94,7 @@ public sealed class PlayerScalableStatDefinitionPropertyDrawer : PropertyDrawer
     /// <param name="scalingRulesProperty">Optional scaling-rules list used for Add Scaling controls.</param>
     /// <param name="label">Field label override.</param>
     /// <param name="allowedVariables">Allowed scalable stat variables for formula validation.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     private static void AddField(VisualElement parent,
                                  SerializedProperty property,
                                  SerializedProperty scalingRulesProperty,

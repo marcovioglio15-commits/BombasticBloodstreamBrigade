@@ -7,8 +7,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Declares the payload editor visibility mode used by advanced-pattern module drawers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum EnemyAdvancedPatternPayloadEditorMode
 {
@@ -19,8 +17,6 @@ public enum EnemyAdvancedPatternPayloadEditorMode
 
 /// <summary>
 /// Provides shared editor helpers for Enemy Advanced Pattern property drawers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class EnemyAdvancedPatternDrawerUtility
 {
@@ -29,11 +25,11 @@ public static class EnemyAdvancedPatternDrawerUtility
     #region Public Methods
     /// <summary>
     /// Adds a bound property field to a parent container.
-    /// /params parent Parent visual element that receives the field.
-    /// /params property Serialized property to bind.
-    /// /params label UI label text.
-    /// /returns True when the field is successfully added.
     /// </summary>
+    /// <param name="parent">Parent visual element that receives the field.</param>
+    /// <param name="property">Serialized property to bind.</param>
+    /// <param name="label">UI label text.</param>
+    /// <returns>True when the field is successfully added.</returns>
     public static bool AddField(VisualElement parent, SerializedProperty property, string label)
     {
         if (parent == null)
@@ -50,9 +46,9 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Resolves module kind enum from serialized property with fallback.
-    /// /params moduleKindProperty Serialized enum property.
-    /// /returns A valid module kind value.
     /// </summary>
+    /// <param name="moduleKindProperty">Serialized enum property.</param>
+    /// <returns>A valid module kind value.</returns>
     public static EnemyPatternModuleKind ResolveModuleKind(SerializedProperty moduleKindProperty)
     {
         if (moduleKindProperty == null)
@@ -71,9 +67,9 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Resolves the payload editor mode implied by one serialized property path.
-    /// /params contextProperty Serialized property used to infer the editor context.
-    /// /returns The resolved payload editor mode.
     /// </summary>
+    /// <param name="contextProperty">Serialized property used to infer the editor context.</param>
+    /// <returns>The resolved payload editor mode.</returns>
     public static EnemyAdvancedPatternPayloadEditorMode ResolvePayloadEditorMode(SerializedProperty contextProperty)
     {
         if (contextProperty == null)
@@ -101,12 +97,12 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Builds and refreshes payload UI for a specific module kind.
-    /// /params payloadDataProperty Serialized payload data root.
-    /// /params moduleKind Target module kind.
-    /// /params payloadContainer Container to rebuild.
-    /// /params editorMode Payload visibility mode for the current authoring context.
-    /// /returns True when payload UI is built.
     /// </summary>
+    /// <param name="payloadDataProperty">Serialized payload data root.</param>
+    /// <param name="moduleKind">Target module kind.</param>
+    /// <param name="payloadContainer">Container to rebuild.</param>
+    /// <param name="editorMode">Payload visibility mode for the current authoring context.</param>
+    /// <returns>True when payload UI is built.</returns>
     public static bool RefreshPayloadEditor(SerializedProperty payloadDataProperty,
                                             EnemyPatternModuleKind moduleKind,
                                             VisualElement payloadContainer,
@@ -162,9 +158,9 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Builds module ID options by reading the correct catalog section for the provided context property.
-    /// /params contextProperty Serialized property that requires module options.
-    /// /returns Distinct module IDs preserving authoring order.
     /// </summary>
+    /// <param name="contextProperty">Serialized property that requires module options.</param>
+    /// <returns>Distinct module IDs preserving authoring order.</returns>
     public static List<string> BuildModuleIdOptions(SerializedProperty contextProperty)
     {
         List<string> options = new List<string>();
@@ -195,10 +191,10 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Resolves current module ID to a valid option value.
-    /// /params currentModuleId Current module ID string value.
-    /// /params options Available module options.
-    /// /returns A module ID guaranteed to exist in options when options are present.
     /// </summary>
+    /// <param name="currentModuleId">Current module ID string value.</param>
+    /// <param name="options">Available module options.</param>
+    /// <returns>A module ID guaranteed to exist in options when options are present.</returns>
     public static string ResolveInitialModuleId(string currentModuleId, List<string> options)
     {
         if (options == null || options.Count == 0)
@@ -217,12 +213,12 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Resolves module metadata for a specific module ID in the correct context-aware catalog.
-    /// /params contextProperty Serialized property that requires module resolution.
-    /// /params moduleId Module ID to resolve.
-    /// /params moduleKind Resolved module kind.
-    /// /params displayName Resolved module display name.
-    /// /returns True when the module definition is found.
     /// </summary>
+    /// <param name="contextProperty">Serialized property that requires module resolution.</param>
+    /// <param name="moduleId">Module ID to resolve.</param>
+    /// <param name="moduleKind">Resolved module kind.</param>
+    /// <param name="displayName">Resolved module display name.</param>
+    /// <returns>True when the module definition is found.</returns>
     public static bool TryResolveModuleInfo(SerializedProperty contextProperty,
                                             string moduleId,
                                             out EnemyPatternModuleKind moduleKind,
@@ -274,10 +270,10 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Resolves the catalog section that owns one module-definition property when such ownership is explicit in the property path.
-    /// /params property Serialized property to inspect.
-    /// /params section Resolved catalog section.
-    /// /returns True when the property path maps to one explicit shared catalog section.
     /// </summary>
+    /// <param name="property">Serialized property to inspect.</param>
+    /// <param name="section">Resolved catalog section.</param>
+    /// <returns>True when the property path maps to one explicit shared catalog section.</returns>
     public static bool TryResolveContainingCatalogSection(SerializedProperty property, out EnemyPatternModuleCatalogSection section)
     {
         section = EnemyPatternModuleCatalogSection.CoreMovement;
@@ -319,10 +315,10 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Returns whether one module kind is legal inside the requested shared catalog section.
-    /// /params moduleKind Candidate module kind.
-    /// /params section Target shared catalog section.
-    /// /returns True when the module kind is valid for that catalog section.
     /// </summary>
+    /// <param name="moduleKind">Candidate module kind.</param>
+    /// <param name="section">Target shared catalog section.</param>
+    /// <returns>True when the module kind is valid for that catalog section.</returns>
     public static bool IsModuleKindAllowedInCatalogSection(EnemyPatternModuleKind moduleKind, EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -349,9 +345,9 @@ public static class EnemyAdvancedPatternDrawerUtility
     #region Private Methods
     /// <summary>
     /// Resolves the list of shared catalog sections allowed for one property context.
-    /// /params contextProperty Serialized property that requires context-aware catalog resolution.
-    /// /returns The ordered list of allowed shared catalog sections.
     /// </summary>
+    /// <param name="contextProperty">Serialized property that requires context-aware catalog resolution.</param>
+    /// <returns>The ordered list of allowed shared catalog sections.</returns>
     private static List<EnemyPatternModuleCatalogSection> ResolveAllowedCatalogSections(SerializedProperty contextProperty)
     {
         List<EnemyPatternModuleCatalogSection> sections = new List<EnemyPatternModuleCatalogSection>();
@@ -393,9 +389,9 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Returns the serialized property name used by one shared catalog section.
-    /// /params section Requested catalog section.
-    /// /returns Serialized field name for the section list.
     /// </summary>
+    /// <param name="section">Requested catalog section.</param>
+    /// <returns>Serialized field name for the section list.</returns>
     private static string GetDefinitionsPropertyName(EnemyPatternModuleCatalogSection section)
     {
         switch (section)
@@ -416,10 +412,9 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Adds distinct module IDs from one serialized definitions array into the provided option list.
-    /// /params definitionsProperty Serialized definitions array to inspect.
-    /// /params options Distinct options list to append to.
-    /// /returns None.
     /// </summary>
+    /// <param name="definitionsProperty">Serialized definitions array to inspect.</param>
+    /// <param name="options">Distinct options list to append to.</param>
     private static void AddModuleIdsFromDefinitions(SerializedProperty definitionsProperty, List<string> options)
     {
         if (definitionsProperty == null)
@@ -454,12 +449,12 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Tries to resolve one module entry inside a specific serialized definitions array.
-    /// /params definitionsProperty Serialized definitions array to inspect.
-    /// /params moduleId Target module identifier.
-    /// /params moduleKind Resolved module kind.
-    /// /params displayName Resolved display name.
-    /// /returns True when the module is found.
     /// </summary>
+    /// <param name="definitionsProperty">Serialized definitions array to inspect.</param>
+    /// <param name="moduleId">Target module identifier.</param>
+    /// <param name="moduleKind">Resolved module kind.</param>
+    /// <param name="displayName">Resolved display name.</param>
+    /// <returns>True when the module is found.</returns>
     private static bool TryResolveModuleInfoInDefinitions(SerializedProperty definitionsProperty,
                                                           string moduleId,
                                                           out EnemyPatternModuleKind moduleKind,
@@ -503,10 +498,10 @@ public static class EnemyAdvancedPatternDrawerUtility
 
     /// <summary>
     /// Checks whether a list already contains an option value using case-insensitive comparison.
-    /// /params options Current options list.
-    /// /params value Value to test.
-    /// /returns True when the value exists in the list.
     /// </summary>
+    /// <param name="options">Current options list.</param>
+    /// <param name="value">Value to test.</param>
+    /// <returns>True when the value exists in the list.</returns>
     private static bool ContainsOption(List<string> options, string value)
     {
         if (options == null)

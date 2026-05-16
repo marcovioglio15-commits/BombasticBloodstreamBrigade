@@ -12,7 +12,6 @@ using UnityEditor;
 /// <summary>
 /// Builds combo-counter baselines, runtime data, and Add Scaling metadata used by progression baking.
 /// none.
-/// returns none.
 /// </summary>
 internal static class PlayerRuntimeScalingComboBakeUtility
 {
@@ -25,17 +24,16 @@ internal static class PlayerRuntimeScalingComboBakeUtility
     #region Public Methods
     /// <summary>
     /// Populates combo base/runtime configs, combo ranks, and flattened rank-bonus formulas from progression presets.
-    /// /params scaledPreset Scaled progression preset currently used by bake.
-    /// /params sourcePreset Unscaled progression preset used as immutable baseline.
-    /// /params baseRanks Destination immutable combo-rank buffer.
-    /// /params runtimeRanks Destination runtime combo-rank buffer initialized from the scaled preset.
-    /// /params basePassiveUnlocks Destination immutable combo passive-unlock buffer.
-    /// /params runtimePassiveUnlocks Destination runtime combo passive-unlock buffer initialized from the scaled preset.
-    /// /params characterTuningFormulaBuffer Shared flattened Character Tuning formula buffer appended with combo rank bonuses.
-    /// /params baseConfig Resolved immutable combo runtime config.
-    /// /params runtimeConfig Resolved scaled combo runtime config.
-    /// /returns void.
     /// </summary>
+    /// <param name="scaledPreset">Scaled progression preset currently used by bake.</param>
+    /// <param name="sourcePreset">Unscaled progression preset used as immutable baseline.</param>
+    /// <param name="baseRanks">Destination immutable combo-rank buffer.</param>
+    /// <param name="runtimeRanks">Destination runtime combo-rank buffer initialized from the scaled preset.</param>
+    /// <param name="basePassiveUnlocks">Destination immutable combo passive-unlock buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Destination runtime combo passive-unlock buffer initialized from the scaled preset.</param>
+    /// <param name="characterTuningFormulaBuffer">Shared flattened Character Tuning formula buffer appended with combo rank bonuses.</param>
+    /// <param name="baseConfig">Resolved immutable combo runtime config.</param>
+    /// <param name="runtimeConfig">Resolved scaled combo runtime config.</param>
     public static void PopulateComboCounterRuntimeData(PlayerProgressionPreset scaledPreset,
                                                        PlayerProgressionPreset sourcePreset,
                                                        DynamicBuffer<PlayerBaseComboRankElement> baseRanks,
@@ -130,10 +128,9 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Populates the baked combo-rank visual buffer used by the HUD runtime.
-    /// /params preset Progression preset that owns the authored combo-rank visuals.
-    /// /params rankVisuals Destination visual buffer indexed like the runtime combo-rank buffer.
-    /// /returns void.
     /// </summary>
+    /// <param name="preset">Progression preset that owns the authored combo-rank visuals.</param>
+    /// <param name="rankVisuals">Destination visual buffer indexed like the runtime combo-rank buffer.</param>
     public static void PopulateComboCounterRankVisuals(PlayerProgressionPreset preset,
                                                        DynamicBuffer<PlayerComboRankVisualElement> rankVisuals)
     {
@@ -173,10 +170,9 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Populates combo Add Scaling metadata from the unscaled progression preset.
-    /// /params sourcePreset Unscaled progression preset inspected for enabled Add Scaling rules.
-    /// /params scalingBuffer Destination combo scaling metadata buffer.
-    /// /returns void.
     /// </summary>
+    /// <param name="sourcePreset">Unscaled progression preset inspected for enabled Add Scaling rules.</param>
+    /// <param name="scalingBuffer">Destination combo scaling metadata buffer.</param>
     public static void PopulateComboCounterScalingMetadata(PlayerProgressionPreset sourcePreset,
                                                            DynamicBuffer<PlayerRuntimeComboCounterScalingElement> scalingBuffer)
     {
@@ -248,9 +244,9 @@ internal static class PlayerRuntimeScalingComboBakeUtility
     #region Private Methods
     /// <summary>
     /// Converts one authored combo definition into the runtime config struct used by base/runtime buffers.
-    /// /params comboDefinition Authored combo definition inspected for runtime values.
-    /// /returns Resolved combo runtime config.
     /// </summary>
+    /// <param name="comboDefinition">Authored combo definition inspected for runtime values.</param>
+    /// <returns>Resolved combo runtime config.</returns>
     private static PlayerBaseComboCounterConfig BuildComboConfig(PlayerComboCounterDefinition comboDefinition)
     {
         return new PlayerBaseComboCounterConfig
@@ -265,11 +261,11 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Resolves the stable runtime rank identifier without mutating authoring data.
-    /// /params rankIndex Zero-based authored rank index.
-    /// /params sourceRank Rank entry taken from the unscaled preset when available.
-    /// /params scaledRank Rank entry taken from the scaled preset when available.
-    /// /returns Stable runtime rank identifier used for presentation and Add Scaling keys.
     /// </summary>
+    /// <param name="rankIndex">Zero-based authored rank index.</param>
+    /// <param name="sourceRank">Rank entry taken from the unscaled preset when available.</param>
+    /// <param name="scaledRank">Rank entry taken from the scaled preset when available.</param>
+    /// <returns>Stable runtime rank identifier used for presentation and Add Scaling keys.</returns>
     private static string ResolveRankId(int rankIndex,
                                         PlayerComboRankDefinition sourceRank,
                                         PlayerComboRankDefinition scaledRank)
@@ -290,10 +286,10 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Appends all valid Character Tuning formulas defined by one combo rank into the shared flattened runtime buffer.
-    /// /params rankDefinition Authored combo rank inspected for bonus formulas.
-    /// /params characterTuningFormulaBuffer Shared flattened Character Tuning formula buffer.
-    /// /returns Number of formulas appended for the provided rank.
     /// </summary>
+    /// <param name="rankDefinition">Authored combo rank inspected for bonus formulas.</param>
+    /// <param name="characterTuningFormulaBuffer">Shared flattened Character Tuning formula buffer.</param>
+    /// <returns>Number of formulas appended for the provided rank.</returns>
     private static int AppendRankBonusFormulas(PlayerComboRankDefinition rankDefinition,
                                                DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer)
     {
@@ -329,12 +325,12 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Appends base and runtime passive unlock entries authored under one combo rank.
-    /// /params sourceRank Unscaled rank used for immutable baseline values.
-    /// /params scaledRank Scaled rank used for initial runtime values.
-    /// /params basePassiveUnlocks Destination immutable passive unlock buffer.
-    /// /params runtimePassiveUnlocks Destination mutable passive unlock buffer.
-    /// /returns Number of unlock entries appended for the rank.
     /// </summary>
+    /// <param name="sourceRank">Unscaled rank used for immutable baseline values.</param>
+    /// <param name="scaledRank">Scaled rank used for initial runtime values.</param>
+    /// <param name="basePassiveUnlocks">Destination immutable passive unlock buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Destination mutable passive unlock buffer.</param>
+    /// <returns>Number of unlock entries appended for the rank.</returns>
     private static int AppendPassiveUnlocks(PlayerComboRankDefinition sourceRank,
                                             PlayerComboRankDefinition scaledRank,
                                             DynamicBuffer<PlayerBaseComboPassiveUnlockElement> basePassiveUnlocks,
@@ -367,10 +363,10 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Resolves one passive PowerUpId from a preferred unlock entry with fallback support.
-    /// /params preferredUnlock Preferred unlock entry.
-    /// /params fallbackUnlock Fallback unlock entry.
-    /// /returns Trimmed PowerUpId or an empty string when no valid ID is authored.
     /// </summary>
+    /// <param name="preferredUnlock">Preferred unlock entry.</param>
+    /// <param name="fallbackUnlock">Fallback unlock entry.</param>
+    /// <returns>Trimmed PowerUpId or an empty string when no valid ID is authored.</returns>
     private static string ResolvePassivePowerUpId(PlayerComboPassivePowerUpUnlockDefinition preferredUnlock,
                                                   PlayerComboPassivePowerUpUnlockDefinition fallbackUnlock)
     {
@@ -389,10 +385,10 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Resolves one passive unlock enable flag from a preferred unlock entry with fallback support.
-    /// /params preferredUnlock Preferred unlock entry.
-    /// /params fallbackUnlock Fallback unlock entry.
-    /// /returns One when the resolved unlock is enabled; otherwise zero.
     /// </summary>
+    /// <param name="preferredUnlock">Preferred unlock entry.</param>
+    /// <param name="fallbackUnlock">Fallback unlock entry.</param>
+    /// <returns>One when the resolved unlock is enabled; otherwise zero.</returns>
     private static byte ResolvePassiveUnlockEnabled(PlayerComboPassivePowerUpUnlockDefinition preferredUnlock,
                                                     PlayerComboPassivePowerUpUnlockDefinition fallbackUnlock)
     {
@@ -412,14 +408,14 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Resolves combo scaling baseline metadata, including token-backed passive PowerUpId fields.
-    /// /params property Serialized property targeted by Add Scaling.
-    /// /params valueType Runtime formula value type.
-    /// /params baseValue Numeric base value when applicable.
-    /// /params baseBooleanValue Boolean base value when applicable.
-    /// /params isInteger True when numeric values should be rounded before assignment.
-    /// /params baseTokenValue Token base value when applicable.
-    /// /returns True when the serialized property can be converted to combo scaling metadata.
     /// </summary>
+    /// <param name="property">Serialized property targeted by Add Scaling.</param>
+    /// <param name="valueType">Runtime formula value type.</param>
+    /// <param name="baseValue">Numeric base value when applicable.</param>
+    /// <param name="baseBooleanValue">Boolean base value when applicable.</param>
+    /// <param name="isInteger">True when numeric values should be rounded before assignment.</param>
+    /// <param name="baseTokenValue">Token base value when applicable.</param>
+    /// <returns>True when the serialized property can be converted to combo scaling metadata.</returns>
     private static bool TryResolveComboScalingBaseMetadata(SerializedProperty property,
                                                            out byte valueType,
                                                            out float baseValue,
@@ -451,12 +447,12 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Maps one progression Add Scaling stat key to the combo runtime field targeted by that rule.
-    /// /params statKey Stable Add Scaling stat key emitted by the progression preset.
-    /// /params rankIndex Resolved combo rank index when the mapping targets one rank milestone.
-    /// /params passiveUnlockIndex Resolved passive unlock index when the mapping targets one nested passive unlock.
-    /// /params fieldId Resolved combo runtime field identifier.
-    /// /returns True when the stat key targets the combo module; otherwise false.
     /// </summary>
+    /// <param name="statKey">Stable Add Scaling stat key emitted by the progression preset.</param>
+    /// <param name="rankIndex">Resolved combo rank index when the mapping targets one rank milestone.</param>
+    /// <param name="passiveUnlockIndex">Resolved passive unlock index when the mapping targets one nested passive unlock.</param>
+    /// <param name="fieldId">Resolved combo runtime field identifier.</param>
+    /// <returns>True when the stat key targets the combo module; otherwise false.</returns>
     private static bool TryMapComboFieldId(string statKey,
                                            out int rankIndex,
                                            out int passiveUnlockIndex,
@@ -563,11 +559,11 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Extracts one authored array index from a stable Add Scaling key token such as data[2|rankId:S].
-    /// /params statKey Stable Add Scaling stat key containing array tokens.
-    /// /params occurrenceIndex Zero-based data[] occurrence to parse.
-    /// /params arrayIndex Parsed authored array index.
-    /// /returns True when the requested array token was parsed successfully; otherwise false.
     /// </summary>
+    /// <param name="statKey">Stable Add Scaling stat key containing array tokens.</param>
+    /// <param name="occurrenceIndex">Zero-based data[] occurrence to parse.</param>
+    /// <param name="arrayIndex">Parsed authored array index.</param>
+    /// <returns>True when the requested array token was parsed successfully; otherwise false.</returns>
     private static bool TryParseStableArrayIndex(string statKey, int occurrenceIndex, out int arrayIndex)
     {
         arrayIndex = -1;
@@ -603,9 +599,9 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
     /// <summary>
     /// Converts one Unity color to the float4 layout stored inside ECS buffers.
-    /// /params color Source color.
-    /// /returns Float4 representation of the provided color.
     /// </summary>
+    /// <param name="color">Source color.</param>
+    /// <returns>Float4 representation of the provided color.</returns>
     private static float4 ToFloat4(Color color)
     {
         return new float4(color.r, color.g, color.b, color.a);

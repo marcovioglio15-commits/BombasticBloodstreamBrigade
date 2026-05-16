@@ -11,8 +11,6 @@ using static GameSceneManagementProjectSetupSerializedUtility;
 
 /// <summary>
 /// Applies the default bootstrap-driven Scene Manager setup for the current project scenes and presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneManagementProjectSetupUtility
 {
@@ -57,8 +55,6 @@ public static class GameSceneManagementProjectSetupUtility
     #region Public Methods
     /// <summary>
     /// Executes the project setup from the Unity menu after giving the editor a chance to save open scenes.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     //[MenuItem("Tools/Game/Scene Manager/Apply Default Setup")]
     public static void ExecuteSetupFromMenu()
@@ -71,8 +67,6 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Executes the setup from batch mode without opening any confirmation dialogs.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     public static void ExecuteBatchSetup()
     {
@@ -81,9 +75,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Creates or refreshes the default Scene Manager preset, master preset link, bootstrap scene, build order and transition layer.
-    /// /params logToConsole True when setup completion should be logged.
-    /// /returns None.
     /// </summary>
+    /// <param name="logToConsole">True when setup completion should be logged.</param>
     public static void ApplyDefaultProjectSetup(bool logToConsole)
     {
         EnsureSceneFolders();
@@ -110,9 +103,8 @@ public static class GameSceneManagementProjectSetupUtility
     #region Preset Setup
     /// <summary>
     /// Loads or creates the default Scene Manager preset and registers it in the Scene Manager library.
-    /// /params None.
-    /// /returns Default Scene Manager preset asset.
     /// </summary>
+    /// <returns>Default Scene Manager preset asset.</returns>
     private static GameSceneManagerPreset EnsureSceneManagerPreset()
     {
         GameSceneManagerPreset preset = AssetDatabase.LoadAssetAtPath<GameSceneManagerPreset>(DefaultScenePresetPath);
@@ -131,9 +123,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Loads or creates the default Game Master preset and links the Scene Manager sub-preset.
-    /// /params scenePreset Scene Manager preset assigned as the master sub-preset.
-    /// /returns Default Game Master preset asset.
     /// </summary>
+    /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
+    /// <returns>Default Game Master preset asset.</returns>
     private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset)
     {
         GameMasterPreset masterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
@@ -159,9 +151,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Writes the default bootstrap, scene table, transitions and runtime defaults to the Scene Manager preset.
-    /// /params preset Scene Manager preset to synchronize.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene Manager preset to synchronize.</param>
     private static void SynchronizeSceneManagerPreset(GameSceneManagerPreset preset)
     {
         if (preset == null)
@@ -189,9 +180,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Writes default fade timing values used by bootstrap transitions.
-    /// /params serializedPreset Serialized Scene Manager preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
     private static void SynchronizeFadeSettings(SerializedObject serializedPreset)
     {
         SerializedProperty fadeSettingsProperty = serializedPreset.FindProperty("fadeSettings");
@@ -209,9 +199,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Writes default trigger settings and expected layer name used by transition volumes.
-    /// /params serializedPreset Serialized Scene Manager preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
     private static void SynchronizeTriggerSettings(SerializedObject serializedPreset)
     {
         SerializedProperty triggerSettingsProperty = serializedPreset.FindProperty("triggerSettings");
@@ -228,9 +217,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Rebuilds the default managed scene table with synchronized path, GUID, scene asset and build index metadata.
-    /// /params serializedPreset Serialized Scene Manager preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
     private static void SynchronizeSceneDefinitions(SerializedObject serializedPreset)
     {
         SerializedProperty scenesProperty = serializedPreset.FindProperty("sceneDefinitions");
@@ -261,9 +249,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Rebuilds the default menu-command transition graph for menu and gameplay scene flow.
-    /// /params serializedPreset Serialized Scene Manager preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
     private static void SynchronizeTransitionDefinitions(SerializedObject serializedPreset)
     {
         SerializedProperty transitionsProperty = serializedPreset.FindProperty("transitionDefinitions");
@@ -298,8 +285,6 @@ public static class GameSceneManagementProjectSetupUtility
     #region Build Settings
     /// <summary>
     /// Applies the bootstrap scene as the only required Build Settings entry for Addressables-driven scene loading.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void ApplyDefaultBuildSettings()
     {
@@ -326,10 +311,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Adds one enabled build scene only when its path is not already present.
-    /// /params scenes Mutable build-settings scene list.
-    /// /params scenePath Project-relative Unity scene path.
-    /// /returns None.
     /// </summary>
+    /// <param name="scenes">Mutable build-settings scene list.</param>
+    /// <param name="scenePath">Project-relative Unity scene path.</param>
     private static void AddBuildSceneIfMissing(List<EditorBuildSettingsScene> scenes, string scenePath)
     {
         for (int index = 0; index < scenes.Count; index++)
@@ -343,9 +327,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Resolves the default Addressables key for one managed top-level scene.
-    /// /params setup Default scene setup entry.
-    /// /returns Stable Addressables key, or an empty string for bootstrap and SubScene entries.
     /// </summary>
+    /// <param name="setup">Default scene setup entry.</param>
+    /// <returns>Stable Addressables key, or an empty string for bootstrap and SubScene entries.</returns>
     private static string ResolveDefaultAddressableKey(GameSceneDefinitionSetup setup)
     {
         if (setup.SceneKind == GameSceneKind.Bootstrap)
@@ -362,9 +346,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Resolves whether a scene path is loaded through Addressables by the default Scene Manager setup.
-    /// /params scenePath Project-relative scene path.
-    /// /returns True when the scene should not remain in Build Settings.
     /// </summary>
+    /// <param name="scenePath">Project-relative scene path.</param>
+    /// <returns>True when the scene should not remain in Build Settings.</returns>
     private static bool IsDefaultAddressableScenePath(string scenePath)
     {
         return string.Equals(scenePath, MainMenuScenePath, StringComparison.Ordinal) ||
@@ -376,10 +360,9 @@ public static class GameSceneManagementProjectSetupUtility
     #region Bootstrap Scene
     /// <summary>
     /// Creates or refreshes the persistent bootstrap scene with the manager authoring object and fade overlay.
-    /// /params masterPreset Game Master preset assigned to the bootstrap manager authoring component.
-    /// /params scenePreset Direct Scene Manager fallback assigned to the bootstrap manager authoring component.
-    /// /returns None.
     /// </summary>
+    /// <param name="masterPreset">Game Master preset assigned to the bootstrap manager authoring component.</param>
+    /// <param name="scenePreset">Direct Scene Manager fallback assigned to the bootstrap manager authoring component.</param>
     private static void EnsureBootstrapScene(GameMasterPreset masterPreset, GameSceneManagerPreset scenePreset)
     {
         Scene bootstrapScene = OpenOrCreateBootstrapScene();
@@ -393,9 +376,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Opens the existing bootstrap scene or creates an empty one at the expected path.
-    /// /params None.
-    /// /returns Open bootstrap scene.
     /// </summary>
+    /// <returns>Open bootstrap scene.</returns>
     private static Scene OpenOrCreateBootstrapScene()
     {
         SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(BootstrapScenePath);
@@ -408,9 +390,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Ensures the bootstrap scene has one camera for standalone play-mode visibility.
-    /// /params scene Bootstrap scene being configured.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Bootstrap scene being configured.</param>
     private static void EnsureBootstrapCamera(Scene scene)
     {
         Camera camera = FindFirstComponentInScene<Camera>(scene);
@@ -444,9 +425,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Ensures the bootstrap scene has one light so opening it directly is not visually blank.
-    /// /params scene Bootstrap scene being configured.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Bootstrap scene being configured.</param>
     private static void EnsureBootstrapLight(Scene scene)
     {
         Light light = FindFirstComponentInScene<Light>(scene);
@@ -463,11 +443,10 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Ensures exactly one bootstrap GameSceneManagerAuthoring object exists and references the default presets.
-    /// /params scene Bootstrap scene being configured.
-    /// /params masterPreset Game Master preset assigned to authoring.
-    /// /params scenePreset Scene Manager fallback assigned to authoring.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Bootstrap scene being configured.</param>
+    /// <param name="masterPreset">Game Master preset assigned to authoring.</param>
+    /// <param name="scenePreset">Scene Manager fallback assigned to authoring.</param>
     private static void EnsureSceneManagerAuthoring(Scene scene, GameMasterPreset masterPreset, GameSceneManagerPreset scenePreset)
     {
         List<GameSceneManagerAuthoring> managers = FindComponentsInScene<GameSceneManagerAuthoring>(scene);
@@ -495,9 +474,8 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Ensures the bootstrap scene owns an authored full-screen fade canvas view.
-    /// /params scene Bootstrap scene being configured.
-    /// /returns None.
     /// </summary>
+    /// <param name="scene">Bootstrap scene being configured.</param>
     private static void EnsureFadeCanvas(Scene scene)
     {
         List<GameSceneFadeCanvasView> views = FindComponentsInScene<GameSceneFadeCanvasView>(scene);
@@ -543,9 +521,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Creates a new fade canvas root in the bootstrap scene.
-    /// /params scene Bootstrap scene receiving the canvas.
-    /// /returns Newly created fade canvas view.
     /// </summary>
+    /// <param name="scene">Bootstrap scene receiving the canvas.</param>
+    /// <returns>Newly created fade canvas view.</returns>
     private static GameSceneFadeCanvasView CreateFadeCanvas(Scene scene)
     {
         GameObject canvasObject = new GameObject(FadeCanvasObjectName,
@@ -563,9 +541,9 @@ public static class GameSceneManagementProjectSetupUtility
 
     /// <summary>
     /// Ensures the fade canvas has one full-screen image child used as the opaque fade surface.
-    /// /params parent Fade canvas transform.
-    /// /returns Fade surface image component.
     /// </summary>
+    /// <param name="parent">Fade canvas transform.</param>
+    /// <returns>Fade surface image component.</returns>
     private static Image EnsureFadeSurface(Transform parent)
     {
         Transform existingChild = parent.Find(FadeSurfaceObjectName);
@@ -587,8 +565,6 @@ public static class GameSceneManagementProjectSetupUtility
     #region Generic Helpers
     /// <summary>
     /// Ensures every project folder needed by the default scene setup exists.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private static void EnsureSceneFolders()
     {

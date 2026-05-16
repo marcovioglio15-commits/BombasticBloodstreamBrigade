@@ -6,8 +6,6 @@ using Hash128 = Unity.Entities.Hash128;
 
 /// <summary>
 /// Handles direct DOTS scene operations for the persistent player scene outside Unity scene loading.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameScenePersistentPlayerSceneUtility
 {
@@ -16,14 +14,13 @@ internal static class GameScenePersistentPlayerSceneUtility
     #region Operation Collection
     /// <summary>
     /// Builds persistent player load and unload work for the active transition.
-    /// /params scenes Runtime scene definitions.
-    /// /params targetScene Transition target scene definition.
-    /// /params reloadPersistentPlayer True when restart should recreate the player entity scene.
-    /// /params preLoadUnloadScenes Output scenes unloaded before persistent player reload.
-    /// /params loadScenes Output persistent player scenes required by the target.
-    /// /params postLoadUnloadScenes Output persistent player scenes unloaded after leaving gameplay.
-    /// /returns None.
     /// </summary>
+    /// <param name="scenes">Runtime scene definitions.</param>
+    /// <param name="targetScene">Transition target scene definition.</param>
+    /// <param name="reloadPersistentPlayer">True when restart should recreate the player entity scene.</param>
+    /// <param name="preLoadUnloadScenes">Output scenes unloaded before persistent player reload.</param>
+    /// <param name="loadScenes">Output persistent player scenes required by the target.</param>
+    /// <param name="postLoadUnloadScenes">Output persistent player scenes unloaded after leaving gameplay.</param>
     public static void CollectOperations(DynamicBuffer<GameSceneDefinitionElement> scenes,
                                          GameSceneDefinitionElement targetScene,
                                          bool reloadPersistentPlayer,
@@ -57,9 +54,9 @@ internal static class GameScenePersistentPlayerSceneUtility
 
     /// <summary>
     /// Resolves whether one scene kind should have the persistent player available.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when the scene represents playable gameplay space.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when the scene represents playable gameplay space.</returns>
     public static bool IsGameplayLikeScene(GameSceneDefinitionElement sceneDefinition)
     {
         switch (sceneDefinition.SceneKind)
@@ -74,11 +71,10 @@ internal static class GameScenePersistentPlayerSceneUtility
 
     /// <summary>
     /// Clears operation lists while tolerating missing optional containers.
-    /// /params preLoadUnloadScenes Persistent player scenes unloaded before reload.
-    /// /params loadScenes Persistent player scenes loaded for gameplay.
-    /// /params postLoadUnloadScenes Persistent player scenes unloaded after gameplay.
-    /// /returns None.
     /// </summary>
+    /// <param name="preLoadUnloadScenes">Persistent player scenes unloaded before reload.</param>
+    /// <param name="loadScenes">Persistent player scenes loaded for gameplay.</param>
+    /// <param name="postLoadUnloadScenes">Persistent player scenes unloaded after gameplay.</param>
     private static void ClearOperationLists(List<GameSceneDefinitionElement> preLoadUnloadScenes,
                                             List<GameSceneDefinitionElement> loadScenes,
                                             List<GameSceneDefinitionElement> postLoadUnloadScenes)
@@ -92,10 +88,10 @@ internal static class GameScenePersistentPlayerSceneUtility
     #region Load
     /// <summary>
     /// Advances direct DOTS scene loads one scene at a time.
-    /// /params scenes Ordered persistent player scenes to load.
-    /// /params operationIndex Mutable index of the scene currently being processed.
-    /// /returns True while a scene load is still in flight.
     /// </summary>
+    /// <param name="scenes">Ordered persistent player scenes to load.</param>
+    /// <param name="operationIndex">Mutable index of the scene currently being processed.</param>
+    /// <returns>True while a scene load is still in flight.</returns>
     public static bool TickLoadSteps(List<GameSceneDefinitionElement> scenes, ref int operationIndex)
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -139,10 +135,10 @@ internal static class GameScenePersistentPlayerSceneUtility
     #region Unload
     /// <summary>
     /// Unloads direct DOTS scene content for persistent player scenes.
-    /// /params scenes Ordered persistent player scenes to unload.
-    /// /params operationIndex Mutable index of the scene currently being processed.
-    /// /returns False because SceneSystem unload is immediate while the active transition keeps gameplay paused.
     /// </summary>
+    /// <param name="scenes">Ordered persistent player scenes to unload.</param>
+    /// <param name="operationIndex">Mutable index of the scene currently being processed.</param>
+    /// <returns>False because SceneSystem unload is immediate while the active transition keeps gameplay paused.</returns>
     public static bool TickUnloadSteps(List<GameSceneDefinitionElement> scenes, ref int operationIndex)
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -167,9 +163,9 @@ internal static class GameScenePersistentPlayerSceneUtility
     #region State
     /// <summary>
     /// Checks whether one direct DOTS scene definition is loaded.
-    /// /params sceneDefinition Persistent player scene definition.
-    /// /returns True when SceneSystem reports the entity scene as loaded.
     /// </summary>
+    /// <param name="sceneDefinition">Persistent player scene definition.</param>
+    /// <returns>True when SceneSystem reports the entity scene as loaded.</returns>
     public static bool IsSceneLoaded(GameSceneDefinitionElement sceneDefinition)
     {
         World world = World.DefaultGameObjectInjectionWorld;
@@ -192,9 +188,8 @@ internal static class GameScenePersistentPlayerSceneUtility
     #region Helpers
     /// <summary>
     /// Builds load parameters shared by transition-managed direct DOTS scenes.
-    /// /params None.
-    /// /returns SceneSystem load parameters.
     /// </summary>
+    /// <returns>SceneSystem load parameters.</returns>
     private static SceneSystem.LoadParameters BuildLoadParameters()
     {
         return new SceneSystem.LoadParameters
@@ -205,10 +200,10 @@ internal static class GameScenePersistentPlayerSceneUtility
 
     /// <summary>
     /// Converts the scene definition GUID string to an Entities Hash128.
-    /// /params sceneDefinition Scene definition with serialized asset GUID.
-    /// /params sceneGuid Parsed scene GUID when valid.
-    /// /returns True when the GUID can be used by SceneSystem.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition with serialized asset GUID.</param>
+    /// <param name="sceneGuid">Parsed scene GUID when valid.</param>
+    /// <returns>True when the GUID can be used by SceneSystem.</returns>
     private static bool TryResolveSceneGuid(GameSceneDefinitionElement sceneDefinition, out Hash128 sceneGuid)
     {
         sceneGuid = default;

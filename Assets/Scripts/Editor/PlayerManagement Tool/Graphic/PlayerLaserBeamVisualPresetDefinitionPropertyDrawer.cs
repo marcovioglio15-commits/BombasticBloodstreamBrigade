@@ -14,9 +14,9 @@ public sealed class PlayerLaserBeamVisualPresetDefinitionPropertyDrawer : Proper
     #region Public Methods
     /// <summary>
     /// Builds the UI Toolkit layout for one Laser Beam visual preset definition entry.
-    /// /params property Serialized preset definition property.
-    /// /returns Configured UI Toolkit element.
     /// </summary>
+    /// <param name="property">Serialized preset definition property.</param>
+    /// <returns>Configured UI Toolkit element.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();

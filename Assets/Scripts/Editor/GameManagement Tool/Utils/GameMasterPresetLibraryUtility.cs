@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Editor asset factory for GameMasterPresetLibrary and GameMasterPreset assets.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameMasterPresetLibraryUtility
 {
@@ -19,9 +17,8 @@ public static class GameMasterPresetLibraryUtility
     #region Public Methods
     /// <summary>
     /// Loads the game master preset library or creates it at the default path.
-    /// /params None.
-    /// /returns Existing or newly created library asset.
     /// </summary>
+    /// <returns>Existing or newly created library asset.</returns>
     public static GameMasterPresetLibrary GetOrCreateLibrary()
     {
         GameMasterPresetLibrary library = AssetDatabase.LoadAssetAtPath<GameMasterPresetLibrary>(DefaultLibraryPath);
@@ -38,9 +35,9 @@ public static class GameMasterPresetLibraryUtility
 
     /// <summary>
     /// Creates one game master preset asset in the default preset folder.
-    /// /params presetName Requested preset display name.
-    /// /returns Created preset asset or null when asset creation fails.
     /// </summary>
+    /// <param name="presetName">Requested preset display name.</param>
+    /// <returns>Created preset asset or null when asset creation fails.</returns>
     public static GameMasterPreset CreatePresetAsset(string presetName)
     {
         GameManagementAssetUtility.EnsureFolder(DefaultPresetsFolder);
@@ -62,10 +59,9 @@ public static class GameMasterPresetLibraryUtility
     #region Private Methods
     /// <summary>
     /// Writes the serialized preset name so list display and asset filename start synchronized.
-    /// /params preset Preset asset to update.
-    /// /params finalName Asset filename without extension.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Preset asset to update.</param>
+    /// <param name="finalName">Asset filename without extension.</param>
     private static void SynchronizePresetName(GameMasterPreset preset, string finalName)
     {
         if (preset == null)

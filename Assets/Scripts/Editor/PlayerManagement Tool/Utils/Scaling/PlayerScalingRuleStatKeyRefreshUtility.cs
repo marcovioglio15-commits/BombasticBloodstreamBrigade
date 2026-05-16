@@ -14,7 +14,7 @@ internal static class PlayerScalingRuleStatKeyRefreshUtility
     /// Rebinds every resolvable scaling rule to the current normalized stat key emitted by the mutated serialized object.
     /// </summary>
     /// <param name="serializedObject">Serialized preset object whose scaling rules should be synchronized after list reorders or similar structural edits.</param>
-    /// <returns>True when at least one rule stat key was rewritten, otherwise false.<returns>
+    /// <returns>True when at least one rule stat key was rewritten, otherwise false.</returns>
     public static bool RefreshStatKeys(SerializedObject serializedObject)
     {
         if (serializedObject == null)
@@ -61,7 +61,7 @@ internal static class PlayerScalingRuleStatKeyRefreshUtility
     /// <param name="serializedObject">Serialized object used to resolve the incoming stat key.</param>
     /// <param name="currentStatKey">Stored stat key before the structural mutation repair pass.</param>
     /// <param name="updatedStatKey">Current normalized key for the same numeric property when found.</param>
-    /// <returns>True when the incoming key still resolves to a numeric property, otherwise false.<returns>
+    /// <returns>True when the incoming key still resolves to a numeric property, otherwise false.</returns>
     private static bool TryResolveUpdatedStatKey(SerializedObject serializedObject,
                                                  string currentStatKey,
                                                  out string updatedStatKey)

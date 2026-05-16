@@ -3,8 +3,6 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Tracks the local release latch and unscaled cooldown used by dropped-container interactions.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal struct HUDPowerUpContainerInteractionInputGate
 {
@@ -20,9 +18,8 @@ internal struct HUDPowerUpContainerInteractionInputGate
     #region Public Methods
     /// <summary>
     /// Starts a local input block that lasts until relevant actions are released and the cooldown expires.
-    /// /params durationSeconds Minimum unscaled cooldown duration before another container action can be accepted.
-    /// /returns void.
     /// </summary>
+    /// <param name="durationSeconds">Minimum unscaled cooldown duration before another container action can be accepted.</param>
     public void Begin(float durationSeconds)
     {
         waitingForInputRelease = true;
@@ -33,9 +30,8 @@ internal struct HUDPowerUpContainerInteractionInputGate
 
     /// <summary>
     /// Synchronizes the gate with pause/menu ownership so resume input cannot leak into container prompts.
-    /// /params isHardGameplayPauseActive True while gameplay input is owned by pause or menu flows.
-    /// /returns void.
     /// </summary>
+    /// <param name="isHardGameplayPauseActive">True while gameplay input is owned by pause or menu flows.</param>
     public void SynchronizeHardPause(bool isHardGameplayPauseActive)
     {
         if (isHardGameplayPauseActive)
@@ -54,8 +50,6 @@ internal struct HUDPowerUpContainerInteractionInputGate
 
     /// <summary>
     /// Clears all local input-gate state during teardown or player-context loss.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Clear()
     {
@@ -67,8 +61,6 @@ internal struct HUDPowerUpContainerInteractionInputGate
 
     /// <summary>
     /// Updates the release latch used to reject held gamepad actions after overlay open or swap confirmation.
-    /// /params None.
-    /// /returns void.
     /// </summary>
     public void Refresh()
     {
@@ -83,9 +75,8 @@ internal struct HUDPowerUpContainerInteractionInputGate
 
     /// <summary>
     /// Returns whether dropped-container prompts should currently ignore gameplay interaction actions.
-    /// /params None.
-    /// /returns True while the release latch or unscaled cooldown is still active.
     /// </summary>
+    /// <returns>True while the release latch or unscaled cooldown is still active.</returns>
     public bool IsBlocked()
     {
         Refresh();
@@ -101,9 +92,8 @@ internal struct HUDPowerUpContainerInteractionInputGate
 
     /// <summary>
     /// Checks all gameplay and UI-submit actions that can participate in the container flow.
-    /// /params None.
-    /// /returns True when no relevant action is currently held.
     /// </summary>
+    /// <returns>True when no relevant action is currently held.</returns>
     public static bool AreActionsReleased()
     {
         if (IsActionPressed(PlayerInputRuntime.PowerUpContainerInteractAction))
@@ -131,9 +121,9 @@ internal struct HUDPowerUpContainerInteractionInputGate
     #region Private Methods
     /// <summary>
     /// Safely checks whether one input action is currently held.
-    /// /params action Input action inspected for pressed state.
-    /// /returns True when the action exists and is pressed.
     /// </summary>
+    /// <param name="action">Input action inspected for pressed state.</param>
+    /// <returns>True when the action exists and is pressed.</returns>
     private static bool IsActionPressed(InputAction action)
     {
         if (action == null)

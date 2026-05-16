@@ -36,7 +36,7 @@ public static class EnemyWallSteeringUtility
     /// <param name="resolvedDisplacement">Best resolved displacement produced by the bypass evaluation.</param>
     /// <param name="resolvedVelocity">Velocity corresponding to the resolved displacement.</param>
     /// <param name="resolvedHitNormal">Wall normal of the resolved bypass candidate when still partially blocked.</param>
-    /// <returns>True when a better bypass candidate is found and should replace the default blocked response.<returns>
+    /// <returns>True when a better bypass candidate is found and should replace the default blocked response.</returns>
     public static bool TryResolveCircumnavigationDisplacement(in PhysicsWorldSingleton physicsWorldSingleton,
                                                               int enemyStableIndex,
                                                               float3 startPosition,
@@ -178,7 +178,7 @@ public static class EnemyWallSteeringUtility
     /// <param name="candidateDisplacement">Resolved displacement of this candidate.</param>
     /// <param name="candidateVelocity">Velocity corresponding to the candidate displacement.</param>
     /// <param name="candidateHitNormal">Wall normal for this candidate when still partially blocked.</param>
-    /// <returns>True when candidate is valid and produces usable movement.<returns>
+    /// <returns>True when candidate is valid and produces usable movement.</returns>
     private static bool EvaluateCircumnavigationCandidate(in PhysicsWorldSingleton physicsWorldSingleton,
                                                           float3 startPosition,
                                                           float3 candidateDirection,
@@ -244,7 +244,7 @@ public static class EnemyWallSteeringUtility
     /// <param name="toPlayerDirection">Normalized planar direction from enemy to player.</param>
     /// <param name="planarCurrentVelocity">Current planar velocity.</param>
     /// <param name="enemyStableIndex">Stable enemy index used for deterministic fallback.</param>
-    /// <returns>+1 or -1 sign used to orient the first tangent candidate.<returns>
+    /// <returns>+1 or -1 sign used to orient the first tangent candidate.</returns>
     private static float ResolvePreferredSign(float3 tangent,
                                               float3 toPlayerDirection,
                                               float3 planarCurrentVelocity,
@@ -268,7 +268,7 @@ public static class EnemyWallSteeringUtility
     /// Returns a deterministic sign based on enemy index to avoid random oscillation between tangent sides.
     /// </summary>
     /// <param name="enemyStableIndex">Stable enemy index.</param>
-    /// <returns>+1 when hash bit is even, otherwise -1.<returns>
+    /// <returns>+1 when hash bit is even, otherwise -1.</returns>
     private static float ResolveDeterministicSign(int enemyStableIndex)
     {
         uint hash = math.hash(new int2(enemyStableIndex * 17 + 3, enemyStableIndex * 31 + 7));

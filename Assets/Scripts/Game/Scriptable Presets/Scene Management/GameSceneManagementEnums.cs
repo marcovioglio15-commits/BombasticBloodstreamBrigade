@@ -1,7 +1,5 @@
 /// <summary>
 /// Identifies the high-level purpose of a scene handled by the Game Scene Manager.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneKind : byte
 {
@@ -17,8 +15,6 @@ public enum GameSceneKind : byte
 
 /// <summary>
 /// Describes how a loaded scene should be treated when another scene becomes active.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneUnloadPolicy : byte
 {
@@ -29,8 +25,6 @@ public enum GameSceneUnloadPolicy : byte
 
 /// <summary>
 /// Selects the scene loading backend used by the Game Scene Manager.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneLoadBackend : byte
 {
@@ -40,8 +34,6 @@ public enum GameSceneLoadBackend : byte
 
 /// <summary>
 /// Defines how a transition can be requested by gameplay, UI or authored trigger volumes.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneTransitionMode : byte
 {
@@ -53,8 +45,6 @@ public enum GameSceneTransitionMode : byte
 
 /// <summary>
 /// Defines the runtime request submitted to the scene manager singleton.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneTransitionRequestType : byte
 {
@@ -67,8 +57,6 @@ public enum GameSceneTransitionRequestType : byte
 
 /// <summary>
 /// Runtime phase used by the scene transition execution system.
-/// /params None.
-/// /returns None.
 /// </summary>
 public enum GameSceneTransitionPhase : byte
 {

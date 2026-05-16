@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds Scene Manager preset detail sections, validation output and setup actions.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneManagerPresetsPanelSectionsUtility
 {
@@ -19,9 +17,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
     #region Public Methods
     /// <summary>
     /// Loads the persisted active Scene Manager details section.
-    /// /params None.
-    /// /returns Persisted section value or Metadata when none exists.
     /// </summary>
+    /// <returns>Persisted section value or Metadata when none exists.</returns>
     public static GameSceneManagerPresetsPanel.DetailsSectionType LoadActiveSection()
     {
         return ManagementToolStateUtility.LoadEnumValue(ActiveSectionStateKey, GameSceneManagerPresetsPanel.DetailsSectionType.Metadata);
@@ -29,10 +26,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Selects one Scene Manager preset and rebuilds details.
-    /// /params panel Owning panel with detail roots.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with detail roots.</param>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     public static void SelectPreset(GameSceneManagerPresetsPanel panel, GameSceneManagerPreset preset)
     {
         if (panel == null || panel.DetailsRoot == null)
@@ -67,9 +63,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Rebuilds the currently selected Scene Manager details section.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     public static void BuildActiveSection(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null || panel.SectionContentRoot == null || panel.PresetSerializedObject == null)
@@ -114,9 +109,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Marks the selected Scene Manager preset dirty in the draft session.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     public static void MarkSelectedPresetDirty(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null || panel.PresetSerializedObject == null)
@@ -131,9 +125,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
     #region Section Builders
     /// <summary>
     /// Builds metadata fields for the selected Scene Manager preset.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildMetadataSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Preset Details");
@@ -155,9 +148,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds startup scene flow and backend controls.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildStartupSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Startup Flow");
@@ -172,9 +164,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds scene table controls and build settings maintenance actions.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildSceneTableSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Scene Table");
@@ -184,9 +175,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds transition graph controls.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildTransitionsSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Transitions");
@@ -195,12 +185,11 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds a simple single-property section for grouped preset settings.
-    /// /params panel Owning panel with serialized preset context.
-    /// /params title Section title.
-    /// /params propertyName Serialized property shown in the section.
-    /// /params tooltip Tooltip applied to the generated property field.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="title">Section title.</param>
+    /// <param name="propertyName">Serialized property shown in the section.</param>
+    /// <param name="tooltip">Tooltip applied to the generated property field.</param>
     private static void BuildPropertySection(GameSceneManagerPresetsPanel panel, string title, string propertyName, string tooltip)
     {
         VisualElement section = CreateSection(panel, title);
@@ -209,9 +198,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds trigger defaults and layer maintenance controls.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildTriggerSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Trigger Authoring");
@@ -238,9 +226,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds Addressables status and future backend controls.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void BuildAddressablesSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Addressables");
@@ -268,9 +255,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds non-mutating validation warning output.
-    /// /params panel Owning panel with selected preset and warning buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset and warning buffer.</param>
     private static void BuildValidationSection(GameSceneManagerPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Validation");
@@ -303,9 +289,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
     #region Helpers
     /// <summary>
     /// Builds buttons for Scene Manager detail sections.
-    /// /params panel Owning panel that stores the active section.
-    /// /returns Section button row.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the active section.</param>
+    /// <returns>Section button row.</returns>
     private static VisualElement BuildSectionButtons(GameSceneManagerPresetsPanel panel)
     {
         VisualElement buttonsRoot = new VisualElement();
@@ -326,12 +312,11 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one Scene Manager detail section selector button.
-    /// /params panel Owning panel receiving the selected section.
-    /// /params parent Parent button row.
-    /// /params sectionType Section activated by the button.
-    /// /params label Visible label.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel receiving the selected section.</param>
+    /// <param name="parent">Parent button row.</param>
+    /// <param name="sectionType">Section activated by the button.</param>
+    /// <param name="label">Visible label.</param>
     private static void AddSectionButton(GameSceneManagerPresetsPanel panel,
                                          VisualElement parent,
                                          GameSceneManagerPresetsPanel.DetailsSectionType sectionType,
@@ -354,9 +339,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Resolves a stable minimum width for Scene Manager section buttons.
-    /// /params sectionType Section represented by the selector button.
-    /// /returns Minimum width that keeps the label readable before wrapping to a new row.
     /// </summary>
+    /// <param name="sectionType">Section represented by the selector button.</param>
+    /// <returns>Minimum width that keeps the label readable before wrapping to a new row.</returns>
     private static float ResolveSectionButtonWidth(GameSceneManagerPresetsPanel.DetailsSectionType sectionType)
     {
         switch (sectionType)
@@ -378,10 +363,10 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates a styled section container and registers its heading for recolor utilities.
-    /// /params panel Owning panel with active details content root.
-    /// /params title Section title.
-    /// /returns Section container.
     /// </summary>
+    /// <param name="panel">Owning panel with active details content root.</param>
+    /// <param name="title">Section title.</param>
+    /// <returns>Section container.</returns>
     private static VisualElement CreateSection(GameSceneManagerPresetsPanel panel, string title)
     {
         VisualElement section = new VisualElement();
@@ -398,12 +383,11 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one property field and marks the draft dirty on serialized edits.
-    /// /params panel Owning panel with selected preset context.
-    /// /params parent Parent section.
-    /// /params propertyName Serialized property name.
-    /// /params tooltip Field tooltip.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="tooltip">Field tooltip.</param>
     private static void AddPropertyField(GameSceneManagerPresetsPanel panel, VisualElement parent, string propertyName, string tooltip)
     {
         SerializedProperty property = panel.PresetSerializedObject.FindProperty(propertyName);
@@ -421,14 +405,13 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one bound text field and marks the draft dirty on edit.
-    /// /params panel Owning panel with serialized preset context.
-    /// /params parent Parent section.
-    /// /params label Display label.
-    /// /params propertyName Serialized property name.
-    /// /params refreshList True when list labels should update after change.
-    /// /params multiline True when multiline editing is enabled.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="refreshList">True when list labels should update after change.</param>
+    /// <param name="multiline">True when multiline editing is enabled.</param>
     private static void AddBoundTextField(GameSceneManagerPresetsPanel panel,
                                           VisualElement parent,
                                           string label,
@@ -460,9 +443,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds scene table maintenance buttons.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns Toolbar visual element.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <returns>Toolbar visual element.</returns>
     private static Toolbar BuildSceneTableToolbar(GameSceneManagerPresetsPanel panel)
     {
         Toolbar toolbar = new Toolbar();
@@ -484,9 +467,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Refreshes build index metadata on serialized scene definitions.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void SynchronizeBuildMetadata(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null || panel.PresetSerializedObject == null)
@@ -524,9 +506,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Applies authored non-SubScene scene order to Editor Build Settings.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void ApplySceneOrderToBuildSettings(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)
@@ -546,10 +527,9 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates the configured transition layer and refreshes the visible section.
-    /// /params panel Owning panel with selected preset context.
-    /// /params layerName Layer name to create.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="layerName">Layer name to create.</param>
     private static void CreateTransitionLayer(GameSceneManagerPresetsPanel panel, string layerName)
     {
         if (GameSceneTransitionLayerUtility.TryCreateLayer(layerName))
@@ -558,9 +538,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
 
     /// <summary>
     /// Synchronizes Addressables settings and scene entries for the selected Scene Manager preset.
-    /// /params panel Owning panel with selected preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
     private static void SynchronizeAddressableScenes(GameSceneManagerPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)

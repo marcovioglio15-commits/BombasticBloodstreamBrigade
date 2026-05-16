@@ -19,7 +19,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
     /// </summary>
     /// <param name="panel">Owning panel that stores UI references.</param>
     /// <param name="leftPaneWidth">Initial split width for the preset list pane.</param>
-    /// <returns>Returns the constructed main content root.<returns>
+    /// <returns>Returns the constructed main content root.</returns>
     public static VisualElement BuildMainContent(PlayerMasterPresetsPanel panel, float leftPaneWidth)
     {
         VisualElement container = new VisualElement();
@@ -37,7 +37,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
     /// Builds the left pane that hosts toolbar actions, search and preset list.
     /// </summary>
     /// <param name="panel">Owning panel that stores preset list state and callbacks.</param>
-    /// <returns>Returns the constructed left pane visual element.<returns>
+    /// <returns>Returns the constructed left pane visual element.</returns>
     public static VisualElement BuildLeftPane(PlayerMasterPresetsPanel panel)
     {
         VisualElement leftPane = new VisualElement();
@@ -93,7 +93,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
     /// Builds the right pane that hosts the preset detail scroll view.
     /// </summary>
     /// <param name="panel">Owning panel that stores the detail root reference.</param>
-    /// <returns>Returns the constructed right pane visual element.<returns>
+    /// <returns>Returns the constructed right pane visual element.</returns>
     public static VisualElement BuildRightPane(PlayerMasterPresetsPanel panel)
     {
         VisualElement rightPane = new VisualElement();
@@ -113,7 +113,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
     /// Creates one reusable preset list item with contextual menu actions.
     /// </summary>
     /// <param name="panel">Owning panel that provides preset callbacks.</param>
-    /// <returns>Returns the list item visual element.<returns>
+    /// <returns>Returns the list item visual element.</returns>
     public static VisualElement MakePresetItem(PlayerMasterPresetsPanel panel)
     {
         Label label = new Label();
@@ -408,7 +408,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
     /// </summary>
     /// <param name="preset">Preset to test.</param>
     /// <param name="searchText">Current search text.</param>
-    /// <returns>Returns true when the preset matches the filter.<returns>
+    /// <returns>Returns true when the preset matches the filter.</returns>
     private static bool IsMatchingSearch(PlayerMasterPreset preset, string searchText)
     {
         if (string.IsNullOrWhiteSpace(searchText))

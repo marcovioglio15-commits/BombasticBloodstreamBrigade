@@ -4,8 +4,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Centralizes projectile-request math shared by base shooting and active power-up shooting paths.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerProjectileRequestUtility
 {
@@ -18,10 +16,10 @@ public static class PlayerProjectileRequestUtility
     #region Public Methods
     /// <summary>
     /// Resolves the planar shoot direction from look state and falls back to the current transform forward.
-    /// /params lookState Current player look state.
-    /// /params localTransform Current player transform used for fallback orientation.
-    /// /returns The normalized planar shoot direction.
     /// </summary>
+    /// <param name="lookState">Current player look state.</param>
+    /// <param name="localTransform">Current player transform used for fallback orientation.</param>
+    /// <returns>The normalized planar shoot direction.</returns>
     public static float3 ResolveShootDirection(in PlayerLookState lookState,
                                                in LocalTransform localTransform)
     {
@@ -37,14 +35,14 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Resolves the spawn position used by projectile-like emissions from the current muzzle configuration.
-    /// /params playerEntity Current player entity owning the emission.
-    /// /params localTransform Current player transform.
-    /// /params runtimeShootingConfig Runtime shooting config used to resolve the shoot offset.
-    /// /params muzzleLookup Read-only muzzle anchor lookup.
-    /// /params transformLookup Read-only transform lookup.
-    /// /params localToWorldLookup Read-only LocalToWorld lookup.
-    /// /returns The resolved world-space spawn position.
     /// </summary>
+    /// <param name="playerEntity">Current player entity owning the emission.</param>
+    /// <param name="localTransform">Current player transform.</param>
+    /// <param name="runtimeShootingConfig">Runtime shooting config used to resolve the shoot offset.</param>
+    /// <param name="muzzleLookup">Read-only muzzle anchor lookup.</param>
+    /// <param name="transformLookup">Read-only transform lookup.</param>
+    /// <param name="localToWorldLookup">Read-only LocalToWorld lookup.</param>
+    /// <returns>The resolved world-space spawn position.</returns>
     public static float3 ResolveShootSpawnPosition(Entity playerEntity,
                                                    in LocalTransform localTransform,
                                                    in PlayerRuntimeShootingConfig runtimeShootingConfig,
@@ -63,19 +61,19 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Builds one projectile request template from runtime shooting data plus optional local multipliers and elemental override.
-    /// /params runtimeShootingConfig Current runtime shooting config.
-    /// /params appliedElementSlots Runtime default elemental-slot buffer.
-    /// /params passiveToolsState Current aggregated passive-tool state.
-    /// /params sizeMultiplier Local size multiplier applied on top of base and passive values.
-    /// /params damageMultiplier Local damage multiplier applied on top of base and passive values.
-    /// /params speedMultiplier Local speed multiplier applied on top of base and passive values.
-    /// /params rangeMultiplier Local range multiplier applied on top of base and passive values.
-    /// /params lifetimeMultiplier Local lifetime multiplier applied on top of base and passive values.
-    /// /params hasElementalPayloadOverride True when the override elemental payload should replace the default one.
-    /// /params elementalEffectOverride Override elemental effect configuration.
-    /// /params elementalStacksPerHitOverride Override elemental stacks per hit.
-    /// /returns The resolved request template ready to be emitted as one or more ShootRequest entries.
     /// </summary>
+    /// <param name="runtimeShootingConfig">Current runtime shooting config.</param>
+    /// <param name="appliedElementSlots">Runtime default elemental-slot buffer.</param>
+    /// <param name="passiveToolsState">Current aggregated passive-tool state.</param>
+    /// <param name="sizeMultiplier">Local size multiplier applied on top of base and passive values.</param>
+    /// <param name="damageMultiplier">Local damage multiplier applied on top of base and passive values.</param>
+    /// <param name="speedMultiplier">Local speed multiplier applied on top of base and passive values.</param>
+    /// <param name="rangeMultiplier">Local range multiplier applied on top of base and passive values.</param>
+    /// <param name="lifetimeMultiplier">Local lifetime multiplier applied on top of base and passive values.</param>
+    /// <param name="hasElementalPayloadOverride">True when the override elemental payload should replace the default one.</param>
+    /// <param name="elementalEffectOverride">Override elemental effect configuration.</param>
+    /// <param name="elementalStacksPerHitOverride">Override elemental stacks per hit.</param>
+    /// <returns>The resolved request template ready to be emitted as one or more ShootRequest entries.</returns>
     public static PlayerProjectileRequestTemplate BuildProjectileTemplate(in PlayerRuntimeShootingConfig runtimeShootingConfig,
                                                                           DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
                                                                           in PlayerPassiveToolsState passiveToolsState,
@@ -129,13 +127,12 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Resolves final penetration settings by merging base shooting values with an optional override.
-    /// /params baseShootingValues Base controller shooting values.
-    /// /params overrideMode Optional override penetration mode.
-    /// /params overrideMaxPenetrations Optional override penetration count.
-    /// /params resolvedMode Final resolved penetration mode.
-    /// /params resolvedMaxPenetrations Final resolved maximum penetration count.
-    /// /returns None.
     /// </summary>
+    /// <param name="baseShootingValues">Base controller shooting values.</param>
+    /// <param name="overrideMode">Optional override penetration mode.</param>
+    /// <param name="overrideMaxPenetrations">Optional override penetration count.</param>
+    /// <param name="resolvedMode">Final resolved penetration mode.</param>
+    /// <param name="resolvedMaxPenetrations">Final resolved maximum penetration count.</param>
     public static void ResolvePenetrationSettings(in ShootingValuesBlob baseShootingValues,
                                                   ProjectilePenetrationMode overrideMode,
                                                   int overrideMaxPenetrations,
@@ -153,17 +150,16 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Emits one single request or one evenly spread burst, depending on the projectile count.
-    /// /params shootRequests Mutable ShootRequest buffer receiving the generated entries.
-    /// /params projectileCount Number of projectile lanes to emit.
-    /// /params coneAngleDegrees Total spread angle in degrees.
-    /// /params spawnPosition World-space emission origin.
-    /// /params shootDirection Base forward direction.
-    /// /params template Resolved template copied into each ShootRequest.
-    /// /params penetrationMode Penetration mode assigned to emitted requests.
-    /// /params maxPenetrations Maximum penetrations assigned to emitted requests.
-    /// /params isSplitChild Flag propagated to emitted requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shootRequests">Mutable ShootRequest buffer receiving the generated entries.</param>
+    /// <param name="projectileCount">Number of projectile lanes to emit.</param>
+    /// <param name="coneAngleDegrees">Total spread angle in degrees.</param>
+    /// <param name="spawnPosition">World-space emission origin.</param>
+    /// <param name="shootDirection">Base forward direction.</param>
+    /// <param name="template">Resolved template copied into each ShootRequest.</param>
+    /// <param name="penetrationMode">Penetration mode assigned to emitted requests.</param>
+    /// <param name="maxPenetrations">Maximum penetrations assigned to emitted requests.</param>
+    /// <param name="isSplitChild">Flag propagated to emitted requests.</param>
     public static void AddSpreadRequests(ref DynamicBuffer<ShootRequest> shootRequests,
                                          int projectileCount,
                                          float coneAngleDegrees,
@@ -210,15 +206,14 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Adds one fully initialized ShootRequest entry to the provided buffer.
-    /// /params shootRequests Mutable ShootRequest buffer receiving the entry.
-    /// /params position World-space emission origin.
-    /// /params direction Desired projectile forward direction.
-    /// /params template Resolved projectile template.
-    /// /params penetrationMode Penetration mode assigned to the entry.
-    /// /params maxPenetrations Maximum penetrations assigned to the entry.
-    /// /params isSplitChild Flag propagated to the entry.
-    /// /returns None.
     /// </summary>
+    /// <param name="shootRequests">Mutable ShootRequest buffer receiving the entry.</param>
+    /// <param name="position">World-space emission origin.</param>
+    /// <param name="direction">Desired projectile forward direction.</param>
+    /// <param name="template">Resolved projectile template.</param>
+    /// <param name="penetrationMode">Penetration mode assigned to the entry.</param>
+    /// <param name="maxPenetrations">Maximum penetrations assigned to the entry.</param>
+    /// <param name="isSplitChild">Flag propagated to the entry.</param>
     public static void AddShootRequest(ref DynamicBuffer<ShootRequest> shootRequests,
                                        float3 position,
                                        float3 direction,
@@ -252,10 +247,10 @@ public static class PlayerProjectileRequestUtility
 
     /// <summary>
     /// Applies a safe multiplier to one range or lifetime limit while preserving non-positive disabled values.
-    /// /params baseLifetimeValue Base lifetime or range value.
-    /// /params lifetimeMultiplier Multiplier applied when the base value is positive.
-    /// /returns The scaled value, or the untouched disabled base value when the input is non-positive.
     /// </summary>
+    /// <param name="baseLifetimeValue">Base lifetime or range value.</param>
+    /// <param name="lifetimeMultiplier">Multiplier applied when the base value is positive.</param>
+    /// <returns>The scaled value, or the untouched disabled base value when the input is non-positive.</returns>
     public static float ApplyLifetimeMultiplier(float baseLifetimeValue,
                                                 float lifetimeMultiplier)
     {
@@ -271,8 +266,6 @@ public static class PlayerProjectileRequestUtility
 
 /// <summary>
 /// Stores one reusable projectile request payload before emission into ShootRequest buffers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public struct PlayerProjectileRequestTemplate
 {

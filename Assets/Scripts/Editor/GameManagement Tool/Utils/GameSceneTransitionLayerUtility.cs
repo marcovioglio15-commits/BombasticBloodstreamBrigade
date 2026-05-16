@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides editor helpers for Scene Manager transition layer validation and setup.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneTransitionLayerUtility
 {
@@ -14,9 +12,9 @@ public static class GameSceneTransitionLayerUtility
     #region Public Methods
     /// <summary>
     /// Resolves whether a Unity layer with the provided name exists.
-    /// /params layerName Unity layer name.
-    /// /returns True when the layer exists.
     /// </summary>
+    /// <param name="layerName">Unity layer name.</param>
+    /// <returns>True when the layer exists.</returns>
     public static bool LayerExists(string layerName)
     {
         if (string.IsNullOrWhiteSpace(layerName))
@@ -27,10 +25,9 @@ public static class GameSceneTransitionLayerUtility
 
     /// <summary>
     /// Adds a warning when the configured transition layer is missing.
-    /// /params preset Scene manager preset to inspect.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene manager preset to inspect.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     public static void CollectLayerWarnings(GameSceneManagerPreset preset, List<string> warnings)
     {
         if (preset == null || warnings == null || preset.TriggerSettings == null)
@@ -44,9 +41,9 @@ public static class GameSceneTransitionLayerUtility
 
     /// <summary>
     /// Creates the configured transition layer in the first available user layer slot.
-    /// /params layerName Unity layer name to create.
-    /// /returns True when a new layer was created.
     /// </summary>
+    /// <param name="layerName">Unity layer name to create.</param>
+    /// <returns>True when a new layer was created.</returns>
     public static bool TryCreateLayer(string layerName)
     {
         if (string.IsNullOrWhiteSpace(layerName))

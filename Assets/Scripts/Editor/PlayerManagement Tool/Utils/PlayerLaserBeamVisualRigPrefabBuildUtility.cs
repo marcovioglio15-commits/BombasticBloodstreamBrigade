@@ -6,8 +6,6 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// Builds Laser Beam visual rig prefabs and synchronizes the player visual bridge authoring component.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 {
@@ -20,11 +18,11 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
     #region Public Methods
     /// <summary>
     /// Builds or refreshes one mesh-body prefab from the provided deterministic definition.
-    /// /params definition Deterministic body prefab definition.
-    /// /params bodyMaterial Material assigned to every mesh layer of the body prefab.
-    /// /params sphereMesh Mesh used by each liquid body blob.
-    /// /returns Built body prefab asset.
     /// </summary>
+    /// <param name="definition">Deterministic body prefab definition.</param>
+    /// <param name="bodyMaterial">Material assigned to every mesh layer of the body prefab.</param>
+    /// <param name="sphereMesh">Mesh used by each liquid body blob.</param>
+    /// <returns>Built body prefab asset.</returns>
     public static GameObject BuildBodyPrefab(PlayerLaserBeamBodyPrefabDefinition definition, Material bodyMaterial, Mesh sphereMesh)
     {
         bool wasExistingPrefab;
@@ -60,11 +58,11 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Builds or refreshes one particle prefab from the provided deterministic layered-emitter definition.
-    /// /params definition Deterministic particle prefab definition.
-    /// /params particleMaterial Material assigned to every particle renderer in the prefab.
-    /// /params sphereMesh Mesh used by the mesh-particle renderers.
-    /// /returns Built particle prefab asset.
     /// </summary>
+    /// <param name="definition">Deterministic particle prefab definition.</param>
+    /// <param name="particleMaterial">Material assigned to every particle renderer in the prefab.</param>
+    /// <param name="sphereMesh">Mesh used by the mesh-particle renderers.</param>
+    /// <returns>Built particle prefab asset.</returns>
     public static GameObject BuildParticlePrefab(PlayerLaserBeamParticlePrefabDefinition definition, Material particleMaterial, Mesh sphereMesh)
     {
         bool wasExistingPrefab;
@@ -94,15 +92,14 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Synchronizes the runtime visual bridge prefab with the newly generated Laser Beam rig assets.
-    /// /params playerVisualPrefabPath Runtime visual bridge prefab path.
-    /// /params bubbleBurstSourcePrefab Bubble-burst source prefab asset.
-    /// /params starBloomSourcePrefab Star-bloom source prefab asset.
-    /// /params softDiscSourcePrefab Soft-disc source prefab asset.
-    /// /params bubbleBurstImpactPrefab Bubble-burst impact prefab asset.
-    /// /params starBloomImpactPrefab Star-bloom impact prefab asset.
-    /// /params softDiscImpactPrefab Soft-disc impact prefab asset.
-    /// /returns None.
     /// </summary>
+    /// <param name="playerVisualPrefabPath">Runtime visual bridge prefab path.</param>
+    /// <param name="bubbleBurstSourcePrefab">Bubble-burst source prefab asset.</param>
+    /// <param name="starBloomSourcePrefab">Star-bloom source prefab asset.</param>
+    /// <param name="softDiscSourcePrefab">Soft-disc source prefab asset.</param>
+    /// <param name="bubbleBurstImpactPrefab">Bubble-burst impact prefab asset.</param>
+    /// <param name="starBloomImpactPrefab">Star-bloom impact prefab asset.</param>
+    /// <param name="softDiscImpactPrefab">Soft-disc impact prefab asset.</param>
     public static void SynchronizePlayerVisualBridge(string playerVisualPrefabPath,
                                                      GameObject bubbleBurstSourcePrefab,
                                                      GameObject starBloomSourcePrefab,
@@ -141,9 +138,8 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Ensures that one AssetDatabase folder path exists before prefab generation runs.
-    /// /params folderPath Folder path that must exist inside the AssetDatabase.
-    /// /returns None.
     /// </summary>
+    /// <param name="folderPath">Folder path that must exist inside the AssetDatabase.</param>
     public static void EnsureFolder(string folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath) || AssetDatabase.IsValidFolder(folderPath))
@@ -160,11 +156,11 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Rebuilds one normalized primitive mesh asset used by the Laser Beam visual rig.
-    /// /params meshAssetPath Asset path where the generated mesh should live.
-    /// /params primitiveType Unity primitive type used as the source mesh.
-    /// /params meshRotation Local-space rotation baked directly into the saved mesh vertices.
-    /// /returns Generated mesh asset ready to be referenced by prefabs.
     /// </summary>
+    /// <param name="meshAssetPath">Asset path where the generated mesh should live.</param>
+    /// <param name="primitiveType">Unity primitive type used as the source mesh.</param>
+    /// <param name="meshRotation">Local-space rotation baked directly into the saved mesh vertices.</param>
+    /// <returns>Generated mesh asset ready to be referenced by prefabs.</returns>
     public static Mesh RebuildPrimitiveMeshAsset(string meshAssetPath,
                                                  PrimitiveType primitiveType,
                                                  Quaternion meshRotation)
@@ -209,15 +205,14 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
     #region Private Methods
     /// <summary>
     /// Creates one mesh child used by the deterministic beam body prefabs.
-    /// /params parent Parent transform that receives the mesh child.
-    /// /params childName Child GameObject name.
-    /// /params sphereMesh Mesh used by the child renderer.
-    /// /params material Shared liquid material assigned to the mesh renderer.
-    /// /params localPosition Local position of the child.
-    /// /params localScale Local scale of the child.
-    /// /params sortingOrder Renderer sorting order used for layered shells.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent transform that receives the mesh child.</param>
+    /// <param name="childName">Child GameObject name.</param>
+    /// <param name="sphereMesh">Mesh used by the child renderer.</param>
+    /// <param name="material">Shared liquid material assigned to the mesh renderer.</param>
+    /// <param name="localPosition">Local position of the child.</param>
+    /// <param name="localScale">Local scale of the child.</param>
+    /// <param name="sortingOrder">Renderer sorting order used for layered shells.</param>
     private static void CreateBodyRenderer(Transform parent,
                                            string childName,
                                            Mesh sphereMesh,
@@ -246,12 +241,11 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Creates one particle emitter child used by the deterministic source and impact prefabs.
-    /// /params parent Parent transform that receives the emitter child.
-    /// /params definition Deterministic emitter definition.
-    /// /params particleMaterial Shared particle material assigned to the renderer.
-    /// /params sphereMesh Mesh used by the mesh-particle renderer.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent transform that receives the emitter child.</param>
+    /// <param name="definition">Deterministic emitter definition.</param>
+    /// <param name="particleMaterial">Shared particle material assigned to the renderer.</param>
+    /// <param name="sphereMesh">Mesh used by the mesh-particle renderer.</param>
     private static void CreateParticleEmitter(Transform parent,
                                               in PlayerLaserBeamParticleEmitterDefinition definition,
                                               Material particleMaterial,
@@ -340,9 +334,8 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Creates the shared fade gradient used by the deterministic particle prefabs.
-    /// /params None.
-    /// /returns Shared fade gradient.
     /// </summary>
+    /// <returns>Shared fade gradient.</returns>
     private static Gradient CreateFadeGradient()
     {
         Gradient gradient = new Gradient();
@@ -360,9 +353,8 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Creates the shared size curve used by the deterministic particle prefabs.
-    /// /params None.
-    /// /returns Shared size-over-lifetime curve.
     /// </summary>
+    /// <returns>Shared size-over-lifetime curve.</returns>
     private static AnimationCurve CreateBubbleSizeCurve()
     {
         return new AnimationCurve(new Keyframe(0f, 0.28f),
@@ -373,11 +365,11 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Loads prefab contents when the prefab already exists, otherwise creates a new root object.
-    /// /params prefabPath Prefab asset path.
-    /// /params rootName Root name used for new prefabs.
-    /// /params wasExistingPrefab True when the prefab already existed on disk.
-    /// /returns Loaded prefab contents root or a new unsaved root object.
     /// </summary>
+    /// <param name="prefabPath">Prefab asset path.</param>
+    /// <param name="rootName">Root name used for new prefabs.</param>
+    /// <param name="wasExistingPrefab">True when the prefab already existed on disk.</param>
+    /// <returns>Loaded prefab contents root or a new unsaved root object.</returns>
     private static GameObject LoadOrCreatePrefabContents(string prefabPath, string rootName, out bool wasExistingPrefab)
     {
         GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
@@ -396,10 +388,9 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Releases prefab contents after a save operation, unloading loaded contents or destroying unsaved roots.
-    /// /params prefabContentsRoot Prefab contents root to release.
-    /// /params wasExistingPrefab True when the contents were loaded from an existing prefab asset.
-    /// /returns None.
     /// </summary>
+    /// <param name="prefabContentsRoot">Prefab contents root to release.</param>
+    /// <param name="wasExistingPrefab">True when the contents were loaded from an existing prefab asset.</param>
     private static void UnloadOrDestroyPrefabContents(GameObject prefabContentsRoot, bool wasExistingPrefab)
     {
         if (wasExistingPrefab)
@@ -413,10 +404,9 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Resets one prefab root before deterministic children are rebuilt.
-    /// /params rootObject Prefab root object to reset.
-    /// /params rootName Root name to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="rootObject">Prefab root object to reset.</param>
+    /// <param name="rootName">Root name to assign.</param>
     private static void ResetRoot(GameObject rootObject, string rootName)
     {
         if (rootObject == null)
@@ -433,9 +423,8 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Destroys every child below one transform.
-    /// /params parent Parent transform whose children should be removed.
-    /// /returns None.
     /// </summary>
+    /// <param name="parent">Parent transform whose children should be removed.</param>
     private static void DestroyAllChildren(Transform parent)
     {
         if (parent == null)
@@ -447,9 +436,8 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Removes every component from one root except the Transform so prefab rebuilds stay deterministic.
-    /// /params rootObject Root object whose extra components should be removed.
-    /// /returns None.
     /// </summary>
+    /// <param name="rootObject">Root object whose extra components should be removed.</param>
     private static void DestroyExtraComponents(GameObject rootObject)
     {
         Component[] components = rootObject.GetComponents<Component>();
@@ -467,10 +455,9 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Applies one layer recursively to an object hierarchy.
-    /// /params rootObject Root object of the hierarchy to update.
-    /// /params layer Layer index to assign recursively.
-    /// /returns None.
     /// </summary>
+    /// <param name="rootObject">Root object of the hierarchy to update.</param>
+    /// <param name="layer">Layer index to assign recursively.</param>
     private static void SetLayerRecursively(GameObject rootObject, int layer)
     {
         if (rootObject == null)
@@ -485,9 +472,9 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Returns one existing component from the target object or adds it when missing.
-    /// /params targetObject Target object that should own the component.
-    /// /returns Existing or newly added component instance.
     /// </summary>
+    /// <param name="targetObject">Target object that should own the component.</param>
+    /// <returns>Existing or newly added component instance.</returns>
     private static TComponent GetOrAddComponent<TComponent>(GameObject targetObject)
         where TComponent : Component
     {
@@ -501,10 +488,9 @@ internal static class PlayerLaserBeamVisualRigPrefabBuildUtility
 
     /// <summary>
     /// Rotates mesh vertex data in local space so the generated asset has the required forward axis baked in.
-    /// /params mesh Mesh asset instance to rotate.
-    /// /params rotation Rotation applied to vertices, normals, and tangents.
-    /// /returns None.
     /// </summary>
+    /// <param name="mesh">Mesh asset instance to rotate.</param>
+    /// <param name="rotation">Rotation applied to vertices, normals, and tangents.</param>
     private static void BakeMeshRotation(Mesh mesh, Quaternion rotation)
     {
         if (mesh == null || rotation == Quaternion.identity)

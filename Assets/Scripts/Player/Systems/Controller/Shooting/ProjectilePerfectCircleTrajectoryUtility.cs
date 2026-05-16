@@ -2,8 +2,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes Perfect Circle trajectory advancement so projectile simulation and Laser Beam sampling stay aligned.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class ProjectilePerfectCircleTrajectoryUtility
 {
@@ -17,10 +15,10 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
     #region Public Methods
     /// <summary>
     /// Resolves the pulsing circular radius used by the standard Perfect Circle orbit mode.
-    /// /params globalTime Absolute world time used by the radius pulse.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns Current circular orbit radius.
     /// </summary>
+    /// <param name="globalTime">Absolute world time used by the radius pulse.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>Current circular orbit radius.</returns>
     public static float ResolveCircularOrbitRadius(float globalTime,
                                                    in PerfectCirclePassiveConfig perfectCircleConfig)
     {
@@ -34,10 +32,10 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves the radial distance at which the path should leave the straight entry phase and begin orbit blending.
-    /// /params globalTime Absolute world time used by pulsing-circle mode.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns Orbit-entry threshold distance.
     /// </summary>
+    /// <param name="globalTime">Absolute world time used by pulsing-circle mode.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>Orbit-entry threshold distance.</returns>
     public static float ResolveOrbitEntryThreshold(float globalTime,
                                                    in PerfectCirclePassiveConfig perfectCircleConfig)
     {
@@ -54,16 +52,16 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves one simulation delta that keeps sampled Laser Beam orbit lanes smooth without exploding segment counts.
-    /// /params perfectCircleState Current Perfect Circle runtime state.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /params speedMultiplier Beam-local speed multiplier applied to Perfect Circle motion.
-    /// /params globalTime Absolute world time at the current sample.
-    /// /params targetSegmentLength Preferred straight-line length of one sampled segment.
-    /// /params maximumAngularStepRadians Maximum angular change allowed per sample.
-    /// /params minimumSimulationDeltaTime Lower simulation-delta clamp.
-    /// /params maximumSimulationDeltaTime Upper simulation-delta clamp.
-    /// /returns Suggested simulation delta for the next lane sample.
     /// </summary>
+    /// <param name="perfectCircleState">Current Perfect Circle runtime state.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <param name="speedMultiplier">Beam-local speed multiplier applied to Perfect Circle motion.</param>
+    /// <param name="globalTime">Absolute world time at the current sample.</param>
+    /// <param name="targetSegmentLength">Preferred straight-line length of one sampled segment.</param>
+    /// <param name="maximumAngularStepRadians">Maximum angular change allowed per sample.</param>
+    /// <param name="minimumSimulationDeltaTime">Lower simulation-delta clamp.</param>
+    /// <param name="maximumSimulationDeltaTime">Upper simulation-delta clamp.</param>
+    /// <returns>Suggested simulation delta for the next lane sample.</returns>
     public static float ResolveSuggestedSimulationDeltaTime(in ProjectilePerfectCircleState perfectCircleState,
                                                             in PerfectCirclePassiveConfig perfectCircleConfig,
                                                             float speedMultiplier,
@@ -119,16 +117,16 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Advances one Perfect Circle state by a single simulation step and returns the world-space position reached.
-    /// /params perfectCircleState Mutable Perfect Circle state to advance.
-    /// /params shooterPosition Current shooter position used as orbit center.
-    /// /params shooterInheritedVelocity Current shooter velocity used by radial entry and transition blending.
-    /// /params fallbackPosition Previous world-space position returned when no movement can be produced.
-    /// /params deltaTime Step delta to apply.
-    /// /params globalTime Absolute world time associated with the end of the step.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored Perfect Circle speeds.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns The world-space position reached after advancing the trajectory.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state to advance.</param>
+    /// <param name="shooterPosition">Current shooter position used as orbit center.</param>
+    /// <param name="shooterInheritedVelocity">Current shooter velocity used by radial entry and transition blending.</param>
+    /// <param name="fallbackPosition">Previous world-space position returned when no movement can be produced.</param>
+    /// <param name="deltaTime">Step delta to apply.</param>
+    /// <param name="globalTime">Absolute world time associated with the end of the step.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored Perfect Circle speeds.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>The world-space position reached after advancing the trajectory.</returns>
     public static float3 ResolveNextPosition(ref ProjectilePerfectCircleState perfectCircleState,
                                              float3 shooterPosition,
                                              float3 shooterInheritedVelocity,
@@ -190,10 +188,10 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
     #region Private Methods
     /// <summary>
     /// Resolves a safe radial direction for the current trajectory state.
-    /// /params perfectCircleState Mutable Perfect Circle state that stores the radial direction.
-    /// /params fallbackPosition Previous valid world-space position used as fallback when no direction was authored.
-    /// /returns A normalized radial direction.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state that stores the radial direction.</param>
+    /// <param name="fallbackPosition">Previous valid world-space position used as fallback when no direction was authored.</param>
+    /// <returns>A normalized radial direction.</returns>
     private static float3 ResolveEntryDirection(ref ProjectilePerfectCircleState perfectCircleState,
                                                 float3 fallbackPosition)
     {
@@ -212,16 +210,16 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Advances the straight radial entry phase and reports whether the path has reached the orbit threshold.
-    /// /params perfectCircleState Mutable Perfect Circle state to advance.
-    /// /params shooterInheritedVelocity Current shooter velocity inherited by the radial phase.
-    /// /params entryDirection Normalized outward radial direction.
-    /// /params deltaTime Step delta to apply.
-    /// /params globalTime Absolute world time associated with the end of the step.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored entry speed.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /params reachedOrbitEntry True when the radial phase reached the orbit threshold during this step.
-    /// /returns The world-space position reached by the radial phase.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state to advance.</param>
+    /// <param name="shooterInheritedVelocity">Current shooter velocity inherited by the radial phase.</param>
+    /// <param name="entryDirection">Normalized outward radial direction.</param>
+    /// <param name="deltaTime">Step delta to apply.</param>
+    /// <param name="globalTime">Absolute world time associated with the end of the step.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored entry speed.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <param name="reachedOrbitEntry">True when the radial phase reached the orbit threshold during this step.</param>
+    /// <returns>The world-space position reached by the radial phase.</returns>
     private static float3 AdvanceRadialEntry(ref ProjectilePerfectCircleState perfectCircleState,
                                              float3 shooterInheritedVelocity,
                                              float3 entryDirection,
@@ -245,15 +243,14 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Initializes the orbit-phase state and stores the linear continuation used by the transition blend.
-    /// /params perfectCircleState Mutable Perfect Circle state entering the orbit phase.
-    /// /params entryPosition Final world-space position reached by the radial phase.
-    /// /params shooterPosition Current shooter position used to derive the orbit angle.
-    /// /params shooterInheritedVelocity Current shooter velocity used to preserve motion continuity.
-    /// /params entryDirection Normalized outward radial direction.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored entry speed.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns None.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state entering the orbit phase.</param>
+    /// <param name="entryPosition">Final world-space position reached by the radial phase.</param>
+    /// <param name="shooterPosition">Current shooter position used to derive the orbit angle.</param>
+    /// <param name="shooterInheritedVelocity">Current shooter velocity used to preserve motion continuity.</param>
+    /// <param name="entryDirection">Normalized outward radial direction.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored entry speed.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
     private static void InitializeOrbitTransition(ref ProjectilePerfectCircleState perfectCircleState,
                                                   float3 entryPosition,
                                                   float3 shooterPosition,
@@ -283,14 +280,14 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves the unblended orbit target for the current step.
-    /// /params perfectCircleState Mutable Perfect Circle state advanced by the orbit phase.
-    /// /params shooterPosition Current shooter position used as orbit center.
-    /// /params deltaTime Step delta to apply.
-    /// /params globalTime Absolute world time associated with the end of the step.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored orbit speed.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns The unblended orbit target position for the current step.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state advanced by the orbit phase.</param>
+    /// <param name="shooterPosition">Current shooter position used as orbit center.</param>
+    /// <param name="deltaTime">Step delta to apply.</param>
+    /// <param name="globalTime">Absolute world time associated with the end of the step.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored orbit speed.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>The unblended orbit target position for the current step.</returns>
     private static float3 ResolveOrbitPosition(ref ProjectilePerfectCircleState perfectCircleState,
                                                float3 shooterPosition,
                                                float deltaTime,
@@ -318,14 +315,14 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves one circular-orbit position using the pulsing-radius configuration.
-    /// /params perfectCircleState Mutable Perfect Circle state advanced by the circular orbit.
-    /// /params shooterPosition Current shooter position used as orbit center.
-    /// /params deltaTime Step delta to apply.
-    /// /params globalTime Absolute world time associated with the end of the step.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored orbit speed.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns The circular-orbit target position reached this step.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state advanced by the circular orbit.</param>
+    /// <param name="shooterPosition">Current shooter position used as orbit center.</param>
+    /// <param name="deltaTime">Step delta to apply.</param>
+    /// <param name="globalTime">Absolute world time associated with the end of the step.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored orbit speed.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>The circular-orbit target position reached this step.</returns>
     private static float3 ResolveCircularOrbitPosition(ref ProjectilePerfectCircleState perfectCircleState,
                                                        float3 shooterPosition,
                                                        float deltaTime,
@@ -358,13 +355,13 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves one golden-spiral orbit position using the authored growth and angular-speed configuration.
-    /// /params perfectCircleState Mutable Perfect Circle state advanced by the golden spiral.
-    /// /params shooterPosition Current shooter position used as orbit center.
-    /// /params deltaTime Step delta to apply.
-    /// /params speedMultiplier Motion multiplier applied on top of the authored spiral speed.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns The golden-spiral target position reached this step.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state advanced by the golden spiral.</param>
+    /// <param name="shooterPosition">Current shooter position used as orbit center.</param>
+    /// <param name="deltaTime">Step delta to apply.</param>
+    /// <param name="speedMultiplier">Motion multiplier applied on top of the authored spiral speed.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>The golden-spiral target position reached this step.</returns>
     private static float3 ResolveGoldenSpiralOrbitPosition(ref ProjectilePerfectCircleState perfectCircleState,
                                                            float3 shooterPosition,
                                                            float deltaTime,
@@ -415,12 +412,11 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Captures the vertical plane used by one orbital projectile before radial entry or orbit blending begins.
-    /// /params perfectCircleState Mutable trajectory state receiving the resolved plane height.
-    /// /params shooterPosition Current shooter position used when an explicit height offset is authored.
-    /// /params fallbackPosition Current projectile position used to preserve muzzle height when the offset is zero.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns None.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable trajectory state receiving the resolved plane height.</param>
+    /// <param name="shooterPosition">Current shooter position used when an explicit height offset is authored.</param>
+    /// <param name="fallbackPosition">Current projectile position used to preserve muzzle height when the offset is zero.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
     private static void EnsureOrbitPlaneHeight(ref ProjectilePerfectCircleState perfectCircleState,
                                                float3 shooterPosition,
                                                float3 fallbackPosition,
@@ -438,13 +434,13 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Blends from the straight radial continuation into the orbit target so the entry path does not form a sharp V.
-    /// /params perfectCircleState Mutable Perfect Circle state storing the blend anchor and progress.
-    /// /params orbitPosition Unblended orbit target reached this step.
-    /// /params deltaTime Step delta applied to the transition.
-    /// /params justEnteredOrbit True when the current step crossed the orbit threshold for the first time.
-    /// /params perfectCircleConfig Aggregated Perfect Circle configuration.
-    /// /returns The final blended trajectory position for the current step.
     /// </summary>
+    /// <param name="perfectCircleState">Mutable Perfect Circle state storing the blend anchor and progress.</param>
+    /// <param name="orbitPosition">Unblended orbit target reached this step.</param>
+    /// <param name="deltaTime">Step delta applied to the transition.</param>
+    /// <param name="justEnteredOrbit">True when the current step crossed the orbit threshold for the first time.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <returns>The final blended trajectory position for the current step.</returns>
     private static float3 ResolveBlendedOrbitPosition(ref ProjectilePerfectCircleState perfectCircleState,
                                                       float3 orbitPosition,
                                                       float deltaTime,
@@ -479,9 +475,9 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     /// <summary>
     /// Resolves a smoother-step interpolation value to avoid visible hard acceleration changes during orbit entry.
-    /// /params value Unsaturated interpolation value.
-    /// /returns Smoothed interpolation in the 0-1 range.
     /// </summary>
+    /// <param name="value">Unsaturated interpolation value.</param>
+    /// <returns>Smoothed interpolation in the 0-1 range.</returns>
     private static float ResolveSmootherStep01(float value)
     {
         float saturatedValue = math.saturate(value);

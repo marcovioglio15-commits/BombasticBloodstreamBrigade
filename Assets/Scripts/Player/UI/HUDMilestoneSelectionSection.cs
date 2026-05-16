@@ -296,7 +296,7 @@ public sealed class HUDMilestoneSelectionSection
     /// </summary>
     /// <param name="selectionState">Resolved milestone selection state when active.</param>
     /// <param name="selectionOffers">Resolved milestone offer buffer when active.</param>
-    /// <returns>True when the player currently owns an active milestone selection; otherwise false.<returns>
+    /// <returns>True when the player currently owns an active milestone selection; otherwise false.</returns>
     private bool TryGetActiveSelectionOffers(out PlayerMilestonePowerUpSelectionState selectionState,
                                              out DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers)
     {
@@ -327,7 +327,7 @@ public sealed class HUDMilestoneSelectionSection
     /// <summary>
     /// Returns whether the current milestone panel exposes at least one control that can select a rolled offer.
     /// </summary>
-    /// <returns>True when card views can select an offer; otherwise false.<returns>
+    /// <returns>True when card views can select an offer; otherwise false.</returns>
     private bool HasOfferSelectionUi()
     {
         return HUDMilestoneSelectionOptionUtility.HasDiscoveredOptionView(discoveredOptionViews);
@@ -599,7 +599,7 @@ public sealed class HUDMilestoneSelectionSection
     /// Queues a power-up selection command for the specified offer index.
     /// </summary>
     /// <param name="offerIndex">Offer index selected by the player.</param>
-    /// <returns>True when the command is queued; otherwise false.<returns>
+    /// <returns>True when the command is queued; otherwise false.</returns>
     private bool TryQueueSelectionCommand(int offerIndex)
     {
         return HUDMilestoneSelectionCommandUtility.TryQueueCommand(entityManager,
@@ -611,7 +611,7 @@ public sealed class HUDMilestoneSelectionSection
     /// <summary>
     /// Queues a skip command for the currently active milestone selection.
     /// </summary>
-    /// <returns>True when the command is queued; otherwise false.<returns>
+    /// <returns>True when the command is queued; otherwise false.</returns>
     private bool TryQueueSkipCommand()
     {
         return HUDMilestoneSelectionCommandUtility.TryQueueCommand(entityManager,

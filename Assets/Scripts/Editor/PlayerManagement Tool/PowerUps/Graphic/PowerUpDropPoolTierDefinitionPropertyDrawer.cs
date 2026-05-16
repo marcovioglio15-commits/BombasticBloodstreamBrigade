@@ -15,7 +15,7 @@ public sealed class PowerUpDropPoolTierDefinitionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit inspector for one drop-pool tier candidate.
     /// </summary>
     /// <param name="property">Serialized drop-pool tier property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -108,7 +108,7 @@ public sealed class PowerUpDropPoolTierDefinitionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="options">Available dropdown options resolved from the owning power-ups preset.</param>
     /// <param name="currentTierId">Serialized tier ID currently stored by the drop-pool candidate.</param>
-    /// <returns>True when the current tier ID is still selectable; otherwise false.<returns>
+    /// <returns>True when the current tier ID is still selectable; otherwise false.</returns>
     private static bool ContainsTierIdOption(List<string> options, string currentTierId)
     {
         if (options == null || options.Count <= 0 || string.IsNullOrWhiteSpace(currentTierId))

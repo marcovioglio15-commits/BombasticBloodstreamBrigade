@@ -7,7 +7,6 @@ using UnityEngine.UI;
 /// Centralizes default menu selection and pointer-hover takeover for authored UI menus.
 /// It keeps keyboard/controller navigation stable while letting hovered buttons temporarily own submit input.
 /// None.
-/// returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class MenuSelectionController : MonoBehaviour
@@ -81,9 +80,8 @@ public sealed class MenuSelectionController : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Replaces the fallback selectable used by future default-selection restores.
-    /// selectable: Selectable that should become the new fallback target.
-    /// returns None.
     /// </summary>
+    /// <param name="selectable">Selectable that should become the new fallback target.</param>
     public void SetDefaultSelectable(Selectable selectable)
     {
         if (!IsSelectionCandidateValid(selectable))
@@ -94,10 +92,9 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Selects one authored button immediately and optionally stores it as the fallback target.
-    /// selectable: Selectable that should own navigation and submit input.
-    /// rememberAsDefault: True when this selectable should become the new fallback target.
-    /// returns None.
     /// </summary>
+    /// <param name="selectable">Selectable that should own navigation and submit input.</param>
+    /// <param name="rememberAsDefault">True when this selectable should become the new fallback target.</param>
     public void SelectSelectable(Selectable selectable, bool rememberAsDefault)
     {
         // Persist the preferred fallback target when requested by the caller.
@@ -113,9 +110,8 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Handles pointer-entry takeover so the hovered button becomes the active submit target.
-    /// selectable: Hovered selectable reported by one menu button relay.
-    /// returns None.
     /// </summary>
+    /// <param name="selectable">Hovered selectable reported by one menu button relay.</param>
     public void RegisterPointerEnter(Selectable selectable)
     {
         // Ignore invalid hover sources.
@@ -137,9 +133,8 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Handles pointer-exit restore so keyboard/controller selection returns to its previous button.
-    /// selectable: Selectable whose hover ownership has just ended.
-    /// returns None.
     /// </summary>
+    /// <param name="selectable">Selectable whose hover ownership has just ended.</param>
     public void RegisterPointerExit(Selectable selectable)
     {
         // Ignore stale exits coming from buttons that no longer own hover takeover.
@@ -155,7 +150,6 @@ public sealed class MenuSelectionController : MonoBehaviour
     /// <summary>
     /// Queues one end-of-frame fallback selection pass so menu highlight is restored reliably after activation.
     /// None.
-    /// returns None.
     /// </summary>
     private void QueueDeferredDefaultSelection()
     {
@@ -171,8 +165,8 @@ public sealed class MenuSelectionController : MonoBehaviour
     /// <summary>
     /// Applies the fallback selection on the next frame after layout and EventSystem startup have settled.
     /// None.
-    /// returns Enumerator used by Unity coroutine scheduling.
     /// </summary>
+    /// <returns>Enumerator used by Unity coroutine scheduling.</returns>
     private IEnumerator DeferredDefaultSelectionCoroutine()
     {
         // Wait one frame so EventSystem and layout state are fully initialized.
@@ -189,7 +183,6 @@ public sealed class MenuSelectionController : MonoBehaviour
     /// <summary>
     /// Restores either the pre-hover selection or the configured fallback selectable after hover ends.
     /// None.
-    /// returns None.
     /// </summary>
     private void RestoreSelectionAfterHover()
     {
@@ -209,9 +202,8 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Applies one selection to the resolved EventSystem using both Button.Select and SetSelectedGameObject.
-    /// selectable: Selectable that should own the current UI focus.
-    /// returns None.
     /// </summary>
+    /// <param name="selectable">Selectable that should own the current UI focus.</param>
     private void ApplySelection(Selectable selectable)
     {
         EventSystem resolvedEventSystem = ResolveEventSystem();
@@ -229,8 +221,8 @@ public sealed class MenuSelectionController : MonoBehaviour
     /// <summary>
     /// Resolves the usable EventSystem instance for this menu.
     /// None.
-    /// returns EventSystem used by this menu, or null when none is available.
     /// </summary>
+    /// <returns>EventSystem used by this menu, or null when none is available.</returns>
     private EventSystem ResolveEventSystem()
     {
         if (eventSystemOverride != null)
@@ -241,9 +233,9 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Resolves one Selectable component from the provided GameObject when present.
-    /// targetObject: GameObject that may carry a Selectable component.
-    /// returns Resolved selectable or null when none is available.
     /// </summary>
+    /// <param name="targetObject">GameObject that may carry a Selectable component.</param>
+    /// <returns>Resolved selectable or null when none is available.</returns>
     private static Selectable ResolveSelectable(GameObject targetObject)
     {
         if (targetObject == null)
@@ -254,9 +246,9 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Checks whether a selectable can safely receive focus at the current moment.
-    /// selectable: Selectable to validate.
-    /// returns True when the selectable is active, interactable and usable, otherwise false.
     /// </summary>
+    /// <param name="selectable">Selectable to validate.</param>
+    /// <returns>True when the selectable is active, interactable and usable, otherwise false.</returns>
     private static bool IsSelectionCandidateValid(Selectable selectable)
     {
         if (selectable == null)

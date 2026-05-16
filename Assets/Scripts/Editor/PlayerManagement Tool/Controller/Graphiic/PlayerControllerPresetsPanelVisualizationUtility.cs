@@ -36,7 +36,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// </summary>
     /// <param name="tableRoot">Receives the table container where multiplier rows are injected.</param>
     /// <param name="headerLabel">Receives the section header label whose title changes with sampling mode.</param>
-    /// <returns>Returns the configured multipliers section container.<returns>
+    /// <returns>Returns the configured multipliers section container.</returns>
     public static VisualElement BuildDiscreteMultipliersSection(out VisualElement tableRoot, out Label headerLabel)
     {
         VisualElement container = new VisualElement();
@@ -243,7 +243,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// <param name="color">Text color used by the field.</param>
     /// <param name="tooltip">Tooltip text displayed by the field.</param>
     /// <param name="label">Optional field label.</param>
-    /// <returns>Returns the configured float field.<returns>
+    /// <returns>Returns the configured float field.</returns>
     public static FloatField CreatePercentField(SerializedProperty property, Color color, string tooltip, string label)
     {
         FloatField field = new FloatField(label);
@@ -283,7 +283,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// Builds the multipliers table header row for the requested sampling mode.
     /// </summary>
     /// <param name="samplingMode">Current multiplier sampling mode.</param>
-    /// <returns>Returns the header row.<returns>
+    /// <returns>Returns the header row.</returns>
     private static VisualElement BuildMultipliersHeaderRow(LookMultiplierSampling samplingMode)
     {
         VisualElement row = new VisualElement();
@@ -318,7 +318,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// <param name="accelerationProperty">Serialized acceleration multiplier property.</param>
     /// <param name="maxSpeedTooltip">Tooltip for the max-speed field.</param>
     /// <param name="accelerationTooltip">Tooltip for the acceleration field.</param>
-    /// <returns>Returns the constructed direction row.<returns>
+    /// <returns>Returns the constructed direction row.</returns>
     private static VisualElement BuildDirectionRow(int index,
                                                    float angle,
                                                    SerializedProperty maxSpeedProperty,
@@ -348,7 +348,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// <param name="accelerationProperty">Serialized acceleration multiplier property.</param>
     /// <param name="maxSpeedTooltip">Tooltip for the max-speed field.</param>
     /// <param name="accelerationTooltip">Tooltip for the acceleration field.</param>
-    /// <returns>Returns the constructed arc row.<returns>
+    /// <returns>Returns the constructed arc row.</returns>
     private static VisualElement BuildArcRow(int index,
                                              string range,
                                              SerializedProperty maxSpeedProperty,
@@ -374,7 +374,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// </summary>
     /// <param name="text">Header text.</param>
     /// <param name="width">Fixed label width.</param>
-    /// <returns>Returns the configured header label.<returns>
+    /// <returns>Returns the configured header label.</returns>
     private static Label BuildHeaderLabel(string text, float width)
     {
         Label label = new Label(text);
@@ -394,7 +394,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// </summary>
     /// <param name="text">Visible row text.</param>
     /// <param name="width">Fixed label width.</param>
-    /// <returns>Returns the configured row label.<returns>
+    /// <returns>Returns the configured row label.</returns>
     private static Label BuildRowLabel(string text, float width)
     {
         Label label = new Label(text);
@@ -412,7 +412,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// </summary>
     /// <param name="startAngle">Range start in degrees.</param>
     /// <param name="endAngle">Range end in degrees.</param>
-    /// <returns>Returns the formatted range string.<returns>
+    /// <returns>Returns the formatted range string.</returns>
     private static string FormatAngleRange(float startAngle, float endAngle)
     {
         float normalizedStart = Mathf.Repeat(startAngle, 360f);
@@ -432,7 +432,7 @@ internal static class PlayerControllerPresetsPanelVisualizationUtility
     /// <param name="count">Discrete direction count.</param>
     /// <param name="offset">Current direction offset in degrees.</param>
     /// <param name="prefix">Prefix displayed before the direction index.</param>
-    /// <returns>Returns the list of configured label descriptors.<returns>
+    /// <returns>Returns the list of configured label descriptors.</returns>
     private static List<PieChartElement.LabelDescriptor> BuildDirectionalLabels(int count, float offset, string prefix)
     {
         int sliceCount = Mathf.Max(1, count);

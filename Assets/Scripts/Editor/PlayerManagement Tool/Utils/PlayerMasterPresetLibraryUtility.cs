@@ -19,7 +19,7 @@ public static class PlayerMasterPresetLibraryUtility
     /// Loads the PlayerMasterPresetLibrary asset from the default path, or creates and saves a new one if it does not
     /// exist.
     /// </summary>
-    /// <returns>The loaded or newly created PlayerMasterPresetLibrary instance.<returns>
+    /// <returns>The loaded or newly created PlayerMasterPresetLibrary instance.</returns>
     public static PlayerMasterPresetLibrary GetOrCreateLibrary()
     {
         PlayerMasterPresetLibrary library = AssetDatabase.LoadAssetAtPath<PlayerMasterPresetLibrary>(DefaultLibraryPath);
@@ -39,7 +39,7 @@ public static class PlayerMasterPresetLibraryUtility
     /// Creates a new PlayerMasterPreset asset with the specified name in the default presets folder.
     /// </summary>
     /// <param name="presetName">The name to assign to the new master preset asset.</param>
-    /// <returns>The created PlayerMasterPreset asset.<returns>
+    /// <returns>The created PlayerMasterPreset asset.</returns>
     public static PlayerMasterPreset CreatePresetAsset(string presetName)
     {
         EnsureFolder(DefaultPresetsFolder);

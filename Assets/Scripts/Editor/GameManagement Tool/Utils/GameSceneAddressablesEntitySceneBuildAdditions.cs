@@ -5,8 +5,6 @@ using Hash128 = Unity.Entities.Hash128;
 
 /// <summary>
 /// Registers DOTS scenes referenced by Scene Manager presets so Entities deploys their baked data in player builds.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntitySceneBuildAdditions
 {
@@ -19,9 +17,8 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
     #region Build Additions
     /// <summary>
     /// Collects direct DOTS scene GUIDs and Addressables root SubScene GUIDs during the Unity player build pipeline.
-    /// /params None.
-    /// /returns Set of DOTS SubScene GUIDs that must be baked and deployed with the player.
     /// </summary>
+    /// <returns>Set of DOTS SubScene GUIDs that must be baked and deployed with the player.</returns>
     public HashSet<Hash128> RegisterAdditionalEntityScenesToBuild()
     {
         HashSet<Hash128> subSceneGuids = new HashSet<Hash128>();
@@ -45,9 +42,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
     #region Preset Scan
     /// <summary>
     /// Resolves whether a Scene Manager preset has scene definitions that can reference DOTS scene data.
-    /// /params preset Preset discovered through AssetDatabase.
-    /// /returns True when the preset should be scanned for direct DOTS scenes and optional root SubScenes.
     /// </summary>
+    /// <param name="preset">Preset discovered through AssetDatabase.</param>
+    /// <returns>True when the preset should be scanned for direct DOTS scenes and optional root SubScenes.</returns>
     private static bool ShouldScanPreset(GameSceneManagerPreset preset)
     {
         if (preset == null)
@@ -58,10 +55,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     /// <summary>
     /// Adds every SubScene referenced by Addressables-owned root scenes in one preset.
-    /// /params preset Scene Manager preset being scanned.
-    /// /params subSceneGuids Mutable output set receiving DOTS SubScene GUIDs.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene Manager preset being scanned.</param>
+    /// <param name="subSceneGuids">Mutable output set receiving DOTS SubScene GUIDs.</param>
     private static void RegisterPresetSubScenes(GameSceneManagerPreset preset, HashSet<Hash128> subSceneGuids)
     {
         for (int index = 0; index < preset.SceneDefinitions.Count; index++)
@@ -86,9 +82,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     /// <summary>
     /// Resolves whether one scene definition points directly at a DOTS scene loaded through SceneSystem.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when the scene GUID should be included directly in player builds.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when the scene GUID should be included directly in player builds.</returns>
     private static bool ShouldRegisterDirectEntityScene(GameSceneDefinition sceneDefinition)
     {
         if (sceneDefinition == null)
@@ -102,9 +98,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     /// <summary>
     /// Resolves whether a scene definition represents an Addressables-owned top-level scene.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when its referenced SubScenes should be included in player builds.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when its referenced SubScenes should be included in player builds.</returns>
     private static bool ShouldScanRootScene(GameSceneDefinition sceneDefinition)
     {
         if (sceneDefinition == null)
@@ -129,10 +125,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
     #region SubScene Registration
     /// <summary>
     /// Queries the Entities metadata importer for SubScenes referenced by one root scene.
-    /// /params scenePath Project-relative path to the root Unity scene.
-    /// /params subSceneGuids Mutable output set receiving DOTS SubScene GUIDs.
-    /// /returns None.
     /// </summary>
+    /// <param name="scenePath">Project-relative path to the root Unity scene.</param>
+    /// <param name="subSceneGuids">Mutable output set receiving DOTS SubScene GUIDs.</param>
     private static void RegisterRootSceneSubScenes(string scenePath, HashSet<Hash128> subSceneGuids)
     {
         UnityEditor.GUID rootSceneGuid = AssetDatabase.GUIDFromAssetPath(scenePath);
@@ -148,10 +143,9 @@ public sealed class GameSceneAddressablesEntitySceneBuildAdditions : IEntityScen
 
     /// <summary>
     /// Adds one direct DOTS scene GUID authored in the Scene Manager preset.
-    /// /params sceneDefinition Direct entity scene definition.
-    /// /params subSceneGuids Mutable output set receiving DOTS scene GUIDs.
-    /// /returns None.
     /// </summary>
+    /// <param name="sceneDefinition">Direct entity scene definition.</param>
+    /// <param name="subSceneGuids">Mutable output set receiving DOTS scene GUIDs.</param>
     private static void RegisterDirectEntityScene(GameSceneDefinition sceneDefinition, HashSet<Hash128> subSceneGuids)
     {
         Hash128 sceneGuid = new Hash128(sceneDefinition.SceneGuid);

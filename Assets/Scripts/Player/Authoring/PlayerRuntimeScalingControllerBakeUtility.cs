@@ -19,9 +19,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
     #region Public Methods
     /// <summary>
     /// Builds the immutable baseline movement config from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /returns Sanitized runtime baseline movement config.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <returns>Sanitized runtime baseline movement config.</returns>
     public static PlayerBaseMovementConfig BuildBaseMovementConfig(PlayerControllerPreset preset)
     {
         MovementSettings movementSettings = preset != null ? preset.MovementSettings : null;
@@ -52,9 +52,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Builds the immutable baseline look config from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /returns Sanitized runtime baseline look config.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <returns>Sanitized runtime baseline look config.</returns>
     public static PlayerBaseLookConfig BuildBaseLookConfig(PlayerControllerPreset preset)
     {
         LookSettings lookSettings = preset != null ? preset.LookSettings : null;
@@ -110,9 +110,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Builds the immutable baseline camera config from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /returns Sanitized runtime baseline camera config.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <returns>Sanitized runtime baseline camera config.</returns>
     public static PlayerBaseCameraConfig BuildBaseCameraConfig(PlayerControllerPreset preset)
     {
         CameraSettings cameraSettings = preset != null ? preset.CameraSettings : null;
@@ -138,9 +138,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Builds the immutable baseline shooting config from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /returns Sanitized runtime baseline shooting config.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <returns>Sanitized runtime baseline shooting config.</returns>
     public static PlayerBaseShootingConfig BuildBaseShootingConfig(PlayerControllerPreset preset)
     {
         ShootingSettings shootingSettings = preset != null ? preset.ShootingSettings : null;
@@ -160,10 +160,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Populates immutable baseline applied-element slots from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /params buffer Destination immutable baseline slot buffer.
-    /// /returns void.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <param name="buffer">Destination immutable baseline slot buffer.</param>
     public static void PopulateBaseAppliedElementSlots(PlayerControllerPreset preset,
                                                        DynamicBuffer<PlayerBaseShootingAppliedElementSlot> buffer)
     {
@@ -174,10 +173,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Populates mutable runtime applied-element slots from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /params buffer Destination mutable runtime slot buffer.
-    /// /returns void.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <param name="buffer">Destination mutable runtime slot buffer.</param>
     public static void PopulateRuntimeAppliedElementSlots(PlayerControllerPreset preset,
                                                           DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> buffer)
     {
@@ -188,9 +186,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 
     /// <summary>
     /// Builds the immutable baseline health config from one authoring preset.
-    /// /params preset Source controller preset.
-    /// /returns Sanitized runtime baseline health config.
     /// </summary>
+    /// <param name="preset">Source controller preset.</param>
+    /// <returns>Sanitized runtime baseline health config.</returns>
     public static PlayerBaseHealthStatisticsConfig BuildBaseHealthStatisticsConfig(PlayerControllerPreset preset)
     {
         PlayerHealthStatisticsSettings healthStatistics = preset != null ? preset.HealthStatistics : null;
@@ -211,10 +209,9 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
 #if UNITY_EDITOR
     /// <summary>
     /// Populates controller scaling metadata from the unscaled controller preset.
-    /// /params sourcePreset Unscaled source controller preset.
-    /// /params scalingBuffer Destination scaling metadata buffer.
-    /// /returns void.
     /// </summary>
+    /// <param name="sourcePreset">Unscaled source controller preset.</param>
+    /// <param name="scalingBuffer">Destination scaling metadata buffer.</param>
     public static void PopulateControllerScalingMetadata(PlayerControllerPreset sourcePreset,
                                                          DynamicBuffer<PlayerRuntimeControllerScalingElement> scalingBuffer)
     {

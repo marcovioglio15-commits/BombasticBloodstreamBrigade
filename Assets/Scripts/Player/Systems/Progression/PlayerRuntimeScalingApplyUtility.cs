@@ -18,41 +18,41 @@ internal static class PlayerRuntimeScalingApplyUtility
     #region Public Methods
     /// <summary>
     /// Reapplies controller, progression, and power-up scaling against the current scalable-stat values.
-    /// scalableStats: Runtime scalable-stat buffer used as formula variable context.
-    /// controllerScaling: Controller scaling metadata baked from Add Scaling rules.
-    /// baseMovement: Immutable movement baseline.
-    /// runtimeMovement: Mutable runtime movement config rebuilt in place.
-    /// baseLook: Immutable look baseline.
-    /// runtimeLook: Mutable runtime look config rebuilt in place.
-    /// baseCamera: Immutable camera baseline.
-    /// runtimeCamera: Mutable runtime camera config rebuilt in place.
-    /// baseShooting: Immutable shooting baseline.
-    /// runtimeShooting: Mutable runtime shooting config rebuilt in place.
-    /// baseAppliedElementSlots: Immutable applied-element slot baseline.
-    /// runtimeAppliedElementSlots: Mutable applied-element slot buffer rebuilt in place.
-    /// baseHealth: Immutable health baseline.
-    /// runtimeHealth: Mutable runtime health config rebuilt in place.
-    /// progressionScaling: Progression scaling metadata baked from Add Scaling rules.
-    /// baseGamePhases: Immutable progression-phase baselines.
-    /// runtimeGamePhases: Mutable runtime progression phases rebuilt in place.
-    /// baseComboPassiveUnlocks: Immutable combo passive-unlock baseline buffer.
-    /// runtimeComboPassiveUnlocks: Mutable runtime combo passive-unlock buffer rebuilt in place.
-    /// basePowerUpConfigs: Immutable modular power-up baselines keyed by PowerUpId.
-    /// powerUpScaling: Power-up scaling metadata baked from Add Scaling rules.
-    /// powerUpsConfig: Mutable active-slot config rebuilt in place.
-    /// unlockCatalog: Mutable unlock catalog rebuilt in place for active/passive runtime configs.
-    /// equippedPassiveTools: Mutable equipped-passives buffer rebuilt in place.
-    /// passiveToolsState: Mutable aggregated passive runtime state.
-    /// playerHealth: Mutable runtime health component clamped to the new max.
-    /// playerShield: Mutable runtime shield component clamped to the new max.
-    /// progressionConfig: Runtime progression config used to update required experience and pickup radius.
-    /// playerExperience: Mutable runtime experience component kept aligned with current scalable stats.
-    /// playerLevel: Mutable runtime level component updated against current runtime phases.
-    /// playerExperienceCollection: Mutable pickup-radius runtime component synchronized after formulas.
-    /// runtimeScalingState: Mutable sync state storing the last applied scalable-stat hash.
-    /// forceApply: True to rebuild even when the scalable-stat hash did not change.
-    /// returns True when the runtime-scaled state was rebuilt; otherwise false.
     /// </summary>
+    /// <param name="scalableStats">Runtime scalable-stat buffer used as formula variable context.</param>
+    /// <param name="controllerScaling">Controller scaling metadata baked from Add Scaling rules.</param>
+    /// <param name="baseMovement">Immutable movement baseline.</param>
+    /// <param name="runtimeMovement">Mutable runtime movement config rebuilt in place.</param>
+    /// <param name="baseLook">Immutable look baseline.</param>
+    /// <param name="runtimeLook">Mutable runtime look config rebuilt in place.</param>
+    /// <param name="baseCamera">Immutable camera baseline.</param>
+    /// <param name="runtimeCamera">Mutable runtime camera config rebuilt in place.</param>
+    /// <param name="baseShooting">Immutable shooting baseline.</param>
+    /// <param name="runtimeShooting">Mutable runtime shooting config rebuilt in place.</param>
+    /// <param name="baseAppliedElementSlots">Immutable applied-element slot baseline.</param>
+    /// <param name="runtimeAppliedElementSlots">Mutable applied-element slot buffer rebuilt in place.</param>
+    /// <param name="baseHealth">Immutable health baseline.</param>
+    /// <param name="runtimeHealth">Mutable runtime health config rebuilt in place.</param>
+    /// <param name="progressionScaling">Progression scaling metadata baked from Add Scaling rules.</param>
+    /// <param name="baseGamePhases">Immutable progression-phase baselines.</param>
+    /// <param name="runtimeGamePhases">Mutable runtime progression phases rebuilt in place.</param>
+    /// <param name="baseComboPassiveUnlocks">Immutable combo passive-unlock baseline buffer.</param>
+    /// <param name="runtimeComboPassiveUnlocks">Mutable runtime combo passive-unlock buffer rebuilt in place.</param>
+    /// <param name="basePowerUpConfigs">Immutable modular power-up baselines keyed by PowerUpId.</param>
+    /// <param name="powerUpScaling">Power-up scaling metadata baked from Add Scaling rules.</param>
+    /// <param name="powerUpsConfig">Mutable active-slot config rebuilt in place.</param>
+    /// <param name="unlockCatalog">Mutable unlock catalog rebuilt in place for active/passive runtime configs.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passives buffer rebuilt in place.</param>
+    /// <param name="passiveToolsState">Mutable aggregated passive runtime state.</param>
+    /// <param name="playerHealth">Mutable runtime health component clamped to the new max.</param>
+    /// <param name="playerShield">Mutable runtime shield component clamped to the new max.</param>
+    /// <param name="progressionConfig">Runtime progression config used to update required experience and pickup radius.</param>
+    /// <param name="playerExperience">Mutable runtime experience component kept aligned with current scalable stats.</param>
+    /// <param name="playerLevel">Mutable runtime level component updated against current runtime phases.</param>
+    /// <param name="playerExperienceCollection">Mutable pickup-radius runtime component synchronized after formulas.</param>
+    /// <param name="runtimeScalingState">Mutable sync state storing the last applied scalable-stat hash.</param>
+    /// <param name="forceApply">True to rebuild even when the scalable-stat hash did not change.</param>
+    /// <returns>True when the runtime-scaled state was rebuilt; otherwise false.</returns>
     public static bool TryApply(DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                 DynamicBuffer<PlayerRuntimeControllerScalingElement> controllerScaling,
                                 in PlayerBaseMovementConfig baseMovement,
@@ -158,14 +158,13 @@ internal static class PlayerRuntimeScalingApplyUtility
 
     /// <summary>
     /// Synchronizes runtime level requirement and pickup radius using the already rebuilt runtime phases.
-    /// scalableStats: Current scalable-stat buffer.
-    /// progressionConfig: Runtime progression config.
-    /// runtimeGamePhases: Current rebuilt runtime phases.
-    /// playerExperience: Mutable runtime experience component.
-    /// playerLevel: Mutable runtime level component.
-    /// playerExperienceCollection: Mutable pickup-radius runtime component.
-    /// returns void.
     /// </summary>
+    /// <param name="scalableStats">Current scalable-stat buffer.</param>
+    /// <param name="progressionConfig">Runtime progression config.</param>
+    /// <param name="runtimeGamePhases">Current rebuilt runtime phases.</param>
+    /// <param name="playerExperience">Mutable runtime experience component.</param>
+    /// <param name="playerLevel">Mutable runtime level component.</param>
+    /// <param name="playerExperienceCollection">Mutable pickup-radius runtime component.</param>
     public static void SyncProgressionRuntimeState(IReadOnlyList<PlayerScalableStatElement> scalableStats,
                                                    PlayerProgressionConfig progressionConfig,
                                                    DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,

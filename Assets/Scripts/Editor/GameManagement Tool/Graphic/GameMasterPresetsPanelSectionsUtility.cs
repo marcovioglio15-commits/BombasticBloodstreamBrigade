@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds selected game master preset detail sections and sub-preset creation flows.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameMasterPresetsPanelSectionsUtility
 {
@@ -15,10 +13,9 @@ internal static class GameMasterPresetsPanelSectionsUtility
     #region Public Methods
     /// <summary>
     /// Selects one master preset and rebuilds the active detail section.
-    /// /params panel Owning panel with detail roots.
-    /// /params preset Preset to select, or null to clear details.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with detail roots.</param>
+    /// <param name="preset">Preset to select, or null to clear details.</param>
     public static void SelectPreset(GameMasterPresetsPanel panel, GameMasterPreset preset)
     {
         if (panel == null || panel.DetailsRoot == null)
@@ -53,9 +50,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Rebuilds the currently active detail section.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     public static void BuildActiveDetailsSection(GameMasterPresetsPanel panel)
     {
         if (panel == null || panel.DetailSectionContentRoot == null || panel.PresetSerializedObject == null)
@@ -85,9 +81,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates, registers and assigns a new Audio Manager preset to the selected master preset.
-    /// /params panel Owning panel with selected master preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
     public static void CreateAudioManagerPreset(GameMasterPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)
@@ -110,9 +105,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates, registers and assigns a new Scene Manager preset to the selected master preset.
-    /// /params panel Owning panel with selected master preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
     public static void CreateSceneManagerPreset(GameMasterPresetsPanel panel)
     {
         if (panel == null || panel.SelectedPreset == null)
@@ -135,11 +129,10 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Assigns one sub-preset reference to the selected master preset.
-    /// /params panel Owning panel with serialized master preset.
-    /// /params propertyName Serialized property receiving the object reference.
-    /// /params preset Preset object to assign.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized master preset.</param>
+    /// <param name="propertyName">Serialized property receiving the object reference.</param>
+    /// <param name="preset">Preset object to assign.</param>
     public static void AssignSubPreset(GameMasterPresetsPanel panel, string propertyName, UnityEngine.Object preset)
     {
         if (panel == null || panel.SelectedPreset == null || panel.PresetSerializedObject == null)
@@ -163,9 +156,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
     #region Section Builders
     /// <summary>
     /// Builds metadata fields for the selected master preset.
-    /// /params panel Owning panel with serialized preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
     private static void BuildMetadataSection(GameMasterPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Preset Details");
@@ -187,9 +179,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds Audio Manager sub-preset assignment controls.
-    /// /params panel Owning panel with selected master preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
     private static void BuildSubPresetsSection(GameMasterPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Sub Presets");
@@ -215,9 +206,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds prefab authoring controls for the selected game master preset.
-    /// /params panel Owning panel that stores selected prefab state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores selected prefab state.</param>
     private static void BuildActiveAuthoringSection(GameMasterPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Active Authoring");
@@ -298,9 +288,8 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds quick navigation controls for implemented game sub-sections.
-    /// /params panel Owning panel that opens side panels.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that opens side panels.</param>
     private static void BuildNavigationSection(GameMasterPresetsPanel panel)
     {
         VisualElement section = CreateSection(panel, "Open Sections");
@@ -324,17 +313,16 @@ internal static class GameMasterPresetsPanelSectionsUtility
     #region Detail Helpers
     /// <summary>
     /// Adds one master sub-preset object field with section open and asset create actions.
-    /// /params panel Owning panel with serialized master preset context.
-    /// /params section Parent section.
-    /// /params label Object field label.
-    /// /params propertyName Serialized object reference property.
-    /// /params objectType Accepted preset asset type.
-    /// /params tooltip Object field tooltip.
-    /// /params panelType Side panel opened by the row.
-    /// /params sectionName Human-readable section name.
-    /// /params createCallback Callback used to create and assign a new preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized master preset context.</param>
+    /// <param name="section">Parent section.</param>
+    /// <param name="label">Object field label.</param>
+    /// <param name="propertyName">Serialized object reference property.</param>
+    /// <param name="objectType">Accepted preset asset type.</param>
+    /// <param name="tooltip">Object field tooltip.</param>
+    /// <param name="panelType">Side panel opened by the row.</param>
+    /// <param name="sectionName">Human-readable section name.</param>
+    /// <param name="createCallback">Callback used to create and assign a new preset.</param>
     private static void AddSubPresetControl(GameMasterPresetsPanel panel,
                                             VisualElement section,
                                             string label,
@@ -382,9 +370,9 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds detail section selector buttons.
-    /// /params panel Owning panel that stores the active section state.
-    /// /returns Detail section button row.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the active section state.</param>
+    /// <returns>Detail section button row.</returns>
     private static VisualElement BuildDetailsSectionButtons(GameMasterPresetsPanel panel)
     {
         VisualElement buttonsRoot = new VisualElement();
@@ -400,12 +388,11 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one detail section selector button.
-    /// /params panel Owning panel that receives the selected section.
-    /// /params parent Parent row.
-    /// /params sectionType Section activated by the button.
-    /// /params label Visible button label.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that receives the selected section.</param>
+    /// <param name="parent">Parent row.</param>
+    /// <param name="sectionType">Section activated by the button.</param>
+    /// <param name="label">Visible button label.</param>
     private static void AddDetailsSectionButton(GameMasterPresetsPanel panel, VisualElement parent, GameMasterPresetsPanel.DetailsSectionType sectionType, string label)
     {
         Button button = new Button(() =>
@@ -425,9 +412,9 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Resolves a stable minimum width for Game Master detail section buttons.
-    /// /params sectionType Section represented by the selector button.
-    /// /returns Minimum width that keeps the label readable before wrapping to a new row.
     /// </summary>
+    /// <param name="sectionType">Section represented by the selector button.</param>
+    /// <returns>Minimum width that keeps the label readable before wrapping to a new row.</returns>
     private static float ResolveDetailsSectionButtonWidth(GameMasterPresetsPanel.DetailsSectionType sectionType)
     {
         switch (sectionType)
@@ -445,10 +432,10 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Creates a styled section container and registers its heading for recolor utilities.
-    /// /params panel Owning panel with active details root.
-    /// /params title Section title.
-    /// /returns Section container.
     /// </summary>
+    /// <param name="panel">Owning panel with active details root.</param>
+    /// <param name="title">Section title.</param>
+    /// <returns>Section container.</returns>
     private static VisualElement CreateSection(GameMasterPresetsPanel panel, string title)
     {
         VisualElement section = new VisualElement();
@@ -465,14 +452,13 @@ internal static class GameMasterPresetsPanelSectionsUtility
 
     /// <summary>
     /// Adds one bound text field and marks the draft dirty on edits.
-    /// /params panel Owning panel with serialized preset context.
-    /// /params parent Parent section.
-    /// /params label Display label.
-    /// /params propertyName Serialized property name.
-    /// /params refreshList True when list labels should update after change.
-    /// /params multiline True when the field should use multiline editing.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="refreshList">True when list labels should update after change.</param>
+    /// <param name="multiline">True when the field should use multiline editing.</param>
     private static void AddBoundTextField(GameMasterPresetsPanel panel, VisualElement parent, string label, string propertyName, bool refreshList, bool multiline)
     {
         SerializedProperty property = panel.PresetSerializedObject.FindProperty(propertyName);

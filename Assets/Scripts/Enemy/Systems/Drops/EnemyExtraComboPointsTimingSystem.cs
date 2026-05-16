@@ -14,9 +14,8 @@ public partial struct EnemyExtraComboPointsTimingSystem : ISystem
     #region Lifecycle
     /// <summary>
     /// Registers the runtime state required by the timing update.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<EnemyRuntimeState>();
@@ -24,9 +23,8 @@ public partial struct EnemyExtraComboPointsTimingSystem : ISystem
 
     /// <summary>
     /// Advances enemy lifetime while the enemy stays active in simulation.
-    /// /params state Current ECS system state.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         float enemyTimeScale = 1f;

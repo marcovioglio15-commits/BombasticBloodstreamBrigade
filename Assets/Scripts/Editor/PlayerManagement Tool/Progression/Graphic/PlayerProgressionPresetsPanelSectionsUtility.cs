@@ -16,9 +16,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
     #region Public Methods
     /// <summary>
     /// Builds the metadata section of the progression preset panel.
-    /// panel Panel instance that owns the serialized preset and target UI container.
-    /// returns void
     /// </summary>
+    /// <param name="panel">Panel instance that owns the serialized preset and target UI container.</param>
     public static void BuildMetadataSection(PlayerProgressionPresetsPanel panel)
     {
         if (panel == null || panel.sectionContentRoot == null || panel.presetSerializedObject == null)
@@ -86,9 +85,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the scalable stats section and live validation warnings.
-    /// panel Panel instance that owns the serialized preset and target UI container.
-    /// returns void
     /// </summary>
+    /// <param name="panel">Panel instance that owns the serialized preset and target UI container.</param>
     public static void BuildScalableStatsSection(PlayerProgressionPresetsPanel panel)
     {
         if (panel == null || panel.presetSerializedObject == null)
@@ -137,10 +135,9 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the milestones section, including all visible root properties related to phase progression.
-    /// panel Panel instance that owns the serialized preset and target UI container.
-    /// excludedRootPropertyNames Root-level property names intentionally hidden from the milestones view.
-    /// returns void
     /// </summary>
+    /// <param name="panel">Panel instance that owns the serialized preset and target UI container.</param>
+    /// <param name="excludedRootPropertyNames">Root-level property names intentionally hidden from the milestones view.</param>
     public static void BuildMilestonesSection(PlayerProgressionPresetsPanel panel, HashSet<string> excludedRootPropertyNames)
     {
         if (panel == null || panel.presetSerializedObject == null)
@@ -217,9 +214,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the schedules section and the popup used to select the runtime-equipped schedule.
-    /// panel Panel instance that owns the serialized preset and target UI container.
-    /// returns void
     /// </summary>
+    /// <param name="panel">Panel instance that owns the serialized preset and target UI container.</param>
     public static void BuildSchedulesSection(PlayerProgressionPresetsPanel panel)
     {
         if (panel == null || panel.presetSerializedObject == null)
@@ -273,9 +269,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
 
     /// <summary>
     /// Builds the combo-counter section, including scalable runtime toggles, thresholds, and rank bonus formulas.
-    /// panel Panel instance that owns the serialized preset and target UI container.
-    /// returns void
     /// </summary>
+    /// <param name="panel">Panel instance that owns the serialized preset and target UI container.</param>
     public static void BuildComboCounterSection(PlayerProgressionPresetsPanel panel)
     {
         if (panel == null || panel.presetSerializedObject == null)

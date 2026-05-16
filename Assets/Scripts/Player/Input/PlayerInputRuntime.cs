@@ -204,7 +204,7 @@ public static class PlayerInputRuntime
     /// <summary>
     /// Resolves whether mouse-pointer look should drive aim in the current runtime context.
     /// </summary>
-    /// <returns>True when look supports mouse pointer and no controller-like devices are connected.<returns>
+    /// <returns>True when look supports mouse pointer and no controller-like devices are connected.</returns>
     public static bool ShouldUseMousePointerLook()
     {
         if (lookActionUsesMousePointer == false)
@@ -217,7 +217,7 @@ public static class PlayerInputRuntime
     /// Reads look input while excluding pointer controls when the action mixes mouse and controller bindings.
     /// </summary>
     /// <param name="lookValue">Resolved look vector.</param>
-    /// <returns>True when a look vector was resolved from the runtime look action.<returns>
+    /// <returns>True when a look vector was resolved from the runtime look action.</returns>
     public static bool TryReadControllerLookVector(out Vector2 lookValue)
     {
         lookValue = Vector2.zero;
@@ -279,7 +279,7 @@ public static class PlayerInputRuntime
     /// <summary>
     /// Determines whether the current runtime input environment exposes only mouse and keyboard without gamepad/joystick devices.
     /// </summary>
-    /// <returns>True when mouse and keyboard are available and no controller-like device is connected.<returns>
+    /// <returns>True when mouse and keyboard are available and no controller-like device is connected.</returns>
     public static bool IsMouseKeyboardOnlyContext()
     {
         if (Mouse.current == null)
@@ -302,7 +302,7 @@ public static class PlayerInputRuntime
     /// </summary>
     /// <param name="action">Input action whose binding label must be displayed.</param>
     /// <param name="fallback">Fallback string used when no matching binding can be resolved.</param>
-    /// <returns>Context-aware binding label for prompts and HUD text.<returns>
+    /// <returns>Context-aware binding label for prompts and HUD text.</returns>
     public static string ResolveBindingDisplayString(InputAction action, string fallback)
     {
         if (action == null)
@@ -525,7 +525,7 @@ public static class PlayerInputRuntime
     /// Checks whether the resolved look action includes at least one mouse binding path.
     /// </summary>
     /// <param name="action">Resolved look action from the runtime input asset.</param>
-    /// <returns>True when at least one binding path references the Mouse device.<returns>
+    /// <returns>True when at least one binding path references the Mouse device.</returns>
     private static bool ResolveLookActionUsesMousePointer(InputAction action)
     {
         if (action == null)

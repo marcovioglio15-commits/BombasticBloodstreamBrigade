@@ -5,7 +5,6 @@ using Unity.Mathematics;
 /// <summary>
 /// Consumes authoritative swap commands issued by HUD or world-space prompts for dropped power-up containers.
 /// none.
-/// returns none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMilestonePowerUpSelectionResolveSystem))]
@@ -18,9 +17,8 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
     /// <summary>
     /// Registers the runtime components required to resolve dropped-container swap commands.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpContainerSwapCommand>();
@@ -31,9 +29,8 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
     /// <summary>
     /// Applies the first valid dropped-container swap command queued on each player entity.
-    /// state: Current ECS system state.
-    /// returns void.
     /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         ComponentLookup<PlayerDroppedPowerUpContainerContent> droppedContainerContentLookup = SystemAPI.GetComponentLookup<PlayerDroppedPowerUpContainerContent>(false);
@@ -121,13 +118,12 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
     /// <summary>
     /// Stores the post-swap container lock so held or repeated inputs cannot immediately swap the same container again.
-    /// /params playerEntity Player entity that consumed the swap command.
-    /// /params containerEntity Dropped container involved in the swap.
-    /// /params containerDestroyed True when the container was consumed because the destination slot was empty.
-    /// /params interactionLockDuration Duration of the temporary interaction lock in seconds.
-    /// /params interactionLockLookup Mutable lookup used to write the player lock component.
-    /// /returns None.
     /// </summary>
+    /// <param name="playerEntity">Player entity that consumed the swap command.</param>
+    /// <param name="containerEntity">Dropped container involved in the swap.</param>
+    /// <param name="containerDestroyed">True when the container was consumed because the destination slot was empty.</param>
+    /// <param name="interactionLockDuration">Duration of the temporary interaction lock in seconds.</param>
+    /// <param name="interactionLockLookup">Mutable lookup used to write the player lock component.</param>
     private static void ApplyInteractionLock(Entity playerEntity,
                                              Entity containerEntity,
                                              bool containerDestroyed,

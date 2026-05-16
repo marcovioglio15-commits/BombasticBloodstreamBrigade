@@ -4,8 +4,6 @@ using Unity.Physics;
 
 /// <summary>
 /// Provides shared geometry and runtime helpers for the player Laser Beam override.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerLaserBeamUtility
 {
@@ -27,12 +25,12 @@ public static class PlayerLaserBeamUtility
     #region Public Methods
     /// <summary>
     /// Resolves the current Laser Beam travel budget from active time, virtual projectile speed and base range or lifetime limits.
-    /// /params activeSeconds Consecutive active time accumulated by the beam.
-    /// /params projectileSpeed Current effective projectile speed inherited by the beam.
-    /// /params rangeLimit Current effective range limit.
-    /// /params lifetimeLimit Current effective lifetime limit.
-    /// /returns The clamped travel budget used to build the current beam geometry.
     /// </summary>
+    /// <param name="activeSeconds">Consecutive active time accumulated by the beam.</param>
+    /// <param name="projectileSpeed">Current effective projectile speed inherited by the beam.</param>
+    /// <param name="rangeLimit">Current effective range limit.</param>
+    /// <param name="lifetimeLimit">Current effective lifetime limit.</param>
+    /// <returns>The clamped travel budget used to build the current beam geometry.</returns>
     internal static float ResolveTravelDistance(float activeSeconds,
                                                 float projectileSpeed,
                                                 float rangeLimit,
@@ -51,10 +49,10 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves one effective collision radius from projectile scale and beam-local width tuning.
-    /// /params projectileScaleMultiplier Effective projectile scale multiplier inherited from the shooting config.
-    /// /params collisionWidthMultiplier Beam-local collision width multiplier.
-    /// /returns The effective beam collision radius.
     /// </summary>
+    /// <param name="projectileScaleMultiplier">Effective projectile scale multiplier inherited from the shooting config.</param>
+    /// <param name="collisionWidthMultiplier">Beam-local collision width multiplier.</param>
+    /// <returns>The effective beam collision radius.</returns>
     internal static float ResolveCollisionRadius(float projectileScaleMultiplier,
                                                  float collisionWidthMultiplier)
     {
@@ -64,10 +62,10 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves one effective visual body width from projectile scale and beam-local width tuning.
-    /// /params projectileScaleMultiplier Effective projectile scale multiplier inherited from the shooting config.
-    /// /params bodyWidthMultiplier Beam-local visual width multiplier.
-    /// /returns The effective beam body width used by the presentation system.
     /// </summary>
+    /// <param name="projectileScaleMultiplier">Effective projectile scale multiplier inherited from the shooting config.</param>
+    /// <param name="bodyWidthMultiplier">Beam-local visual width multiplier.</param>
+    /// <returns>The effective beam body width used by the presentation system.</returns>
     internal static float ResolveBodyWidth(float projectileScaleMultiplier,
                                            float bodyWidthMultiplier)
     {
@@ -77,12 +75,12 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves one evenly spread lane direction from the base look direction and shotgun cone settings.
-    /// /params baseDirection Base shoot direction.
-    /// /params laneIndex Zero-based lane index.
-    /// /params laneCount Total lane count in the current primary emission.
-    /// /params coneAngleDegrees Total spread angle in degrees.
-    /// /returns The normalized lane direction.
     /// </summary>
+    /// <param name="baseDirection">Base shoot direction.</param>
+    /// <param name="laneIndex">Zero-based lane index.</param>
+    /// <param name="laneCount">Total lane count in the current primary emission.</param>
+    /// <param name="coneAngleDegrees">Total spread angle in degrees.</param>
+    /// <returns>The normalized lane direction.</returns>
     internal static float3 ResolveSpreadDirection(float3 baseDirection,
                                                   int laneIndex,
                                                   int laneCount,
@@ -107,9 +105,9 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Clamps one requested travel distance to the runtime safety envelope used by beam geometry and queries.
-    /// /params travelDistance Requested travel distance.
-    /// /returns Safe travel distance.
     /// </summary>
+    /// <param name="travelDistance">Requested travel distance.</param>
+    /// <returns>Safe travel distance.</returns>
     internal static float ClampRequestedTravelDistance(float travelDistance)
     {
         if (!IsFinite(travelDistance))
@@ -120,9 +118,9 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Clamps one beam collision radius to the runtime safety envelope used by wall queries and hit resolution.
-    /// /params collisionRadius Requested collision radius.
-    /// /returns Safe collision radius.
     /// </summary>
+    /// <param name="collisionRadius">Requested collision radius.</param>
+    /// <returns>Safe collision radius.</returns>
     internal static float ClampCollisionRadius(float collisionRadius)
     {
         if (!IsFinite(collisionRadius))
@@ -133,9 +131,9 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Clamps one beam body width to the runtime safety envelope used by lane storage and presentation.
-    /// /params bodyWidth Requested beam body width.
-    /// /returns Safe beam body width.
     /// </summary>
+    /// <param name="bodyWidth">Requested beam body width.</param>
+    /// <returns>Safe beam body width.</returns>
     internal static float ClampBodyWidth(float bodyWidth)
     {
         if (!IsFinite(bodyWidth))
@@ -146,19 +144,19 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves one clipped beam segment against walls and returns the final world-space segment data.
-    /// /params startPoint Requested world-space segment start.
-    /// /params endPoint Requested world-space segment end.
-    /// /params collisionRadius Effective collision radius used for wall casts.
-    /// /params physicsWorldSingleton Physics world used for wall casts.
-    /// /params wallsCollisionFilter Collision filter used to query world walls.
-    /// /params wallsEnabled True when wall clipping should be evaluated.
-    /// /params resolvedEndPoint Final segment end after wall clipping.
-    /// /params resolvedDirection Final normalized direction after clipping.
-    /// /params resolvedLength Final segment length after clipping.
-    /// /params hitWall True when the requested segment was clipped by a wall.
-    /// /params wallNormal Wall normal returned by the blocking cast when available.
-    /// /returns True when the resolved segment still has a usable non-zero length.
     /// </summary>
+    /// <param name="startPoint">Requested world-space segment start.</param>
+    /// <param name="endPoint">Requested world-space segment end.</param>
+    /// <param name="collisionRadius">Effective collision radius used for wall casts.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall casts.</param>
+    /// <param name="wallsCollisionFilter">Collision filter used to query world walls.</param>
+    /// <param name="wallsEnabled">True when wall clipping should be evaluated.</param>
+    /// <param name="resolvedEndPoint">Final segment end after wall clipping.</param>
+    /// <param name="resolvedDirection">Final normalized direction after clipping.</param>
+    /// <param name="resolvedLength">Final segment length after clipping.</param>
+    /// <param name="hitWall">True when the requested segment was clipped by a wall.</param>
+    /// <param name="wallNormal">Wall normal returned by the blocking cast when available.</param>
+    /// <returns>True when the resolved segment still has a usable non-zero length.</returns>
     internal static bool TryResolveSegment(float3 startPoint,
                                            float3 endPoint,
                                            float collisionRadius,
@@ -217,21 +215,20 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Appends one already-resolved Laser Beam segment to the output buffer.
-    /// /params laneBuffer Output segment buffer.
-    /// /params laneIndex Stable lane index assigned to the segment.
-    /// /params isSplitChild True when the segment belongs to a split child lane.
-    /// /params startPoint Segment start point.
-    /// /params endPoint Segment end point.
-    /// /params direction Segment direction.
-    /// /params length Segment length.
-    /// /params collisionRadius Effective collision radius used by gameplay checks.
-    /// /params visualWidth Effective visual width used by the presentation system.
-    /// /params damageMultiplier Lane-local damage multiplier.
-    /// /params isTerminalSegment True when the segment is the final segment for the lane.
-    /// /params terminalBlockedByWall True when the terminal segment ended on a wall clip.
-    /// /params terminalNormal Final wall normal stored for debugging and cap logic.
-    /// /returns None.
     /// </summary>
+    /// <param name="laneBuffer">Output segment buffer.</param>
+    /// <param name="laneIndex">Stable lane index assigned to the segment.</param>
+    /// <param name="isSplitChild">True when the segment belongs to a split child lane.</param>
+    /// <param name="startPoint">Segment start point.</param>
+    /// <param name="endPoint">Segment end point.</param>
+    /// <param name="direction">Segment direction.</param>
+    /// <param name="length">Segment length.</param>
+    /// <param name="collisionRadius">Effective collision radius used by gameplay checks.</param>
+    /// <param name="visualWidth">Effective visual width used by the presentation system.</param>
+    /// <param name="damageMultiplier">Lane-local damage multiplier.</param>
+    /// <param name="isTerminalSegment">True when the segment is the final segment for the lane.</param>
+    /// <param name="terminalBlockedByWall">True when the terminal segment ended on a wall clip.</param>
+    /// <param name="terminalNormal">Final wall normal stored for debugging and cap logic.</param>
     internal static void AppendLaneSegment(ref DynamicBuffer<PlayerLaserBeamLaneElement> laneBuffer,
                                            int laneIndex,
                                            bool isSplitChild,
@@ -268,19 +265,19 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Builds one bounced beam path and appends all resolved segments to the output buffer.
-    /// /params laneBuffer Output segment buffer.
-    /// /params laneIndex Stable lane index assigned to all appended segments.
-    /// /params isSplitChild True when the lane belongs to a split branch.
-    /// /params startPoint World-space origin of the lane.
-    /// /params direction Initial lane direction.
-    /// /params travelDistance Total travel budget available for the lane.
-    /// /params collisionRadius Effective collision radius.
-    /// /params maximumBounceSegments Maximum reflected wall segments supported by the lane.
-    /// /params physicsWorldSingleton Physics world used for wall casts.
-    /// /params wallsCollisionFilter Collision filter used to detect world walls.
-    /// /params wallsEnabled True when wall tests should be evaluated.
-    /// /returns True when at least one segment was appended.
     /// </summary>
+    /// <param name="laneBuffer">Output segment buffer.</param>
+    /// <param name="laneIndex">Stable lane index assigned to all appended segments.</param>
+    /// <param name="isSplitChild">True when the lane belongs to a split branch.</param>
+    /// <param name="startPoint">World-space origin of the lane.</param>
+    /// <param name="direction">Initial lane direction.</param>
+    /// <param name="travelDistance">Total travel budget available for the lane.</param>
+    /// <param name="collisionRadius">Effective collision radius.</param>
+    /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by the lane.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for wall casts.</param>
+    /// <param name="wallsCollisionFilter">Collision filter used to detect world walls.</param>
+    /// <param name="wallsEnabled">True when wall tests should be evaluated.</param>
+    /// <returns>True when at least one segment was appended.</returns>
     internal static bool TryAppendLaneSegments(ref DynamicBuffer<PlayerLaserBeamLaneElement> laneBuffer,
                                                int laneIndex,
                                                bool isSplitChild,
@@ -366,11 +363,11 @@ public static class PlayerLaserBeamUtility
     #region Private Methods
     /// <summary>
     /// Resolves the absolute maximum travel distance allowed by the inherited range and lifetime caps.
-    /// /params projectileSpeed Current effective projectile speed.
-    /// /params rangeLimit Effective range cap.
-    /// /params lifetimeLimit Effective lifetime cap.
-    /// /returns Maximum beam travel distance before wall clipping.
     /// </summary>
+    /// <param name="projectileSpeed">Current effective projectile speed.</param>
+    /// <param name="rangeLimit">Effective range cap.</param>
+    /// <param name="lifetimeLimit">Effective lifetime cap.</param>
+    /// <returns>Maximum beam travel distance before wall clipping.</returns>
     internal static float ResolveMaximumTravelDistance(float projectileSpeed,
                                                        float rangeLimit,
                                                        float lifetimeLimit)
@@ -389,9 +386,9 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves whether one scalar value can be consumed safely by beam math.
-    /// /params value Scalar value to validate.
-    /// /returns True when the value is finite.
     /// </summary>
+    /// <param name="value">Scalar value to validate.</param>
+    /// <returns>True when the value is finite.</returns>
     private static bool IsFinite(float value)
     {
         return !float.IsNaN(value) && !float.IsInfinity(value);
@@ -399,9 +396,9 @@ public static class PlayerLaserBeamUtility
 
     /// <summary>
     /// Resolves whether one float3 can be consumed safely by beam math.
-    /// /params value Float3 value to validate.
-    /// /returns True when every component is finite.
     /// </summary>
+    /// <param name="value">Float3 value to validate.</param>
+    /// <returns>True when every component is finite.</returns>
     private static bool IsFinite(float3 value)
     {
         return IsFinite(value.x) &&

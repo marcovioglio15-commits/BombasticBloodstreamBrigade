@@ -239,8 +239,6 @@ public sealed class BombToolData
 
 /// <summary>
 /// Stores authoring data for Dash active modules and legacy Dash tools.
-/// /params None.
-/// /returns None.
 /// </summary>
 [Serializable]
 public sealed class DashToolData

@@ -3,8 +3,6 @@ using UnityEngine;
 
 /// <summary>
 /// Provides shared default authored values used by Laser Beam visual preset data and bake fallbacks.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class PlayerLaserBeamVisualDefaultsUtility
 {
@@ -22,9 +20,9 @@ public static class PlayerLaserBeamVisualDefaultsUtility
     #region Public Methods
     /// <summary>
     /// Creates one authored visual preset entry initialized with a default name and the default colors for the requested ID.
-    /// /params stableId Stable numeric ID to initialize.
-    /// /returns New visual preset definition populated with default colors.
     /// </summary>
+    /// <param name="stableId">Stable numeric ID to initialize.</param>
+    /// <returns>New visual preset definition populated with default colors.</returns>
     public static PlayerLaserBeamVisualPresetDefinition CreateDefaultVisualPresetDefinition(int stableId = DefaultVisualPresetId)
     {
         ResolveDefaultPreset(stableId,
@@ -45,9 +43,8 @@ public static class PlayerLaserBeamVisualDefaultsUtility
 
     /// <summary>
     /// Validates authored Laser Beam visual preset entries without rewriting designer-authored IDs or names.
-    /// /params visualPresetDefinitions Mutable preset list authored on the visual preset.
-    /// /returns None.
     /// </summary>
+    /// <param name="visualPresetDefinitions">Mutable preset list authored on the visual preset.</param>
     public static void ValidateVisualPresetDefinitions(List<PlayerLaserBeamVisualPresetDefinition> visualPresetDefinitions)
     {
         if (visualPresetDefinitions == null)
@@ -66,14 +63,13 @@ public static class PlayerLaserBeamVisualDefaultsUtility
 
     /// <summary>
     /// Resolves the default label and colors used when no authored visual preset matches the requested stable ID.
-    /// /params stableId Stable numeric preset ID.
-    /// /params displayName Default designer-facing preset name.
-    /// /params coreColor White-hot core color.
-    /// /params flowColor Primary beam flow color.
-    /// /params stormColor Electrical storm color.
-    /// /params contactColor Terminal cap and contact highlight color.
-    /// /returns None.
     /// </summary>
+    /// <param name="stableId">Stable numeric preset ID.</param>
+    /// <param name="displayName">Default designer-facing preset name.</param>
+    /// <param name="coreColor">White-hot core color.</param>
+    /// <param name="flowColor">Primary beam flow color.</param>
+    /// <param name="stormColor">Electrical storm color.</param>
+    /// <param name="contactColor">Terminal cap and contact highlight color.</param>
     public static void ResolveDefaultPreset(int stableId,
                                             out string displayName,
                                             out Color coreColor,

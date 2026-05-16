@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Authoring component for an ECS scene transition volume triggered by the player entering its bounds.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameSceneTransitionTriggerAuthoring : MonoBehaviour
@@ -118,8 +116,6 @@ public sealed class GameSceneTransitionTriggerAuthoring : MonoBehaviour
     #region Gizmos
     /// <summary>
     /// Draws a clean selected-volume preview for scene transition authoring.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDrawGizmosSelected()
     {
@@ -140,8 +136,6 @@ public sealed class GameSceneTransitionTriggerAuthoring : MonoBehaviour
 
 /// <summary>
 /// Baker that converts GameSceneTransitionTriggerAuthoring into a static ECS transition trigger.
-/// /params None.
-/// /returns None.
 /// </summary>
 public sealed class GameSceneTransitionTriggerAuthoringBaker : Baker<GameSceneTransitionTriggerAuthoring>
 {
@@ -150,9 +144,8 @@ public sealed class GameSceneTransitionTriggerAuthoringBaker : Baker<GameSceneTr
     #region Bake
     /// <summary>
     /// Bakes a world-space trigger volume and its runtime cooldown state.
-    /// /params authoring Source transition trigger authoring component.
-    /// /returns None.
     /// </summary>
+    /// <param name="authoring">Source transition trigger authoring component.</param>
     public override void Bake(GameSceneTransitionTriggerAuthoring authoring)
     {
         if (authoring == null)
@@ -167,9 +160,9 @@ public sealed class GameSceneTransitionTriggerAuthoringBaker : Baker<GameSceneTr
     #region Helpers
     /// <summary>
     /// Converts authoring transform and local bounds into a runtime trigger component.
-    /// /params authoring Source transition trigger authoring component.
-    /// /returns Baked runtime trigger data.
     /// </summary>
+    /// <param name="authoring">Source transition trigger authoring component.</param>
+    /// <returns>Baked runtime trigger data.</returns>
     private static GameSceneTransitionTrigger BuildTrigger(GameSceneTransitionTriggerAuthoring authoring)
     {
         Vector3 worldCenter = authoring.transform.TransformPoint(authoring.LocalCenter);

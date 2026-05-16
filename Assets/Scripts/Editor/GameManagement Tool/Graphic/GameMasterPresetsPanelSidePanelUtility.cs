@@ -5,8 +5,6 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Manages Game Management side panels, persisted tab state and cross-panel selection sync.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameMasterPresetsPanelSidePanelUtility
 {
@@ -23,9 +21,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     #region Public Methods
     /// <summary>
     /// Restores active tab, details section and selected audio prefab from editor state.
-    /// /params panel Owning panel that stores persisted state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores persisted state.</param>
     public static void RestorePersistedState(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -39,9 +36,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Builds the root tab bar, content host and initially restored side panels.
-    /// /params panel Owning panel that stores tab UI state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores tab UI state.</param>
     public static void BuildPanelsContainer(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -84,10 +80,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Opens or activates a side panel and synchronizes it with the selected master preset.
-    /// /params panel Owning panel that stores side panel entries.
-    /// /params panelType Panel type to open or activate.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores side panel entries.</param>
+    /// <param name="panelType">Panel type to open or activate.</param>
     public static void OpenSidePanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
     {
         if (panel == null)
@@ -118,9 +113,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Refreshes every open side panel after session changes.
-    /// /params panel Owning panel with opened side panel controllers.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with opened side panel controllers.</param>
     public static void RefreshOpenSidePanels(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -145,9 +139,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Synchronizes all open side panel selections with the selected master preset references.
-    /// /params panel Owning panel with selected master preset context.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
     public static void SyncOpenSidePanels(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -159,9 +152,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Persists the active details section.
-    /// /params panel Owning panel that stores the active section.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores the active section.</param>
     public static void SaveActiveDetailsSection(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -172,9 +164,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Persists the selected audio manager prefab reference.
-    /// /params panel Owning panel that stores selected prefab state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores selected prefab state.</param>
     public static void SaveSelectedAudioPrefabState(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -185,9 +176,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Persists the selected scene manager prefab reference.
-    /// /params panel Owning panel that stores selected prefab state.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel that stores selected prefab state.</param>
     public static void SaveSelectedScenePrefabState(GameMasterPresetsPanel panel)
     {
         if (panel == null)
@@ -200,10 +190,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     #region Private Methods
     /// <summary>
     /// Creates and registers the Audio Manager side panel.
-    /// /params panel Owning panel with tab state.
-    /// /params panelType Side panel type.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
     private static void OpenAudioManagerPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
     {
         GameAudioManagerPresetsPanel audioPanel = new GameAudioManagerPresetsPanel();
@@ -213,10 +202,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Creates and registers the Scene Manager side panel.
-    /// /params panel Owning panel with tab state.
-    /// /params panelType Side panel type.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
     private static void OpenSceneManagerPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
     {
         GameSceneManagerPresetsPanel scenePanel = new GameSceneManagerPresetsPanel();
@@ -226,12 +214,12 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Creates the side-panel root with a title and close button.
-    /// /params panel Owning panel used by the close callback.
-    /// /params title Panel title.
-    /// /params content Inner panel content.
-    /// /params panelType Panel type represented by this root.
-    /// /returns Side-panel root element.
     /// </summary>
+    /// <param name="panel">Owning panel used by the close callback.</param>
+    /// <param name="title">Panel title.</param>
+    /// <param name="content">Inner panel content.</param>
+    /// <param name="panelType">Panel type represented by this root.</param>
+    /// <returns>Side-panel root element.</returns>
     private static VisualElement BuildSidePanelRoot(GameMasterPresetsPanel panel, string title, VisualElement content, GameManagementWindow.PanelType panelType)
     {
         VisualElement panelRoot = new VisualElement();
@@ -263,14 +251,13 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Adds one tab entry to the tab host.
-    /// /params panel Owning panel with tab bar and content host.
-    /// /params panelType Panel type represented by the tab.
-    /// /params label Tab label.
-    /// /params content Content shown when active.
-    /// /params audioPanel Optional Audio Manager panel controller.
-    /// /params scenePanel Optional Scene Manager panel controller.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with tab bar and content host.</param>
+    /// <param name="panelType">Panel type represented by the tab.</param>
+    /// <param name="label">Tab label.</param>
+    /// <param name="content">Content shown when active.</param>
+    /// <param name="audioPanel">Optional Audio Manager panel controller.</param>
+    /// <param name="scenePanel">Optional Scene Manager panel controller.</param>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
@@ -302,10 +289,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Activates one panel tab and swaps content.
-    /// /params panel Owning panel with tab state.
-    /// /params panelType Panel type to activate.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Panel type to activate.</param>
     private static void SetActivePanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
     {
         if (!panel.SidePanels.TryGetValue(panelType, out GameMasterPresetsPanel.SidePanelEntry entry))
@@ -324,10 +310,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Closes one side panel while keeping the master panel available.
-    /// /params panel Owning panel with tab state.
-    /// /params panelType Panel type to close.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Panel type to close.</param>
     private static void CloseSidePanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
     {
         if (panel == null || panelType == GameManagementWindow.PanelType.GameMasterPresets)
@@ -347,11 +332,10 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Synchronizes one side panel selection with the selected master preset.
-    /// /params panel Owning panel with selected master preset context.
-    /// /params panelType Side panel type.
-    /// /params entry Side panel entry.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    /// <param name="panelType">Side panel type.</param>
+    /// <param name="entry">Side panel entry.</param>
     private static void SyncSidePanelSelection(GameMasterPresetsPanel panel,
                                                GameManagementWindow.PanelType panelType,
                                                GameMasterPresetsPanel.SidePanelEntry entry)
@@ -377,9 +361,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
     /// <summary>
     /// Updates tab button styling to highlight the active tab.
-    /// /params panel Owning panel with side panel entries.
-    /// /returns None.
     /// </summary>
+    /// <param name="panel">Owning panel with side panel entries.</param>
     private static void UpdateTabStyles(GameMasterPresetsPanel panel)
     {
         foreach (KeyValuePair<GameManagementWindow.PanelType, GameMasterPresetsPanel.SidePanelEntry> entry in panel.SidePanels)

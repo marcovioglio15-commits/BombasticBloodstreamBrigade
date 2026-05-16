@@ -5,8 +5,6 @@ using Unity.Transforms;
 
 /// <summary>
 /// Applies traveling Laser Beam tick packets using the projectile hit-payload rules inherited from the current shooting config.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class PlayerLaserBeamDamagePacketHitUtility
 {
@@ -15,33 +13,32 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     #region Public Methods
     /// <summary>
     /// Applies one traveling tick packet against the filtered lane candidates using the projectile penetration rules inherited by the beam.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Damage budget carried by the packet before lane multipliers.
-    /// /params penetrationMode Projectile penetration mode inherited from the current shooting config.
-    /// /params maximumPenetrations Maximum penetration budget inherited from the current shooting config.
-    /// /params projectileTemplate Projectile template used to resolve knockback, elemental and VFX payloads.
-    /// /params laserBeamLanes Resolved lane buffer of the current player.
-    /// /params segmentStartIndex First segment index belonging to the lane.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params enemyDataArray Cached immutable data of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Damage budget carried by the packet before lane multipliers.</param>
+    /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
+    /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve knockback, elemental and VFX payloads.</param>
+    /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
+    /// <param name="segmentStartIndex">First segment index belonging to the lane.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="enemyDataArray">Cached immutable data of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     public static void ResolveLaneHits(Entity shooterEntity,
                                        float laneDamagePerTick,
                                        ProjectilePenetrationMode penetrationMode,
@@ -183,29 +180,28 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     #region Private Methods
     /// <summary>
     /// Applies one single-hit packet to the nearest valid enemy.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Effective lane damage carried by the packet.
-    /// /params projectileTemplate Projectile template used to resolve hit payloads.
-    /// /params referenceSegment Lane segment used to inherit direction and radius data.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
+    /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveSingleHitMode(Entity shooterEntity,
                                              float laneDamagePerTick,
                                              PlayerProjectileRequestTemplate projectileTemplate,
@@ -274,30 +270,29 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
 
     /// <summary>
     /// Applies one fixed-hit packet to the ordered hit list until the penetration budget is exhausted.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Effective lane damage carried by the packet.
-    /// /params maximumPenetrations Maximum penetration budget inherited from the current shooting config.
-    /// /params projectileTemplate Projectile template used to resolve hit payloads.
-    /// /params referenceSegment Lane segment used to inherit direction and radius data.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
+    /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveFixedHitMode(Entity shooterEntity,
                                             float laneDamagePerTick,
                                             int maximumPenetrations,
@@ -373,29 +368,28 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
 
     /// <summary>
     /// Applies one infinite-penetration packet to every crossed enemy.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Effective lane damage carried by the packet.
-    /// /params projectileTemplate Projectile template used to resolve hit payloads.
-    /// /params referenceSegment Lane segment used to inherit direction and radius data.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
+    /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveInfiniteHitMode(Entity shooterEntity,
                                                float laneDamagePerTick,
                                                PlayerProjectileRequestTemplate projectileTemplate,
@@ -463,30 +457,29 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
 
     /// <summary>
     /// Applies one damage-based packet that spends remaining damage budget while enemies are killed.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params laneDamagePerTick Effective lane damage carried by the packet.
-    /// /params maximumPenetrations Maximum kill-based penetration budget inherited from the current shooting config.
-    /// /params projectileTemplate Projectile template used to resolve hit payloads.
-    /// /params referenceSegment Lane segment used to inherit direction and radius data.
-    /// /params hitCandidates Filtered lane hit candidates crossed by the packet during the current frame.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params projectedEnemyHealth Mutable projected enemy health buffer.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyDirtyFlags Per-enemy dirty flags tracking health updates.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /params despawnRequestLookup Lookup used to avoid duplicate despawn requests.
-    /// /params commandBuffer ECB used to enqueue despawn requests.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="maximumPenetrations">Maximum kill-based penetration budget inherited from the current shooting config.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
+    /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyDirtyFlags">Per-enemy dirty flags tracking health updates.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate despawn requests.</param>
+    /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveDamageBasedMode(Entity shooterEntity,
                                                float laneDamagePerTick,
                                                int maximumPenetrations,
@@ -570,27 +563,26 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
 
     /// <summary>
     /// Applies projectile-derived elemental, knockback and hit-VFX payloads to one enemy already damaged by the beam.
-    /// /params shooterEntity Player entity owning the beam.
-    /// /params enemyIndex Enemy index receiving payloads.
-    /// /params hitPoint World-space hit point used by the payload helpers.
-    /// /params hitDirection World-space impact direction used by the payload helpers.
-    /// /params appliedDamage Damage already applied to the enemy during this packet evaluation.
-    /// /params projectileTemplate Projectile template used to resolve payload details.
-    /// /params referenceSegment Lane segment used to inherit collision radius and fallback direction.
-    /// /params enemyEntities Projected enemy entities.
-    /// /params enemyPositions Cached world positions of projected enemies.
-    /// /params enemyRuntimeArray Cached runtime states of projected enemies.
-    /// /params projectedEnemyKnockback Mutable projected knockback buffer.
-    /// /params enemyKnockbackDirtyFlags Per-enemy dirty flags tracking knockback updates.
-    /// /params elementalVfxConfigLookup Lookup of player-owned elemental VFX config.
-    /// /params elementalVfxAnchorLookup Lookup of enemy-owned elemental VFX anchors.
-    /// /params enemyHitVfxConfigLookup Lookup of enemy hit VFX config.
-    /// /params spawnInactivityLockLookup Lookup used by hit VFX payload spawning.
-    /// /params canEnqueueVfxRequests True when the shooter can enqueue VFX requests this frame.
-    /// /params shooterVfxRequests Mutable shooter VFX buffer.
-    /// /params elementalStackLookup Mutable elemental stack lookup on enemies.
-    /// /returns None.
     /// </summary>
+    /// <param name="shooterEntity">Player entity owning the beam.</param>
+    /// <param name="enemyIndex">Enemy index receiving payloads.</param>
+    /// <param name="hitPoint">World-space hit point used by the payload helpers.</param>
+    /// <param name="hitDirection">World-space impact direction used by the payload helpers.</param>
+    /// <param name="appliedDamage">Damage already applied to the enemy during this packet evaluation.</param>
+    /// <param name="projectileTemplate">Projectile template used to resolve payload details.</param>
+    /// <param name="referenceSegment">Lane segment used to inherit collision radius and fallback direction.</param>
+    /// <param name="enemyEntities">Projected enemy entities.</param>
+    /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
+    /// <param name="enemyRuntimeArray">Cached runtime states of projected enemies.</param>
+    /// <param name="projectedEnemyKnockback">Mutable projected knockback buffer.</param>
+    /// <param name="enemyKnockbackDirtyFlags">Per-enemy dirty flags tracking knockback updates.</param>
+    /// <param name="elementalVfxConfigLookup">Lookup of player-owned elemental VFX config.</param>
+    /// <param name="elementalVfxAnchorLookup">Lookup of enemy-owned elemental VFX anchors.</param>
+    /// <param name="enemyHitVfxConfigLookup">Lookup of enemy hit VFX config.</param>
+    /// <param name="spawnInactivityLockLookup">Lookup used by hit VFX payload spawning.</param>
+    /// <param name="canEnqueueVfxRequests">True when the shooter can enqueue VFX requests this frame.</param>
+    /// <param name="shooterVfxRequests">Mutable shooter VFX buffer.</param>
+    /// <param name="elementalStackLookup">Mutable elemental stack lookup on enemies.</param>
     private static void ApplyHitPayloads(Entity shooterEntity,
                                          int enemyIndex,
                                          float3 hitPoint,

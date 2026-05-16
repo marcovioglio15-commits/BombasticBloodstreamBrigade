@@ -32,7 +32,7 @@ public readonly struct PlayerFormulaValue
     /// <param name="numberValue">Numeric payload.</param>
     /// <param name="booleanValue">Boolean payload.</param>
     /// <param name="tokenValue">Token payload.</param>
-    /// <returns>Initialized formula value.<returns>
+    /// <returns>Initialized formula value.</returns>
     private PlayerFormulaValue(PlayerFormulaValueType typeValue,
                                float numberValue,
                                bool booleanValue,
@@ -62,7 +62,7 @@ public readonly struct PlayerFormulaValue
     /// Creates one numeric formula value.
     /// </summary>
     /// <param name="numberValue">Numeric payload.</param>
-    /// <returns>Numeric formula value.<returns>
+    /// <returns>Numeric formula value.</returns>
     public static PlayerFormulaValue CreateNumber(float numberValue)
     {
         return new PlayerFormulaValue(PlayerFormulaValueType.Number,
@@ -75,7 +75,7 @@ public readonly struct PlayerFormulaValue
     /// Creates one boolean formula value.
     /// </summary>
     /// <param name="booleanValue">Boolean payload.</param>
-    /// <returns>Boolean formula value.<returns>
+    /// <returns>Boolean formula value.</returns>
     public static PlayerFormulaValue CreateBoolean(bool booleanValue)
     {
         return new PlayerFormulaValue(PlayerFormulaValueType.Boolean,
@@ -88,7 +88,7 @@ public readonly struct PlayerFormulaValue
     /// Creates one token formula value.
     /// </summary>
     /// <param name="tokenValue">Token payload.</param>
-    /// <returns>Token formula value.<returns>
+    /// <returns>Token formula value.</returns>
     public static PlayerFormulaValue CreateToken(string tokenValue)
     {
         return new PlayerFormulaValue(PlayerFormulaValueType.Token,
@@ -100,7 +100,7 @@ public readonly struct PlayerFormulaValue
     /// <summary>
     /// Creates one invalid formula value.
     /// </summary>
-    /// <returns>Invalid sentinel value.<returns>
+    /// <returns>Invalid sentinel value.</returns>
     public static PlayerFormulaValue CreateInvalid()
     {
         return new PlayerFormulaValue(PlayerFormulaValueType.Invalid,
@@ -116,7 +116,7 @@ public readonly struct PlayerFormulaValue
     /// </summary>
     /// <param name="leftValue">First value.</param>
     /// <param name="rightValue">Second value.</param>
-    /// <returns>True when both values are equal.<returns>
+    /// <returns>True when both values are equal.</returns>
     public static bool AreEqual(in PlayerFormulaValue leftValue, in PlayerFormulaValue rightValue)
     {
         if (leftValue.Type != rightValue.Type)
@@ -142,7 +142,7 @@ public readonly struct PlayerFormulaValue
     /// <summary>
     /// Formats the value using invariant culture for logs and editor diagnostics.
     /// </summary>
-    /// <returns>Formatted payload text.<returns>
+    /// <returns>Formatted payload text.</returns>
     public string ToDisplayString()
     {
         switch (Type)

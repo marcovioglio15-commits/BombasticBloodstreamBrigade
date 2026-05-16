@@ -16,9 +16,9 @@ public static class EnemySpawnerRuntimeUtility
     /// <summary>
     /// Resolves the effective player-distance threshold used to return alive enemies to pool.
     /// This keeps enemies alive while they are still on the opposite side of the authored spawn envelope.
-    /// spawner: Runtime spawner configuration baked from authoring data.
-    /// returns Effective planar despawn distance measured from the player.
     /// </summary>
+    /// <param name="spawner">Runtime spawner configuration baked from authoring data.</param>
+    /// <returns>Effective planar despawn distance measured from the player.</returns>
     public static float ResolveEffectiveDespawnDistance(in EnemySpawner spawner)
     {
         float authoredDespawnDistance = math.max(0f, spawner.DespawnDistance);

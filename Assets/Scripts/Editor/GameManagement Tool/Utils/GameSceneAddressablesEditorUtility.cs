@@ -6,8 +6,6 @@ using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 
 /// <summary>
 /// Provides editor-only Addressables setup helpers for managed top-level scenes.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneAddressablesEditorUtility
 {
@@ -21,9 +19,9 @@ public static class GameSceneAddressablesEditorUtility
     #region Public Methods
     /// <summary>
     /// Creates Addressables settings and entries for every non-bootstrap scene with an authored key.
-    /// /params preset Scene Manager preset containing scene table metadata.
-    /// /returns True when settings or entries were updated.
     /// </summary>
+    /// <param name="preset">Scene Manager preset containing scene table metadata.</param>
+    /// <returns>True when settings or entries were updated.</returns>
     public static bool EnsureSceneEntries(GameSceneManagerPreset preset)
     {
         if (preset == null || preset.SceneDefinitions == null)
@@ -62,10 +60,9 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Adds non-mutating warnings for the Addressables settings and entries required by one Scene Manager preset.
-    /// /params preset Scene Manager preset to inspect.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Scene Manager preset to inspect.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     public static void CollectWarnings(GameSceneManagerPreset preset, List<string> warnings)
     {
         if (preset == null || warnings == null || preset.LoadBackend != GameSceneLoadBackend.Addressables)
@@ -94,9 +91,8 @@ public static class GameSceneAddressablesEditorUtility
     #region Settings
     /// <summary>
     /// Loads or creates the project Addressables settings asset.
-    /// /params None.
-    /// /returns Active Addressables settings asset, or null when creation failed.
     /// </summary>
+    /// <returns>Active Addressables settings asset, or null when creation failed.</returns>
     private static AddressableAssetSettings GetOrCreateSettings()
     {
         AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
@@ -114,9 +110,9 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Loads or creates the local group used by Scene Manager addressable scenes.
-    /// /params settings Addressables settings asset.
-    /// /returns Addressables group used for managed scenes.
     /// </summary>
+    /// <param name="settings">Addressables settings asset.</param>
+    /// <returns>Addressables group used for managed scenes.</returns>
     private static AddressableAssetGroup GetOrCreateSceneGroup(AddressableAssetSettings settings)
     {
         AddressableAssetGroup group = settings.FindGroup(SceneGroupName);
@@ -135,9 +131,9 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Enables Addressables content building as part of Player builds to avoid a manual content-build hook.
-    /// /params settings Addressables settings asset.
-    /// /returns True when the setting changed.
     /// </summary>
+    /// <param name="settings">Addressables settings asset.</param>
+    /// <returns>True when the setting changed.</returns>
     private static bool EnsureBuildWithPlayer(AddressableAssetSettings settings)
     {
         if (settings.BuildAddressablesWithPlayerBuild == AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer)
@@ -152,11 +148,11 @@ public static class GameSceneAddressablesEditorUtility
     #region Entries
     /// <summary>
     /// Ensures one scene asset has a matching Addressables entry, address and label.
-    /// /params settings Addressables settings asset.
-    /// /params sceneGroup Target group for managed scene entries.
-    /// /params sceneDefinition Scene definition to register.
-    /// /returns True when the entry was created or modified.
     /// </summary>
+    /// <param name="settings">Addressables settings asset.</param>
+    /// <param name="sceneGroup">Target group for managed scene entries.</param>
+    /// <param name="sceneDefinition">Scene definition to register.</param>
+    /// <returns>True when the entry was created or modified.</returns>
     private static bool EnsureSceneEntry(AddressableAssetSettings settings,
                                          AddressableAssetGroup sceneGroup,
                                          GameSceneDefinition sceneDefinition)
@@ -186,11 +182,10 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Validates one required scene Addressables entry without changing settings.
-    /// /params settings Addressables settings asset.
-    /// /params sceneDefinition Scene definition expected to have an entry.
-    /// /params warnings Mutable warning output list.
-    /// /returns None.
     /// </summary>
+    /// <param name="settings">Addressables settings asset.</param>
+    /// <param name="sceneDefinition">Scene definition expected to have an entry.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateSceneEntry(AddressableAssetSettings settings,
                                            GameSceneDefinition sceneDefinition,
                                            List<string> warnings)
@@ -217,9 +212,9 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Resolves whether a scene definition should be registered as Addressable.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns True when the scene is a top-level non-bootstrap scene with an Addressables key.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>True when the scene is a top-level non-bootstrap scene with an Addressables key.</returns>
     private static bool ShouldRegisterScene(GameSceneDefinition sceneDefinition)
     {
         if (sceneDefinition.SceneKind == GameSceneKind.Bootstrap)
@@ -236,9 +231,9 @@ public static class GameSceneAddressablesEditorUtility
 
     /// <summary>
     /// Resolves a scene asset GUID from stored scene definition metadata.
-    /// /params sceneDefinition Scene definition being registered.
-    /// /returns Scene asset GUID or an empty string when unresolved.
     /// </summary>
+    /// <param name="sceneDefinition">Scene definition being registered.</param>
+    /// <returns>Scene asset GUID or an empty string when unresolved.</returns>
     private static string ResolveSceneGuid(GameSceneDefinition sceneDefinition)
     {
         if (!string.IsNullOrWhiteSpace(sceneDefinition.SceneGuid))

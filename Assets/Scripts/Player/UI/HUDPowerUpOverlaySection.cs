@@ -5,7 +5,6 @@ using UnityEngine.UI;
 /// <summary>
 /// Drives the managed HUD overlay for equipped active power-up slots, including icons and conditional module bars.
 /// none.
-/// returns none.
 /// </summary>
 internal sealed class HUDPowerUpOverlaySection
 {
@@ -34,22 +33,22 @@ internal sealed class HUDPowerUpOverlaySection
     #region Initialization
     /// <summary>
     /// Creates one runtime overlay section from the HUD image references already bound on the manager.
-    /// primaryIconImage: Primary slot icon image.
-    /// secondaryIconImage: Secondary slot icon image.
-    /// primarySlotRootObject: Optional root object for the primary slot UI.
-    /// secondarySlotRootObject: Optional root object for the secondary slot UI.
-    /// primaryEnergyFillImage: Primary slot energy fill image.
-    /// secondaryEnergyFillImage: Secondary slot energy fill image.
-    /// primaryChargeFillImage: Primary slot charge fill image.
-    /// secondaryChargeFillImage: Secondary slot charge fill image.
-    /// energyBarSmoothingSecondsValue: Smoothing time applied to energy bars.
-    /// hideEnergyBarsWhenPlayerMissingValue: Hides energy bars when the player entity is unavailable.
-    /// hideEnergyBarsWhenModuleMissingValue: Hides energy bars when the slot has no energy module.
-    /// chargeBarSmoothingSecondsValue: Smoothing time applied to charge bars.
-    /// hideChargeBarsWhenPlayerMissingValue: Hides charge bars when the player entity is unavailable.
-    /// hideChargeBarsWhenModuleMissingValue: Hides charge bars when the slot has no charge module.
-    /// returns A ready-to-use overlay section.
     /// </summary>
+    /// <param name="primaryIconImage">Primary slot icon image.</param>
+    /// <param name="secondaryIconImage">Secondary slot icon image.</param>
+    /// <param name="primarySlotRootObject">Optional root object for the primary slot UI.</param>
+    /// <param name="secondarySlotRootObject">Optional root object for the secondary slot UI.</param>
+    /// <param name="primaryEnergyFillImage">Primary slot energy fill image.</param>
+    /// <param name="secondaryEnergyFillImage">Secondary slot energy fill image.</param>
+    /// <param name="primaryChargeFillImage">Primary slot charge fill image.</param>
+    /// <param name="secondaryChargeFillImage">Secondary slot charge fill image.</param>
+    /// <param name="energyBarSmoothingSecondsValue">Smoothing time applied to energy bars.</param>
+    /// <param name="hideEnergyBarsWhenPlayerMissingValue">Hides energy bars when the player entity is unavailable.</param>
+    /// <param name="hideEnergyBarsWhenModuleMissingValue">Hides energy bars when the slot has no energy module.</param>
+    /// <param name="chargeBarSmoothingSecondsValue">Smoothing time applied to charge bars.</param>
+    /// <param name="hideChargeBarsWhenPlayerMissingValue">Hides charge bars when the player entity is unavailable.</param>
+    /// <param name="hideChargeBarsWhenModuleMissingValue">Hides charge bars when the slot has no charge module.</param>
+    /// <returns>A ready-to-use overlay section.</returns>
     public HUDPowerUpOverlaySection(Image primaryIconImage,
                                     Image secondaryIconImage,
                                     GameObject primarySlotRootObject,
@@ -84,7 +83,6 @@ internal sealed class HUDPowerUpOverlaySection
     /// <summary>
     /// Applies the initial visual state before ECS data is available.
     /// none.
-    /// returns void.
     /// </summary>
     public void ApplyInitialVisualState()
     {
@@ -97,8 +95,8 @@ internal sealed class HUDPowerUpOverlaySection
     /// <summary>
     /// Returns whether at least one slot exposes an icon or module bar that can be driven by runtime data.
     /// none.
-    /// returns True when the overlay section has something to render.
     /// </summary>
+    /// <returns>True when the overlay section has something to render.</returns>
     public bool HasAnyVisuals()
     {
         if (primarySlot.HasAnyVisuals)
@@ -109,10 +107,9 @@ internal sealed class HUDPowerUpOverlaySection
 
     /// <summary>
     /// Updates both active-slot overlays from the current ECS power-up config and state.
-    /// entityManager: Entity manager used to read runtime power-up components.
-    /// playerEntity: Player entity currently driving the overlay.
-    /// returns void.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read runtime power-up components.</param>
+    /// <param name="playerEntity">Player entity currently driving the overlay.</param>
     public void Update(EntityManager entityManager, Entity playerEntity)
     {
         if (!HasAnyVisuals())
@@ -148,7 +145,6 @@ internal sealed class HUDPowerUpOverlaySection
     /// <summary>
     /// Applies the missing-player state to icons and module bars.
     /// none.
-    /// returns void.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -160,9 +156,9 @@ internal sealed class HUDPowerUpOverlaySection
     #region Shared Helpers
     /// <summary>
     /// Returns whether the current slot exposes one energy module that should drive the energy bar.
-    /// slotConfig: Slot configuration currently bound to the HUD slot.
-    /// returns True when an energy module is present.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration currently bound to the HUD slot.</param>
+    /// <returns>True when an energy module is present.</returns>
     private static bool HasEnergyModule(in PlayerPowerUpSlotConfig slotConfig)
     {
         if (slotConfig.IsDefined == 0)
@@ -173,9 +169,9 @@ internal sealed class HUDPowerUpOverlaySection
 
     /// <summary>
     /// Returns whether the current slot exposes one charge module that should drive the charge bar.
-    /// slotConfig: Slot configuration currently bound to the HUD slot.
-    /// returns True when a charge module is present.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration currently bound to the HUD slot.</param>
+    /// <returns>True when a charge module is present.</returns>
     private static bool HasChargeModule(in PlayerPowerUpSlotConfig slotConfig)
     {
         if (slotConfig.IsDefined == 0)
@@ -195,10 +191,10 @@ internal sealed class HUDPowerUpOverlaySection
 
     /// <summary>
     /// Returns whether charge progress is meaningful for the current slot and energy state.
-    /// slotConfig: Slot configuration currently bound to the HUD slot.
-    /// currentEnergy: Current slot energy value.
-    /// returns True when the charge bar can show progress.
     /// </summary>
+    /// <param name="slotConfig">Slot configuration currently bound to the HUD slot.</param>
+    /// <param name="currentEnergy">Current slot energy value.</param>
+    /// <returns>True when the charge bar can show progress.</returns>
     private static bool CanDisplayChargeProgress(in PlayerPowerUpSlotConfig slotConfig, float currentEnergy)
     {
         if (slotConfig.ActivationResource != PowerUpResourceType.Energy)
@@ -229,11 +225,11 @@ internal sealed class HUDPowerUpOverlaySection
 
     /// <summary>
     /// Smoothly approaches one normalized target value used by energy and charge bars.
-    /// displayedValue: Current displayed normalized value.
-    /// targetValue: New normalized target value.
-    /// smoothingSeconds: Time used to interpolate the value.
-    /// returns Smoothed normalized value.
     /// </summary>
+    /// <param name="displayedValue">Current displayed normalized value.</param>
+    /// <param name="targetValue">New normalized target value.</param>
+    /// <param name="smoothingSeconds">Time used to interpolate the value.</param>
+    /// <returns>Smoothed normalized value.</returns>
     private static float SmoothNormalized(float displayedValue, float targetValue, float smoothingSeconds)
     {
         if (smoothingSeconds <= 0f)
@@ -252,7 +248,6 @@ internal sealed class HUDPowerUpOverlaySection
     /// <summary>
     /// Stores and updates the managed visuals for one active power-up slot.
     /// none.
-    /// returns none.
     /// </summary>
     private sealed class HUDPowerUpSlotVisual
     {
@@ -290,12 +285,12 @@ internal sealed class HUDPowerUpOverlaySection
         #region Factory
         /// <summary>
         /// Builds one slot-visual descriptor from the bar fill images already bound in the HUD.
-        /// iconImage: Direct icon image reference serialized on the HUD manager.
-        /// explicitSlotRootObject: Optional root object used to hide the entire slot when no power-up is equipped.
-        /// energyFillImage: Energy fill image for the slot.
-        /// chargeFillImage: Charge fill image for the slot.
-        /// returns A slot-visual descriptor ready for runtime updates.
         /// </summary>
+        /// <param name="iconImage">Direct icon image reference serialized on the HUD manager.</param>
+        /// <param name="explicitSlotRootObject">Optional root object used to hide the entire slot when no power-up is equipped.</param>
+        /// <param name="energyFillImage">Energy fill image for the slot.</param>
+        /// <param name="chargeFillImage">Charge fill image for the slot.</param>
+        /// <returns>A slot-visual descriptor ready for runtime updates.</returns>
         public static HUDPowerUpSlotVisual Create(Image iconImage,
                                                   GameObject explicitSlotRootObject,
                                                   Image energyFillImage,
@@ -309,12 +304,12 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Creates one slot visual descriptor.
-        /// iconImageValue: Optional icon image shown above the module bars.
-        /// slotRootObjectValue: Root object toggled when the slot is undefined.
-        /// energyBarValue: Energy bar visuals owned by the slot.
-        /// chargeBarValue: Charge bar visuals owned by the slot.
-        /// returns A fully initialized slot visual descriptor.
         /// </summary>
+        /// <param name="iconImageValue">Optional icon image shown above the module bars.</param>
+        /// <param name="slotRootObjectValue">Root object toggled when the slot is undefined.</param>
+        /// <param name="energyBarValue">Energy bar visuals owned by the slot.</param>
+        /// <param name="chargeBarValue">Charge bar visuals owned by the slot.</param>
+        /// <returns>A fully initialized slot visual descriptor.</returns>
         private HUDPowerUpSlotVisual(Image iconImageValue,
                                      GameObject slotRootObjectValue,
                                      in HUDPowerUpBarVisual energyBarValue,
@@ -331,7 +326,6 @@ internal sealed class HUDPowerUpOverlaySection
         /// <summary>
         /// Applies the initial fill amounts and icon visibility before ECS data arrives.
         /// none.
-        /// returns void.
         /// </summary>
         public void ApplyInitialVisualState()
         {
@@ -345,15 +339,14 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Updates the slot icon plus its energy and charge bars from the current slot runtime data.
-        /// slotConfig: Active slot configuration currently bound to the player.
-        /// currentEnergy: Current energy value stored for the slot.
-        /// currentCharge: Current charge value stored for the slot.
-        /// energySmoothingSeconds: Smoothing time applied to energy visuals.
-        /// hideEnergyWhenModuleMissing: Hides the energy bar root when no module is present.
-        /// chargeSmoothingSeconds: Smoothing time applied to charge visuals.
-        /// hideChargeWhenModuleMissing: Hides the charge bar root when no module is present.
-        /// returns void.
         /// </summary>
+        /// <param name="slotConfig">Active slot configuration currently bound to the player.</param>
+        /// <param name="currentEnergy">Current energy value stored for the slot.</param>
+        /// <param name="currentCharge">Current charge value stored for the slot.</param>
+        /// <param name="energySmoothingSeconds">Smoothing time applied to energy visuals.</param>
+        /// <param name="hideEnergyWhenModuleMissing">Hides the energy bar root when no module is present.</param>
+        /// <param name="chargeSmoothingSeconds">Smoothing time applied to charge visuals.</param>
+        /// <param name="hideChargeWhenModuleMissing">Hides the charge bar root when no module is present.</param>
         public void Update(in PlayerPowerUpSlotConfig slotConfig,
                            float currentEnergy,
                            float currentCharge,
@@ -376,10 +369,9 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Applies the missing-player state to the slot visuals.
-        /// hideEnergyBar: Hides the energy bar when the player is unavailable.
-        /// hideChargeBar: Hides the charge bar when the player is unavailable.
-        /// returns void.
         /// </summary>
+        /// <param name="hideEnergyBar">Hides the energy bar when the player is unavailable.</param>
+        /// <param name="hideChargeBar">Hides the charge bar when the player is unavailable.</param>
         public void HandleMissingPlayer(bool hideEnergyBar, bool hideChargeBar)
         {
             ApplyMissingIcon();
@@ -391,9 +383,8 @@ internal sealed class HUDPowerUpOverlaySection
         #region Update Helpers
         /// <summary>
         /// Updates the slot icon from the cached presentation runtime.
-        /// slotConfig: Active slot configuration currently bound to the player.
-        /// returns void.
         /// </summary>
+        /// <param name="slotConfig">Active slot configuration currently bound to the player.</param>
         private void UpdateIcon(in PlayerPowerUpSlotConfig slotConfig)
         {
             if (iconImage == null)
@@ -422,12 +413,11 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Updates the energy bar for the slot.
-        /// slotConfig: Active slot configuration currently bound to the player.
-        /// currentEnergy: Current slot energy value.
-        /// smoothingSeconds: Smoothing time applied to the displayed fill.
-        /// hideWhenModuleMissing: Hides the energy bar root when no module is present.
-        /// returns void.
         /// </summary>
+        /// <param name="slotConfig">Active slot configuration currently bound to the player.</param>
+        /// <param name="currentEnergy">Current slot energy value.</param>
+        /// <param name="smoothingSeconds">Smoothing time applied to the displayed fill.</param>
+        /// <param name="hideWhenModuleMissing">Hides the energy bar root when no module is present.</param>
         private void UpdateEnergyBar(in PlayerPowerUpSlotConfig slotConfig,
                                      float currentEnergy,
                                      float smoothingSeconds,
@@ -455,13 +445,12 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Updates the charge bar for the slot.
-        /// slotConfig: Active slot configuration currently bound to the player.
-        /// currentEnergy: Current slot energy value.
-        /// currentCharge: Current slot charge value.
-        /// smoothingSeconds: Smoothing time applied to the displayed fill.
-        /// hideWhenModuleMissing: Hides the charge bar root when no module is present.
-        /// returns void.
         /// </summary>
+        /// <param name="slotConfig">Active slot configuration currently bound to the player.</param>
+        /// <param name="currentEnergy">Current slot energy value.</param>
+        /// <param name="currentCharge">Current slot charge value.</param>
+        /// <param name="smoothingSeconds">Smoothing time applied to the displayed fill.</param>
+        /// <param name="hideWhenModuleMissing">Hides the charge bar root when no module is present.</param>
         private void UpdateChargeBar(in PlayerPowerUpSlotConfig slotConfig,
                                      float currentEnergy,
                                      float currentCharge,
@@ -498,7 +487,6 @@ internal sealed class HUDPowerUpOverlaySection
         /// <summary>
         /// Applies the hidden state used by startup-empty or not-yet-acquired slots.
         /// none.
-        /// returns void.
         /// </summary>
         private void ApplyUndefinedSlotVisualState()
         {
@@ -513,7 +501,6 @@ internal sealed class HUDPowerUpOverlaySection
         /// <summary>
         /// Applies the empty icon state when no power-up or runtime icon is available.
         /// none.
-        /// returns void.
         /// </summary>
         private void ApplyMissingIcon()
         {
@@ -526,9 +513,8 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Shows or hides the dedicated slot root when one explicit power-up is equipped.
-        /// isVisible: Target slot-root visibility.
-        /// returns void.
         /// </summary>
+        /// <param name="isVisible">Target slot-root visibility.</param>
         private void SetSlotVisible(bool isVisible)
         {
             if (slotRootObject == null)
@@ -542,10 +528,10 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Resolves the object used to toggle the entire slot UI.
-        /// iconImage: Optional icon image assigned to the slot.
-        /// explicitSlotRootObject: Explicit slot root serialized on the HUD manager.
-        /// returns Slot root object or null when no safe root can be inferred.
         /// </summary>
+        /// <param name="iconImage">Optional icon image assigned to the slot.</param>
+        /// <param name="explicitSlotRootObject">Explicit slot root serialized on the HUD manager.</param>
+        /// <returns>Slot root object or null when no safe root can be inferred.</returns>
         private static GameObject ResolveSlotRootObject(Image iconImage, GameObject explicitSlotRootObject)
         {
             if (explicitSlotRootObject != null)
@@ -576,7 +562,6 @@ internal sealed class HUDPowerUpOverlaySection
     /// <summary>
     /// Stores the visual references used by one HUD bar, including the fill image and its background root.
     /// none.
-    /// returns none.
     /// </summary>
     private readonly struct HUDPowerUpBarVisual
     {
@@ -601,9 +586,9 @@ internal sealed class HUDPowerUpOverlaySection
         #region Methods
         /// <summary>
         /// Creates one bar-visual descriptor from a fill image and its parent background object.
-        /// fillImage: Fill image bound in the HUD manager.
-        /// returns A bar-visual descriptor ready for updates.
         /// </summary>
+        /// <param name="fillImage">Fill image bound in the HUD manager.</param>
+        /// <returns>A bar-visual descriptor ready for updates.</returns>
         public static HUDPowerUpBarVisual Create(Image fillImage)
         {
             GameObject rootObject = null;
@@ -619,10 +604,10 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Creates one bar-visual descriptor.
-        /// fillImageValue: Fill image driven by runtime values.
-        /// rootObjectValue: Root object that contains the bar background and fill.
-        /// returns A fully initialized bar-visual descriptor.
         /// </summary>
+        /// <param name="fillImageValue">Fill image driven by runtime values.</param>
+        /// <param name="rootObjectValue">Root object that contains the bar background and fill.</param>
+        /// <returns>A fully initialized bar-visual descriptor.</returns>
         private HUDPowerUpBarVisual(Image fillImageValue, GameObject rootObjectValue)
         {
             FillImage = fillImageValue;
@@ -631,9 +616,8 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Applies one normalized fill value while keeping the full bar hierarchy visible.
-        /// normalizedValue: Normalized fill amount written into the fill image.
-        /// returns void.
         /// </summary>
+        /// <param name="normalizedValue">Normalized fill amount written into the fill image.</param>
         public void ApplyFill(float normalizedValue)
         {
             if (!HasVisual)
@@ -652,10 +636,9 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Applies the missing-data state to the bar.
-        /// displayedValue: Last displayed normalized value used when the bar remains visible.
-        /// hideWhenMissing: Hides the entire bar hierarchy when true.
-        /// returns void.
         /// </summary>
+        /// <param name="displayedValue">Last displayed normalized value used when the bar remains visible.</param>
+        /// <param name="hideWhenMissing">Hides the entire bar hierarchy when true.</param>
         public void HandleMissing(float displayedValue, bool hideWhenMissing)
         {
             if (!HasVisual)
@@ -672,10 +655,9 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Applies the missing-module state to the bar.
-        /// displayedValue: Last displayed normalized value used when the bar remains visible.
-        /// hideWhenMissing: Hides the entire bar hierarchy when true.
-        /// returns void.
         /// </summary>
+        /// <param name="displayedValue">Last displayed normalized value used when the bar remains visible.</param>
+        /// <param name="hideWhenMissing">Hides the entire bar hierarchy when true.</param>
         public void ApplyMissing(float displayedValue, bool hideWhenMissing)
         {
             HandleMissing(displayedValue, hideWhenMissing);
@@ -683,9 +665,8 @@ internal sealed class HUDPowerUpOverlaySection
 
         /// <summary>
         /// Shows or hides the full bar hierarchy only when a state change is required.
-        /// isVisible: Target active state for the bar root.
-        /// returns void.
         /// </summary>
+        /// <param name="isVisible">Target active state for the bar root.</param>
         private void SetRootVisible(bool isVisible)
         {
             if (RootObject != null)

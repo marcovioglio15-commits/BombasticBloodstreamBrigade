@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Resolves Add Scaling stat keys and runtime field rewrites for stacked projectile elements and per-element bullet behaviours.
-/// /params none.
-/// /returns none.
 /// </summary>
 public static class PlayerRuntimeScalingControllerElementFieldUtility
 {
@@ -20,11 +18,11 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
     #region Public Methods
     /// <summary>
     /// Resolves a shooting-related stacked-element stat key into the matching runtime controller field identifier.
-    /// /params statKey Normalized Add Scaling stat key.
-    /// /params fieldId Resolved field identifier when the key belongs to the stacked-element system.
-    /// /params slotIndex Resolved applied-element slot index when the key targets one slot entry.
-    /// /returns True when the key was resolved by this utility.
     /// </summary>
+    /// <param name="statKey">Normalized Add Scaling stat key.</param>
+    /// <param name="fieldId">Resolved field identifier when the key belongs to the stacked-element system.</param>
+    /// <param name="slotIndex">Resolved applied-element slot index when the key targets one slot entry.</param>
+    /// <returns>True when the key was resolved by this utility.</returns>
     public static bool TryMapFieldId(string statKey,
                                      out PlayerRuntimeControllerFieldId fieldId,
                                      out int slotIndex)
@@ -43,13 +41,13 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Applies one resolved runtime scaling value to the stacked-element shooting config fields.
-    /// /params fieldId Runtime field being updated.
-    /// /params slotIndex Resolved applied-element slot index for dynamic slot rewrites.
-    /// /params resolvedValue Final numeric value produced by formula evaluation.
-    /// /params runtimeShooting Mutable shooting config rebuilt this frame.
-    /// /params runtimeAppliedElements Mutable runtime applied-element slot buffer rebuilt this frame.
-    /// /returns True when this utility handled the field.
     /// </summary>
+    /// <param name="fieldId">Runtime field being updated.</param>
+    /// <param name="slotIndex">Resolved applied-element slot index for dynamic slot rewrites.</param>
+    /// <param name="resolvedValue">Final numeric value produced by formula evaluation.</param>
+    /// <param name="runtimeShooting">Mutable shooting config rebuilt this frame.</param>
+    /// <param name="runtimeAppliedElements">Mutable runtime applied-element slot buffer rebuilt this frame.</param>
+    /// <returns>True when this utility handled the field.</returns>
     public static bool TryApplyField(PlayerRuntimeControllerFieldId fieldId,
                                      int slotIndex,
                                      float resolvedValue,
@@ -95,11 +93,11 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Applies one resolved boolean scaling value to the stacked-element shooting config fields.
-    /// /params fieldId Runtime field being updated.
-    /// /params resolvedValue Final boolean value produced by formula evaluation.
-    /// /params runtimeShooting Mutable shooting config rebuilt this frame.
-    /// /returns True when this utility handled the field.
     /// </summary>
+    /// <param name="fieldId">Runtime field being updated.</param>
+    /// <param name="resolvedValue">Final boolean value produced by formula evaluation.</param>
+    /// <param name="runtimeShooting">Mutable shooting config rebuilt this frame.</param>
+    /// <returns>True when this utility handled the field.</returns>
     public static bool TryApplyBooleanField(PlayerRuntimeControllerFieldId fieldId,
                                             bool resolvedValue,
                                             ref PlayerRuntimeShootingConfig runtimeShooting)
@@ -143,10 +141,10 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
     #region Private Methods
     /// <summary>
     /// Resolves one applied-element array stat key into the corresponding fixed slot field.
-    /// /params statKey Normalized stat key.
-    /// /params fieldId Resolved field identifier.
-    /// /returns True when the stat key targets an applied-element slot.
     /// </summary>
+    /// <param name="statKey">Normalized stat key.</param>
+    /// <param name="fieldId">Resolved field identifier.</param>
+    /// <returns>True when the stat key targets an applied-element slot.</returns>
     private static bool TryMapAppliedElementSlotFieldId(string statKey,
                                                         out PlayerRuntimeControllerFieldId fieldId,
                                                         out int slotIndex)
@@ -176,10 +174,10 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Resolves one per-element behaviour stat key into the matching runtime field identifier.
-    /// /params statKey Normalized stat key.
-    /// /params fieldId Resolved field identifier.
-    /// /returns True when the stat key targets one per-element behaviour property.
     /// </summary>
+    /// <param name="statKey">Normalized stat key.</param>
+    /// <param name="fieldId">Resolved field identifier.</param>
+    /// <returns>True when the stat key targets one per-element behaviour property.</returns>
     private static bool TryMapElementBehaviourFieldId(string statKey, out PlayerRuntimeControllerFieldId fieldId)
     {
         fieldId = default;
@@ -207,11 +205,11 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Resolves a runtime field identifier into one element index and one property index inside the per-element behaviour ranges.
-    /// /params fieldId Runtime controller field identifier.
-    /// /params elementIndex Resolved supported element index.
-    /// /params propertyIndex Resolved per-element property index.
-    /// /returns True when the identifier belongs to one supported per-element behaviour range.
     /// </summary>
+    /// <param name="fieldId">Runtime controller field identifier.</param>
+    /// <param name="elementIndex">Resolved supported element index.</param>
+    /// <param name="propertyIndex">Resolved per-element property index.</param>
+    /// <returns>True when the identifier belongs to one supported per-element behaviour range.</returns>
     private static bool TryResolveElementFieldTarget(PlayerRuntimeControllerFieldId fieldId,
                                                      out int elementIndex,
                                                      out int propertyIndex)
@@ -238,10 +236,10 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Resolves the serialized element field name to the matching behaviour-range index.
-    /// /params elementKey Lowercase serialized element field name.
-    /// /params elementIndex Resolved element range index.
-    /// /returns True when the key belongs to one supported element block.
     /// </summary>
+    /// <param name="elementKey">Lowercase serialized element field name.</param>
+    /// <param name="elementIndex">Resolved element range index.</param>
+    /// <returns>True when the key belongs to one supported element block.</returns>
     private static bool TryResolveElementIndex(string elementKey, out int elementIndex)
     {
         switch (elementKey)
@@ -266,10 +264,10 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Resolves a serialized per-element property suffix to the matching property offset inside one behaviour range.
-    /// /params propertySuffix Serialized property suffix.
-    /// /params propertyOffset Resolved property offset inside the range.
-    /// /returns True when the suffix matches one supported property.
     /// </summary>
+    /// <param name="propertySuffix">Serialized property suffix.</param>
+    /// <param name="propertyOffset">Resolved property offset inside the range.</param>
+    /// <returns>True when the suffix matches one supported property.</returns>
     private static bool TryResolveElementPropertyOffset(string propertySuffix, out int propertyOffset)
     {
         switch (propertySuffix)
@@ -327,9 +325,9 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Resolves the first field identifier value used by one element behaviour range.
-    /// /params elementIndex Zero-based supported element index.
-    /// /returns First field value used by that element range.
     /// </summary>
+    /// <param name="elementIndex">Zero-based supported element index.</param>
+    /// <returns>First field value used by that element range.</returns>
     private static int ResolveElementFieldStartValue(int elementIndex)
     {
         switch (elementIndex)
@@ -347,11 +345,10 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
 
     /// <summary>
     /// Applies one resolved scaling value to one property inside a per-element behaviour block.
-    /// /params elementSettings Mutable per-element behaviour block.
-    /// /params propertyIndex Offset of the property inside the behaviour range.
-    /// /params resolvedValue Final numeric value produced by the scaling formula.
-    /// /returns void.
     /// </summary>
+    /// <param name="elementSettings">Mutable per-element behaviour block.</param>
+    /// <param name="propertyIndex">Offset of the property inside the behaviour range.</param>
+    /// <param name="resolvedValue">Final numeric value produced by the scaling formula.</param>
     private static void ApplyElementBehaviourProperty(ref ElementBulletSettingsBlob elementSettings,
                                                       int propertyIndex,
                                                       float resolvedValue)

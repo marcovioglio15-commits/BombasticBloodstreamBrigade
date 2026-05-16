@@ -4,8 +4,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Provides transition loading-progress calculations and status text assembly for the Scene Manager presentation bridge.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal static class GameSceneLoadingProgressRuntimeUtility
 {
@@ -14,10 +12,9 @@ internal static class GameSceneLoadingProgressRuntimeUtility
     #region State
     /// <summary>
     /// Applies hidden loading-progress state while preserving baked visual settings.
-    /// /params state Mutable loading-progress presentation state.
-    /// /params config Runtime scene manager config.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable loading-progress presentation state.</param>
+    /// <param name="config">Runtime scene manager config.</param>
     public static void Hide(ref GameSceneLoadingProgressPresentationState state, GameSceneManagerConfig config)
     {
         ApplySettings(ref state, config);
@@ -28,13 +25,12 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Applies active loading-progress state with an operation-specific status label.
-    /// /params state Mutable loading-progress presentation state.
-    /// /params config Runtime scene manager config.
-    /// /params progressNormalized Aggregate loading progress in the 0..1 range.
-    /// /params operationKind Current transition operation kind.
-    /// /params sceneDefinition Scene definition currently being processed.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable loading-progress presentation state.</param>
+    /// <param name="config">Runtime scene manager config.</param>
+    /// <param name="progressNormalized">Aggregate loading progress in the 0..1 range.</param>
+    /// <param name="operationKind">Current transition operation kind.</param>
+    /// <param name="sceneDefinition">Scene definition currently being processed.</param>
     public static void ApplyProgress(ref GameSceneLoadingProgressPresentationState state,
                                      GameSceneManagerConfig config,
                                      float progressNormalized,
@@ -56,10 +52,9 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Applies the final ready state used while optional black-screen hold time elapses.
-    /// /params state Mutable loading-progress presentation state.
-    /// /params config Runtime scene manager config.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable loading-progress presentation state.</param>
+    /// <param name="config">Runtime scene manager config.</param>
     public static void ApplyReady(ref GameSceneLoadingProgressPresentationState state, GameSceneManagerConfig config)
     {
         ApplySettings(ref state, config);
@@ -79,20 +74,20 @@ internal static class GameSceneLoadingProgressRuntimeUtility
     #region Progress
     /// <summary>
     /// Counts authored transition operations that contribute to the aggregate loading progress.
-    /// /params reloadActiveScene True when the source scene is unloaded before loading the replacement.
-    /// /params hasSourceScene True when a managed source scene definition is available.
-    /// /params sourceScene Source scene definition.
-    /// /params hasSourceCompanionScene True when a companion UI scene is attached to the source scene.
-    /// /params sourceCompanionScene Source companion UI scene definition.
-    /// /params sourceSceneId Runtime source scene ID.
-    /// /params targetSceneId Runtime target scene ID.
-    /// /params hasTargetCompanionScene True when the target scene has a companion UI scene.
-    /// /params targetCompanionScene Target companion UI scene definition.
-    /// /params persistentPlayerPreLoadUnloadScenes Persistent player scenes unloaded before target loading.
-    /// /params persistentPlayerLoadScenes Persistent player scenes loaded for the target.
-    /// /params persistentPlayerPostLoadUnloadScenes Persistent player scenes unloaded after target loading.
-    /// /returns Operation count used as the aggregate progress denominator.
     /// </summary>
+    /// <param name="reloadActiveScene">True when the source scene is unloaded before loading the replacement.</param>
+    /// <param name="hasSourceScene">True when a managed source scene definition is available.</param>
+    /// <param name="sourceScene">Source scene definition.</param>
+    /// <param name="hasSourceCompanionScene">True when a companion UI scene is attached to the source scene.</param>
+    /// <param name="sourceCompanionScene">Source companion UI scene definition.</param>
+    /// <param name="sourceSceneId">Runtime source scene ID.</param>
+    /// <param name="targetSceneId">Runtime target scene ID.</param>
+    /// <param name="hasTargetCompanionScene">True when the target scene has a companion UI scene.</param>
+    /// <param name="targetCompanionScene">Target companion UI scene definition.</param>
+    /// <param name="persistentPlayerPreLoadUnloadScenes">Persistent player scenes unloaded before target loading.</param>
+    /// <param name="persistentPlayerLoadScenes">Persistent player scenes loaded for the target.</param>
+    /// <param name="persistentPlayerPostLoadUnloadScenes">Persistent player scenes unloaded after target loading.</param>
+    /// <returns>Operation count used as the aggregate progress denominator.</returns>
     public static int CountTransitionSteps(bool reloadActiveScene,
                                            bool hasSourceScene,
                                            GameSceneDefinitionElement sourceScene,
@@ -144,11 +139,11 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Converts completed operation count plus the active Unity async operation into aggregate progress.
-    /// /params completedSteps Number of transition operations that have finished.
-    /// /params totalSteps Total operation denominator for the active transition.
-    /// /params activeOperation Current managed Unity async operation.
-    /// /returns Aggregate progress in the 0..1 range.
     /// </summary>
+    /// <param name="completedSteps">Number of transition operations that have finished.</param>
+    /// <param name="totalSteps">Total operation denominator for the active transition.</param>
+    /// <param name="activeOperation">Current managed Unity async operation.</param>
+    /// <returns>Aggregate progress in the 0..1 range.</returns>
     public static float ResolveAggregateProgress(int completedSteps, int totalSteps, GameSceneSceneOperationState activeOperation)
     {
         int safeTotalSteps = math.max(1, totalSteps);
@@ -158,10 +153,10 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Counts one unload step only when the scene can actually be unloaded by transition policy.
-    /// /params hasScene True when the scene definition is valid.
-    /// /params sceneDefinition Scene definition being inspected.
-    /// /returns One when the unload operation should be counted, otherwise zero.
     /// </summary>
+    /// <param name="hasScene">True when the scene definition is valid.</param>
+    /// <param name="sceneDefinition">Scene definition being inspected.</param>
+    /// <returns>One when the unload operation should be counted, otherwise zero.</returns>
     public static int CountUnloadStep(bool hasScene, GameSceneDefinitionElement sceneDefinition)
     {
         if (!hasScene)
@@ -174,10 +169,10 @@ internal static class GameSceneLoadingProgressRuntimeUtility
     #region Labels
     /// <summary>
     /// Resolves the best label for the current operation from Addressables key, scene name or scene ID.
-    /// /params config Runtime scene manager config.
-    /// /params sceneDefinition Scene definition being displayed.
-    /// /returns Stable human-readable loading label.
     /// </summary>
+    /// <param name="config">Runtime scene manager config.</param>
+    /// <param name="sceneDefinition">Scene definition being displayed.</param>
+    /// <returns>Stable human-readable loading label.</returns>
     public static string ResolveSceneLabel(GameSceneManagerConfig config, GameSceneDefinitionElement sceneDefinition)
     {
         if (config.LoadBackend == GameSceneLoadBackend.Addressables && sceneDefinition.AddressableKey.Length > 0)
@@ -196,10 +191,9 @@ internal static class GameSceneLoadingProgressRuntimeUtility
     #region Helpers
     /// <summary>
     /// Copies baked visual settings into the mutable presentation state.
-    /// /params state Mutable loading-progress presentation state.
-    /// /params config Runtime scene manager config.
-    /// /returns None.
     /// </summary>
+    /// <param name="state">Mutable loading-progress presentation state.</param>
+    /// <param name="config">Runtime scene manager config.</param>
     private static void ApplySettings(ref GameSceneLoadingProgressPresentationState state, GameSceneManagerConfig config)
     {
         state.SpinnerRotationDegreesPerSecond = config.LoadingProgressSpinnerRotationDegreesPerSecond;
@@ -215,11 +209,11 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Builds the current operation status text from the configured prefix and scene label.
-    /// /params config Runtime scene manager config.
-    /// /params operationKind Current transition operation kind.
-    /// /params sceneDefinition Scene definition currently being processed.
-    /// /returns Fixed-string status text for UI presentation.
     /// </summary>
+    /// <param name="config">Runtime scene manager config.</param>
+    /// <param name="operationKind">Current transition operation kind.</param>
+    /// <param name="sceneDefinition">Scene definition currently being processed.</param>
+    /// <returns>Fixed-string status text for UI presentation.</returns>
     private static FixedString128Bytes BuildStatusText(GameSceneManagerConfig config,
                                                        GameSceneLoadingProgressOperationKind operationKind,
                                                        GameSceneDefinitionElement sceneDefinition)
@@ -239,10 +233,10 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Combines one status prefix and one scene label without assuming a specific language order beyond prefix-before-label.
-    /// /params prefix Authored operation prefix.
-    /// /params sceneLabel Scene or Addressables label.
-    /// /returns Combined status text.
     /// </summary>
+    /// <param name="prefix">Authored operation prefix.</param>
+    /// <param name="sceneLabel">Scene or Addressables label.</param>
+    /// <returns>Combined status text.</returns>
     private static FixedString128Bytes BuildPrefixStatus(FixedString64Bytes prefix, string sceneLabel)
     {
         string prefixText = prefix.ToString();
@@ -255,9 +249,9 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
     /// <summary>
     /// Counts a nullable operation list without requiring callers to allocate defensive empty lists.
-    /// /params scenes Scene operation list.
-    /// /returns Scene count or zero when the list is missing.
     /// </summary>
+    /// <param name="scenes">Scene operation list.</param>
+    /// <returns>Scene count or zero when the list is missing.</returns>
     private static int CountList(List<GameSceneDefinitionElement> scenes)
     {
         if (scenes == null)
@@ -272,8 +266,6 @@ internal static class GameSceneLoadingProgressRuntimeUtility
 
 /// <summary>
 /// Identifies the status text mode used by loading-progress presentation.
-/// /params None.
-/// /returns None.
 /// </summary>
 internal enum GameSceneLoadingProgressOperationKind : byte
 {

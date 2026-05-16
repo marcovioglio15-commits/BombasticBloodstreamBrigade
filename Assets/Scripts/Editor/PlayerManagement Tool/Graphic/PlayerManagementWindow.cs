@@ -143,7 +143,7 @@ public sealed class PlayerManagementWindow : EditorWindow
     /// Creates toolbar with panel toggle, session actions, and status label.
     /// Called by BuildWindowLayout.
     /// </summary>
-    /// <returns>Returns configured toolbar visual element.<returns>
+    /// <returns>Returns configured toolbar visual element.</returns>
     private VisualElement BuildToolbar()
     {
         // Create toolbar root and the main panel toggle.
@@ -195,8 +195,6 @@ public sealed class PlayerManagementWindow : EditorWindow
     /// <summary>
     /// Opens the stable color browser for the current tool window.
     /// Called by the toolbar Colors button.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OpenColorBrowser()
     {
@@ -211,7 +209,7 @@ public sealed class PlayerManagementWindow : EditorWindow
     /// <param name="label">Displayed toggle label.</param>
     /// <param name="panelType">Panel activated when toggle becomes true.</param>
     /// <param name="isDefault">Initial toggle state.</param>
-    /// <returns>Returns configured toggle control.<returns>
+    /// <returns>Returns configured toggle control.</returns>
     private ToolbarToggle CreatePanelToggle(string label, PanelType panelType, bool isDefault)
     {
         // Bind toggle change to panel switching.
@@ -315,7 +313,7 @@ public sealed class PlayerManagementWindow : EditorWindow
     /// Takes in a panel enum value.
     /// </summary>
     /// <param name="panelType">Panel to map to label text.</param>
-    /// <returns>Returns the toolbar label string.<returns>
+    /// <returns>Returns the toolbar label string.</returns>
     private string GetPanelLabel(PanelType panelType)
     {
         if (panelType == PanelType.PlayerMasterPresets)

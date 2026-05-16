@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Drives the screen-space boss HUD from ECS boss health, transform and visual preset data.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class EnemyBossHudPresentation : MonoBehaviour
@@ -94,8 +92,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     #region Unity Methods
     /// <summary>
     /// Validates UI references and applies a safe initial hidden state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Awake()
     {
@@ -107,8 +103,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Releases runtime material instances created by the liquid boss bars.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDestroy()
     {
@@ -117,8 +111,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Keeps serialized settings safe after inspector edits.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnValidate()
     {
@@ -134,8 +126,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Updates the boss HUD from the cached ECS boss entity.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Update()
     {
@@ -166,9 +156,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     #region ECS
     /// <summary>
     /// Initializes or refreshes cached ECS world, entity manager and boss query references.
-    /// /params None.
-    /// /returns True when ECS bindings are ready.
     /// </summary>
+    /// <returns>True when ECS bindings are ready.</returns>
     private bool TryInitializeEcsBindings()
     {
         World currentWorld = World.DefaultGameObjectInjectionWorld;
@@ -208,8 +197,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Clears cached ECS references after the default world becomes unavailable.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ClearEcsBindings()
     {
@@ -223,10 +210,9 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     #region Presentation
     /// <summary>
     /// Synchronizes health, text, colors and offscreen indicator for the current boss aggregate.
-    /// /params bossSnapshot Aggregated active boss HUD snapshot.
-    /// /params deltaTime Unscaled frame delta used for smoothing.
-    /// /returns None.
     /// </summary>
+    /// <param name="bossSnapshot">Aggregated active boss HUD snapshot.</param>
+    /// <param name="deltaTime">Unscaled frame delta used for smoothing.</param>
     private void SyncBossHud(in EnemyBossHudSnapshot bossSnapshot, float deltaTime)
     {
         EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
@@ -253,9 +239,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies boss HUD configuration baked from the selected visual preset.
-    /// /params bossSnapshot Aggregated snapshot whose primary boss supplies labels, colors and managed sprite data.
-    /// /returns None.
     /// </summary>
+    /// <param name="bossSnapshot">Aggregated snapshot whose primary boss supplies labels, colors and managed sprite data.</param>
     private void SyncConfig(in EnemyBossHudSnapshot bossSnapshot)
     {
         EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
@@ -274,10 +259,9 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Updates the health and shield fill values from summed active boss ECS health data.
-    /// /params bossSnapshot Aggregated boss health and shield values.
-    /// /params deltaTime Unscaled frame delta used for smoothing.
-    /// /returns None.
     /// </summary>
+    /// <param name="bossSnapshot">Aggregated boss health and shield values.</param>
+    /// <param name="deltaTime">Unscaled frame delta used for smoothing.</param>
     private void SyncBars(in EnemyBossHudSnapshot bossSnapshot, float deltaTime)
     {
         float targetHealthNormalized = 0f;
@@ -314,8 +298,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies missing-boss visibility and resets cached boss state.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void HandleMissingBoss()
     {
@@ -334,8 +316,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     #region Helpers
     /// <summary>
     /// Resolves missing serialized references from child hierarchy.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateReferences()
     {
@@ -373,8 +353,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Ensures boss bar presentation settings exist on scenes authored before this HUD mirrored the player bars.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void EnsureBossBarPresentationSettings()
     {
@@ -387,8 +365,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Builds reusable liquid-bar runtimes once the prefab image bindings are available.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void EnsureBossBarVisualsInitialized()
     {
@@ -403,8 +379,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies the authored initial bar states before ECS data is available.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ApplyInitialBarVisualState()
     {
@@ -417,8 +391,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Releases runtime liquid materials created for boss health and shield bars.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void DisposeBossBarVisuals()
     {
@@ -431,9 +403,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies boss name text only when it changed.
-    /// /params bossName Boss name to display.
-    /// /returns None.
     /// </summary>
+    /// <param name="bossName">Boss name to display.</param>
     private void SyncBossName(string bossName)
     {
         if (bossNameText == null)
@@ -450,9 +421,9 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Resolves the label shown by the boss HUD, including a compact count suffix when multiple bosses contribute to the bars.
-    /// /params bossSnapshot Aggregated boss HUD snapshot.
-    /// /returns Display name for the active boss aggregate.
     /// </summary>
+    /// <param name="bossSnapshot">Aggregated boss HUD snapshot.</param>
+    /// <returns>Display name for the active boss aggregate.</returns>
     private static string ResolveBossDisplayName(in EnemyBossHudSnapshot bossSnapshot)
     {
         string primaryName = bossSnapshot.PrimaryConfig.DisplayName.ToString();
@@ -466,12 +437,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies one boss bar value through the liquid runtime when available, falling back to a direct fill amount.
-    /// /params barRuntime Optional liquid-bar runtime that drives shader and piston state.
-    /// /params fallbackFillImage Fill image used when the runtime has not been created yet.
-    /// /params displayedNormalizedValue Smoothed normalized value shown by the bar.
-    /// /params targetNormalizedValue Raw normalized target used for liquid delta motion.
-    /// /returns None.
     /// </summary>
+    /// <param name="barRuntime">Optional liquid-bar runtime that drives shader and piston state.</param>
+    /// <param name="fallbackFillImage">Fill image used when the runtime has not been created yet.</param>
+    /// <param name="displayedNormalizedValue">Smoothed normalized value shown by the bar.</param>
+    /// <param name="targetNormalizedValue">Raw normalized target used for liquid delta motion.</param>
     private void ApplyBarFill(HUDLiquidBarRuntime barRuntime,
                               Image fallbackFillImage,
                               float displayedNormalizedValue,
@@ -491,9 +461,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Toggles the boss HUD content without disabling the presenter host.
-    /// /params visible Desired visibility state.
-    /// /returns None.
     /// </summary>
+    /// <param name="visible">Desired visibility state.</param>
     private void ApplyVisibility(bool visible)
     {
         GameObject targetObject = ResolveVisibilityTarget();
@@ -515,9 +484,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Resolves the object that can be safely toggled without disabling this presenter.
-    /// /params None.
-    /// /returns Content GameObject to toggle, or null when no safe target exists.
     /// </summary>
+    /// <returns>Content GameObject to toggle, or null when no safe target exists.</returns>
     private GameObject ResolveVisibilityTarget()
     {
         if (visibilityRoot != null && visibilityRoot != gameObject)
@@ -530,9 +498,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Resolves the panel GameObject used as a fallback visibility target.
-    /// /params None.
-    /// /returns Panel GameObject, or null when the panel reference is unavailable.
     /// </summary>
+    /// <returns>Panel GameObject, or null when the panel reference is unavailable.</returns>
     private GameObject ResolvePanelVisibilityTarget()
     {
         if (panelRoot != null)
@@ -545,10 +512,10 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     /// <summary>
     /// Applies active state to one target while tolerating Unity Missing references from stale prefab overrides.
-    /// /params targetObject Candidate object to toggle.
-    /// /params visible Desired visibility state.
-    /// /returns True when a valid target was handled.
     /// </summary>
+    /// <param name="targetObject">Candidate object to toggle.</param>
+    /// <param name="visible">Desired visibility state.</param>
+    /// <returns>True when a valid target was handled.</returns>
     private bool TryApplyVisibilityToTarget(GameObject targetObject, bool visible)
     {
         if (targetObject == null)

@@ -17,12 +17,12 @@ internal sealed class PlayerFormulaSwitchNode : PlayerFormulaNode
     #region Constructors
     /// <summary>
     /// Creates one switch-style formula node.
-    /// /params conditionNodeValue Condition expression evaluated once and compared against each case expression.
-    /// /params caseNodesValue Ordered case expressions.
-    /// /params resultNodesValue Ordered result expressions paired with caseNodesValue.
-    /// /params fallbackNodeValue Optional fallback expression evaluated only when no case matches.
-    /// /returns Initialized node.
     /// </summary>
+    /// <param name="conditionNodeValue">Condition expression evaluated once and compared against each case expression.</param>
+    /// <param name="caseNodesValue">Ordered case expressions.</param>
+    /// <param name="resultNodesValue">Ordered result expressions paired with caseNodesValue.</param>
+    /// <param name="fallbackNodeValue">Optional fallback expression evaluated only when no case matches.</param>
+    /// <returns>Initialized node.</returns>
     public PlayerFormulaSwitchNode(PlayerFormulaNode conditionNodeValue,
                                    PlayerFormulaNode[] caseNodesValue,
                                    PlayerFormulaNode[] resultNodesValue,

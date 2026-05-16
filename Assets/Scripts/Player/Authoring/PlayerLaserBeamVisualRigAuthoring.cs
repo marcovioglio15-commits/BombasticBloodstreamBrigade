@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// Stores authored source and impact prefabs plus ribbon sampling defaults used by the Laser Beam presentation runtime.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
@@ -152,9 +150,9 @@ public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
     #region Public Methods
     /// <summary>
     /// Resolves the authored source particle prefab for one runtime cap-shape selector.
-    /// /params capShape Runtime cap-shape selector.
-    /// /returns Matching prefab when configured, otherwise null.
     /// </summary>
+    /// <param name="capShape">Runtime cap-shape selector.</param>
+    /// <returns>Matching prefab when configured, otherwise null.</returns>
     public GameObject ResolveSourcePrefab(LaserBeamCapShape capShape)
     {
         switch (capShape)
@@ -170,9 +168,9 @@ public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
 
     /// <summary>
     /// Resolves the authored impact particle prefab for one runtime cap-shape selector.
-    /// /params capShape Runtime cap-shape selector.
-    /// /returns Matching prefab when configured, otherwise null.
     /// </summary>
+    /// <param name="capShape">Runtime cap-shape selector.</param>
+    /// <returns>Matching prefab when configured, otherwise null.</returns>
     public GameObject ResolveImpactPrefab(LaserBeamCapShape capShape)
     {
         switch (capShape)
@@ -190,8 +188,6 @@ public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
     #region Private Methods
     /// <summary>
     /// Emits editor-time warnings for missing prefab variants and invalid ribbon settings.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateAssignments()
     {
@@ -214,10 +210,9 @@ public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
 
     /// <summary>
     /// Emits one warning when an authored prefab slot is empty.
-    /// /params prefab Assigned prefab to validate.
-    /// /params label Human-readable slot description.
-    /// /returns None.
     /// </summary>
+    /// <param name="prefab">Assigned prefab to validate.</param>
+    /// <param name="label">Human-readable slot description.</param>
     private void ValidatePrefabReference(GameObject prefab, string label)
     {
         if (prefab != null)

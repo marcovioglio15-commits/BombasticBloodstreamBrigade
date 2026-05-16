@@ -17,7 +17,7 @@ internal static class PlayerControllerPresetsPanelFieldUtility
     /// <param name="valuesProperty">Serialized values block to inspect.</param>
     /// <param name="scalingRulesProperty">Scaling rules serialized property used by scaling-aware fields.</param>
     /// <param name="fieldNames">Relative child field names to render.</param>
-    /// <returns>Returns the configured values foldout.<returns>
+    /// <returns>Returns the configured values foldout.</returns>
     public static Foldout BuildValuesFoldout(SerializedProperty valuesProperty, SerializedProperty scalingRulesProperty, string[] fieldNames)
     {
         Foldout foldout = new Foldout();
@@ -84,7 +84,7 @@ internal static class PlayerControllerPresetsPanelFieldUtility
     /// <param name="presetSerializedObject">Serialized preset object owning the action id property.</param>
     /// <param name="actionIdProperty">Serialized string property containing the action identifier.</param>
     /// <param name="mode">Selection mode used by the input action selector.</param>
-    /// <returns>Returns the configured bindings foldout.<returns>
+    /// <returns>Returns the configured bindings foldout.</returns>
     public static Foldout BuildBindingsFoldout(InputActionAsset inputAsset,
                                                SerializedObject presetSerializedObject,
                                                SerializedProperty actionIdProperty,
@@ -101,7 +101,7 @@ internal static class PlayerControllerPresetsPanelFieldUtility
     /// Creates a zoom slider that updates the provided pie chart element.
     /// </summary>
     /// <param name="pieChart">Pie chart whose zoom value is controlled by the slider.</param>
-    /// <returns>Returns the configured slider.<returns>
+    /// <returns>Returns the configured slider.</returns>
     public static Slider CreatePieZoomSlider(PieChartElement pieChart)
     {
         Slider slider = new Slider("Pie Zoom", 0.6f, 1.6f);

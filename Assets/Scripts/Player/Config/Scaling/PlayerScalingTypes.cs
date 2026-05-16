@@ -112,7 +112,7 @@ public sealed class PlayerScalableStatDefinition
     /// Sanitizes the scalable stat entry while preserving designer-authored values.
     /// </summary>
     /// <param name="fallbackName">Fallback name used when the current stat name is invalid.</param>
-    /// <returns>True when at least one field was modified during validation.<returns>
+    /// <returns>True when at least one field was modified during validation.</returns>
     public bool Validate(string fallbackName)
     {
         bool changed = false;
@@ -140,7 +140,7 @@ public sealed class PlayerScalableStatDefinition
     /// <summary>
     /// Resolves the typed runtime default value of this scalable stat.
     /// </summary>
-    /// <returns>Runtime-ready typed default value.<returns>
+    /// <returns>Runtime-ready typed default value.</returns>
     public PlayerFormulaValue ResolveRuntimeDefaultFormulaValue()
     {
         switch (statType)
@@ -164,7 +164,7 @@ public sealed class PlayerScalableStatDefinition
     /// <summary>
     /// Resolves the numeric projection of the default value for legacy numeric-only code paths.
     /// </summary>
-    /// <returns>Numeric default projection.<returns>
+    /// <returns>Numeric default projection.</returns>
     public float ResolveRuntimeDefaultValue()
     {
         PlayerFormulaValue defaultFormulaValue = ResolveRuntimeDefaultFormulaValue();
@@ -179,7 +179,7 @@ public sealed class PlayerScalableStatDefinition
     /// <param name="statNameValue">Formula variable name.</param>
     /// <param name="statTypeValue">Runtime scalable stat type.</param>
     /// <param name="defaultValueValue">Default numeric value.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void Configure(string statNameValue, PlayerScalableStatType statTypeValue, float defaultValueValue)
     {
         Configure(statNameValue,
@@ -197,7 +197,7 @@ public sealed class PlayerScalableStatDefinition
     /// <param name="defaultValueValue">Default numeric value.</param>
     /// <param name="minimumValueValue">Minimum numeric clamp value.</param>
     /// <param name="maximumValueValue">Maximum numeric clamp value.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void Configure(string statNameValue,
                           PlayerScalableStatType statTypeValue,
                           float defaultValueValue,
@@ -218,7 +218,7 @@ public sealed class PlayerScalableStatDefinition
     /// </summary>
     /// <param name="statNameValue">Formula variable name.</param>
     /// <param name="defaultBooleanValueValue">Default boolean value.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void ConfigureBoolean(string statNameValue, bool defaultBooleanValueValue)
     {
         statName = statNameValue;
@@ -235,7 +235,7 @@ public sealed class PlayerScalableStatDefinition
     /// </summary>
     /// <param name="statNameValue">Formula variable name.</param>
     /// <param name="defaultTokenValueValue">Default token value.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void ConfigureToken(string statNameValue, string defaultTokenValueValue)
     {
         statName = statNameValue;
@@ -338,7 +338,7 @@ public sealed class PlayerStatScalingRule
     /// <summary>
     /// Returns the default debug color used by scaling rules.
     /// </summary>
-    /// <returns>Default opaque yellow debug color.<returns>
+    /// <returns>Default opaque yellow debug color.</returns>
     public static Color GetDefaultDebugColor()
     {
         return new Color(DebugColorDefaultRed,
@@ -352,7 +352,7 @@ public sealed class PlayerStatScalingRule
     /// <summary>
     /// Normalizes rule storage fields to avoid invalid serialized state.
     /// </summary>
-    /// <returns>True when at least one field was modified during validation.<returns>
+    /// <returns>True when at least one field was modified during validation.</returns>
     public bool Validate()
     {
         bool changed = false;
@@ -394,7 +394,7 @@ public sealed class PlayerStatScalingRule
     /// <param name="statKeyValue">Stable key of the target serialized property.</param>
     /// <param name="addScalingValue">Whether scaling is enabled.</param>
     /// <param name="formulaValue">Formula text evaluated when scaling is enabled.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void Configure(string statKeyValue, bool addScalingValue, string formulaValue)
     {
         Configure(statKeyValue, addScalingValue, formulaValue, false, GetDefaultDebugColor());
@@ -407,7 +407,7 @@ public sealed class PlayerStatScalingRule
     /// <param name="addScalingValue">Whether scaling is enabled.</param>
     /// <param name="formulaValue">Formula text evaluated when scaling is enabled.</param>
     /// <param name="debugInConsoleValue">Whether editor-only runtime logging is enabled.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void Configure(string statKeyValue, bool addScalingValue, string formulaValue, bool debugInConsoleValue)
     {
         Configure(statKeyValue, addScalingValue, formulaValue, debugInConsoleValue, GetDefaultDebugColor());
@@ -421,7 +421,7 @@ public sealed class PlayerStatScalingRule
     /// <param name="formulaValue">Formula text evaluated when scaling is enabled.</param>
     /// <param name="debugInConsoleValue">Whether editor-only runtime logging is enabled.</param>
     /// <param name="debugColorValue">Editor-only debug color used by this rule.</param>
-    /// <returns>Void.<returns>
+    /// <returns>Void.</returns>
     public void Configure(string statKeyValue,
                           bool addScalingValue,
                           string formulaValue,
@@ -441,7 +441,7 @@ public sealed class PlayerStatScalingRule
     /// Sanitizes debug color channels while preserving a visible alpha.
     /// </summary>
     /// <param name="sourceColor">Raw serialized color.</param>
-    /// <returns>Sanitized opaque color.<returns>
+    /// <returns>Sanitized opaque color.</returns>
     private static Color SanitizeDebugColor(Color sourceColor)
     {
         if (sourceColor.a <= 0.0001f)
@@ -458,7 +458,7 @@ public sealed class PlayerStatScalingRule
     /// </summary>
     /// <param name="leftColor">First color.</param>
     /// <param name="rightColor">Second color.</param>
-    /// <returns>True when the colors are approximately equal.<returns>
+    /// <returns>True when the colors are approximately equal.</returns>
     private static bool AreColorsApproximatelyEqual(Color leftColor, Color rightColor)
     {
         if (Mathf.Abs(leftColor.r - rightColor.r) > 0.0001f)
@@ -494,7 +494,7 @@ public static class PlayerScalableStatNameUtility
     /// </summary>
     /// <param name="inputName">Raw user-entered stat name.</param>
     /// <param name="fallbackName">Fallback name used when the input is invalid.</param>
-    /// <returns>Sanitized stat name that is never null or whitespace.<returns>
+    /// <returns>Sanitized stat name that is never null or whitespace.</returns>
     public static string Sanitize(string inputName, string fallbackName)
     {
         string trimmedName = string.IsNullOrWhiteSpace(inputName) ? string.Empty : inputName.Trim();
@@ -513,7 +513,7 @@ public static class PlayerScalableStatNameUtility
     /// Checks whether a scalable stat name satisfies allowed syntax and reserved-word restrictions.
     /// </summary>
     /// <param name="name">Candidate name to validate.</param>
-    /// <returns>True when the name is valid.<returns>
+    /// <returns>True when the name is valid.</returns>
     public static bool IsValid(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
@@ -545,7 +545,7 @@ public static class PlayerScalableStatNameUtility
     /// Ensures scalable stat names are unique using case-insensitive comparison.
     /// </summary>
     /// <param name="definitions">Definitions to inspect.</param>
-    /// <returns>True when all names are unique.<returns>
+    /// <returns>True when all names are unique.</returns>
     public static bool AreUnique(IReadOnlyList<PlayerScalableStatDefinition> definitions)
     {
         if (definitions == null)
@@ -583,7 +583,7 @@ public static class PlayerScalableStatTypeUtility
     /// Converts one scalable stat type to the matching formula value type.
     /// </summary>
     /// <param name="statType">Scalable stat type.</param>
-    /// <returns>Matching formula value type.<returns>
+    /// <returns>Matching formula value type.</returns>
     public static PlayerFormulaValueType ToFormulaValueType(PlayerScalableStatType statType)
     {
         switch (statType)
@@ -606,7 +606,7 @@ public static class PlayerScalableStatTypeUtility
     /// </summary>
     /// <param name="statType">Source scalable stat type.</param>
     /// <param name="value">Typed source value.</param>
-    /// <returns>Numeric projection used by legacy numeric-only systems.<returns>
+    /// <returns>Numeric projection used by legacy numeric-only systems.</returns>
     public static float ResolveNumericProjection(PlayerScalableStatType statType, PlayerFormulaValue value)
     {
         switch (statType)
@@ -628,7 +628,7 @@ public static class PlayerScalableStatTypeUtility
     /// Builds the compact editor-facing label used to describe one scalable-stat type in formula helpers.
     /// </summary>
     /// <param name="statType">Source scalable-stat type.</param>
-    /// <returns>Short human-readable type label.<returns>
+    /// <returns>Short human-readable type label.</returns>
     public static string BuildDisplayLabel(PlayerScalableStatType statType)
     {
         switch (statType)

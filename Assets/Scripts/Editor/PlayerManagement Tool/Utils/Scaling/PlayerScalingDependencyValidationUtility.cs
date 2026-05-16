@@ -16,7 +16,7 @@ public static class PlayerScalingDependencyValidationUtility
     /// </summary>
     /// <param name="scalableStatsProperty">Serialized scalable stats list used to resolve stat names.</param>
     /// <param name="scalingRulesProperty">Serialized scaling rules list used to read Add Scaling formulas.</param>
-    /// <returns>List of warning messages. Empty list when no dependency issues are found.<returns>
+    /// <returns>List of warning messages. Empty list when no dependency issues are found.</returns>
     public static List<string> BuildScalableStatsDependencyWarnings(SerializedProperty scalableStatsProperty,
                                                                     SerializedProperty scalingRulesProperty)
     {

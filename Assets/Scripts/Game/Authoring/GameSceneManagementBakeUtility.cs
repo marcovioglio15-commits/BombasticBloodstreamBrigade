@@ -4,8 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Converts GameSceneManagerPreset data into ECS singleton components and buffers.
-/// /params None.
-/// /returns None.
 /// </summary>
 public static class GameSceneManagementBakeUtility
 {
@@ -14,9 +12,9 @@ public static class GameSceneManagementBakeUtility
     #region Public Methods
     /// <summary>
     /// Builds the runtime scene manager singleton config from one preset.
-    /// /params preset Source scene manager preset.
-    /// /returns Runtime config component.
     /// </summary>
+    /// <param name="preset">Source scene manager preset.</param>
+    /// <returns>Runtime config component.</returns>
     public static GameSceneManagerConfig BuildConfig(GameSceneManagerPreset preset)
     {
         GameSceneFadeSettings fadeSettings = preset != null ? preset.FadeSettings : null;
@@ -65,9 +63,9 @@ public static class GameSceneManagementBakeUtility
 
     /// <summary>
     /// Builds the initial hidden loading-progress presentation state from baked config values.
-    /// /params config Runtime scene manager config.
-    /// /returns Hidden loading-progress presentation state.
     /// </summary>
+    /// <param name="config">Runtime scene manager config.</param>
+    /// <returns>Hidden loading-progress presentation state.</returns>
     public static GameSceneLoadingProgressPresentationState BuildLoadingProgressPresentationState(GameSceneManagerConfig config)
     {
         return new GameSceneLoadingProgressPresentationState
@@ -89,10 +87,9 @@ public static class GameSceneManagementBakeUtility
 
     /// <summary>
     /// Populates the scene definition buffer from one preset.
-    /// /params preset Source scene manager preset.
-    /// /params sceneBuffer Output scene definition buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source scene manager preset.</param>
+    /// <param name="sceneBuffer">Output scene definition buffer.</param>
     public static void PopulateSceneBuffer(GameSceneManagerPreset preset, DynamicBuffer<GameSceneDefinitionElement> sceneBuffer)
     {
         sceneBuffer.Clear();
@@ -125,10 +122,9 @@ public static class GameSceneManagementBakeUtility
 
     /// <summary>
     /// Populates the transition definition buffer from one preset.
-    /// /params preset Source scene manager preset.
-    /// /params transitionBuffer Output transition definition buffer.
-    /// /returns None.
     /// </summary>
+    /// <param name="preset">Source scene manager preset.</param>
+    /// <param name="transitionBuffer">Output transition definition buffer.</param>
     public static void PopulateTransitionBuffer(GameSceneManagerPreset preset, DynamicBuffer<GameSceneTransitionElement> transitionBuffer)
     {
         transitionBuffer.Clear();

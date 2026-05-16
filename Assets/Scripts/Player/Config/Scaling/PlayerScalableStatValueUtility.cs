@@ -18,7 +18,7 @@ public static class PlayerScalableStatValueUtility
     /// Resolves the typed default value stored in one baked scalable-stat blob.
     /// </summary>
     /// <param name="scalableStat">Baked scalable-stat blob.</param>
-    /// <returns>Typed default value ready for runtime initialization.<returns>
+    /// <returns>Typed default value ready for runtime initialization.</returns>
     public static PlayerFormulaValue ResolveDefaultValue(ref PlayerScalableStatBlob scalableStat)
     {
         PlayerScalableStatType statType = (PlayerScalableStatType)scalableStat.Type;
@@ -39,7 +39,7 @@ public static class PlayerScalableStatValueUtility
     /// Resolves the current typed runtime value stored inside one scalable-stat buffer element.
     /// </summary>
     /// <param name="scalableStat">Runtime scalable-stat buffer element.</param>
-    /// <returns>Typed runtime value exposed to the formula engine.<returns>
+    /// <returns>Typed runtime value exposed to the formula engine.</returns>
     public static PlayerFormulaValue ResolveRuntimeValue(in PlayerScalableStatElement scalableStat)
     {
         PlayerScalableStatType statType = (PlayerScalableStatType)scalableStat.Type;
@@ -62,7 +62,7 @@ public static class PlayerScalableStatValueUtility
     /// <param name="scalableStat">Mutable runtime scalable-stat buffer element.</param>
     /// <param name="value">Typed formula result to persist.</param>
     /// <param name="errorMessage">Failure reason when the value type is not compatible.</param>
-    /// <returns>True when the value is successfully written.<returns>
+    /// <returns>True when the value is successfully written.</returns>
     public static bool TryWriteRuntimeValue(ref PlayerScalableStatElement scalableStat,
                                             PlayerFormulaValue value,
                                             out string errorMessage)
@@ -132,7 +132,7 @@ public static class PlayerScalableStatValueUtility
     /// </summary>
     /// <param name="scalableStat">Runtime scalable-stat buffer element.</param>
     /// <param name="value">Comparison value.</param>
-    /// <returns>True when both values are logically equivalent.<returns>
+    /// <returns>True when both values are logically equivalent.</returns>
     public static bool HasSameRuntimeValue(in PlayerScalableStatElement scalableStat, PlayerFormulaValue value)
     {
         PlayerFormulaValue currentValue = ResolveRuntimeValue(in scalableStat);
@@ -147,7 +147,7 @@ public static class PlayerScalableStatValueUtility
     /// <param name="tokenText">Managed token text.</param>
     /// <param name="fixedToken">Resolved fixed-size token value when conversion succeeds.</param>
     /// <param name="errorMessage">Failure reason when the token exceeds runtime storage capacity.</param>
-    /// <returns>True when conversion succeeds.<returns>
+    /// <returns>True when conversion succeeds.</returns>
     private static bool TryCreateFixedToken(string tokenText,
                                             out FixedString64Bytes fixedToken,
                                             out string errorMessage)

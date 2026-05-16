@@ -346,10 +346,10 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
     #region Helpers
     /// <summary>
     /// Resolves the experience reward multiplier attached to special enemies such as boss-spawned minions.
-    /// /params entityManager Entity manager used to read optional reward component.
-    /// /params enemyEntity Enemy entity being killed.
-    /// /returns Non-negative experience multiplier.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to read optional reward component.</param>
+    /// <param name="enemyEntity">Enemy entity being killed.</param>
+    /// <returns>Non-negative experience multiplier.</returns>
     private static float ResolveExperienceRewardMultiplier(EntityManager entityManager, Entity enemyEntity)
     {
         if (!entityManager.HasComponent<EnemyDropRewardMultiplier>(enemyEntity))

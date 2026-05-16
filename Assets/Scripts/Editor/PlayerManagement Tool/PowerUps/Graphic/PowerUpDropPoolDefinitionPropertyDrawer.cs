@@ -23,7 +23,7 @@ public sealed class PowerUpDropPoolDefinitionPropertyDrawer : PropertyDrawer
     /// Builds the UI Toolkit inspector for one drop-pool definition.
     /// </summary>
     /// <param name="property">Serialized drop-pool definition property.</param>
-    /// <returns>Root UI element used by the inspector.<returns>
+    /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         VisualElement root = new VisualElement();
@@ -88,7 +88,7 @@ public sealed class PowerUpDropPoolDefinitionPropertyDrawer : PropertyDrawer
     /// Sums all non-negative tier percentages configured inside the serialized drop-pool tier array.
     /// </summary>
     /// <param name="tierRollsProperty">Serialized tier-roll array belonging to the drop-pool definition.</param>
-    /// <returns>Total configured percentage for the current drop pool.<returns>
+    /// <returns>Total configured percentage for the current drop pool.</returns>
     private static float CalculateTierRollPercentageSum(SerializedProperty tierRollsProperty)
     {
         if (tierRollsProperty == null || !tierRollsProperty.isArray)
@@ -118,7 +118,7 @@ public sealed class PowerUpDropPoolDefinitionPropertyDrawer : PropertyDrawer
     /// Builds a warning message when the same Tier ID appears more than once inside one drop pool.
     /// </summary>
     /// <param name="tierRollsProperty">Serialized tier-roll array belonging to the drop-pool definition.</param>
-    /// <returns>Warning text when duplicates are detected; otherwise an empty string.<returns>
+    /// <returns>Warning text when duplicates are detected; otherwise an empty string.</returns>
     private static string BuildDuplicateTierWarning(SerializedProperty tierRollsProperty)
     {
         if (tierRollsProperty == null || !tierRollsProperty.isArray)
@@ -164,7 +164,7 @@ public sealed class PowerUpDropPoolDefinitionPropertyDrawer : PropertyDrawer
     /// Returns one trimmed string value from a serialized property when available.
     /// </summary>
     /// <param name="stringProperty">Serialized string property to normalize.</param>
-    /// <returns>Trimmed string value or an empty string when unavailable.<returns>
+    /// <returns>Trimmed string value or an empty string when unavailable.</returns>
     private static string ResolveNormalizedStringValue(SerializedProperty stringProperty)
     {
         if (stringProperty == null)

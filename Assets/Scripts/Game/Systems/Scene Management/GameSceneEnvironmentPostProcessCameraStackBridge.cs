@@ -4,8 +4,6 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Routes URP camera stacking so post-processing is applied only to the authored environment pass.
-/// /params None.
-/// /returns None.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Camera))]
@@ -81,8 +79,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Unity Methods
     /// <summary>
     /// Applies the environment/gameplay camera split and registers scene callbacks when requested.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnEnable()
     {
@@ -97,8 +93,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Removes transient stack wiring and unregisters scene callbacks before this bridge unloads.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDisable()
     {
@@ -114,8 +108,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Assigns the local camera as the default base camera when the component is first added.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void Reset()
     {
@@ -125,8 +117,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Draws selected-scene frustums for quick authoring verification.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void OnDrawGizmosSelected()
     {
@@ -143,10 +133,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Scene Events
     /// <summary>
     /// Re-applies the stack when Unity changes the active scene during managed scene transitions.
-    /// /params previousScene Scene that was active before the change.
-    /// /params nextScene Scene that became active.
-    /// /returns None.
     /// </summary>
+    /// <param name="previousScene">Scene that was active before the change.</param>
+    /// <param name="nextScene">Scene that became active.</param>
     private void HandleActiveSceneChanged(Scene previousScene, Scene nextScene)
     {
         ApplyCameraStack();
@@ -154,10 +143,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Re-applies the stack when an additive scene may have contributed extra overlay cameras.
-    /// /params loadedScene Scene loaded by Unity.
-    /// /params loadMode Mode used by Unity for the scene load.
-    /// /returns None.
     /// </summary>
+    /// <param name="loadedScene">Scene loaded by Unity.</param>
+    /// <param name="loadMode">Mode used by Unity for the scene load.</param>
     private void HandleSceneLoaded(Scene loadedScene, LoadSceneMode loadMode)
     {
         ApplyCameraStack();
@@ -167,8 +155,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Public Methods
     /// <summary>
     /// Applies the configured environment/gameplay split immediately.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     [ContextMenu("Apply Camera Stack Now")]
     public void ApplyCameraStack()
@@ -191,10 +177,10 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Camera Resolution
     /// <summary>
     /// Resolves the serialized base and gameplay cameras, falling back to the local camera and named child camera.
-    /// /params resolvedBaseCamera Base camera resolved for environment rendering.
-    /// /params resolvedGameplayCamera Overlay camera resolved for gameplay rendering.
-    /// /returns True when both cameras are valid and distinct.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Base camera resolved for environment rendering.</param>
+    /// <param name="resolvedGameplayCamera">Overlay camera resolved for gameplay rendering.</param>
+    /// <returns>True when both cameras are valid and distinct.</returns>
     private bool TryResolveCameras(out Camera resolvedBaseCamera, out Camera resolvedGameplayCamera)
     {
         resolvedBaseCamera = baseCamera != null ? baseCamera : GetComponent<Camera>();
@@ -223,9 +209,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Finds a child camera named for the gameplay overlay setup utility.
-    /// /params parentCamera Base camera whose direct children are searched.
-    /// /returns Child gameplay camera when available.
     /// </summary>
+    /// <param name="parentCamera">Base camera whose direct children are searched.</param>
+    /// <returns>Child gameplay camera when available.</returns>
     private static Camera ResolveChildGameplayCamera(Camera parentCamera)
     {
         if (parentCamera == null)
@@ -248,12 +234,12 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Resolves URP camera data components and reports invalid stack configuration early.
-    /// /params resolvedBaseCamera Base camera being configured.
-    /// /params resolvedGameplayCamera Gameplay overlay camera being configured.
-    /// /params baseCameraData URP data for the base camera when available.
-    /// /params gameplayCameraData URP data for the gameplay overlay camera when available.
-    /// /returns True when both cameras can participate in URP camera stacking.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Base camera being configured.</param>
+    /// <param name="resolvedGameplayCamera">Gameplay overlay camera being configured.</param>
+    /// <param name="baseCameraData">URP data for the base camera when available.</param>
+    /// <param name="gameplayCameraData">URP data for the gameplay overlay camera when available.</param>
+    /// <returns>True when both cameras can participate in URP camera stacking.</returns>
     private bool TryResolveCameraData(Camera resolvedBaseCamera,
                                       Camera resolvedGameplayCamera,
                                       out UniversalAdditionalCameraData baseCameraData,
@@ -281,10 +267,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Camera Configuration
     /// <summary>
     /// Configures the base camera as the post-processed environment-only render pass.
-    /// /params resolvedBaseCamera Camera that owns the URP stack.
-    /// /params baseCameraData URP data paired with the base camera.
-    /// /returns None.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Camera that owns the URP stack.</param>
+    /// <param name="baseCameraData">URP data paired with the base camera.</param>
     private void ConfigureBaseCamera(Camera resolvedBaseCamera, UniversalAdditionalCameraData baseCameraData)
     {
         baseCameraData.renderType = CameraRenderType.Base;
@@ -296,11 +281,10 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Configures the overlay camera to render gameplay layers after the environment post-process pass.
-    /// /params resolvedBaseCamera Base camera whose projection settings are mirrored.
-    /// /params resolvedGameplayCamera Gameplay overlay camera being configured.
-    /// /params gameplayCameraData URP data paired with the gameplay overlay camera.
-    /// /returns None.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Base camera whose projection settings are mirrored.</param>
+    /// <param name="resolvedGameplayCamera">Gameplay overlay camera being configured.</param>
+    /// <param name="gameplayCameraData">URP data paired with the gameplay overlay camera.</param>
     private void ConfigureGameplayCamera(Camera resolvedBaseCamera,
                                          Camera resolvedGameplayCamera,
                                          UniversalAdditionalCameraData gameplayCameraData)
@@ -322,10 +306,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Copies static projection and clipping values from the base camera to the gameplay overlay camera.
-    /// /params resolvedBaseCamera Source camera.
-    /// /params resolvedGameplayCamera Destination overlay camera.
-    /// /returns None.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Source camera.</param>
+    /// <param name="resolvedGameplayCamera">Destination overlay camera.</param>
     private static void MirrorCameraProjection(Camera resolvedBaseCamera, Camera resolvedGameplayCamera)
     {
         resolvedGameplayCamera.nearClipPlane = resolvedBaseCamera.nearClipPlane;
@@ -340,9 +323,8 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Resolves the gameplay overlay mask from the chosen routing mode.
-    /// /params None.
-    /// /returns Culling mask assigned to the gameplay overlay camera.
     /// </summary>
+    /// <returns>Culling mask assigned to the gameplay overlay camera.</returns>
     private int ResolveGameplayCullingMask()
     {
         if (deriveGameplayCullingMask)
@@ -355,10 +337,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Stack Management
     /// <summary>
     /// Inserts the gameplay overlay camera at the start of the base camera stack while preserving other overlays.
-    /// /params baseCameraData URP data whose camera stack is edited.
-    /// /params resolvedGameplayCamera Gameplay overlay camera that must render before UI overlays.
-    /// /returns None.
     /// </summary>
+    /// <param name="baseCameraData">URP data whose camera stack is edited.</param>
+    /// <param name="resolvedGameplayCamera">Gameplay overlay camera that must render before UI overlays.</param>
     private static void InsertGameplayCamera(UniversalAdditionalCameraData baseCameraData, Camera resolvedGameplayCamera)
     {
         GameSceneUrpCameraStackUtility.InsertOverlayCamera(baseCameraData, resolvedGameplayCamera, 0);
@@ -366,8 +347,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Removes the last configured gameplay overlay camera from the last configured base stack.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void RemoveGameplayCameraFromStack()
     {
@@ -383,8 +362,6 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Validation
     /// <summary>
     /// Reports environment mask issues without mutating serialized values.
-    /// /params None.
-    /// /returns None.
     /// </summary>
     private void ValidateEnvironmentMask()
     {
@@ -394,9 +371,8 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Reports gameplay mask issues without mutating serialized values.
-    /// /params gameplayMask Final gameplay overlay mask.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayMask">Final gameplay overlay mask.</param>
     private void ValidateGameplayMask(int gameplayMask)
     {
         if (gameplayMask == 0)
@@ -411,9 +387,8 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Reports explicit gameplay mask overlap with environment layers.
-    /// /params gameplayMask Explicit gameplay overlay mask.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayMask">Explicit gameplay overlay mask.</param>
     private void ValidateExplicitGameplayMask(int gameplayMask)
     {
         if (GameSceneCameraLayerUtility.HasLayerOverlap(gameplayMask, environmentCullingMask.value))
@@ -422,10 +397,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Reports overlay parenting problems that would desynchronize camera follow without a per-frame sync.
-    /// /params resolvedBaseCamera Base camera expected to own the gameplay overlay transform.
-    /// /params resolvedGameplayCamera Gameplay overlay camera being inspected.
-    /// /returns None.
     /// </summary>
+    /// <param name="resolvedBaseCamera">Base camera expected to own the gameplay overlay transform.</param>
+    /// <param name="resolvedGameplayCamera">Gameplay overlay camera being inspected.</param>
     private void ValidateGameplayCameraParent(Camera resolvedBaseCamera, Camera resolvedGameplayCamera)
     {
         if (resolvedGameplayCamera.transform.parent == resolvedBaseCamera.transform)
@@ -436,9 +410,8 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Reports overlay depth-clear mismatches without using runtime reflection against URP internals.
-    /// /params gameplayCameraData URP data paired with the gameplay overlay camera.
-    /// /returns None.
     /// </summary>
+    /// <param name="gameplayCameraData">URP data paired with the gameplay overlay camera.</param>
     private void ValidateGameplayDepthMode(UniversalAdditionalCameraData gameplayCameraData)
     {
         if (preserveEnvironmentDepth && gameplayCameraData.clearDepth)
@@ -455,10 +428,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     #region Gizmos
     /// <summary>
     /// Draws one camera frustum in the Scene view when a camera is assigned.
-    /// /params camera Camera whose frustum should be drawn.
-    /// /params color Gizmo color used for the frustum.
-    /// /returns None.
     /// </summary>
+    /// <param name="camera">Camera whose frustum should be drawn.</param>
+    /// <param name="color">Gizmo color used for the frustum.</param>
     private void DrawCameraFrustum(Camera camera, Color color)
     {
         if (camera == null)
@@ -478,9 +450,8 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Draws an orthographic camera volume using the same capped depth as perspective frustums.
-    /// /params camera Orthographic camera being drawn.
-    /// /returns None.
     /// </summary>
+    /// <param name="camera">Orthographic camera being drawn.</param>
     private void DrawOrthographicGizmo(Camera camera)
     {
         float height = camera.orthographicSize * 2f;
@@ -490,9 +461,9 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
     /// <summary>
     /// Resolves the capped far clip used for scene debug gizmos.
-    /// /params camera Camera whose clipping distance is considered.
-    /// /returns Positive far clip distance for gizmo rendering.
     /// </summary>
+    /// <param name="camera">Camera whose clipping distance is considered.</param>
+    /// <returns>Positive far clip distance for gizmo rendering.</returns>
     private float ResolveGizmoFarClip(Camera camera)
     {
         float configuredFarClip = Mathf.Max(MinimumGizmoFarClip, debugGizmoFarClip);

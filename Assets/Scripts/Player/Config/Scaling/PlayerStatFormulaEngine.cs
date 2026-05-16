@@ -19,7 +19,7 @@ public static class PlayerStatFormulaEngine
     /// </summary>
     /// <param name="formula">Formula string using [variables], operators, parentheses and log().</param>
     /// <param name="requireAtLeastOneVariable">When true, formulas with no variable tokens are rejected.</param>
-    /// <returns>Compilation result containing either a compiled formula or an error.<returns>
+    /// <returns>Compilation result containing either a compiled formula or an error.</returns>
     public static PlayerStatFormulaCompileResult Compile(string formula, bool requireAtLeastOneVariable)
     {
         string normalizedFormula = string.IsNullOrWhiteSpace(formula) ? string.Empty : formula.Trim();
@@ -41,7 +41,7 @@ public static class PlayerStatFormulaEngine
     /// <param name="variableValues">Typed variable dictionary for named scalable stats.</param>
     /// <param name="result">Computed typed result when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded, otherwise false.<returns>
+    /// <returns>True when evaluation succeeded, otherwise false.</returns>
     public static bool TryEvaluate(string formula,
                                    PlayerFormulaValue thisValue,
                                    IReadOnlyDictionary<string, PlayerFormulaValue> variableValues,
@@ -69,7 +69,7 @@ public static class PlayerStatFormulaEngine
     /// <param name="variableValues">Typed variable dictionary for named scalable stats.</param>
     /// <param name="result">Computed numeric result when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded, otherwise false.<returns>
+    /// <returns>True when evaluation succeeded, otherwise false.</returns>
     public static bool TryEvaluate(string formula,
                                    float thisValue,
                                    IReadOnlyDictionary<string, PlayerFormulaValue> variableValues,
@@ -97,7 +97,7 @@ public static class PlayerStatFormulaEngine
     /// <param name="variableValues">Legacy numeric variable dictionary.</param>
     /// <param name="result">Computed numeric result when evaluation succeeds.</param>
     /// <param name="errorMessage">Failure reason when evaluation fails.</param>
-    /// <returns>True when evaluation succeeded, otherwise false.<returns>
+    /// <returns>True when evaluation succeeded, otherwise false.</returns>
     public static bool TryEvaluate(string formula,
                                    float thisValue,
                                    IReadOnlyDictionary<string, float> variableValues,

@@ -16,7 +16,7 @@ internal static class EnemyAdvancedPatternPresetsPanelElementUtility
     /// </summary>
     /// <param name="panel">Owning panel that provides the content root.</param>
     /// <param name="sectionTitle">Header text for the section.</param>
-    /// <returns>Returns the created section container, or null when the panel is not ready.<returns>
+    /// <returns>Returns the created section container, or null when the panel is not ready.</returns>
     public static VisualElement CreateDetailsSectionContainer(EnemyAdvancedPatternPresetsPanel panel, string sectionTitle)
     {
         if (panel == null)
@@ -76,7 +76,6 @@ internal static class EnemyAdvancedPatternPresetsPanelElementUtility
     /// </summary>
     /// <param name="panel">Owning panel that should rebuild its active details section.</param>
     /// <param name="parent">Section container that owns the tracker lifetime.</param>
-    /// <returns>None.<returns>
     public static void AddReactiveDetailsRefreshTracker(EnemyAdvancedPatternPresetsPanel panel, VisualElement parent)
     {
         if (panel == null)

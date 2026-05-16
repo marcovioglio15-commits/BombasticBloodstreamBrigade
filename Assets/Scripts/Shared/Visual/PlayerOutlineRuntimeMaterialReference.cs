@@ -2,8 +2,6 @@ using UnityEngine;
 
 /// <summary>
 /// References the material used by the player outline RenderObjects feature so gameplay and editor tools can drive it from presets.
-/// /params None.
-/// /returns None.
 /// </summary>
 [CreateAssetMenu(fileName = "PlayerOutlineRuntimeMaterialReference", menuName = "Visual/Player Outline Runtime Material Reference")]
 public sealed class PlayerOutlineRuntimeMaterialReference : ScriptableObject
@@ -34,9 +32,8 @@ public sealed class PlayerOutlineRuntimeMaterialReference : ScriptableObject
     #region Editor Methods
     /// <summary>
     /// Assigns the runtime outline material reference used by the editor/runtime sync utility.
-    /// /params materialValue Material referenced by the player outline pipeline.
-    /// /returns None.
     /// </summary>
+    /// <param name="materialValue">Material referenced by the player outline pipeline.</param>
     public void SetOutlineMaterial(Material materialValue)
     {
         outlineMaterial = materialValue;

@@ -16,7 +16,7 @@ public static class PlayerScalingSerializedPropertyUtility
     /// <param name="property">Serialized property being scaled.</param>
     /// <param name="thisValue">Typed value bound to the reserved [this] token.</param>
     /// <param name="isIntegerLike">True when numeric outputs should be rounded before assignment.</param>
-    /// <returns>True when the property type is supported.<returns>
+    /// <returns>True when the property type is supported.</returns>
     public static bool TryReadFormulaInput(SerializedProperty property,
                                            out PlayerFormulaValue thisValue,
                                            out bool isIntegerLike)
@@ -58,7 +58,7 @@ public static class PlayerScalingSerializedPropertyUtility
     /// <param name="result">Typed result produced by the formula engine.</param>
     /// <param name="changed">True when the serialized value changed.</param>
     /// <param name="errorMessage">Failure reason when the value type is incompatible.</param>
-    /// <returns>True when the value was applied or already matched the target property.<returns>
+    /// <returns>True when the value was applied or already matched the target property.</returns>
     public static bool TryApplyFormulaResult(SerializedProperty property,
                                              PlayerFormulaValue result,
                                              out bool changed,
