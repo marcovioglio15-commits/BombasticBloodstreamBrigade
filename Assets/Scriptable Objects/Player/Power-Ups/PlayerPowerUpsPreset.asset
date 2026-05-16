@@ -8443,8 +8443,8 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 30
-          activationCost: 30
+          maximumEnergy: 100
+          activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
           maintenanceTicksPerSecond: 4
@@ -8610,11 +8610,11 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    - bindingId: c211a8799ab443deb5600f602185ff66
+    - bindingId: ddd4f62701154fc4bc5b1451cdc07b85
       moduleId: Module_SpawnObject
       stage: 4
       isEnabled: 1
-      useOverridePayload: 0
+      useOverridePayload: 1
       overridePayload:
         holdCharge:
           requiredCharge: 500
@@ -8697,15 +8697,15 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 100
-          activationCost: 100
+          maximumEnergy: 30
+          activationCost: 30
           maintenanceCostPerSecond: 0
           isToggleable: 0
           maintenanceTicksPerSecond: 4
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 100
-          cooldownSeconds: 1
+          minimumActivationEnergyPercent: 100
+          chargeType: 1
+          chargePerTrigger: 1
+          cooldownSeconds: 5
           allowRechargeDuringToggleStartupLock: 0
         suppressShooting:
           suppressBaseShootingWhileActive: 1
@@ -8718,22 +8718,22 @@ MonoBehaviour:
         characterTuning:
           formulas: []
         bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 1.2}
+          bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
+          spawnOffset: {x: 0, y: 0, z: -1.2}
           spawnOffsetOrientation: 0
-          deploySpeed: 4.5
+          deploySpeed: 1.5
           collisionRadius: 0.18
           bounceOnWalls: 1
           bounceDamping: 0.65
           linearDampingPerSecond: 1.2
-          fuseSeconds: 1.25
-          radius: 7
+          fuseSeconds: 1.5
+          radius: 25
           enableDamagePayload: 1
           damage: 120
           affectAllEnemiesInRadius: 1
-          explosionVfxPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
           scaleVfxToRadius: 1
-          vfxScaleMultiplier: 1
+          vfxScaleMultiplier: 5
         dash:
           distance: 6
           directionMode: 0
@@ -9510,9 +9510,9 @@ MonoBehaviour:
           scaleVfxToRadius: 1
           vfxScaleMultiplier: 1
         dash:
-          distance: 3
-          directionMode: 2
-          duration: 0.1
+          distance: 4
+          directionMode: 0
+          duration: 0.15
           speedTransitionInSeconds: 0.01
           speedTransitionOutSeconds: 0.01
           wallBounceIntensity: 0.12
@@ -19244,7 +19244,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveGigaBomb
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:
