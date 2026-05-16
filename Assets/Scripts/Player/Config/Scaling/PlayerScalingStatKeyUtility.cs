@@ -17,6 +17,7 @@ public static class PlayerScalingStatKeyUtility
         "bindingId",
         "presetId",
         "statName",
+        "scheduleId",
         "phaseID",
         "rankId",
         "passivePowerUpId"
@@ -34,7 +35,6 @@ public static class PlayerScalingStatKeyUtility
     #endregion
 
     #region Methods
-
     #region Public Methods
     /// <summary>
     /// Builds a normalized stat key for a serialized property supported by Add Scaling.
@@ -64,13 +64,11 @@ public static class PlayerScalingStatKeyUtility
                                                 out SerializedProperty property)
     {
         property = null;
-
         if (serializedObject == null)
             return false;
 
         if (string.IsNullOrWhiteSpace(statKey))
             return false;
-
         string resolvedStatKey = ApplyKnownAliases(statKey);
         SerializedProperty directProperty = serializedObject.FindProperty(resolvedStatKey);
 
@@ -167,7 +165,7 @@ public static class PlayerScalingStatKeyUtility
                 SerializedProperty arrayElementProperty = serializedObject.FindProperty(elementPath);
                 string stableToken = ResolveStableArrayElementToken(arrayElementProperty);
 
-                if (string.IsNullOrWhiteSpace(stableToken) == false)
+                if (!string.IsNullOrWhiteSpace(stableToken))
                 {
                     string resolvedDataSegment = BuildStableDataSegmentWithFallbackIndex(dataSegment, stableToken);
                     ReplaceLastArrayToken(outputBuilder, resolvedDataSegment);
@@ -268,30 +266,27 @@ public static class PlayerScalingStatKeyUtility
                                                       out SerializedProperty property)
     {
         property = null;
-
         if (serializedObject == null)
             return false;
 
         if (string.IsNullOrWhiteSpace(statKey))
             return false;
-
         SerializedProperty iterator = serializedObject.GetIterator();
 
         if (iterator == null)
             return false;
-
         bool enterChildren = true;
 
         while (iterator.Next(enterChildren))
         {
             enterChildren = true;
 
-            if (IsScalingSupportedProperty(iterator) == false)
+            if (!IsScalingSupportedProperty(iterator))
                 continue;
 
             string iteratorKey = BuildStatKey(iterator);
 
-            if (string.Equals(iteratorKey, statKey, StringComparison.OrdinalIgnoreCase) == false)
+            if (!string.Equals(iteratorKey, statKey, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             property = iterator.Copy();
@@ -306,13 +301,11 @@ public static class PlayerScalingStatKeyUtility
                                                        out SerializedProperty property)
     {
         property = null;
-
         if (serializedObject == null)
             return false;
 
         if (string.IsNullOrWhiteSpace(statKey))
             return false;
-
         string[] pathSegments = statKey.Split('.');
 
         if (pathSegments == null || pathSegments.Length == 0)
@@ -367,10 +360,10 @@ public static class PlayerScalingStatKeyUtility
             return true;
         }
 
-        if (TryParseStableArrayDataToken(dataSegment,
-                                         out int fallbackIndex,
-                                         out string idPropertyName,
-                                         out string idPropertyValue) == false)
+        if (!TryParseStableArrayDataToken(dataSegment,
+                                          out int fallbackIndex,
+                                          out string idPropertyName,
+                                          out string idPropertyValue))
             return false;
 
         string arrayPath = resolvedPathBuilder.ToString();
@@ -380,7 +373,7 @@ public static class PlayerScalingStatKeyUtility
 
         SerializedProperty arrayProperty = serializedObject.FindProperty(arrayPath);
 
-        if (arrayProperty == null || arrayProperty.isArray == false)
+        if (arrayProperty == null || !arrayProperty.isArray)
             return false;
 
         int resolvedIndex = FindArrayElementIndexByStableId(arrayProperty,
@@ -405,15 +398,15 @@ public static class PlayerScalingStatKeyUtility
     {
         index = -1;
 
-        if (dataSegment.StartsWith("data[", StringComparison.Ordinal) == false)
+        if (!dataSegment.StartsWith("data[", StringComparison.Ordinal))
             return false;
 
-        if (dataSegment.EndsWith("]", StringComparison.Ordinal) == false)
+        if (!dataSegment.EndsWith("]", StringComparison.Ordinal))
             return false;
 
         string indexText = dataSegment.Substring(5, dataSegment.Length - 6);
 
-        if (int.TryParse(indexText, out int parsedIndex) == false)
+        if (!int.TryParse(indexText, out int parsedIndex))
             return false;
 
         index = parsedIndex;
@@ -429,10 +422,10 @@ public static class PlayerScalingStatKeyUtility
         idPropertyName = string.Empty;
         idPropertyValue = string.Empty;
 
-        if (dataSegment.StartsWith("data[", StringComparison.Ordinal) == false)
+        if (!dataSegment.StartsWith("data[", StringComparison.Ordinal))
             return false;
 
-        if (dataSegment.EndsWith("]", StringComparison.Ordinal) == false)
+        if (!dataSegment.EndsWith("]", StringComparison.Ordinal))
             return false;
 
         string tokenContent = dataSegment.Substring(5, dataSegment.Length - 6);
@@ -472,7 +465,7 @@ public static class PlayerScalingStatKeyUtility
                                                        string idPropertyValue,
                                                        int preferredIndex)
     {
-        if (arrayProperty == null || arrayProperty.isArray == false)
+        if (arrayProperty == null || !arrayProperty.isArray)
             return -1;
 
         if (string.IsNullOrWhiteSpace(idPropertyName) || string.IsNullOrWhiteSpace(idPropertyValue))
@@ -579,7 +572,7 @@ public static class PlayerScalingStatKeyUtility
 
         if (idProperty.propertyType == SerializedPropertyType.Integer)
         {
-            if (int.TryParse(tokenValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedInteger) == false)
+            if (!int.TryParse(tokenValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedInteger))
                 return false;
 
             return idProperty.intValue == parsedInteger;
@@ -675,7 +668,7 @@ public static class PlayerScalingStatKeyUtility
         if (string.IsNullOrWhiteSpace(stableToken))
             return dataSegment;
 
-        if (TryParseNumericArrayDataToken(dataSegment, out int indexValue) == false)
+        if (!TryParseNumericArrayDataToken(dataSegment, out int indexValue))
             return string.Format("data[{0}]", stableToken);
 
         return string.Format(CultureInfo.InvariantCulture, "data[{0}|{1}]", indexValue, stableToken);

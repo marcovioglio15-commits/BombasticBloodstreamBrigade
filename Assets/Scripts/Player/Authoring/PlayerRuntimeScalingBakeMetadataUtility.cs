@@ -224,6 +224,58 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
         formula = ResolveFormula(sourcePreset, "powerUpContainerSettings.interactionLockDuration");
         return true;
     }
+
+    /// <summary>
+    /// Resolves raw schedule-step value scaling metadata from the source progression preset.
+    /// /params sourcePreset Unscaled source progression preset.
+    /// /params scheduleIndex Schedule index inside the preset.
+    /// /params stepIndex Step index inside the selected schedule sequence.
+    /// /params baseValue Raw schedule-step value stored on the source preset.
+    /// /params formula Enabled Add Scaling formula when present.
+    /// /returns True when metadata was resolved from the source preset; otherwise false.
+    /// </summary>
+    public static bool TryResolveScheduleStepValueScalingData(PlayerProgressionPreset sourcePreset,
+                                                              int scheduleIndex,
+                                                              int stepIndex,
+                                                              out float baseValue,
+                                                              out string formula)
+    {
+        baseValue = 0f;
+        formula = string.Empty;
+
+        if (sourcePreset == null || sourcePreset.Schedules == null)
+            return false;
+
+        if (scheduleIndex < 0 || scheduleIndex >= sourcePreset.Schedules.Count)
+            return false;
+
+        PlayerLevelUpScheduleDefinition schedule = sourcePreset.Schedules[scheduleIndex];
+
+        if (schedule == null || schedule.Sequence == null)
+            return false;
+
+        if (stepIndex < 0 || stepIndex >= schedule.Sequence.Count)
+            return false;
+
+#if UNITY_EDITOR
+        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
+        string propertyPath = string.Format("schedules.Array.data[{0}].sequence.Array.data[{1}].value",
+                                            scheduleIndex,
+                                            stepIndex);
+        SerializedProperty valueProperty = serializedPreset.FindProperty(propertyPath);
+
+        if (valueProperty == null)
+            return false;
+
+        baseValue = valueProperty.floatValue;
+        formula = ResolveFormula(serializedPreset,
+                                 sourcePreset.ScalingRules,
+                                 valueProperty);
+        return true;
+#else
+        return false;
+#endif
+    }
     #endregion
 
     #region Private Methods
@@ -275,6 +327,8 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
         if (string.IsNullOrWhiteSpace(statKey))
             return string.Empty;
 
+        string propertyPath = property.propertyPath;
+
         for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
         {
             PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
@@ -286,7 +340,15 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
                 continue;
 
             if (!string.Equals(scalingRule.StatKey, statKey, StringComparison.Ordinal))
-                continue;
+            {
+                if (!PlayerScalingStatKeyUtility.TryFindPropertyByStatKey(serializedObject,
+                                                                           scalingRule.StatKey,
+                                                                           out SerializedProperty resolvedProperty))
+                    continue;
+
+                if (!string.Equals(resolvedProperty.propertyPath, propertyPath, StringComparison.Ordinal))
+                    continue;
+            }
 
             return scalingRule.Formula.Trim();
         }

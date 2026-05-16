@@ -55,7 +55,7 @@ internal static class PlayerProgressionBlobBakeUtility
                                   powerUpsPreset,
                                   sourcePowerUpsPreset);
         BakeProgressionScalableStats(builder, ref root, preset);
-        BakeProgressionSchedules(builder, ref root, preset);
+        BakeProgressionSchedules(builder, ref root, preset, sourcePreset);
 
         BlobAssetReference<PlayerProgressionConfigBlob> blob = builder.CreateBlobAssetReference<PlayerProgressionConfigBlob>(Allocator.Persistent);
         builder.Dispose();
@@ -324,10 +324,12 @@ internal static class PlayerProgressionBlobBakeUtility
     /// <param name="builder">Blob builder used to allocate nested arrays and strings.</param>
     /// <param name="root">Progression blob root being populated.</param>
     /// <param name="preset">Source progression preset.</param>
+    /// <param name="sourcePreset">Unscaled source progression preset used to bake runtime scaling metadata.</param>
 
     private static void BakeProgressionSchedules(BlobBuilder builder,
                                                  ref PlayerProgressionConfigBlob root,
-                                                 PlayerProgressionPreset preset)
+                                                 PlayerProgressionPreset preset,
+                                                 PlayerProgressionPreset sourcePreset)
     {
         IReadOnlyList<PlayerLevelUpScheduleDefinition> schedules = preset != null ? preset.Schedules : null;
         int schedulesCount = schedules != null ? schedules.Count : 0;
@@ -358,13 +360,28 @@ internal static class PlayerProgressionBlobBakeUtility
                     : string.Empty;
                 PlayerLevelUpScheduleApplyMode applyMode = step != null ? step.ApplyMode : PlayerLevelUpScheduleApplyMode.Flat;
                 float value = step != null ? step.Value : 0f;
+                float baseValue = value;
+                string scalingFormula = string.Empty;
+
+                if (PlayerRuntimeScalingBakeMetadataUtility.TryResolveScheduleStepValueScalingData(sourcePreset,
+                                                                                                   scheduleIndex,
+                                                                                                   stepIndex,
+                                                                                                   out float resolvedBaseValue,
+                                                                                                   out string resolvedScalingFormula))
+                {
+                    baseValue = resolvedBaseValue;
+                    scalingFormula = resolvedScalingFormula;
+                }
 
                 stepArray[stepIndex] = new PlayerLevelUpScheduleStepBlob
                 {
                     ApplyMode = (byte)applyMode,
-                    Value = value
+                    Value = value,
+                    BaseValue = baseValue
                 };
                 builder.AllocateString(ref stepArray[stepIndex].StatName, statName);
+                builder.AllocateString(ref stepArray[stepIndex].ScalingFormula,
+                                       string.IsNullOrWhiteSpace(scalingFormula) ? string.Empty : scalingFormula);
             }
 
             if (root.EquippedScheduleIndex >= 0 || string.IsNullOrWhiteSpace(equippedScheduleId))

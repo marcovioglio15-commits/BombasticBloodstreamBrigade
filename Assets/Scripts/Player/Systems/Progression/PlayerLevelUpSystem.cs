@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Unity.Entities;
 using UnityEngine;
@@ -12,6 +13,11 @@ public partial struct PlayerLevelUpSystem : ISystem
 {
     #region Constants
     private const int MaxLevelUpsPerFrame = 1024;
+    #endregion
+
+    #region Fields
+    private static readonly Dictionary<string, PlayerFormulaValue> scheduleVariableContext =
+        new Dictionary<string, PlayerFormulaValue>(64, StringComparer.OrdinalIgnoreCase);
     #endregion
 
     #region Nested Types
@@ -493,7 +499,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     {
         scheduleDebugInfo = default;
 
-        if (targetLevel <= 1)
+        if (targetLevel <= 0)
             return false;
 
         if (!progressionConfig.Config.IsCreated)
@@ -513,7 +519,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         if (schedule.Steps.Length <= 0)
             return false;
 
-        int stepIndex = (targetLevel - 2) % schedule.Steps.Length;
+        int stepIndex = (targetLevel - 1) % schedule.Steps.Length;
         ref PlayerLevelUpScheduleStepBlob step = ref schedule.Steps[stepIndex];
         string statName = step.StatName.ToString();
 
@@ -530,7 +536,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         PlayerLevelUpScheduleApplyMode applyMode = step.ApplyMode == (byte)PlayerLevelUpScheduleApplyMode.Percent
             ? PlayerLevelUpScheduleApplyMode.Percent
             : PlayerLevelUpScheduleApplyMode.Flat;
-        float deltaValue = step.Value;
+        float deltaValue = ResolveScheduleStepValue(ref step, scalableStats);
         float newValue = applyMode == PlayerLevelUpScheduleApplyMode.Percent
             ? previousValue + (previousValue * (deltaValue * 0.01f))
             : previousValue + deltaValue;
@@ -538,9 +544,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         if (!PlayerScalableStatValueUtility.TryWriteRuntimeValue(ref scalableStat,
                                                                  PlayerFormulaValue.CreateNumber(newValue),
                                                                  out string _))
-        {
             return false;
-        }
 
         newValue = PlayerScalableStatClampUtility.ResolveNumericProjection(in scalableStat);
         scalableStats[statBufferIndex] = scalableStat;
@@ -556,6 +560,32 @@ public partial struct PlayerLevelUpSystem : ISystem
             NewValue = newValue
         };
         return true;
+    }
+
+    /// <summary>
+    /// Resolves one schedule step value, including Add Scaling formulas baked from the progression preset.
+    /// </summary>
+    /// <param name="step">Baked schedule step being consumed.</param>
+    /// <param name="scalableStats">Current runtime scalable-stat buffer used as formula variables.</param>
+    /// <returns>Runtime step value, or the pre-scaled baked value when no formula can be evaluated.<returns>
+    private static float ResolveScheduleStepValue(ref PlayerLevelUpScheduleStepBlob step,
+                                                  DynamicBuffer<PlayerScalableStatElement> scalableStats)
+    {
+        string scalingFormula = step.ScalingFormula.ToString();
+
+        if (string.IsNullOrWhiteSpace(scalingFormula))
+            return step.Value;
+
+        PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, scheduleVariableContext);
+
+        if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(scalingFormula,
+                                                                                  step.BaseValue,
+                                                                                  false,
+                                                                                  scheduleVariableContext,
+                                                                                  out float resolvedValue))
+            return step.Value;
+
+        return resolvedValue;
     }
 
     /// <summary>

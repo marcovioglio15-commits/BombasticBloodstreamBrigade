@@ -117,5 +117,7 @@ public struct PlayerLevelUpScheduleStepBlob
     public BlobString StatName;
     public byte ApplyMode;
     public float Value;
+    public float BaseValue;
+    public BlobString ScalingFormula;
 }
 #endregion

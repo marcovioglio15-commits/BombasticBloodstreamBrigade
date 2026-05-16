@@ -21,7 +21,7 @@ MonoBehaviour:
     statType: 1
     defaultValue: 5
     minimumValue: 1
-    maximumValue: 10
+    maximumValue: 1000
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: Shield
@@ -347,18 +347,18 @@ MonoBehaviour:
   schedules:
   - scheduleId: ScheduleRookie
     sequence:
-    - statName: Health
-      applyMode: 0
-      value: 3
     - statName: FireRate
       applyMode: 0
-      value: 0.3
+      value: 3
+    - statName: Health
+      applyMode: 0
+      value: 300
     - statName: MovementSpeed
       applyMode: 0
-      value: 0.5
+      value: 5
     - statName: Damage
       applyMode: 0
-      value: 0.2
+      value: 2
     - statName: Luck
       applyMode: 0
       value: 1
