@@ -29,7 +29,7 @@ MonoBehaviour:
     flashMaximumBlend: 0.6
   outline:
     enableOutline: 1
-    outlineThickness: 12
+    outlineThickness: 6
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
   offensiveEngagementFeedback:
     enableColorBlend: 1
