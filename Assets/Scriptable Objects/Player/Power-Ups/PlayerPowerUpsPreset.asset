@@ -83,8 +83,8 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.bodyWidthMultiplier
-    addScaling: 0
-    formula: '[LaserWidth]'
+    addScaling: 1
+    formula: '[LaserWidth_Small]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: dropPools.Array.data[0].tierRolls.Array.data[0].selectionPercentage
@@ -99,7 +99,7 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.damageTickIntervalSeconds
     addScaling: 1
-    formula: 1 / ([FireRate] * 2)
+    formula: 1/([FireRate]*2)
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickDamageLengthTolerance
@@ -109,7 +109,17 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.virtualProjectileSpeedMultiplier
     addScaling: 1
-    formula: '[ShotRange]'
+    formula: '[ShotRange]*2'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.flowPulseFrequency
+    addScaling: 1
+    formula: '[ShotRange]*2'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormRingFrequency
+    addScaling: 0
+    formula: '[ShotRange]*2'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
@@ -19710,7 +19720,7 @@ MonoBehaviour:
           splitSpeedPercentFromOriginal: 0
           splitLifetimePercentFromOriginal: 0
         laserBeam:
-          damageMultiplier: 1
+          damageMultiplier: 0.8
           continuousDamagePerSecondMultiplier: 0
           virtualProjectileSpeedMultiplier: 1
           damageTickIntervalSeconds: 1
@@ -19719,38 +19729,38 @@ MonoBehaviour:
           maximumBounceSegments: 2
           applyPlayerHandlingNerfWhileFiring: 1
           firingMoveSpeedMultiplier: 1
-          firingRotationSpeedMultiplier: 0.7
+          firingRotationSpeedMultiplier: 0.1
           visualPresetId: 1
           bodyProfile: 0
-          sourceShape: 1
+          sourceShape: 0
           terminalCapShape: 0
           bodyWidthMultiplier: 1
           collisionWidthMultiplier: 1
           sourceScaleMultiplier: 1
-          terminalCapScaleMultiplier: 1.2
-          contactFlareScaleMultiplier: 1.2
+          terminalCapScaleMultiplier: 1
+          contactFlareScaleMultiplier: 1
           bodyOpacity: 0.5
           coreWidthMultiplier: 0.5
           coreBrightness: 1
           rimBrightness: 1
           flowScrollSpeed: 3
-          flowPulseFrequency: 5
+          flowPulseFrequency: 1
           stormTwistSpeed: 14
           stormTickPostTravelHoldSeconds: 0.2
-          stormIdleIntensity: 0.48
-          stormBurstIntensity: 1.1
-          sourceOffset: 0.08
-          sourceDischargeIntensity: 1.2
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0.1
+          sourceDischargeIntensity: 1
           stormShellWidthMultiplier: 1
-          stormShellSeparation: 0.2
-          stormRingFrequency: 5.4
-          stormRingThickness: 0.18
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0.2
           stormTickTravelSpeed: 5
           stormTickDamageLengthTolerance: 0.1
-          terminalCapIntensity: 1.12
-          contactFlareIntensity: 1.28
-          wobbleAmplitude: 0.3
-          bubbleDriftSpeed: 1.4
+          terminalCapIntensity: 1
+          contactFlareIntensity: 1
+          wobbleAmplitude: 0.2
+          bubbleDriftSpeed: 1
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -20042,8 +20052,7 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - Passive_LaserBeam
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

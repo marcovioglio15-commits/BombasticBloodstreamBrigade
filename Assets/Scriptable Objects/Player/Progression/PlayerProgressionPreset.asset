@@ -131,7 +131,7 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: LaserWidth_Small
     statType: 0
-    defaultValue: 5
+    defaultValue: 2.5
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
