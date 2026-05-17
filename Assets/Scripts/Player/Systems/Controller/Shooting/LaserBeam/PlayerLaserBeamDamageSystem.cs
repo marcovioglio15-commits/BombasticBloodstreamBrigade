@@ -32,6 +32,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
         state.RequireForUpdate<PlayerLaserBeamState>();
         state.RequireForUpdate<PlayerLaserBeamLaneElement>();
+        state.RequireForUpdate<PlayerLaserBeamPulseHitElement>();
     }
 
     /// <summary>
@@ -111,17 +112,21 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate> hitCandidates = new NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate>(32, frameAllocator);
         NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate> traversedHitCandidates = new NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate>(16, frameAllocator);
+        NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet =
+            new NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey>(math.max(64, enemyCount * 64), frameAllocator);
 
         foreach ((RefRO<PlayerRuntimeShootingConfig> runtimeShootingConfig,
                   DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
                   RefRO<PlayerPassiveToolsState> passiveToolsState,
                   RefRW<PlayerLaserBeamState> laserBeamState,
+                  DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
                   DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                   Entity playerEntity)
                  in SystemAPI.Query<RefRO<PlayerRuntimeShootingConfig>,
                                     DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot>,
                                     RefRO<PlayerPassiveToolsState>,
                                     RefRW<PlayerLaserBeamState>,
+                                    DynamicBuffer<PlayerLaserBeamPulseHitElement>,
                                     DynamicBuffer<PlayerLaserBeamLaneElement>>()
                              .WithEntityAccess())
         {
@@ -131,7 +136,10 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             bool hasTriggeredActiveLaser = PlayerLaserBeamStateUtility.HasTriggeredActiveLaser(in currentLaserBeamState);
 
             if (currentLaserBeamState.IsActive == 0)
+            {
+                PlayerLaserBeamPulseHitUtility.ClearPulseHits(pulseHits);
                 continue;
+            }
 
             LaserBeamPassiveConfig laserBeamConfig = effectivePassiveToolsState.LaserBeam;
             float tickIntervalSeconds = math.max(0.0001f, laserBeamConfig.DamageTickIntervalSeconds);
@@ -146,10 +154,19 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                     PlayerLaserBeamStateUtility.EnqueueStormTickPulses(ref currentLaserBeamState, in laserBeamConfig, pendingTickCount);
             }
 
-            if (laserBeamLanes.Length <= 0 || effectivePassiveToolsState.HasLaserBeam == 0)
+            if (effectivePassiveToolsState.HasLaserBeam == 0)
+            {
+                currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
+                PlayerLaserBeamPulseHitUtility.ClearPulseHits(pulseHits);
+                laserBeamState.ValueRW = currentLaserBeamState;
+                continue;
+            }
+
+            if (laserBeamLanes.Length <= 0)
             {
                 currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
                 PlayerLaserBeamStateUtility.RemoveCompletedStormTickPulses(ref currentLaserBeamState, in laserBeamConfig);
+                PlayerLaserBeamPulseHitUtility.RetainActivePulseHits(pulseHits, in currentLaserBeamState);
                 laserBeamState.ValueRW = currentLaserBeamState;
                 continue;
             }
@@ -196,6 +213,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             if (continuousDamagePerTick <= 0f && !hasActiveStormTickPulses)
             {
                 PlayerLaserBeamStateUtility.RemoveCompletedStormTickPulses(ref currentLaserBeamState, in laserBeamConfig);
+                PlayerLaserBeamPulseHitUtility.RetainActivePulseHits(pulseHits, in currentLaserBeamState);
                 laserBeamState.ValueRW = currentLaserBeamState;
                 continue;
             }
@@ -223,6 +241,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             if (canEnqueueVfxRequests)
                 shooterVfxRequests = vfxRequestLookup[playerEntity];
 
+            PlayerLaserBeamPulseHitUtility.PopulatePulseHitSet(in pulseHits, ref pulseHitSet);
             int segmentStartIndex = 0;
 
             while (segmentStartIndex < laserBeamLanes.Length)
@@ -269,12 +288,13 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                         ApplyStormTickPulseLaneHits(playerEntity,
                                                     laneLength,
                                                     tickDamagePerPulse,
-                                                    deltaTime,
                                                     penetrationMode,
                                                     maximumPenetrations,
                                                     projectileTemplate,
                                                     in currentLaserBeamState,
                                                     in laserBeamConfig,
+                                                    pulseHits,
+                                                    ref pulseHitSet,
                                                     in laserBeamLanes,
                                                     segmentStartIndex,
                                                     in hitCandidates,
@@ -304,6 +324,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             }
 
             PlayerLaserBeamStateUtility.RemoveCompletedStormTickPulses(ref currentLaserBeamState, in laserBeamConfig);
+            PlayerLaserBeamPulseHitUtility.RetainActivePulseHits(pulseHits, in currentLaserBeamState);
             laserBeamState.ValueRW = currentLaserBeamState;
         }
 
@@ -357,8 +378,11 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
     private void ConsumeBeamTicksWithoutTargets(ref SystemState state)
     {
         foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
-                  RefRW<PlayerLaserBeamState> laserBeamState)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>, RefRW<PlayerLaserBeamState>>())
+                  RefRW<PlayerLaserBeamState> laserBeamState,
+                  DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits)
+                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                                    RefRW<PlayerLaserBeamState>,
+                                    DynamicBuffer<PlayerLaserBeamPulseHitElement>>())
         {
             PlayerLaserBeamState currentLaserBeamState = laserBeamState.ValueRO;
             PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState.ValueRO,
@@ -374,6 +398,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             if (effectivePassiveToolsState.HasLaserBeam == 0)
             {
                 laserBeamState.ValueRW = currentLaserBeamState;
+                PlayerLaserBeamPulseHitUtility.ClearPulseHits(pulseHits);
                 continue;
             }
 
@@ -391,6 +416,7 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             }
 
             PlayerLaserBeamStateUtility.RemoveCompletedStormTickPulses(ref currentLaserBeamState, in laserBeamConfig);
+            PlayerLaserBeamPulseHitUtility.RetainActivePulseHits(pulseHits, in currentLaserBeamState);
             laserBeamState.ValueRW = currentLaserBeamState;
         }
     }
@@ -460,20 +486,22 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
     }
 
     /// <summary>
-    /// Applies every active traveling tick packet as a moving storm trail that damages the lane portion already traversed during the current frame.
+    /// Applies every active traveling tick packet as a pulse span that can damage each enemy once for the pulse lifetime.
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneLength">Total length of the current lane.</param>
-    /// <param name="tickDamagePerPulse">Damage carried by one authored tick packet before lane multipliers.</param>
+    /// <param name="tickDamagePerPulse">Full damage carried by one authored tick packet before lane multipliers.</param>
     /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
     /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
     /// <param name="laserBeamState">Current beam runtime state containing active traveling packets.</param>
     /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
     /// <param name="segmentStartIndex">First segment index belonging to the current lane.</param>
     /// <param name="hitCandidates">Sorted lane hit candidates.</param>
-    /// <param name="traversedHitCandidates">Reusable output list used to store the candidates currently covered by one packet trail.</param>
+    /// <param name="traversedHitCandidates">Reusable output list used to store the candidates currently covered by one pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -494,12 +522,13 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
     private static void ApplyStormTickPulseLaneHits(Entity shooterEntity,
                                                     float laneLength,
                                                     float tickDamagePerPulse,
-                                                    float deltaTime,
                                                     ProjectilePenetrationMode penetrationMode,
                                                     int maximumPenetrations,
                                                     PlayerProjectileRequestTemplate projectileTemplate,
                                                     in PlayerLaserBeamState laserBeamState,
                                                     in LaserBeamPassiveConfig laserBeamConfig,
+                                                    DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                                    ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                                     in DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                                     int segmentStartIndex,
                                                     in NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate> hitCandidates,
@@ -533,12 +562,9 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
 
         float travelDurationSeconds = PlayerLaserBeamStateUtility.ResolveStormTickTravelDurationSeconds(travelSpeed);
         float totalDurationSeconds = PlayerLaserBeamStateUtility.ResolveStormTickTotalDurationSeconds(in laserBeamConfig);
-        float frameDamagePerPulse = math.max(0f,
-                                             tickDamagePerPulse *
-                                             math.max(0f, deltaTime) /
-                                             math.max(0.0001f, totalDurationSeconds));
+        float damagePerPulse = math.max(0f, tickDamagePerPulse);
 
-        if (frameDamagePerPulse <= 0f)
+        if (damagePerPulse <= 0f)
             return;
 
         float damageLengthTolerance = math.max(0f, laserBeamConfig.StormTickDamageLengthTolerance);
@@ -567,7 +593,10 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                 continue;
 
             PlayerLaserBeamDamageResolutionUtility.ResolveLaneHits(shooterEntity,
-                                                                  frameDamagePerPulse,
+                                                                  damagePerPulse,
+                                                                  pulse.PulseId,
+                                                                  pulseHits,
+                                                                  ref pulseHitSet,
                                                                   penetrationMode,
                                                                   maximumPenetrations,
                                                                   projectileTemplate,

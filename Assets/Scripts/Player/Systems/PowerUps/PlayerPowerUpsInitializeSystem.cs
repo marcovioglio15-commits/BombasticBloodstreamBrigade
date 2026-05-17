@@ -22,6 +22,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingBombRequestBufferQuery;
     private EntityQuery missingElementalTrailSegmentBufferQuery;
     private EntityQuery missingLaserBeamLaneBufferQuery;
+    private EntityQuery missingLaserBeamPulseHitBufferQuery;
     private EntityQuery missingExplosionRequestBufferQuery;
     private EntityQuery missingPowerUpVfxRequestBufferQuery;
     private EntityQuery missingPowerUpVfxPoolBufferQuery;
@@ -121,6 +122,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingLaserBeamLaneBufferQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfig>()
             .WithNone<PlayerLaserBeamLaneElement>()
+            .Build();
+
+        missingLaserBeamPulseHitBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfig>()
+            .WithNone<PlayerLaserBeamPulseHitElement>()
             .Build();
 
         missingExplosionRequestBufferQuery = SystemAPI.QueryBuilder()
@@ -231,6 +237,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingBombRequestBufferQuery,
             in missingElementalTrailSegmentBufferQuery,
             in missingLaserBeamLaneBufferQuery,
+            in missingLaserBeamPulseHitBufferQuery,
             in missingExplosionRequestBufferQuery,
             in missingPowerUpVfxRequestBufferQuery,
             in missingPowerUpVfxPoolBufferQuery,
@@ -330,6 +337,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingLaserBeamLaneBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingLaserBeamLaneBuffers(ref commandBuffer, in missingLaserBeamLaneBufferQuery);
+        }
+
+        if (missingFlags.HasMissingLaserBeamPulseHitBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingLaserBeamPulseHitBuffers(ref commandBuffer, in missingLaserBeamPulseHitBufferQuery);
         }
 
         if (missingFlags.HasMissingExplosionRequestBuffer)
@@ -437,6 +449,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingBombRequestBufferQuery,
             in missingElementalTrailSegmentBufferQuery,
             in missingLaserBeamLaneBufferQuery,
+            in missingLaserBeamPulseHitBufferQuery,
             in missingExplosionRequestBufferQuery,
             in missingPowerUpVfxRequestBufferQuery,
             in missingPowerUpVfxPoolBufferQuery,

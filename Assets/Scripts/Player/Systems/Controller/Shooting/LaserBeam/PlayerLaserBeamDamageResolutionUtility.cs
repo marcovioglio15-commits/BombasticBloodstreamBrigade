@@ -100,11 +100,11 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     }
 
     /// <summary>
-    /// Filters one sorted hit-candidate list down to the candidates crossed by the traveling tick packet during the current frame.
+    /// Filters one sorted hit-candidate list down to the candidates covered by the active tick-pulse span.
     /// </summary>
     /// <param name="hitCandidates">Sorted lane hit candidates.</param>
-    /// <param name="startDistance">Packet center distance at the start of the frame.</param>
-    /// <param name="endDistance">Packet center distance at the end of the frame.</param>
+    /// <param name="startDistance">Minimum lane distance covered by the pulse span.</param>
+    /// <param name="endDistance">Maximum lane distance covered by the pulse span.</param>
     /// <param name="traversedHitCandidates">Output list reused by the caller.</param>
     public static void CollectTraversedHitCandidates(in NativeList<LaserBeamHitCandidate> hitCandidates,
                                                      float startDistance,
@@ -182,12 +182,15 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Damage budget carried by the packet before lane multipliers.</param>
+    /// <param name="pulseId">Unique id of the storm pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
     /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve knockback, elemental and VFX payloads.</param>
     /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
     /// <param name="segmentStartIndex">First segment index belonging to the lane.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -207,6 +210,9 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     public static void ResolveLaneHits(Entity shooterEntity,
                                        float laneDamagePerTick,
+                                       int pulseId,
+                                       DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                       ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                        ProjectilePenetrationMode penetrationMode,
                                        int maximumPenetrations,
                                        PlayerProjectileRequestTemplate projectileTemplate,
@@ -234,6 +240,9 @@ internal static class PlayerLaserBeamDamageResolutionUtility
     {
         PlayerLaserBeamDamagePacketHitUtility.ResolveLaneHits(shooterEntity,
                                                               laneDamagePerTick,
+                                                              pulseId,
+                                                        pulseHits,
+                                                              ref pulseHitSet,
                                                               penetrationMode,
                                                               maximumPenetrations,
                                                               projectileTemplate,

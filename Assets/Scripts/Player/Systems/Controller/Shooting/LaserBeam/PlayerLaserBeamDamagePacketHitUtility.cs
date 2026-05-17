@@ -16,12 +16,15 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Damage budget carried by the packet before lane multipliers.</param>
+    /// <param name="pulseId">Unique id of the pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="penetrationMode">Projectile penetration mode inherited from the current shooting config.</param>
     /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve knockback, elemental and VFX payloads.</param>
     /// <param name="laserBeamLanes">Resolved lane buffer of the current player.</param>
     /// <param name="segmentStartIndex">First segment index belonging to the lane.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -41,6 +44,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     public static void ResolveLaneHits(Entity shooterEntity,
                                        float laneDamagePerTick,
+                                       int pulseId,
+                                       DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                       ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                        ProjectilePenetrationMode penetrationMode,
                                        int maximumPenetrations,
                                        PlayerProjectileRequestTemplate projectileTemplate,
@@ -74,6 +80,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             case ProjectilePenetrationMode.FixedHits:
                 ResolveFixedHitMode(shooterEntity,
                                     effectiveLaneDamagePerTick,
+                                    pulseId,
+                                    pulseHits,
+                                    ref pulseHitSet,
                                     maximumPenetrations,
                                     projectileTemplate,
                                     in referenceSegment,
@@ -100,6 +109,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             case ProjectilePenetrationMode.Infinite:
                 ResolveInfiniteHitMode(shooterEntity,
                                        effectiveLaneDamagePerTick,
+                                       pulseId,
+                                       pulseHits,
+                                       ref pulseHitSet,
                                        projectileTemplate,
                                        in referenceSegment,
                                        in hitCandidates,
@@ -125,6 +137,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             case ProjectilePenetrationMode.DamageBased:
                 ResolveDamageBasedMode(shooterEntity,
                                        effectiveLaneDamagePerTick,
+                                       pulseId,
+                                       pulseHits,
+                                       ref pulseHitSet,
                                        maximumPenetrations,
                                        projectileTemplate,
                                        in referenceSegment,
@@ -151,6 +166,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             default:
                 ResolveSingleHitMode(shooterEntity,
                                      effectiveLaneDamagePerTick,
+                                     pulseId,
+                                     pulseHits,
+                                     ref pulseHitSet,
                                      projectileTemplate,
                                      in referenceSegment,
                                      in hitCandidates,
@@ -183,9 +201,12 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="pulseId">Unique id of the pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
     /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -204,6 +225,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveSingleHitMode(Entity shooterEntity,
                                              float laneDamagePerTick,
+                                             int pulseId,
+                                             DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                             ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                              PlayerProjectileRequestTemplate projectileTemplate,
                                              in PlayerLaserBeamLaneElement referenceSegment,
                                              in NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate> hitCandidates,
@@ -229,6 +253,10 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
         for (int candidateIndex = 0; candidateIndex < hitCandidates.Length; candidateIndex++)
         {
             PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate hitCandidate = hitCandidates[candidateIndex];
+            Entity enemyEntity = enemyEntities[hitCandidate.EnemyIndex];
+
+            if (PlayerLaserBeamPulseHitUtility.HasPulseHit(in pulseHitSet, pulseId, enemyEntity))
+                continue;
 
             if (!PlayerLaserBeamDamageResolutionUtility.TryApplyFlatDamageHit(ref projectedEnemyHealth,
                                                                               hitCandidate.EnemyIndex,
@@ -238,6 +266,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                 continue;
             }
 
+            PlayerLaserBeamPulseHitUtility.RegisterPulseHit(pulseHits, ref pulseHitSet, pulseId, enemyEntity);
             enemyDirtyFlags[hitCandidate.EnemyIndex] = 1;
             enemyFlashDirtyFlags[hitCandidate.EnemyIndex] = 1;
             ApplyHitPayloads(shooterEntity,
@@ -260,7 +289,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                              canEnqueueVfxRequests,
                              ref shooterVfxRequests,
                              ref elementalStackLookup);
-            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntities[hitCandidate.EnemyIndex],
+            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntity,
                                                                       projectedEnemyHealth[hitCandidate.EnemyIndex],
                                                                       in despawnRequestLookup,
                                                                       ref commandBuffer);
@@ -273,10 +302,13 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="pulseId">Unique id of the pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="maximumPenetrations">Maximum penetration budget inherited from the current shooting config.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
     /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -295,6 +327,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveFixedHitMode(Entity shooterEntity,
                                             float laneDamagePerTick,
+                                            int pulseId,
+                                            DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                            ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                             int maximumPenetrations,
                                             PlayerProjectileRequestTemplate projectileTemplate,
                                             in PlayerLaserBeamLaneElement referenceSegment,
@@ -327,6 +362,10 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                 return;
 
             PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate hitCandidate = hitCandidates[candidateIndex];
+            Entity enemyEntity = enemyEntities[hitCandidate.EnemyIndex];
+
+            if (PlayerLaserBeamPulseHitUtility.HasPulseHit(in pulseHitSet, pulseId, enemyEntity))
+                continue;
 
             if (!PlayerLaserBeamDamageResolutionUtility.TryApplyFlatDamageHit(ref projectedEnemyHealth,
                                                                               hitCandidate.EnemyIndex,
@@ -336,6 +375,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                 continue;
             }
 
+            PlayerLaserBeamPulseHitUtility.RegisterPulseHit(pulseHits, ref pulseHitSet, pulseId, enemyEntity);
             appliedHitCount++;
             enemyDirtyFlags[hitCandidate.EnemyIndex] = 1;
             enemyFlashDirtyFlags[hitCandidate.EnemyIndex] = 1;
@@ -359,7 +399,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                              canEnqueueVfxRequests,
                              ref shooterVfxRequests,
                              ref elementalStackLookup);
-            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntities[hitCandidate.EnemyIndex],
+            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntity,
                                                                       projectedEnemyHealth[hitCandidate.EnemyIndex],
                                                                       in despawnRequestLookup,
                                                                       ref commandBuffer);
@@ -371,9 +411,12 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="pulseId">Unique id of the pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
     /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -392,6 +435,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveInfiniteHitMode(Entity shooterEntity,
                                                float laneDamagePerTick,
+                                               int pulseId,
+                                               DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                               ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                                PlayerProjectileRequestTemplate projectileTemplate,
                                                in PlayerLaserBeamLaneElement referenceSegment,
                                                in NativeList<PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate> hitCandidates,
@@ -417,6 +463,10 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
         for (int candidateIndex = 0; candidateIndex < hitCandidates.Length; candidateIndex++)
         {
             PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate hitCandidate = hitCandidates[candidateIndex];
+            Entity enemyEntity = enemyEntities[hitCandidate.EnemyIndex];
+
+            if (PlayerLaserBeamPulseHitUtility.HasPulseHit(in pulseHitSet, pulseId, enemyEntity))
+                continue;
 
             if (!PlayerLaserBeamDamageResolutionUtility.TryApplyFlatDamageHit(ref projectedEnemyHealth,
                                                                               hitCandidate.EnemyIndex,
@@ -426,6 +476,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                 continue;
             }
 
+            PlayerLaserBeamPulseHitUtility.RegisterPulseHit(pulseHits, ref pulseHitSet, pulseId, enemyEntity);
             enemyDirtyFlags[hitCandidate.EnemyIndex] = 1;
             enemyFlashDirtyFlags[hitCandidate.EnemyIndex] = 1;
             ApplyHitPayloads(shooterEntity,
@@ -448,7 +499,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                              canEnqueueVfxRequests,
                              ref shooterVfxRequests,
                              ref elementalStackLookup);
-            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntities[hitCandidate.EnemyIndex],
+            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntity,
                                                                       projectedEnemyHealth[hitCandidate.EnemyIndex],
                                                                       in despawnRequestLookup,
                                                                       ref commandBuffer);
@@ -460,10 +511,13 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// </summary>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="laneDamagePerTick">Effective lane damage carried by the packet.</param>
+    /// <param name="pulseId">Unique id of the pulse being resolved.</param>
+    /// <param name="pulseHits">Mutable pulse-hit history used to prevent duplicate enemy hits by the same pulse.</param>
+    /// <param name="pulseHitSet">Mutable frame-local pulse-hit lookup synchronized with the persistent hit buffer.</param>
     /// <param name="maximumPenetrations">Maximum kill-based penetration budget inherited from the current shooting config.</param>
     /// <param name="projectileTemplate">Projectile template used to resolve hit payloads.</param>
     /// <param name="referenceSegment">Lane segment used to inherit direction and radius data.</param>
-    /// <param name="hitCandidates">Filtered lane hit candidates crossed by the packet during the current frame.</param>
+    /// <param name="hitCandidates">Filtered lane hit candidates covered by the pulse span.</param>
     /// <param name="enemyEntities">Projected enemy entities.</param>
     /// <param name="projectedEnemyHealth">Mutable projected enemy health buffer.</param>
     /// <param name="enemyPositions">Cached world positions of projected enemies.</param>
@@ -482,6 +536,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
     /// <param name="commandBuffer">ECB used to enqueue despawn requests.</param>
     private static void ResolveDamageBasedMode(Entity shooterEntity,
                                                float laneDamagePerTick,
+                                               int pulseId,
+                                               DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
+                                               ref NativeParallelHashSet<PlayerLaserBeamPulseHitUtility.PulseHitKey> pulseHitSet,
                                                int maximumPenetrations,
                                                PlayerProjectileRequestTemplate projectileTemplate,
                                                in PlayerLaserBeamLaneElement referenceSegment,
@@ -514,6 +571,11 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                 return;
 
             PlayerLaserBeamDamageResolutionUtility.LaserBeamHitCandidate hitCandidate = hitCandidates[candidateIndex];
+            Entity enemyEntity = enemyEntities[hitCandidate.EnemyIndex];
+
+            if (PlayerLaserBeamPulseHitUtility.HasPulseHit(in pulseHitSet, pulseId, enemyEntity))
+                continue;
+
             bool enemyKilled;
             float leftoverDamage = PlayerLaserBeamDamageResolutionUtility.ApplyDamageBasedHit(ref projectedEnemyHealth,
                                                                                               hitCandidate.EnemyIndex,
@@ -523,6 +585,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             if (leftoverDamage == remainingDamage)
                 continue;
 
+            PlayerLaserBeamPulseHitUtility.RegisterPulseHit(pulseHits, ref pulseHitSet, pulseId, enemyEntity);
             enemyDirtyFlags[hitCandidate.EnemyIndex] = 1;
             enemyFlashDirtyFlags[hitCandidate.EnemyIndex] = 1;
             ApplyHitPayloads(shooterEntity,
@@ -545,7 +608,7 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
                              canEnqueueVfxRequests,
                              ref shooterVfxRequests,
                              ref elementalStackLookup);
-            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntities[hitCandidate.EnemyIndex],
+            PlayerLaserBeamDamageResolutionUtility.TryScheduleDespawn(enemyEntity,
                                                                       projectedEnemyHealth[hitCandidate.EnemyIndex],
                                                                       in despawnRequestLookup,
                                                                       ref commandBuffer);

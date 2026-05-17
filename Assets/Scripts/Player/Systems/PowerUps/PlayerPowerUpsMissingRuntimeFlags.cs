@@ -20,6 +20,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     public readonly bool HasMissingBombRequestBuffer;
     public readonly bool HasMissingElementalTrailSegmentBuffer;
     public readonly bool HasMissingLaserBeamLaneBuffer;
+    public readonly bool HasMissingLaserBeamPulseHitBuffer;
     public readonly bool HasMissingExplosionRequestBuffer;
     public readonly bool HasMissingPowerUpVfxRequestBuffer;
     public readonly bool HasMissingPowerUpVfxPoolBuffer;
@@ -58,6 +59,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
                    HasMissingBombRequestBuffer ||
                    HasMissingElementalTrailSegmentBuffer ||
                    HasMissingLaserBeamLaneBuffer ||
+                   HasMissingLaserBeamPulseHitBuffer ||
                    HasMissingExplosionRequestBuffer ||
                    HasMissingPowerUpVfxRequestBuffer ||
                    HasMissingPowerUpVfxPoolBuffer ||
@@ -99,6 +101,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="hasMissingBombRequestBuffer">True when PlayerBombSpawnRequest buffer is missing.</param>
     /// <param name="hasMissingElementalTrailSegmentBuffer">True when PlayerElementalTrailSegmentElement buffer is missing.</param>
     /// <param name="hasMissingLaserBeamLaneBuffer">True when PlayerLaserBeamLaneElement buffer is missing.</param>
+    /// <param name="hasMissingLaserBeamPulseHitBuffer">True when PlayerLaserBeamPulseHitElement buffer is missing.</param>
     /// <param name="hasMissingExplosionRequestBuffer">True when PlayerExplosionRequest buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxRequestBuffer">True when PlayerPowerUpVfxSpawnRequest buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxPoolBuffer">True when PlayerPowerUpVfxPoolElement buffer is missing.</param>
@@ -132,6 +135,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         bool hasMissingBombRequestBuffer,
         bool hasMissingElementalTrailSegmentBuffer,
         bool hasMissingLaserBeamLaneBuffer,
+        bool hasMissingLaserBeamPulseHitBuffer,
         bool hasMissingExplosionRequestBuffer,
         bool hasMissingPowerUpVfxRequestBuffer,
         bool hasMissingPowerUpVfxPoolBuffer,
@@ -164,6 +168,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         HasMissingBombRequestBuffer = hasMissingBombRequestBuffer;
         HasMissingElementalTrailSegmentBuffer = hasMissingElementalTrailSegmentBuffer;
         HasMissingLaserBeamLaneBuffer = hasMissingLaserBeamLaneBuffer;
+        HasMissingLaserBeamPulseHitBuffer = hasMissingLaserBeamPulseHitBuffer;
         HasMissingExplosionRequestBuffer = hasMissingExplosionRequestBuffer;
         HasMissingPowerUpVfxRequestBuffer = hasMissingPowerUpVfxRequestBuffer;
         HasMissingPowerUpVfxPoolBuffer = hasMissingPowerUpVfxPoolBuffer;
@@ -202,6 +207,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="missingBombRequestBufferQuery">Query for entities missing PlayerBombSpawnRequest buffer.</param>
     /// <param name="missingElementalTrailSegmentBufferQuery">Query for entities missing PlayerElementalTrailSegmentElement buffer.</param>
     /// <param name="missingLaserBeamLaneBufferQuery">Query for entities missing PlayerLaserBeamLaneElement buffer.</param>
+    /// <param name="missingLaserBeamPulseHitBufferQuery">Query for entities missing PlayerLaserBeamPulseHitElement buffer.</param>
     /// <param name="missingExplosionRequestBufferQuery">Query for entities missing PlayerExplosionRequest buffer.</param>
     /// <param name="missingPowerUpVfxRequestBufferQuery">Query for entities missing PlayerPowerUpVfxSpawnRequest buffer.</param>
     /// <param name="missingPowerUpVfxPoolBufferQuery">Query for entities missing PlayerPowerUpVfxPoolElement buffer.</param>
@@ -235,6 +241,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         in EntityQuery missingBombRequestBufferQuery,
         in EntityQuery missingElementalTrailSegmentBufferQuery,
         in EntityQuery missingLaserBeamLaneBufferQuery,
+        in EntityQuery missingLaserBeamPulseHitBufferQuery,
         in EntityQuery missingExplosionRequestBufferQuery,
         in EntityQuery missingPowerUpVfxRequestBufferQuery,
         in EntityQuery missingPowerUpVfxPoolBufferQuery,
@@ -268,6 +275,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
             !missingBombRequestBufferQuery.IsEmptyIgnoreFilter,
             !missingElementalTrailSegmentBufferQuery.IsEmptyIgnoreFilter,
             !missingLaserBeamLaneBufferQuery.IsEmptyIgnoreFilter,
+            !missingLaserBeamPulseHitBufferQuery.IsEmptyIgnoreFilter,
             !missingExplosionRequestBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxRequestBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxPoolBufferQuery.IsEmptyIgnoreFilter,

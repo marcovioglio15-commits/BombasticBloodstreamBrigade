@@ -383,11 +383,11 @@ public struct PlayerPassiveBulletTimeState : IComponentData
 }
 
 /// <summary>
-/// Stores one traveling Laser Beam damage packet with previous and current elapsed travel times.
+/// Stores one traveling Laser Beam damage packet with a stable id and current elapsed travel time.
 /// </summary>
 public struct PlayerLaserBeamStormTickPulse
 {
-    public float PreviousElapsedSeconds;
+    public int PulseId;
     public float CurrentElapsedSeconds;
 }
 
@@ -405,6 +405,7 @@ public struct PlayerLaserBeamState : IComponentData
     public float DamageTickTimer;
     public float ContinuousDamageAccumulatorSeconds;
     public float StormBurstRemainingSeconds;
+    public int NextStormTickPulseId;
     public FixedList512Bytes<PlayerLaserBeamStormTickPulse> StormTickPulses;
     public float TriggeredActiveRemainingSeconds;
     public ProjectilePenetrationMode TriggeredActivePenetrationMode;
@@ -415,6 +416,16 @@ public struct PlayerLaserBeamState : IComponentData
     public float ChargeImpulseDamageMultiplier;
     public float ChargeImpulseWidthMultiplier;
     public float ChargeImpulseTravelDistance;
+}
+
+/// <summary>
+/// Tracks one enemy already damaged by one Laser Beam storm pulse.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerLaserBeamPulseHitElement : IBufferElementData
+{
+    public int PulseId;
+    public Entity EnemyEntity;
 }
 
 /// <summary>

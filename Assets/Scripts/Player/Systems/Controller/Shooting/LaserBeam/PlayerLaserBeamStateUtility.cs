@@ -27,6 +27,7 @@ internal static class PlayerLaserBeamStateUtility
         laserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
         ClearStormBurst(ref laserBeamState);
         ClearStormTickPulses(ref laserBeamState);
+        laserBeamState.NextStormTickPulseId = 1;
         ClearTriggeredActiveLaser(ref laserBeamState);
         ClearChargeImpulse(ref laserBeamState);
     }
@@ -56,7 +57,7 @@ internal static class PlayerLaserBeamStateUtility
     }
 
     /// <summary>
-    /// Advances every active traveling damage packet while preserving its previous progress for the current frame.
+    /// Advances every active traveling damage packet so presentation and hit coverage share the same elapsed pulse time.
     /// </summary>
     /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
@@ -82,7 +83,6 @@ internal static class PlayerLaserBeamStateUtility
         for (int pulseIndex = 0; pulseIndex < laserBeamState.StormTickPulses.Length; pulseIndex++)
         {
             PlayerLaserBeamStormTickPulse pulse = laserBeamState.StormTickPulses[pulseIndex];
-            pulse.PreviousElapsedSeconds = pulse.CurrentElapsedSeconds;
             pulse.CurrentElapsedSeconds += safeDeltaTime;
             laserBeamState.StormTickPulses[pulseIndex] = pulse;
         }
@@ -187,7 +187,7 @@ internal static class PlayerLaserBeamStateUtility
     }
 
     /// <summary>
-    /// Queues one or more serialized traveling damage packets after consuming Laser Beam tick budget.
+    /// Queues one or more independent traveling damage packets after consuming Laser Beam tick budget.
     /// </summary>
     /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     /// <param name="laserBeamConfig">Runtime Laser Beam config that provides pulse travel and post-travel hold timing.</param>
@@ -206,16 +206,13 @@ internal static class PlayerLaserBeamStateUtility
 
         for (int pulseIndex = 0; pulseIndex < pendingTickCount; pulseIndex++)
         {
-            float initialElapsedSeconds = ResolveQueuedStormTickInitialElapsedSeconds(in laserBeamState,
-                                                                                      totalDurationSeconds);
-
             if (laserBeamState.StormTickPulses.Length >= laserBeamState.StormTickPulses.Capacity)
                 laserBeamState.StormTickPulses.RemoveAt(0);
 
             laserBeamState.StormTickPulses.Add(new PlayerLaserBeamStormTickPulse
             {
-                PreviousElapsedSeconds = initialElapsedSeconds,
-                CurrentElapsedSeconds = initialElapsedSeconds
+                PulseId = AllocateStormTickPulseId(ref laserBeamState),
+                CurrentElapsedSeconds = 0f
             });
         }
 
@@ -426,19 +423,18 @@ internal static class PlayerLaserBeamStateUtility
 
     #region Private Methods
     /// <summary>
-    /// Resolves the elapsed-time seed assigned to the next queued pulse so pulses remain serialized without overlap.
+    /// Allocates the next positive pulse id and advances the state counter with wrap protection.
     /// </summary>
-    /// <param name="laserBeamState">Runtime beam state containing the existing pulse queue.</param>
-    /// <param name="totalDurationSeconds">Total duration of one pulse including travel and hold.</param>
-    /// <returns>Initial elapsed time assigned to the newly queued pulse.</returns>
-    private static float ResolveQueuedStormTickInitialElapsedSeconds(in PlayerLaserBeamState laserBeamState,
-                                                                     float totalDurationSeconds)
+    /// <param name="laserBeamState">Mutable beam state that stores the next pulse id.</param>
+    /// <returns>Positive id assigned to the newly queued pulse.</returns>
+    private static int AllocateStormTickPulseId(ref PlayerLaserBeamState laserBeamState)
     {
-        if (laserBeamState.StormTickPulses.Length <= 0)
-            return 0f;
+        if (laserBeamState.NextStormTickPulseId <= 0)
+            laserBeamState.NextStormTickPulseId = 1;
 
-        PlayerLaserBeamStormTickPulse lastPulse = laserBeamState.StormTickPulses[laserBeamState.StormTickPulses.Length - 1];
-        return lastPulse.CurrentElapsedSeconds - totalDurationSeconds;
+        int pulseId = laserBeamState.NextStormTickPulseId;
+        laserBeamState.NextStormTickPulseId = pulseId == int.MaxValue ? 1 : pulseId + 1;
+        return pulseId;
     }
 
     /// <summary>

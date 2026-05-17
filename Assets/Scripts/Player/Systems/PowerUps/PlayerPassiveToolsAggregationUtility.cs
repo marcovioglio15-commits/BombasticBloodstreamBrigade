@@ -338,6 +338,13 @@ public static class PlayerPassiveToolsAggregationUtility
             : math.min(passiveToolsState.LaserBeam.CooldownSeconds, passiveToolConfig.LaserBeam.CooldownSeconds);
         passiveToolsState.LaserBeam.MaximumBounceSegments = math.max(passiveToolsState.LaserBeam.MaximumBounceSegments,
                                                                      passiveToolConfig.LaserBeam.MaximumBounceSegments);
+        passiveToolsState.LaserBeam.ApplyPlayerHandlingNerfWhileFiring =
+            passiveToolsState.LaserBeam.ApplyPlayerHandlingNerfWhileFiring != 0 ||
+            passiveToolConfig.LaserBeam.ApplyPlayerHandlingNerfWhileFiring != 0
+                ? (byte)1
+                : (byte)0;
+        passiveToolsState.LaserBeam.FiringMoveSpeedMultiplier *= math.max(0f, passiveToolConfig.LaserBeam.FiringMoveSpeedMultiplier);
+        passiveToolsState.LaserBeam.FiringRotationSpeedMultiplier *= math.max(0f, passiveToolConfig.LaserBeam.FiringRotationSpeedMultiplier);
         passiveToolsState.LaserBeam.BodyWidthMultiplier = math.max(passiveToolsState.LaserBeam.BodyWidthMultiplier,
                                                                    passiveToolConfig.LaserBeam.BodyWidthMultiplier);
         passiveToolsState.LaserBeam.CollisionWidthMultiplier = math.max(passiveToolsState.LaserBeam.CollisionWidthMultiplier,

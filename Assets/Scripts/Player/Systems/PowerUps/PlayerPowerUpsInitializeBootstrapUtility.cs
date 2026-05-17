@@ -189,6 +189,7 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
             DamageTickTimer = 0f,
             ContinuousDamageAccumulatorSeconds = 0f,
             StormBurstRemainingSeconds = 0f,
+            NextStormTickPulseId = 1,
             StormTickPulses = default,
             TriggeredActiveRemainingSeconds = 0f,
             TriggeredActivePenetrationMode = ProjectilePenetrationMode.None,
@@ -202,6 +203,16 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
         };
 
         AddComponentForEntities(ref commandBuffer, in missingLaserBeamStateQuery, initialState);
+    }
+
+    /// <summary>
+    /// Adds PlayerLaserBeamPulseHitElement buffers to entities missing them.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingLaserBeamPulseHitBufferQuery">Query selecting entities without PlayerLaserBeamPulseHitElement buffers.</param>
+    public static void AddMissingLaserBeamPulseHitBuffers(ref EntityCommandBuffer commandBuffer, in EntityQuery missingLaserBeamPulseHitBufferQuery)
+    {
+        AddBufferForEntities<PlayerLaserBeamPulseHitElement>(ref commandBuffer, in missingLaserBeamPulseHitBufferQuery);
     }
 
     /// <summary>

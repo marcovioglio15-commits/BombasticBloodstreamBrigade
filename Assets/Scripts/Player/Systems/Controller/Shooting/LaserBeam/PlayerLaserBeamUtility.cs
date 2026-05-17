@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Transforms;
 
 /// <summary>
 /// Provides shared geometry and runtime helpers for the player Laser Beam override.
@@ -71,6 +72,17 @@ public static class PlayerLaserBeamUtility
     {
         float bodyWidth = BaseProjectileRadius * 2f * math.max(0.01f, projectileScaleMultiplier) * math.max(0.01f, bodyWidthMultiplier);
         return ClampBodyWidth(bodyWidth);
+    }
+
+    /// <summary>
+    /// Resolves the current planar player forward used by Laser Beam lanes that must follow actual player rotation.
+    /// </summary>
+    /// <param name="localTransform">Current player transform after look rotation has been applied.</param>
+    /// <returns>Normalized planar forward direction.</returns>
+    internal static float3 ResolveCurrentForwardDirection(in LocalTransform localTransform)
+    {
+        float3 forwardDirection = math.forward(localTransform.Rotation);
+        return PlayerControllerMath.NormalizePlanar(forwardDirection, new float3(0f, 0f, 1f));
     }
 
     /// <summary>
