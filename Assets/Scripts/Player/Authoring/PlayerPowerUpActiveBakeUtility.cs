@@ -202,6 +202,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool explosionAffectAllEnemies = false;
         bool hasExplosionData = false;
         bool hasCharacterTuning = false;
+        bool applyCharacterTuningOnActiveTrigger = false;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -311,7 +312,13 @@ public static class PlayerPowerUpActiveBakeUtility
                                                            math.max(0f, shotgunPatternData.LaserDurationSeconds));
                     break;
                 case PowerUpModuleKind.CharacterTuning:
-                    hasCharacterTuning = hasCharacterTuning || HasCharacterTuningFormulas(payload);
+                    bool hasCharacterTuningFormulas = HasCharacterTuningFormulas(payload);
+                    hasCharacterTuning = hasCharacterTuning || hasCharacterTuningFormulas;
+
+                    if (hasCharacterTuningFormulas && payload.CharacterTuning != null)
+                        applyCharacterTuningOnActiveTrigger = applyCharacterTuningOnActiveTrigger ||
+                                                              payload.CharacterTuning.ApplyFormulasOnlyOnActiveTrigger;
+
                     break;
                 case PowerUpModuleKind.Stackable:
                     break;
@@ -558,6 +565,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                               healthPackDurationSeconds,
                                                                               healthPackTickIntervalSeconds,
                                                                               healthPackStackPolicy,
+                                                                              applyCharacterTuningOnActiveTrigger,
                                                                               in triggeredProjectilePassiveTool,
                                                                               in togglePassiveTool,
                                                                               resolvedToolKind);
@@ -634,6 +642,7 @@ public static class PlayerPowerUpActiveBakeUtility
             ChargePerTrigger = math.max(0f, activeTool.ChargePerTrigger),
             ActivationInputMode = PowerUpActivationInputMode.OnPress,
             Toggleable = activeTool.Toggleable ? (byte)1 : (byte)0,
+            ApplyCharacterTuningOnActiveTrigger = 0,
             AllowRechargeDuringToggleStartupLock = 0,
             MinimumActivationEnergyPercent = math.clamp(activeTool.MinimumActivationEnergyPercent, 0f, 100f),
             Unreplaceable = activeTool.Unreplaceable ? (byte)1 : (byte)0,

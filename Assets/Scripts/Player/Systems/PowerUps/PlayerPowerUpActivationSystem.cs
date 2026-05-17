@@ -255,6 +255,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             PlayerShield updatedShield = default;
             bool primaryScopedCharacterTuningShouldBeActiveBeforePrimary = ShouldScopedCharacterTuningBeActiveBeforeSlotProcessing(in primarySlotConfig,
                                                                                                                                      primaryPressedThisFrame,
+                                                                                                                                     primaryReleasedThisFrame,
                                                                                                                                      primaryIsCharging,
                                                                                                                                      primaryIsActive,
                                                                                                                                      primaryCooldownRemaining);
@@ -378,6 +379,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                        primaryIsActive);
             bool secondaryScopedCharacterTuningShouldBeActiveBeforeSecondary = ShouldScopedCharacterTuningBeActiveBeforeSlotProcessing(in secondarySlotConfig,
                                                                                                                                          secondaryPressedThisFrame,
+                                                                                                                                         secondaryReleasedThisFrame,
                                                                                                                                          secondaryIsCharging,
                                                                                                                                          secondaryIsActive,
                                                                                                                                          secondaryCooldownRemaining);
@@ -605,12 +607,14 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     /// </summary>
     /// <param name="slotConfig">Slot config inspected for temporary Character Tuning semantics.</param>
     /// <param name="pressedThisFrame">True when the slot input was freshly pressed during the current frame.</param>
+    /// <param name="releasedThisFrame">True when the slot input was released during the current frame.</param>
     /// <param name="isCharging">Current charging flag before slot processing mutates it.</param>
     /// <param name="isActive">Current toggle-active flag before slot processing mutates it.</param>
     /// <param name="cooldownRemaining">Current cooldown or startup-lock value before slot processing mutates it.</param>
     /// <returns>True when the temporary Character Tuning overlay should be active while the current slot is processed.</returns>
     private static bool ShouldScopedCharacterTuningBeActiveBeforeSlotProcessing(in PlayerPowerUpSlotConfig slotConfig,
                                                                                 bool pressedThisFrame,
+                                                                                bool releasedThisFrame,
                                                                                 byte isCharging,
                                                                                 byte isActive,
                                                                                 float cooldownRemaining)
@@ -633,6 +637,20 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                 return false;
 
             return slotConfig.ChargeShot.MaximumCharge > 0f;
+        }
+
+        if (PlayerPowerUpCharacterTuningRuntimeUtility.IsActiveTriggerScopedCharacterTuning(in slotConfig))
+        {
+            if (cooldownRemaining > 0f)
+                return false;
+
+            switch (slotConfig.ActivationInputMode)
+            {
+                case PowerUpActivationInputMode.OnRelease:
+                    return releasedThisFrame;
+                default:
+                    return pressedThisFrame;
+            }
         }
 
         if (slotConfig.Toggleable == 0)

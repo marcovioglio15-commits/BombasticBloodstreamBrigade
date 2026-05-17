@@ -668,6 +668,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "resourceGate.isToggleable":
                 activeSlotConfig.Toggleable = resolvedValue ? (byte)1 : (byte)0;
                 return;
+            case "characterTuning.applyFormulasOnlyOnActiveTrigger":
+                activeSlotConfig.ApplyCharacterTuningOnActiveTrigger = resolvedValue ? (byte)1 : (byte)0;
+                return;
             case "resourceGate.allowRechargeDuringToggleStartupLock":
                 activeSlotConfig.AllowRechargeDuringToggleStartupLock = resolvedValue ? (byte)1 : (byte)0;
                 return;

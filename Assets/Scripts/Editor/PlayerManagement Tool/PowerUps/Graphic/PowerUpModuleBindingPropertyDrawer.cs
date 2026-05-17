@@ -8,6 +8,9 @@ using UnityEngine.UIElements;
 public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 {
     #region Fields
+    private const string ActivePowerUpsRoot = "activePowerUps.Array.data[";
+    private const string ModuleBindingsPath = ".moduleBindings.Array.data[";
+
     private static readonly string[] spawnObjectPayloadPropertyNames =
     {
         "bombPrefab",
@@ -79,7 +82,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         overrideContainer.style.marginLeft = 10f;
         root.Add(overrideContainer);
 
-        RefreshBindingUi(property.serializedObject,
+        RefreshBindingUi(property,
+                         property.serializedObject,
                          moduleIdProperty,
                          stageProperty,
                          useOverrideProperty,
@@ -96,7 +100,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
             moduleIdProperty.serializedObject.Update();
             moduleIdProperty.stringValue = evt.newValue;
             moduleIdProperty.serializedObject.ApplyModifiedProperties();
-            RefreshBindingUi(property.serializedObject,
+            RefreshBindingUi(property,
+                             property.serializedObject,
                              moduleIdProperty,
                              stageProperty,
                              useOverrideProperty,
@@ -108,7 +113,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         root.TrackPropertyValue(moduleIdProperty, changedProperty =>
         {
-            RefreshBindingUi(property.serializedObject,
+            RefreshBindingUi(property,
+                             property.serializedObject,
                              changedProperty,
                              stageProperty,
                              useOverrideProperty,
@@ -120,7 +126,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         root.TrackPropertyValue(useOverrideProperty, changedProperty =>
         {
-            RefreshBindingUi(property.serializedObject,
+            RefreshBindingUi(property,
+                             property.serializedObject,
                              moduleIdProperty,
                              stageProperty,
                              changedProperty,
@@ -133,7 +140,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         return root;
     }
 
-    private static void RefreshBindingUi(SerializedObject serializedObject,
+    private static void RefreshBindingUi(SerializedProperty bindingProperty,
+                                         SerializedObject serializedObject,
                                          SerializedProperty moduleIdProperty,
                                          SerializedProperty stageProperty,
                                          SerializedProperty useOverrideProperty,
@@ -189,7 +197,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                  overridePayloadProperty,
                                  moduleDefaultPayloadProperty,
                                  moduleResolved,
-                                 moduleKind);
+                                 moduleKind,
+                                 bindingProperty);
     }
 
     private static void UpdateModuleInfoBox(HelpBox infoBox, bool moduleResolved, PowerUpModuleKind moduleKind, string moduleDisplayName)
@@ -216,7 +225,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                  SerializedProperty overridePayloadProperty,
                                                  SerializedProperty moduleDefaultPayloadProperty,
                                                  bool moduleResolved,
-                                                 PowerUpModuleKind moduleKind)
+                                                 PowerUpModuleKind moduleKind,
+                                                 SerializedProperty bindingProperty)
     {
         if (overrideContainer == null)
             return;
@@ -263,7 +273,12 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         }
 
         AddOverridePayloadWarnings(overrideContainer, overridePayloadProperty, moduleDefaultPayloadProperty, moduleKind);
-        PowerUpModuleDefinitionPropertyDrawer.BuildPayloadEditor(overrideContainer, payloadProperty, moduleKind, payloadLabel);
+        bool showActiveTriggerCharacterTuningOption = ShouldShowActiveTriggerCharacterTuningOption(bindingProperty, moduleKind);
+        PowerUpModuleDefinitionPropertyDrawer.BuildPayloadEditor(overrideContainer,
+                                                                 payloadProperty,
+                                                                 moduleKind,
+                                                                 payloadLabel,
+                                                                 showActiveTriggerCharacterTuningOption);
     }
 
     private static bool TryResolveModuleInfo(SerializedObject serializedObject,
@@ -316,6 +331,186 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Resolves whether the Character Tuning payload should show active-trigger scope controls for this binding.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized module binding currently being drawn.</param>
+    /// <param name="moduleKind">Resolved module kind for the selected binding.</param>
+    /// <returns>True when the binding belongs to a triggerable non-toggleable active without Trigger Hold Charge.</returns>
+    private static bool ShouldShowActiveTriggerCharacterTuningOption(SerializedProperty bindingProperty, PowerUpModuleKind moduleKind)
+    {
+        if (moduleKind != PowerUpModuleKind.CharacterTuning)
+            return false;
+
+        if (bindingProperty == null)
+            return false;
+
+        if (!IsBindingEnabled(bindingProperty))
+            return false;
+
+        if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
+            return false;
+
+        return IsNonToggleableActiveWithoutHoldCharge(powerUpProperty);
+    }
+
+    /// <summary>
+    /// Resolves whether one binding is currently enabled.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized binding property being inspected.</param>
+    /// <returns>True when the binding is enabled or the serialized flag is missing.</returns>
+    private static bool IsBindingEnabled(SerializedProperty bindingProperty)
+    {
+        SerializedProperty enabledProperty = bindingProperty != null
+            ? bindingProperty.FindPropertyRelative("isEnabled")
+            : null;
+
+        return enabledProperty == null || enabledProperty.boolValue;
+    }
+
+    /// <summary>
+    /// Resolves the active power-up property that owns the provided binding.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized binding property being inspected.</param>
+    /// <param name="powerUpProperty">Owning active power-up property when resolved.</param>
+    /// <returns>True when the binding belongs to the Active Power Ups array.</returns>
+    private static bool TryResolveOwningActivePowerUpProperty(SerializedProperty bindingProperty, out SerializedProperty powerUpProperty)
+    {
+        powerUpProperty = null;
+
+        if (bindingProperty == null || bindingProperty.serializedObject == null)
+            return false;
+
+        string propertyPath = bindingProperty.propertyPath;
+
+        if (string.IsNullOrWhiteSpace(propertyPath))
+            return false;
+
+        if (!propertyPath.StartsWith(ActivePowerUpsRoot, System.StringComparison.Ordinal))
+            return false;
+
+        int moduleBindingsIndex = propertyPath.IndexOf(ModuleBindingsPath, System.StringComparison.Ordinal);
+
+        if (moduleBindingsIndex <= 0)
+            return false;
+
+        string powerUpPath = propertyPath.Substring(0, moduleBindingsIndex);
+        powerUpProperty = bindingProperty.serializedObject.FindProperty(powerUpPath);
+        return powerUpProperty != null;
+    }
+
+    /// <summary>
+    /// Checks the owning active composition for the exact runtime context that supports trigger-scoped Character Tuning.
+    /// </summary>
+    /// <param name="powerUpProperty">Serialized active power-up definition that owns the binding.</param>
+    /// <returns>True when the active has a triggerable tool, is not toggleable, and has no Trigger Hold Charge module.</returns>
+    private static bool IsNonToggleableActiveWithoutHoldCharge(SerializedProperty powerUpProperty)
+    {
+        if (powerUpProperty == null)
+            return false;
+
+        SerializedProperty moduleBindingsProperty = powerUpProperty.FindPropertyRelative("moduleBindings");
+
+        if (moduleBindingsProperty == null || !moduleBindingsProperty.isArray)
+            return false;
+
+        bool hasHoldCharge = false;
+        bool hasToggleableGate = false;
+        bool hasTriggerableTool = false;
+
+        for (int bindingIndex = 0; bindingIndex < moduleBindingsProperty.arraySize; bindingIndex++)
+        {
+            SerializedProperty siblingBindingProperty = moduleBindingsProperty.GetArrayElementAtIndex(bindingIndex);
+
+            if (!IsBindingEnabled(siblingBindingProperty))
+                continue;
+
+            SerializedProperty moduleIdProperty = siblingBindingProperty.FindPropertyRelative("moduleId");
+
+            if (moduleIdProperty == null)
+                continue;
+
+            if (!TryResolveModuleInfo(powerUpProperty.serializedObject,
+                                      moduleIdProperty.stringValue,
+                                      out PowerUpModuleKind siblingModuleKind,
+                                      out PowerUpModuleStage _,
+                                      out string _,
+                                      out SerializedProperty moduleDefaultPayloadProperty))
+            {
+                continue;
+            }
+
+            switch (siblingModuleKind)
+            {
+                case PowerUpModuleKind.TriggerHoldCharge:
+                    hasHoldCharge = true;
+                    break;
+                case PowerUpModuleKind.GateResource:
+                    hasToggleableGate = hasToggleableGate ||
+                                        ResolveBindingResourceGateToggleable(siblingBindingProperty,
+                                                                              moduleDefaultPayloadProperty);
+                    break;
+                case PowerUpModuleKind.ProjectilesPatternCone:
+                case PowerUpModuleKind.SpawnObject:
+                case PowerUpModuleKind.Dash:
+                case PowerUpModuleKind.TimeDilationEnemies:
+                case PowerUpModuleKind.Heal:
+                    hasTriggerableTool = true;
+                    break;
+            }
+
+            if (hasHoldCharge || hasToggleableGate)
+                return false;
+        }
+
+        return hasTriggerableTool;
+    }
+
+    /// <summary>
+    /// Resolves the effective Resource Gate toggleable flag for a binding, honoring override payloads.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized Resource Gate binding being inspected.</param>
+    /// <param name="moduleDefaultPayloadProperty">Referenced module-default payload root.</param>
+    /// <returns>True when the effective Resource Gate payload is toggleable.</returns>
+    private static bool ResolveBindingResourceGateToggleable(SerializedProperty bindingProperty,
+                                                             SerializedProperty moduleDefaultPayloadProperty)
+    {
+        SerializedProperty payloadRootProperty = ResolveBindingPayloadRoot(bindingProperty, moduleDefaultPayloadProperty);
+        SerializedProperty resourceGateProperty = payloadRootProperty != null
+            ? payloadRootProperty.FindPropertyRelative("resourceGate")
+            : null;
+        SerializedProperty isToggleableProperty = resourceGateProperty != null
+            ? resourceGateProperty.FindPropertyRelative("isToggleable")
+            : null;
+
+        return isToggleableProperty != null && isToggleableProperty.boolValue;
+    }
+
+    /// <summary>
+    /// Resolves the payload root used by one binding, preferring override payloads when enabled.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized binding whose payload root is requested.</param>
+    /// <param name="moduleDefaultPayloadProperty">Referenced module-default payload root.</param>
+    /// <returns>Override payload root when enabled; otherwise the module-default payload root.</returns>
+    private static SerializedProperty ResolveBindingPayloadRoot(SerializedProperty bindingProperty,
+                                                               SerializedProperty moduleDefaultPayloadProperty)
+    {
+        if (bindingProperty == null)
+            return moduleDefaultPayloadProperty;
+
+        SerializedProperty useOverrideProperty = bindingProperty.FindPropertyRelative("useOverridePayload");
+
+        if (useOverrideProperty == null || !useOverrideProperty.boolValue)
+            return moduleDefaultPayloadProperty;
+
+        SerializedProperty overridePayloadProperty = bindingProperty.FindPropertyRelative("overridePayload");
+
+        if (overridePayloadProperty == null)
+            return moduleDefaultPayloadProperty;
+
+        return overridePayloadProperty;
     }
 
     /// <summary>

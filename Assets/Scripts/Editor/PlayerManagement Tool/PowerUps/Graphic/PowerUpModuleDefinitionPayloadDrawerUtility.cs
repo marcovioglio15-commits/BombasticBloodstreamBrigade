@@ -29,10 +29,12 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="payloadProperty">Serialized payload property to edit.</param>
     /// <param name="moduleKind">Module kind that selects the UI variant.</param>
     /// <param name="payloadLabel">Optional label used by the generic payload fallback.</param>
+    /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
-                                          string payloadLabel)
+                                          string payloadLabel,
+                                          bool showActiveTriggerCharacterTuningOption = false)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -61,7 +63,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);
                 return;
             case PowerUpModuleKind.CharacterTuning:
-                BuildCharacterTuningPayloadUi(payloadContainer, payloadProperty);
+                BuildCharacterTuningPayloadUi(payloadContainer,
+                                              payloadProperty,
+                                              showActiveTriggerCharacterTuningOption);
                 return;
             case PowerUpModuleKind.ProjectilesPatternCone:
                 PowerUpModuleDefinitionVisualizationUtility.BuildProjectilePatternConePayloadUi(payloadContainer, payloadProperty);
@@ -422,15 +426,18 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         });
     }
 
-    private static void BuildCharacterTuningPayloadUi(VisualElement payloadContainer, SerializedProperty characterTuningPayloadProperty)
+    private static void BuildCharacterTuningPayloadUi(VisualElement payloadContainer,
+                                                      SerializedProperty characterTuningPayloadProperty,
+                                                      bool showActiveTriggerCharacterTuningOption)
     {
         if (payloadContainer == null || characterTuningPayloadProperty == null)
             return;
 
         SerializedObject serializedObject = characterTuningPayloadProperty.serializedObject;
+        SerializedProperty applyFormulasOnlyOnActiveTriggerProperty = characterTuningPayloadProperty.FindPropertyRelative("applyFormulasOnlyOnActiveTrigger");
         SerializedProperty formulasProperty = characterTuningPayloadProperty.FindPropertyRelative("formulas");
 
-        if (formulasProperty == null)
+        if (applyFormulasOnlyOnActiveTriggerProperty == null || formulasProperty == null)
         {
             HelpBox errorBox = new HelpBox("Character Tuning payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(errorBox);
@@ -439,7 +446,20 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         HelpBox infoBox = new HelpBox("Each entry uses [TargetStat] = expression syntax. The right-hand expression supports the same operators and functions available in Add Scaling formulas, including switch(condition, case:value, ..., fallback).", HelpBoxMessageType.Info);
         payloadContainer.Add(infoBox);
-        VisualElement formulasField = AddField(payloadContainer, formulasProperty, "Acquisition Formulas");
+
+        if (showActiveTriggerCharacterTuningOption)
+        {
+            AddField(payloadContainer,
+                     applyFormulasOnlyOnActiveTriggerProperty,
+                     "Apply Only On Active Trigger");
+            HelpBox triggerScopeInfoBox = new HelpBox("When enabled here, this active power-up skips acquisition-time Character Tuning and applies the formulas only while its non-toggle activation trigger is executed.", HelpBoxMessageType.Info);
+            payloadContainer.Add(triggerScopeInfoBox);
+        }
+
+        string formulasLabel = showActiveTriggerCharacterTuningOption
+            ? "Character Tuning Formulas"
+            : "Acquisition Formulas";
+        VisualElement formulasField = AddField(payloadContainer, formulasProperty, formulasLabel);
         ScrollView availableVariablesScrollView = new ScrollView(ScrollViewMode.Vertical);
         availableVariablesScrollView.style.marginTop = 2f;
         availableVariablesScrollView.style.height = AvailableVariablesBoxHeight;

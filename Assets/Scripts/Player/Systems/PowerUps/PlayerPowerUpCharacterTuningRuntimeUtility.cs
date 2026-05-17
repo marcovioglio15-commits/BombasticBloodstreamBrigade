@@ -25,7 +25,10 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
         if (unlockCatalogEntry.CharacterTuningFormulaCount <= 0)
             return false;
 
-        return !IsRuntimeScopedCharacterTuning(in unlockCatalogEntry);
+        if (IsRuntimeScopedCharacterTuning(in unlockCatalogEntry))
+            return false;
+
+        return true;
     }
 
     /// <summary>
@@ -50,7 +53,52 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
         if (unlockCatalogEntry.ActiveSlotConfig.ToolKind == ActiveToolKind.ChargeShot)
             return true;
 
-        return unlockCatalogEntry.ActiveSlotConfig.Toggleable != 0;
+        if (unlockCatalogEntry.ActiveSlotConfig.Toggleable != 0)
+            return true;
+
+        return IsActiveTriggerScopedCharacterTuning(in unlockCatalogEntry);
+    }
+
+    /// <summary>
+    /// Resolves whether one active slot applies Character Tuning only during the activation trigger execution.
+    /// </summary>
+    /// <param name="slotConfig">Active slot configuration inspected for trigger-scoped Character Tuning.</param>
+    /// <returns>True when Character Tuning is scoped to a single active trigger; otherwise false.</returns>
+    public static bool IsActiveTriggerScopedCharacterTuning(in PlayerPowerUpSlotConfig slotConfig)
+    {
+        if (slotConfig.IsDefined == 0)
+            return false;
+
+        if (slotConfig.ApplyCharacterTuningOnActiveTrigger == 0)
+            return false;
+
+        if (slotConfig.Toggleable != 0)
+            return false;
+
+        if (slotConfig.ToolKind == ActiveToolKind.ChargeShot ||
+            slotConfig.ToolKind == ActiveToolKind.PassiveToggle ||
+            slotConfig.ToolKind == ActiveToolKind.Custom)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves whether one catalog entry applies Character Tuning only during the activation trigger execution.
+    /// </summary>
+    /// <param name="unlockCatalogEntry">Unlock catalog entry inspected for trigger-scoped Character Tuning.</param>
+    /// <returns>True when the entry has trigger-scoped formulas; otherwise false.</returns>
+    public static bool IsActiveTriggerScopedCharacterTuning(in PlayerPowerUpUnlockCatalogElement unlockCatalogEntry)
+    {
+        if (unlockCatalogEntry.CharacterTuningFormulaCount <= 0)
+            return false;
+
+        if (unlockCatalogEntry.UnlockKind != PlayerPowerUpUnlockKind.Active)
+            return false;
+
+        return IsActiveTriggerScopedCharacterTuning(in unlockCatalogEntry.ActiveSlotConfig);
     }
 
     /// <summary>

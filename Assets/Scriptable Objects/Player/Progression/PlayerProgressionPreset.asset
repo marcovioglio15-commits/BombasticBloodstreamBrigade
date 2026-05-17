@@ -389,6 +389,7 @@ MonoBehaviour:
         progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
         progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas:
         - formula: '[GatheringRadius]=[GatheringRadius]*1.2'
       passivePowerUpUnlocks: []
@@ -404,6 +405,7 @@ MonoBehaviour:
         progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
         progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas:
         - formula: '[MovementSpeed]=[MovementSpeed]*1.2'
       passivePowerUpUnlocks: []
@@ -419,6 +421,7 @@ MonoBehaviour:
         progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
         progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas:
         - formula: '[ShotRange]=[ShotRange]*1.2'
       passivePowerUpUnlocks: []
@@ -434,6 +437,7 @@ MonoBehaviour:
         progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
         progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas:
         - formula: '[FireRate]=[FireRate]*1.2'
       passivePowerUpUnlocks: []
@@ -449,6 +453,7 @@ MonoBehaviour:
         progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
         progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas:
         - formula: '[InfinitePenetration]=true'
       passivePowerUpUnlocks: []

@@ -356,6 +356,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                                  float healthPackDurationSeconds,
                                                                  float healthPackTickIntervalSeconds,
                                                                  PowerUpHealStackPolicy healthPackStackPolicy,
+                                                                 bool applyCharacterTuningOnActiveTrigger,
                                                                  in PlayerPassiveToolConfig triggeredProjectilePassiveTool,
                                                                  in PlayerPassiveToolConfig togglePassiveTool,
                                                                  ActiveToolKind resolvedToolKind)
@@ -394,6 +395,10 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             CooldownSeconds = cooldownSeconds,
             ActivationInputMode = activationInputMode,
             Toggleable = isToggleable ? (byte)1 : (byte)0,
+            ApplyCharacterTuningOnActiveTrigger = ResolveActiveTriggerCharacterTuningFlag(applyCharacterTuningOnActiveTrigger,
+                                                                                          isToggleable,
+                                                                                          hasHoldCharge,
+                                                                                          resolvedToolKind),
             AllowRechargeDuringToggleStartupLock = allowRechargeDuringToggleStartupLock ? (byte)1 : (byte)0,
             MinimumActivationEnergyPercent = math.clamp(minimumActivationEnergyPercent, 0f, 100f),
             Unreplaceable = powerUp.Unreplaceable ? (byte)1 : (byte)0,
@@ -519,6 +524,31 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             return PowerUpActivationInputMode.OnRelease;
 
         return PowerUpActivationInputMode.OnPress;
+    }
+
+    /// <summary>
+    /// Resolves whether active Character Tuning should be scoped only to the activation trigger for the compiled slot.
+    /// </summary>
+    /// <param name="requested">True when at least one Character Tuning module requested trigger-scoped formulas.</param>
+    /// <param name="isToggleable">True when the active is compiled as a toggleable passive snapshot.</param>
+    /// <param name="hasHoldCharge">True when the active uses Trigger Hold Charge.</param>
+    /// <param name="resolvedToolKind">Compiled active tool kind.</param>
+    /// <returns>One when trigger-scoped Character Tuning is valid for this slot; otherwise zero.</returns>
+    private static byte ResolveActiveTriggerCharacterTuningFlag(bool requested,
+                                                                bool isToggleable,
+                                                                bool hasHoldCharge,
+                                                                ActiveToolKind resolvedToolKind)
+    {
+        if (!requested)
+            return 0;
+
+        if (isToggleable || hasHoldCharge)
+            return 0;
+
+        if (resolvedToolKind == ActiveToolKind.Custom || resolvedToolKind == ActiveToolKind.PassiveToggle)
+            return 0;
+
+        return 1;
     }
 
     /// <summary>

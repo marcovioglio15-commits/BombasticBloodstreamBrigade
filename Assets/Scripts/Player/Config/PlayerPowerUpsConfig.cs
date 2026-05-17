@@ -40,6 +40,7 @@ public struct PlayerPowerUpSlotConfig
     public float CooldownSeconds;
     public PowerUpActivationInputMode ActivationInputMode;
     public byte Toggleable;
+    public byte ApplyCharacterTuningOnActiveTrigger;
     public byte AllowRechargeDuringToggleStartupLock;
     public float MinimumActivationEnergyPercent;
     public byte Unreplaceable;

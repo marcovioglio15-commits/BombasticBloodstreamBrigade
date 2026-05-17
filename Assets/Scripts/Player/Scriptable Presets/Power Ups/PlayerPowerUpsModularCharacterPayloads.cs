@@ -58,7 +58,7 @@ public sealed class PowerUpCharacterTuningFormulaData
 }
 
 /// <summary>
-/// Stores all scalable-stat assignments executed once when the owning power-up is obtained.
+/// Stores scalable-stat assignments used by Character Tuning power-up modules.
 /// </summary>
 [Serializable]
 public sealed class PowerUpCharacterTuningModuleData
@@ -66,13 +66,26 @@ public sealed class PowerUpCharacterTuningModuleData
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Ordered acquisition formulas applied one after another when this power-up is obtained.")]
+    [Header("Active Trigger Scope")]
+    [Tooltip("When enabled on a non-toggleable active power-up without Trigger Hold Charge, all Character Tuning formulas on that power-up are applied only while the activation trigger is executed.")]
+    [SerializeField] private bool applyFormulasOnlyOnActiveTrigger;
+
+    [Header("Formulas")]
+    [Tooltip("Ordered formulas applied one after another according to this module's runtime scope.")]
     [SerializeField] private List<PowerUpCharacterTuningFormulaData> formulas = new List<PowerUpCharacterTuningFormulaData>();
     #endregion
 
     #endregion
 
     #region Properties
+    public bool ApplyFormulasOnlyOnActiveTrigger
+    {
+        get
+        {
+            return applyFormulasOnlyOnActiveTrigger;
+        }
+    }
+
     public IReadOnlyList<PowerUpCharacterTuningFormulaData> Formulas
     {
         get
@@ -89,8 +102,11 @@ public sealed class PowerUpCharacterTuningModuleData
     /// Replaces the stored acquisition-formula list with the provided entries.
     /// </summary>
     /// <param name="formulasValue">New ordered list of acquisition formulas.</param>
-    public void Configure(List<PowerUpCharacterTuningFormulaData> formulasValue)
+    /// <param name="applyFormulasOnlyOnActiveTriggerValue">True when eligible active power-ups apply formulas only during their activation trigger.</param>
+    public void Configure(List<PowerUpCharacterTuningFormulaData> formulasValue,
+                          bool applyFormulasOnlyOnActiveTriggerValue = false)
     {
+        applyFormulasOnlyOnActiveTrigger = applyFormulasOnlyOnActiveTriggerValue;
         formulas = formulasValue;
     }
     #endregion

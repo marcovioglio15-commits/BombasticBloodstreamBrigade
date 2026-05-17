@@ -307,6 +307,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -568,6 +569,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -829,6 +831,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -1090,6 +1093,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -1351,6 +1355,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -1612,6 +1617,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -1873,6 +1879,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -2134,6 +2141,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -2395,6 +2403,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
@@ -2656,6 +2665,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -2917,6 +2927,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -3178,6 +3189,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -3439,6 +3451,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -3700,6 +3713,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -3961,6 +3975,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -4222,6 +4237,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -4483,6 +4499,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -4744,6 +4761,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -5005,6 +5023,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -5266,6 +5285,7 @@ MonoBehaviour:
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
       characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
       bomb:
         bombPrefab: {fileID: 0}
@@ -5540,6 +5560,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -5801,6 +5822,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -6062,6 +6084,7 @@ MonoBehaviour:
           coneAngleDegrees: 1
           laserDurationSeconds: 1
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -6323,6 +6346,7 @@ MonoBehaviour:
           coneAngleDegrees: 1
           laserDurationSeconds: 1
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -6584,6 +6608,7 @@ MonoBehaviour:
           coneAngleDegrees: 1
           laserDurationSeconds: 1
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 1
           formulas:
           - formula: '[ShotRange]=[ShotRange]*1.5'
         bomb:
@@ -6859,6 +6884,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -7120,6 +7146,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -7381,6 +7408,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -7642,6 +7670,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -7903,6 +7932,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[InfinitePenetration]=true'
           - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
@@ -8168,6 +8198,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[InfinitePenetration]=true'
           - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
@@ -8446,6 +8477,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -8707,6 +8739,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -8968,6 +9001,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
@@ -9242,6 +9276,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -9503,6 +9538,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -9764,6 +9800,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -10038,6 +10075,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -10299,6 +10337,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -10560,6 +10599,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -10834,6 +10874,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -11095,6 +11136,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -11356,6 +11398,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -11627,6 +11670,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -11888,6 +11932,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -12149,6 +12194,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[Damage]=[Damage]+3'
         bomb:
@@ -12422,6 +12468,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -12681,6 +12728,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -12954,6 +13002,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -13215,6 +13264,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -13489,6 +13539,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -13763,6 +13814,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -14024,6 +14076,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotRange]=50'
         bomb:
@@ -14299,6 +14352,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -14573,6 +14627,7 @@ MonoBehaviour:
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -14844,6 +14899,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*1.5'
           - formula: '[Damage]=[Damage]*1.5'
@@ -15116,6 +15172,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[Health]=[Health]+1'
         bomb:
@@ -15376,6 +15433,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -15646,6 +15704,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -15906,6 +15965,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -16166,6 +16226,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -16436,6 +16497,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[Damage]=[Damage]+1'
         bomb:
@@ -16696,6 +16758,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -16966,6 +17029,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[FireRate]=[FireRate]+0.5'
         bomb:
@@ -17226,6 +17290,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -17496,6 +17561,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[GatheringRadius]=[GatheringRadius]+1'
         bomb:
@@ -17756,6 +17822,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -18026,6 +18093,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[MovementSpeed]=[MovementSpeed]+0.5'
         bomb:
@@ -18286,6 +18354,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -18556,6 +18625,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[Shield]=[Shield]+1'
         bomb:
@@ -18816,6 +18886,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
         bomb:
@@ -19087,6 +19158,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[BulletElementType_A]="Fire"'
         bomb:
@@ -19358,6 +19430,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[BulletElementType_B]="Ice"'
         bomb:
@@ -19629,6 +19702,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
         bomb:
           bombPrefab: {fileID: 0}
@@ -19888,6 +19962,7 @@ MonoBehaviour:
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
         characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[Knockback]=0'
         bomb:
@@ -20040,7 +20115,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: Active_Shotgun
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
   - Passive_LaserBeam
