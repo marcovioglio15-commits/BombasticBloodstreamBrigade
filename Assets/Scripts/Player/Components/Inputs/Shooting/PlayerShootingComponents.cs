@@ -122,6 +122,15 @@ public struct ProjectileOwner : IComponentData
 }
 
 /// <summary>
+/// Tracks whether one pooled projectile still needs an offscreen warning before it first becomes visible.
+/// </summary>
+public struct ProjectileOffscreenWarningState : IComponentData
+{
+    public byte Enabled;
+    public byte HasBeenVisible;
+}
+
+/// <summary>
 /// Stores enemies already hit during the projectile's current overlap contact so penetration cannot damage them every frame until the projectile exits.
 /// </summary>
 [InternalBufferCapacity(8)]

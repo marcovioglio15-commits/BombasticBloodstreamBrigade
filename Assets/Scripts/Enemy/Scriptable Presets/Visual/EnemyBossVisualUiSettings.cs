@@ -13,6 +13,12 @@ public sealed class EnemyBossVisualUiSettings
     [Tooltip("Enables the dedicated boss HUD for enemies using a Boss Pattern Preset.")]
     [SerializeField] private bool enabled = true;
 
+    [Tooltip("Shows the mirrored boss health and shield bars when the dedicated boss HUD is enabled.")]
+    [SerializeField] private bool showHealthBar = true;
+
+    [Tooltip("Shows the screen-edge indicator for an active boss that is outside the camera view.")]
+    [SerializeField] private bool showOffscreenIndicator = true;
+
     [Tooltip("Optional boss display name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.")]
     [SerializeField] private string bossDisplayName;
 
@@ -51,6 +57,22 @@ public sealed class EnemyBossVisualUiSettings
         get
         {
             return enabled;
+        }
+    }
+
+    public bool ShowHealthBar
+    {
+        get
+        {
+            return showHealthBar;
+        }
+    }
+
+    public bool ShowOffscreenIndicator
+    {
+        get
+        {
+            return showOffscreenIndicator;
         }
     }
 

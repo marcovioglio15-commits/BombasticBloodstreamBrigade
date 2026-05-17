@@ -302,7 +302,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
         maintenanceTickTimer = 0f;
 
-        if (!pressedThisFrame || slotConfig.TogglePassiveTool.IsDefined == 0)
+        if (!pressedThisFrame)
             return;
 
         if (!PlayerPowerUpResourceCostUtility.CanPayActivationCost(in slotConfig,

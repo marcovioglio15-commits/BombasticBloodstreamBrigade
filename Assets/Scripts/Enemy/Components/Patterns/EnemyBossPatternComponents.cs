@@ -17,6 +17,8 @@ public struct EnemyBossTag : IComponentData
 public struct EnemyBossHudConfig : IComponentData
 {
     public byte Enabled;
+    public byte ShowHealthBar;
+    public byte ShowOffscreenIndicator;
     public FixedString64Bytes DisplayName;
     public float4 HealthFillColor;
     public float4 HealthBackgroundColor;

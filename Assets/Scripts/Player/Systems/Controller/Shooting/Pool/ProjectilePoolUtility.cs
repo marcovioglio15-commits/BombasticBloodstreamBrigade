@@ -113,6 +113,9 @@ public static class ProjectilePoolUtility
 
         if (!entityManager.HasComponent<ProjectileElementalPayload>(projectileEntity))
             entityManager.AddComponentData(projectileEntity, default(ProjectileElementalPayload));
+
+        if (!entityManager.HasComponent<ProjectileOffscreenWarningState>(projectileEntity))
+            entityManager.AddComponentData(projectileEntity, default(ProjectileOffscreenWarningState));
     }
 
     /// <summary>

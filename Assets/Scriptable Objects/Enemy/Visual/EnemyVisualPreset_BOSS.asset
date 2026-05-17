@@ -64,8 +64,16 @@ MonoBehaviour:
     spawnWarningMaximumAlpha: 0.95
     spawnWarningFadeOutSeconds: 0.18
     spawnWarningColor: {r: 1, g: 0.72, b: 0.18, a: 1}
+  projectileOffscreenWarning:
+    enabled: 0
+    indicatorSprite: {fileID: 0}
+    indicatorColor: {r: 1, g: 0.48, b: 0.05, a: 0.95}
+    indicatorSizePixels: 42
+    edgePaddingPixels: 28
   bossUi:
     enabled: 1
+    showHealthBar: 1
+    showOffscreenIndicator: 1
     bossDisplayName: BOSS
     healthFillColor: {r: 0.9, g: 0.12, b: 0.08, a: 1}
     healthBackgroundColor: {r: 1, g: 1, b: 1, a: 1}

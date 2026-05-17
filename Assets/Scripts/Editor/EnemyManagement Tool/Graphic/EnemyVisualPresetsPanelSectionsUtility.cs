@@ -142,6 +142,10 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                EnemyVisualPresetsPanel.VisualSubSectionType.BossUi,
                                "Boss UI",
                                BuildBossUiSubSection(panel));
+        AddVisualSubSectionTab(panel,
+                               EnemyVisualPresetsPanel.VisualSubSectionType.ProjectileOffscreenWarning,
+                               "Projectile Warnings",
+                               BuildProjectileOffscreenWarningSubSection(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = EnemyVisualPresetsPanel.VisualSubSectionType.Visibility;
@@ -409,26 +413,13 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
             return container;
 
         SerializedProperty enabledProperty = bossUiProperty.FindPropertyRelative("enabled");
+        SerializedProperty showHealthBarProperty = bossUiProperty.FindPropertyRelative("showHealthBar");
+        SerializedProperty showOffscreenIndicatorProperty = bossUiProperty.FindPropertyRelative("showOffscreenIndicator");
 
         if (enabledProperty == null)
             return container;
 
-        Toggle enabledField = new Toggle("Enabled");
-        enabledField.tooltip = "Enables the dedicated boss HUD for enemies using a Boss Pattern Preset.";
-        enabledField.SetValueWithoutNotify(enabledProperty.boolValue);
-        enabledField.RegisterValueChangedCallback(evt =>
-        {
-            Object targetObject = panel.PresetSerializedObject.targetObject;
-            Undo.RecordObject(targetObject, "Edit Enemy Boss UI Settings");
-            panel.PresetSerializedObject.Update();
-            enabledProperty.boolValue = evt.newValue;
-            panel.PresetSerializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(targetObject);
-            EnemyManagementDraftSession.MarkDirty();
-            panel.RefreshPresetList();
-            panel.RebuildActiveDetailsSection();
-        });
-        container.Add(enabledField);
+        AddReactiveToggleField(panel, container, enabledProperty, "Enabled", "Enables the dedicated boss HUD for enemies using a Boss Pattern Preset.", "Edit Enemy Boss UI Settings");
 
         if (!enabledProperty.boolValue)
         {
@@ -436,18 +427,66 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
             return container;
         }
 
-        AddSectionLabel(container, "Mirrored Boss Bars");
-        AddPropertyField(panel, container, bossUiProperty, "bossDisplayName", "Boss Display Name", "Optional boss name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.");
-        AddPropertyField(panel, container, bossUiProperty, "healthFillColor", "Health Fill Color", "Screen-space health fill color used by the mirrored boss health syringe bar.");
-        AddPropertyField(panel, container, bossUiProperty, "healthBackgroundColor", "Health Background Tint", "Sprite tint used behind the mirrored boss health syringe bar. Keep white to preserve the player bar background silhouette.");
-        AddPropertyField(panel, container, bossUiProperty, "shieldFillColor", "Shield Fill Color", "Screen-space shield fill color used by the mirrored boss shield syringe bar.");
-        AddPropertyField(panel, container, bossUiProperty, "shieldBackgroundColor", "Shield Background Tint", "Sprite tint used behind the mirrored boss shield syringe bar. Keep white to preserve the player bar background silhouette.");
+        AddReactiveToggleField(panel, container, showHealthBarProperty, "Show Health Bar", "Shows the mirrored boss health and shield bars when the dedicated boss HUD is enabled.", "Edit Enemy Boss UI Settings");
+        AddReactiveToggleField(panel, container, showOffscreenIndicatorProperty, "Show Offscreen Indicator", "Shows the screen-edge indicator for an active boss that is outside the camera view.", "Edit Enemy Boss UI Settings");
 
-        AddSectionLabel(container, "Offscreen Indicator");
-        AddPropertyField(panel, container, bossUiProperty, "offscreenIndicatorSprite", "Offscreen Indicator Sprite", "Sprite used by the off-screen indicator that slides along screen edges.");
-        AddPropertyField(panel, container, bossUiProperty, "offscreenIndicatorColor", "Offscreen Indicator Color", "Tint color applied to the off-screen boss indicator.");
-        AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("offscreenIndicatorSizePixels"), "Indicator Size", 16f, 192f, "Square size in pixels used by the off-screen boss indicator image.");
-        AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("edgePaddingPixels"), "Screen Margin", 0f, 160f, "Extra screen-edge margin in pixels kept outside the off-screen indicator half size.");
+        bool showHealthBar = showHealthBarProperty == null || showHealthBarProperty.boolValue;
+        bool showOffscreenIndicator = showOffscreenIndicatorProperty == null || showOffscreenIndicatorProperty.boolValue;
+
+        if (!showHealthBar && !showOffscreenIndicator)
+            container.Add(new HelpBox("Both Boss UI outputs are disabled. Enable at least one output to show boss runtime UI.", HelpBoxMessageType.Warning));
+
+        if (showHealthBar)
+        {
+            AddSectionLabel(container, "Mirrored Boss Bars");
+            AddPropertyField(panel, container, bossUiProperty, "bossDisplayName", "Boss Display Name", "Optional boss name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.");
+            AddPropertyField(panel, container, bossUiProperty, "healthFillColor", "Health Fill Color", "Screen-space health fill color used by the mirrored boss health syringe bar.");
+            AddPropertyField(panel, container, bossUiProperty, "healthBackgroundColor", "Health Background Tint", "Sprite tint used behind the mirrored boss health syringe bar. Keep white to preserve the player bar background silhouette.");
+            AddPropertyField(panel, container, bossUiProperty, "shieldFillColor", "Shield Fill Color", "Screen-space shield fill color used by the mirrored boss shield syringe bar.");
+            AddPropertyField(panel, container, bossUiProperty, "shieldBackgroundColor", "Shield Background Tint", "Sprite tint used behind the mirrored boss shield syringe bar. Keep white to preserve the player bar background silhouette.");
+        }
+
+        if (showOffscreenIndicator)
+        {
+            AddSectionLabel(container, "Offscreen Indicator");
+            AddPropertyField(panel, container, bossUiProperty, "offscreenIndicatorSprite", "Offscreen Indicator Sprite", "Sprite used by the off-screen indicator that slides along screen edges.");
+            AddPropertyField(panel, container, bossUiProperty, "offscreenIndicatorColor", "Offscreen Indicator Color", "Tint color applied to the off-screen boss indicator.");
+            AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("offscreenIndicatorSizePixels"), "Indicator Size", 16f, 192f, "Square size in pixels used by the off-screen boss indicator image.");
+            AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("edgePaddingPixels"), "Screen Margin", 0f, 160f, "Extra screen-edge margin in pixels kept outside the off-screen indicator half size.");
+            AddNonPositiveValueWarning(bossUiProperty, container, "offscreenIndicatorSizePixels", "Boss offscreen indicator size should be greater than zero.");
+            AddNegativeValueWarning(bossUiProperty, container, "edgePaddingPixels", "Boss offscreen indicator screen margin must be zero or positive.");
+        }
+
+        return container;
+    }
+
+    /// <summary>
+    /// Builds projectile offscreen-warning controls with dependent fields shown only while warnings are enabled.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the serialized preset context.</param>
+    /// <returns>Projectile offscreen-warning subsection content.</returns>
+    private static VisualElement BuildProjectileOffscreenWarningSubSection(EnemyVisualPresetsPanel panel)
+    {
+        SerializedProperty warningProperty = panel.PresetSerializedObject.FindProperty("projectileOffscreenWarning");
+        VisualElement container = CreateSubSectionContainer("Projectile Warnings");
+
+        if (warningProperty == null)
+            return container;
+
+        SerializedProperty enabledProperty = warningProperty.FindPropertyRelative("enabled");
+        AddReactiveToggleField(panel, container, enabledProperty, "Enabled", "Shows a screen-edge warning for enemy-owned projectiles that are fired while still outside camera view.", "Edit Enemy Projectile Warning Settings");
+
+        if (enabledProperty != null && !enabledProperty.boolValue)
+        {
+            container.Add(new HelpBox("Projectile offscreen warnings are disabled for this visual preset.", HelpBoxMessageType.Info));
+            return container;
+        }
+
+        AddPropertyField(panel, container, warningProperty, "indicatorSprite", "Indicator Sprite", "Optional sprite used by offscreen projectile warnings. Empty uses the built-in triangular warning sprite.");
+        AddPropertyField(panel, container, warningProperty, "indicatorColor", "Indicator Color", "Tint applied to offscreen projectile warning indicators.");
+        AddSliderField(panel, container, warningProperty.FindPropertyRelative("indicatorSizePixels"), "Indicator Size", 12f, 128f, "Square size in pixels used by each projectile warning indicator.");
+        AddSliderField(panel, container, warningProperty.FindPropertyRelative("edgePaddingPixels"), "Screen Margin", 0f, 160f, "Extra screen-edge margin in pixels kept outside the projectile warning half size.");
+        AddProjectileOffscreenWarningWarnings(warningProperty, container);
         return container;
     }
 
@@ -492,7 +531,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         slider.RegisterValueChangedCallback(evt =>
         {
             Object targetObject = panel.PresetSerializedObject.targetObject;
-            Undo.RecordObject(targetObject, "Edit Enemy Boss UI Settings");
+            Undo.RecordObject(targetObject, "Edit Enemy Visual Settings");
             panel.PresetSerializedObject.Update();
             property.floatValue = evt.newValue;
             panel.PresetSerializedObject.ApplyModifiedProperties();
@@ -517,6 +556,25 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                                string label,
                                                string tooltip)
     {
+        AddReactiveToggleField(panel, target, property, label, tooltip, "Edit Enemy Visual Settings");
+    }
+
+    /// <summary>
+    /// Adds a toggle that rebuilds the active details section when dependent settings should appear or hide.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the serialized preset context.</param>
+    /// <param name="target">Parent element receiving the toggle.</param>
+    /// <param name="property">Serialized boolean property.</param>
+    /// <param name="label">Visible control label.</param>
+    /// <param name="tooltip">Tooltip explaining the setting.</param>
+    /// <param name="undoLabel">Undo label used for the serialized edit.</param>
+    private static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
+                                               VisualElement target,
+                                               SerializedProperty property,
+                                               string label,
+                                               string tooltip,
+                                               string undoLabel)
+    {
         if (panel == null || target == null || property == null)
             return;
 
@@ -526,7 +584,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         toggle.RegisterValueChangedCallback(evt =>
         {
             Object targetObject = panel.PresetSerializedObject.targetObject;
-            Undo.RecordObject(targetObject, "Edit Enemy Visual Spawn Overrides");
+            Undo.RecordObject(targetObject, undoLabel);
             panel.PresetSerializedObject.Update();
             property.boolValue = evt.newValue;
             panel.PresetSerializedObject.ApplyModifiedProperties();
@@ -536,6 +594,20 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
             panel.RebuildActiveDetailsSection();
         });
         target.Add(toggle);
+    }
+
+    /// <summary>
+    /// Adds authored-value warnings for projectile offscreen indicators without mutating the serialized values.
+    /// </summary>
+    /// <param name="warningProperty">Serialized projectile warning settings.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    private static void AddProjectileOffscreenWarningWarnings(SerializedProperty warningProperty, VisualElement container)
+    {
+        if (warningProperty == null || container == null)
+            return;
+
+        AddNonPositiveValueWarning(warningProperty, container, "indicatorSizePixels", "Projectile warning indicator size should be greater than zero.");
+        AddNegativeValueWarning(warningProperty, container, "edgePaddingPixels", "Projectile warning screen margin must be zero or positive.");
     }
 
     /// <summary>

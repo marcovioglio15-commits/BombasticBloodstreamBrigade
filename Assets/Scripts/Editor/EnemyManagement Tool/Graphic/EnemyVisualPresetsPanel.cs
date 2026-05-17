@@ -667,7 +667,8 @@ public sealed class EnemyVisualPresetsPanel
         Prefabs = 3,
         OffensiveEngagementFeedback = 4,
         SpawnOverrides = 5,
-        BossUi = 6
+        BossUi = 6,
+        ProjectileOffscreenWarning = 7
     }
 
     internal sealed class VisualSubSectionTabEntry

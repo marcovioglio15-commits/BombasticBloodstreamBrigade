@@ -163,6 +163,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             LifetimeSeconds = math.max(0.05f, authoring.HitVfxLifetimeSeconds),
             ScaleMultiplier = math.max(0.01f, authoring.HitVfxScaleMultiplier)
         });
+        AddComponent(entity, BuildProjectileOffscreenWarningConfig(authoring));
+        TryBakeProjectileOffscreenWarningManagedConfig(authoring, entity);
 
         float4 damageFlashColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.DamageFlashColor);
         AddComponent(entity, new DamageFlashConfig
@@ -400,6 +402,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         return new EnemyBossHudConfig
         {
             Enabled = bossUi == null || bossUi.Enabled ? (byte)1 : (byte)0,
+            ShowHealthBar = bossUi == null || bossUi.ShowHealthBar ? (byte)1 : (byte)0,
+            ShowOffscreenIndicator = bossUi == null || bossUi.ShowOffscreenIndicator ? (byte)1 : (byte)0,
             DisplayName = new Unity.Collections.FixedString64Bytes(displayName),
             HealthFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthFillColor),
             HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthBackgroundColor),
@@ -409,6 +413,53 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             OffscreenIndicatorSizePixels = bossUi != null ? math.max(1f, bossUi.OffscreenIndicatorSizePixels) : 56f,
             EdgePaddingPixels = bossUi != null ? math.max(0f, bossUi.EdgePaddingPixels) : 30f
         };
+    }
+
+    /// <summary>
+    /// Builds unmanaged projectile offscreen-warning configuration from the resolved enemy visual preset.
+    /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <returns>Baked projectile offscreen-warning config component.</returns>
+    private static EnemyProjectileOffscreenWarningConfig BuildProjectileOffscreenWarningConfig(EnemyAuthoring authoring)
+    {
+        EnemyVisualPreset visualPreset = authoring != null ? authoring.VisualPreset : null;
+        EnemyProjectileOffscreenWarningSettings warningSettings = visualPreset != null ? visualPreset.ProjectileOffscreenWarning : null;
+        Color indicatorColor = warningSettings != null ? warningSettings.IndicatorColor : new Color(1f, 0.48f, 0.05f, 0.95f);
+
+        return new EnemyProjectileOffscreenWarningConfig
+        {
+            Enabled = warningSettings != null && warningSettings.Enabled ? (byte)1 : (byte)0,
+            IndicatorColor = DamageFlashRuntimeUtility.ToLinearFloat4(indicatorColor),
+            IndicatorSizePixels = warningSettings != null ? math.max(1f, warningSettings.IndicatorSizePixels) : 42f,
+            EdgePaddingPixels = warningSettings != null ? math.max(0f, warningSettings.EdgePaddingPixels) : 28f
+        };
+    }
+
+    /// <summary>
+    /// Adds managed projectile warning assets such as custom offscreen indicator sprites.
+    /// </summary>
+    /// <param name="authoring">Source authoring component.</param>
+    /// <param name="entity">Enemy entity receiving managed data.</param>
+    private void TryBakeProjectileOffscreenWarningManagedConfig(EnemyAuthoring authoring, Entity entity)
+    {
+        if (authoring == null)
+            return;
+
+        EnemyVisualPreset visualPreset = authoring.VisualPreset;
+
+        if (visualPreset == null || visualPreset.ProjectileOffscreenWarning == null)
+            return;
+
+        if (!visualPreset.ProjectileOffscreenWarning.Enabled)
+            return;
+
+        if (visualPreset.ProjectileOffscreenWarning.IndicatorSprite == null)
+            return;
+
+        AddComponentObject(entity, new EnemyProjectileOffscreenWarningManagedConfig
+        {
+            IndicatorSprite = visualPreset.ProjectileOffscreenWarning.IndicatorSprite
+        });
     }
 
     /// <summary>
@@ -424,6 +475,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         EnemyVisualPreset visualPreset = authoring.VisualPreset;
 
         if (visualPreset == null || visualPreset.BossUi == null)
+            return;
+
+        if (!visualPreset.BossUi.ShowOffscreenIndicator)
             return;
 
         if (visualPreset.BossUi.OffscreenIndicatorSprite == null)

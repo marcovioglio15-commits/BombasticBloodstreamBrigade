@@ -628,7 +628,523 @@ MonoBehaviour:
               minimumFinalMultiplier: 0
               maximumFinalMultiplier: 4
               conditions: []
-  interactions: []
+  interactions:
+  - enabled: 1
+    interactionType: 3
+    displayName: Missing Health Interaction 1
+    minimumActiveSeconds: 0
+    minimumMissingHealthPercent: 0
+    maximumMissingHealthPercent: 0
+    minimumElapsedSeconds: 0
+    maximumElapsedSeconds: 0
+    minimumTravelledDistance: 0
+    maximumTravelledDistance: 0
+    minimumPlayerDistance: 0
+    maximumPlayerDistance: 0
+    recentlyDamagedWindowSeconds: 0
+    coreMovement:
+      isEnabled: 1
+      binding:
+        moduleId: Module_Stationary
+        isEnabled: 1
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 0
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+              arrivalTolerance: 0
+              waitCooldownSeconds: 0
+              candidateSampleCount: 0
+              useInfiniteDirectionSampling: 0
+              infiniteDirectionStepDegrees: 0
+              unexploredDirectionPreference: 0
+              towardPlayerPreference: 0
+              minimumEnemyClearance: 0
+              trajectoryPredictionTime: 0
+              freeTrajectoryPreference: 0
+              blockedPathRetryDelay: 0
+            dvd:
+              speedMultiplier: 0
+              bounceDamping: 0
+              randomizeInitialDirection: 0
+              fixedInitialDirectionDegrees: 0
+              cornerNudgeDistance: 0
+              ignoreSteeringAndPriority: 0
+          coward:
+            detectionRadius: 0
+            releaseDistanceBuffer: 0
+            searchRadius: 0
+            minimumRetreatDistance: 0
+            maximumRetreatDistance: 0
+            arrivalTolerance: 0
+            candidateSampleCount: 0
+            useInfiniteDirectionSampling: 0
+            infiniteDirectionStepDegrees: 0
+            minimumEnemyClearance: 0
+            trajectoryPredictionTime: 0
+            freeTrajectoryPreference: 0
+            retreatDirectionPreference: 0
+            openSpacePreference: 0
+            navigationRetreatPreference: 0
+            patrolRadius: 0
+            patrolWaitSeconds: 0
+            patrolSpeedMultiplier: 0
+            retreatSpeedMultiplierFar: 0
+            retreatSpeedMultiplierNear: 0
+            blockedPathRetryDelay: 0
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0
+              moveSpeedMultiplierWhileAiming: 0
+            recovery:
+              cooldownSeconds: 0
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 0
+              distanceOffset: 0
+              fixedDistance: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+            path:
+              dashDurationSeconds: 0
+              lateralAmplitude: 0
+              mirrorMode: 0
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 0
+            burstCount: 0
+            aimWindupSeconds: 0
+            preFireStopSeconds: 0
+            postFireStopSeconds: 0
+            intraBurstDelay: 0
+            useMinimumRange: 0
+            minimumRange: 0
+            useMaximumRange: 0
+            maximumRange: 0
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 0
+              spreadAngleDegrees: 0
+              projectileSpeed: 0
+              projectileDamage: 0
+              projectileRange: 0
+              projectileLifetime: 0
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 0
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 0
+              poolExpandBatch: 0
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 0
+                maximumStacks: 0
+                stackDecayPerSecond: 0
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 0
+                dotTickInterval: 0
+                dotDurationSeconds: 0
+                impedimentSlowPercentPerStack: 0
+                impedimentProcSlowPercent: 0
+                impedimentMaxSlowPercent: 0
+                impedimentDurationSeconds: 0
+              stacksPerHit: 0
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 0
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0
+              dropRadius: 0
+              collectionMovement:
+                moveSpeed: 0
+                collectDistance: 0
+                collectDistancePerPlayerSpeed: 0
+                spawnAnimationMinDuration: 0
+                spawnAnimationMaxDuration: 0
+            extraComboPoints:
+              baseMultiplier: 0
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 0
+              conditions: []
+    shortRangeInteraction:
+      isEnabled: 0
+      activationRange: 0
+      releaseDistanceBuffer: 0
+      displayBehaviourEngagementTrigger: 0
+      useEngagementFeedbackOverride: 0
+      engagementFeedbackOverride:
+        enableColorBlend: 0
+        colorBlendColor: {r: 0, g: 0, b: 0, a: 0}
+        colorBlendLeadTimeSeconds: 0
+        colorBlendFadeOutSeconds: 0
+        colorBlendMaximumBlend: 0
+        enableBillboard: 0
+        billboardSprite: {fileID: 0}
+        billboardColor: {r: 0, g: 0, b: 0, a: 0}
+        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardLeadTimeSeconds: 0
+        billboardBaseScale: 0
+        billboardPulseScaleMultiplier: 0
+        billboardPulseExpandDurationSeconds: 0
+        billboardPulseContractDurationSeconds: 0
+      binding:
+        moduleId: Module_Custom
+        isEnabled: 0
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 0
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+              arrivalTolerance: 0
+              waitCooldownSeconds: 0
+              candidateSampleCount: 0
+              useInfiniteDirectionSampling: 0
+              infiniteDirectionStepDegrees: 0
+              unexploredDirectionPreference: 0
+              towardPlayerPreference: 0
+              minimumEnemyClearance: 0
+              trajectoryPredictionTime: 0
+              freeTrajectoryPreference: 0
+              blockedPathRetryDelay: 0
+            dvd:
+              speedMultiplier: 0
+              bounceDamping: 0
+              randomizeInitialDirection: 0
+              fixedInitialDirectionDegrees: 0
+              cornerNudgeDistance: 0
+              ignoreSteeringAndPriority: 0
+          coward:
+            detectionRadius: 0
+            releaseDistanceBuffer: 0
+            searchRadius: 0
+            minimumRetreatDistance: 0
+            maximumRetreatDistance: 0
+            arrivalTolerance: 0
+            candidateSampleCount: 0
+            useInfiniteDirectionSampling: 0
+            infiniteDirectionStepDegrees: 0
+            minimumEnemyClearance: 0
+            trajectoryPredictionTime: 0
+            freeTrajectoryPreference: 0
+            retreatDirectionPreference: 0
+            openSpacePreference: 0
+            navigationRetreatPreference: 0
+            patrolRadius: 0
+            patrolWaitSeconds: 0
+            patrolSpeedMultiplier: 0
+            retreatSpeedMultiplierFar: 0
+            retreatSpeedMultiplierNear: 0
+            blockedPathRetryDelay: 0
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0
+              moveSpeedMultiplierWhileAiming: 0
+            recovery:
+              cooldownSeconds: 0
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 0
+              distanceOffset: 0
+              fixedDistance: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+            path:
+              dashDurationSeconds: 0
+              lateralAmplitude: 0
+              mirrorMode: 0
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 0
+            burstCount: 0
+            aimWindupSeconds: 0
+            preFireStopSeconds: 0
+            postFireStopSeconds: 0
+            intraBurstDelay: 0
+            useMinimumRange: 0
+            minimumRange: 0
+            useMaximumRange: 0
+            maximumRange: 0
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 0
+              spreadAngleDegrees: 0
+              projectileSpeed: 0
+              projectileDamage: 0
+              projectileRange: 0
+              projectileLifetime: 0
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 0
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 0
+              poolExpandBatch: 0
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 0
+                maximumStacks: 0
+                stackDecayPerSecond: 0
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 0
+                dotTickInterval: 0
+                dotDurationSeconds: 0
+                impedimentSlowPercentPerStack: 0
+                impedimentProcSlowPercent: 0
+                impedimentMaxSlowPercent: 0
+                impedimentDurationSeconds: 0
+              stacksPerHit: 0
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 0
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0
+              dropRadius: 0
+              collectionMovement:
+                moveSpeed: 0
+                collectDistance: 0
+                collectDistancePerPlayerSpeed: 0
+                spawnAnimationMinDuration: 0
+                spawnAnimationMaxDuration: 0
+            extraComboPoints:
+              baseMultiplier: 0
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 0
+              conditions: []
+    weaponInteraction:
+      isEnabled: 0
+      useMinimumRange: 0
+      minimumRange: 0
+      useMaximumRange: 0
+      maximumRange: 0
+      exclusiveLookDirectionControl: 0
+      activationGates: 0
+      maximumActivationSpeed: 0
+      recentlyDamagedWindowSeconds: 0
+      displayBehaviourEngagementTrigger: 0
+      useEngagementFeedbackOverride: 0
+      engagementFeedbackOverride:
+        enableColorBlend: 0
+        colorBlendColor: {r: 0, g: 0, b: 0, a: 0}
+        colorBlendLeadTimeSeconds: 0
+        colorBlendFadeOutSeconds: 0
+        colorBlendMaximumBlend: 0
+        enableBillboard: 0
+        billboardSprite: {fileID: 0}
+        billboardColor: {r: 0, g: 0, b: 0, a: 0}
+        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardLeadTimeSeconds: 0
+        billboardBaseScale: 0
+        billboardPulseScaleMultiplier: 0
+        billboardPulseExpandDurationSeconds: 0
+        billboardPulseContractDurationSeconds: 0
+      binding:
+        moduleId: Module_Custom
+        isEnabled: 0
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 0
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+              arrivalTolerance: 0
+              waitCooldownSeconds: 0
+              candidateSampleCount: 0
+              useInfiniteDirectionSampling: 0
+              infiniteDirectionStepDegrees: 0
+              unexploredDirectionPreference: 0
+              towardPlayerPreference: 0
+              minimumEnemyClearance: 0
+              trajectoryPredictionTime: 0
+              freeTrajectoryPreference: 0
+              blockedPathRetryDelay: 0
+            dvd:
+              speedMultiplier: 0
+              bounceDamping: 0
+              randomizeInitialDirection: 0
+              fixedInitialDirectionDegrees: 0
+              cornerNudgeDistance: 0
+              ignoreSteeringAndPriority: 0
+          coward:
+            detectionRadius: 0
+            releaseDistanceBuffer: 0
+            searchRadius: 0
+            minimumRetreatDistance: 0
+            maximumRetreatDistance: 0
+            arrivalTolerance: 0
+            candidateSampleCount: 0
+            useInfiniteDirectionSampling: 0
+            infiniteDirectionStepDegrees: 0
+            minimumEnemyClearance: 0
+            trajectoryPredictionTime: 0
+            freeTrajectoryPreference: 0
+            retreatDirectionPreference: 0
+            openSpacePreference: 0
+            navigationRetreatPreference: 0
+            patrolRadius: 0
+            patrolWaitSeconds: 0
+            patrolSpeedMultiplier: 0
+            retreatSpeedMultiplierFar: 0
+            retreatSpeedMultiplierNear: 0
+            blockedPathRetryDelay: 0
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0
+              moveSpeedMultiplierWhileAiming: 0
+            recovery:
+              cooldownSeconds: 0
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 0
+              distanceOffset: 0
+              fixedDistance: 0
+              minimumTravelDistance: 0
+              maximumTravelDistance: 0
+            path:
+              dashDurationSeconds: 0
+              lateralAmplitude: 0
+              mirrorMode: 0
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve: []
+                m_PreInfinity: 0
+                m_PostInfinity: 0
+                m_RotationOrder: 0
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 0
+            burstCount: 0
+            aimWindupSeconds: 0
+            preFireStopSeconds: 0
+            postFireStopSeconds: 0
+            intraBurstDelay: 0
+            useMinimumRange: 0
+            minimumRange: 0
+            useMaximumRange: 0
+            maximumRange: 0
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 0
+              spreadAngleDegrees: 0
+              projectileSpeed: 0
+              projectileDamage: 0
+              projectileRange: 0
+              projectileLifetime: 0
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 0
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 0
+              poolExpandBatch: 0
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 0
+                maximumStacks: 0
+                stackDecayPerSecond: 0
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 0
+                dotTickInterval: 0
+                dotDurationSeconds: 0
+                impedimentSlowPercentPerStack: 0
+                impedimentProcSlowPercent: 0
+                impedimentMaxSlowPercent: 0
+                impedimentDurationSeconds: 0
+              stacksPerHit: 0
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 0
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0
+              dropRadius: 0
+              collectionMovement:
+                moveSpeed: 0
+                collectDistance: 0
+                collectDistancePerPlayerSpeed: 0
+                spawnAnimationMinDuration: 0
+                spawnAnimationMaxDuration: 0
+            extraComboPoints:
+              baseMultiplier: 0
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 0
+              conditions: []
   minionSpawn:
     enabled: 1
     fallbackIntervalSeconds: 8

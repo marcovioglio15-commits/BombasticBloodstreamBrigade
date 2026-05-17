@@ -75,6 +75,8 @@ public partial struct ProjectileSpawnSystem : ISystem
         ComponentLookup<Projectile> projectileLookup = SystemAPI.GetComponentLookup<Projectile>(false);
         ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup = SystemAPI.GetComponentLookup<ProjectileRuntimeState>(false);
         ComponentLookup<ProjectileOwner> projectileOwnerLookup = SystemAPI.GetComponentLookup<ProjectileOwner>(false);
+        ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup = SystemAPI.GetComponentLookup<EnemyProjectileOffscreenWarningConfig>(true);
+        ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup = SystemAPI.GetComponentLookup<ProjectileOffscreenWarningState>(false);
         ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup = SystemAPI.GetComponentLookup<ProjectileBaseScale>(true);
         ComponentLookup<ProjectilePerfectCircleState> perfectCircleLookup = SystemAPI.GetComponentLookup<ProjectilePerfectCircleState>(false);
         ComponentLookup<ProjectileBounceState> bounceLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(false);
@@ -92,6 +94,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                              ref projectileLookup,
                              ref projectileRuntimeLookup,
                              ref projectileOwnerLookup,
+                             in enemyProjectileOffscreenWarningLookup,
+                             ref projectileOffscreenWarningLookup,
                              in projectileBaseScaleLookup,
                              ref perfectCircleLookup,
                              ref bounceLookup,
@@ -197,6 +201,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       ref ComponentLookup<Projectile> projectileLookup,
                                       ref ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup,
                                       ref ComponentLookup<ProjectileOwner> projectileOwnerLookup,
+                                      in ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup,
+                                      ref ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup,
                                       in ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup,
                                       ref ComponentLookup<ProjectilePerfectCircleState> perfectCircleLookup,
                                       ref ComponentLookup<ProjectileBounceState> bounceLookup,
@@ -292,6 +298,10 @@ public partial struct ProjectileSpawnSystem : ISystem
                 {
                     ShooterEntity = shooterEntity
                 };
+                ConfigureProjectileOffscreenWarning(projectileEntity,
+                                                   shooterEntity,
+                                                   in enemyProjectileOffscreenWarningLookup,
+                                                   ref projectileOffscreenWarningLookup);
                 ResetProjectileHitHistory(projectileEntity, ref projectileHitHistoryLookup);
 
                 ProjectilePerfectCircleState perfectCircleState = BuildPerfectCircleState(in passiveToolsState.PerfectCircle,
@@ -390,6 +400,32 @@ public partial struct ProjectileSpawnSystem : ISystem
             return passiveToolsLookup[shooterEntity];
 
         return default;
+    }
+
+    /// <summary>
+    /// Resets and enables projectile offscreen-warning state when the shooter has an enemy warning config.
+    /// </summary>
+    /// <param name="projectileEntity">Pooled projectile being reactivated.</param>
+    /// <param name="shooterEntity">Shooter that owns the projectile spawn request.</param>
+    /// <param name="enemyProjectileOffscreenWarningLookup">Read-only enemy warning config lookup.</param>
+    /// <param name="projectileOffscreenWarningLookup">Mutable projectile warning-state lookup.</param>
+    private static void ConfigureProjectileOffscreenWarning(Entity projectileEntity,
+                                                           Entity shooterEntity,
+                                                           in ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup,
+                                                           ref ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup)
+    {
+        if (!projectileOffscreenWarningLookup.HasComponent(projectileEntity))
+            return;
+
+        ProjectileOffscreenWarningState warningState = default;
+
+        if (enemyProjectileOffscreenWarningLookup.HasComponent(shooterEntity) &&
+            enemyProjectileOffscreenWarningLookup[shooterEntity].Enabled != 0)
+        {
+            warningState.Enabled = 1;
+        }
+
+        projectileOffscreenWarningLookup[projectileEntity] = warningState;
     }
 
     /// <summary>

@@ -19319,7 +19319,7 @@ MonoBehaviour:
           maxAcquisitions: 2
     unreplaceable: 0
   primaryActivePowerUpId: ActiveGigaBomb
-  secondaryActivePowerUpId: 
+  secondaryActivePowerUpId: Active_DamageBoost
   equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:

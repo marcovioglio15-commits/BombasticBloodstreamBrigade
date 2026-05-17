@@ -201,6 +201,7 @@ public static class PlayerPowerUpActiveBakeUtility
         float explosionDamage = 0f;
         bool explosionAffectAllEnemies = false;
         bool hasExplosionData = false;
+        bool hasCharacterTuning = false;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -310,6 +311,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                            math.max(0f, shotgunPatternData.LaserDurationSeconds));
                     break;
                 case PowerUpModuleKind.CharacterTuning:
+                    hasCharacterTuning = hasCharacterTuning || HasCharacterTuningFormulas(payload);
+                    break;
                 case PowerUpModuleKind.Stackable:
                     break;
                 case PowerUpModuleKind.SpawnObject:
@@ -408,7 +411,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                                          powerUp,
                                                                                                          resolveDynamicPrefabEntity);
 
-            if (togglePassiveTool.IsDefined == 0)
+            if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning)
                 return default;
 
             resolvedToolKind = ActiveToolKind.PassiveToggle;
@@ -558,6 +561,20 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                               in triggeredProjectilePassiveTool,
                                                                               in togglePassiveTool,
                                                                               resolvedToolKind);
+    }
+
+    /// <summary>
+    /// Detects active-only character tuning formulas so toggle slots can be baked even when they do not contain a traditional passive payload.
+    /// </summary>
+    /// <param name="payload">Resolved module payload being inspected during active-slot synthesis.</param>
+    /// <returns>True when the payload contains at least one character tuning formula.</returns>
+    private static bool HasCharacterTuningFormulas(PowerUpModuleData payload)
+    {
+        if (payload == null || payload.CharacterTuning == null)
+            return false;
+
+        IReadOnlyList<PowerUpCharacterTuningFormulaData> formulas = payload.CharacterTuning.Formulas;
+        return formulas != null && formulas.Count > 0;
     }
 
     /// <summary>

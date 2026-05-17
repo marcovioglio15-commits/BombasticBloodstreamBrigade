@@ -389,6 +389,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [Tooltip("Enemy-type overrides for spawner-dependent spawn offset and spawn warning settings.")]
     [SerializeField] private EnemyVisualSpawnOverridesSettings spawnOverrides = new EnemyVisualSpawnOverridesSettings();
 
+    [Tooltip("Projectile offscreen warning settings block.")]
+    [SerializeField] private EnemyProjectileOffscreenWarningSettings projectileOffscreenWarning = new EnemyProjectileOffscreenWarningSettings();
+
     [Tooltip("Boss-specific screen-space UI block used when an enemy has a Boss Pattern Preset.")]
     [SerializeField] private EnemyBossVisualUiSettings bossUi = new EnemyBossVisualUiSettings();
     #endregion
@@ -476,6 +479,14 @@ public sealed class EnemyVisualPreset : ScriptableObject
         }
     }
 
+    public EnemyProjectileOffscreenWarningSettings ProjectileOffscreenWarning
+    {
+        get
+        {
+            return projectileOffscreenWarning;
+        }
+    }
+
     public EnemyVisualSpawnOverridesSettings SpawnOverrides
     {
         get
@@ -514,6 +525,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
         if (spawnOverrides == null)
             spawnOverrides = new EnemyVisualSpawnOverridesSettings();
 
+        if (projectileOffscreenWarning == null)
+            projectileOffscreenWarning = new EnemyProjectileOffscreenWarningSettings();
+
         if (bossUi == null)
             bossUi = new EnemyBossVisualUiSettings();
 
@@ -523,6 +537,7 @@ public sealed class EnemyVisualPreset : ScriptableObject
         offensiveEngagementFeedback.Validate();
         prefabs.Validate();
         spawnOverrides.Validate();
+        projectileOffscreenWarning.Validate();
         bossUi.Validate();
     }
     #endregion

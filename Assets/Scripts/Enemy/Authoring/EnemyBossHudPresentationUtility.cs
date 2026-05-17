@@ -7,10 +7,6 @@ using UnityEngine.UI;
 /// </summary>
 internal static class EnemyBossHudPresentationUtility
 {
-    #region Constants
-    private const float Epsilon = 0.0001f;
-    #endregion
-
     #region Methods
 
     #region Public Methods
@@ -22,27 +18,7 @@ internal static class EnemyBossHudPresentationUtility
     /// <returns>Screen-space indicator position.</returns>
     public static Vector2 ResolveEdgePosition(Vector3 viewportPosition, float paddingPixels)
     {
-        Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-        Vector2 screenPosition = new Vector2(viewportPosition.x * Screen.width, viewportPosition.y * Screen.height);
-
-        if (viewportPosition.z < 0f)
-            screenPosition = screenCenter - (screenPosition - screenCenter);
-
-        Vector2 direction = screenPosition - screenCenter;
-
-        if (direction.sqrMagnitude <= Epsilon)
-            direction = Vector2.up;
-
-        float halfWidth = Mathf.Max(0f, Screen.width * 0.5f - paddingPixels);
-        float halfHeight = Mathf.Max(0f, Screen.height * 0.5f - paddingPixels);
-        float widthScale = Mathf.Abs(direction.x) > Epsilon ? halfWidth / Mathf.Abs(direction.x) : float.PositiveInfinity;
-        float heightScale = Mathf.Abs(direction.y) > Epsilon ? halfHeight / Mathf.Abs(direction.y) : float.PositiveInfinity;
-        float scale = Mathf.Min(widthScale, heightScale);
-
-        if (float.IsInfinity(scale))
-            scale = 1f;
-
-        return screenCenter + direction * Mathf.Max(0f, scale);
+        return ScreenSpaceOffscreenIndicatorUtility.ResolveEdgePosition(viewportPosition, paddingPixels);
     }
 
     /// <summary>

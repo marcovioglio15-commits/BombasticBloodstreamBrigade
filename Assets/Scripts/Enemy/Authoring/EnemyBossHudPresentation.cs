@@ -223,25 +223,46 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             return;
         }
 
+        bool showHealthBar = hudConfig.ShowHealthBar != 0;
+        bool showOffscreenIndicator = hudConfig.ShowOffscreenIndicator != 0;
+
         ApplyVisibility(true);
-        SyncConfig(in bossSnapshot);
-        SyncBars(in bossSnapshot, deltaTime);
-        EnemyBossHudOffscreenIndicatorUtility.Sync(entityManager,
-                                                   bossSnapshot.PrimaryEntity,
-                                                   in hudConfig,
-                                                   targetCamera,
-                                                   offscreenIndicatorRoot,
-                                                   ref cachedCamera,
-                                                   ref nextCameraResolveTime,
-                                                   ref indicatorParentRect,
-                                                   ref rootCanvas);
+        ApplyHealthBarVisibility(showHealthBar);
+
+        if (showHealthBar)
+        {
+            SyncHealthBarConfig(in bossSnapshot);
+            SyncBars(in bossSnapshot, deltaTime);
+        }
+        else
+        {
+            HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
+        }
+
+        if (showOffscreenIndicator)
+        {
+            SyncOffscreenIndicatorConfig(in bossSnapshot);
+            EnemyBossHudOffscreenIndicatorUtility.Sync(entityManager,
+                                                       bossSnapshot.PrimaryEntity,
+                                                       in hudConfig,
+                                                       targetCamera,
+                                                       offscreenIndicatorRoot,
+                                                       ref cachedCamera,
+                                                       ref nextCameraResolveTime,
+                                                       ref indicatorParentRect,
+                                                       ref rootCanvas);
+        }
+        else
+        {
+            EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
+        }
     }
 
     /// <summary>
-    /// Applies boss HUD configuration baked from the selected visual preset.
+    /// Applies boss bar configuration baked from the selected visual preset.
     /// </summary>
     /// <param name="bossSnapshot">Aggregated snapshot whose primary boss supplies labels, colors and managed sprite data.</param>
-    private void SyncConfig(in EnemyBossHudSnapshot bossSnapshot)
+    private void SyncHealthBarConfig(in EnemyBossHudSnapshot bossSnapshot)
     {
         EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
         SyncBossName(ResolveBossDisplayName(in bossSnapshot));
@@ -249,6 +270,15 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         EnemyBossHudPresentationUtility.ApplyImageColor(healthBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthBackgroundColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(shieldFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldFillColor));
         EnemyBossHudPresentationUtility.ApplyImageColor(shieldBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldBackgroundColor));
+    }
+
+    /// <summary>
+    /// Applies boss offscreen-indicator configuration baked from the selected visual preset.
+    /// </summary>
+    /// <param name="bossSnapshot">Aggregated snapshot whose primary boss supplies indicator sprite and tint data.</param>
+    private void SyncOffscreenIndicatorConfig(in EnemyBossHudSnapshot bossSnapshot)
+    {
+        EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
         EnemyBossHudOffscreenIndicatorUtility.ApplyConfig(entityManager,
                                                           bossSnapshot.PrimaryEntity,
                                                           offscreenIndicatorRoot,
@@ -304,11 +334,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         cachedBossEntity = Entity.Null;
         aggregateBaseline.Reset();
         HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
+        EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
 
         if (hideWhenNoBoss)
         {
             ApplyVisibility(false);
-            EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
         }
     }
     #endregion
@@ -480,6 +510,20 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         }
 
         TryApplyVisibilityToTarget(fallbackObject, visible);
+    }
+
+    /// <summary>
+    /// Toggles only the mirrored health and shield bar panel while keeping the presenter active for offscreen-only setups.
+    /// </summary>
+    /// <param name="visible">Desired boss bar panel visibility.</param>
+    private void ApplyHealthBarVisibility(bool visible)
+    {
+        GameObject panelObject = ResolvePanelVisibilityTarget();
+
+        if (panelObject == null)
+            return;
+
+        TryApplyVisibilityToTarget(panelObject, visible);
     }
 
     /// <summary>
