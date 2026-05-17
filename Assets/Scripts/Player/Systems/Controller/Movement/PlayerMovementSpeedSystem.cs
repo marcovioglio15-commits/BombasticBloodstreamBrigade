@@ -52,6 +52,10 @@ public partial struct PlayerMovementSpeedSystem : ISystem
 
         float deltaTime = SystemAPI.Time.DeltaTime;
         ComponentLookup<PlayerElementalRuntimeState> elementalRuntimeLookup = SystemAPI.GetComponentLookup<PlayerElementalRuntimeState>(true);
+        ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
+        ComponentLookup<PlayerLaserBeamState> laserBeamStateLookup = SystemAPI.GetComponentLookup<PlayerLaserBeamState>(true);
 
         foreach ((RefRW<PlayerMovementState> movementState,
                   RefRO<PlayerMovementModifiers> modifiers,
@@ -69,6 +73,15 @@ public partial struct PlayerMovementSpeedSystem : ISystem
                 float elementalSlowPercent = math.clamp(elementalRuntimeLookup[playerEntity].SlowPercent, 0f, 100f);
                 speedMultiplier *= math.saturate(1f - elementalSlowPercent * 0.01f);
             }
+
+            if (PlayerLaserBeamHandlingNerfUtility.TryResolveFiringHandlingMultipliers(playerEntity,
+                                                                                       in inputStateLookup,
+                                                                                       in powerUpsStateLookup,
+                                                                                       in passiveToolsStateLookup,
+                                                                                       in laserBeamStateLookup,
+                                                                                       out float laserMoveSpeedMultiplier,
+                                                                                       out float _))
+                speedMultiplier *= laserMoveSpeedMultiplier;
 
             bool forceZeroSpeed = speedMultiplier <= 0f;
             float baseSpeed = movementConfig.Values.BaseSpeed * speedMultiplier;

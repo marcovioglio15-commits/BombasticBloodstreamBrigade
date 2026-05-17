@@ -385,6 +385,13 @@ public static class PlayerPowerUpPassiveBakeUtility
                         : math.min(laserBeamConfig.CooldownSeconds, candidateLaserBeamConfig.CooldownSeconds);
                     laserBeamConfig.MaximumBounceSegments = math.max(laserBeamConfig.MaximumBounceSegments,
                                                                     candidateLaserBeamConfig.MaximumBounceSegments);
+                    laserBeamConfig.ApplyPlayerHandlingNerfWhileFiring =
+                        laserBeamConfig.ApplyPlayerHandlingNerfWhileFiring != 0 ||
+                        candidateLaserBeamConfig.ApplyPlayerHandlingNerfWhileFiring != 0
+                            ? (byte)1
+                            : (byte)0;
+                    laserBeamConfig.FiringMoveSpeedMultiplier *= math.max(0f, candidateLaserBeamConfig.FiringMoveSpeedMultiplier);
+                    laserBeamConfig.FiringRotationSpeedMultiplier *= math.max(0f, candidateLaserBeamConfig.FiringRotationSpeedMultiplier);
                     laserBeamConfig.BodyWidthMultiplier = math.max(laserBeamConfig.BodyWidthMultiplier,
                                                                   candidateLaserBeamConfig.BodyWidthMultiplier);
                     laserBeamConfig.CollisionWidthMultiplier = math.max(laserBeamConfig.CollisionWidthMultiplier,

@@ -223,6 +223,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -394,6 +397,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -478,6 +484,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -649,6 +658,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -733,6 +745,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -904,6 +919,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -988,6 +1006,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -1159,6 +1180,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -1243,6 +1267,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -1414,6 +1441,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -1498,6 +1528,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -1669,6 +1702,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -1753,6 +1789,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -1924,6 +1963,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -2008,6 +2050,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -2179,6 +2224,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -2263,6 +2311,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -2434,6 +2485,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -2518,6 +2572,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -2689,6 +2746,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -2773,6 +2833,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -2944,6 +3007,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -3028,6 +3094,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -3199,6 +3268,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -3283,6 +3355,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -3454,6 +3529,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -3538,6 +3616,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -3709,6 +3790,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -3793,6 +3877,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -3964,6 +4051,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -4048,6 +4138,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -4219,6 +4312,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -4303,6 +4399,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -4474,6 +4573,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -4558,6 +4660,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -4729,6 +4834,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -4813,6 +4921,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -4984,6 +5095,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.5
         cooldownSeconds: 2
         maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 0
         sourceShape: 2
@@ -5068,6 +5182,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 2
           sourceShape: 0
@@ -5239,6 +5356,9 @@ MonoBehaviour:
         maximumContinuousActiveSeconds: 2.75
         cooldownSeconds: 0.15
         maximumBounceSegments: 2
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
         visualPresetId: 0
         bodyProfile: 1
         sourceShape: 2
@@ -5336,6 +5456,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -5507,6 +5630,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -5591,6 +5717,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -5762,6 +5891,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -5846,6 +5978,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -6017,6 +6152,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -6101,6 +6239,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -6272,6 +6413,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -6356,6 +6500,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -6528,6 +6675,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -6625,6 +6775,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -6796,6 +6949,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -6880,6 +7036,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.75
             cooldownSeconds: 0.15
             maximumBounceSegments: 2
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -7051,6 +7210,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -7135,6 +7297,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -7306,6 +7471,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -7390,6 +7558,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -7561,6 +7732,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -7645,6 +7819,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -7820,6 +7997,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -7904,6 +8084,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -8079,6 +8262,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -8176,6 +8362,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -8347,6 +8536,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -8431,6 +8623,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -8602,6 +8797,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -8686,6 +8884,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -8857,6 +9058,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -8954,6 +9158,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -9125,6 +9332,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -9209,6 +9419,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -9380,6 +9593,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -9464,6 +9680,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -9635,6 +9854,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -9732,6 +9954,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -9903,6 +10128,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -9987,6 +10215,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -10158,6 +10389,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -10242,6 +10476,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -10413,6 +10650,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -10510,6 +10750,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -10681,6 +10924,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -10765,6 +11011,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -10936,6 +11185,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -11020,6 +11272,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -11191,6 +11446,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -11285,6 +11543,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -11456,6 +11717,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -11540,6 +11804,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -11711,6 +11978,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -11795,6 +12065,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -11967,6 +12240,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -12062,6 +12338,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -12231,6 +12510,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 0
           cooldownSeconds: 0
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 0
@@ -12315,6 +12597,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -12484,6 +12769,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 0
           cooldownSeconds: 0
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 0
@@ -12582,6 +12870,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -12753,6 +13044,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -12837,6 +13131,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -13008,6 +13305,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -13105,6 +13405,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -13276,6 +13579,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -13373,6 +13679,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -13544,6 +13853,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -13628,6 +13940,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -13800,6 +14115,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -13897,6 +14215,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -14068,6 +14389,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -14165,6 +14489,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -14336,6 +14663,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -14430,6 +14760,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -14602,6 +14935,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -14696,6 +15032,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -14866,6 +15205,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -14950,6 +15292,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -15120,6 +15465,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -15214,6 +15562,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -15384,6 +15735,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -15468,6 +15822,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -15638,6 +15995,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -15722,6 +16082,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -15892,6 +16255,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -15986,6 +16352,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -16156,6 +16525,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -16240,6 +16612,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -16410,6 +16785,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -16504,6 +16882,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -16674,6 +17055,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -16758,6 +17142,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -16928,6 +17315,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -17022,6 +17412,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -17192,6 +17585,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -17276,6 +17672,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -17446,6 +17845,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -17540,6 +17942,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -17710,6 +18115,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -17794,6 +18202,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -17964,6 +18375,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -18058,6 +18472,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -18228,6 +18645,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -18312,6 +18732,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -18482,6 +18905,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -18577,6 +19003,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -18747,6 +19176,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -18842,6 +19274,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -19012,6 +19447,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 2.5
           cooldownSeconds: 2
           maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 0
           bodyProfile: 0
           sourceShape: 2
@@ -19107,6 +19545,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -19276,6 +19717,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 0
           cooldownSeconds: 0
           maximumBounceSegments: 2
+          applyPlayerHandlingNerfWhileFiring: 1
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 0.7
           visualPresetId: 1
           bodyProfile: 0
           sourceShape: 1
@@ -19360,6 +19804,9 @@ MonoBehaviour:
             maximumContinuousActiveSeconds: 2.5
             cooldownSeconds: 2
             maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
             visualPresetId: 0
             bodyProfile: 2
             sourceShape: 0
@@ -19530,6 +19977,9 @@ MonoBehaviour:
           maximumContinuousActiveSeconds: 0
           cooldownSeconds: 0
           maximumBounceSegments: 2
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
           visualPresetId: 1
           bodyProfile: 0
           sourceShape: 1

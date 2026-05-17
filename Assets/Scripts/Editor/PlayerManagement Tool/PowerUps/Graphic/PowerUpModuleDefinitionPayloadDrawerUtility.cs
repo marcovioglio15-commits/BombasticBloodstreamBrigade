@@ -611,6 +611,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty maximumContinuousActiveSecondsProperty = laserBeamPayloadProperty.FindPropertyRelative("maximumContinuousActiveSeconds");
         SerializedProperty cooldownSecondsProperty = laserBeamPayloadProperty.FindPropertyRelative("cooldownSeconds");
         SerializedProperty maximumBounceSegmentsProperty = laserBeamPayloadProperty.FindPropertyRelative("maximumBounceSegments");
+        SerializedProperty applyPlayerHandlingNerfWhileFiringProperty = laserBeamPayloadProperty.FindPropertyRelative("applyPlayerHandlingNerfWhileFiring");
+        SerializedProperty firingMoveSpeedMultiplierProperty = laserBeamPayloadProperty.FindPropertyRelative("firingMoveSpeedMultiplier");
+        SerializedProperty firingRotationSpeedMultiplierProperty = laserBeamPayloadProperty.FindPropertyRelative("firingRotationSpeedMultiplier");
         SerializedProperty visualPresetIdProperty = laserBeamPayloadProperty.FindPropertyRelative("visualPresetId");
         SerializedProperty bodyProfileProperty = laserBeamPayloadProperty.FindPropertyRelative("bodyProfile");
         SerializedProperty sourceShapeProperty = laserBeamPayloadProperty.FindPropertyRelative("sourceShape");
@@ -650,6 +653,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             maximumContinuousActiveSecondsProperty == null ||
             cooldownSecondsProperty == null ||
             maximumBounceSegmentsProperty == null ||
+            applyPlayerHandlingNerfWhileFiringProperty == null ||
+            firingMoveSpeedMultiplierProperty == null ||
+            firingRotationSpeedMultiplierProperty == null ||
             visualPresetIdProperty == null ||
             bodyProfileProperty == null ||
             sourceShapeProperty == null ||
@@ -725,6 +731,19 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         cooldownContainer.style.marginLeft = 12f;
         gameplayBehaviourFoldout.Add(cooldownContainer);
         AddField(cooldownContainer, maximumContinuousActiveSecondsProperty, "Maximum Continuous Active Seconds");
+
+        Foldout playerHandlingFoldout = PlayerManagementFoldoutStateUtility.CreatePropertyFoldout(laserBeamPayloadProperty,
+                                                                                                   "Player Handling",
+                                                                                                   "LaserBeamPayloadGameplayPlayerHandling",
+                                                                                                   false);
+        gameplayFoldout.Add(playerHandlingFoldout);
+        AddField(playerHandlingFoldout, applyPlayerHandlingNerfWhileFiringProperty, "Apply Handling Nerf While Firing");
+
+        VisualElement playerHandlingValuesContainer = new VisualElement();
+        playerHandlingValuesContainer.style.marginLeft = 12f;
+        playerHandlingFoldout.Add(playerHandlingValuesContainer);
+        AddField(playerHandlingValuesContainer, firingMoveSpeedMultiplierProperty, "Firing Move Speed Multiplier");
+        AddField(playerHandlingValuesContainer, firingRotationSpeedMultiplierProperty, "Firing Rotation Speed Multiplier");
 
         Foldout visualsFoldout = PlayerManagementFoldoutStateUtility.CreatePropertyFoldout(laserBeamPayloadProperty,
                                                                                            "Presentation",
@@ -823,6 +842,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                      damageTickIntervalSecondsProperty,
                                      maximumContinuousActiveSecondsProperty,
                                      maximumBounceSegmentsProperty,
+                                     applyPlayerHandlingNerfWhileFiringProperty,
+                                     firingMoveSpeedMultiplierProperty,
+                                     firingRotationSpeedMultiplierProperty,
                                      bodyWidthMultiplierProperty,
                                      collisionWidthMultiplierProperty,
                                      sourceScaleMultiplierProperty,
@@ -848,11 +870,17 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         }
 
         UpdateLaserBeamCooldownVisibility(cooldownSecondsProperty, cooldownContainer);
+        UpdateBooleanContainerVisibility(applyPlayerHandlingNerfWhileFiringProperty, playerHandlingValuesContainer);
         RefreshWarnings();
 
         payloadContainer.TrackPropertyValue(cooldownSecondsProperty, changedProperty =>
         {
             UpdateLaserBeamCooldownVisibility(changedProperty, cooldownContainer);
+            RefreshWarnings();
+        });
+        payloadContainer.TrackPropertyValue(applyPlayerHandlingNerfWhileFiringProperty, changedProperty =>
+        {
+            UpdateBooleanContainerVisibility(changedProperty, playerHandlingValuesContainer);
             RefreshWarnings();
         });
         RegisterLaserBeamWarningRefresh(payloadContainer,
@@ -863,6 +891,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                         damageTickIntervalSecondsProperty,
                                         maximumContinuousActiveSecondsProperty,
                                         maximumBounceSegmentsProperty,
+                                        firingMoveSpeedMultiplierProperty,
+                                        firingRotationSpeedMultiplierProperty,
                                         bodyWidthMultiplierProperty,
                                         collisionWidthMultiplierProperty,
                                         sourceScaleMultiplierProperty,
@@ -1213,6 +1243,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                                  SerializedProperty damageTickIntervalSecondsProperty,
                                                  SerializedProperty maximumContinuousActiveSecondsProperty,
                                                  SerializedProperty maximumBounceSegmentsProperty,
+                                                 SerializedProperty applyPlayerHandlingNerfWhileFiringProperty,
+                                                 SerializedProperty firingMoveSpeedMultiplierProperty,
+                                                 SerializedProperty firingRotationSpeedMultiplierProperty,
                                                  SerializedProperty bodyWidthMultiplierProperty,
                                                  SerializedProperty collisionWidthMultiplierProperty,
                                                  SerializedProperty sourceScaleMultiplierProperty,
@@ -1277,6 +1310,30 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         if (maximumBounceSegmentsProperty != null && maximumBounceSegmentsProperty.intValue > PlayerLaserBeamUtility.MaximumSupportedBounceSegments)
             warningLines.Add(string.Format("Maximum Bounce Segments above {0} is clamped at runtime to keep beam lane rebuild stable.", PlayerLaserBeamUtility.MaximumSupportedBounceSegments));
+
+        if (applyPlayerHandlingNerfWhileFiringProperty != null &&
+            applyPlayerHandlingNerfWhileFiringProperty.boolValue)
+        {
+            if (firingMoveSpeedMultiplierProperty != null &&
+                firingMoveSpeedMultiplierProperty.floatValue < 0f)
+            {
+                warningLines.Add("Firing Move Speed Multiplier should be >= 0.");
+            }
+
+            if (firingRotationSpeedMultiplierProperty != null &&
+                firingRotationSpeedMultiplierProperty.floatValue < 0f)
+            {
+                warningLines.Add("Firing Rotation Speed Multiplier should be >= 0.");
+            }
+
+            if (firingMoveSpeedMultiplierProperty != null &&
+                firingRotationSpeedMultiplierProperty != null &&
+                Mathf.Approximately(firingMoveSpeedMultiplierProperty.floatValue, 1f) &&
+                Mathf.Approximately(firingRotationSpeedMultiplierProperty.floatValue, 1f))
+            {
+                warningLines.Add("Apply Handling Nerf While Firing is enabled but both handling multipliers are 1, so it has no practical effect.");
+            }
+        }
 
         if (virtualProjectileSpeedMultiplierProperty != null && virtualProjectileSpeedMultiplierProperty.floatValue > 12f)
             warningLines.Add("Virtual Projectile Speed Multiplier is very high. Beam reach can hit the runtime travel safety cap.");

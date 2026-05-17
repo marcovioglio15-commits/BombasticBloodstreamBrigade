@@ -47,9 +47,18 @@ public partial struct PlayerLookRotationSystem : ISystem
         if (deltaTime <= 0f)
             return;
 
+        ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
+        ComponentLookup<PlayerLaserBeamState> laserBeamStateLookup = SystemAPI.GetComponentLookup<PlayerLaserBeamState>(true);
+
         foreach ((RefRW<PlayerLookState> lookState,
                   RefRW<LocalTransform> localTransform,
-                  RefRO<PlayerRuntimeLookConfig> runtimeLookConfig) in SystemAPI.Query<RefRW<PlayerLookState>, RefRW<LocalTransform>, RefRO<PlayerRuntimeLookConfig>>())
+                  RefRO<PlayerRuntimeLookConfig> runtimeLookConfig,
+                  Entity playerEntity) in SystemAPI.Query<RefRW<PlayerLookState>,
+                                                          RefRW<LocalTransform>,
+                                                          RefRO<PlayerRuntimeLookConfig>>()
+                                                   .WithEntityAccess())
         {
             PlayerRuntimeLookConfig lookConfig = runtimeLookConfig.ValueRO;
             PlayerLookState lookStateData = lookState.ValueRO;
@@ -92,8 +101,19 @@ public partial struct PlayerLookRotationSystem : ISystem
                 continue;
             }
 
-            float targetSpeedDeg = lookConfig.RotationSpeed;
-            float maxSpeedDeg = lookConfig.Values.RotationMaxSpeed;
+            float rotationSpeedMultiplier = 1f;
+
+            if (PlayerLaserBeamHandlingNerfUtility.TryResolveFiringHandlingMultipliers(playerEntity,
+                                                                                       in inputStateLookup,
+                                                                                       in powerUpsStateLookup,
+                                                                                       in passiveToolsStateLookup,
+                                                                                       in laserBeamStateLookup,
+                                                                                       out float _,
+                                                                                       out float laserRotationSpeedMultiplier))
+                rotationSpeedMultiplier = laserRotationSpeedMultiplier;
+
+            float targetSpeedDeg = lookConfig.RotationSpeed * rotationSpeedMultiplier;
+            float maxSpeedDeg = lookConfig.Values.RotationMaxSpeed * rotationSpeedMultiplier;
 
             if (targetSpeedDeg <= 0f)
                 targetSpeedDeg = maxSpeedDeg;

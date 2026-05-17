@@ -10,6 +10,7 @@ using Unity.Transforms;
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerShootingIntentSystem))]
 [UpdateAfter(typeof(PlayerMovementApplySystem))]
+[UpdateAfter(typeof(PlayerLookRotationSystem))]
 public partial struct PlayerLaserBeamSimulationSystem : ISystem
 {
     #region Constants
@@ -28,7 +29,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         state.RequireForUpdate<PlayerLaserBeamState>();
         state.RequireForUpdate<PlayerLaserBeamLaneElement>();
         state.RequireForUpdate<PlayerInputState>();
-        state.RequireForUpdate<PlayerLookState>();
         state.RequireForUpdate<PlayerMovementState>();
         state.RequireForUpdate<PlayerShootingState>();
         state.RequireForUpdate<PlayerRuntimeShootingConfig>();
@@ -67,7 +67,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
-        ComponentLookup<PlayerLookState> lookStateLookup = SystemAPI.GetComponentLookup<PlayerLookState>(true);
         ComponentLookup<PlayerMovementState> movementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true);
         ComponentLookup<PlayerRuntimeShootingConfig> runtimeShootingConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeShootingConfig>(true);
         ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
@@ -90,7 +89,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                              .WithEntityAccess())
         {
             if (!inputStateLookup.HasComponent(playerEntity) ||
-                !lookStateLookup.HasComponent(playerEntity) ||
                 !movementStateLookup.HasComponent(playerEntity) ||
                 !runtimeShootingConfigLookup.HasComponent(playerEntity) ||
                 !passiveToolsStateLookup.HasComponent(playerEntity) ||
@@ -109,7 +107,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in currentPassiveToolsState,
                                                                                                                                 in currentLaserBeamState);
             PlayerInputState currentInputState = inputStateLookup[playerEntity];
-            PlayerLookState currentLookState = lookStateLookup[playerEntity];
             PlayerMovementState currentMovementState = movementStateLookup[playerEntity];
             PlayerRuntimeShootingConfig currentRuntimeShootingConfig = runtimeShootingConfigLookup[playerEntity];
             DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots = appliedElementSlotsLookup[playerEntity];
@@ -258,7 +255,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                     GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShootLaserTick, spawnPosition);
             }
 
-            float3 baseDirection = PlayerProjectileRequestUtility.ResolveShootDirection(in currentLookState, in localTransform.ValueRO);
+            float3 baseDirection = PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO);
             float travelDistance = hasPerfectCircle
                 ? 0f
                 : hasTriggeredActiveLaser

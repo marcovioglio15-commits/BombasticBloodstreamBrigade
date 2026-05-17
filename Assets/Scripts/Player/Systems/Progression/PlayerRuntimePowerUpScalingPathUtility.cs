@@ -509,6 +509,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "maximumBounceSegments":
                 laserBeamConfig.MaximumBounceSegments = math.max(0, (int)resolvedValue);
                 return true;
+            case "firingMoveSpeedMultiplier":
+                laserBeamConfig.FiringMoveSpeedMultiplier = math.max(0f, resolvedValue);
+                return true;
+            case "firingRotationSpeedMultiplier":
+                laserBeamConfig.FiringRotationSpeedMultiplier = math.max(0f, resolvedValue);
+                return true;
             case "visualPresetId":
                 laserBeamConfig.VisualPresetId = math.max(0, (int)math.round(resolvedValue));
                 return true;
@@ -608,6 +614,37 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
+    /// Applies a resolved boolean Add Scaling value to a Laser Beam config using a payload-prefix namespace.
+    /// </summary>
+    /// <param name="payloadPath">Full modular payload path carried by the scaling rule.</param>
+    /// <param name="prefix">Path prefix that identifies the owning payload namespace.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="laserBeamConfig">Mutable Laser Beam config being rebuilt from immutable baseline data.</param>
+    /// <returns>True when the path matched a Laser Beam boolean field and was applied.</returns>
+    private static bool TryApplyLaserBeamBooleanValue(string payloadPath,
+                                                      string prefix,
+                                                      bool resolvedValue,
+                                                      ref LaserBeamPassiveConfig laserBeamConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
+            return false;
+
+        if (!payloadPath.StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+
+        string laserBeamFieldPath = payloadPath.Substring(prefix.Length);
+
+        switch (laserBeamFieldPath)
+        {
+            case "applyPlayerHandlingNerfWhileFiring":
+                laserBeamConfig.ApplyPlayerHandlingNerfWhileFiring = resolvedValue ? (byte)1 : (byte)0;
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Applies one resolved boolean Add Scaling value to an active-slot runtime config field.
     /// </summary>
     /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
@@ -617,6 +654,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                                 bool resolvedValue,
                                                 ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (TryApplyLaserBeamBooleanValue(payloadPath,
+                                          HoldChargeChargedLaserBeamPayloadPrefix,
+                                          resolvedValue,
+                                          ref activeSlotConfig.ChargeShot.ChargedLaserBeam))
+            return;
+
         if (PlayerRuntimePowerUpBombScalingApplyUtility.TryApplyBooleanValue(payloadPath, resolvedValue, ref activeSlotConfig.Bomb))
             return;
 
@@ -659,6 +702,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                                  bool resolvedValue,
                                                  ref PlayerPassiveToolConfig passiveToolConfig)
     {
+        if (TryApplyLaserBeamBooleanValue(payloadPath,
+                                          PassiveLaserBeamPayloadPrefix,
+                                          resolvedValue,
+                                          ref passiveToolConfig.LaserBeam))
+            return;
+
         switch (payloadPath)
         {
             case "projectileOrbitOverride.spiralClockwise":

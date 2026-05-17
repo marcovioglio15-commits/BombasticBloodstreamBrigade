@@ -228,6 +228,9 @@ public struct LaserBeamPassiveConfig
     public float MaximumContinuousActiveSeconds;
     public float CooldownSeconds;
     public int MaximumBounceSegments;
+    public byte ApplyPlayerHandlingNerfWhileFiring;
+    public float FiringMoveSpeedMultiplier;
+    public float FiringRotationSpeedMultiplier;
     public int VisualPresetId;
     public LaserBeamBodyProfile BodyProfile;
     public LaserBeamCapShape SourceShape;

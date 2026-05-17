@@ -56,6 +56,16 @@ public sealed class PowerUpLaserBeamModuleData
     [Tooltip("Maximum number of reflected wall segments resolved per lane when bouncing projectiles are also active.")]
     [SerializeField] private int maximumBounceSegments = 0;
 
+    [Header("Player Handling")]
+    [Tooltip("When enabled, the beam applies the authored movement and rotation multipliers while it is firing.")]
+    [SerializeField] private bool applyPlayerHandlingNerfWhileFiring;
+
+    [Tooltip("Multiplier applied to player movement speed while the Laser Beam is firing. Values below 1 slow the player.")]
+    [SerializeField] private float firingMoveSpeedMultiplier = 1f;
+
+    [Tooltip("Multiplier applied to player look rotation speed while the Laser Beam is firing. Values below 1 slow aiming rotation.")]
+    [SerializeField] private float firingRotationSpeedMultiplier = 1f;
+
     [Header("Presentation")]
     [Tooltip("Stable Laser Beam visual preset ID resolved against the active Player Visual Preset library at runtime.")]
     [PlayerLaserBeamVisualPresetSelector]
@@ -216,6 +226,30 @@ public sealed class PowerUpLaserBeamModuleData
         get
         {
             return maximumBounceSegments;
+        }
+    }
+
+    public bool ApplyPlayerHandlingNerfWhileFiring
+    {
+        get
+        {
+            return applyPlayerHandlingNerfWhileFiring;
+        }
+    }
+
+    public float FiringMoveSpeedMultiplier
+    {
+        get
+        {
+            return firingMoveSpeedMultiplier;
+        }
+    }
+
+    public float FiringRotationSpeedMultiplier
+    {
+        get
+        {
+            return firingRotationSpeedMultiplier;
         }
     }
 
