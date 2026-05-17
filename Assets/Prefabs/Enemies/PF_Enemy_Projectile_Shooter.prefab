@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1506323467520610189}
   m_Layer: 0
-  m_Name: PF_Enemy_Projectile
+  m_Name: PF_Enemy_Projectile_Shooter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -8659,7 +8659,7 @@ MonoBehaviour:
               maxPenetrations: 0
               inheritShooterSpeed: 0
             runtimeProjectile:
-              projectilePrefab: {fileID: 3091458169621715366, guid: 16675f8e9bd6c9e40a04fa43790c3c21, type: 3}
+              projectilePrefab: {fileID: 3091458169621715366, guid: fe4b5acc45a7f6547a167de7cc5d00f4, type: 3}
               poolInitialCapacity: 24
               poolExpandBatch: 8
             elemental:
