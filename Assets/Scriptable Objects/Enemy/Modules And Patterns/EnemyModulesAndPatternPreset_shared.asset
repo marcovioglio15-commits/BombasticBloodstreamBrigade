@@ -8517,7 +8517,7 @@ MonoBehaviour:
       binding:
         moduleId: Module_Shooter
         isEnabled: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -8649,8 +8649,8 @@ MonoBehaviour:
               shotPattern: 0
               projectilesPerShot: 1
               spreadAngleDegrees: 0
-              projectileSpeed: 14
-              projectileDamage: 6
+              projectileSpeed: 7
+              projectileDamage: 1
               projectileRange: 28
               projectileLifetime: 4
               projectileExplosionRadius: 0
@@ -8659,7 +8659,7 @@ MonoBehaviour:
               maxPenetrations: 0
               inheritShooterSpeed: 0
             runtimeProjectile:
-              projectilePrefab: {fileID: 0}
+              projectilePrefab: {fileID: 3091458169621715366, guid: 16675f8e9bd6c9e40a04fa43790c3c21, type: 3}
               poolInitialCapacity: 24
               poolExpandBatch: 8
             elemental:
