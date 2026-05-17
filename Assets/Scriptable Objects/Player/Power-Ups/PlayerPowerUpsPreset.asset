@@ -99,7 +99,7 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.damageTickIntervalSeconds
     addScaling: 1
-    formula: 1/([FireRate]*2)
+    formula: '1/[FireRate]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickDamageLengthTolerance
@@ -108,18 +108,33 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.virtualProjectileSpeedMultiplier
-    addScaling: 1
-    formula: '[ShotRange]*2'
+    addScaling: 0
+    formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.flowPulseFrequency
-    addScaling: 1
-    formula: '[ShotRange]*2'
+    addScaling: 0
+    formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormRingFrequency
     addScaling: 0
     formula: '[ShotRange]*2'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTwistSpeed
+    addScaling: 0
+    formula: '[FireRate]*4'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickTravelSpeed
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: activePowerUps.Array.data[7|powerUpId:Active_ToggleableLaser].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.bodyWidthMultiplier
+    addScaling: 1
+    formula: '[LaserWidth_Big]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
@@ -12360,9 +12375,9 @@ MonoBehaviour:
           maxAcquisitions: 2
     unreplaceable: 0
   - commonData:
-      powerUpId: Active_ToggleableLaser
-      displayName: ToggleableLaser
-      description: ToggleableLaser
+      powerUpId: Active_GigaLaser
+      displayName: Giga Laser
+      description: Giga Laser
       icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
       dropPools:
       - Milestone
@@ -12373,7 +12388,7 @@ MonoBehaviour:
       moduleId: Module_LaserBeam
       stage: 7
       isEnabled: 1
-      useOverridePayload: 0
+      useOverridePayload: 1
       overridePayload:
         holdCharge:
           requiredCharge: 0
@@ -12560,45 +12575,45 @@ MonoBehaviour:
           splitSpeedPercentFromOriginal: 0
           splitLifetimePercentFromOriginal: 0
         laserBeam:
-          damageMultiplier: 0
+          damageMultiplier: 2.5
           continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 5
           maximumContinuousActiveSeconds: 0
           cooldownSeconds: 0
           maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 1
-          firingRotationSpeedMultiplier: 1
-          visualPresetId: 0
+          applyPlayerHandlingNerfWhileFiring: 1
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 4
           bodyProfile: 0
           sourceShape: 0
           terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
+          bodyWidthMultiplier: 1
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1
+          terminalCapScaleMultiplier: 1
+          contactFlareScaleMultiplier: 1
+          bodyOpacity: 1
+          coreWidthMultiplier: 1
+          coreBrightness: 1
+          rimBrightness: 1
           flowScrollSpeed: 0
           flowPulseFrequency: 0
-          stormTwistSpeed: 0
+          stormTwistSpeed: 5
           stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
+          stormIdleIntensity: 1
           stormBurstIntensity: 0
           sourceOffset: 0
           sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0.18
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
+          stormShellWidthMultiplier: 2
+          stormShellSeparation: 1
+          stormRingFrequency: 1
+          stormRingThickness: 1
+          stormTickTravelSpeed: 5
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 1
+          contactFlareIntensity: 1
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         trailSpawn:
@@ -12719,12 +12734,12 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 30
-          activationCost: 5
-          maintenanceCostPerSecond: 5
-          isToggleable: 1
+          maximumEnergy: 10
+          activationCost: 10
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
           maintenanceTicksPerSecond: 1
-          minimumActivationEnergyPercent: 50
+          minimumActivationEnergyPercent: 100
           chargeType: 1
           chargePerTrigger: 1
           cooldownSeconds: 1
@@ -19794,7 +19809,7 @@ MonoBehaviour:
           splitSpeedPercentFromOriginal: 0
           splitLifetimePercentFromOriginal: 0
         laserBeam:
-          damageMultiplier: 0.8
+          damageMultiplier: 0.5
           continuousDamagePerSecondMultiplier: 0
           virtualProjectileSpeedMultiplier: 1
           damageTickIntervalSeconds: 1
@@ -19814,26 +19829,26 @@ MonoBehaviour:
           terminalCapScaleMultiplier: 1
           contactFlareScaleMultiplier: 1
           bodyOpacity: 0.5
-          coreWidthMultiplier: 0.5
+          coreWidthMultiplier: 1
           coreBrightness: 1
           rimBrightness: 1
-          flowScrollSpeed: 3
-          flowPulseFrequency: 1
-          stormTwistSpeed: 14
-          stormTickPostTravelHoldSeconds: 0.2
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
           stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0.1
+          stormBurstIntensity: 1
+          sourceOffset: 0
           sourceDischargeIntensity: 1
-          stormShellWidthMultiplier: 1
+          stormShellWidthMultiplier: 1.05
           stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0.2
-          stormTickTravelSpeed: 5
-          stormTickDamageLengthTolerance: 0.1
+          stormRingFrequency: 1
+          stormRingThickness: 1
+          stormTickTravelSpeed: 3.5
+          stormTickDamageLengthTolerance: 0
           terminalCapIntensity: 1
           contactFlareIntensity: 1
-          wobbleAmplitude: 0.2
+          wobbleAmplitude: 0
           bubbleDriftSpeed: 1
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
@@ -20125,7 +20140,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: Active_Shotgun
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:

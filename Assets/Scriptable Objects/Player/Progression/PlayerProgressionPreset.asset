@@ -61,7 +61,7 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: GatheringRadius
     statType: 0
-    defaultValue: 3
+    defaultValue: 2.5
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
@@ -124,21 +124,21 @@ MonoBehaviour:
     defaultTokenValue: '"None"'
   - statName: LaserWidth
     statType: 0
-    defaultValue: 5
+    defaultValue: 10
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: LaserWidth_Small
     statType: 0
-    defaultValue: 2.5
+    defaultValue: 0.5
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: LaserWidth_Big
     statType: 0
-    defaultValue: 12.5
+    defaultValue: 25
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
