@@ -204,8 +204,8 @@ MonoBehaviour:
       maxPenetrations: 0
       knockback:
         enabled: 1
-        strength: 6
-        durationSeconds: 0.18
+        strength: 1
+        durationSeconds: 0.2
         directionMode: 0
         stackingMode: 0
     initialPoolCapacity: 1500
@@ -321,6 +321,11 @@ MonoBehaviour:
   - statKey: 'shootingSettings.values.appliedElements.Array.data[2]'
     addScaling: 1
     formula: switch([BulletElementType_C],"Fire":[Fire],"Ice":[Ice],"Poison":[Poison],"None":[None],[None])
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: shootingSettings.values.knockback.strength
+    addScaling: 1
+    formula: '[Knockback]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   elementalPayloadScalingMigrated: 1

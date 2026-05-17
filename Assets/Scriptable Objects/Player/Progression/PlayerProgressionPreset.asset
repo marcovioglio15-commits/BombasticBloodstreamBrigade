@@ -143,6 +143,13 @@ MonoBehaviour:
     maximumValue: 1000000
     defaultBooleanValue: 0
     defaultTokenValue: 
+  - statName: Knockback
+    statType: 0
+    defaultValue: 7
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
   scalingRules:
   - statKey: gamePhasesDefinition.Array.data[0|phaseID:Phase0].requiredExperienceGrouth
     addScaling: 0

@@ -71,16 +71,16 @@ MonoBehaviour:
     minimumSegmentLength: 0.02
     visualPresets:
     - stableId: 0
-      displayName: Electric Azure
+      displayName: Azure
       coreColor: {r: 1, g: 1, b: 1, a: 1}
       flowColor: {r: 0.19, g: 0.93, b: 1, a: 1}
       stormColor: {r: 0.75, g: 1, b: 1, a: 1}
       contactColor: {r: 1, g: 1, b: 1, a: 1}
     - stableId: 1
-      displayName: MINT
+      displayName: Mint
       coreColor: {r: 1, g: 1, b: 1, a: 1}
-      flowColor: {r: 0.22, g: 0.92, b: 0.72, a: 1}
-      stormColor: {r: 0.72, g: 1, b: 0.85, a: 1}
+      flowColor: {r: 0.25490198, g: 0.88235295, b: 0.84313726, a: 1}
+      stormColor: {r: 0.7254902, g: 1, b: 1, a: 1}
       contactColor: {r: 1, g: 1, b: 1, a: 1}
     - stableId: 2
       displayName: Blue
