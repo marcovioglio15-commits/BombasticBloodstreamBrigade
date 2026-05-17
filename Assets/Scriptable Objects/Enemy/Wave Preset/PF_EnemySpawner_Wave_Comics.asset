@@ -1174,7 +1174,7 @@ MonoBehaviour:
   - waveLabel: Wave 6
     previewInScene: 0
     startMode: 3
-    startDelaySeconds: 0
+    startDelaySeconds: 8
     spawnDurationSeconds: 4
     defaultDistributionCurve:
       serializedVersion: 2
@@ -1626,7 +1626,7 @@ MonoBehaviour:
   - waveLabel: Wave 8
     previewInScene: 0
     startMode: 2
-    startDelaySeconds: 0
+    startDelaySeconds: 5
     spawnDurationSeconds: 4
     defaultDistributionCurve:
       serializedVersion: 2
