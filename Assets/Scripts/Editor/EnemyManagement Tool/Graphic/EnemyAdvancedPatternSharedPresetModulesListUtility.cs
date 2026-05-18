@@ -141,6 +141,7 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
         VisualElement actionsRow = EnemyAdvancedPatternSharedPresetCardUtility.CreateHorizontalRow(false);
         Label countLabel = EnemyAdvancedPatternSharedPresetCardUtility.CreateCountLabel();
         ScrollView cardsContainer = EnemyAdvancedPatternSharedPresetCardUtility.CreateCardsScrollView();
+        ManagementToolScrollStateUtility.BindScrollView(cardsContainer, sectionStateKey + "|Cards");
 
         Button addButton = EnemyAdvancedPatternSharedPresetCardUtility.CreateActionButton("Add Module",
                                                                                           "Create a new shared module definition inside this catalog section.",
@@ -259,6 +260,9 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
         if (panel == null || sharedPresetSerializedObject == null || sharedPreset == null || cardsContainer == null || countLabel == null)
             return;
 
+        ScrollView cardsScrollView = cardsContainer as ScrollView;
+        ManagementToolFoldoutStateUtility.CaptureFoldoutStates(cardsContainer);
+        ManagementToolScrollStateUtility.CaptureScrollOffset(cardsScrollView);
         cardsContainer.Clear();
         SerializedProperty definitionsProperty = sharedPresetSerializedObject.FindProperty(EnemyAdvancedPatternSharedPresetModuleCatalogUtility.ResolveDefinitionsPropertyName(section));
 
@@ -266,6 +270,7 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
         {
             countLabel.text = "Visible Modules: 0 / 0";
             cardsContainer.Add(EnemyAdvancedPatternSharedPresetCardUtility.CreateStatusLabel("Module definitions are unavailable for this catalog section."));
+            ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
             return;
         }
 
@@ -302,9 +307,13 @@ internal static class EnemyAdvancedPatternSharedPresetModulesListUtility
         countLabel.text = string.Format("Visible Modules: {0} / {1}", visibleModules, totalModules);
 
         if (visibleModules > 0)
+        {
+            ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
             return;
+        }
 
         cardsContainer.Add(EnemyAdvancedPatternSharedPresetCardUtility.CreateStatusLabel("No modules match current filters."));
+        ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
     }
 
     /// <summary>

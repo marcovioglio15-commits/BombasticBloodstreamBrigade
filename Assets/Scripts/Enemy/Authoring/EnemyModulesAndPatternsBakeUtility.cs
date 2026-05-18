@@ -200,32 +200,198 @@ internal static class EnemyModulesAndPatternsBakeUtility
         if (moduleDefinition == null)
             return false;
 
-        if (EnemyAdvancedPatternBakeUtility.ResolveModuleKind(moduleDefinition.ModuleKind) != EnemyPatternModuleKind.Shooter)
-            return false;
-
-        int previousConfigCount = result.ShooterConfigs.Count;
+        EnemyPatternModuleKind moduleKind = EnemyAdvancedPatternBakeUtility.ResolveModuleKind(moduleDefinition.ModuleKind);
         EnemyPatternModulePayloadData resolvedPayload = EnemyAdvancedPatternBakeUtility.ResolveBindingPayload(moduleDefinition, binding);
+
+        switch (moduleKind)
+        {
+            case EnemyPatternModuleKind.Shooter:
+                return TryAddShooterWeaponModule(resolvedPayload,
+                                                 useMinimumRange,
+                                                 minimumRange,
+                                                 useMaximumRange,
+                                                 maximumRange,
+                                                 exclusiveLookDirectionControl,
+                                                 activationGates,
+                                                 maximumActivationSpeed,
+                                                 recentlyDamagedWindowSeconds,
+                                                 ref result);
+
+            case EnemyPatternModuleKind.PowerUpStealer:
+                return TryAddPowerUpStealerWeaponModule(resolvedPayload,
+                                                        useMinimumRange,
+                                                        minimumRange,
+                                                        useMaximumRange,
+                                                        maximumRange,
+                                                        exclusiveLookDirectionControl,
+                                                        activationGates,
+                                                        maximumActivationSpeed,
+                                                        recentlyDamagedWindowSeconds,
+                                                        ref result);
+
+            default:
+                return false;
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Appends one Shooter module and applies shared Weapon Interaction gating.
+    /// </summary>
+    /// <param name="resolvedPayload">Resolved Shooter payload.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    /// <param name="result">Mutable compiled result.</param>
+    /// <returns>True when a Shooter config was appended.</returns>
+    private static bool TryAddShooterWeaponModule(EnemyPatternModulePayloadData resolvedPayload,
+                                                  bool useMinimumRange,
+                                                  float minimumRange,
+                                                  bool useMaximumRange,
+                                                  float maximumRange,
+                                                  bool exclusiveLookDirectionControl,
+                                                  EnemyWeaponInteractionActivationGate activationGates,
+                                                  float maximumActivationSpeed,
+                                                  float recentlyDamagedWindowSeconds,
+                                                  ref EnemyCompiledPatternBakeResult result)
+    {
+        int previousConfigCount = result.ShooterConfigs.Count;
         EnemyAdvancedPatternBakeUtility.TryAddShooterModule(resolvedPayload, result.ShooterConfigs, ref result);
 
         for (int shooterIndex = previousConfigCount; shooterIndex < result.ShooterConfigs.Count; shooterIndex++)
         {
             EnemyShooterConfigElement shooterConfig = result.ShooterConfigs[shooterIndex];
-            shooterConfig.UseMinimumRange = useMinimumRange ? (byte)1 : (byte)0;
-            shooterConfig.MinimumRange = math.max(0f, minimumRange);
-            shooterConfig.UseMaximumRange = useMaximumRange ? (byte)1 : (byte)0;
-            shooterConfig.MaximumRange = math.max(shooterConfig.MinimumRange, maximumRange);
-            shooterConfig.ExclusiveLookDirectionControl = exclusiveLookDirectionControl ? (byte)1 : (byte)0;
-            shooterConfig.ActivationGates = ResolveWeaponActivationGates(activationGates);
-            shooterConfig.MaximumActivationSpeed = math.max(0f, maximumActivationSpeed);
-            shooterConfig.RecentlyDamagedWindowSeconds = math.max(0f, recentlyDamagedWindowSeconds);
+            ApplyWeaponGates(ref shooterConfig,
+                             useMinimumRange,
+                             minimumRange,
+                             useMaximumRange,
+                             maximumRange,
+                             exclusiveLookDirectionControl,
+                             activationGates,
+                             maximumActivationSpeed,
+                             recentlyDamagedWindowSeconds);
             result.ShooterConfigs[shooterIndex] = shooterConfig;
         }
 
         return result.ShooterConfigs.Count > previousConfigCount;
     }
-    #endregion
 
-    #region Private Methods
+    /// <summary>
+    /// Appends one Power-Up Stealer module and applies shared Weapon Interaction gating.
+    /// </summary>
+    /// <param name="resolvedPayload">Resolved Power-Up Stealer payload.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    /// <param name="result">Mutable compiled result.</param>
+    /// <returns>True when a Power-Up Stealer config was appended.</returns>
+    private static bool TryAddPowerUpStealerWeaponModule(EnemyPatternModulePayloadData resolvedPayload,
+                                                         bool useMinimumRange,
+                                                         float minimumRange,
+                                                         bool useMaximumRange,
+                                                         float maximumRange,
+                                                         bool exclusiveLookDirectionControl,
+                                                         EnemyWeaponInteractionActivationGate activationGates,
+                                                         float maximumActivationSpeed,
+                                                         float recentlyDamagedWindowSeconds,
+                                                         ref EnemyCompiledPatternBakeResult result)
+    {
+        int previousConfigCount = result.PowerUpStealerConfigs.Count;
+        EnemyAdvancedPatternBakeUtility.TryAddPowerUpStealerModule(resolvedPayload, result.PowerUpStealerConfigs);
+
+        for (int stealerIndex = previousConfigCount; stealerIndex < result.PowerUpStealerConfigs.Count; stealerIndex++)
+        {
+            EnemyPowerUpStealerConfigElement stealerConfig = result.PowerUpStealerConfigs[stealerIndex];
+            ApplyWeaponGates(ref stealerConfig,
+                             useMinimumRange,
+                             minimumRange,
+                             useMaximumRange,
+                             maximumRange,
+                             exclusiveLookDirectionControl,
+                             activationGates,
+                             maximumActivationSpeed,
+                             recentlyDamagedWindowSeconds);
+            result.PowerUpStealerConfigs[stealerIndex] = stealerConfig;
+        }
+
+        return result.PowerUpStealerConfigs.Count > previousConfigCount;
+    }
+
+    /// <summary>
+    /// Applies shared Weapon Interaction gates to one Shooter config.
+    /// </summary>
+    /// <param name="config">Mutable Shooter config.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    private static void ApplyWeaponGates(ref EnemyShooterConfigElement config,
+                                         bool useMinimumRange,
+                                         float minimumRange,
+                                         bool useMaximumRange,
+                                         float maximumRange,
+                                         bool exclusiveLookDirectionControl,
+                                         EnemyWeaponInteractionActivationGate activationGates,
+                                         float maximumActivationSpeed,
+                                         float recentlyDamagedWindowSeconds)
+    {
+        config.UseMinimumRange = useMinimumRange ? (byte)1 : (byte)0;
+        config.MinimumRange = math.max(0f, minimumRange);
+        config.UseMaximumRange = useMaximumRange ? (byte)1 : (byte)0;
+        config.MaximumRange = math.max(config.MinimumRange, maximumRange);
+        config.ExclusiveLookDirectionControl = exclusiveLookDirectionControl ? (byte)1 : (byte)0;
+        config.ActivationGates = ResolveWeaponActivationGates(activationGates);
+        config.MaximumActivationSpeed = math.max(0f, maximumActivationSpeed);
+        config.RecentlyDamagedWindowSeconds = math.max(0f, recentlyDamagedWindowSeconds);
+    }
+
+    /// <summary>
+    /// Applies shared Weapon Interaction gates to one Power-Up Stealer config.
+    /// </summary>
+    /// <param name="config">Mutable Power-Up Stealer config.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    private static void ApplyWeaponGates(ref EnemyPowerUpStealerConfigElement config,
+                                         bool useMinimumRange,
+                                         float minimumRange,
+                                         bool useMaximumRange,
+                                         float maximumRange,
+                                         bool exclusiveLookDirectionControl,
+                                         EnemyWeaponInteractionActivationGate activationGates,
+                                         float maximumActivationSpeed,
+                                         float recentlyDamagedWindowSeconds)
+    {
+        config.UseMinimumRange = useMinimumRange ? (byte)1 : (byte)0;
+        config.MinimumRange = math.max(0f, minimumRange);
+        config.UseMaximumRange = useMaximumRange ? (byte)1 : (byte)0;
+        config.MaximumRange = math.max(config.MinimumRange, maximumRange);
+        config.ExclusiveLookDirectionControl = exclusiveLookDirectionControl ? (byte)1 : (byte)0;
+        config.ActivationGates = ResolveWeaponActivationGates(activationGates);
+        config.MaximumActivationSpeed = math.max(0f, maximumActivationSpeed);
+        config.RecentlyDamagedWindowSeconds = math.max(0f, recentlyDamagedWindowSeconds);
+    }
+
     /// <summary>
     /// Compiles one shared pattern definition into movement, shooter and drop buffers.
     /// </summary>

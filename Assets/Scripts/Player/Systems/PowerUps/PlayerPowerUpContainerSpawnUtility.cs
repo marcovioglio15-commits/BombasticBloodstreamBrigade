@@ -33,6 +33,29 @@ internal static class PlayerPowerUpContainerSpawnUtility
                                                 in PlayerStoredActivePowerUpData storedPowerUp,
                                                 ref EntityCommandBuffer commandBuffer)
     {
+        float3 dropOrigin = ResolveForwardDropOrigin(in playerTransform);
+        return TrySpawnDroppedContainerAtPosition(in physicsWorldSingleton,
+                                                  dropOrigin,
+                                                  in interactionConfig,
+                                                  in storedPowerUp,
+                                                  ref commandBuffer);
+    }
+
+    /// <summary>
+    /// Instantiates one dropped power-up container at an authored world position and grounds it through the shared probe.
+    /// </summary>
+    /// <param name="physicsWorldSingleton">Physics world used to ground the container.</param>
+    /// <param name="dropOrigin">World-space origin where the container should be dropped.</param>
+    /// <param name="interactionConfig">Player-side container interaction config containing the baked prefab entity.</param>
+    /// <param name="storedPowerUp">Active-slot snapshot serialized into the dropped world entity.</param>
+    /// <param name="commandBuffer">ECB used to instantiate and configure the container entity.</param>
+    /// <returns>True when a container was spawned; otherwise false.</returns>
+    public static bool TrySpawnDroppedContainerAtPosition(in PhysicsWorldSingleton physicsWorldSingleton,
+                                                          float3 dropOrigin,
+                                                          in PlayerPowerUpContainerInteractionConfig interactionConfig,
+                                                          in PlayerStoredActivePowerUpData storedPowerUp,
+                                                          ref EntityCommandBuffer commandBuffer)
+    {
         if (storedPowerUp.SlotConfig.IsDefined == 0)
             return false;
 
@@ -40,9 +63,9 @@ internal static class PlayerPowerUpContainerSpawnUtility
             return false;
 
         Entity containerEntity = commandBuffer.Instantiate(interactionConfig.ContainerPrefabEntity);
-        LocalTransform containerTransform = LocalTransform.FromPositionRotationScale(ResolveDropPosition(in physicsWorldSingleton,
-                                                                                                         in playerTransform,
-                                                                                                         in interactionConfig),
+        LocalTransform containerTransform = LocalTransform.FromPositionRotationScale(ResolveGroundedDropPosition(in physicsWorldSingleton,
+                                                                                                                 dropOrigin,
+                                                                                                                 in interactionConfig),
                                                                                      quaternion.identity,
                                                                                      1f);
 
@@ -57,13 +80,11 @@ internal static class PlayerPowerUpContainerSpawnUtility
 
     #region Private Methods
     /// <summary>
-    /// Resolves a grounded drop position slightly in front of the player.
+    /// Resolves a drop origin slightly in front of the player.
     /// </summary>
     /// <param name="playerTransform">Current player transform used to place the dropped container.</param>
-    /// <returns>World position used by the container entity.</returns>
-    private static float3 ResolveDropPosition(in PhysicsWorldSingleton physicsWorldSingleton,
-                                              in LocalTransform playerTransform,
-                                              in PlayerPowerUpContainerInteractionConfig interactionConfig)
+    /// <returns>World position before ground projection.</returns>
+    private static float3 ResolveForwardDropOrigin(in LocalTransform playerTransform)
     {
         float3 forward = math.mul(playerTransform.Rotation, new float3(0f, 0f, 1f));
         forward.y = 0f;
@@ -73,7 +94,21 @@ internal static class PlayerPowerUpContainerSpawnUtility
         else
             forward = new float3(0f, 0f, ForwardDropDistance);
 
-        float3 dropPosition = playerTransform.Position + forward;
+        return playerTransform.Position + forward;
+    }
+
+    /// <summary>
+    /// Resolves a grounded drop position from the requested origin.
+    /// </summary>
+    /// <param name="physicsWorldSingleton">Physics world used to ground the container.</param>
+    /// <param name="dropOrigin">World-space origin requested by the caller.</param>
+    /// <param name="interactionConfig">Container interaction config providing clearance offsets.</param>
+    /// <returns>World position used by the container entity.</returns>
+    private static float3 ResolveGroundedDropPosition(in PhysicsWorldSingleton physicsWorldSingleton,
+                                                      float3 dropOrigin,
+                                                      in PlayerPowerUpContainerInteractionConfig interactionConfig)
+    {
+        float3 dropPosition = dropOrigin;
         float groundClearanceOffset = math.max(0f, interactionConfig.ContainerGroundClearanceOffset);
         RaycastInput groundProbe = new RaycastInput
         {
@@ -90,7 +125,7 @@ internal static class PlayerPowerUpContainerSpawnUtility
         if (physicsWorldSingleton.CastRay(groundProbe, out Unity.Physics.RaycastHit groundHit))
             dropPosition.y = groundHit.Position.y + groundClearanceOffset;
         else
-            dropPosition.y = playerTransform.Position.y + groundClearanceOffset;
+            dropPosition.y = dropOrigin.y + groundClearanceOffset;
 
         return dropPosition;
     }

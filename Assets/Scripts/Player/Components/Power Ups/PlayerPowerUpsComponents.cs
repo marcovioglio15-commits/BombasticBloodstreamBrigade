@@ -514,6 +514,7 @@ public struct PlayerExplosionRequest : IBufferElementData
 public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
 {
     public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
     public float3 Position;
     public quaternion Rotation;
     public float UniformScale;

@@ -212,6 +212,25 @@ internal static class EnemyBossPatternBakeUtility
     }
 
     /// <summary>
+    /// Appends one compiled pattern Power-Up Stealer slice to the boss-owned source buffer.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern providing Power-Up Stealer configs.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    /// <returns>First appended Power-Up Stealer config index.</returns>
+    internal static int AppendPowerUpStealerConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
+    {
+        if (compiledPattern == null || result == null)
+            return 0;
+
+        int firstStealerConfigIndex = result.PowerUpStealerConfigs.Count;
+
+        for (int stealerIndex = 0; stealerIndex < compiledPattern.PowerUpStealerConfigs.Count; stealerIndex++)
+            result.PowerUpStealerConfigs.Add(compiledPattern.PowerUpStealerConfigs[stealerIndex]);
+
+        return firstStealerConfigIndex;
+    }
+
+    /// <summary>
     /// Appends one compiled offensive engagement slice to the boss-owned source buffer.
     /// </summary>
     /// <param name="engagementConfigs">Compiled engagement configs for one boss layer.</param>
@@ -374,6 +393,7 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public readonly List<EnemyBossPatternModuleExtractionElement> ModuleExtractions = new List<EnemyBossPatternModuleExtractionElement>();
     public readonly List<EnemyBossPatternModuleCandidateElement> ModuleCandidates = new List<EnemyBossPatternModuleCandidateElement>();
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
+    public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyOffensiveEngagementConfigElement> OffensiveEngagementConfigs = new List<EnemyOffensiveEngagementConfigElement>();
     public readonly List<EnemyBossMinionSpawnElement> MinionSpawns = new List<EnemyBossMinionSpawnElement>();
     public readonly List<EnemyBossDropCandidateElement> DropCandidates = new List<EnemyBossDropCandidateElement>();

@@ -549,9 +549,11 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         return true;
     }
+
     #endregion
 
     #region Private Methods
+
     /// <summary>
     /// Creates a payload foldout with a stable key so rebuilds keep the current expanded state.
     /// </summary>

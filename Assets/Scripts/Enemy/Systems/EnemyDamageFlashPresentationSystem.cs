@@ -14,6 +14,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     private const float BlendEpsilon = 0.0001f;
     private const float ColorEpsilon = 0.0001f;
     private const float CameraResolveRetryIntervalSeconds = 0.5f;
+    private const float DefaultStealerIconScale = 0.75f;
     #endregion
 
     #region Fields
@@ -43,6 +44,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         BufferLookup<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimeLookup = SystemAPI.GetBufferLookup<EnemyBossPatternSlotRuntimeElement>(true);
         ComponentLookup<EnemyPatternConfig> patternConfigLookup = SystemAPI.GetComponentLookup<EnemyPatternConfig>(true);
         ComponentLookup<EnemyPatternRuntimeState> patternRuntimeStateLookup = SystemAPI.GetComponentLookup<EnemyPatternRuntimeState>(true);
+        ComponentLookup<EnemyPowerUpStealerVisualState> stealerVisualStateLookup = SystemAPI.GetComponentLookup<EnemyPowerUpStealerVisualState>(true);
         ComponentLookup<EnemyBossPatternChangeFeedbackConfig> patternChangeConfigLookup = SystemAPI.GetComponentLookup<EnemyBossPatternChangeFeedbackConfig>(true);
         ComponentLookup<EnemyBossPatternChangeFeedbackState> patternChangeStateLookup = SystemAPI.GetComponentLookup<EnemyBossPatternChangeFeedbackState>();
 
@@ -102,7 +104,8 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                    bossSlotRuntimes,
                                    in currentPatternConfig,
                                    in currentPatternRuntimeState,
-                                   patternChangeResult);
+                                   patternChangeResult,
+                                   stealerVisualStateLookup);
 
             float4 targetColor = damageFlashConfig.ValueRO.FlashColor;
             float targetBlend = damageBlend;
@@ -335,6 +338,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
     /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
     /// <param name="patternChangeResult">Boss pattern-change billboard result resolved for the current frame.</param>
+    /// <param name="stealerVisualStateLookup">Lookup used to resolve stolen power-up icon state.</param>
     private static void SyncOffensiveBillboard(EntityManager entityManager,
                                                Entity enemyEntity,
                                                bool enemyVisible,
@@ -346,7 +350,8 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                                DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                in EnemyPatternConfig patternConfig,
                                                in EnemyPatternRuntimeState patternRuntimeState,
-                                               EnemyBossPatternChangePresentationResult patternChangeResult)
+                                               EnemyBossPatternChangePresentationResult patternChangeResult,
+                                               ComponentLookup<EnemyPowerUpStealerVisualState> stealerVisualStateLookup)
     {
         if (!EnemyOffensiveEngagementBillboardRuntimeUtility.TryResolveRuntimeView(entityManager,
                                                                                   enemyEntity,
@@ -358,6 +363,16 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         if (!enemyVisible || cameraTransform == null)
         {
             billboardView.Hide();
+            return;
+        }
+
+        if (TryRenderPowerUpStealerBillboard(enemyEntity,
+                                             enemyPosition,
+                                             cameraTransform,
+                                             offensiveEngagementConfigs,
+                                             stealerVisualStateLookup,
+                                             billboardView))
+        {
             return;
         }
 
@@ -393,6 +408,76 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                              DamageFlashRuntimeUtility.ToManagedColor(color),
                              worldOffset,
                              uniformScale);
+    }
+
+    /// <summary>
+    /// Renders the stolen power-up icon above the enemy when the Stealer module holds a payload with presentation metadata.
+    /// </summary>
+    /// <param name="enemyEntity">Enemy entity being presented.</param>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
+    /// <param name="offensiveEngagementConfigs">Baked engagement configs used to reuse authored billboard placement.</param>
+    /// <param name="stealerVisualStateLookup">Lookup used to resolve stolen power-up icon state.</param>
+    /// <param name="billboardView">Managed billboard view to render into.</param>
+    /// <returns>True when the Stealer icon was rendered.</returns>
+    private static bool TryRenderPowerUpStealerBillboard(Entity enemyEntity,
+                                                         float3 enemyPosition,
+                                                         Transform cameraTransform,
+                                                         DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs,
+                                                         ComponentLookup<EnemyPowerUpStealerVisualState> stealerVisualStateLookup,
+                                                         EnemyOffensiveEngagementBillboardView billboardView)
+    {
+        if (!stealerVisualStateLookup.HasComponent(enemyEntity))
+            return false;
+
+        EnemyPowerUpStealerVisualState stealerVisualState = stealerVisualStateLookup[enemyEntity];
+
+        if (stealerVisualState.HasStolenPowerUp == 0 || stealerVisualState.PowerUpId.Length <= 0)
+            return false;
+
+        if (!PlayerPowerUpPresentationRuntime.TryResolveIcon(stealerVisualState.PowerUpId.ToString(), out Sprite icon))
+            return false;
+
+        EnemyPowerUpStealerBillboardStyle style = ResolveStealerBillboardStyle(offensiveEngagementConfigs);
+        Vector3 worldPosition = new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z);
+        Vector3 worldOffset = new Vector3(style.Offset.x, style.Offset.y, style.Offset.z);
+        billboardView.RenderStaticSprite(worldPosition,
+                                         cameraTransform,
+                                         icon,
+                                         DamageFlashRuntimeUtility.ToManagedColor(style.Color),
+                                         worldOffset,
+                                         style.Scale);
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves the Stealer icon style from authored engagement billboard settings when available.
+    /// </summary>
+    /// <param name="offensiveEngagementConfigs">Baked engagement configs to inspect.</param>
+    /// <returns>Resolved Stealer billboard style.</returns>
+    private static EnemyPowerUpStealerBillboardStyle ResolveStealerBillboardStyle(DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs)
+    {
+        EnemyPowerUpStealerBillboardStyle style = new EnemyPowerUpStealerBillboardStyle
+        {
+            Color = new float4(1f, 1f, 1f, 1f),
+            Offset = new float3(0f, 1.8f, 0f),
+            Scale = DefaultStealerIconScale
+        };
+
+        for (int configIndex = 0; configIndex < offensiveEngagementConfigs.Length; configIndex++)
+        {
+            EnemyOffensiveEngagementConfigElement config = offensiveEngagementConfigs[configIndex];
+
+            if (config.Source != EnemyOffensiveEngagementTriggerSource.WeaponInteraction)
+                continue;
+
+            style.Color = config.BillboardColor;
+            style.Offset = config.BillboardOffset;
+            style.Scale = math.max(0f, config.BillboardBaseScale);
+            return style;
+        }
+
+        return style;
     }
 
     /// <summary>
@@ -489,4 +574,14 @@ internal struct EnemyBossPatternChangePresentationResult
     public float4 BillboardColor;
     public float3 BillboardOffset;
     public float BillboardScale;
+}
+
+/// <summary>
+/// Stores resolved billboard style values for the enemy Power-Up Stealer icon.
+/// </summary>
+internal struct EnemyPowerUpStealerBillboardStyle
+{
+    public float4 Color;
+    public float3 Offset;
+    public float Scale;
 }

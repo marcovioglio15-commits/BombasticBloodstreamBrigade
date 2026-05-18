@@ -108,6 +108,15 @@ public static class EnemyPoolUtility
             if (!entityManager.HasBuffer<EnemyShooterRuntimeElement>(enemyEntity))
                 entityManager.AddBuffer<EnemyShooterRuntimeElement>(enemyEntity);
 
+            if (!entityManager.HasBuffer<EnemyPowerUpStealerConfigElement>(enemyEntity))
+                entityManager.AddBuffer<EnemyPowerUpStealerConfigElement>(enemyEntity);
+
+            if (!entityManager.HasBuffer<EnemyPowerUpStealerRuntimeElement>(enemyEntity))
+                entityManager.AddBuffer<EnemyPowerUpStealerRuntimeElement>(enemyEntity);
+
+            if (!entityManager.HasComponent<EnemyPowerUpStealerVisualState>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, CreateDefaultPowerUpStealerVisualState());
+
             if (!entityManager.HasBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity))
                 entityManager.AddBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity);
 
@@ -411,6 +420,12 @@ public static class EnemyPoolUtility
         if (entityManager.HasBuffer<EnemyShooterRuntimeElement>(enemyEntity))
             ResetShooterRuntime(entityManager, enemyEntity);
 
+        if (entityManager.HasBuffer<EnemyPowerUpStealerRuntimeElement>(enemyEntity))
+            ResetPowerUpStealerRuntime(entityManager, enemyEntity);
+
+        if (entityManager.HasComponent<EnemyPowerUpStealerVisualState>(enemyEntity))
+            entityManager.SetComponentData(enemyEntity, CreateDefaultPowerUpStealerVisualState());
+
         if (entityManager.HasComponent<EnemyHealth>(enemyEntity))
             ResetHealth(entityManager, enemyEntity);
 
@@ -555,6 +570,41 @@ public static class EnemyPoolUtility
                 HasLockedAimDirection = 0
             });
         }
+    }
+
+    /// <summary>
+    /// Resets Power-Up Stealer runtime elements from the baked Stealer config count.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to access Stealer buffers.</param>
+    /// <param name="enemyEntity">Enemy instance whose Stealer runtime must be rebuilt.</param>
+    private static void ResetPowerUpStealerRuntime(EntityManager entityManager, Entity enemyEntity)
+    {
+        DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = entityManager.GetBuffer<EnemyPowerUpStealerRuntimeElement>(enemyEntity);
+        int stealerCount = 0;
+
+        if (entityManager.HasBuffer<EnemyPowerUpStealerConfigElement>(enemyEntity))
+            stealerCount = entityManager.GetBuffer<EnemyPowerUpStealerConfigElement>(enemyEntity).Length;
+
+        stealerRuntime.Clear();
+
+        for (int stealerIndex = 0; stealerIndex < stealerCount; stealerIndex++)
+        {
+            stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+        }
+    }
+
+    /// <summary>
+    /// Creates the default cleared visual state for Power-Up Stealer icon presentation.
+    /// </summary>
+    /// <returns>Default Power-Up Stealer visual state.</returns>
+    private static EnemyPowerUpStealerVisualState CreateDefaultPowerUpStealerVisualState()
+    {
+        return new EnemyPowerUpStealerVisualState
+        {
+            HasStolenPowerUp = 0,
+            PowerUpId = default,
+            StolenKind = PlayerPowerUpUnlockKind.Active
+        };
     }
 
     /// <summary>

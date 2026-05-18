@@ -20140,9 +20140,12 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
-  secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  primaryActivePowerUpId: ActiveBulletTime
+  secondaryActivePowerUpId: ActiveChargeShot
+  equippedPassivePowerUpIds:
+  - Passive_LaserBeam
+  - Passive_ElementalBullets_Ice
+  - Passive_AdditionalBarrel
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

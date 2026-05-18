@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b187d81c45ffd2842bf4641501124f9a, type: 3}
+  m_Name: EnemyBrainPreset_Stealers
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyBrainPreset
+  presetId: cb14e727b7f746d6b03f3ed31fac0f6d
+  presetName: EnemyBrainPreset_Stealers
+  description: 
+  version: 1.0.0
+  movement:
+    moveSpeed: 6
+    maxSpeed: 6
+    acceleration: 40
+    deceleration: 20
+    inactivityTime: 0.08
+    rotationSpeedDegreesPerSecond: 0
+    priorityTier: 0
+    steeringAggressiveness: 1
+    minimumWallDistance: 0.25
+    disablePlayerKnockback: 0
+  steering:
+    separationRadius: 1.1
+    separationWeight: 2
+    bodyRadius: 0.55
+  damage:
+    contactDamageEnabled: 1
+    contactRadius: 0.8
+    contactAmountPerTick: 1
+    contactTickInterval: 0.75
+    areaDamageEnabled: 1
+    areaRadius: 0
+    areaAmountPerTickPercent: 0
+    areaTickInterval: 1
+  healthStatistics:
+    maxHealth: 1
+    maxShield: 0

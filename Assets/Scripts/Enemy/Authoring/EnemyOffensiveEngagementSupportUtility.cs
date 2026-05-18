@@ -103,6 +103,9 @@ public static class EnemyOffensiveEngagementSupportUtility
             case EnemyPatternModuleKind.Shooter:
                 return EnemyOffensiveEngagementTimingMode.WeaponShot;
 
+            case EnemyPatternModuleKind.PowerUpStealer:
+                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
+
             case EnemyPatternModuleKind.Grunt:
             case EnemyPatternModuleKind.Stationary:
             case EnemyPatternModuleKind.Wanderer:

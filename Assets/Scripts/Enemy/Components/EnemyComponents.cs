@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 #region Enemy Components
 /// <summary>
@@ -127,6 +128,7 @@ public struct EnemyPoolValidated : IComponentData
 public struct EnemyHitVfxConfig : IComponentData
 {
     public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> Prefab;
     public float LifetimeSeconds;
     public float ScaleMultiplier;
 }

@@ -16,6 +16,7 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     private const string DefaultShortRangeCowardModuleId = "Module_ShortRange_Coward";
     private const string DefaultShortRangeDashModuleId = "Module_ShortRange_Dash";
     private const string DefaultWeaponShooterModuleId = "Module_Weapon_Shooter";
+    private const string DefaultWeaponPowerUpStealerModuleId = "Module_Weapon_PowerUpStealer";
     private const string DefaultDropItemsModuleId = "Module_DropItems";
     private const string DefaultPatternId = "Pattern_DefaultGrunt";
     #endregion
@@ -368,6 +369,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
                                                              "Shooter",
                                                              EnemyPatternModuleKind.Shooter,
                                                              "Fires periodic projectiles while the weapon interaction is in range."));
+        weaponInteractionDefinitions.Add(CreateDefaultModule(DefaultWeaponPowerUpStealerModuleId,
+                                                             "Power-Up Stealer",
+                                                             EnemyPatternModuleKind.PowerUpStealer,
+                                                             "Steals one player power-up while the weapon interaction is in range."));
 
         dropItemsDefinitions.Add(CreateDefaultModule(DefaultDropItemsModuleId,
                                                      "Drop Items",
@@ -520,6 +525,10 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
                 return EnemyPatternModuleKind.Grunt;
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
+                if (candidateKind == EnemyPatternModuleKind.Shooter ||
+                    candidateKind == EnemyPatternModuleKind.PowerUpStealer)
+                    return candidateKind;
+
                 return EnemyPatternModuleKind.Shooter;
 
             default:
@@ -560,6 +569,9 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
                 return DefaultShortRangeGruntModuleId;
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
+                if (moduleKind == EnemyPatternModuleKind.PowerUpStealer)
+                    return DefaultWeaponPowerUpStealerModuleId;
+
                 return DefaultWeaponShooterModuleId;
 
             default:

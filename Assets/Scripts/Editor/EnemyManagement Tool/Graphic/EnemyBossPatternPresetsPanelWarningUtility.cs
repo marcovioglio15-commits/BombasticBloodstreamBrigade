@@ -150,7 +150,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
                                                            VisualElement parent)
     {
         GameObject firstProjectilePrefab = null;
-        bool hasWeaponSlot = false;
+        bool hasShooterSlot = false;
         bool hasMissingProjectilePrefab = false;
         bool hasConflictingProjectilePrefab = false;
 
@@ -166,13 +166,13 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
                 InspectWeaponExtraction(interactionProperty.FindPropertyRelative("weaponExtraction"),
                                         sourcePreset,
                                         ref firstProjectilePrefab,
-                                        ref hasWeaponSlot,
+                                        ref hasShooterSlot,
                                         ref hasMissingProjectilePrefab,
                                         ref hasConflictingProjectilePrefab);
             }
         }
 
-        if (!hasWeaponSlot)
+        if (!hasShooterSlot)
             return;
 
         if (firstProjectilePrefab == null)
@@ -193,13 +193,13 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     /// <param name="weaponExtractionProperty">Serialized weapon extraction root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
-    /// <param name="hasWeaponSlot">Tracks whether any weapon slot is enabled.</param>
+    /// <param name="hasShooterSlot">Tracks whether any enabled weapon slot resolves to Shooter.</param>
     /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
     /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
     private static void InspectWeaponExtraction(SerializedProperty weaponExtractionProperty,
                                                 EnemyModulesAndPatternsPreset sourcePreset,
                                                 ref GameObject firstProjectilePrefab,
-                                                ref bool hasWeaponSlot,
+                                                ref bool hasShooterSlot,
                                                 ref bool hasMissingProjectilePrefab,
                                                 ref bool hasConflictingProjectilePrefab)
     {
@@ -226,7 +226,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
             InspectWeaponSlot(candidateProperty != null ? candidateProperty.FindPropertyRelative("interaction") : null,
                               sourcePreset,
                               ref firstProjectilePrefab,
-                              ref hasWeaponSlot,
+                              ref hasShooterSlot,
                               ref hasMissingProjectilePrefab,
                               ref hasConflictingProjectilePrefab);
         }
@@ -238,20 +238,26 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     /// <param name="weaponSlotProperty">Serialized weapon slot root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
-    /// <param name="hasWeaponSlot">Tracks whether any weapon slot is enabled.</param>
+    /// <param name="hasShooterSlot">Tracks whether any enabled weapon slot resolves to Shooter.</param>
     /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
     /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
     private static void InspectWeaponSlot(SerializedProperty weaponSlotProperty,
                                           EnemyModulesAndPatternsPreset sourcePreset,
                                           ref GameObject firstProjectilePrefab,
-                                          ref bool hasWeaponSlot,
+                                          ref bool hasShooterSlot,
                                           ref bool hasMissingProjectilePrefab,
                                           ref bool hasConflictingProjectilePrefab)
     {
         if (!IsEnabledSlot(weaponSlotProperty))
             return;
 
-        hasWeaponSlot = true;
+        if (!TryResolveWeaponModuleKind(weaponSlotProperty.FindPropertyRelative("binding"), sourcePreset, out EnemyPatternModuleKind moduleKind))
+            return;
+
+        if (moduleKind != EnemyPatternModuleKind.Shooter)
+            return;
+
+        hasShooterSlot = true;
 
         if (!TryResolveWeaponRuntimeProjectile(weaponSlotProperty.FindPropertyRelative("binding"), sourcePreset, out GameObject projectilePrefab) ||
             projectilePrefab == null)
@@ -271,6 +277,48 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     }
 
     /// <summary>
+    /// Resolves the module kind assigned to one weapon binding.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized weapon binding.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="moduleKind">Output module kind from the resolved definition.</param>
+    /// <returns>True when the binding points to a known module definition.</returns>
+    private static bool TryResolveWeaponModuleKind(SerializedProperty bindingProperty,
+                                                   EnemyModulesAndPatternsPreset sourcePreset,
+                                                   out EnemyPatternModuleKind moduleKind)
+    {
+        moduleKind = EnemyPatternModuleKind.Grunt;
+
+        if (!TryResolveWeaponModuleDefinition(bindingProperty, sourcePreset, out EnemyPatternModuleDefinition moduleDefinition))
+            return false;
+
+        moduleKind = moduleDefinition.ModuleKind;
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves the module definition assigned to one weapon binding.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized weapon binding.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="moduleDefinition">Output module definition.</param>
+    /// <returns>True when the binding points to a known module definition.</returns>
+    private static bool TryResolveWeaponModuleDefinition(SerializedProperty bindingProperty,
+                                                         EnemyModulesAndPatternsPreset sourcePreset,
+                                                         out EnemyPatternModuleDefinition moduleDefinition)
+    {
+        moduleDefinition = null;
+
+        if (bindingProperty == null || sourcePreset == null)
+            return false;
+
+        SerializedProperty moduleIdProperty = bindingProperty.FindPropertyRelative("moduleId");
+        string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
+        moduleDefinition = sourcePreset.ResolveModuleDefinitionById(moduleId);
+        return moduleDefinition != null;
+    }
+
+    /// <summary>
     /// Resolves the Runtime Projectile prefab used by one weapon binding, including payload overrides.
     /// </summary>
     /// <param name="bindingProperty">Serialized weapon binding.</param>
@@ -283,7 +331,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     {
         projectilePrefab = null;
 
-        if (bindingProperty == null || sourcePreset == null)
+        if (!TryResolveWeaponModuleDefinition(bindingProperty, sourcePreset, out EnemyPatternModuleDefinition moduleDefinition))
             return false;
 
         SerializedProperty useOverridePayloadProperty = bindingProperty.FindPropertyRelative("useOverridePayload");
@@ -291,11 +339,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
         if (useOverridePayloadProperty != null && useOverridePayloadProperty.boolValue)
             return TryReadOverrideRuntimeProjectile(bindingProperty.FindPropertyRelative("overridePayload"), out projectilePrefab);
 
-        SerializedProperty moduleIdProperty = bindingProperty.FindPropertyRelative("moduleId");
-        string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
-        EnemyPatternModuleDefinition moduleDefinition = sourcePreset.ResolveModuleDefinitionById(moduleId);
-
-        if (moduleDefinition == null || moduleDefinition.ModuleKind != EnemyPatternModuleKind.Shooter)
+        if (moduleDefinition.ModuleKind != EnemyPatternModuleKind.Shooter)
             return false;
 
         EnemyPatternModulePayloadData payloadData = moduleDefinition.Data;

@@ -61,7 +61,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                 in PlayerPowerUpVfxSpawnRequest request,
                                 in PlayerPowerUpVfxCapConfig capConfig)
     {
-        GameObject sourcePrefab = ResolveSourcePrefab(prefabBindings, request.PrefabEntity);
+        GameObject sourcePrefab = ResolveSourcePrefab(prefabBindings, in request);
 
         if (sourcePrefab == null)
             return false;
@@ -102,25 +102,25 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     /// Resolves the GameObject prefab mapped to one baked VFX prefab entity.
     /// </summary>
     /// <param name="prefabBindings">Player-owned prefab entity to GameObject source bindings.</param>
-    /// <param name="prefabEntity">Baked prefab entity referenced by the VFX request.</param>
+    /// <param name="request">Baked VFX request that can carry either a player binding entity or a direct source prefab reference.</param>
     /// <returns>Source GameObject prefab, or null when no binding exists.</returns>
     private static GameObject ResolveSourcePrefab(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
-                                                  Entity prefabEntity)
+                                                  in PlayerPowerUpVfxSpawnRequest request)
     {
-        if (prefabEntity == Entity.Null)
+        if (request.PrefabEntity == Entity.Null)
             return null;
 
         for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
         {
             PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
 
-            if (binding.PrefabEntity != prefabEntity)
+            if (binding.PrefabEntity != request.PrefabEntity)
                 continue;
 
             return binding.Prefab.Value;
         }
 
-        return null;
+        return request.SourcePrefab.Value;
     }
 
     /// <summary>

@@ -165,6 +165,65 @@ public struct EnemyShooterRuntimeElement : IBufferElementData
 }
 
 /// <summary>
+/// Runtime Power-Up Stealer module configuration compiled from Weapon Interaction patterns.
+/// </summary>
+public struct EnemyPowerUpStealerConfigElement : IBufferElementData
+{
+    public EnemyPowerUpStealTriggerMode TriggerMode;
+    public EnemyPowerUpStealTargetKind TargetKind;
+    public float ActiveTargetBiasPercent;
+    public byte UseMinimumRange;
+    public float MinimumRange;
+    public byte UseMaximumRange;
+    public float MaximumRange;
+    public byte ExclusiveLookDirectionControl;
+    public EnemyWeaponInteractionActivationGate ActivationGates;
+    public float MaximumActivationSpeed;
+    public float RecentlyDamagedWindowSeconds;
+    public byte UseDamageRecovery;
+    public float DamageRecoveryPercent;
+    public byte UseTimedDamageRecovery;
+    public float TimedDamageRecoveryPercent;
+    public float TimedDamageRecoverySeconds;
+}
+
+/// <summary>
+/// Mutable runtime state for one Power-Up Stealer module instance.
+/// </summary>
+public struct EnemyPowerUpStealerRuntimeElement : IBufferElementData
+{
+    public byte HasTriggeredOnce;
+    public byte HasStolenPowerUp;
+    public PlayerPowerUpUnlockKind StolenKind;
+    public FixedString64Bytes PowerUpId;
+    public PlayerStoredActivePowerUpData StoredActivePowerUp;
+    public PlayerPassiveToolConfig StoredPassiveTool;
+    public int OriginalActiveSlotIndex;
+    public int OriginalPassiveCatalogIndex;
+    public int OriginalPassiveUnlockCount;
+    public Entity PlayerEntity;
+    public byte UseDamageRecovery;
+    public float DamageRecoveryPercent;
+    public byte UseTimedDamageRecovery;
+    public float TimedDamageRecoveryPercent;
+    public float TimedDamageRecoverySeconds;
+    public float HealthAtSteal;
+    public float LastObservedHealth;
+    public float RecoveryWindowElapsedSeconds;
+    public float RecoveryWindowAccumulatedPercent;
+}
+
+/// <summary>
+/// Stores the icon state currently displayed above enemies holding a stolen power-up.
+/// </summary>
+public struct EnemyPowerUpStealerVisualState : IComponentData
+{
+    public byte HasStolenPowerUp;
+    public FixedString64Bytes PowerUpId;
+    public PlayerPowerUpUnlockKind StolenKind;
+}
+
+/// <summary>
 /// Tags enemies whose movement is driven by custom pattern systems instead of default steering.
 /// </summary>
 public struct EnemyCustomPatternMovementTag : IComponentData
