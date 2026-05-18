@@ -175,7 +175,7 @@ MonoBehaviour:
   - phaseID: Phase1
     startsAtLevel: 3
     startingRequiredLevelUpExp: 25
-    requiredExperienceGrouth: 10
+    requiredExperienceGrouth: 5
     milestones:
     - milestoneLevel: 5
       specialExpRequirement: 98
@@ -222,7 +222,7 @@ MonoBehaviour:
   - phaseID: Phase2
     startsAtLevel: 21
     startingRequiredLevelUpExp: 165
-    requiredExperienceGrouth: 15
+    requiredExperienceGrouth: 10
     milestones:
     - milestoneLevel: 30
       specialExpRequirement: 600
@@ -255,7 +255,7 @@ MonoBehaviour:
   - phaseID: Phase3
     startsAtLevel: 41
     startingRequiredLevelUpExp: 435
-    requiredExperienceGrouth: 20
+    requiredExperienceGrouth: 15
     milestones:
     - milestoneLevel: 50
       specialExpRequirement: 1169
@@ -288,7 +288,7 @@ MonoBehaviour:
   - phaseID: Phase4
     startsAtLevel: 61
     startingRequiredLevelUpExp: 820
-    requiredExperienceGrouth: 25
+    requiredExperienceGrouth: 20
     milestones:
     - milestoneLevel: 70
       specialExpRequirement: 1836
@@ -321,7 +321,7 @@ MonoBehaviour:
   - phaseID: Phase5
     startsAtLevel: 81
     startingRequiredLevelUpExp: 1275
-    requiredExperienceGrouth: 30
+    requiredExperienceGrouth: 25
     milestones:
     - milestoneLevel: 90
       specialExpRequirement: 2576
