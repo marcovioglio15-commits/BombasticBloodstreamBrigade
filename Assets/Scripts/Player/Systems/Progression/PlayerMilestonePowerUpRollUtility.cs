@@ -56,6 +56,8 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="tierEntries">Flattened tier-entry buffer.</param>
     /// <param name="tierEntryScaling">Optional runtime scaling metadata for tier-entry weights.</param>
     /// <param name="equippedPassiveTools">Current equipped passive-tools buffer used to exclude incompatible passive offers.</param>
+    /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
+    /// <param name="reservedPassiveKinds">Passive tool kinds temporarily reserved by Stealer enemies.</param>
     /// <param name="selectionOffers">Selection-offers destination buffer.</param>
     /// <param name="selectionState">Selection-state component updated in place.</param>
     /// <param name="rolledOfferCount">Number of offers rolled for this milestone selection.</param>
@@ -69,6 +71,8 @@ public static class PlayerMilestonePowerUpRollUtility
                                                  DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
                                                  DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
                                                  DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                 IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
+                                                 HashSet<PassiveToolKind> reservedPassiveKinds,
                                                  DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers,
                                                  ref PlayerMilestonePowerUpSelectionState selectionState,
                                                  out int rolledOfferCount)
@@ -101,6 +105,7 @@ public static class PlayerMilestonePowerUpRollUtility
         PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
         HashSet<int> rolledCatalogIndices = new HashSet<int>();
         HashSet<PassiveToolKind> blockedPassiveKinds = BuildBlockedPassiveKinds(equippedPassiveTools);
+        MergeBlockedPassiveKinds(blockedPassiveKinds, reservedPassiveKinds);
 
         for (int rollIndex = 0; rollIndex < milestoneBlob.PowerUpUnlocks.Length; rollIndex++)
         {
@@ -114,6 +119,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                        tierEntryScaling,
                                        rolledCatalogIndices,
                                        blockedPassiveKinds,
+                                       reservedUnlockCountsByPowerUpId,
                                        out int rolledCatalogIndex,
                                        out string selectedDropPoolId,
                                        out string selectedTierId,
@@ -182,6 +188,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="tierEntryScaling">Optional runtime scaling metadata for tier-entry weights.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in this milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds already equipped or already rolled during this selection.</param>
+    /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <param name="rolledCatalogIndex">Resolved rolled catalog index when successful.</param>
     /// <param name="selectedTierId">Tier ID selected for the current roll.</param>
     /// <param name="selectedTierPercentage">Percentage assigned to the selected milestone tier candidate.</param>
@@ -195,6 +202,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                               DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
                                               HashSet<int> rolledCatalogIndices,
                                               HashSet<PassiveToolKind> blockedPassiveKinds,
+                                              IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
                                               out int rolledCatalogIndex,
                                               out string selectedDropPoolId,
                                               out string selectedTierId,
@@ -229,7 +237,8 @@ public static class PlayerMilestonePowerUpRollUtility
                                      variableContext,
                                      unlockCatalog,
                                      rolledCatalogIndices,
-                                     blockedPassiveKinds))
+                                     blockedPassiveKinds,
+                                     reservedUnlockCountsByPowerUpId))
                 continue;
 
             rollCandidateIndices.Add(tierRollIndex);
@@ -256,6 +265,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                       unlockCatalog,
                                       rolledCatalogIndices,
                                       blockedPassiveKinds,
+                                      reservedUnlockCountsByPowerUpId,
                                       out rolledCatalogIndex,
                                       out selectedEntryWeight);
     }
@@ -300,6 +310,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalog">Unlock catalog buffer.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in current milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
+    /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <returns>True when at least one rollable candidate is available; otherwise false.</returns>
     private static bool HasAnyRollableEntry(in PlayerPowerUpTierDefinitionElement tierDefinition,
                                             DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
@@ -307,7 +318,8 @@ public static class PlayerMilestonePowerUpRollUtility
                                             IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
                                             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                             HashSet<int> rolledCatalogIndices,
-                                            HashSet<PassiveToolKind> blockedPassiveKinds)
+                                            HashSet<PassiveToolKind> blockedPassiveKinds,
+                                            IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId)
     {
         int startIndex = mathMax(0, tierDefinition.EntryStartIndex);
         int endIndex = mathMin(tierEntries.Length, startIndex + mathMax(0, tierDefinition.EntryCount));
@@ -331,11 +343,12 @@ public static class PlayerMilestonePowerUpRollUtility
                 continue;
 
             PlayerPowerUpUnlockCatalogElement unlockEntry = unlockCatalog[catalogIndex];
+            int effectiveCurrentUnlockCount = ResolveEffectiveCurrentUnlockCount(in unlockEntry, reservedUnlockCountsByPowerUpId);
 
-            if (!HasRemainingUnlocks(in unlockEntry))
+            if (!HasRemainingUnlocks(in unlockEntry, effectiveCurrentUnlockCount))
                 continue;
 
-            if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds))
+            if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds, effectiveCurrentUnlockCount))
                 continue;
 
             return true;
@@ -354,6 +367,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalog">Unlock catalog buffer.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in current milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
+    /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <param name="catalogIndex">Resolved catalog index when successful.</param>
     /// <param name="entryWeight">Weight of the selected power-up entry.</param>
     /// <returns>True when a candidate is rolled; otherwise false.</returns>
@@ -364,6 +378,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                                DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                HashSet<int> rolledCatalogIndices,
                                                HashSet<PassiveToolKind> blockedPassiveKinds,
+                                               IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
                                                out int catalogIndex,
                                                out float entryWeight)
     {
@@ -395,11 +410,12 @@ public static class PlayerMilestonePowerUpRollUtility
                 continue;
 
             PlayerPowerUpUnlockCatalogElement unlockEntry = unlockCatalog[candidateCatalogIndex];
+            int effectiveCurrentUnlockCount = ResolveEffectiveCurrentUnlockCount(in unlockEntry, reservedUnlockCountsByPowerUpId);
 
-            if (!HasRemainingUnlocks(in unlockEntry))
+            if (!HasRemainingUnlocks(in unlockEntry, effectiveCurrentUnlockCount))
                 continue;
 
-            if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds))
+            if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds, effectiveCurrentUnlockCount))
                 continue;
 
             AddOrAccumulateCandidateWeight(candidateCatalogIndices,
@@ -449,6 +465,11 @@ public static class PlayerMilestonePowerUpRollUtility
         candidateWeights.Add(safeWeight);
     }
 
+    /// <summary>
+    /// Builds the passive-kind exclusion set from currently equipped passives.
+    /// </summary>
+    /// <param name="equippedPassiveTools">Equipped passive buffer to scan.</param>
+    /// <returns>Passive kinds that should block first-time offers of the same kind.</returns>
     private static HashSet<PassiveToolKind> BuildBlockedPassiveKinds(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
     {
         HashSet<PassiveToolKind> blockedPassiveKinds = new HashSet<PassiveToolKind>();
@@ -469,12 +490,38 @@ public static class PlayerMilestonePowerUpRollUtility
         return blockedPassiveKinds;
     }
 
-    private static bool IsPassiveOfferBlocked(in PlayerPowerUpUnlockCatalogElement unlockEntry, HashSet<PassiveToolKind> blockedPassiveKinds)
+    /// <summary>
+    /// Adds passive kinds that are temporarily reserved by Stealer enemies to the milestone exclusion set.
+    /// </summary>
+    /// <param name="blockedPassiveKinds">Mutable passive-kind exclusion set.</param>
+    /// <param name="reservedPassiveKinds">Passive kinds currently held by Stealer enemies.</param>
+    private static void MergeBlockedPassiveKinds(HashSet<PassiveToolKind> blockedPassiveKinds, HashSet<PassiveToolKind> reservedPassiveKinds)
+    {
+        if (blockedPassiveKinds == null)
+            return;
+
+        if (reservedPassiveKinds == null || reservedPassiveKinds.Count <= 0)
+            return;
+
+        foreach (PassiveToolKind reservedPassiveKind in reservedPassiveKinds)
+            blockedPassiveKinds.Add(reservedPassiveKind);
+    }
+
+    /// <summary>
+    /// Checks whether a passive offer conflicts with an equipped or temporarily stolen passive kind.
+    /// </summary>
+    /// <param name="unlockEntry">Catalog entry being considered for the milestone offer.</param>
+    /// <param name="blockedPassiveKinds">Passive kinds already equipped, rolled, or temporarily stolen.</param>
+    /// <param name="effectiveCurrentUnlockCount">Unlock count after applying temporary Stealer reservations.</param>
+    /// <returns>True when this passive offer should be excluded.</returns>
+    private static bool IsPassiveOfferBlocked(in PlayerPowerUpUnlockCatalogElement unlockEntry,
+                                              HashSet<PassiveToolKind> blockedPassiveKinds,
+                                              int effectiveCurrentUnlockCount)
     {
         if (unlockEntry.UnlockKind != PlayerPowerUpUnlockKind.Passive)
             return false;
 
-        if (unlockEntry.CurrentUnlockCount > 0)
+        if (effectiveCurrentUnlockCount > 0)
             return false;
 
         if (unlockEntry.PassiveToolConfig.IsDefined == 0)
@@ -486,9 +533,43 @@ public static class PlayerMilestonePowerUpRollUtility
         return blockedPassiveKinds.Contains(unlockEntry.PassiveToolConfig.ToolKind);
     }
 
-    private static bool HasRemainingUnlocks(in PlayerPowerUpUnlockCatalogElement unlockEntry)
+    /// <summary>
+    /// Checks whether the catalog entry still has room for another unlock after temporary reservations are applied.
+    /// </summary>
+    /// <param name="unlockEntry">Catalog entry being considered for the milestone offer.</param>
+    /// <param name="effectiveCurrentUnlockCount">Unlock count after applying temporary Stealer reservations.</param>
+    /// <returns>True when this entry can still be offered.</returns>
+    private static bool HasRemainingUnlocks(in PlayerPowerUpUnlockCatalogElement unlockEntry, int effectiveCurrentUnlockCount)
     {
-        return unlockEntry.CurrentUnlockCount < mathMax(1, unlockEntry.MaximumUnlockCount);
+        return effectiveCurrentUnlockCount < mathMax(1, unlockEntry.MaximumUnlockCount);
+    }
+
+    /// <summary>
+    /// Resolves the effective unlock count by treating stolen power-ups as still owned for milestone exclusions.
+    /// </summary>
+    /// <param name="unlockEntry">Catalog entry being considered for the milestone offer.</param>
+    /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies.</param>
+    /// <returns>Current unlock count merged with any matching Stealer reservation.</returns>
+    private static int ResolveEffectiveCurrentUnlockCount(in PlayerPowerUpUnlockCatalogElement unlockEntry,
+                                                          IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId)
+    {
+        int effectiveUnlockCount = mathMax(0, unlockEntry.CurrentUnlockCount);
+
+        if (reservedUnlockCountsByPowerUpId == null || reservedUnlockCountsByPowerUpId.Count <= 0)
+            return effectiveUnlockCount;
+
+        if (unlockEntry.PowerUpId.Length <= 0)
+            return effectiveUnlockCount;
+
+        string powerUpId = unlockEntry.PowerUpId.ToString();
+
+        if (string.IsNullOrWhiteSpace(powerUpId))
+            return effectiveUnlockCount;
+
+        if (!reservedUnlockCountsByPowerUpId.TryGetValue(powerUpId.Trim(), out int reservedUnlockCount))
+            return effectiveUnlockCount;
+
+        return mathMax(effectiveUnlockCount, reservedUnlockCount);
     }
 
     private static float ResolveTierRollPercentage(ref PlayerMilestoneTierRollBlob tierRoll,

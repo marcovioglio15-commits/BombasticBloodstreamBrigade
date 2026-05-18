@@ -152,6 +152,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                                              in powerUpsState);
         ApplyStoredPowerUpToSlot(in storedPowerUp,
                                  targetSlotIndex,
+                                 0,
                                  ref powerUpsConfig,
                                  ref powerUpsState);
         storedPowerUp = replacedPowerUp;
@@ -213,6 +214,28 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                            ref PlayerPowerUpsConfig powerUpsConfig,
                                                            ref PlayerPowerUpsState powerUpsState)
     {
+        return TryRestoreStoredPowerUpToVacantSlot(in storedPowerUp,
+                                                   targetSlotIndex,
+                                                   0,
+                                                   ref powerUpsConfig,
+                                                   ref powerUpsState);
+    }
+
+    /// <summary>
+    /// Restores one stored active power-up while preserving a known equip order when the requested destination slot is still vacant.
+    /// </summary>
+    /// <param name="storedPowerUp">Stored active payload to restore.</param>
+    /// <param name="targetSlotIndex">Slot index to restore into. 0 is primary and 1 is secondary.</param>
+    /// <param name="restoredEquipOrder">Original positive equip-order marker to preserve, or 0 to assign a new order.</param>
+    /// <param name="powerUpsConfig">Runtime loadout config to mutate.</param>
+    /// <param name="powerUpsState">Runtime slot state to mutate.</param>
+    /// <returns>True when the stored power-up was restored directly; otherwise false.</returns>
+    public static bool TryRestoreStoredPowerUpToVacantSlot(in PlayerStoredActivePowerUpData storedPowerUp,
+                                                           int targetSlotIndex,
+                                                           int restoredEquipOrder,
+                                                           ref PlayerPowerUpsConfig powerUpsConfig,
+                                                           ref PlayerPowerUpsState powerUpsState)
+    {
         if (storedPowerUp.SlotConfig.IsDefined == 0)
             return false;
 
@@ -222,14 +245,22 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 if (powerUpsConfig.PrimarySlot.IsDefined != 0)
                     return false;
 
-                ApplyStoredPowerUpToSlot(in storedPowerUp, targetSlotIndex, ref powerUpsConfig, ref powerUpsState);
+                ApplyStoredPowerUpToSlot(in storedPowerUp,
+                                         targetSlotIndex,
+                                         restoredEquipOrder,
+                                         ref powerUpsConfig,
+                                         ref powerUpsState);
                 return true;
 
             case 1:
                 if (powerUpsConfig.SecondarySlot.IsDefined != 0)
                     return false;
 
-                ApplyStoredPowerUpToSlot(in storedPowerUp, targetSlotIndex, ref powerUpsConfig, ref powerUpsState);
+                ApplyStoredPowerUpToSlot(in storedPowerUp,
+                                         targetSlotIndex,
+                                         restoredEquipOrder,
+                                         ref powerUpsConfig,
+                                         ref powerUpsState);
                 return true;
 
             default:
@@ -373,10 +404,12 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// </summary>
     /// <param name="storedPowerUp">Stored payload restored from a dropped container.</param>
     /// <param name="targetSlotIndex">Slot index receiving the payload. 0 is primary and 1 is secondary.</param>
+    /// <param name="restoredEquipOrder">Original positive equip-order marker to preserve, or 0 to assign a new order.</param>
     /// <param name="powerUpsConfig">Runtime loadout config to mutate.</param>
     /// <param name="powerUpsState">Runtime slot state to mutate.</param>
     private static void ApplyStoredPowerUpToSlot(in PlayerStoredActivePowerUpData storedPowerUp,
                                                  int targetSlotIndex,
+                                                 int restoredEquipOrder,
                                                  ref PlayerPowerUpsConfig powerUpsConfig,
                                                  ref PlayerPowerUpsState powerUpsState)
     {
@@ -390,7 +423,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 powerUpsState.PrimaryMaintenanceTickTimer = 0f;
                 powerUpsState.PrimaryIsCharging = 0;
                 powerUpsState.PrimaryIsActive = 0;
-                powerUpsState.PrimaryEquipOrder = ConsumeNextEquipOrder(ref powerUpsState);
+                powerUpsState.PrimaryEquipOrder = ResolveRestoredEquipOrder(ref powerUpsState, restoredEquipOrder);
                 return;
             case 1:
                 powerUpsConfig.SecondarySlot = storedPowerUp.SlotConfig;
@@ -400,7 +433,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 powerUpsState.SecondaryMaintenanceTickTimer = 0f;
                 powerUpsState.SecondaryIsCharging = 0;
                 powerUpsState.SecondaryIsActive = 0;
-                powerUpsState.SecondaryEquipOrder = ConsumeNextEquipOrder(ref powerUpsState);
+                powerUpsState.SecondaryEquipOrder = ResolveRestoredEquipOrder(ref powerUpsState, restoredEquipOrder);
                 return;
         }
     }
@@ -433,6 +466,23 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         powerUpsState.SecondaryMaintenanceTickTimer = 0f;
         powerUpsState.SecondaryIsCharging = 0;
         powerUpsState.SecondaryIsActive = 0;
+    }
+
+    /// <summary>
+    /// Preserves a restored active's original order marker while keeping the next-order cursor monotonic.
+    /// </summary>
+    /// <param name="powerUpsState">Runtime active state that stores the next available order value.</param>
+    /// <param name="restoredEquipOrder">Original positive order marker to preserve, or 0 to consume a new order.</param>
+    /// <returns>Equip-order marker assigned to the restored active slot.</returns>
+    private static int ResolveRestoredEquipOrder(ref PlayerPowerUpsState powerUpsState, int restoredEquipOrder)
+    {
+        if (restoredEquipOrder <= 0)
+            return ConsumeNextEquipOrder(ref powerUpsState);
+
+        if (powerUpsState.NextEquipOrder <= restoredEquipOrder && restoredEquipOrder < int.MaxValue)
+            powerUpsState.NextEquipOrder = restoredEquipOrder + 1;
+
+        return restoredEquipOrder;
     }
 
     /// <summary>

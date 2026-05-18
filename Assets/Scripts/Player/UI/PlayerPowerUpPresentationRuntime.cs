@@ -171,13 +171,42 @@ public static class PlayerPowerUpPresentationRuntime
 
         string powerUpId = commonData.PowerUpId.Trim();
 
-        if (entriesByPowerUpId.ContainsKey(powerUpId))
+        if (entriesByPowerUpId.TryGetValue(powerUpId, out PowerUpPresentationEntry existingEntry))
+        {
+            entriesByPowerUpId[powerUpId] = MergeCommonData(existingEntry, commonData);
             return;
+        }
 
         entriesByPowerUpId.Add(powerUpId, new PowerUpPresentationEntry(powerUpId,
                                                                        commonData.DisplayName,
                                                                        commonData.Description,
                                                                        commonData.Icon));
+    }
+
+    /// <summary>
+    /// Merges duplicate metadata rows while preserving the first useful values already registered in the cache.
+    /// </summary>
+    /// <param name="existingEntry">Existing cached presentation entry for this PowerUpId.</param>
+    /// <param name="commonData">New metadata row being registered from the active preset.</param>
+    /// <returns>Merged presentation entry with the best available display text and icon.</returns>
+    private static PowerUpPresentationEntry MergeCommonData(PowerUpPresentationEntry existingEntry, PowerUpCommonData commonData)
+    {
+        bool existingDisplayNameIsFallback = string.Equals(existingEntry.DisplayName,
+                                                           existingEntry.PowerUpId,
+                                                           StringComparison.OrdinalIgnoreCase);
+        string displayName = (string.IsNullOrWhiteSpace(existingEntry.DisplayName) || existingDisplayNameIsFallback) &&
+                             !string.IsNullOrWhiteSpace(commonData.DisplayName)
+            ? commonData.DisplayName
+            : existingEntry.DisplayName;
+        string description = string.IsNullOrWhiteSpace(existingEntry.Description)
+            ? commonData.Description
+            : existingEntry.Description;
+        Sprite icon = existingEntry.Icon != null ? existingEntry.Icon : commonData.Icon;
+
+        return new PowerUpPresentationEntry(existingEntry.PowerUpId,
+                                            displayName,
+                                            description,
+                                            icon);
     }
     #endregion
 

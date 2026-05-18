@@ -193,6 +193,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -389,6 +390,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -585,6 +587,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -781,6 +784,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -977,6 +981,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -1179,6 +1184,7 @@ MonoBehaviour:
       powerUpStealer:
         triggerMode: 1
         targetKind: 2
+        selectionMode: 0
         activeTargetBiasPercent: 50
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
@@ -1387,6 +1393,7 @@ MonoBehaviour:
         powerUpStealer:
           triggerMode: 1
           targetKind: 2
+          selectionMode: 0
           activeTargetBiasPercent: 50
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
@@ -1582,6 +1589,7 @@ MonoBehaviour:
         powerUpStealer:
           triggerMode: 1
           targetKind: 2
+          selectionMode: 0
           activeTargetBiasPercent: 50
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
@@ -1777,6 +1785,7 @@ MonoBehaviour:
         powerUpStealer:
           triggerMode: 1
           targetKind: 2
+          selectionMode: 0
           activeTargetBiasPercent: 50
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25

@@ -16,6 +16,9 @@ public sealed class EnemyPowerUpStealerModuleData
     [Tooltip("Which player power-up category can be stolen by this module.")]
     [SerializeField] private EnemyPowerUpStealTargetKind targetKind = EnemyPowerUpStealTargetKind.ActiveOrPassive;
 
+    [Tooltip("Selects which eligible power-up inside the resolved category is stolen. First/Last use active equip order and passive acquisition order, while Random samples only valid entries.")]
+    [SerializeField] private EnemyPowerUpStealSelectionMode selectionMode = EnemyPowerUpStealSelectionMode.FirstObtained;
+
     [Tooltip("Percentage chance to try an active power-up before a passive one when Target Kind is Active Or Passive. Runtime falls back to the other category if the preferred one is unavailable.")]
     [Range(0f, 100f)]
     [SerializeField] private float activeTargetBiasPercent = 50f;
@@ -56,6 +59,14 @@ public sealed class EnemyPowerUpStealerModuleData
         get
         {
             return targetKind;
+        }
+    }
+
+    public EnemyPowerUpStealSelectionMode SelectionMode
+    {
+        get
+        {
+            return selectionMode;
         }
     }
 

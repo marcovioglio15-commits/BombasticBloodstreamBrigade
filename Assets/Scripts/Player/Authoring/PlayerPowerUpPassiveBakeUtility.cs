@@ -20,6 +20,7 @@ public static class PlayerPowerUpPassiveBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="outputPassiveToolConfigs">Destination list receiving compiled passive configs.</param>
+    /// <param name="outputPowerUpIds">Optional destination list receiving the PowerUpId aligned to each compiled passive config.</param>
     public static void CollectEquippedPassiveToolConfigs(PlayerAuthoring authoring,
                                                          PlayerPowerUpsPreset preset,
                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
@@ -64,14 +65,15 @@ public static class PlayerPowerUpPassiveBakeUtility
                                                                                                      preset,
                                                                                                      passivePowerUp,
                                                                                                      resolveDynamicPrefabEntity);
+                FixedString64Bytes powerUpId = ResolvePassivePowerUpId(passivePowerUp);
 
-                if (passiveToolConfig.IsDefined == 0)
+                if (powerUpId.Length <= 0)
                     continue;
 
                 outputPassiveToolConfigs.Add(passiveToolConfig);
 
                 if (outputPowerUpIds != null)
-                    outputPowerUpIds.Add(new FixedString64Bytes(passivePowerUp.CommonData.PowerUpId.Trim()));
+                    outputPowerUpIds.Add(powerUpId);
             }
 
             return;
@@ -107,8 +109,40 @@ public static class PlayerPowerUpPassiveBakeUtility
             outputPassiveToolConfigs.Add(passiveToolConfig);
 
             if (outputPowerUpIds != null)
-                outputPowerUpIds.Add(default);
+                outputPowerUpIds.Add(ResolvePassiveToolPowerUpId(passiveTool));
         }
+    }
+
+    /// <summary>
+    /// Resolves a modular passive PowerUpId even when the passive has only catalog-driven effects.
+    /// </summary>
+    /// <param name="passivePowerUp">Modular passive definition being baked into the equipped-passive order buffer.</param>
+    /// <returns>Stable PowerUpId, or default when the definition has no valid id.</returns>
+    private static FixedString64Bytes ResolvePassivePowerUpId(ModularPowerUpDefinition passivePowerUp)
+    {
+        if (passivePowerUp == null || passivePowerUp.CommonData == null)
+            return default;
+
+        if (string.IsNullOrWhiteSpace(passivePowerUp.CommonData.PowerUpId))
+            return default;
+
+        return new FixedString64Bytes(passivePowerUp.CommonData.PowerUpId.Trim());
+    }
+
+    /// <summary>
+    /// Resolves the legacy passive tool PowerUpId so runtime systems can still identify stolen passive payloads.
+    /// </summary>
+    /// <param name="passiveTool">Legacy passive definition being baked into runtime config.</param>
+    /// <returns>Stable PowerUpId, or default when the definition has no valid id.</returns>
+    private static FixedString64Bytes ResolvePassiveToolPowerUpId(PassiveToolDefinition passiveTool)
+    {
+        if (passiveTool == null || passiveTool.CommonData == null)
+            return default;
+
+        if (string.IsNullOrWhiteSpace(passiveTool.CommonData.PowerUpId))
+            return default;
+
+        return new FixedString64Bytes(passiveTool.CommonData.PowerUpId.Trim());
     }
 
     /// <summary>

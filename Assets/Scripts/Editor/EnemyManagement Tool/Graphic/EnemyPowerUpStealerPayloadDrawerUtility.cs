@@ -38,6 +38,7 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
 
         SerializedProperty triggerModeProperty = stealerProperty.FindPropertyRelative("triggerMode");
         SerializedProperty targetKindProperty = stealerProperty.FindPropertyRelative("targetKind");
+        SerializedProperty selectionModeProperty = stealerProperty.FindPropertyRelative("selectionMode");
         SerializedProperty activeTargetBiasPercentProperty = stealerProperty.FindPropertyRelative("activeTargetBiasPercent");
         SerializedProperty recoverAfterDamageTakenPercentProperty = stealerProperty.FindPropertyRelative("recoverAfterDamageTakenPercent");
         SerializedProperty recoveryDamageTakenPercentProperty = stealerProperty.FindPropertyRelative("recoveryDamageTakenPercent");
@@ -47,6 +48,7 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
 
         if (triggerModeProperty == null ||
             targetKindProperty == null ||
+            selectionModeProperty == null ||
             activeTargetBiasPercentProperty == null ||
             recoverAfterDamageTakenPercentProperty == null ||
             recoveryDamageTakenPercentProperty == null ||
@@ -63,6 +65,7 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
         BuildStealSection(stealFoldout,
                           triggerModeProperty,
                           targetKindProperty,
+                          selectionModeProperty,
                           activeTargetBiasPercentProperty);
 
         Foldout recoveryFoldout = CreatePayloadFoldout(stealerProperty, "Recovery", "PowerUpStealerRecovery");
@@ -87,14 +90,17 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
     /// <param name="stealFoldout">Foldout that receives the controls.</param>
     /// <param name="triggerModeProperty">Serialized trigger mode property.</param>
     /// <param name="targetKindProperty">Serialized target kind property.</param>
+    /// <param name="selectionModeProperty">Serialized within-category selection mode property.</param>
     /// <param name="activeTargetBiasPercentProperty">Serialized active-target bias percentage property.</param>
     private static void BuildStealSection(Foldout stealFoldout,
                                           SerializedProperty triggerModeProperty,
                                           SerializedProperty targetKindProperty,
+                                          SerializedProperty selectionModeProperty,
                                           SerializedProperty activeTargetBiasPercentProperty)
     {
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, triggerModeProperty, "Trigger Mode");
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, targetKindProperty, "Target Kind");
+        EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, selectionModeProperty, "Selection Mode");
 
         VisualElement activeBiasContainer = new VisualElement();
         activeBiasContainer.tooltip = "Shown only when the module can steal either active or passive power-ups.";

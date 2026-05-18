@@ -175,10 +175,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         });
 
         Entity hitVfxPrefabEntity = ResolveHitVfxPrefabEntity(authoring);
+        Vector3 hitVfxSpawnOffset = authoring.HitVfxSpawnOffset;
         AddComponent(entity, new EnemyHitVfxConfig
         {
             PrefabEntity = hitVfxPrefabEntity,
             Prefab = authoring.HitVfxPrefab,
+            SpawnOffset = new float3(hitVfxSpawnOffset.x, hitVfxSpawnOffset.y, hitVfxSpawnOffset.z),
             LifetimeSeconds = math.max(0.05f, authoring.HitVfxLifetimeSeconds),
             ScaleMultiplier = math.max(0.01f, authoring.HitVfxScaleMultiplier)
         });

@@ -250,6 +250,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -443,6 +444,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -636,6 +638,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -903,6 +906,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -1136,6 +1140,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -1392,6 +1397,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -1631,6 +1637,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -1870,6 +1877,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -2032,6 +2040,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -2213,6 +2222,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -2400,6 +2410,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -2607,6 +2618,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -2874,6 +2886,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -3130,6 +3143,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -3369,6 +3383,7 @@ MonoBehaviour:
               powerUpStealer:
                 triggerMode: 1
                 targetKind: 2
+                selectionMode: 0
                 activeTargetBiasPercent: 50
                 recoverAfterDamageTakenPercent: 0
                 recoveryDamageTakenPercent: 25
@@ -3531,6 +3546,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -3712,6 +3728,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -3899,6 +3916,7 @@ MonoBehaviour:
           powerUpStealer:
             triggerMode: 1
             targetKind: 2
+            selectionMode: 0
             activeTargetBiasPercent: 50
             recoverAfterDamageTakenPercent: 0
             recoveryDamageTakenPercent: 25
@@ -4104,6 +4122,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -4306,6 +4325,7 @@ MonoBehaviour:
             powerUpStealer:
               triggerMode: 1
               targetKind: 2
+              selectionMode: 0
               activeTargetBiasPercent: 50
               recoverAfterDamageTakenPercent: 0
               recoveryDamageTakenPercent: 25
@@ -4336,6 +4356,7 @@ MonoBehaviour:
     enabled: 1
     fallbackIntervalSeconds: 8
     poolExpandBatch: 4
+    spawnOffset: {x: 0, y: 0.5, z: 0}
     killMinionsOnBossDeath: 1
     requireMinionsKilledForRunCompletion: 1
     rules:

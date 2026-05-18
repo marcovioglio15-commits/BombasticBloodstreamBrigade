@@ -591,6 +591,7 @@ public static class EnemyAdvancedPatternBakeUtility
         {
             TriggerMode = ResolvePowerUpStealTriggerMode(stealerData.TriggerMode),
             TargetKind = ResolvePowerUpStealTargetKind(stealerData.TargetKind),
+            SelectionMode = ResolvePowerUpStealSelectionMode(stealerData.SelectionMode),
             ActiveTargetBiasPercent = math.clamp(stealerData.ActiveTargetBiasPercent, 0f, 100f),
             UseMinimumRange = 0,
             MinimumRange = 0f,
@@ -643,6 +644,25 @@ public static class EnemyAdvancedPatternBakeUtility
 
             default:
                 return EnemyPowerUpStealTargetKind.ActiveOrPassive;
+        }
+    }
+
+    /// <summary>
+    /// Resolves one legal Power-Up Stealer within-category selection enum value.
+    /// </summary>
+    /// <param name="selectionMode">Authored within-category selection mode.</param>
+    /// <returns>Supported selection mode.</returns>
+    internal static EnemyPowerUpStealSelectionMode ResolvePowerUpStealSelectionMode(EnemyPowerUpStealSelectionMode selectionMode)
+    {
+        switch (selectionMode)
+        {
+            case EnemyPowerUpStealSelectionMode.FirstObtained:
+            case EnemyPowerUpStealSelectionMode.LastObtained:
+            case EnemyPowerUpStealSelectionMode.Random:
+                return selectionMode;
+
+            default:
+                return EnemyPowerUpStealSelectionMode.FirstObtained;
         }
     }
 

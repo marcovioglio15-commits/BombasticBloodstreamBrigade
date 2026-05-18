@@ -40,9 +40,6 @@ public static class PlayerPowerUpCatalogBakeUtility
         {
             PlayerPassiveToolConfig passiveToolConfig = equippedPassiveToolConfigs[passiveToolIndex];
 
-            if (passiveToolConfig.IsDefined == 0)
-                continue;
-
             equippedPassiveToolsBuffer.Add(new EquippedPassiveToolElement
             {
                 PowerUpId = passiveToolIndex < equippedPassiveToolIds.Count ? equippedPassiveToolIds[passiveToolIndex] : default,
@@ -140,6 +137,7 @@ public static class PlayerPowerUpCatalogBakeUtility
             return;
 
         List<PlayerPassiveToolConfig> collectedPassiveToolConfigs = new List<PlayerPassiveToolConfig>(8);
+        List<FixedString64Bytes> collectedPassivePowerUpIds = new List<FixedString64Bytes>(8);
 
         for (int presetIndex = 0; presetIndex < cheatPresets.Count; presetIndex++)
         {
@@ -158,17 +156,16 @@ public static class PlayerPowerUpCatalogBakeUtility
                 PlayerPowerUpPassiveBakeUtility.CollectEquippedPassiveToolConfigs(authoring,
                                                                                   cheatPreset,
                                                                                   resolveDynamicPrefabEntity,
-                                                                                  collectedPassiveToolConfigs);
+                                                                                  collectedPassiveToolConfigs,
+                                                                                  collectedPassivePowerUpIds);
 
                 for (int passiveToolIndex = 0; passiveToolIndex < collectedPassiveToolConfigs.Count; passiveToolIndex++)
                 {
                     PlayerPassiveToolConfig passiveToolConfig = collectedPassiveToolConfigs[passiveToolIndex];
 
-                    if (passiveToolConfig.IsDefined == 0)
-                        continue;
-
                     cheatPresetPassivesBuffer.Add(new PlayerPowerUpCheatPresetPassiveElement
                     {
+                        PowerUpId = passiveToolIndex < collectedPassivePowerUpIds.Count ? collectedPassivePowerUpIds[passiveToolIndex] : default,
                         Tool = passiveToolConfig
                     });
                     passiveCount++;

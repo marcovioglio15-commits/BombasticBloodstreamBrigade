@@ -603,6 +603,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public Vector3 HitVfxSpawnOffset
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return Vector3.zero;
+
+            return settings.HitVfxSpawnOffset;
+        }
+    }
+
     public float HitVfxScaleMultiplier
     {
         get

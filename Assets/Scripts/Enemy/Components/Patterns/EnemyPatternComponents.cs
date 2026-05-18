@@ -171,6 +171,7 @@ public struct EnemyPowerUpStealerConfigElement : IBufferElementData
 {
     public EnemyPowerUpStealTriggerMode TriggerMode;
     public EnemyPowerUpStealTargetKind TargetKind;
+    public EnemyPowerUpStealSelectionMode SelectionMode;
     public float ActiveTargetBiasPercent;
     public byte UseMinimumRange;
     public float MinimumRange;
@@ -199,7 +200,9 @@ public struct EnemyPowerUpStealerRuntimeElement : IBufferElementData
     public PlayerStoredActivePowerUpData StoredActivePowerUp;
     public PlayerPassiveToolConfig StoredPassiveTool;
     public int OriginalActiveSlotIndex;
+    public int OriginalActiveEquipOrder;
     public int OriginalPassiveCatalogIndex;
+    public int OriginalPassiveBufferIndex;
     public int OriginalPassiveUnlockCount;
     public Entity PlayerEntity;
     public byte UseDamageRecovery;

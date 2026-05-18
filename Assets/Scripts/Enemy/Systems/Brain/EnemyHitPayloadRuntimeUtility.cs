@@ -270,7 +270,7 @@ public static class EnemyHitPayloadRuntimeUtility
         {
             PrefabEntity = hitVfxConfig.PrefabEntity,
             SourcePrefab = hitVfxConfig.Prefab,
-            Position = enemyPosition,
+            Position = enemyPosition + hitVfxConfig.SpawnOffset,
             Rotation = quaternion.identity,
             UniformScale = math.max(0.01f, hitVfxConfig.ScaleMultiplier),
             LifetimeSeconds = math.max(0.05f, hitVfxConfig.LifetimeSeconds),

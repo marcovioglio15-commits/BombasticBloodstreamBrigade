@@ -37,12 +37,12 @@ MonoBehaviour:
     colorBlendLeadTimeSeconds: 0.3
     colorBlendFadeOutSeconds: 0.18
     colorBlendMaximumBlend: 0.7
-    enableBillboard: 0
+    enableBillboard: 1
     billboardSprite: {fileID: 21300000, guid: 6a0b1d07def993649a48cc9aca31ab30, type: 3}
     billboardColor: {r: 1, g: 1, b: 1, a: 1}
     billboardLocalOffset: {x: 0, y: 2.1, z: 0}
     billboardLeadTimeSeconds: 0.5
-    billboardBaseScale: 0.05
+    billboardBaseScale: 0.15
     billboardPulseScaleMultiplier: 2
     billboardPulseExpandDurationSeconds: 0.15
     billboardPulseContractDurationSeconds: 0.35
@@ -63,7 +63,8 @@ MonoBehaviour:
     billboardPulseContractDurationSeconds: 0.14
   prefabs:
     enemyPrefab: {fileID: 3091458169621715366, guid: 52f3964b147ffda42ab37ba660246989, type: 3}
-    hitVfxPrefab: {fileID: 3021818779694104051, guid: afa1147b43317a74db598d39f92f660e, type: 3}
+    hitVfxPrefab: {fileID: 8477671424390131711, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+    hitVfxSpawnOffset: {x: 0, y: 0, z: 0}
     hitVfxLifetimeSeconds: 0.35
     hitVfxScaleMultiplier: 1
     spawnPaintColor: {r: 0.2980392, g: 1, b: 0.815305, a: 1}

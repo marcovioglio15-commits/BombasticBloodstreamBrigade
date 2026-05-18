@@ -70,7 +70,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                           ref runtime,
                                           ref playerAccess);
 
-            if (config.TriggerMode != EnemyPowerUpStealTriggerMode.OnEveryPlayerHit)
+            if (stolen && config.TriggerMode != EnemyPowerUpStealTriggerMode.OnEveryPlayerHit)
                 runtime.HasTriggeredOnce = 1;
 
             if (stolen)
@@ -204,10 +204,22 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         switch (config.TargetKind)
         {
             case EnemyPowerUpStealTargetKind.Active:
-                return TryStealActivePowerUp(playerEntity, ref runtime, ref playerAccess);
+                return TryStealActivePowerUp(playerEntity,
+                                             enemyEntity,
+                                             in enemyRuntimeState,
+                                             stealerIndex,
+                                             in config,
+                                             ref runtime,
+                                             ref playerAccess);
 
             case EnemyPowerUpStealTargetKind.Passive:
-                return TryStealPassivePowerUp(playerEntity, ref runtime, ref playerAccess);
+                return TryStealPassivePowerUp(playerEntity,
+                                              enemyEntity,
+                                              in enemyRuntimeState,
+                                              stealerIndex,
+                                              in config,
+                                              ref runtime,
+                                              ref playerAccess);
 
             default:
                 return TryStealByBias(playerEntity,
@@ -241,16 +253,40 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     {
         if (ShouldTryActiveFirst(enemyEntity, in enemyRuntimeState, stealerIndex, in config))
         {
-            if (TryStealActivePowerUp(playerEntity, ref runtime, ref playerAccess))
+            if (TryStealActivePowerUp(playerEntity,
+                                      enemyEntity,
+                                      in enemyRuntimeState,
+                                      stealerIndex,
+                                      in config,
+                                      ref runtime,
+                                      ref playerAccess))
                 return true;
 
-            return TryStealPassivePowerUp(playerEntity, ref runtime, ref playerAccess);
+            return TryStealPassivePowerUp(playerEntity,
+                                          enemyEntity,
+                                          in enemyRuntimeState,
+                                          stealerIndex,
+                                          in config,
+                                          ref runtime,
+                                          ref playerAccess);
         }
 
-        if (TryStealPassivePowerUp(playerEntity, ref runtime, ref playerAccess))
+        if (TryStealPassivePowerUp(playerEntity,
+                                   enemyEntity,
+                                   in enemyRuntimeState,
+                                   stealerIndex,
+                                   in config,
+                                   ref runtime,
+                                   ref playerAccess))
             return true;
 
-        return TryStealActivePowerUp(playerEntity, ref runtime, ref playerAccess);
+        return TryStealActivePowerUp(playerEntity,
+                                     enemyEntity,
+                                     in enemyRuntimeState,
+                                     stealerIndex,
+                                     in config,
+                                     ref runtime,
+                                     ref playerAccess);
     }
 
     /// <summary>
@@ -261,23 +297,32 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// <param name="playerAccess">Mutable player loadout accessors.</param>
     /// <returns>True when an active slot was stolen.</returns>
     private static bool TryStealActivePowerUp(Entity playerEntity,
+                                              Entity enemyEntity,
+                                              in EnemyRuntimeState enemyRuntimeState,
+                                              int stealerIndex,
+                                              in EnemyPowerUpStealerConfigElement config,
                                               ref EnemyPowerUpStealerRuntimeElement runtime,
                                               ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         PlayerPowerUpsConfig powerUpsConfig = playerAccess.PowerUpsConfigLookup[playerEntity];
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
-        int slotIndex = ResolveActiveSlotToSteal(in powerUpsConfig);
+        int slotIndex = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotToSteal(in powerUpsConfig,
+                                                                                     in powerUpsState,
+                                                                                     enemyEntity,
+                                                                                     in enemyRuntimeState,
+                                                                                     stealerIndex,
+                                                                                     config.SelectionMode);
 
         if (slotIndex < 0)
             return false;
+
+        int originalEquipOrder = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotEquipOrder(slotIndex, in powerUpsState);
 
         if (!PlayerPowerUpLoadoutRuntimeUtility.TryRemoveActiveSlot(slotIndex,
                                                                     ref powerUpsConfig,
                                                                     ref powerUpsState,
                                                                     out PlayerStoredActivePowerUpData storedPowerUp))
-        {
             return false;
-        }
 
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;
@@ -290,7 +335,9 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         runtime.StoredActivePowerUp = storedPowerUp;
         runtime.StoredPassiveTool = default;
         runtime.OriginalActiveSlotIndex = slotIndex;
+        runtime.OriginalActiveEquipOrder = originalEquipOrder;
         runtime.OriginalPassiveCatalogIndex = -1;
+        runtime.OriginalPassiveBufferIndex = -1;
         runtime.OriginalPassiveUnlockCount = 0;
         runtime.PlayerEntity = playerEntity;
         return true;
@@ -304,22 +351,37 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// <param name="playerAccess">Mutable player passive accessors.</param>
     /// <returns>True when a passive power-up was stolen.</returns>
     private static bool TryStealPassivePowerUp(Entity playerEntity,
+                                               Entity enemyEntity,
+                                               in EnemyRuntimeState enemyRuntimeState,
+                                               int stealerIndex,
+                                               in EnemyPowerUpStealerConfigElement config,
                                                ref EnemyPowerUpStealerRuntimeElement runtime,
                                                ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
 
-        if (equippedPassiveTools.Length <= 0)
-            return false;
+        int passiveIndex = equippedPassiveTools.Length > 0
+            ? EnemyPowerUpStealerSelectionUtility.ResolvePassiveIndexToSteal(equippedPassiveTools,
+                                                                             enemyEntity,
+                                                                             in enemyRuntimeState,
+                                                                             stealerIndex,
+                                                                             config.SelectionMode)
+            : -1;
 
-        EquippedPassiveToolElement stolenPassive = equippedPassiveTools[0];
+        if (passiveIndex < 0)
+            return EnemyPowerUpStealerPassiveCatalogRuntimeUtility.TryStealCatalogOnlyPassivePowerUp(playerEntity,
+                                                                                                     enemyEntity,
+                                                                                                     in enemyRuntimeState,
+                                                                                                     stealerIndex,
+                                                                                                     in config,
+                                                                                                     equippedPassiveTools,
+                                                                                                     ref runtime,
+                                                                                                     ref playerAccess);
 
-        if (stolenPassive.Tool.IsDefined == 0 || stolenPassive.PowerUpId.Length <= 0)
-            return false;
-
+        EquippedPassiveToolElement stolenPassive = equippedPassiveTools[passiveIndex];
         int catalogIndex = FindCatalogIndex(stolenPassive.PowerUpId, PlayerPowerUpUnlockKind.Passive, playerAccess.UnlockCatalogLookup[playerEntity]);
         int originalUnlockCount = 0;
-        equippedPassiveTools.RemoveAt(0);
+        equippedPassiveTools.RemoveAt(passiveIndex);
         PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
         playerAccess.PassiveToolsStateLookup[playerEntity] = passiveToolsState;
 
@@ -340,7 +402,9 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         runtime.StoredActivePowerUp = default;
         runtime.StoredPassiveTool = stolenPassive.Tool;
         runtime.OriginalActiveSlotIndex = -1;
+        runtime.OriginalActiveEquipOrder = 0;
         runtime.OriginalPassiveCatalogIndex = catalogIndex;
+        runtime.OriginalPassiveBufferIndex = passiveIndex;
         runtime.OriginalPassiveUnlockCount = originalUnlockCount;
         runtime.PlayerEntity = playerEntity;
         return true;
@@ -433,22 +497,6 @@ internal static class EnemyPowerUpStealerRuntimeUtility
             return false;
 
         return playerAccess.UnlockCatalogLookup.HasBuffer(playerEntity);
-    }
-
-    /// <summary>
-    /// Resolves the active slot selected for stealing.
-    /// </summary>
-    /// <param name="powerUpsConfig">Current player active loadout.</param>
-    /// <returns>0 for primary, 1 for secondary, or -1 when no active slot exists.</returns>
-    private static int ResolveActiveSlotToSteal(in PlayerPowerUpsConfig powerUpsConfig)
-    {
-        if (powerUpsConfig.PrimarySlot.IsDefined != 0)
-            return 0;
-
-        if (powerUpsConfig.SecondarySlot.IsDefined != 0)
-            return 1;
-
-        return -1;
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -15,11 +16,15 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     private const float ColorEpsilon = 0.0001f;
     private const float CameraResolveRetryIntervalSeconds = 0.5f;
     private const float DefaultStealerIconScale = 0.75f;
+    private const string MissingStealerIconWarningFormat =
+        "[EnemyDamageFlashPresentationSystem] Power-Up Stealer is holding '{0}', but no icon is registered in PlayerPowerUpPresentationRuntime." +
+        " Assign an icon on the matching PowerUpCommonData entry or ensure the active PlayerPowerUpsPreset is initialized by InputAuthoring.";
     #endregion
 
     #region Fields
     private static Transform cachedMainCameraTransform;
     private static float nextCameraResolveTime;
+    private static readonly HashSet<string> missingStealerIconWarnings = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
     #endregion
 
     #region Methods
@@ -167,6 +172,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     {
         cachedMainCameraTransform = null;
         nextCameraResolveTime = 0f;
+        missingStealerIconWarnings.Clear();
         EnemyOffensiveEngagementBillboardRuntimeUtility.Shutdown();
     }
     #endregion
@@ -435,8 +441,14 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         if (stealerVisualState.HasStolenPowerUp == 0 || stealerVisualState.PowerUpId.Length <= 0)
             return false;
 
-        if (!PlayerPowerUpPresentationRuntime.TryResolveIcon(stealerVisualState.PowerUpId.ToString(), out Sprite icon))
-            return false;
+        string powerUpId = stealerVisualState.PowerUpId.ToString();
+
+        if (!PlayerPowerUpPresentationRuntime.TryResolveIcon(powerUpId, out Sprite icon))
+        {
+            LogMissingStealerIconOnce(powerUpId);
+            billboardView.Hide();
+            return true;
+        }
 
         EnemyPowerUpStealerBillboardStyle style = ResolveStealerBillboardStyle(offensiveEngagementConfigs);
         Vector3 worldPosition = new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z);
@@ -448,6 +460,23 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                          worldOffset,
                                          style.Scale);
         return true;
+    }
+
+    /// <summary>
+    /// Logs one diagnostic when a stolen power-up has no registered icon, without spamming the presentation loop.
+    /// </summary>
+    /// <param name="powerUpId">Power-up id that could not resolve an icon.</param>
+    private static void LogMissingStealerIconOnce(string powerUpId)
+    {
+        if (string.IsNullOrWhiteSpace(powerUpId))
+            return;
+
+        string trimmedPowerUpId = powerUpId.Trim();
+
+        if (!missingStealerIconWarnings.Add(trimmedPowerUpId))
+            return;
+
+        Debug.LogWarning(string.Format(MissingStealerIconWarningFormat, trimmedPowerUpId));
     }
 
     /// <summary>

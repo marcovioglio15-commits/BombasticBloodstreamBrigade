@@ -293,6 +293,7 @@ public struct EnemyBossMinionSpawnElement : IBufferElementData
     public int SpawnCount;
     public int MaxAliveMinions;
     public float SpawnRadius;
+    public float3 SpawnOffset;
     public float DespawnDistance;
     public float ExperienceDropMultiplier;
     public float ExtraComboPointsMultiplier;

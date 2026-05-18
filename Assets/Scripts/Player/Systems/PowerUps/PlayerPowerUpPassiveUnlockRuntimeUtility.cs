@@ -120,6 +120,12 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
                                                   equippedPassiveTools,
                                                   ref passiveToolsState,
                                                   out applyTarget);
+
+            if (!equippedOnGrant &&
+                TryAddPassiveOwnershipMarker(in catalogEntry, equippedPassiveTools, out applyTarget))
+            {
+                equippedOnGrant = true;
+            }
         }
         else
         {
@@ -249,6 +255,60 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             {
                 continue;
             }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Adds a passive ownership marker when the catalog entry has no runtime tool to equip.
+    /// </summary>
+    /// <param name="selectedCatalogEntry">Passive catalog entry being acquired.</param>
+    /// <param name="equippedPassiveTools">Runtime equipped-passive buffer receiving the marker.</param>
+    /// <param name="applyTarget">Debug label describing the marker apply result.</param>
+    /// <returns>True when a marker was added to preserve ownership order and Stealer visibility.</returns>
+    private static bool TryAddPassiveOwnershipMarker(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
+                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                     out string applyTarget)
+    {
+        applyTarget = "InvalidPassiveMarker";
+
+        if (!equippedPassiveTools.IsCreated || selectedCatalogEntry.PowerUpId.Length <= 0)
+            return false;
+
+        if (ContainsPassivePowerUpId(equippedPassiveTools, selectedCatalogEntry.PowerUpId))
+        {
+            applyTarget = "PassiveMarkerAlreadyPresent";
+            return false;
+        }
+
+        equippedPassiveTools.Add(new EquippedPassiveToolElement
+        {
+            PowerUpId = selectedCatalogEntry.PowerUpId,
+            Tool = default
+        });
+        applyTarget = "PassiveOwnershipMarker";
+        return true;
+    }
+
+    /// <summary>
+    /// Checks whether a passive ownership entry already exists for one PowerUpId.
+    /// </summary>
+    /// <param name="equippedPassiveTools">Runtime equipped-passive buffer to scan.</param>
+    /// <param name="powerUpId">PowerUpId to find.</param>
+    /// <returns>True when the buffer already contains the requested PowerUpId.</returns>
+    private static bool ContainsPassivePowerUpId(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                 FixedString64Bytes powerUpId)
+    {
+        if (!equippedPassiveTools.IsCreated || powerUpId.Length <= 0)
+            return false;
+
+        for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
+        {
+            if (equippedPassiveTools[passiveIndex].PowerUpId != powerUpId)
+                continue;
 
             return true;
         }

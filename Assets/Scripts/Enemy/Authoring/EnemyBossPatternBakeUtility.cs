@@ -307,6 +307,8 @@ internal static class EnemyBossPatternBakeUtility
         if (rules == null)
             return;
 
+        float3 spawnOffset = ResolveMinionSpawnOffset(minionSpawn.SpawnOffset);
+
         for (int ruleIndex = 0; ruleIndex < rules.Count; ruleIndex++)
         {
             EnemyBossMinionSpawnRule rule = rules[ruleIndex];
@@ -335,6 +337,7 @@ internal static class EnemyBossPatternBakeUtility
                 SpawnCount = math.max(0, rule.SpawnCount),
                 MaxAliveMinions = math.max(0, rule.MaxAliveMinions),
                 SpawnRadius = math.max(0f, rule.SpawnRadius),
+                SpawnOffset = spawnOffset,
                 DespawnDistance = math.max(0f, rule.DespawnDistance),
                 ExperienceDropMultiplier = math.max(0f, rule.ExperienceDropMultiplier),
                 ExtraComboPointsMultiplier = math.max(0f, rule.ExtraComboPointsMultiplier),
@@ -353,6 +356,33 @@ internal static class EnemyBossPatternBakeUtility
                 Initialized = 0
             });
         }
+    }
+
+    /// <summary>
+    /// Resolves a finite boss-minion spawn offset while preserving the authored default for invalid components.
+    /// </summary>
+    /// <param name="spawnOffset">Authored shared minion spawn offset.</param>
+    /// <returns>Finite offset copied into every baked minion rule.</returns>
+    private static float3 ResolveMinionSpawnOffset(Vector3 spawnOffset)
+    {
+        Vector3 defaultSpawnOffset = EnemyBossMinionSpawnSettings.DefaultSpawnOffset;
+        return new float3(ResolveFiniteFloat(spawnOffset.x, defaultSpawnOffset.x),
+                          ResolveFiniteFloat(spawnOffset.y, defaultSpawnOffset.y),
+                          ResolveFiniteFloat(spawnOffset.z, defaultSpawnOffset.z));
+    }
+
+    /// <summary>
+    /// Resolves one finite authored float component for bake-time ECS data.
+    /// </summary>
+    /// <param name="value">Authored component value.</param>
+    /// <param name="fallback">Fallback component used when the authored value is not finite.</param>
+    /// <returns>Finite component value safe for runtime math.</returns>
+    private static float ResolveFiniteFloat(float value, float fallback)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value))
+            return fallback;
+
+        return value;
     }
     #endregion
 

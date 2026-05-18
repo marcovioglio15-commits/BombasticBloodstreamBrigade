@@ -129,6 +129,7 @@ public struct EnemyHitVfxConfig : IComponentData
 {
     public Entity PrefabEntity;
     public UnityObjectRef<GameObject> Prefab;
+    public float3 SpawnOffset;
     public float LifetimeSeconds;
     public float ScaleMultiplier;
 }

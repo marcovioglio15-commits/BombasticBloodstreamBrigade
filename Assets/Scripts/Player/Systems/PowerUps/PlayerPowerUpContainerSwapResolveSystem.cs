@@ -84,6 +84,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
                 if (storedPowerUpConsumed)
                 {
+                    PlayerDroppedPowerUpContainerViewRuntimeUtility.ReleaseRuntimeView(swapCommand.ContainerEntity);
                     commandBuffer.DestroyEntity(swapCommand.ContainerEntity);
                 }
                 else

@@ -65,6 +65,7 @@ public struct PlayerPowerUpCheatPresetEntry : IBufferElementData
 [InternalBufferCapacity(0)]
 public struct PlayerPowerUpCheatPresetPassiveElement : IBufferElementData
 {
+    public FixedString64Bytes PowerUpId;
     public PlayerPassiveToolConfig Tool;
 }
 

@@ -279,7 +279,6 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
             return false;
 
         if (forceContainerDrop)
-        {
             return TryDropActivePowerUpContainer(playerEntity,
                                                  dropPosition,
                                                  in runtime.StoredActivePowerUp,
@@ -287,13 +286,13 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                  hasPhysicsWorld,
                                                  ref playerAccess,
                                                  ref commandBuffer);
-        }
 
         PlayerPowerUpsConfig powerUpsConfig = playerAccess.PowerUpsConfigLookup[playerEntity];
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
 
         if (PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    runtime.OriginalActiveSlotIndex,
+                                                                                   runtime.OriginalActiveEquipOrder,
                                                                                    ref powerUpsConfig,
                                                                                    ref powerUpsState))
         {
@@ -309,16 +308,16 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                           hasPhysicsWorld,
                                           ref playerAccess,
                                           ref commandBuffer))
-        {
             return true;
-        }
 
         if (PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    0,
+                                                                                   runtime.OriginalActiveEquipOrder,
                                                                                    ref powerUpsConfig,
                                                                                    ref powerUpsState) ||
             PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    1,
+                                                                                   runtime.OriginalActiveEquipOrder,
                                                                                    ref powerUpsConfig,
                                                                                    ref powerUpsState))
         {
@@ -346,14 +345,17 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
 
-        if (!EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(runtime.PowerUpId, equippedPassiveTools) &&
-            runtime.StoredPassiveTool.IsDefined != 0)
+        if (runtime.OriginalPassiveBufferIndex >= 0 &&
+            !EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(runtime.PowerUpId, equippedPassiveTools) &&
+            runtime.PowerUpId.Length > 0)
         {
-            equippedPassiveTools.Add(new EquippedPassiveToolElement
-            {
-                PowerUpId = runtime.PowerUpId,
-                Tool = runtime.StoredPassiveTool
-            });
+            InsertPassiveAtRestoredIndex(equippedPassiveTools,
+                                         runtime.OriginalPassiveBufferIndex,
+                                         new EquippedPassiveToolElement
+                                         {
+                                             PowerUpId = runtime.PowerUpId,
+                                             Tool = runtime.StoredPassiveTool
+                                         });
         }
 
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
@@ -376,6 +378,30 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         playerAccess.PassiveToolsStateLookup[playerEntity] = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
         return true;
+    }
+
+    /// <summary>
+    /// Restores a passive payload at its original buffer index when possible to preserve acquisition order.
+    /// </summary>
+    /// <param name="equippedPassiveTools">Mutable passive buffer receiving the restored entry.</param>
+    /// <param name="restoredIndex">Original passive buffer index captured when the Stealer removed the entry.</param>
+    /// <param name="restoredPassive">Passive entry to restore.</param>
+    private static void InsertPassiveAtRestoredIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                     int restoredIndex,
+                                                     EquippedPassiveToolElement restoredPassive)
+    {
+        int insertionIndex = restoredIndex >= 0
+            ? math.min(restoredIndex, equippedPassiveTools.Length)
+            : equippedPassiveTools.Length;
+        equippedPassiveTools.Add(restoredPassive);
+
+        // Shift the newly appended entry into its original acquisition slot.
+        for (int passiveIndex = equippedPassiveTools.Length - 1; passiveIndex > insertionIndex; passiveIndex--)
+        {
+            equippedPassiveTools[passiveIndex] = equippedPassiveTools[passiveIndex - 1];
+        }
+
+        equippedPassiveTools[insertionIndex] = restoredPassive;
     }
 
     /// <summary>

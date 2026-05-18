@@ -272,6 +272,9 @@ public sealed class EnemyVisualPrefabSettings
     [Tooltip("Optional one-shot VFX prefab spawned every time this enemy receives a projectile hit.")]
     [SerializeField] private GameObject hitVfxPrefab;
 
+    [Tooltip("World-space offset added to the resolved impact position before spawning the enemy hit VFX.")]
+    [SerializeField] private Vector3 hitVfxSpawnOffset;
+
     [Tooltip("Lifetime in seconds assigned to each spawned hit VFX instance.")]
     [SerializeField] private float hitVfxLifetimeSeconds = 0.35f;
 
@@ -298,6 +301,14 @@ public sealed class EnemyVisualPrefabSettings
         get
         {
             return hitVfxPrefab;
+        }
+    }
+
+    public Vector3 HitVfxSpawnOffset
+    {
+        get
+        {
+            return hitVfxSpawnOffset;
         }
     }
 

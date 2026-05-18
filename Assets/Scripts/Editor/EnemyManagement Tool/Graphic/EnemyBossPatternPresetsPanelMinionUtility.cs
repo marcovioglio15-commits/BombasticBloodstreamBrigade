@@ -38,6 +38,7 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
         SerializedProperty enabledProperty = minionSpawnProperty.FindPropertyRelative("enabled");
         SerializedProperty fallbackIntervalProperty = minionSpawnProperty.FindPropertyRelative("fallbackIntervalSeconds");
         SerializedProperty poolExpandBatchProperty = minionSpawnProperty.FindPropertyRelative("poolExpandBatch");
+        SerializedProperty spawnOffsetProperty = minionSpawnProperty.FindPropertyRelative("spawnOffset");
         SerializedProperty killMinionsOnBossDeathProperty = minionSpawnProperty.FindPropertyRelative("killMinionsOnBossDeath");
         SerializedProperty requireMinionsKilledForRunCompletionProperty = minionSpawnProperty.FindPropertyRelative("requireMinionsKilledForRunCompletion");
         SerializedProperty rulesProperty = minionSpawnProperty.FindPropertyRelative("rules");
@@ -52,6 +53,8 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
 
         EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, sectionContainer, fallbackIntervalProperty, "Fallback Interval Seconds", 0.25f, 60f, "Fallback interval used when a rule has a non-positive interval.");
         EnemyBossPatternPresetsPanelSharedUtility.AddIntSliderField(panel, sectionContainer, poolExpandBatchProperty, "Pool Expand Batch", 0, 64, "Additional entities created when an automatic minion pool needs to expand.");
+        sectionContainer.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, spawnOffsetProperty, "Spawn Offset", "World-space offset added to the boss spawn center before radial minion placement."));
+        AddMinionSpawnSettingsWarnings(fallbackIntervalProperty, poolExpandBatchProperty, spawnOffsetProperty, sectionContainer);
         sectionContainer.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, killMinionsOnBossDeathProperty, "Kill Minions On Boss Death", "When enabled, active minions spawned by this boss are killed automatically when the boss dies."));
 
         if (killMinionsOnBossDeathProperty != null && !killMinionsOnBossDeathProperty.boolValue)
@@ -173,6 +176,31 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
 
     #region Helpers
     /// <summary>
+    /// Adds warnings for shared minion-spawn settings.
+    /// </summary>
+    /// <param name="fallbackIntervalProperty">Serialized fallback interval property.</param>
+    /// <param name="poolExpandBatchProperty">Serialized pool expand batch property.</param>
+    /// <param name="spawnOffsetProperty">Serialized shared spawn offset property.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
+    private static void AddMinionSpawnSettingsWarnings(SerializedProperty fallbackIntervalProperty,
+                                                       SerializedProperty poolExpandBatchProperty,
+                                                       SerializedProperty spawnOffsetProperty,
+                                                       VisualElement parent)
+    {
+        if (parent == null)
+            return;
+
+        if (fallbackIntervalProperty != null && fallbackIntervalProperty.floatValue <= 0f)
+            parent.Add(new HelpBox("Fallback Interval Seconds is not positive. Runtime uses a minimum interval for invalid interval rules.", HelpBoxMessageType.Warning));
+
+        if (poolExpandBatchProperty != null && poolExpandBatchProperty.intValue <= 0)
+            parent.Add(new HelpBox("Pool Expand Batch is not positive. Runtime expands minion pools by at least one entity.", HelpBoxMessageType.Warning));
+
+        if (spawnOffsetProperty != null && ContainsInvalidVectorComponent(spawnOffsetProperty.vector3Value))
+            parent.Add(new HelpBox("Spawn Offset contains invalid numeric values. Bake uses default components where the authored values are not finite.", HelpBoxMessageType.Warning));
+    }
+
+    /// <summary>
     /// Adds warnings for one minion rule.
     /// </summary>
     /// <param name="ruleProperty">Serialized minion rule.</param>
@@ -201,6 +229,21 @@ internal static class EnemyBossPatternPresetsPanelMinionUtility
         {
             parent.Add(new HelpBox("Boss Hit Cooldown Seconds is negative. Runtime treats it as 0.", HelpBoxMessageType.Warning));
         }
+    }
+
+    /// <summary>
+    /// Checks whether one Vector3 contains NaN or infinity values.
+    /// </summary>
+    /// <param name="value">Vector value to inspect.</param>
+    /// <returns>True when at least one component is invalid.</returns>
+    private static bool ContainsInvalidVectorComponent(Vector3 value)
+    {
+        return float.IsNaN(value.x) ||
+               float.IsInfinity(value.x) ||
+               float.IsNaN(value.y) ||
+               float.IsInfinity(value.y) ||
+               float.IsNaN(value.z) ||
+               float.IsInfinity(value.z);
     }
 
     /// <summary>

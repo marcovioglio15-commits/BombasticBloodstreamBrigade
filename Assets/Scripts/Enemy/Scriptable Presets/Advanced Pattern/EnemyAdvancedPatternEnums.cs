@@ -36,6 +36,16 @@ public enum EnemyPowerUpStealTargetKind
 }
 
 /// <summary>
+/// Declares how Power-Up Stealer modules choose a specific power-up after the target category is resolved.
+/// </summary>
+public enum EnemyPowerUpStealSelectionMode
+{
+    FirstObtained = 0,
+    LastObtained = 1,
+    Random = 2
+}
+
+/// <summary>
 /// Declares movement variants available for Wanderer modules.
 /// </summary>
 public enum EnemyWandererMode
