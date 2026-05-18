@@ -123,7 +123,7 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
-  secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
+  secondaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
   dropPools:
   - poolId: Milestone

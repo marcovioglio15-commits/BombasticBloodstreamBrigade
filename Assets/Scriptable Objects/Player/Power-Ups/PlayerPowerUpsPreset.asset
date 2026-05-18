@@ -180,7 +180,7 @@ MonoBehaviour:
       powerUpId: PassiveBouncingProjectiles
       selectionWeight: 6
     - entryKind: 0
-      powerUpId: ActiveGigaBomb
+      powerUpId: ActiveGigaLaser
       selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_Shield
@@ -204,25 +204,28 @@ MonoBehaviour:
     entries:
     - entryKind: 0
       powerUpId: ActiveChargeShot
-      selectionWeight: 15
+      selectionWeight: 13
     - entryKind: 0
       powerUpId: ActiveBulletTime
-      selectionWeight: 14
+      selectionWeight: 12
     - entryKind: 1
       powerUpId: Passive_AdditionalBarrel
-      selectionWeight: 15
+      selectionWeight: 13
     - entryKind: 1
       powerUpId: PassiveElementalTrail
-      selectionWeight: 14
+      selectionWeight: 12
     - entryKind: 1
       powerUpId: PassiveEnemiesExplodeOnDeath
-      selectionWeight: 14
+      selectionWeight: 12
     - entryKind: 1
       powerUpId: PassiveSplittingProjectiles
-      selectionWeight: 14
+      selectionWeight: 12
     - entryKind: 1
       powerUpId: Passive_LaserBeam
-      selectionWeight: 14
+      selectionWeight: 13
+    - entryKind: 0
+      powerUpId: ActiveGigaBomb
+      selectionWeight: 13
   dropPoolCatalog:
   - Milestone
   - Shop
@@ -8426,15 +8429,15 @@ MonoBehaviour:
             applyPlayerHandlingNerfWhileFiring: 1
             firingMoveSpeedMultiplier: 0
             firingRotationSpeedMultiplier: 0
-            visualPresetId: 0
-            bodyProfile: 2
+            visualPresetId: 1
+            bodyProfile: 0
             sourceShape: 0
-            terminalCapShape: 1
+            terminalCapShape: 0
             bodyWidthMultiplier: 1
             collisionWidthMultiplier: 1
             sourceScaleMultiplier: 1
-            terminalCapScaleMultiplier: 2
-            contactFlareScaleMultiplier: 1.2
+            terminalCapScaleMultiplier: 1
+            contactFlareScaleMultiplier: 1
             bodyOpacity: 1
             coreWidthMultiplier: 1
             coreBrightness: 1
@@ -8453,10 +8456,10 @@ MonoBehaviour:
             stormRingThickness: 0.1
             stormTickTravelSpeed: 5
             stormTickDamageLengthTolerance: 0.1
-            terminalCapIntensity: 1.12
-            contactFlareIntensity: 1.28
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
             wobbleAmplitude: 0
-            bubbleDriftSpeed: 1.8
+            bubbleDriftSpeed: 1
           slowPlayerWhileCharging: 1
           maximumPlayerSlowPercent: 100
           playerSlowCurve:
@@ -8750,15 +8753,15 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 40
-          activationCost: 40
+          maximumEnergy: 35
+          activationCost: 35
           maintenanceCostPerSecond: 0
           isToggleable: 0
           maintenanceTicksPerSecond: 5
           minimumActivationEnergyPercent: 100
           chargeType: 1
-          chargePerTrigger: 40
-          cooldownSeconds: 3
+          chargePerTrigger: 1
+          cooldownSeconds: 2
           allowRechargeDuringToggleStartupLock: 0
         suppressShooting:
           suppressBaseShootingWhileActive: 1
@@ -20676,7 +20679,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveGigaLaser
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:
