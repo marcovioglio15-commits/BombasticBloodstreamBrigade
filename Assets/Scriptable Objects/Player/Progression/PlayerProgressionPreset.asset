@@ -47,7 +47,7 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: FireRate
     statType: 0
-    defaultValue: 2.5
+    defaultValue: 2
     minimumValue: 0.1
     maximumValue: 8
     defaultBooleanValue: 0
@@ -138,7 +138,7 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: LaserWidth_Big
     statType: 0
-    defaultValue: 25
+    defaultValue: 50
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
@@ -175,10 +175,10 @@ MonoBehaviour:
   - phaseID: Phase1
     startsAtLevel: 3
     startingRequiredLevelUpExp: 25
-    requiredExperienceGrouth: 5
+    requiredExperienceGrouth: 10
     milestones:
     - milestoneLevel: 5
-      specialExpRequirement: 98
+      specialExpRequirement: 100
       recurring: 0
       recurrenceIntervalLevels: 1
       powerUpUnlocks:
@@ -192,7 +192,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 10
-      specialExpRequirement: 210
+      specialExpRequirement: 200
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -206,7 +206,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 20
-      specialExpRequirement: 462
+      specialExpRequirement: 300
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -225,7 +225,7 @@ MonoBehaviour:
     requiredExperienceGrouth: 10
     milestones:
     - milestoneLevel: 30
-      specialExpRequirement: 600
+      specialExpRequirement: 450
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -239,7 +239,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 40
-      specialExpRequirement: 870
+      specialExpRequirement: 600
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -258,7 +258,7 @@ MonoBehaviour:
     requiredExperienceGrouth: 15
     milestones:
     - milestoneLevel: 50
-      specialExpRequirement: 1169
+      specialExpRequirement: 800
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -272,7 +272,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 60
-      specialExpRequirement: 1511
+      specialExpRequirement: 1000
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -291,7 +291,7 @@ MonoBehaviour:
     requiredExperienceGrouth: 20
     milestones:
     - milestoneLevel: 70
-      specialExpRequirement: 1836
+      specialExpRequirement: 1200
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -305,7 +305,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 80
-      specialExpRequirement: 2241
+      specialExpRequirement: 1450
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -324,7 +324,7 @@ MonoBehaviour:
     requiredExperienceGrouth: 25
     milestones:
     - milestoneLevel: 90
-      specialExpRequirement: 2576
+      specialExpRequirement: 1700
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -338,7 +338,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 100
-      specialExpRequirement: 3035
+      specialExpRequirement: 2000
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
