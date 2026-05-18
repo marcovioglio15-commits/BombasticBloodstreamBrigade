@@ -33,6 +33,19 @@ public partial struct EnemyContactDamageSystem : ISystem
     {
         EntityManager entityManager = state.EntityManager;
         ComponentLookup<PlayerDashState> dashStateLookup = SystemAPI.GetComponentLookup<PlayerDashState>(true);
+        ComponentLookup<EnemyPowerUpStealerVisualState> stealerVisualStateLookup = SystemAPI.GetComponentLookup<EnemyPowerUpStealerVisualState>(false);
+        ComponentLookup<EnemyPatternRuntimeState> patternRuntimeStateLookup = SystemAPI.GetComponentLookup<EnemyPatternRuntimeState>(true);
+        BufferLookup<EnemyPowerUpStealerConfigElement> stealerConfigLookup = SystemAPI.GetBufferLookup<EnemyPowerUpStealerConfigElement>(false);
+        BufferLookup<EnemyPowerUpStealerRuntimeElement> stealerRuntimeLookup = SystemAPI.GetBufferLookup<EnemyPowerUpStealerRuntimeElement>(false);
+        EnemyPowerUpStealerPlayerAccess stealerPlayerAccess = new EnemyPowerUpStealerPlayerAccess
+        {
+            PowerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false),
+            PowerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false),
+            EquippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false),
+            PassiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false),
+            UnlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false),
+            ContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true)
+        };
         Entity playerEntity = Entity.Null;
         LocalTransform playerTransform = default;
         PlayerHealth playerHealth = default;
@@ -100,13 +113,20 @@ public partial struct EnemyContactDamageSystem : ISystem
 
         foreach ((RefRO<EnemyData> enemyData,
                   RefRW<EnemyRuntimeState> runtimeState,
-                  RefRO<LocalTransform> enemyTransform) in SystemAPI.Query<RefRO<EnemyData>, RefRW<EnemyRuntimeState>, RefRO<LocalTransform>>()
-                                                                      .WithAll<EnemyActive>()
-                                                                      .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>())
+                  RefRO<EnemyHealth> enemyHealth,
+                  RefRO<LocalTransform> enemyTransform,
+                  Entity enemyEntity) in SystemAPI.Query<RefRO<EnemyData>,
+                                                         RefRW<EnemyRuntimeState>,
+                                                         RefRO<EnemyHealth>,
+                                                         RefRO<LocalTransform>>()
+                                                  .WithAll<EnemyActive>()
+                                                  .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>()
+                                                  .WithEntityAccess())
         {
             EnemyRuntimeState nextState = runtimeState.ValueRO;
             nextState.ContactDamageCooldown -= deltaTime;
             nextState.AreaDamageCooldown -= deltaTime;
+            bool hitPlayerThisTick = false;
 
             if (nextState.ContactDamageCooldown < 0f)
                 nextState.ContactDamageCooldown = 0f;
@@ -130,6 +150,7 @@ public partial struct EnemyContactDamageSystem : ISystem
                     {
                         accumulatedContactDamage += math.max(0f, enemyData.ValueRO.ContactAmountPerTick);
                         nextState.ContactDamageCooldown = math.max(0.01f, enemyData.ValueRO.ContactTickInterval);
+                        hitPlayerThisTick = true;
                     }
                 }
             }
@@ -146,7 +167,46 @@ public partial struct EnemyContactDamageSystem : ISystem
                     {
                         accumulatedAreaPercentDamage += math.max(0f, enemyData.ValueRO.AreaAmountPerTickPercent);
                         nextState.AreaDamageCooldown = math.max(0.01f, enemyData.ValueRO.AreaTickInterval);
+                        hitPlayerThisTick = true;
                     }
+                }
+            }
+
+            if (hitPlayerThisTick &&
+                stealerConfigLookup.HasBuffer(enemyEntity) &&
+                stealerRuntimeLookup.HasBuffer(enemyEntity) &&
+                patternRuntimeStateLookup.HasComponent(enemyEntity))
+            {
+                DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs = stealerConfigLookup[enemyEntity];
+                DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = stealerRuntimeLookup[enemyEntity];
+                EnemyPatternRuntimeState patternRuntimeState = patternRuntimeStateLookup[enemyEntity];
+                bool stolen = EnemyPowerUpStealerRuntimeUtility.TryStealForTrigger(enemyEntity,
+                                                                                   playerEntity,
+                                                                                   enemyTransform.ValueRO.Position,
+                                                                                   playerPosition,
+                                                                                   in nextState,
+                                                                                   in patternRuntimeState,
+                                                                                   in enemyHealth.ValueRO,
+                                                                                   EnemyPowerUpStealTriggerMode.OnFirstPlayerHit,
+                                                                                   stealerConfigs,
+                                                                                   stealerRuntime,
+                                                                                   ref stealerVisualStateLookup,
+                                                                                   ref stealerPlayerAccess);
+
+                if (!stolen)
+                {
+                    EnemyPowerUpStealerRuntimeUtility.TryStealForTrigger(enemyEntity,
+                                                                         playerEntity,
+                                                                         enemyTransform.ValueRO.Position,
+                                                                         playerPosition,
+                                                                         in nextState,
+                                                                         in patternRuntimeState,
+                                                                         in enemyHealth.ValueRO,
+                                                                         EnemyPowerUpStealTriggerMode.OnEveryPlayerHit,
+                                                                         stealerConfigs,
+                                                                         stealerRuntime,
+                                                                         ref stealerVisualStateLookup,
+                                                                         ref stealerPlayerAccess);
                 }
             }
 

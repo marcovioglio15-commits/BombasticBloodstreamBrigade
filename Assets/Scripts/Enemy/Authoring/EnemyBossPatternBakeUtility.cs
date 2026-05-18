@@ -212,6 +212,25 @@ internal static class EnemyBossPatternBakeUtility
     }
 
     /// <summary>
+    /// Appends one compiled pattern Power-Up Stealer slice to the boss-owned source buffer.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern providing Power-Up Stealer configs.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    /// <returns>First appended Power-Up Stealer config index.</returns>
+    internal static int AppendPowerUpStealerConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
+    {
+        if (compiledPattern == null || result == null)
+            return 0;
+
+        int firstStealerConfigIndex = result.PowerUpStealerConfigs.Count;
+
+        for (int stealerIndex = 0; stealerIndex < compiledPattern.PowerUpStealerConfigs.Count; stealerIndex++)
+            result.PowerUpStealerConfigs.Add(compiledPattern.PowerUpStealerConfigs[stealerIndex]);
+
+        return firstStealerConfigIndex;
+    }
+
+    /// <summary>
     /// Appends one compiled offensive engagement slice to the boss-owned source buffer.
     /// </summary>
     /// <param name="engagementConfigs">Compiled engagement configs for one boss layer.</param>
@@ -288,6 +307,8 @@ internal static class EnemyBossPatternBakeUtility
         if (rules == null)
             return;
 
+        float3 spawnOffset = ResolveMinionSpawnOffset(minionSpawn.SpawnOffset);
+
         for (int ruleIndex = 0; ruleIndex < rules.Count; ruleIndex++)
         {
             EnemyBossMinionSpawnRule rule = rules[ruleIndex];
@@ -316,6 +337,7 @@ internal static class EnemyBossPatternBakeUtility
                 SpawnCount = math.max(0, rule.SpawnCount),
                 MaxAliveMinions = math.max(0, rule.MaxAliveMinions),
                 SpawnRadius = math.max(0f, rule.SpawnRadius),
+                SpawnOffset = spawnOffset,
                 DespawnDistance = math.max(0f, rule.DespawnDistance),
                 ExperienceDropMultiplier = math.max(0f, rule.ExperienceDropMultiplier),
                 ExtraComboPointsMultiplier = math.max(0f, rule.ExtraComboPointsMultiplier),
@@ -334,6 +356,33 @@ internal static class EnemyBossPatternBakeUtility
                 Initialized = 0
             });
         }
+    }
+
+    /// <summary>
+    /// Resolves a finite boss-minion spawn offset while preserving the authored default for invalid components.
+    /// </summary>
+    /// <param name="spawnOffset">Authored shared minion spawn offset.</param>
+    /// <returns>Finite offset copied into every baked minion rule.</returns>
+    private static float3 ResolveMinionSpawnOffset(Vector3 spawnOffset)
+    {
+        Vector3 defaultSpawnOffset = EnemyBossMinionSpawnSettings.DefaultSpawnOffset;
+        return new float3(ResolveFiniteFloat(spawnOffset.x, defaultSpawnOffset.x),
+                          ResolveFiniteFloat(spawnOffset.y, defaultSpawnOffset.y),
+                          ResolveFiniteFloat(spawnOffset.z, defaultSpawnOffset.z));
+    }
+
+    /// <summary>
+    /// Resolves one finite authored float component for bake-time ECS data.
+    /// </summary>
+    /// <param name="value">Authored component value.</param>
+    /// <param name="fallback">Fallback component used when the authored value is not finite.</param>
+    /// <returns>Finite component value safe for runtime math.</returns>
+    private static float ResolveFiniteFloat(float value, float fallback)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value))
+            return fallback;
+
+        return value;
     }
     #endregion
 
@@ -374,6 +423,7 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public readonly List<EnemyBossPatternModuleExtractionElement> ModuleExtractions = new List<EnemyBossPatternModuleExtractionElement>();
     public readonly List<EnemyBossPatternModuleCandidateElement> ModuleCandidates = new List<EnemyBossPatternModuleCandidateElement>();
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
+    public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyOffensiveEngagementConfigElement> OffensiveEngagementConfigs = new List<EnemyOffensiveEngagementConfigElement>();
     public readonly List<EnemyBossMinionSpawnElement> MinionSpawns = new List<EnemyBossMinionSpawnElement>();
     public readonly List<EnemyBossDropCandidateElement> DropCandidates = new List<EnemyBossDropCandidateElement>();

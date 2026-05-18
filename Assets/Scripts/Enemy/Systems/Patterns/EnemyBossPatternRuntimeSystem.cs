@@ -37,6 +37,7 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
         state.RequireForUpdate<EnemyBossPatternModuleCandidateElement>();
         state.RequireForUpdate<EnemyBossPatternSlotRuntimeElement>();
         state.RequireForUpdate<EnemyBossPatternOffensiveEngagementConfigElement>();
+        state.RequireForUpdate<EnemyBossPatternPowerUpStealerConfigElement>();
     }
 
     /// <summary>
@@ -79,9 +80,12 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                             .WithAll<EnemyBossPatternModuleCandidateElement>()
                             .WithAll<EnemyBossPatternSlotRuntimeElement>()
                             .WithAll<EnemyBossPatternShooterConfigElement>()
+                            .WithAll<EnemyBossPatternPowerUpStealerConfigElement>()
                              .WithAll<EnemyBossPatternOffensiveEngagementConfigElement>()
                              .WithAll<EnemyShooterConfigElement>()
                              .WithAll<EnemyShooterRuntimeElement>()
+                             .WithAll<EnemyPowerUpStealerConfigElement>()
+                             .WithAll<EnemyPowerUpStealerRuntimeElement>()
                              .WithAll<EnemyOffensiveEngagementConfigElement>()
                              .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>()
                              .WithEntityAccess())
@@ -91,9 +95,12 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
             DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates = entityManager.GetBuffer<EnemyBossPatternModuleCandidateElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes = entityManager.GetBuffer<EnemyBossPatternSlotRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs = entityManager.GetBuffer<EnemyBossPatternShooterConfigElement>(bossEntity);
+            DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs = entityManager.GetBuffer<EnemyBossPatternPowerUpStealerConfigElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs = entityManager.GetBuffer<EnemyBossPatternOffensiveEngagementConfigElement>(bossEntity);
             DynamicBuffer<EnemyShooterConfigElement> shooterConfigs = entityManager.GetBuffer<EnemyShooterConfigElement>(bossEntity);
             DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = entityManager.GetBuffer<EnemyShooterRuntimeElement>(bossEntity);
+            DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs = entityManager.GetBuffer<EnemyPowerUpStealerConfigElement>(bossEntity);
+            DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = entityManager.GetBuffer<EnemyPowerUpStealerRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs = entityManager.GetBuffer<EnemyOffensiveEngagementConfigElement>(bossEntity);
             EnemyBossPatternRuntimeState runtimeState = bossRuntimeState.ValueRO;
             EnemyRuntimeState enemyRuntime = enemyRuntimeState.ValueRO;
@@ -115,9 +122,12 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                                moduleCandidates,
                                                                slotRuntimes,
                                                                bossShooterConfigs,
+                                                               bossStealerConfigs,
                                                                bossEngagementConfigs,
                                                                shooterConfigs,
                                                                shooterRuntime,
+                                                               stealerConfigs,
+                                                               stealerRuntime,
                                                                engagementConfigs,
                                                                in extractionConfig.ValueRO,
                                                                in enemyHealth.ValueRO,
@@ -256,9 +266,12 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                  DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                                  DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                  DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                                 DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                                  DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                                  DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                 DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                                 DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                  DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
                                                  in EnemyBossPatternExtractionConfig extractionConfig,
                                                  in EnemyHealth health,
@@ -316,10 +329,13 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                                                           moduleExtractions,
                                                                                           moduleCandidates,
                                                                                           bossShooterConfigs,
+                                                                                          bossStealerConfigs,
                                                                                           bossEngagementConfigs,
                                                                                           slotRuntimes,
                                                                                           shooterConfigs,
                                                                                           shooterRuntime,
+                                                                                          stealerConfigs,
+                                                                                          stealerRuntime,
                                                                                           engagementConfigs,
                                                                                           in health,
                                                                                           in enemyRuntime,

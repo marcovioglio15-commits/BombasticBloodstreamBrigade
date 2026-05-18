@@ -49,6 +49,8 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
         VisualElement actionsRow = EnemyAdvancedPatternSharedPresetCardUtility.CreateHorizontalRow(false);
         Label countLabel = EnemyAdvancedPatternSharedPresetCardUtility.CreateCountLabel();
         ScrollView cardsContainer = EnemyAdvancedPatternSharedPresetCardUtility.CreateCardsScrollView();
+        string sharedPresetStateKey = ManagementToolFoldoutStateUtility.BuildSerializedObjectStateKey(sharedPresetSerializedObject);
+        ManagementToolScrollStateUtility.BindScrollView(cardsContainer, sharedPresetStateKey + "|SharedPresetPatternCards");
 
         Button addButton = EnemyAdvancedPatternSharedPresetCardUtility.CreateActionButton("Add Pattern",
                                                                                           "Create a new shared assembled pattern.",
@@ -195,6 +197,9 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
         if (panel == null || sharedPresetSerializedObject == null || sharedPreset == null || cardsContainer == null || countLabel == null)
             return;
 
+        ScrollView cardsScrollView = cardsContainer as ScrollView;
+        ManagementToolFoldoutStateUtility.CaptureFoldoutStates(cardsContainer);
+        ManagementToolScrollStateUtility.CaptureScrollOffset(cardsScrollView);
         cardsContainer.Clear();
         SerializedProperty patternsProperty = sharedPresetSerializedObject.FindProperty("patterns");
 
@@ -202,6 +207,7 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
         {
             countLabel.text = "Visible Patterns: 0 / 0";
             cardsContainer.Add(EnemyAdvancedPatternSharedPresetCardUtility.CreateStatusLabel("Shared pattern definitions are unavailable."));
+            ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
             return;
         }
 
@@ -237,9 +243,13 @@ internal static class EnemyAdvancedPatternSharedPresetPatternsListUtility
         countLabel.text = string.Format("Visible Patterns: {0} / {1}", visiblePatterns, totalPatterns);
 
         if (visiblePatterns > 0)
+        {
+            ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
             return;
+        }
 
         cardsContainer.Add(EnemyAdvancedPatternSharedPresetCardUtility.CreateStatusLabel("No patterns match current filters."));
+        ManagementToolScrollStateUtility.RestoreScrollOffset(cardsScrollView);
     }
 
     /// <summary>

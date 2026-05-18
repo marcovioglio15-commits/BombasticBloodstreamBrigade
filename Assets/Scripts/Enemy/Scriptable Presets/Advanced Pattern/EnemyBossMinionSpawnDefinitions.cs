@@ -206,6 +206,10 @@ public sealed class EnemyBossMinionSpawnRule
 [Serializable]
 public sealed class EnemyBossMinionSpawnSettings
 {
+    #region Defaults
+    private static readonly Vector3 DefaultSpawnOffsetValue = new Vector3(0f, 0.5f, 0f);
+    #endregion
+
     #region Fields
 
     #region Serialized Fields
@@ -217,6 +221,9 @@ public sealed class EnemyBossMinionSpawnSettings
 
     [Tooltip("Fallback expand batch used by automatically created minion pools.")]
     [SerializeField] private int poolExpandBatch = 4;
+
+    [Tooltip("World-space offset added to the boss spawn center before radial minion placement. The default raises minions slightly above the room plane.")]
+    [SerializeField] private Vector3 spawnOffset = DefaultSpawnOffsetValue;
 
     [Tooltip("When enabled, active minions spawned by this boss are killed automatically when the boss dies.")]
     [SerializeField] private bool killMinionsOnBossDeath = true;
@@ -231,6 +238,14 @@ public sealed class EnemyBossMinionSpawnSettings
     #endregion
 
     #region Properties
+    public static Vector3 DefaultSpawnOffset
+    {
+        get
+        {
+            return DefaultSpawnOffsetValue;
+        }
+    }
+
     public bool Enabled
     {
         get
@@ -252,6 +267,14 @@ public sealed class EnemyBossMinionSpawnSettings
         get
         {
             return poolExpandBatch;
+        }
+    }
+
+    public Vector3 SpawnOffset
+    {
+        get
+        {
+            return spawnOffset;
         }
     }
 

@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -76,10 +77,13 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                                                     DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractions,
                                                     DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                                     DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                                    DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                                     DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                                     DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                     DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                                     DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                    DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                                    DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                     DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
                                                     in EnemyHealth health,
                                                     in EnemyRuntimeState enemyRuntime,
@@ -95,6 +99,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             return ClearRuntimeModules(slotRuntimes,
                                        shooterConfigs,
                                        shooterRuntime,
+                                       stealerConfigs,
+                                       stealerRuntime,
                                        engagementConfigs,
                                        ref patternConfig,
                                        ref patternRuntimeState);
@@ -156,9 +162,12 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             ApplySelectedModules(slotRuntimes,
                                  moduleCandidates,
                                  bossShooterConfigs,
+                                 bossStealerConfigs,
                                  bossEngagementConfigs,
                                  shooterConfigs,
                                  shooterRuntime,
+                                 stealerConfigs,
+                                 stealerRuntime,
                                  engagementConfigs,
                                  coreChanged || shortRangeChanged,
                                  weaponChanged,
@@ -459,6 +468,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     private static bool ClearRuntimeModules(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                             DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                             DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                            DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                            DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                             DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
                                             ref EnemyPatternConfig patternConfig,
                                             ref EnemyPatternRuntimeState patternRuntimeState)
@@ -486,6 +497,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
         patternRuntimeState = EnemyPatternDefaultsUtility.CreatePatternRuntimeState();
         shooterConfigs.Clear();
         shooterRuntime.Clear();
+        stealerConfigs.Clear();
+        stealerRuntime.Clear();
         engagementConfigs.Clear();
         return true;
     }
@@ -507,9 +520,12 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     private static void ApplySelectedModules(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                              DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                              DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                             DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                              DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                              DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                              DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                             DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                             DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                              DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
                                              bool movementChanged,
                                              bool weaponChanged,
@@ -544,7 +560,10 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
         }
 
         if (weaponChanged)
+        {
             ApplyShooterConfigs(hasWeaponConfig, in weaponCandidate, bossShooterConfigs, shooterConfigs, shooterRuntime);
+            ApplyPowerUpStealerConfigs(hasWeaponConfig, in weaponCandidate, bossStealerConfigs, stealerConfigs, stealerRuntime);
+        }
 
         if (movementChanged || weaponChanged)
         {
@@ -606,6 +625,55 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             shooterConfigs.Add(bossShooterConfigs[sourceIndex].ShooterConfig);
             shooterRuntime.Add(CreateDefaultShooterRuntime());
         }
+    }
+
+    /// <summary>
+    /// Rebuilds runtime Power-Up Stealer buffers from the selected weapon candidate.
+    /// </summary>
+    /// <param name="hasWeaponConfig">True when weaponCandidate contains a real module.</param>
+    /// <param name="weaponCandidate">Selected weapon candidate.</param>
+    /// <param name="bossStealerConfigs">Boss-owned Power-Up Stealer source buffer.</param>
+    /// <param name="stealerConfigs">Runtime Power-Up Stealer config target buffer.</param>
+    /// <param name="stealerRuntime">Runtime Power-Up Stealer state target buffer.</param>
+    private static void ApplyPowerUpStealerConfigs(bool hasWeaponConfig,
+                                                   in EnemyBossPatternModuleCandidateElement weaponCandidate,
+                                                   DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
+                                                   DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                                   DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime)
+    {
+        NativeList<EnemyPowerUpStealerRuntimeElement> preservedStolenRuntime = new NativeList<EnemyPowerUpStealerRuntimeElement>(Allocator.Temp);
+
+        for (int runtimeIndex = 0; runtimeIndex < stealerRuntime.Length; runtimeIndex++)
+        {
+            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[runtimeIndex];
+
+            if (runtime.HasStolenPowerUp == 0)
+                continue;
+
+            preservedStolenRuntime.Add(runtime);
+        }
+
+        stealerConfigs.Clear();
+        stealerRuntime.Clear();
+
+        if (hasWeaponConfig)
+        {
+            for (int stealerIndex = 0; stealerIndex < weaponCandidate.PowerUpStealerConfigCount; stealerIndex++)
+            {
+                int sourceIndex = weaponCandidate.FirstPowerUpStealerConfigIndex + stealerIndex;
+
+                if (sourceIndex < 0 || sourceIndex >= bossStealerConfigs.Length)
+                    continue;
+
+                stealerConfigs.Add(bossStealerConfigs[sourceIndex].StealerConfig);
+                stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+            }
+        }
+
+        for (int runtimeIndex = 0; runtimeIndex < preservedStolenRuntime.Length; runtimeIndex++)
+            stealerRuntime.Add(preservedStolenRuntime[runtimeIndex]);
+
+        preservedStolenRuntime.Dispose();
     }
 
     /// <summary>

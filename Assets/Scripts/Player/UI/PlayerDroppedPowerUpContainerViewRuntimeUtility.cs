@@ -102,6 +102,32 @@ public static class PlayerDroppedPowerUpContainerViewRuntimeUtility
     }
 
     /// <summary>
+    /// Releases the runtime view currently associated with one consumed dropped-container entity.
+    /// </summary>
+    /// <param name="containerEntity">Dropped container entity whose visual runtime state must be cleared.</param>
+    public static void ReleaseRuntimeView(Entity containerEntity)
+    {
+        EnsureCollections();
+
+        if (containerEntity == Entity.Null)
+            return;
+
+        if (fallbackViewsByEntity.TryGetValue(containerEntity, out PlayerDroppedPowerUpContainerView fallbackView))
+        {
+            cachedViewsByEntity.Remove(containerEntity);
+            fallbackViewsByEntity.Remove(containerEntity);
+            ReleaseFallbackView(fallbackView);
+            return;
+        }
+
+        if (!cachedViewsByEntity.TryGetValue(containerEntity, out PlayerDroppedPowerUpContainerView cachedView))
+            return;
+
+        cachedViewsByEntity.Remove(containerEntity);
+        HideRuntimeView(cachedView, true);
+    }
+
+    /// <summary>
     /// Releases fallback runtime clones whose owning dropped-container entities are no longer valid.
     /// </summary>
     /// <param name="entityManager">Entity manager used to detect stale container entities.</param>
@@ -342,7 +368,11 @@ public static class PlayerDroppedPowerUpContainerViewRuntimeUtility
         if (containerEntity == Entity.Null || !entityManager.Exists(containerEntity))
             return false;
 
-        return entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity);
+        if (!entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity))
+            return false;
+
+        PlayerDroppedPowerUpContainerContent containerContent = entityManager.GetComponentData<PlayerDroppedPowerUpContainerContent>(containerEntity);
+        return containerContent.StoredPowerUp.SlotConfig.IsDefined != 0;
     }
 
     /// <summary>
@@ -354,11 +384,32 @@ public static class PlayerDroppedPowerUpContainerViewRuntimeUtility
         if (!IsRuntimeUsableView(fallbackView))
             return;
 
-        fallbackView.HidePrompts();
-        fallbackView.SetIcon(null);
+        HideRuntimeView(fallbackView, false);
         GameObject fallbackObject = fallbackView.gameObject;
         fallbackObject.SetActive(false);
         fallbackViewPool.Push(fallbackView);
+    }
+
+    /// <summary>
+    /// Clears visible state from one runtime container view and optionally disables its scene object.
+    /// </summary>
+    /// <param name="containerView">Runtime container view to hide.</param>
+    /// <param name="deactivateObject">True when the backing GameObject should be disabled immediately.</param>
+    private static void HideRuntimeView(PlayerDroppedPowerUpContainerView containerView, bool deactivateObject)
+    {
+        if (!IsRuntimeUsableView(containerView))
+            return;
+
+        containerView.HidePrompts();
+        containerView.SetIcon(null);
+
+        if (!deactivateObject)
+            return;
+
+        GameObject containerObject = containerView.gameObject;
+
+        if (containerObject != null && containerObject.activeSelf)
+            containerObject.SetActive(false);
     }
 
     /// <summary>
@@ -381,7 +432,14 @@ public static class PlayerDroppedPowerUpContainerViewRuntimeUtility
         }
 
         for (int releaseIndex = 0; releaseIndex < fallbackReleaseCandidates.Count; releaseIndex++)
-            cachedViewsByEntity.Remove(fallbackReleaseCandidates[releaseIndex]);
+        {
+            Entity containerEntity = fallbackReleaseCandidates[releaseIndex];
+
+            if (cachedViewsByEntity.TryGetValue(containerEntity, out PlayerDroppedPowerUpContainerView cachedView))
+                HideRuntimeView(cachedView, true);
+
+            cachedViewsByEntity.Remove(containerEntity);
+        }
     }
 
     /// <summary>

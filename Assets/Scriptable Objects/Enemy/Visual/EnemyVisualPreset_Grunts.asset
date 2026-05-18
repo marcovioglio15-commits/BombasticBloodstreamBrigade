@@ -63,7 +63,8 @@ MonoBehaviour:
     billboardPulseContractDurationSeconds: 0.35
   prefabs:
     enemyPrefab: {fileID: 3091458169621715366, guid: f3f98af1cee6db041942c48b1be7625a, type: 3}
-    hitVfxPrefab: {fileID: 3021818779694104051, guid: afa1147b43317a74db598d39f92f660e, type: 3}
+    hitVfxPrefab: {fileID: 8477671424390131711, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+    hitVfxSpawnOffset: {x: 0, y: 0, z: 0}
     hitVfxLifetimeSeconds: 0.35
     hitVfxScaleMultiplier: 1
     spawnPaintColor: {r: 0.92, g: 0.28, b: 0.25, a: 1}

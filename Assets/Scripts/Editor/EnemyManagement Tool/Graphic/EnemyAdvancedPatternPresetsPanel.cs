@@ -24,7 +24,7 @@ public sealed class EnemyAdvancedPatternPresetsPanel
     private EnemyAdvancedPatternPresetLibrary library;
     private ListView listView;
     private ToolbarSearchField searchField;
-    private VisualElement detailsRoot;
+    private ScrollView detailsRoot;
     private VisualElement detailsSectionButtonsRoot;
     private VisualElement detailsSectionContentRoot;
 
@@ -94,6 +94,7 @@ public sealed class EnemyAdvancedPatternPresetsPanel
     #region Public Methods
     public void RefreshFromSessionChange()
     {
+        CaptureDetailsViewState();
         EnemyAdvancedPatternPreset previouslySelectedPreset = selectedPreset;
         library = EnemyAdvancedPatternPresetLibraryUtility.GetOrCreateLibrary();
         RefreshPresetList();
@@ -456,7 +457,9 @@ public sealed class EnemyAdvancedPatternPresetsPanel
     #region Preset Details
     private void SelectPreset(EnemyAdvancedPatternPreset preset)
     {
+        CaptureDetailsViewState();
         selectedPreset = preset;
+        presetSerializedObject = null;
         detailsRoot.Clear();
         detailsSectionButtonsRoot = null;
         detailsSectionContentRoot = null;
@@ -470,6 +473,7 @@ public sealed class EnemyAdvancedPatternPresetsPanel
         }
 
         presetSerializedObject = new SerializedObject(selectedPreset);
+        ManagementToolScrollStateUtility.BindScrollView(detailsRoot, BuildDetailsScrollStateKey());
         detailsSectionButtonsRoot = BuildDetailsSectionButtons();
         detailsSectionContentRoot = new VisualElement();
         detailsSectionContentRoot.style.flexDirection = FlexDirection.Column;
@@ -478,6 +482,7 @@ public sealed class EnemyAdvancedPatternPresetsPanel
         detailsRoot.Add(detailsSectionContentRoot);
 
         BuildActiveDetailsSection();
+        RestoreDetailsViewState();
         ManagementToolInteractiveElementColorUtility.RefreshRegisteredSubtree(detailsRoot);
     }
 
@@ -525,6 +530,8 @@ public sealed class EnemyAdvancedPatternPresetsPanel
 
     internal void BuildActiveDetailsSection()
     {
+        CaptureDetailsViewState();
+
         if (detailsSectionButtonsRoot != null)
             detailsSectionButtonsRoot.userData = this;
 
@@ -553,6 +560,47 @@ public sealed class EnemyAdvancedPatternPresetsPanel
         }
 
         ManagementToolInteractiveElementColorUtility.RefreshRegisteredSubtree(detailsSectionContentRoot);
+        RestoreDetailsViewState();
+    }
+
+    /// <summary>
+    /// Captures foldout and scroll state before the active details subtree is rebuilt.
+    /// </summary>
+    internal void CaptureDetailsViewState()
+    {
+        if (detailsRoot == null)
+            return;
+
+        ManagementToolFoldoutStateUtility.CaptureFoldoutStates(detailsRoot);
+        ManagementToolScrollStateUtility.CaptureScrollOffsets(detailsRoot);
+    }
+
+    /// <summary>
+    /// Restores the details scroll offset after UI Toolkit completes the redraw.
+    /// </summary>
+    private void RestoreDetailsViewState()
+    {
+        if (detailsRoot == null)
+            return;
+
+        ManagementToolScrollStateUtility.RestoreScrollOffset(detailsRoot);
+    }
+
+    /// <summary>
+    /// Builds the stable scroll key for the selected preset details and active subsection.
+    /// </summary>
+    /// <returns>Stable scroll state key scoped by selected preset and subsection.</returns>
+    private string BuildDetailsScrollStateKey()
+    {
+        if (presetSerializedObject == null)
+            return string.Empty;
+
+        string objectStateKey = ManagementToolFoldoutStateUtility.BuildSerializedObjectStateKey(presetSerializedObject);
+
+        if (string.IsNullOrWhiteSpace(objectStateKey))
+            return string.Empty;
+
+        return objectStateKey + "|AdvancedPatternDetails|" + activeSection;
     }
 
     internal void RegeneratePresetId()

@@ -75,6 +75,10 @@ public static class EnemyAdvancedPatternBakeUtility
                         TryAddShooterModule(resolvedPayload, result.ShooterConfigs, ref result);
                         break;
 
+                    case EnemyPatternModuleKind.PowerUpStealer:
+                        TryAddPowerUpStealerModule(resolvedPayload, result.PowerUpStealerConfigs);
+                        break;
+
                     case EnemyPatternModuleKind.DropItems:
                         EnemyDropItemsBakeUtility.TryAppendModule(resolvedPayload, ref result);
                         break;
@@ -424,6 +428,7 @@ public static class EnemyAdvancedPatternBakeUtility
             case EnemyPatternModuleKind.Coward:
             case EnemyPatternModuleKind.ShortRangeDash:
             case EnemyPatternModuleKind.Shooter:
+            case EnemyPatternModuleKind.PowerUpStealer:
             case EnemyPatternModuleKind.DropItems:
                 return moduleKind;
 
@@ -568,6 +573,100 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
+    /// Appends one Power-Up Stealer module config from a resolved payload.
+    /// </summary>
+    /// <param name="payload">Resolved module payload.</param>
+    /// <param name="stealerConfigs">Target config list.</param>
+    internal static void TryAddPowerUpStealerModule(EnemyPatternModulePayloadData payload,
+                                                    List<EnemyPowerUpStealerConfigElement> stealerConfigs)
+    {
+        if (stealerConfigs == null)
+            return;
+
+        if (payload == null || payload.PowerUpStealer == null)
+            return;
+
+        EnemyPowerUpStealerModuleData stealerData = payload.PowerUpStealer;
+        stealerConfigs.Add(new EnemyPowerUpStealerConfigElement
+        {
+            TriggerMode = ResolvePowerUpStealTriggerMode(stealerData.TriggerMode),
+            TargetKind = ResolvePowerUpStealTargetKind(stealerData.TargetKind),
+            SelectionMode = ResolvePowerUpStealSelectionMode(stealerData.SelectionMode),
+            ActiveTargetBiasPercent = math.clamp(stealerData.ActiveTargetBiasPercent, 0f, 100f),
+            UseMinimumRange = 0,
+            MinimumRange = 0f,
+            UseMaximumRange = 0,
+            MaximumRange = 0f,
+            ExclusiveLookDirectionControl = 0,
+            ActivationGates = EnemyWeaponInteractionActivationGate.Always,
+            MaximumActivationSpeed = 0f,
+            RecentlyDamagedWindowSeconds = 0f,
+            UseDamageRecovery = stealerData.RecoverAfterDamageTakenPercent ? (byte)1 : (byte)0,
+            DamageRecoveryPercent = math.max(0f, stealerData.RecoveryDamageTakenPercent),
+            UseTimedDamageRecovery = stealerData.RecoverAfterDamageWindow ? (byte)1 : (byte)0,
+            TimedDamageRecoveryPercent = math.max(0f, stealerData.RecoveryDamageWindowPercent),
+            TimedDamageRecoverySeconds = math.max(0f, stealerData.RecoveryDamageWindowSeconds)
+        });
+    }
+
+    /// <summary>
+    /// Resolves one legal Power-Up Stealer trigger enum value.
+    /// </summary>
+    /// <param name="triggerMode">Authored trigger mode.</param>
+    /// <returns>Supported trigger mode.</returns>
+    internal static EnemyPowerUpStealTriggerMode ResolvePowerUpStealTriggerMode(EnemyPowerUpStealTriggerMode triggerMode)
+    {
+        switch (triggerMode)
+        {
+            case EnemyPowerUpStealTriggerMode.OnModuleActivation:
+            case EnemyPowerUpStealTriggerMode.OnFirstPlayerHit:
+            case EnemyPowerUpStealTriggerMode.OnEveryPlayerHit:
+                return triggerMode;
+
+            default:
+                return EnemyPowerUpStealTriggerMode.OnFirstPlayerHit;
+        }
+    }
+
+    /// <summary>
+    /// Resolves one legal Power-Up Stealer target enum value.
+    /// </summary>
+    /// <param name="targetKind">Authored target kind.</param>
+    /// <returns>Supported target kind.</returns>
+    internal static EnemyPowerUpStealTargetKind ResolvePowerUpStealTargetKind(EnemyPowerUpStealTargetKind targetKind)
+    {
+        switch (targetKind)
+        {
+            case EnemyPowerUpStealTargetKind.Active:
+            case EnemyPowerUpStealTargetKind.Passive:
+            case EnemyPowerUpStealTargetKind.ActiveOrPassive:
+                return targetKind;
+
+            default:
+                return EnemyPowerUpStealTargetKind.ActiveOrPassive;
+        }
+    }
+
+    /// <summary>
+    /// Resolves one legal Power-Up Stealer within-category selection enum value.
+    /// </summary>
+    /// <param name="selectionMode">Authored within-category selection mode.</param>
+    /// <returns>Supported selection mode.</returns>
+    internal static EnemyPowerUpStealSelectionMode ResolvePowerUpStealSelectionMode(EnemyPowerUpStealSelectionMode selectionMode)
+    {
+        switch (selectionMode)
+        {
+            case EnemyPowerUpStealSelectionMode.FirstObtained:
+            case EnemyPowerUpStealSelectionMode.LastObtained:
+            case EnemyPowerUpStealSelectionMode.Random:
+                return selectionMode;
+
+            default:
+                return EnemyPowerUpStealSelectionMode.FirstObtained;
+        }
+    }
+
+    /// <summary>
     /// Samples authored dash curves into one compact local path stored directly inside the runtime config.
     /// </summary>
     /// <param name="forwardProgressCurve">Authored forward-progression curve.</param>
@@ -626,6 +725,7 @@ public sealed class EnemyCompiledPatternBakeResult
     public bool HasShooterRuntimeSettings;
     public EnemyDropItemsConfig DropItemsConfig;
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
+    public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyCompiledExperienceDropModule> ExperienceDropModules = new List<EnemyCompiledExperienceDropModule>();
     public readonly List<EnemyCompiledExperienceDropDefinition> ExperienceDropDefinitions = new List<EnemyCompiledExperienceDropDefinition>();
     public readonly List<EnemyCompiledExtraComboPointsModule> ExtraComboPointsModules = new List<EnemyCompiledExtraComboPointsModule>();

@@ -11,7 +11,38 @@ public enum EnemyPatternModuleKind
     Shooter = 3,
     DropItems = 4,
     Coward = 5,
-    ShortRangeDash = 6
+    ShortRangeDash = 6,
+    PowerUpStealer = 7
+}
+
+/// <summary>
+/// Declares when a Power-Up Stealer enemy attempts to steal one player power-up.
+/// </summary>
+public enum EnemyPowerUpStealTriggerMode
+{
+    OnModuleActivation = 0,
+    OnFirstPlayerHit = 1,
+    OnEveryPlayerHit = 2
+}
+
+/// <summary>
+/// Declares which player power-up categories are valid targets for Power-Up Stealer modules.
+/// </summary>
+public enum EnemyPowerUpStealTargetKind
+{
+    Active = 0,
+    Passive = 1,
+    ActiveOrPassive = 2
+}
+
+/// <summary>
+/// Declares how Power-Up Stealer modules choose a specific power-up after the target category is resolved.
+/// </summary>
+public enum EnemyPowerUpStealSelectionMode
+{
+    FirstObtained = 0,
+    LastObtained = 1,
+    Random = 2
 }
 
 /// <summary>

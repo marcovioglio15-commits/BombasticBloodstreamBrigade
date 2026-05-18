@@ -44,6 +44,8 @@ public static class EnemyPoolVisualUtility
             entityManager.AddComponentData(enemyEntity, new EnemyHitVfxConfig
             {
                 PrefabEntity = Entity.Null,
+                Prefab = default,
+                SpawnOffset = float3.zero,
                 LifetimeSeconds = 0.35f,
                 ScaleMultiplier = 1f
             });

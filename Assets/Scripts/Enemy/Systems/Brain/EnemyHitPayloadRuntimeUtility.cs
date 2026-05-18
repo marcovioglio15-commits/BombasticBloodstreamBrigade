@@ -269,7 +269,8 @@ public static class EnemyHitPayloadRuntimeUtility
         vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
         {
             PrefabEntity = hitVfxConfig.PrefabEntity,
-            Position = enemyPosition,
+            SourcePrefab = hitVfxConfig.Prefab,
+            Position = enemyPosition + hitVfxConfig.SpawnOffset,
             Rotation = quaternion.identity,
             UniformScale = math.max(0.01f, hitVfxConfig.ScaleMultiplier),
             LifetimeSeconds = math.max(0.05f, hitVfxConfig.LifetimeSeconds),

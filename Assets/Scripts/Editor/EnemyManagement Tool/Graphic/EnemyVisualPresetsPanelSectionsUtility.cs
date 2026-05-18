@@ -137,7 +137,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.Prefabs,
                                "Prefabs",
-                               BuildPrefabsSubSection(panel));
+                               EnemyVisualPresetsPanelPrefabsSectionUtility.BuildPrefabsSubSection(panel));
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.SpawnOverrides,
                                "Spawn Overrides",
@@ -205,7 +205,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         return container;
     }
 
-    private static VisualElement CreateSubSectionContainer(string sectionTitle)
+    internal static VisualElement CreateSubSectionContainer(string sectionTitle)
     {
         VisualElement container = new VisualElement();
         container.style.marginTop = 4f;
@@ -218,12 +218,12 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         return container;
     }
 
-    private static void AddPropertyField(EnemyVisualPresetsPanel panel,
-                                         VisualElement target,
-                                         SerializedProperty parentProperty,
-                                         string relativePropertyName,
-                                         string label,
-                                         string tooltip)
+    internal static void AddPropertyField(EnemyVisualPresetsPanel panel,
+                                          VisualElement target,
+                                          SerializedProperty parentProperty,
+                                          string relativePropertyName,
+                                          string label,
+                                          string tooltip)
     {
         if (panel == null)
             return;
@@ -303,7 +303,6 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     {
         SerializedProperty visibilityProperty = panel.PresetSerializedObject.FindProperty("visibility");
         VisualElement container = CreateSubSectionContainer("Visibility");
-
         AddPropertyField(panel, container, visibilityProperty, "visualMode", "Visual Mode", "Visual runtime path used by this enemy type.");
         AddPropertyField(panel, container, visibilityProperty, "visualAnimationSpeed", "Visual Animation Speed", "Playback speed multiplier used by both companion and GPU-baked visual paths.");
         AddPropertyField(panel, container, visibilityProperty, "gpuAnimationLoopDuration", "GPU Animation Loop Duration", "Loop duration in seconds used by GPU-baked playback time wrapping.");
@@ -317,23 +316,9 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     {
         SerializedProperty outlineProperty = panel.PresetSerializedObject.FindProperty("outline");
         VisualElement container = CreateSubSectionContainer("Outline");
-
         AddPropertyField(panel, container, outlineProperty, "enableOutline", "Enable Outline", "When enabled, compatible enemy renderers receive outline property overrides from this preset.");
         AddPropertyField(panel, container, outlineProperty, "outlineThickness", "Outline Thickness", "Outline thickness written to compatible enemy materials exposing _OutlineThickness. Enemy presets support stronger values up to 25.");
         AddPropertyField(panel, container, outlineProperty, "outlineColor", "Outline Color", "Outline color written to compatible enemy materials exposing _OutlineColor.");
-        return container;
-    }
-
-    private static VisualElement BuildPrefabsSubSection(EnemyVisualPresetsPanel panel)
-    {
-        SerializedProperty prefabsProperty = panel.PresetSerializedObject.FindProperty("prefabs");
-        VisualElement container = CreateSubSectionContainer("Prefabs");
-
-        AddPropertyField(panel, container, prefabsProperty, "enemyPrefab", "Enemy Prefab", "Enemy prefab associated with this enemy type.");
-        AddPropertyField(panel, container, prefabsProperty, "hitVfxPrefab", "Hit VFX Prefab", "Optional one-shot VFX prefab spawned every time this enemy receives a projectile hit.");
-        AddPropertyField(panel, container, prefabsProperty, "hitVfxLifetimeSeconds", "Hit VFX Lifetime Seconds", "Lifetime in seconds assigned to each spawned hit VFX instance.");
-        AddPropertyField(panel, container, prefabsProperty, "hitVfxScaleMultiplier", "Hit VFX Scale Multiplier", "Uniform scale multiplier applied to the spawned hit VFX instance.");
-        AddPropertyField(panel, container, prefabsProperty, "spawnPaintColor", "Spawn Paint Color", "Color used by the wave painter and scene preview for this enemy type.");
         return container;
     }
 
@@ -388,7 +373,6 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     {
         SerializedProperty damageFeedbackProperty = panel.PresetSerializedObject.FindProperty("damageFeedback");
         VisualElement container = CreateSubSectionContainer("Damage Feedback");
-
         AddPropertyField(panel, container, damageFeedbackProperty, "flashColor", "Flash Color", "Tint color applied during the brief damage flash.");
         AddPropertyField(panel, container, damageFeedbackProperty, "flashDurationSeconds", "Flash Duration Seconds", "Flash duration in seconds. Use very small values for a 1-3 frame reaction.");
         AddPropertyField(panel, container, damageFeedbackProperty, "flashMaximumBlend", "Flash Maximum Blend", "Maximum overlay strength reached immediately after a valid hit.");
@@ -658,10 +642,10 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="container">Parent element receiving warning boxes.</param>
     /// <param name="relativePropertyName">Relative float property name.</param>
     /// <param name="message">Warning text.</param>
-    private static void AddNegativeValueWarning(SerializedProperty parentProperty,
-                                                VisualElement container,
-                                                string relativePropertyName,
-                                                string message)
+    internal static void AddNegativeValueWarning(SerializedProperty parentProperty,
+                                                 VisualElement container,
+                                                 string relativePropertyName,
+                                                 string message)
     {
         SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
 
@@ -676,10 +660,10 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="container">Parent element receiving warning boxes.</param>
     /// <param name="relativePropertyName">Relative float property name.</param>
     /// <param name="message">Warning text.</param>
-    private static void AddNonPositiveValueWarning(SerializedProperty parentProperty,
-                                                   VisualElement container,
-                                                   string relativePropertyName,
-                                                   string message)
+    internal static void AddNonPositiveValueWarning(SerializedProperty parentProperty,
+                                                    VisualElement container,
+                                                    string relativePropertyName,
+                                                    string message)
     {
         SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
 

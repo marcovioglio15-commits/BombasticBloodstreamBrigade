@@ -163,15 +163,12 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
 
         for (int passiveOffset = 0; passiveOffset < safeCount; passiveOffset++)
         {
-            PlayerPassiveToolConfig passiveToolConfig = cheatPresetPassives[safeStartIndex + passiveOffset].Tool;
-
-            if (passiveToolConfig.IsDefined == 0)
-                continue;
+            PlayerPowerUpCheatPresetPassiveElement cheatPresetPassive = cheatPresetPassives[safeStartIndex + passiveOffset];
 
             equippedPassiveTools.Add(new EquippedPassiveToolElement
             {
-                PowerUpId = default,
-                Tool = passiveToolConfig
+                PowerUpId = cheatPresetPassive.PowerUpId,
+                Tool = cheatPresetPassive.Tool
             });
         }
     }

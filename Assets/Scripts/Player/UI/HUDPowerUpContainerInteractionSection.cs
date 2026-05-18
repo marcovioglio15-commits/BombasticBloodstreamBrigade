@@ -291,6 +291,26 @@ public sealed class HUDPowerUpContainerInteractionSection
     {
         InputAction interactAction = PlayerInputRuntime.PowerUpContainerInteractAction;
         string bindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(interactAction, "F");
+
+        if (TryResolveVacantActiveSlot(out int vacantSlotIndex))
+        {
+            containerView.ShowSinglePrompt(string.Format("Press [{0}] to pick up", bindingDisplayString));
+
+            if (interactAction == null)
+                return;
+
+            if (interactionInputGate.IsBlocked())
+                return;
+
+            if (!interactAction.WasPressedThisFrame())
+                return;
+
+            if (TryQueueSwapCommand(currentPlayerEntity, containerEntity, vacantSlotIndex))
+                interactionInputGate.Begin(PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager, currentPlayerEntity));
+
+            return;
+        }
+
         containerView.ShowSinglePrompt(string.Format("Press [{0}] to swap", bindingDisplayString));
 
         if (interactAction == null)
@@ -316,8 +336,30 @@ public sealed class HUDPowerUpContainerInteractionSection
     {
         InputAction replacePrimaryAction = PlayerInputRuntime.PowerUpContainerReplacePrimaryAction;
         InputAction replaceSecondaryAction = PlayerInputRuntime.PowerUpContainerReplaceSecondaryAction;
+        InputAction interactAction = PlayerInputRuntime.PowerUpContainerInteractAction;
+        string interactBindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(interactAction, "F");
         string primaryBindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(replacePrimaryAction, "1");
         string secondaryBindingDisplayString = PlayerInputRuntime.ResolveBindingDisplayString(replaceSecondaryAction, "2");
+
+        if (TryResolveVacantActiveSlot(out int vacantSlotIndex))
+        {
+            containerView.ShowSinglePrompt(string.Format("Press [{0}] to pick up", interactBindingDisplayString));
+
+            if (interactionInputGate.IsBlocked())
+                return;
+
+            bool interactPressed = interactAction != null && interactAction.WasPressedThisFrame();
+            bool primaryPressed = replacePrimaryAction != null && replacePrimaryAction.WasPressedThisFrame();
+            bool secondaryPressed = replaceSecondaryAction != null && replaceSecondaryAction.WasPressedThisFrame();
+
+            if (!interactPressed && !primaryPressed && !secondaryPressed)
+                return;
+
+            if (TryQueueSwapCommand(playerEntity, containerEntity, vacantSlotIndex))
+                interactionInputGate.Begin(PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager, currentPlayerEntity));
+
+            return;
+        }
 
         containerView.ShowSwapPrompt(string.Format("[{0}] Slot 1", primaryBindingDisplayString),
                                      string.Format("[{0}] Slot 2", secondaryBindingDisplayString));
@@ -631,6 +673,38 @@ public sealed class HUDPowerUpContainerInteractionSection
 
         PlayerDroppedPowerUpContainerContent containerContent = entityManager.GetComponentData<PlayerDroppedPowerUpContainerContent>(containerEntity);
         return containerContent.StoredPowerUp.SlotConfig.IsDefined != 0;
+    }
+
+    /// <summary>
+    /// Resolves the first empty active power-up slot on the current player.
+    /// </summary>
+    /// <param name="vacantSlotIndex">Resolved vacant slot index, where 0 is primary and 1 is secondary.</param>
+    /// <returns>True when the player currently has an empty active slot.</returns>
+    private bool TryResolveVacantActiveSlot(out int vacantSlotIndex)
+    {
+        vacantSlotIndex = -1;
+
+        if (currentPlayerEntity == Entity.Null || !entityManager.Exists(currentPlayerEntity))
+            return false;
+
+        if (!entityManager.HasComponent<PlayerPowerUpsConfig>(currentPlayerEntity))
+            return false;
+
+        PlayerPowerUpsConfig powerUpsConfig = entityManager.GetComponentData<PlayerPowerUpsConfig>(currentPlayerEntity);
+
+        if (powerUpsConfig.PrimarySlot.IsDefined == 0)
+        {
+            vacantSlotIndex = 0;
+            return true;
+        }
+
+        if (powerUpsConfig.SecondarySlot.IsDefined == 0)
+        {
+            vacantSlotIndex = 1;
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>

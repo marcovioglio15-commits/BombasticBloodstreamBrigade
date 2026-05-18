@@ -157,6 +157,41 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     }
 
     /// <summary>
+    /// Renders a caller-provided sprite using the same billboard material and transform handling as offensive engagement feedback.
+    /// </summary>
+    /// <param name="enemyPosition">Current enemy world position.</param>
+    /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
+    /// <param name="sprite">Sprite to render.</param>
+    /// <param name="color">Final billboard tint.</param>
+    /// <param name="worldOffset">World-space offset from the enemy pivot.</param>
+    /// <param name="uniformScale">Final uniform billboard scale.</param>
+    public void RenderStaticSprite(Vector3 enemyPosition,
+                                   Transform cameraTransform,
+                                   Sprite sprite,
+                                   Color color,
+                                   Vector3 worldOffset,
+                                   float uniformScale)
+    {
+        ValidateSerializedFields();
+
+        if (spriteRenderer == null)
+            return;
+
+        if (sprite == null || uniformScale <= 0f)
+        {
+            Hide();
+            return;
+        }
+
+        Transform selfTransform = transform;
+        selfTransform.position = enemyPosition + worldOffset;
+        ApplyBillboardRotation(selfTransform, cameraTransform);
+        ApplySprite(sprite, color);
+        ApplyScale(selfTransform, uniformScale);
+        ApplyVisibility(true);
+    }
+
+    /// <summary>
     /// Hides the billboard and clears per-frame transient visual state.
     /// </summary>
     public void Hide()

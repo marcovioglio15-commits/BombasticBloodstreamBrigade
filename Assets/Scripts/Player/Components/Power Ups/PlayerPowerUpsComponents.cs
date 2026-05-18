@@ -65,6 +65,7 @@ public struct PlayerPowerUpCheatPresetEntry : IBufferElementData
 [InternalBufferCapacity(0)]
 public struct PlayerPowerUpCheatPresetPassiveElement : IBufferElementData
 {
+    public FixedString64Bytes PowerUpId;
     public PlayerPassiveToolConfig Tool;
 }
 
@@ -514,6 +515,7 @@ public struct PlayerExplosionRequest : IBufferElementData
 public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
 {
     public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
     public float3 Position;
     public quaternion Rotation;
     public float UniformScale;

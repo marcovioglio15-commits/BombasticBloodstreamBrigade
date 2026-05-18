@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
@@ -18,6 +19,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     #region Fields
     private static readonly Dictionary<string, PlayerFormulaValue> scheduleVariableContext =
         new Dictionary<string, PlayerFormulaValue>(64, StringComparer.OrdinalIgnoreCase);
+    private EntityQuery stolenPowerUpStealerQuery;
     #endregion
 
     #region Nested Types
@@ -81,6 +83,9 @@ public partial struct PlayerLevelUpSystem : ISystem
         state.RequireForUpdate<PlayerRuntimePowerUpScalingElement>();
         state.RequireForUpdate<PlayerPowerUpUnlockCatalogElement>();
         state.RequireForUpdate<EquippedPassiveToolElement>();
+        stolenPowerUpStealerQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<EnemyPowerUpStealerRuntimeElement>()
+            .Build(ref state);
     }
 
     /// <summary>
@@ -398,6 +403,11 @@ public partial struct PlayerLevelUpSystem : ISystem
                     ? equippedPassiveToolsLookup[entity]
                     : default;
                 DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers = milestoneSelectionOffersLookup[entity];
+                PlayerMilestonePowerUpReservationUtility.BuildStolenPowerUpRollReservations(state.EntityManager,
+                                                                                            entity,
+                                                                                            stolenPowerUpStealerQuery,
+                                                                                            out Dictionary<string, int> reservedUnlockCountsByPowerUpId,
+                                                                                            out HashSet<PassiveToolKind> reservedPassiveKinds);
 
                 if (!PlayerMilestonePowerUpRollUtility.TryOpenMilestoneSelection(progressionConfig.ValueRO,
                                                                                  consumedRequirementPhaseIndex,
@@ -408,6 +418,8 @@ public partial struct PlayerLevelUpSystem : ISystem
                                                                                  tierEntries,
                                                                                  tierEntryScaling,
                                                                                  equippedPassiveTools,
+                                                                                 reservedUnlockCountsByPowerUpId,
+                                                                                 reservedPassiveKinds,
                                                                                  selectionOffers,
                                                                                  ref milestoneSelectionState,
                                                                                  out milestoneOfferCount))

@@ -14,7 +14,6 @@ internal static class EnemyBossMinionSpawnPositionUtility
     private const float MinimumClearance = 0.05f;
     private const int CandidateProbeCount = 12;
     private const int MaximumCellSearchRadius = 16;
-    private static readonly float3 MinionSpawnOffset = new float3(0f, 0.5f, 0f);
     #endregion
 
     #region Methods
@@ -26,6 +25,7 @@ internal static class EnemyBossMinionSpawnPositionUtility
     /// <param name="bossPosition">Current boss world position.</param>
     /// <param name="spawnPlaneHeight">World-space height used for minion placement and wall probes.</param>
     /// <param name="radius">Requested spawn radius around the boss.</param>
+    /// <param name="spawnOffset">Authored world-space offset applied before radial placement.</param>
     /// <param name="bossEntity">Boss entity used for deterministic candidate rotation.</param>
     /// <param name="ruleIndex">Source minion rule index.</param>
     /// <param name="spawnIndex">Current minion spawn index within the trigger batch.</param>
@@ -40,6 +40,7 @@ internal static class EnemyBossMinionSpawnPositionUtility
     public static float3 ResolveSpawnPosition(float3 bossPosition,
                                               float spawnPlaneHeight,
                                               float radius,
+                                              float3 spawnOffset,
                                               Entity bossEntity,
                                               int ruleIndex,
                                               int spawnIndex,
@@ -65,7 +66,7 @@ internal static class EnemyBossMinionSpawnPositionUtility
         {
             float normalizedAngle = ResolveNormalizedCandidateAngle(baseSeed, candidateIndex);
             float radiusScale = ResolveCandidateRadiusScale(candidateIndex);
-            float3 candidatePosition = ResolveRadialCandidate(spawnCenterPosition + MinionSpawnOffset, resolvedRadius * radiusScale, normalizedAngle);
+            float3 candidatePosition = ResolveRadialCandidate(spawnCenterPosition + spawnOffset, resolvedRadius * radiusScale, normalizedAngle);
 
             if (TryResolveSafeCandidate(candidatePosition,
                                         spawnCenterPosition,
@@ -84,7 +85,7 @@ internal static class EnemyBossMinionSpawnPositionUtility
         }
 
         // Fallback keeps spawning deterministic even before physics/navigation have warmed up.
-        return ResolveRadialCandidate(spawnCenterPosition + MinionSpawnOffset, resolvedRadius, ResolveNormalizedCandidateAngle(baseSeed, 0));
+        return ResolveRadialCandidate(spawnCenterPosition + spawnOffset, resolvedRadius, ResolveNormalizedCandidateAngle(baseSeed, 0));
     }
     #endregion
 

@@ -105,6 +105,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         DynamicBuffer<EnemyShooterConfigElement> shooterConfigs = AddBuffer<EnemyShooterConfigElement>(entity);
         DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = AddBuffer<EnemyShooterRuntimeElement>(entity);
+        DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs = AddBuffer<EnemyPowerUpStealerConfigElement>(entity);
+        DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = AddBuffer<EnemyPowerUpStealerRuntimeElement>(entity);
         DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs = AddBuffer<EnemyOffensiveEngagementConfigElement>(entity);
 
         for (int shooterIndex = 0; shooterIndex < compiledPattern.ShooterConfigs.Count; shooterIndex++)
@@ -123,6 +125,19 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                 HasLockedAimDirection = 0
             });
         }
+
+        for (int stealerIndex = 0; stealerIndex < compiledPattern.PowerUpStealerConfigs.Count; stealerIndex++)
+        {
+            stealerConfigs.Add(compiledPattern.PowerUpStealerConfigs[stealerIndex]);
+            stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+        }
+
+        AddComponent(entity, new EnemyPowerUpStealerVisualState
+        {
+            HasStolenPowerUp = 0,
+            PowerUpId = default,
+            StolenKind = PlayerPowerUpUnlockKind.Active
+        });
 
         if (ShouldBakeShooterRuntime(compiledPattern))
         {
@@ -160,9 +175,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         });
 
         Entity hitVfxPrefabEntity = ResolveHitVfxPrefabEntity(authoring);
+        Vector3 hitVfxSpawnOffset = authoring.HitVfxSpawnOffset;
         AddComponent(entity, new EnemyHitVfxConfig
         {
             PrefabEntity = hitVfxPrefabEntity,
+            Prefab = authoring.HitVfxPrefab,
+            SpawnOffset = new float3(hitVfxSpawnOffset.x, hitVfxSpawnOffset.y, hitVfxSpawnOffset.z),
             LifetimeSeconds = math.max(0.05f, authoring.HitVfxLifetimeSeconds),
             ScaleMultiplier = math.max(0.01f, authoring.HitVfxScaleMultiplier)
         });
@@ -388,6 +406,16 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             bossShooterBuffer.Add(new EnemyBossPatternShooterConfigElement
             {
                 ShooterConfig = compiledBossPattern.ShooterConfigs[shooterIndex]
+            });
+        }
+
+        DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerBuffer = AddBuffer<EnemyBossPatternPowerUpStealerConfigElement>(entity);
+
+        for (int stealerIndex = 0; stealerIndex < compiledBossPattern.PowerUpStealerConfigs.Count; stealerIndex++)
+        {
+            bossStealerBuffer.Add(new EnemyBossPatternPowerUpStealerConfigElement
+            {
+                StealerConfig = compiledBossPattern.PowerUpStealerConfigs[stealerIndex]
             });
         }
 

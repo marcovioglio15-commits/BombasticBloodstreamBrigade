@@ -190,6 +190,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -377,6 +387,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -564,6 +584,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -751,6 +781,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -938,6 +978,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -1125,6 +1175,16 @@ MonoBehaviour:
             impedimentMaxSlowPercent: 100
             impedimentDurationSeconds: 2
           stacksPerHit: 1
+      powerUpStealer:
+        triggerMode: 1
+        targetKind: 2
+        selectionMode: 0
+        activeTargetBiasPercent: 50
+        recoverAfterDamageTakenPercent: 0
+        recoveryDamageTakenPercent: 25
+        recoverAfterDamageWindow: 0
+        recoveryDamageWindowPercent: 20
+        recoveryDamageWindowSeconds: 5
       dropItems:
         dropPayloadKind: 0
         experience:
@@ -1323,6 +1383,16 @@ MonoBehaviour:
               impedimentMaxSlowPercent: 100
               impedimentDurationSeconds: 2
             stacksPerHit: 1
+        powerUpStealer:
+          triggerMode: 1
+          targetKind: 2
+          selectionMode: 0
+          activeTargetBiasPercent: 50
+          recoverAfterDamageTakenPercent: 0
+          recoveryDamageTakenPercent: 25
+          recoverAfterDamageWindow: 0
+          recoveryDamageWindowPercent: 20
+          recoveryDamageWindowSeconds: 5
         dropItems:
           dropPayloadKind: 0
           experience:
@@ -1509,6 +1579,16 @@ MonoBehaviour:
               impedimentMaxSlowPercent: 100
               impedimentDurationSeconds: 2
             stacksPerHit: 1
+        powerUpStealer:
+          triggerMode: 1
+          targetKind: 2
+          selectionMode: 0
+          activeTargetBiasPercent: 50
+          recoverAfterDamageTakenPercent: 0
+          recoveryDamageTakenPercent: 25
+          recoverAfterDamageWindow: 0
+          recoveryDamageWindowPercent: 20
+          recoveryDamageWindowSeconds: 5
         dropItems:
           dropPayloadKind: 0
           experience:

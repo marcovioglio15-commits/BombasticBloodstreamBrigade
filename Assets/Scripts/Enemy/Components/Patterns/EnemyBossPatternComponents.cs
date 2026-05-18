@@ -160,6 +160,8 @@ public struct EnemyBossPatternModuleCandidateElement : IBufferElementData
     public float RecentlyDamagedWindowSeconds;
     public int FirstShooterConfigIndex;
     public int ShooterConfigCount;
+    public int FirstPowerUpStealerConfigIndex;
+    public int PowerUpStealerConfigCount;
     public int FirstOffensiveEngagementConfigIndex;
     public int OffensiveEngagementConfigCount;
     public EnemyPatternConfig PatternConfig;
@@ -189,6 +191,14 @@ public struct EnemyBossPatternSlotRuntimeElement : IBufferElementData
 public struct EnemyBossPatternShooterConfigElement : IBufferElementData
 {
     public EnemyShooterConfigElement ShooterConfig;
+}
+
+/// <summary>
+/// Stores Power-Up Stealer configs referenced by boss module candidates.
+/// </summary>
+public struct EnemyBossPatternPowerUpStealerConfigElement : IBufferElementData
+{
+    public EnemyPowerUpStealerConfigElement StealerConfig;
 }
 
 /// <summary>
@@ -283,6 +293,7 @@ public struct EnemyBossMinionSpawnElement : IBufferElementData
     public int SpawnCount;
     public int MaxAliveMinions;
     public float SpawnRadius;
+    public float3 SpawnOffset;
     public float DespawnDistance;
     public float ExperienceDropMultiplier;
     public float ExtraComboPointsMultiplier;

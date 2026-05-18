@@ -26,6 +26,9 @@ public sealed class EnemyPatternModulePayloadData
     [Tooltip("Shooter payload used when module kind is Shooter.")]
     [SerializeField] private EnemyShooterModuleData shooter = new EnemyShooterModuleData();
 
+    [Tooltip("Power-Up Stealer payload used when module kind is PowerUpStealer.")]
+    [SerializeField] private EnemyPowerUpStealerModuleData powerUpStealer = new EnemyPowerUpStealerModuleData();
+
     [Tooltip("DropItems payload used when module kind is DropItems.")]
     [SerializeField] private EnemyDropItemsModuleData dropItems = new EnemyDropItemsModuleData();
     #endregion
@@ -73,6 +76,14 @@ public sealed class EnemyPatternModulePayloadData
         }
     }
 
+    public EnemyPowerUpStealerModuleData PowerUpStealer
+    {
+        get
+        {
+            return powerUpStealer;
+        }
+    }
+
     public EnemyDropItemsModuleData DropItems
     {
         get
@@ -105,6 +116,9 @@ public sealed class EnemyPatternModulePayloadData
         if (shooter == null)
             shooter = new EnemyShooterModuleData();
 
+        if (powerUpStealer == null)
+            powerUpStealer = new EnemyPowerUpStealerModuleData();
+
         if (dropItems == null)
             dropItems = new EnemyDropItemsModuleData();
 
@@ -113,6 +127,7 @@ public sealed class EnemyPatternModulePayloadData
         coward.Validate();
         shortRangeDash.Validate();
         shooter.Validate();
+        powerUpStealer.Validate();
         dropItems.Validate();
     }
     #endregion

@@ -600,6 +600,7 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
             float3 spawnPosition = EnemyBossMinionSpawnPositionUtility.ResolveSpawnPosition(bossPosition,
                                                                                             spawnPlaneHeight,
                                                                                             rule.SpawnRadius,
+                                                                                            rule.SpawnOffset,
                                                                                             bossEntity,
                                                                                             ruleIndex,
                                                                                             spawnIndex,
