@@ -10,6 +10,16 @@ public static class EnemyElementalStackUtility
     #region Methods
 
     #region Public Methods
+    /// <summary>
+    /// Applies elemental stacks to one enemy and triggers the configured proc when its threshold is crossed.
+    /// Used by projectile and trail hit paths after they resolve an eligible enemy target.
+    /// </summary>
+    /// <param name="enemyEntity">Enemy entity receiving stacks.</param>
+    /// <param name="stacksToAdd">Stack amount to add before threshold evaluation.</param>
+    /// <param name="effectConfig">Elemental effect definition baked from the active power-up payload.</param>
+    /// <param name="stackLookup">Writable stack-buffer lookup for enemies.</param>
+    /// <param name="thresholdProcTriggered">True when this application crossed the proc threshold.</param>
+    /// <returns>True when stacks or an active proc refresh were applied; otherwise false.</returns>
     public static bool TryApplyStacks(Entity enemyEntity,
                                       float stacksToAdd,
                                       in ElementalEffectConfig effectConfig,
@@ -21,7 +31,7 @@ public static class EnemyElementalStackUtility
         if (stacksToAdd <= 0f)
             return false;
 
-        if (stackLookup.HasBuffer(enemyEntity) == false)
+        if (!stackLookup.HasBuffer(enemyEntity))
             return false;
 
         DynamicBuffer<EnemyElementStackElement> stackBuffer = stackLookup[enemyEntity];
@@ -72,6 +82,12 @@ public static class EnemyElementalStackUtility
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Finds the first stack entry matching the requested element type.
+    /// </summary>
+    /// <param name="stackBuffer">Element stack buffer owned by the target enemy.</param>
+    /// <param name="elementType">Element type to resolve.</param>
+    /// <returns>Stack index, or -1 when the element is not present yet.</returns>
     private static int FindStackIndex(in DynamicBuffer<EnemyElementStackElement> stackBuffer, ElementType elementType)
     {
         for (int index = 0; index < stackBuffer.Length; index++)
@@ -83,6 +99,11 @@ public static class EnemyElementalStackUtility
         return -1;
     }
 
+    /// <summary>
+    /// Creates a new stack entry initialized from the current effect config.
+    /// </summary>
+    /// <param name="effectConfig">Elemental effect definition baked from the active power-up payload.</param>
+    /// <returns>Initialized stack element with zero current stacks.</returns>
     private static EnemyElementStackElement BuildInitialStack(in ElementalEffectConfig effectConfig)
     {
         EnemyElementStackElement stackElement = new EnemyElementStackElement
@@ -102,6 +123,11 @@ public static class EnemyElementalStackUtility
         return stackElement;
     }
 
+    /// <summary>
+    /// Synchronizes mutable stack definition fields with the newest effect config before stack application.
+    /// </summary>
+    /// <param name="stackElement">Stack entry that will receive sanitized config values.</param>
+    /// <param name="effectConfig">Elemental effect definition baked from the active power-up payload.</param>
     private static void SynchronizeStackDefinition(ref EnemyElementStackElement stackElement, in ElementalEffectConfig effectConfig)
     {
         float maximumStacks = math.max(0.1f, effectConfig.MaximumStacks);
@@ -127,6 +153,10 @@ public static class EnemyElementalStackUtility
         stackElement.ImpedimentDurationSeconds = math.max(0.05f, effectConfig.ImpedimentDurationSeconds);
     }
 
+    /// <summary>
+    /// Starts the elemental proc represented by the current stack element.
+    /// </summary>
+    /// <param name="stackElement">Stack entry whose proc state should be activated.</param>
     private static void TriggerProc(ref EnemyElementStackElement stackElement)
     {
         switch (stackElement.EffectKind)
@@ -137,7 +167,7 @@ public static class EnemyElementalStackUtility
                 bool wasDotActive = stackElement.DotRemainingSeconds > 0f;
                 stackElement.DotRemainingSeconds = math.max(stackElement.DotRemainingSeconds, dotDurationSeconds);
 
-                if (wasDotActive == false ||
+                if (!wasDotActive ||
                     stackElement.DotTickTimer <= 0f ||
                     stackElement.DotTickTimer > dotTickInterval)
                     stackElement.DotTickTimer = dotTickInterval;
@@ -155,6 +185,11 @@ public static class EnemyElementalStackUtility
         }
     }
 
+    /// <summary>
+    /// Checks whether the stack currently has an active proc window.
+    /// </summary>
+    /// <param name="stackElement">Stack entry to inspect.</param>
+    /// <returns>True when the configured proc kind is active.</returns>
     private static bool IsProcActive(in EnemyElementStackElement stackElement)
     {
         switch (stackElement.EffectKind)
@@ -168,6 +203,11 @@ public static class EnemyElementalStackUtility
         }
     }
 
+    /// <summary>
+    /// Refreshes the active proc window according to the stack definition.
+    /// </summary>
+    /// <param name="stackElement">Stack entry whose active proc window should be refreshed.</param>
+    /// <returns>True when the configured proc kind was refreshed.</returns>
     private static bool RefreshActiveProc(ref EnemyElementStackElement stackElement)
     {
         switch (stackElement.EffectKind)
@@ -195,6 +235,12 @@ public static class EnemyElementalStackUtility
         }
     }
 
+    /// <summary>
+    /// Writes the updated stack entry back into the target buffer.
+    /// </summary>
+    /// <param name="stackBuffer">Element stack buffer owned by the target enemy.</param>
+    /// <param name="stackIndex">Existing stack index, or -1 to append a new stack entry.</param>
+    /// <param name="stackElement">Stack value to write.</param>
     private static void WriteStack(ref DynamicBuffer<EnemyElementStackElement> stackBuffer,
                                    int stackIndex,
                                    in EnemyElementStackElement stackElement)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Boss-only preset that reuses normal pattern assemble slots and layers ordered boss interactions above them.
+/// Boss-only preset that extracts eligible pattern candidates and their internal module candidates at runtime.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyBossPatternPreset", menuName = "Enemy/Boss Pattern Preset", order = 13)]
 public sealed class EnemyBossPatternPreset : ScriptableObject
@@ -28,13 +28,17 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     [Tooltip("Normal enemy Modules & Patterns preset used as the source module catalog for boss Pattern Assemble slots.")]
     [SerializeField] private EnemyModulesAndPatternsPreset sourcePatternsPreset;
 
-    [Header("Base Pattern Assemble")]
-    [Tooltip("Always-available boss pattern assembled with the same Core Movement, Short-Range Interaction and Weapon Interaction slots used by normal enemies.")]
-    [SerializeField] private EnemyBossPatternAssemblyDefinition basePattern = new EnemyBossPatternAssemblyDefinition();
+    [Header("Pattern Extraction")]
+    [Tooltip("Rules that decide when the boss extracts a new eligible pattern candidate.")]
+    [SerializeField] private EnemyBossPatternExtractionSettings extractionSettings = new EnemyBossPatternExtractionSettings();
 
-    [Header("Boss Interactions")]
-    [Tooltip("Ordered boss-specific interaction layers. The first valid enabled interaction overrides selected slots from the base pattern.")]
+    [Header("Pattern Candidates")]
+    [Tooltip("Boss-specific pattern candidates. Runtime extraction rolls among eligible enabled candidates instead of always taking the first valid entry.")]
     [SerializeField] private List<EnemyBossPatternInteractionDefinition> interactions = new List<EnemyBossPatternInteractionDefinition>();
+
+    [Header("Boss Drop Extraction")]
+    [Tooltip("Boss death drop extraction separated from movement and attack pattern logic.")]
+    [SerializeField] private EnemyBossDropExtractionSettings dropExtraction = new EnemyBossDropExtractionSettings();
 
     [Header("Minion Spawn")]
     [Tooltip("Optional boss-owned spawning of normal enemies with automatic pool sizing and reward multipliers.")]
@@ -84,11 +88,11 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
         }
     }
 
-    public EnemyBossPatternAssemblyDefinition BasePattern
+    public EnemyBossPatternExtractionSettings ExtractionSettings
     {
         get
         {
-            return basePattern;
+            return extractionSettings;
         }
     }
 
@@ -97,6 +101,14 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
         get
         {
             return interactions;
+        }
+    }
+
+    public EnemyBossDropExtractionSettings DropExtraction
+    {
+        get
+        {
+            return dropExtraction;
         }
     }
 
@@ -123,16 +135,17 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
         if (string.IsNullOrWhiteSpace(presetName))
             presetName = "New Boss Pattern Preset";
 
-        if (basePattern == null)
-            basePattern = new EnemyBossPatternAssemblyDefinition();
+        if (extractionSettings == null)
+            extractionSettings = new EnemyBossPatternExtractionSettings();
 
         if (interactions == null)
             interactions = new List<EnemyBossPatternInteractionDefinition>();
 
+        if (dropExtraction == null)
+            dropExtraction = new EnemyBossDropExtractionSettings();
+
         if (minionSpawn == null)
             minionSpawn = new EnemyBossMinionSpawnSettings();
-
-        basePattern.Validate();
 
         for (int index = 0; index < interactions.Count; index++)
         {
@@ -142,6 +155,7 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
             interactions[index].Validate();
         }
 
+        dropExtraction.Validate();
         minionSpawn.Validate();
     }
     #endregion

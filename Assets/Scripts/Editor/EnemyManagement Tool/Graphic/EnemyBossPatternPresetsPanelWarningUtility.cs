@@ -13,14 +13,14 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
     #region Public Methods
     /// <summary>
-    /// Adds pattern assemble warnings based on base slots, boss interactions and source module catalog.
+    /// Adds pattern assemble warnings based on boss interactions and source module catalog.
     /// </summary>
-    /// <param name="basePatternProperty">Serialized base pattern root.</param>
     /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="extractionSettingsProperty">Serialized extraction settings root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="parent">Parent receiving warnings.</param>
-    public static void AddPatternWarnings(SerializedProperty basePatternProperty,
-                                          SerializedProperty interactionsProperty,
+    public static void AddPatternWarnings(SerializedProperty interactionsProperty,
+                                          SerializedProperty extractionSettingsProperty,
                                           EnemyModulesAndPatternsPreset sourcePreset,
                                           VisualElement parent)
     {
@@ -33,29 +33,28 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
             return;
         }
 
-        AddBaseCoreWarning(basePatternProperty, sourcePreset, parent);
+        AddExtractionWarnings(extractionSettingsProperty, parent);
         AddEmptyInteractionWarnings(interactionsProperty, parent);
-        AddWeaponRuntimeProjectileWarnings(basePatternProperty, interactionsProperty, sourcePreset, parent);
+        AddInternalExtractionWarnings(interactionsProperty, parent);
+        AddWeaponRuntimeProjectileWarnings(interactionsProperty, sourcePreset, parent);
     }
     #endregion
 
     #region Pattern Warnings
     /// <summary>
-    /// Adds a warning when the base core movement binding is unavailable or unresolved.
+    /// Adds a warning when no pattern extraction trigger is enabled.
     /// </summary>
-    /// <param name="basePatternProperty">Serialized base pattern root.</param>
-    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="extractionSettingsProperty">Serialized extraction settings root.</param>
     /// <param name="parent">Parent receiving warnings.</param>
-    private static void AddBaseCoreWarning(SerializedProperty basePatternProperty,
-                                           EnemyModulesAndPatternsPreset sourcePreset,
-                                           VisualElement parent)
+    private static void AddExtractionWarnings(SerializedProperty extractionSettingsProperty, VisualElement parent)
     {
-        SerializedProperty bindingProperty = FindNestedBinding(basePatternProperty, "coreMovement");
-        SerializedProperty moduleIdProperty = bindingProperty != null ? bindingProperty.FindPropertyRelative("moduleId") : null;
-        string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
+        if (extractionSettingsProperty == null)
+            return;
 
-        if (!TryResolveModuleOption(sourcePreset, EnemyPatternModuleCatalogSection.CoreMovement, moduleId, out EnemyBossPatternModuleOption _))
-            parent.Add(new HelpBox("Base Pattern Assemble needs a valid Core Movement module so the boss has a reliable fallback.", HelpBoxMessageType.Warning));
+        if (HasAnyExtractionTrigger(extractionSettingsProperty))
+            return;
+
+        parent.Add(new HelpBox("Pattern Extraction has no enabled trigger. The boss will only apply its initial pattern and will not roll new candidates.", HelpBoxMessageType.Warning));
     }
 
     /// <summary>
@@ -83,14 +82,70 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     }
 
     /// <summary>
+    /// Adds warnings for module slots that can select an initial candidate but cannot reroll later.
+    /// </summary>
+    /// <param name="interactionsProperty">Serialized interactions array.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
+    private static void AddInternalExtractionWarnings(SerializedProperty interactionsProperty, VisualElement parent)
+    {
+        if (interactionsProperty == null)
+            return;
+
+        // Inspect every enabled interaction because internal extraction is configured per pattern candidate.
+        for (int interactionIndex = 0; interactionIndex < interactionsProperty.arraySize; interactionIndex++)
+        {
+            SerializedProperty interactionProperty = interactionsProperty.GetArrayElementAtIndex(interactionIndex);
+
+            if (!IsEnabledInteraction(interactionProperty))
+                continue;
+
+            AddInternalExtractionWarning(interactionProperty.FindPropertyRelative("coreMovementExtraction"),
+                                         "Core Movement",
+                                         interactionIndex,
+                                         parent);
+            AddInternalExtractionWarning(interactionProperty.FindPropertyRelative("shortRangeExtraction"),
+                                         "Short-Range",
+                                         interactionIndex,
+                                         parent);
+            AddInternalExtractionWarning(interactionProperty.FindPropertyRelative("weaponExtraction"),
+                                         "Weapon",
+                                         interactionIndex,
+                                         parent);
+        }
+    }
+
+    /// <summary>
+    /// Adds one warning when an internal module slot has candidates but no reroll trigger.
+    /// </summary>
+    /// <param name="extractionProperty">Serialized internal extraction root.</param>
+    /// <param name="slotLabel">Readable slot label shown in the warning.</param>
+    /// <param name="interactionIndex">Interaction index used for user-facing numbering.</param>
+    /// <param name="parent">Parent receiving warnings.</param>
+    private static void AddInternalExtractionWarning(SerializedProperty extractionProperty,
+                                                     string slotLabel,
+                                                     int interactionIndex,
+                                                     VisualElement parent)
+    {
+        if (!HasAnyEnabledModuleCandidate(extractionProperty))
+            return;
+
+        SerializedProperty extractionSettingsProperty = extractionProperty != null
+            ? extractionProperty.FindPropertyRelative("extractionSettings")
+            : null;
+
+        if (HasAnyExtractionTrigger(extractionSettingsProperty))
+            return;
+
+        parent.Add(new HelpBox("Boss Interaction " + (interactionIndex + 1) + " " + slotLabel + " Extraction has candidates but no enabled reroll trigger. It can select an initial module, then it stays locked until the top-level pattern changes.", HelpBoxMessageType.Info));
+    }
+
+    /// <summary>
     /// Adds warnings for weapon runtime projectile payloads that cannot be represented by the current shared shooter pool.
     /// </summary>
-    /// <param name="basePatternProperty">Serialized base pattern root.</param>
     /// <param name="interactionsProperty">Serialized interactions array.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="parent">Parent receiving warnings.</param>
-    private static void AddWeaponRuntimeProjectileWarnings(SerializedProperty basePatternProperty,
-                                                           SerializedProperty interactionsProperty,
+    private static void AddWeaponRuntimeProjectileWarnings(SerializedProperty interactionsProperty,
                                                            EnemyModulesAndPatternsPreset sourcePreset,
                                                            VisualElement parent)
     {
@@ -98,13 +153,6 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
         bool hasWeaponSlot = false;
         bool hasMissingProjectilePrefab = false;
         bool hasConflictingProjectilePrefab = false;
-
-        InspectWeaponSlot(FindNestedSlot(basePatternProperty, "weaponInteraction"),
-                          sourcePreset,
-                          ref firstProjectilePrefab,
-                          ref hasWeaponSlot,
-                          ref hasMissingProjectilePrefab,
-                          ref hasConflictingProjectilePrefab);
 
         if (interactionsProperty != null)
         {
@@ -115,12 +163,12 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
                 if (!IsEnabledInteraction(interactionProperty))
                     continue;
 
-                InspectWeaponSlot(interactionProperty.FindPropertyRelative("weaponInteraction"),
-                                  sourcePreset,
-                                  ref firstProjectilePrefab,
-                                  ref hasWeaponSlot,
-                                  ref hasMissingProjectilePrefab,
-                                  ref hasConflictingProjectilePrefab);
+                InspectWeaponExtraction(interactionProperty.FindPropertyRelative("weaponExtraction"),
+                                        sourcePreset,
+                                        ref firstProjectilePrefab,
+                                        ref hasWeaponSlot,
+                                        ref hasMissingProjectilePrefab,
+                                        ref hasConflictingProjectilePrefab);
             }
         }
 
@@ -139,6 +187,51 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     #endregion
 
     #region Weapon Warnings
+    /// <summary>
+    /// Inspects every module candidate inside one Weapon extraction list for projectile prefab availability and conflicts.
+    /// </summary>
+    /// <param name="weaponExtractionProperty">Serialized weapon extraction root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
+    /// <param name="hasWeaponSlot">Tracks whether any weapon slot is enabled.</param>
+    /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
+    /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
+    private static void InspectWeaponExtraction(SerializedProperty weaponExtractionProperty,
+                                                EnemyModulesAndPatternsPreset sourcePreset,
+                                                ref GameObject firstProjectilePrefab,
+                                                ref bool hasWeaponSlot,
+                                                ref bool hasMissingProjectilePrefab,
+                                                ref bool hasConflictingProjectilePrefab)
+    {
+        SerializedProperty candidatesProperty = weaponExtractionProperty != null
+            ? weaponExtractionProperty.FindPropertyRelative("candidates")
+            : null;
+
+        if (candidatesProperty == null)
+            return;
+
+        for (int candidateIndex = 0; candidateIndex < candidatesProperty.arraySize; candidateIndex++)
+        {
+            SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(candidateIndex);
+            SerializedProperty eligibilityProperty = candidateProperty != null ? candidateProperty.FindPropertyRelative("eligibility") : null;
+            SerializedProperty enabledProperty = eligibilityProperty != null ? eligibilityProperty.FindPropertyRelative("enabled") : null;
+            SerializedProperty moduleModeProperty = candidateProperty != null ? candidateProperty.FindPropertyRelative("moduleMode") : null;
+
+            if (enabledProperty != null && !enabledProperty.boolValue)
+                continue;
+
+            if (moduleModeProperty != null && moduleModeProperty.enumValueIndex == Convert.ToInt32(EnemyBossPatternModuleMode.NullModule))
+                continue;
+
+            InspectWeaponSlot(candidateProperty != null ? candidateProperty.FindPropertyRelative("interaction") : null,
+                              sourcePreset,
+                              ref firstProjectilePrefab,
+                              ref hasWeaponSlot,
+                              ref hasMissingProjectilePrefab,
+                              ref hasConflictingProjectilePrefab);
+        }
+    }
+
     /// <summary>
     /// Inspects one serialized weapon slot for projectile prefab availability and conflicts.
     /// </summary>
@@ -289,6 +382,46 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     }
 
     /// <summary>
+    /// Reads a boolean serialized property defensively.
+    /// </summary>
+    /// <param name="property">Serialized property to read.</param>
+    /// <returns>True when the property exists and is enabled.</returns>
+    private static bool ReadBool(SerializedProperty property)
+    {
+        return property != null && property.boolValue;
+    }
+
+    /// <summary>
+    /// Resolves whether an extraction settings block owns at least one independent trigger.
+    /// </summary>
+    /// <param name="extractionSettingsProperty">Serialized extraction settings root.</param>
+    /// <returns>True when one trigger can independently cause extraction.</returns>
+    private static bool HasAnyExtractionTrigger(SerializedProperty extractionSettingsProperty)
+    {
+        if (extractionSettingsProperty == null)
+            return false;
+
+        if (ReadBool(extractionSettingsProperty.FindPropertyRelative("rerollWhenCurrentPatternBecomesInvalid")))
+            return true;
+
+        if (ReadBool(extractionSettingsProperty.FindPropertyRelative("useElapsedIntervalExtraction")))
+            return true;
+
+        if (ReadBool(extractionSettingsProperty.FindPropertyRelative("useMissingHealthStepExtraction")))
+            return true;
+
+        if (ReadBool(extractionSettingsProperty.FindPropertyRelative("useTravelledDistanceExtraction")))
+            return true;
+
+        if (ReadBool(extractionSettingsProperty.FindPropertyRelative("useDamageWindowExtraction")))
+            return true;
+
+        SerializedProperty playerDistanceConditionProperty = extractionSettingsProperty.FindPropertyRelative("playerDistanceCondition");
+        return playerDistanceConditionProperty != null &&
+               playerDistanceConditionProperty.enumValueIndex != Convert.ToInt32(EnemyBossPatternPlayerDistanceCondition.Disabled);
+    }
+
+    /// <summary>
     /// Resolves whether one serialized slot has its enabled flag active.
     /// </summary>
     /// <param name="slotProperty">Serialized slot property.</param>
@@ -309,16 +442,40 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
         if (interactionProperty == null)
             return false;
 
-        SerializedProperty coreMovementProperty = interactionProperty.FindPropertyRelative("coreMovement");
-        SerializedProperty coreEnabledProperty = coreMovementProperty != null ? coreMovementProperty.FindPropertyRelative("isEnabled") : null;
-
-        if (coreEnabledProperty != null && coreEnabledProperty.boolValue)
+        if (HasAnyEnabledModuleCandidate(interactionProperty.FindPropertyRelative("coreMovementExtraction")))
             return true;
 
-        if (IsEnabledSlot(interactionProperty.FindPropertyRelative("shortRangeInteraction")))
+        if (HasAnyEnabledModuleCandidate(interactionProperty.FindPropertyRelative("shortRangeExtraction")))
             return true;
 
-        return IsEnabledSlot(interactionProperty.FindPropertyRelative("weaponInteraction"));
+        return HasAnyEnabledModuleCandidate(interactionProperty.FindPropertyRelative("weaponExtraction"));
+    }
+
+    /// <summary>
+    /// Resolves whether one internal extraction list owns at least one enabled candidate.
+    /// </summary>
+    /// <param name="extractionProperty">Serialized extraction root.</param>
+    /// <returns>True when an enabled candidate exists.</returns>
+    private static bool HasAnyEnabledModuleCandidate(SerializedProperty extractionProperty)
+    {
+        SerializedProperty candidatesProperty = extractionProperty != null
+            ? extractionProperty.FindPropertyRelative("candidates")
+            : null;
+
+        if (candidatesProperty == null)
+            return false;
+
+        for (int candidateIndex = 0; candidateIndex < candidatesProperty.arraySize; candidateIndex++)
+        {
+            SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(candidateIndex);
+            SerializedProperty eligibilityProperty = candidateProperty != null ? candidateProperty.FindPropertyRelative("eligibility") : null;
+            SerializedProperty enabledProperty = eligibilityProperty != null ? eligibilityProperty.FindPropertyRelative("enabled") : null;
+
+            if (enabledProperty == null || enabledProperty.boolValue)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

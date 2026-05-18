@@ -402,8 +402,10 @@ public static class PlayerMilestonePowerUpRollUtility
             if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds))
                 continue;
 
-            candidateCatalogIndices.Add(candidateCatalogIndex);
-            candidateWeights.Add(tierEntryWeight);
+            AddOrAccumulateCandidateWeight(candidateCatalogIndices,
+                                           candidateWeights,
+                                           candidateCatalogIndex,
+                                           tierEntryWeight);
         }
 
         int selectedCandidateIndex = RollWeightedIndex(candidateWeights);
@@ -414,6 +416,37 @@ public static class PlayerMilestonePowerUpRollUtility
         catalogIndex = candidateCatalogIndices[selectedCandidateIndex];
         entryWeight = candidateWeights[selectedCandidateIndex];
         return true;
+    }
+
+    /// <summary>
+    /// Adds one catalog candidate or accumulates weight into an already present candidate.
+    /// This prevents duplicate tier rows from creating hidden extra entries while preserving intentional weight stacking.
+    /// </summary>
+    /// <param name="candidateCatalogIndices">Catalog indices eligible for the current weighted roll.</param>
+    /// <param name="candidateWeights">Weights aligned with candidateCatalogIndices.</param>
+    /// <param name="catalogIndex">Catalog index being considered.</param>
+    /// <param name="weight">Resolved weight to add.</param>
+    private static void AddOrAccumulateCandidateWeight(List<int> candidateCatalogIndices,
+                                                       List<float> candidateWeights,
+                                                       int catalogIndex,
+                                                       float weight)
+    {
+        float safeWeight = mathMax(0f, weight);
+
+        if (safeWeight <= 0f)
+            return;
+
+        for (int candidateIndex = 0; candidateIndex < candidateCatalogIndices.Count; candidateIndex++)
+        {
+            if (candidateCatalogIndices[candidateIndex] != catalogIndex)
+                continue;
+
+            candidateWeights[candidateIndex] += safeWeight;
+            return;
+        }
+
+        candidateCatalogIndices.Add(catalogIndex);
+        candidateWeights.Add(safeWeight);
     }
 
     private static HashSet<PassiveToolKind> BuildBlockedPassiveKinds(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)

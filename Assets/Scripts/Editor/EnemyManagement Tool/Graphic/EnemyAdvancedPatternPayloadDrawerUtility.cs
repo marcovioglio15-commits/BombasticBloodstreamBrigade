@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -63,9 +62,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         EnemyAdvancedPatternDrawerUtility.AddField(payloadContainer, dropPayloadKindProperty, "Drop Kind");
 
-        Foldout experienceFoldout = new Foldout();
-        experienceFoldout.text = "Experience";
-        experienceFoldout.value = true;
+        Foldout experienceFoldout = CreatePayloadFoldout(experienceProperty, "Experience", "DropItemsExperience");
         payloadContainer.Add(experienceFoldout);
 
         SerializedProperty dropDefinitionsProperty = experienceProperty.FindPropertyRelative("dropDefinitions");
@@ -87,9 +84,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             return false;
         }
 
-        Foldout dropDefinitionFoldout = new Foldout();
-        dropDefinitionFoldout.text = "Drop Definition";
-        dropDefinitionFoldout.value = true;
+        Foldout dropDefinitionFoldout = CreatePayloadFoldout(dropDefinitionsProperty, "Drop Definition", "DropDefinitions");
         experienceFoldout.Add(dropDefinitionFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(dropDefinitionFoldout, dropDefinitionsProperty, "Definitions");
 
@@ -98,9 +93,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, dropsDistributionProperty, "Drops Distribution");
         EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, dropRadiusProperty, "Drop Radius");
 
-        Foldout collectionMovementFoldout = new Foldout();
-        collectionMovementFoldout.text = "Collection Movement";
-        collectionMovementFoldout.value = true;
+        Foldout collectionMovementFoldout = CreatePayloadFoldout(collectionMovementProperty, "Collection Movement", "CollectionMovement");
         experienceFoldout.Add(collectionMovementFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(collectionMovementFoldout, collectionMovementProperty.FindPropertyRelative("moveSpeed"), "Move Speed");
         EnemyAdvancedPatternDrawerUtility.AddField(collectionMovementFoldout, collectionMovementProperty.FindPropertyRelative("collectDistance"), "Collect Distance");
@@ -133,9 +126,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             RefreshDropItemsRangeWarning();
         });
 
-        Foldout extraComboPointsFoldout = new Foldout();
-        extraComboPointsFoldout.text = "Extra Combo Points";
-        extraComboPointsFoldout.value = true;
+        Foldout extraComboPointsFoldout = CreatePayloadFoldout(extraComboPointsProperty, "Extra Combo Points", "ExtraComboPoints");
         payloadContainer.Add(extraComboPointsFoldout);
 
         SerializedProperty baseMultiplierProperty = extraComboPointsProperty.FindPropertyRelative("baseMultiplier");
@@ -163,27 +154,25 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         extraComboPointsInfoBox.style.marginTop = 2f;
         extraComboPointsFoldout.Add(extraComboPointsInfoBox);
 
-        Foldout conditionsFoldout = new Foldout();
-        conditionsFoldout.text = "Conditions";
-        conditionsFoldout.value = true;
+        Foldout conditionsFoldout = CreatePayloadFoldout(conditionsProperty, "Conditions", "ExtraComboConditions");
         extraComboPointsFoldout.Add(conditionsFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(conditionsFoldout, conditionsProperty, "Conditional Multipliers");
 
         HelpBox extraComboPointsWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         extraComboPointsWarningBox.style.marginTop = 4f;
         extraComboPointsFoldout.Add(extraComboPointsWarningBox);
-        RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
+        EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
         payloadContainer.TrackPropertyValue(baseMultiplierProperty, changedProperty =>
         {
-            RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
+            EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
         });
         payloadContainer.TrackPropertyValue(minimumFinalMultiplierProperty, changedProperty =>
         {
-            RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
+            EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
         });
         payloadContainer.TrackPropertyValue(maximumFinalMultiplierProperty, changedProperty =>
         {
-            RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
+            EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
         });
 
         if (payloadDataProperty.serializedObject != null)
@@ -191,14 +180,14 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             payloadContainer.TrackSerializedObjectValue(payloadDataProperty.serializedObject, changedObject =>
             {
                 RefreshDropItemsRangeWarning();
-                RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
+                EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
             });
         }
 
-        UpdateDropPayloadVisibility(dropPayloadKindProperty, experienceFoldout, extraComboPointsFoldout);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(dropPayloadKindProperty, experienceFoldout, extraComboPointsFoldout);
         payloadContainer.TrackPropertyValue(dropPayloadKindProperty, changedProperty =>
         {
-            UpdateDropPayloadVisibility(changedProperty, experienceFoldout, extraComboPointsFoldout);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(changedProperty, experienceFoldout, extraComboPointsFoldout);
         });
 
         return true;
@@ -248,9 +237,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         EnemyAdvancedPatternDrawerUtility.AddField(payloadContainer, modeProperty, "Mode");
 
-        Foldout basicFoldout = new Foldout();
-        basicFoldout.text = "Basic";
-        basicFoldout.value = true;
+        Foldout basicFoldout = CreatePayloadFoldout(basicProperty, "Basic", "WandererBasic");
         payloadContainer.Add(basicFoldout);
 
         AddFloatSliderField(basicFoldout, basicProperty.FindPropertyRelative("searchRadius"), "Search Radius", 0.5f, 32f);
@@ -268,10 +255,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         basicFoldout.Add(infiniteDirectionContainer);
         AddFloatSliderField(infiniteDirectionContainer, infiniteDirectionStepDegreesProperty, "Infinite Direction Step Degrees", 0.5f, 45f);
 
-        UpdateToggleContainerVisibility(useInfiniteDirectionSamplingProperty, infiniteDirectionContainer);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(useInfiniteDirectionSamplingProperty, infiniteDirectionContainer);
         basicFoldout.TrackPropertyValue(useInfiniteDirectionSamplingProperty, changedProperty =>
         {
-            UpdateToggleContainerVisibility(changedProperty, infiniteDirectionContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(changedProperty, infiniteDirectionContainer);
         });
 
         AddFloatSliderField(basicFoldout, basicProperty.FindPropertyRelative("unexploredDirectionPreference"), "Unexplored Direction Preference", 0f, 1f);
@@ -281,9 +268,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         AddFloatSliderField(basicFoldout, basicProperty.FindPropertyRelative("freeTrajectoryPreference"), "Free Trajectory Preference", 0f, 8f);
         AddFloatSliderField(basicFoldout, basicProperty.FindPropertyRelative("blockedPathRetryDelay"), "Blocked Path Retry Delay", 0f, 2f);
 
-        Foldout dvdFoldout = new Foldout();
-        dvdFoldout.text = "DVD";
-        dvdFoldout.value = true;
+        Foldout dvdFoldout = CreatePayloadFoldout(dvdProperty, "DVD", "WandererDvd");
         payloadContainer.Add(dvdFoldout);
 
         AddFloatSliderField(dvdFoldout, dvdProperty.FindPropertyRelative("speedMultiplier"), "Speed Multiplier", 0f, 4f);
@@ -293,10 +278,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         AddFloatSliderField(dvdFoldout, dvdProperty.FindPropertyRelative("cornerNudgeDistance"), "Corner Nudge Distance", 0f, 1f);
         EnemyAdvancedPatternDrawerUtility.AddField(dvdFoldout, dvdProperty.FindPropertyRelative("ignoreSteeringAndPriority"), "Ignore Steering And Priority");
 
-        UpdateWandererModeVisibility(modeProperty, basicFoldout, dvdFoldout);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(modeProperty, basicFoldout, dvdFoldout);
         payloadContainer.TrackPropertyValue(modeProperty, changedProperty =>
         {
-            UpdateWandererModeVisibility(changedProperty, basicFoldout, dvdFoldout);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(changedProperty, basicFoldout, dvdFoldout);
         });
 
         return true;
@@ -323,9 +308,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         if (includeActivationAndPatrolSettings)
         {
-            Foldout detectionFoldout = new Foldout();
-            detectionFoldout.text = "Detection";
-            detectionFoldout.value = true;
+            Foldout detectionFoldout = CreatePayloadFoldout(cowardProperty, "Detection", "CowardDetection");
             payloadContainer.Add(detectionFoldout);
 
             EnemyAdvancedPatternDrawerUtility.AddField(detectionFoldout, cowardProperty.FindPropertyRelative("detectionRadius"), "Detection Radius");
@@ -337,9 +320,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             payloadContainer.Add(categorySettingsInfoBox);
         }
 
-        Foldout retreatDistancesFoldout = new Foldout();
-        retreatDistancesFoldout.text = "Retreat Distances";
-        retreatDistancesFoldout.value = true;
+        Foldout retreatDistancesFoldout = CreatePayloadFoldout(cowardProperty, "Retreat Distances", "CowardRetreatDistances");
         payloadContainer.Add(retreatDistancesFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(retreatDistancesFoldout, cowardProperty.FindPropertyRelative("searchRadius"), "Search Radius");
@@ -356,15 +337,13 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         retreatDistancesFoldout.Add(infiniteDirectionContainer);
         EnemyAdvancedPatternDrawerUtility.AddField(infiniteDirectionContainer, infiniteDirectionStepDegreesProperty, "Infinite Step Degrees");
 
-        UpdateToggleContainerVisibility(useInfiniteDirectionSamplingProperty, infiniteDirectionContainer);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(useInfiniteDirectionSamplingProperty, infiniteDirectionContainer);
         retreatDistancesFoldout.TrackPropertyValue(useInfiniteDirectionSamplingProperty, changedProperty =>
         {
-            UpdateToggleContainerVisibility(changedProperty, infiniteDirectionContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(changedProperty, infiniteDirectionContainer);
         });
 
-        Foldout retreatSteeringFoldout = new Foldout();
-        retreatSteeringFoldout.text = "Retreat Steering";
-        retreatSteeringFoldout.value = true;
+        Foldout retreatSteeringFoldout = CreatePayloadFoldout(cowardProperty, "Retreat Steering", "CowardRetreatSteering");
         payloadContainer.Add(retreatSteeringFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(retreatSteeringFoldout, cowardProperty.FindPropertyRelative("minimumEnemyClearance"), "Enemy Clearance");
@@ -376,9 +355,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
 
         if (includeActivationAndPatrolSettings)
         {
-            Foldout patrolFoldout = new Foldout();
-            patrolFoldout.text = "Patrol";
-            patrolFoldout.value = true;
+            Foldout patrolFoldout = CreatePayloadFoldout(cowardProperty, "Patrol", "CowardPatrol");
             payloadContainer.Add(patrolFoldout);
 
             EnemyAdvancedPatternDrawerUtility.AddField(patrolFoldout, cowardProperty.FindPropertyRelative("patrolRadius"), "Patrol Radius");
@@ -386,17 +363,13 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             EnemyAdvancedPatternDrawerUtility.AddField(patrolFoldout, cowardProperty.FindPropertyRelative("patrolSpeedMultiplier"), "Patrol Speed");
         }
 
-        Foldout speedFoldout = new Foldout();
-        speedFoldout.text = "Speed";
-        speedFoldout.value = true;
+        Foldout speedFoldout = CreatePayloadFoldout(cowardProperty, "Speed", "CowardSpeed");
         payloadContainer.Add(speedFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(speedFoldout, cowardProperty.FindPropertyRelative("retreatSpeedMultiplierFar"), "Retreat Speed Far");
         EnemyAdvancedPatternDrawerUtility.AddField(speedFoldout, cowardProperty.FindPropertyRelative("retreatSpeedMultiplierNear"), "Retreat Speed Near");
 
-        Foldout recoveryFoldout = new Foldout();
-        recoveryFoldout.text = "Recovery";
-        recoveryFoldout.value = true;
+        Foldout recoveryFoldout = CreatePayloadFoldout(cowardProperty, "Recovery", "CowardRecovery");
         payloadContainer.Add(recoveryFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, cowardProperty.FindPropertyRelative("blockedPathRetryDelay"), "Retry Delay");
@@ -465,9 +438,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             return false;
         }
 
-        Foldout firingFoldout = new Foldout();
-        firingFoldout.text = "Firing";
-        firingFoldout.value = true;
+        Foldout firingFoldout = CreatePayloadFoldout(shooterProperty, "Firing", "ShooterFiring");
         payloadContainer.Add(firingFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, aimPolicyProperty, "Aim Policy");
@@ -481,10 +452,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(stopTimingContainer, preFireStopSecondsProperty, "Minimum Stop Before Fire Seconds");
         EnemyAdvancedPatternDrawerUtility.AddField(stopTimingContainer, postFireStopSecondsProperty, "Minimum Stop After Fire Seconds");
         EnemyAdvancedPatternDrawerUtility.AddField(firingFoldout, intraBurstDelayProperty, "Intra Burst Delay");
-        UpdateShooterStopTimingVisibility(movementPolicyProperty, stopTimingContainer);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateShooterStopTimingVisibility(movementPolicyProperty, stopTimingContainer);
         firingFoldout.TrackPropertyValue(movementPolicyProperty, changedProperty =>
         {
-            UpdateShooterStopTimingVisibility(changedProperty, stopTimingContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateShooterStopTimingVisibility(changedProperty, stopTimingContainer);
         });
 
         if (includeRangeSettings)
@@ -503,15 +474,15 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             firingFoldout.Add(maximumRangeContainer);
             EnemyAdvancedPatternDrawerUtility.AddField(maximumRangeContainer, maximumRangeProperty, "Maximum Range");
 
-            UpdateToggleContainerVisibility(useMinimumRangeProperty, minimumRangeContainer);
-            UpdateToggleContainerVisibility(useMaximumRangeProperty, maximumRangeContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(useMinimumRangeProperty, minimumRangeContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(useMaximumRangeProperty, maximumRangeContainer);
             firingFoldout.TrackPropertyValue(useMinimumRangeProperty, changedProperty =>
             {
-                UpdateToggleContainerVisibility(changedProperty, minimumRangeContainer);
+                EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(changedProperty, minimumRangeContainer);
             });
             firingFoldout.TrackPropertyValue(useMaximumRangeProperty, changedProperty =>
             {
-                UpdateToggleContainerVisibility(changedProperty, maximumRangeContainer);
+                EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(changedProperty, maximumRangeContainer);
             });
         }
         else
@@ -520,9 +491,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             firingFoldout.Add(rangeSettingsInfoBox);
         }
 
-        Foldout projectileFoldout = new Foldout();
-        projectileFoldout.text = "Projectile";
-        projectileFoldout.value = true;
+        Foldout projectileFoldout = CreatePayloadFoldout(projectileProperty, "Projectile", "ShooterProjectile");
         payloadContainer.Add(projectileFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, shotPatternProperty, "Shot Pattern");
@@ -540,28 +509,24 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("penetrationMode"), "Penetration Mode");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("maxPenetrations"), "Max Penetrations");
         EnemyAdvancedPatternDrawerUtility.AddField(projectileFoldout, projectileProperty.FindPropertyRelative("inheritShooterSpeed"), "Inherit Shooter Speed");
-        UpdateShooterSpreadVisibility(shotPatternProperty, projectilesPerShotProperty, spreadContainer);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateShooterSpreadVisibility(shotPatternProperty, projectilesPerShotProperty, spreadContainer);
         projectileFoldout.TrackPropertyValue(shotPatternProperty, changedProperty =>
         {
-            UpdateShooterSpreadVisibility(changedProperty, projectilesPerShotProperty, spreadContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateShooterSpreadVisibility(changedProperty, projectilesPerShotProperty, spreadContainer);
         });
         projectileFoldout.TrackPropertyValue(projectilesPerShotProperty, changedProperty =>
         {
-            UpdateShooterSpreadVisibility(shotPatternProperty, changedProperty, spreadContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateShooterSpreadVisibility(shotPatternProperty, changedProperty, spreadContainer);
         });
 
-        Foldout runtimeProjectileFoldout = new Foldout();
-        runtimeProjectileFoldout.text = "Runtime Projectile";
-        runtimeProjectileFoldout.value = true;
+        Foldout runtimeProjectileFoldout = CreatePayloadFoldout(runtimeProjectileProperty, "Runtime Projectile", "ShooterRuntimeProjectile");
         payloadContainer.Add(runtimeProjectileFoldout);
 
         EnemyAdvancedPatternDrawerUtility.AddField(runtimeProjectileFoldout, runtimeProjectileProperty.FindPropertyRelative("projectilePrefab"), "Projectile Prefab");
         EnemyAdvancedPatternDrawerUtility.AddField(runtimeProjectileFoldout, runtimeProjectileProperty.FindPropertyRelative("poolInitialCapacity"), "Pool Initial Capacity");
         EnemyAdvancedPatternDrawerUtility.AddField(runtimeProjectileFoldout, runtimeProjectileProperty.FindPropertyRelative("poolExpandBatch"), "Pool Expand Batch");
 
-        Foldout elementalFoldout = new Foldout();
-        elementalFoldout.text = "Elemental";
-        elementalFoldout.value = true;
+        Foldout elementalFoldout = CreatePayloadFoldout(elementalProperty, "Elemental", "ShooterElemental");
         payloadContainer.Add(elementalFoldout);
 
         SerializedProperty enableElementalDamageProperty = elementalProperty.FindPropertyRelative("enableElementalDamage");
@@ -576,10 +541,10 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(elementalPayloadContainer, effectDataProperty, "Effect Data");
         EnemyAdvancedPatternDrawerUtility.AddField(elementalPayloadContainer, stacksPerHitProperty, "Stacks Per Hit");
 
-        UpdateToggleContainerVisibility(enableElementalDamageProperty, elementalPayloadContainer);
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(enableElementalDamageProperty, elementalPayloadContainer);
         elementalFoldout.TrackPropertyValue(enableElementalDamageProperty, changedProperty =>
         {
-            UpdateToggleContainerVisibility(changedProperty, elementalPayloadContainer);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateToggleContainerVisibility(changedProperty, elementalPayloadContainer);
         });
 
         return true;
@@ -587,6 +552,20 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Creates a payload foldout with a stable key so rebuilds keep the current expanded state.
+    /// </summary>
+    /// <param name="property">Serialized property that identifies the payload subsection.</param>
+    /// <param name="title">Visible foldout title.</param>
+    /// <param name="suffix">Local suffix used to distinguish sibling foldouts.</param>
+    /// <returns>Configured foldout element.</returns>
+    private static Foldout CreatePayloadFoldout(SerializedProperty property, string title, string suffix)
+    {
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(property, title, "Payload" + suffix, true);
+        foldout.tooltip = "Groups " + title + " payload settings.";
+        return foldout;
+    }
+
     /// <summary>
     /// Adds a bound float slider so dense movement-bias values remain readable in the tool.
     /// </summary>
@@ -637,259 +616,6 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         return true;
     }
 
-    /// <summary>
-    /// Updates Wanderer payload foldout visibility from selected mode.
-    /// </summary>
-    /// <param name="modeProperty">Serialized mode property.</param>
-    /// <param name="basicFoldout">Basic foldout element.</param>
-    /// <param name="dvdFoldout">DVD foldout element.</param>
-
-    private static void UpdateWandererModeVisibility(SerializedProperty modeProperty, VisualElement basicFoldout, VisualElement dvdFoldout)
-    {
-        EnemyWandererMode mode = EnemyWandererMode.Basic;
-
-        if (modeProperty != null && modeProperty.propertyType == SerializedPropertyType.Enum)
-            mode = (EnemyWandererMode)modeProperty.enumValueIndex;
-
-        if (basicFoldout != null)
-            basicFoldout.style.display = mode == EnemyWandererMode.Basic ? DisplayStyle.Flex : DisplayStyle.None;
-
-        if (dvdFoldout != null)
-            dvdFoldout.style.display = mode == EnemyWandererMode.Dvd ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Updates visibility for Shooter stop timing fields that only affect Stop While Aiming movement.
-    /// </summary>
-    /// <param name="movementPolicyProperty">Serialized Shooter movement policy field.</param>
-    /// <param name="stopTimingContainer">Container that owns the stop timing fields.</param>
-    private static void UpdateShooterStopTimingVisibility(SerializedProperty movementPolicyProperty,
-                                                          VisualElement stopTimingContainer)
-    {
-        if (stopTimingContainer == null)
-            return;
-
-        EnemyShooterMovementPolicy movementPolicy = ResolveShooterMovementPolicy(movementPolicyProperty);
-        stopTimingContainer.style.display = movementPolicy == EnemyShooterMovementPolicy.StopWhileAiming
-            ? DisplayStyle.Flex
-            : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Updates visibility for forward-spread angle controls based on shot pattern and projectile count.
-    /// </summary>
-    /// <param name="shotPatternProperty">Serialized Shooter shot pattern field.</param>
-    /// <param name="projectilesPerShotProperty">Serialized projectile count field.</param>
-    /// <param name="spreadContainer">Container that owns the spread angle field.</param>
-    private static void UpdateShooterSpreadVisibility(SerializedProperty shotPatternProperty,
-                                                      SerializedProperty projectilesPerShotProperty,
-                                                      VisualElement spreadContainer)
-    {
-        if (spreadContainer == null)
-            return;
-
-        EnemyShooterShotPattern shotPattern = ResolveShooterShotPattern(shotPatternProperty);
-        int projectilesPerShot = projectilesPerShotProperty != null ? projectilesPerShotProperty.intValue : 1;
-        bool showSpread = shotPattern == EnemyShooterShotPattern.ForwardSpread && projectilesPerShot > 1;
-        spreadContainer.style.display = showSpread ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Resolves a serialized Shooter movement policy for editor-only visibility decisions.
-    /// </summary>
-    /// <param name="movementPolicyProperty">Serialized enum field.</param>
-    /// <returns>Valid movement policy value.</returns>
-    private static EnemyShooterMovementPolicy ResolveShooterMovementPolicy(SerializedProperty movementPolicyProperty)
-    {
-        if (movementPolicyProperty == null || movementPolicyProperty.propertyType != SerializedPropertyType.Enum)
-            return EnemyShooterMovementPolicy.KeepMoving;
-
-        switch (movementPolicyProperty.enumValueIndex)
-        {
-            case (int)EnemyShooterMovementPolicy.StopWhileAiming:
-                return EnemyShooterMovementPolicy.StopWhileAiming;
-
-            default:
-                return EnemyShooterMovementPolicy.KeepMoving;
-        }
-    }
-
-    /// <summary>
-    /// Resolves a serialized Shooter shot pattern for editor-only visibility decisions.
-    /// </summary>
-    /// <param name="shotPatternProperty">Serialized enum field.</param>
-    /// <returns>Valid shot pattern value.</returns>
-    private static EnemyShooterShotPattern ResolveShooterShotPattern(SerializedProperty shotPatternProperty)
-    {
-        if (shotPatternProperty == null || shotPatternProperty.propertyType != SerializedPropertyType.Enum)
-            return EnemyShooterShotPattern.ForwardSpread;
-
-        switch (shotPatternProperty.enumValueIndex)
-        {
-            case (int)EnemyShooterShotPattern.RadialBurst:
-                return EnemyShooterShotPattern.RadialBurst;
-
-            default:
-                return EnemyShooterShotPattern.ForwardSpread;
-        }
-    }
-
-    /// <summary>
-    /// Updates child container visibility from a boolean toggle property.
-    /// </summary>
-    /// <param name="toggleProperty">Boolean serialized property.</param>
-    /// <param name="container">Container to show or hide.</param>
-
-    private static void UpdateToggleContainerVisibility(SerializedProperty toggleProperty, VisualElement container)
-    {
-        if (container == null)
-            return;
-
-        if (toggleProperty == null)
-        {
-            container.style.display = DisplayStyle.None;
-            return;
-        }
-
-        container.style.display = toggleProperty.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Updates DropItems payload visibility from the selected drop payload kind.
-    /// </summary>
-    /// <param name="dropPayloadKindProperty">Drop payload kind property.</param>
-    /// <param name="experienceFoldout">Experience settings foldout.</param>
-
-    private static void UpdateDropPayloadVisibility(SerializedProperty dropPayloadKindProperty,
-                                                    VisualElement experienceFoldout,
-                                                    VisualElement extraComboPointsFoldout)
-    {
-        EnemyDropItemsPayloadKind payloadKind = EnemyDropItemsPayloadKind.Experience;
-
-        if (dropPayloadKindProperty != null && dropPayloadKindProperty.propertyType == SerializedPropertyType.Enum)
-            payloadKind = (EnemyDropItemsPayloadKind)dropPayloadKindProperty.enumValueIndex;
-
-        if (experienceFoldout != null)
-            experienceFoldout.style.display = payloadKind == EnemyDropItemsPayloadKind.Experience ? DisplayStyle.Flex : DisplayStyle.None;
-
-        if (extraComboPointsFoldout != null)
-            extraComboPointsFoldout.style.display = payloadKind == EnemyDropItemsPayloadKind.ExtraComboPoints ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Rebuilds validation warnings for the Extra Combo Points payload without mutating authored values.
-    /// </summary>
-    /// <param name="extraComboPointsProperty">Serialized Extra Combo Points payload property.</param>
-    /// <param name="warningBox">Warning help box refreshed in place.</param>
-    private static void RefreshExtraComboPointsWarning(SerializedProperty extraComboPointsProperty, HelpBox warningBox)
-    {
-        if (extraComboPointsProperty == null || warningBox == null)
-            return;
-
-        List<string> warningLines = new List<string>();
-        SerializedProperty baseMultiplierProperty = extraComboPointsProperty.FindPropertyRelative("baseMultiplier");
-        SerializedProperty minimumFinalMultiplierProperty = extraComboPointsProperty.FindPropertyRelative("minimumFinalMultiplier");
-        SerializedProperty maximumFinalMultiplierProperty = extraComboPointsProperty.FindPropertyRelative("maximumFinalMultiplier");
-        SerializedProperty conditionsProperty = extraComboPointsProperty.FindPropertyRelative("conditions");
-
-        if (baseMultiplierProperty != null && baseMultiplierProperty.floatValue < 0f)
-            warningLines.Add("Base Multiplier is negative. Negative combo-point multipliers are ignored at runtime.");
-
-        if (minimumFinalMultiplierProperty != null &&
-            maximumFinalMultiplierProperty != null &&
-            maximumFinalMultiplierProperty.floatValue < minimumFinalMultiplierProperty.floatValue)
-        {
-            warningLines.Add("Maximum Final Multiplier is lower than Minimum Final Multiplier.");
-        }
-
-        if (conditionsProperty != null)
-        {
-            for (int conditionIndex = 0; conditionIndex < conditionsProperty.arraySize; conditionIndex++)
-            {
-                SerializedProperty conditionProperty = conditionsProperty.GetArrayElementAtIndex(conditionIndex);
-
-                if (conditionProperty == null)
-                    continue;
-
-                SerializedProperty minimumValueProperty = conditionProperty.FindPropertyRelative("minimumValue");
-                SerializedProperty maximumValueProperty = conditionProperty.FindPropertyRelative("maximumValue");
-                SerializedProperty minimumMultiplierProperty = conditionProperty.FindPropertyRelative("minimumMultiplier");
-                SerializedProperty maximumMultiplierProperty = conditionProperty.FindPropertyRelative("maximumMultiplier");
-                SerializedProperty normalizedMultiplierCurveProperty = conditionProperty.FindPropertyRelative("normalizedMultiplierCurve");
-
-                if (minimumMultiplierProperty != null && minimumMultiplierProperty.floatValue < 0f)
-                {
-                    warningLines.Add(string.Format("Condition #{0} has a negative Minimum Multiplier. Negative combo-point multipliers are ignored at runtime.", conditionIndex + 1));
-                }
-
-                if (maximumMultiplierProperty != null && maximumMultiplierProperty.floatValue < 0f)
-                {
-                    warningLines.Add(string.Format("Condition #{0} has a negative Maximum Multiplier. Negative combo-point multipliers are ignored at runtime.", conditionIndex + 1));
-                }
-
-                if (minimumValueProperty != null &&
-                    maximumValueProperty != null &&
-                    maximumValueProperty.floatValue < minimumValueProperty.floatValue)
-                {
-                    warningLines.Add(string.Format("Condition #{0} has Maximum Value lower than Minimum Value. The metric range is inverted.", conditionIndex + 1));
-                }
-
-                if (normalizedMultiplierCurveProperty != null)
-                {
-                    AnimationCurve normalizedMultiplierCurve = normalizedMultiplierCurveProperty.animationCurveValue;
-                    AddNormalizedMultiplierCurveWarnings(normalizedMultiplierCurve, conditionIndex + 1, warningLines);
-                }
-            }
-        }
-
-        if (warningLines.Count <= 0)
-        {
-            warningBox.text = string.Empty;
-            warningBox.style.display = DisplayStyle.None;
-            return;
-        }
-
-        warningBox.text = string.Join("\n", warningLines);
-        warningBox.style.display = DisplayStyle.Flex;
-    }
-
-    /// <summary>
-    /// Adds warnings for normalized combo-point response curves that drift outside the supported 0..1 authoring range.
-    /// </summary>
-    /// <param name="normalizedMultiplierCurve">Authored normalized response curve.</param>
-    /// <param name="conditionNumber">One-based condition number shown in the warning text.</param>
-    /// <param name="warningLines">Mutable warning list.</param>
-    private static void AddNormalizedMultiplierCurveWarnings(AnimationCurve normalizedMultiplierCurve,
-                                                             int conditionNumber,
-                                                             List<string> warningLines)
-    {
-        if (normalizedMultiplierCurve == null || warningLines == null)
-            return;
-
-        Keyframe[] curveKeys = normalizedMultiplierCurve.keys;
-
-        for (int keyIndex = 0; keyIndex < curveKeys.Length; keyIndex++)
-        {
-            Keyframe curveKey = curveKeys[keyIndex];
-
-            if (curveKey.time < 0f || curveKey.time > 1f)
-            {
-                warningLines.Add(string.Format("Condition #{0} has curve keys outside the normalized 0..1 time range. Runtime samples the curve only across that range.", conditionNumber));
-                break;
-            }
-        }
-
-        for (int keyIndex = 0; keyIndex < curveKeys.Length; keyIndex++)
-        {
-            Keyframe curveKey = curveKeys[keyIndex];
-
-            if (curveKey.value < 0f || curveKey.value > 1f)
-            {
-                warningLines.Add(string.Format("Condition #{0} has curve values outside the normalized 0..1 range. Runtime clamps sampled values.", conditionNumber));
-                break;
-            }
-        }
-    }
     #endregion
 
     #endregion

@@ -17,11 +17,17 @@ public static class EnemyOffensiveEngagementSupportUtility
     {
         switch (section)
         {
+            case EnemyPatternModuleCatalogSection.CoreMovement:
+                return ResolveCoreMovementTimingMode(moduleKind);
+
             case EnemyPatternModuleCatalogSection.ShortRangeInteraction:
                 return ResolveShortRangeTimingMode(moduleKind);
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
                 return ResolveWeaponTimingMode(moduleKind);
+
+            case EnemyPatternModuleCatalogSection.DropItems:
+                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
                 return EnemyOffensiveEngagementTimingMode.None;
@@ -43,6 +49,26 @@ public static class EnemyOffensiveEngagementSupportUtility
 
     #region Private Methods
     /// <summary>
+    /// Resolves the visual engagement timing mode for Core Movement modules that do not own a more specific commit hook.
+    /// </summary>
+    /// <param name="moduleKind">Selected Core Movement module kind.</param>
+    /// <returns>Activation timing for every concrete Core Movement module, or None when the binding is invalid.</returns>
+    private static EnemyOffensiveEngagementTimingMode ResolveCoreMovementTimingMode(EnemyPatternModuleKind moduleKind)
+    {
+        switch (moduleKind)
+        {
+            case EnemyPatternModuleKind.Stationary:
+            case EnemyPatternModuleKind.Grunt:
+            case EnemyPatternModuleKind.Wanderer:
+            case EnemyPatternModuleKind.Coward:
+                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
+
+            default:
+                return EnemyOffensiveEngagementTimingMode.None;
+        }
+    }
+
+    /// <summary>
     /// Resolves the predictive engagement timing mode supported by one short-range module kind.
     /// </summary>
     /// <param name="moduleKind">Selected short-range module kind.</param>
@@ -53,6 +79,12 @@ public static class EnemyOffensiveEngagementSupportUtility
         {
             case EnemyPatternModuleKind.ShortRangeDash:
                 return EnemyOffensiveEngagementTimingMode.ShortRangeDashRelease;
+
+            case EnemyPatternModuleKind.Grunt:
+            case EnemyPatternModuleKind.Wanderer:
+            case EnemyPatternModuleKind.Coward:
+            case EnemyPatternModuleKind.Stationary:
+                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
                 return EnemyOffensiveEngagementTimingMode.None;
@@ -70,6 +102,13 @@ public static class EnemyOffensiveEngagementSupportUtility
         {
             case EnemyPatternModuleKind.Shooter:
                 return EnemyOffensiveEngagementTimingMode.WeaponShot;
+
+            case EnemyPatternModuleKind.Grunt:
+            case EnemyPatternModuleKind.Stationary:
+            case EnemyPatternModuleKind.Wanderer:
+            case EnemyPatternModuleKind.Coward:
+            case EnemyPatternModuleKind.ShortRangeDash:
+                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
                 return EnemyOffensiveEngagementTimingMode.None;

@@ -44,22 +44,16 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
         HelpBox categorySettingsInfoBox = new HelpBox("Activation range and release buffer are configured on the Short-Range Interaction assembly.", HelpBoxMessageType.Info);
         payloadContainer.Add(categorySettingsInfoBox);
 
-        Foldout aimFoldout = new Foldout();
-        aimFoldout.text = "Aim";
-        aimFoldout.value = true;
+        Foldout aimFoldout = CreateDashPayloadFoldout(aimProperty, "Aim", "Aim");
         payloadContainer.Add(aimFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(aimFoldout, aimProperty.FindPropertyRelative("aimDurationSeconds"), "Aim Duration Seconds");
         EnemyAdvancedPatternDrawerUtility.AddField(aimFoldout, aimProperty.FindPropertyRelative("moveSpeedMultiplierWhileAiming"), "Move Speed Multiplier While Aiming");
 
-        Foldout recoveryFoldout = new Foldout();
-        recoveryFoldout.text = "Recovery";
-        recoveryFoldout.value = true;
+        Foldout recoveryFoldout = CreateDashPayloadFoldout(recoveryProperty, "Recovery", "Recovery");
         payloadContainer.Add(recoveryFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, recoveryProperty.FindPropertyRelative("cooldownSeconds"), "Cooldown Seconds");
 
-        Foldout distanceFoldout = new Foldout();
-        distanceFoldout.text = "Distance";
-        distanceFoldout.value = true;
+        Foldout distanceFoldout = CreateDashPayloadFoldout(distanceProperty, "Distance", "Distance");
         payloadContainer.Add(distanceFoldout);
 
         SerializedProperty distanceSourceProperty = distanceProperty.FindPropertyRelative("distanceSource");
@@ -91,9 +85,7 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
             UpdateDistanceSourceVisibility(changedProperty, playerDistanceContainer, fixedDistanceContainer);
         });
 
-        Foldout pathFoldout = new Foldout();
-        pathFoldout.text = "Path";
-        pathFoldout.value = true;
+        Foldout pathFoldout = CreateDashPayloadFoldout(pathProperty, "Path", "Path");
         payloadContainer.Add(pathFoldout);
 
         SerializedProperty dashDurationSecondsProperty = pathProperty.FindPropertyRelative("dashDurationSeconds");
@@ -175,6 +167,20 @@ internal static class EnemyShortRangeDashPayloadDrawerUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Creates a short-range dash foldout with stable state across payload rebuilds.
+    /// </summary>
+    /// <param name="property">Serialized dash payload subsection.</param>
+    /// <param name="title">Visible foldout title.</param>
+    /// <param name="suffix">Local suffix used to distinguish sibling foldouts.</param>
+    /// <returns>Configured foldout element.</returns>
+    private static Foldout CreateDashPayloadFoldout(SerializedProperty property, string title, string suffix)
+    {
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(property, title, "ShortRangeDashPayload" + suffix, true);
+        foldout.tooltip = "Groups " + title + " short-range dash settings.";
+        return foldout;
+    }
+
     /// <summary>
     /// Updates distance-field visibility according to the selected travel distance source.
     /// </summary>

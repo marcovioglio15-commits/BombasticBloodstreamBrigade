@@ -1,9 +1,10 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// Applies ordered boss-specific interactions that override the base pattern assemble while their trigger is valid.
+/// Extracts eligible boss pattern candidates and applies their assembled pattern overrides at runtime.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemySpawnSystem))]
@@ -30,13 +31,16 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
 
         state.RequireForUpdate(playerQuery);
         state.RequireForUpdate<EnemyBossTag>();
-        state.RequireForUpdate<EnemyBossPatternBaseConfig>();
+        state.RequireForUpdate<EnemyBossPatternExtractionConfig>();
         state.RequireForUpdate<EnemyBossPatternInteractionElement>();
+        state.RequireForUpdate<EnemyBossPatternModuleExtractionElement>();
+        state.RequireForUpdate<EnemyBossPatternModuleCandidateElement>();
+        state.RequireForUpdate<EnemyBossPatternSlotRuntimeElement>();
         state.RequireForUpdate<EnemyBossPatternOffensiveEngagementConfigElement>();
     }
 
     /// <summary>
-    /// Evaluates ordered boss interactions and applies the selected assembled pattern layer.
+    /// Evaluates boss extraction triggers, rolls eligible pattern candidates and applies the selected assembled pattern layer.
     /// </summary>
     /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -51,8 +55,10 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
         if (deltaTime <= 0f)
             return;
 
+        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+
         foreach ((RefRW<EnemyBossPatternRuntimeState> bossRuntimeState,
-                  RefRO<EnemyBossPatternBaseConfig> baseConfig,
+                  RefRO<EnemyBossPatternExtractionConfig> extractionConfig,
                   RefRW<EnemyPatternConfig> patternConfig,
                   RefRW<EnemyPatternRuntimeState> patternRuntimeState,
                   RefRO<EnemyHealth> enemyHealth,
@@ -60,7 +66,7 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                   RefRO<LocalTransform> enemyTransform,
                   Entity bossEntity)
                  in SystemAPI.Query<RefRW<EnemyBossPatternRuntimeState>,
-                                    RefRO<EnemyBossPatternBaseConfig>,
+                                    RefRO<EnemyBossPatternExtractionConfig>,
                                     RefRW<EnemyPatternConfig>,
                                     RefRW<EnemyPatternRuntimeState>,
                                     RefRO<EnemyHealth>,
@@ -68,8 +74,11 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                     RefRO<LocalTransform>>()
                              .WithAll<EnemyBossTag>()
                              .WithAll<EnemyActive>()
-                             .WithAll<EnemyBossPatternInteractionElement>()
-                             .WithAll<EnemyBossPatternShooterConfigElement>()
+                            .WithAll<EnemyBossPatternInteractionElement>()
+                            .WithAll<EnemyBossPatternModuleExtractionElement>()
+                            .WithAll<EnemyBossPatternModuleCandidateElement>()
+                            .WithAll<EnemyBossPatternSlotRuntimeElement>()
+                            .WithAll<EnemyBossPatternShooterConfigElement>()
                              .WithAll<EnemyBossPatternOffensiveEngagementConfigElement>()
                              .WithAll<EnemyShooterConfigElement>()
                              .WithAll<EnemyShooterRuntimeElement>()
@@ -78,6 +87,9 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                              .WithEntityAccess())
         {
             DynamicBuffer<EnemyBossPatternInteractionElement> interactions = entityManager.GetBuffer<EnemyBossPatternInteractionElement>(bossEntity);
+            DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractions = entityManager.GetBuffer<EnemyBossPatternModuleExtractionElement>(bossEntity);
+            DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates = entityManager.GetBuffer<EnemyBossPatternModuleCandidateElement>(bossEntity);
+            DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes = entityManager.GetBuffer<EnemyBossPatternSlotRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs = entityManager.GetBuffer<EnemyBossPatternShooterConfigElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs = entityManager.GetBuffer<EnemyBossPatternOffensiveEngagementConfigElement>(bossEntity);
             DynamicBuffer<EnemyShooterConfigElement> shooterConfigs = entityManager.GetBuffer<EnemyShooterConfigElement>(bossEntity);
@@ -86,25 +98,50 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
             EnemyBossPatternRuntimeState runtimeState = bossRuntimeState.ValueRO;
             EnemyRuntimeState enemyRuntime = enemyRuntimeState.ValueRO;
             float3 bossPosition = enemyTransform.ValueRO.Position;
+            bool patternChanged;
 
-            InitializeRuntimeIfNeeded(ref runtimeState, bossPosition, enemyRuntime.LastDamageLifetimeSeconds);
-            UpdateRuntimeTimers(ref runtimeState, bossPosition, deltaTime);
-            ApplyResolvedInteraction(interactions,
-                                     bossShooterConfigs,
-                                     bossEngagementConfigs,
-                                     shooterConfigs,
-                                     shooterRuntime,
-                                     engagementConfigs,
-                                     in baseConfig.ValueRO,
-                                     in enemyHealth.ValueRO,
-                                     in enemyRuntime,
-                                     bossPosition,
-                                     playerPosition,
-                                     ref patternConfig.ValueRW,
-                                     ref patternRuntimeState.ValueRW,
-                                     ref runtimeState);
+            InitializeRuntimeIfNeeded(ref runtimeState,
+                                      bossPosition,
+                                      enemyRuntime.LastDamageLifetimeSeconds,
+                                      in enemyHealth.ValueRO);
+            float travelledDistanceThisFrame = UpdateRuntimeTimers(ref runtimeState,
+                                                                    in extractionConfig.ValueRO,
+                                                                    in enemyHealth.ValueRO,
+                                                                    bossPosition,
+                                                                    playerPosition,
+                                                                    deltaTime);
+            bool compositionChanged = ApplyResolvedInteraction(interactions,
+                                                               moduleExtractions,
+                                                               moduleCandidates,
+                                                               slotRuntimes,
+                                                               bossShooterConfigs,
+                                                               bossEngagementConfigs,
+                                                               shooterConfigs,
+                                                               shooterRuntime,
+                                                               engagementConfigs,
+                                                               in extractionConfig.ValueRO,
+                                                               in enemyHealth.ValueRO,
+                                                               in enemyRuntime,
+                                                               bossPosition,
+                                                               playerPosition,
+                                                               travelledDistanceThisFrame,
+                                                               deltaTime,
+                                                               ref patternConfig.ValueRW,
+                                                               ref patternRuntimeState.ValueRW,
+                                                               ref runtimeState,
+                                                               out patternChanged);
+
+            if (compositionChanged)
+                SyncCustomMovementTag(entityManager, commandBuffer, bossEntity, in patternConfig.ValueRO);
+
+            if (patternChanged)
+                TriggerPatternChangeFeedback(entityManager, bossEntity);
+
             bossRuntimeState.ValueRW = runtimeState;
         }
+
+        commandBuffer.Playback(entityManager);
+        commandBuffer.Dispose();
     }
     #endregion
 
@@ -134,17 +171,26 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
     /// <param name="runtimeState">Mutable boss runtime state.</param>
     /// <param name="bossPosition">Current boss position.</param>
     /// <param name="lastDamageLifetimeSeconds">Current damage timestamp from enemy runtime.</param>
+    /// <param name="health">Current boss health state used to seed extraction metrics.</param>
     private static void InitializeRuntimeIfNeeded(ref EnemyBossPatternRuntimeState runtimeState,
                                                   float3 bossPosition,
-                                                  float lastDamageLifetimeSeconds)
+                                                  float lastDamageLifetimeSeconds,
+                                                  in EnemyHealth health)
     {
         if (runtimeState.Initialized != 0)
             return;
 
         runtimeState.ActiveInteractionIndex = -2;
         runtimeState.ActiveInteractionElapsedSeconds = 0f;
+        runtimeState.ExtractionElapsedSeconds = 0f;
         runtimeState.ElapsedSeconds = 0f;
         runtimeState.TravelledDistance = 0f;
+        runtimeState.DistanceSinceLastExtraction = 0f;
+        runtimeState.LastExtractionMissingHealthPercent = EnemyBossPatternSelectionRuntimeUtility.ResolveMissingHealthPercent(in health);
+        runtimeState.PlayerDistanceHoldSeconds = 0f;
+        runtimeState.DamageWindowElapsedSeconds = 0f;
+        runtimeState.DamageWindowAccumulated = 0f;
+        runtimeState.PreviousObservedDurability = EnemyBossPatternSelectionRuntimeUtility.ResolveDurability(in health);
         runtimeState.LastPosition = bossPosition;
         runtimeState.LastObservedDamageLifetimeSeconds = lastDamageLifetimeSeconds;
         runtimeState.Initialized = 1;
@@ -154,33 +200,48 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
     /// Accumulates elapsed time, active interaction duration and travelled distance.
     /// </summary>
     /// <param name="runtimeState">Mutable boss runtime state.</param>
+    /// <param name="extractionConfig">Boss pattern extraction settings.</param>
+    /// <param name="health">Current boss health state.</param>
     /// <param name="bossPosition">Current boss position.</param>
+    /// <param name="playerPosition">Current player position.</param>
     /// <param name="deltaTime">Frame delta time.</param>
-    private static void UpdateRuntimeTimers(ref EnemyBossPatternRuntimeState runtimeState,
-                                            float3 bossPosition,
-                                            float deltaTime)
+    private static float UpdateRuntimeTimers(ref EnemyBossPatternRuntimeState runtimeState,
+                                             in EnemyBossPatternExtractionConfig extractionConfig,
+                                             in EnemyHealth health,
+                                             float3 bossPosition,
+                                             float3 playerPosition,
+                                             float deltaTime)
     {
         float safeDeltaTime = math.max(0f, deltaTime);
         float3 delta = bossPosition - runtimeState.LastPosition;
         delta.y = 0f;
+        float travelledDistance = math.length(delta);
         runtimeState.ElapsedSeconds += safeDeltaTime;
+        runtimeState.ExtractionElapsedSeconds += safeDeltaTime;
         runtimeState.ActiveInteractionElapsedSeconds = runtimeState.ActiveInteractionIndex >= 0
             ? runtimeState.ActiveInteractionElapsedSeconds + safeDeltaTime
             : 0f;
-        runtimeState.TravelledDistance += math.length(delta);
+        runtimeState.TravelledDistance += travelledDistance;
+        runtimeState.DistanceSinceLastExtraction += travelledDistance;
         runtimeState.LastPosition = bossPosition;
+        EnemyBossPatternSelectionRuntimeUtility.UpdatePlayerDistanceHold(ref runtimeState, in extractionConfig, bossPosition, playerPosition, safeDeltaTime);
+        EnemyBossPatternSelectionRuntimeUtility.UpdateDamageWindow(ref runtimeState, in extractionConfig, in health, safeDeltaTime);
+        return travelledDistance;
     }
 
     /// <summary>
     /// Resolves the first valid boss interaction and applies it when switching rules allow the change.
     /// </summary>
     /// <param name="interactions">Ordered boss interaction buffer.</param>
+    /// <param name="moduleExtractions">Compiled extraction settings for each internal boss slot.</param>
+    /// <param name="moduleCandidates">Compiled module candidates for each internal boss slot.</param>
+    /// <param name="slotRuntimes">Mutable runtime state for internal boss slots.</param>
     /// <param name="bossShooterConfigs">Boss-owned shooter config source buffer.</param>
     /// <param name="bossEngagementConfigs">Boss-owned engagement config source buffer.</param>
     /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
     /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
     /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
-    /// <param name="baseConfig">Base boss pattern config.</param>
+    /// <param name="extractionConfig">Boss pattern extraction settings.</param>
     /// <param name="health">Boss health state.</param>
     /// <param name="enemyRuntime">Enemy runtime state used for recent damage checks.</param>
     /// <param name="bossPosition">Current boss position.</param>
@@ -188,330 +249,150 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
     /// <param name="patternConfig">Runtime pattern config component.</param>
     /// <param name="patternRuntimeState">Runtime pattern state component.</param>
     /// <param name="runtimeState">Mutable boss runtime state.</param>
-    private static void ApplyResolvedInteraction(DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
+    /// <param name="patternChanged">True when a new top-level pattern candidate was extracted.</param>
+    /// <returns>True when the active runtime movement or weapon composition changed.</returns>
+    private static bool ApplyResolvedInteraction(DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
+                                                 DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractions,
+                                                 DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
+                                                 DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                  DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
                                                  DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                                  DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
                                                  DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
-                                                 in EnemyBossPatternBaseConfig baseConfig,
+                                                 in EnemyBossPatternExtractionConfig extractionConfig,
                                                  in EnemyHealth health,
                                                  in EnemyRuntimeState enemyRuntime,
                                                  float3 bossPosition,
                                                  float3 playerPosition,
+                                                 float travelledDistanceThisFrame,
+                                                 float deltaTime,
                                                  ref EnemyPatternConfig patternConfig,
                                                  ref EnemyPatternRuntimeState patternRuntimeState,
-                                                 ref EnemyBossPatternRuntimeState runtimeState)
+                                                 ref EnemyBossPatternRuntimeState runtimeState,
+                                                 out bool patternChanged)
     {
-        int selectedInteractionIndex = ResolveSelectedInteractionIndex(interactions,
-                                                                       in runtimeState,
-                                                                       in health,
-                                                                       in enemyRuntime,
-                                                                       bossPosition,
-                                                                       playerPosition);
+        patternChanged = false;
 
-        if (selectedInteractionIndex == runtimeState.ActiveInteractionIndex)
+        if (EnemyBossPatternSelectionRuntimeUtility.ShouldExtractInteraction(interactions,
+                                                                             in extractionConfig,
+                                                                             in runtimeState,
+                                                                             in health,
+                                                                             in enemyRuntime,
+                                                                             bossPosition,
+                                                                             playerPosition) &&
+            EnemyBossPatternSelectionRuntimeUtility.CanSwitchInteraction(interactions,
+                                                                         runtimeState.ActiveInteractionIndex,
+                                                                         runtimeState.ActiveInteractionElapsedSeconds) &&
+            EnemyBossPatternModuleSelectionRuntimeUtility.CanSwitchActivePatternSlots(slotRuntimes,
+                                                                                      moduleCandidates,
+                                                                                      in patternRuntimeState,
+                                                                                      shooterRuntime))
+        {
+            int selectedInteractionIndex = EnemyBossPatternSelectionRuntimeUtility.ResolveSelectedInteractionIndex(interactions,
+                                                                                                                   in runtimeState,
+                                                                                                                   in health,
+                                                                                                                   in enemyRuntime,
+                                                                                                                   bossPosition,
+                                                                                                                   playerPosition);
+
+            if (selectedInteractionIndex == runtimeState.ActiveInteractionIndex)
+            {
+                EnemyBossPatternSelectionRuntimeUtility.ResetExtractionMetrics(ref runtimeState, in health);
+            }
+            else
+            {
+                runtimeState.ActiveInteractionIndex = selectedInteractionIndex;
+                runtimeState.ActiveInteractionElapsedSeconds = 0f;
+                patternChanged = selectedInteractionIndex >= 0;
+                EnemyBossPatternSelectionRuntimeUtility.ResetExtractionMetrics(ref runtimeState, in health);
+                EnemyBossPatternModuleSelectionRuntimeUtility.ResetSlotRuntimesForPattern(slotRuntimes,
+                                                                                          selectedInteractionIndex,
+                                                                                          in health);
+            }
+        }
+
+        return EnemyBossPatternModuleSelectionRuntimeUtility.UpdateAndApplySlotSelections(runtimeState.ActiveInteractionIndex,
+                                                                                          moduleExtractions,
+                                                                                          moduleCandidates,
+                                                                                          bossShooterConfigs,
+                                                                                          bossEngagementConfigs,
+                                                                                          slotRuntimes,
+                                                                                          shooterConfigs,
+                                                                                          shooterRuntime,
+                                                                                          engagementConfigs,
+                                                                                          in health,
+                                                                                          in enemyRuntime,
+                                                                                          bossPosition,
+                                                                                          playerPosition,
+                                                                                          travelledDistanceThisFrame,
+                                                                                          deltaTime,
+                                                                                          ref patternConfig,
+                                                                                          ref patternRuntimeState);
+    }
+
+    /// <summary>
+    /// Opens the boss pattern-change feedback window immediately after a top-level extraction selects a new pattern.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to read baked config and write runtime feedback state.</param>
+    /// <param name="bossEntity">Boss entity whose active pattern changed.</param>
+    private static void TriggerPatternChangeFeedback(EntityManager entityManager, Entity bossEntity)
+    {
+        if (!entityManager.HasComponent<EnemyBossPatternChangeFeedbackConfig>(bossEntity) ||
+            !entityManager.HasComponent<EnemyBossPatternChangeFeedbackState>(bossEntity))
+        {
             return;
+        }
 
-        if (!CanSwitchInteraction(interactions, runtimeState.ActiveInteractionIndex, runtimeState.ActiveInteractionElapsedSeconds))
+        EnemyBossPatternChangeFeedbackConfig config = entityManager.GetComponentData<EnemyBossPatternChangeFeedbackConfig>(bossEntity);
+
+        if (config.Enabled == 0)
+        {
             return;
-
-        runtimeState.ActiveInteractionIndex = selectedInteractionIndex;
-        runtimeState.ActiveInteractionElapsedSeconds = 0f;
-        ApplyInteractionPattern(selectedInteractionIndex,
-                                interactions,
-                                bossShooterConfigs,
-                                bossEngagementConfigs,
-                                shooterConfigs,
-                                shooterRuntime,
-                                engagementConfigs,
-                                in baseConfig,
-                                ref patternConfig,
-                                ref patternRuntimeState);
-    }
-
-    /// <summary>
-    /// Resolves the first valid interaction in authored order.
-    /// </summary>
-    /// <param name="interactions">Ordered boss interaction buffer.</param>
-    /// <param name="runtimeState">Current boss runtime state.</param>
-    /// <param name="health">Boss health state.</param>
-    /// <param name="enemyRuntime">Enemy runtime state used for damage timing.</param>
-    /// <param name="bossPosition">Current boss position.</param>
-    /// <param name="playerPosition">Current player position.</param>
-    /// <returns>Selected interaction buffer index, or -1 when the base pattern should be used.</returns>
-    private static int ResolveSelectedInteractionIndex(DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
-                                                       in EnemyBossPatternRuntimeState runtimeState,
-                                                       in EnemyHealth health,
-                                                       in EnemyRuntimeState enemyRuntime,
-                                                       float3 bossPosition,
-                                                       float3 playerPosition)
-    {
-        for (int interactionIndex = 0; interactionIndex < interactions.Length; interactionIndex++)
-        {
-            EnemyBossPatternInteractionElement interaction = interactions[interactionIndex];
-
-            if (IsInteractionValid(in interaction, in runtimeState, in health, in enemyRuntime, bossPosition, playerPosition))
-                return interactionIndex;
         }
 
-        return -1;
-    }
+        float displayDurationSeconds = math.max(config.ColorBlendDurationSeconds, config.BillboardDurationSeconds);
 
-    /// <summary>
-    /// Evaluates one typed boss interaction trigger.
-    /// </summary>
-    /// <param name="interaction">Interaction being tested.</param>
-    /// <param name="runtimeState">Current boss runtime state.</param>
-    /// <param name="health">Boss health state.</param>
-    /// <param name="enemyRuntime">Enemy runtime state used for damage timing.</param>
-    /// <param name="bossPosition">Current boss position.</param>
-    /// <param name="playerPosition">Current player position.</param>
-    /// <returns>True when the interaction can be selected.</returns>
-    private static bool IsInteractionValid(in EnemyBossPatternInteractionElement interaction,
-                                           in EnemyBossPatternRuntimeState runtimeState,
-                                           in EnemyHealth health,
-                                           in EnemyRuntimeState enemyRuntime,
-                                           float3 bossPosition,
-                                           float3 playerPosition)
-    {
-        switch (interaction.InteractionType)
+        if (displayDurationSeconds <= 0f)
         {
-            case EnemyBossPatternInteractionType.ElapsedTime:
-                return IsInOptionalRange(runtimeState.ElapsedSeconds,
-                                         interaction.MinimumElapsedSeconds,
-                                         interaction.MaximumElapsedSeconds);
-
-            case EnemyBossPatternInteractionType.TravelledDistance:
-                return IsInOptionalRange(runtimeState.TravelledDistance,
-                                         interaction.MinimumTravelledDistance,
-                                         interaction.MaximumTravelledDistance);
-
-            case EnemyBossPatternInteractionType.PlayerDistance:
-                return IsInOptionalRange(ResolvePlanarDistance(bossPosition, playerPosition),
-                                         interaction.MinimumPlayerDistance,
-                                         interaction.MaximumPlayerDistance);
-
-            case EnemyBossPatternInteractionType.RecentlyDamaged:
-                return IsRecentlyDamaged(in enemyRuntime, interaction.RecentlyDamagedWindowSeconds);
-
-            default:
-                return IsInOptionalRange(ResolveMissingHealthPercent(in health),
-                                         interaction.MinimumMissingHealthPercent,
-                                         interaction.MaximumMissingHealthPercent);
-        }
-    }
-
-    /// <summary>
-    /// Applies the selected interaction pattern, or restores the base pattern when no interaction is active.
-    /// </summary>
-    /// <param name="selectedInteractionIndex">Selected interaction index, or -1 for base.</param>
-    /// <param name="interactions">Ordered boss interaction buffer.</param>
-    /// <param name="bossShooterConfigs">Boss-owned shooter config source buffer.</param>
-    /// <param name="bossEngagementConfigs">Boss-owned engagement config source buffer.</param>
-    /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
-    /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
-    /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
-    /// <param name="baseConfig">Base boss pattern config.</param>
-    /// <param name="patternConfig">Runtime pattern config component.</param>
-    /// <param name="patternRuntimeState">Runtime pattern state component.</param>
-    private static void ApplyInteractionPattern(int selectedInteractionIndex,
-                                                DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
-                                                DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
-                                                DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
-                                                DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
-                                                DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
-                                                DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
-                                                in EnemyBossPatternBaseConfig baseConfig,
-                                                ref EnemyPatternConfig patternConfig,
-                                                ref EnemyPatternRuntimeState patternRuntimeState)
-    {
-        int firstShooterConfigIndex = baseConfig.FirstShooterConfigIndex;
-        int shooterConfigCount = baseConfig.ShooterConfigCount;
-        int firstEngagementConfigIndex = baseConfig.FirstOffensiveEngagementConfigIndex;
-        int engagementConfigCount = baseConfig.OffensiveEngagementConfigCount;
-        patternConfig = baseConfig.PatternConfig;
-
-        if (TryResolveInteraction(interactions, selectedInteractionIndex, out EnemyBossPatternInteractionElement interaction))
-        {
-            firstShooterConfigIndex = interaction.FirstShooterConfigIndex;
-            shooterConfigCount = interaction.ShooterConfigCount;
-            firstEngagementConfigIndex = interaction.FirstOffensiveEngagementConfigIndex;
-            engagementConfigCount = interaction.OffensiveEngagementConfigCount;
-            patternConfig = interaction.PatternConfig;
+            return;
         }
 
-        patternRuntimeState = EnemyPatternDefaultsUtility.CreatePatternRuntimeState();
-        ApplyShooterConfigs(firstShooterConfigIndex, shooterConfigCount, bossShooterConfigs, shooterConfigs, shooterRuntime);
-        ApplyOffensiveEngagementConfigs(firstEngagementConfigIndex, engagementConfigCount, bossEngagementConfigs, engagementConfigs);
+        entityManager.SetComponentData(bossEntity, new EnemyBossPatternChangeFeedbackState
+        {
+            ElapsedSeconds = 0f,
+            RemainingSeconds = displayDurationSeconds,
+            DisplayedBlend = 0f,
+            DisplayedColor = config.ColorBlendColor,
+            FadeOutSeconds = math.max(0f, config.ColorBlendFadeOutSeconds)
+        });
     }
 
     /// <summary>
-    /// Rebuilds runtime shooter buffers from a boss-owned source slice.
+    /// Keeps the custom movement tag aligned with boss module selections that change movement at runtime.
     /// </summary>
-    /// <param name="firstShooterConfigIndex">First source shooter config index.</param>
-    /// <param name="shooterConfigCount">Number of shooter configs to copy.</param>
-    /// <param name="bossShooterConfigs">Boss-owned shooter config source buffer.</param>
-    /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
-    /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
-    private static void ApplyShooterConfigs(int firstShooterConfigIndex,
-                                            int shooterConfigCount,
-                                            DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
-                                            DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
-                                            DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime)
+    /// <param name="entityManager">Entity manager used to add or remove the tag.</param>
+    /// <param name="commandBuffer">Command buffer receiving structural tag changes after the query iteration.</param>
+    /// <param name="bossEntity">Boss entity whose active movement config changed.</param>
+    /// <param name="patternConfig">Current merged movement pattern config.</param>
+    private static void SyncCustomMovementTag(EntityManager entityManager,
+                                              EntityCommandBuffer commandBuffer,
+                                              Entity bossEntity,
+                                              in EnemyPatternConfig patternConfig)
     {
-        shooterConfigs.Clear();
-        shooterRuntime.Clear();
+        bool shouldUseCustomMovement = EnemyBossPatternConfigUtility.RequiresCustomMovement(in patternConfig);
+        bool hasCustomMovementTag = entityManager.HasComponent<EnemyCustomPatternMovementTag>(bossEntity);
 
-        for (int shooterIndex = 0; shooterIndex < shooterConfigCount; shooterIndex++)
+        if (shouldUseCustomMovement && !hasCustomMovementTag)
         {
-            int sourceIndex = firstShooterConfigIndex + shooterIndex;
-
-            if (sourceIndex < 0 || sourceIndex >= bossShooterConfigs.Length)
-                continue;
-
-            shooterConfigs.Add(bossShooterConfigs[sourceIndex].ShooterConfig);
-            shooterRuntime.Add(CreateDefaultShooterRuntime());
+            commandBuffer.AddComponent<EnemyCustomPatternMovementTag>(bossEntity);
+            return;
         }
+
+        if (!shouldUseCustomMovement && hasCustomMovementTag)
+            commandBuffer.RemoveComponent<EnemyCustomPatternMovementTag>(bossEntity);
     }
 
-    /// <summary>
-    /// Rebuilds runtime offensive engagement configs from a boss-owned source slice.
-    /// </summary>
-    /// <param name="firstConfigIndex">First source engagement config index.</param>
-    /// <param name="configCount">Number of engagement configs to copy.</param>
-    /// <param name="bossEngagementConfigs">Boss-owned engagement config source buffer.</param>
-    /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
-    private static void ApplyOffensiveEngagementConfigs(int firstConfigIndex,
-                                                        int configCount,
-                                                        DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
-                                                        DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs)
-    {
-        engagementConfigs.Clear();
-
-        for (int configIndex = 0; configIndex < configCount; configIndex++)
-        {
-            int sourceIndex = firstConfigIndex + configIndex;
-
-            if (sourceIndex < 0 || sourceIndex >= bossEngagementConfigs.Length)
-                continue;
-
-            engagementConfigs.Add(bossEngagementConfigs[sourceIndex].Config);
-        }
-    }
-
-    /// <summary>
-    /// Creates a clean shooter runtime state for a freshly selected boss interaction.
-    /// </summary>
-    /// <returns>Default shooter runtime element.</returns>
-    private static EnemyShooterRuntimeElement CreateDefaultShooterRuntime()
-    {
-        return new EnemyShooterRuntimeElement
-        {
-            NextBurstTimer = 0f,
-            NextShotInBurstTimer = 0f,
-            PostFireStopTimer = 0f,
-            RemainingBurstShots = 0,
-            ShotsFiredInCurrentBurst = 0,
-            BurstWindupDurationSeconds = 0f,
-            IsPlayerInRange = 0,
-            LockedAimDirection = float3.zero,
-            HasLockedAimDirection = 0
-        };
-    }
-
-    /// <summary>
-    /// Checks whether the active interaction has satisfied its minimum active time.
-    /// </summary>
-    /// <param name="interactions">Ordered boss interaction buffer.</param>
-    /// <param name="activeInteractionIndex">Current active interaction index.</param>
-    /// <param name="activeElapsedSeconds">Seconds spent in the active interaction.</param>
-    /// <returns>True when the boss may switch to another interaction or the base pattern.</returns>
-    private static bool CanSwitchInteraction(DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
-                                             int activeInteractionIndex,
-                                             float activeElapsedSeconds)
-    {
-        if (!TryResolveInteraction(interactions, activeInteractionIndex, out EnemyBossPatternInteractionElement activeInteraction))
-            return true;
-
-        return activeElapsedSeconds >= math.max(0f, activeInteraction.MinimumActiveSeconds);
-    }
-
-    /// <summary>
-    /// Reads one interaction only when the index is valid.
-    /// </summary>
-    /// <param name="interactions">Ordered boss interaction buffer.</param>
-    /// <param name="interactionIndex">Interaction index to read.</param>
-    /// <param name="interaction">Output interaction data.</param>
-    /// <returns>True when the interaction exists.</returns>
-    private static bool TryResolveInteraction(DynamicBuffer<EnemyBossPatternInteractionElement> interactions,
-                                              int interactionIndex,
-                                              out EnemyBossPatternInteractionElement interaction)
-    {
-        interaction = default;
-
-        if (interactionIndex < 0 || interactionIndex >= interactions.Length)
-            return false;
-
-        interaction = interactions[interactionIndex];
-        return true;
-    }
-
-    /// <summary>
-    /// Evaluates a minimum threshold and optional positive maximum threshold.
-    /// </summary>
-    /// <param name="value">Current metric value.</param>
-    /// <param name="minimum">Minimum allowed value.</param>
-    /// <param name="maximum">Optional maximum value. Values at or below zero disable the upper bound.</param>
-    /// <returns>True when the value is inside the authored range.</returns>
-    private static bool IsInOptionalRange(float value, float minimum, float maximum)
-    {
-        if (value < math.max(0f, minimum))
-            return false;
-
-        if (maximum > 0f && value > maximum)
-            return false;
-
-        return true;
-    }
-
-    /// <summary>
-    /// Resolves missing health as a normalized value from zero to one.
-    /// </summary>
-    /// <param name="health">Boss health state.</param>
-    /// <returns>Normalized missing health.</returns>
-    private static float ResolveMissingHealthPercent(in EnemyHealth health)
-    {
-        if (health.Max <= 0f)
-            return 0f;
-
-        return 1f - math.saturate(health.Current / health.Max);
-    }
-
-    /// <summary>
-    /// Resolves planar distance between two world positions.
-    /// </summary>
-    /// <param name="from">First world position.</param>
-    /// <param name="to">Second world position.</param>
-    /// <returns>Planar distance ignoring vertical offset.</returns>
-    private static float ResolvePlanarDistance(float3 from, float3 to)
-    {
-        float3 delta = to - from;
-        delta.y = 0f;
-        return math.length(delta);
-    }
-
-    /// <summary>
-    /// Resolves whether the boss was damaged inside the configured window.
-    /// </summary>
-    /// <param name="enemyRuntime">Enemy runtime state.</param>
-    /// <param name="windowSeconds">Recent damage window in seconds.</param>
-    /// <returns>True when the boss has taken damage recently enough.</returns>
-    private static bool IsRecentlyDamaged(in EnemyRuntimeState enemyRuntime, float windowSeconds)
-    {
-        float damageAge = enemyRuntime.LifetimeSeconds - enemyRuntime.LastDamageLifetimeSeconds;
-        return enemyRuntime.HasTakenDamage != 0 && damageAge <= math.max(0f, windowSeconds);
-    }
     #endregion
 
     #endregion

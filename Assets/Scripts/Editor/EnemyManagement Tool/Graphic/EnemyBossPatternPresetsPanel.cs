@@ -494,6 +494,7 @@ public sealed class EnemyBossPatternPresetsPanel
         AddDetailsSectionButton(buttonsRoot, SectionType.Metadata, "Metadata");
         AddDetailsSectionButton(buttonsRoot, SectionType.SourcePatterns, "Module & Patterns Preset");
         AddDetailsSectionButton(buttonsRoot, SectionType.PatternAssemble, "Pattern Assemble");
+        AddDetailsSectionButton(buttonsRoot, SectionType.DropExtraction, "Boss Drops");
         AddDetailsSectionButton(buttonsRoot, SectionType.MinionSpawn, "Minion Spawn");
         return buttonsRoot;
     }
@@ -557,6 +558,7 @@ public sealed class EnemyBossPatternPresetsPanel
             return;
 
         presetSerializedObject.Update();
+        ManagementToolFoldoutStateUtility.CaptureFoldoutStates(detailsSectionContentRoot);
         detailsSectionContentRoot.Clear();
 
         switch (activeSection)
@@ -571,6 +573,10 @@ public sealed class EnemyBossPatternPresetsPanel
 
             case SectionType.PatternAssemble:
                 EnemyBossPatternPresetsPanelSectionsUtility.BuildPatternAssembleSection(this);
+                break;
+
+            case SectionType.DropExtraction:
+                EnemyBossPatternPresetsPanelSectionsUtility.BuildDropExtractionSection(this);
                 break;
 
             case SectionType.MinionSpawn:
@@ -639,7 +645,8 @@ public sealed class EnemyBossPatternPresetsPanel
         Metadata = 0,
         SourcePatterns = 1,
         PatternAssemble = 2,
-        MinionSpawn = 3
+        DropExtraction = 3,
+        MinionSpawn = 4
     }
     #endregion
 }

@@ -120,6 +120,23 @@ public static class EnemyAuthoringPresetResolverUtility
 
         return resolvedVisualPreset.OffensiveEngagementFeedback;
     }
+
+    /// <summary>
+    /// Resolves boss pattern-change feedback settings from the active visual preset.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override the visual preset.</param>
+    /// <param name="fallbackVisualPreset">Fallback visual preset assigned directly on the authoring component.</param>
+    /// <returns>Boss pattern-change feedback settings, or null when no visual preset is available.</returns>
+    public static EnemyOffensiveEngagementFeedbackSettings ResolveBossPatternChangeFeedbackSettings(EnemyMasterPreset masterPreset,
+                                                                                                    EnemyVisualPreset fallbackVisualPreset)
+    {
+        EnemyVisualPreset resolvedVisualPreset = ResolveVisualPreset(masterPreset, fallbackVisualPreset);
+
+        if (resolvedVisualPreset == null)
+            return null;
+
+        return resolvedVisualPreset.BossPatternChangeFeedback;
+    }
     #endregion
 
     #endregion

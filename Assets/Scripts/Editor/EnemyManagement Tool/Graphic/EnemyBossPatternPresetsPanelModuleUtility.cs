@@ -84,7 +84,14 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
             if (string.IsNullOrWhiteSpace(option.ModuleId))
                 return;
 
-            SetBindingModule(panel, moduleIdProperty, isEnabledProperty, option.ModuleId);
+            SetBindingModule(panel,
+                             moduleIdProperty,
+                             isEnabledProperty,
+                             useOverridePayloadProperty,
+                             overridePayloadProperty,
+                             sourcePreset,
+                             section,
+                             option.ModuleId);
         });
         parent.Add(selector);
 
@@ -94,7 +101,14 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
         if (!selectedIsValid)
             return;
 
-        AddOverridePayloadFields(panel, parent, useOverridePayloadProperty, overridePayloadProperty, selectedOption.Kind, section);
+        AddOverridePayloadFields(panel,
+                                 parent,
+                                 moduleIdProperty,
+                                 useOverridePayloadProperty,
+                                 overridePayloadProperty,
+                                 sourcePreset,
+                                 selectedOption.Kind,
+                                 section);
     }
 
     /// <summary>
@@ -102,32 +116,52 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     /// </summary>
     /// <param name="panel">Owning panel used for dirty tracking.</param>
     /// <param name="parent">Parent receiving controls.</param>
+    /// <param name="moduleIdProperty">Serialized selected module ID.</param>
     /// <param name="useOverridePayloadProperty">Serialized override toggle.</param>
     /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed override payloads.</param>
     /// <param name="moduleKind">Selected module kind.</param>
     /// <param name="section">Catalog section used to resolve payload visibility.</param>
     private static void AddOverridePayloadFields(EnemyBossPatternPresetsPanel panel,
                                                  VisualElement parent,
+                                                 SerializedProperty moduleIdProperty,
                                                  SerializedProperty useOverridePayloadProperty,
                                                  SerializedProperty overridePayloadProperty,
+                                                 EnemyModulesAndPatternsPreset sourcePreset,
                                                  EnemyPatternModuleKind moduleKind,
                                                  EnemyPatternModuleCatalogSection section)
     {
+        if (parent == null)
+            return;
+
+        if (useOverridePayloadProperty == null || overridePayloadProperty == null)
+        {
+            parent.Add(new HelpBox("Override payload serialized fields are missing for this module binding.", HelpBoxMessageType.Warning));
+            return;
+        }
+
+        parent.Add(CreateOverridePayloadToggle(panel,
+                                               moduleIdProperty,
+                                               useOverridePayloadProperty,
+                                               overridePayloadProperty,
+                                               sourcePreset,
+                                               section));
+
         if (moduleKind == EnemyPatternModuleKind.Grunt)
+        {
+            parent.Add(new HelpBox("The selected Grunt module has no kind-specific payload fields. Slot range, activation and engagement settings remain available in the surrounding module section.", HelpBoxMessageType.Info));
+            return;
+        }
+
+        if (!useOverridePayloadProperty.boolValue)
             return;
 
-        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel,
-                                                                                         useOverridePayloadProperty,
-                                                                                         "Use Override Payload",
-                                                                                         "Override this slot payload instead of using the shared source module payload."));
-
-        if (useOverridePayloadProperty == null || !useOverridePayloadProperty.boolValue)
-            return;
-
-        Label payloadHeader = new Label("Override Payload");
-        payloadHeader.style.unityFontStyleAndWeight = FontStyle.Bold;
-        payloadHeader.style.marginTop = 4f;
-        parent.Add(payloadHeader);
+        VisualElement headerRow = CreatePayloadHeaderRow(panel,
+                                                         moduleIdProperty,
+                                                         overridePayloadProperty,
+                                                         sourcePreset,
+                                                         section);
+        parent.Add(headerRow);
 
         VisualElement payloadContainer = new VisualElement();
         payloadContainer.style.marginLeft = 12f;
@@ -136,6 +170,78 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
                                                                moduleKind,
                                                                payloadContainer,
                                                                ResolvePayloadEditorMode(section));
+    }
+
+    /// <summary>
+    /// Creates the override toggle that seeds payload data from the selected source module when it becomes active.
+    /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="moduleIdProperty">Serialized selected module ID.</param>
+    /// <param name="useOverridePayloadProperty">Serialized override toggle.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed payload data.</param>
+    /// <param name="section">Catalog section that owns the source module.</param>
+    /// <returns>Configured toggle element.</returns>
+    private static Toggle CreateOverridePayloadToggle(EnemyBossPatternPresetsPanel panel,
+                                                      SerializedProperty moduleIdProperty,
+                                                      SerializedProperty useOverridePayloadProperty,
+                                                      SerializedProperty overridePayloadProperty,
+                                                      EnemyModulesAndPatternsPreset sourcePreset,
+                                                      EnemyPatternModuleCatalogSection section)
+    {
+        Toggle toggle = new Toggle("Use Override Payload");
+        toggle.tooltip = "Override this slot payload instead of using the shared source module payload. When enabled, the override starts from the selected source module data.";
+        toggle.SetValueWithoutNotify(useOverridePayloadProperty != null && useOverridePayloadProperty.boolValue);
+        toggle.RegisterValueChangedCallback(evt =>
+        {
+            SetOverridePayloadEnabled(panel,
+                                      moduleIdProperty,
+                                      useOverridePayloadProperty,
+                                      overridePayloadProperty,
+                                      sourcePreset,
+                                      section,
+                                      evt.newValue);
+        });
+        return toggle;
+    }
+
+    /// <summary>
+    /// Creates the payload header and a source-refresh action for already active overrides.
+    /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="moduleIdProperty">Serialized selected module ID.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed payload data.</param>
+    /// <param name="section">Catalog section that owns the source module.</param>
+    /// <returns>Header row shown above the override payload editor.</returns>
+    private static VisualElement CreatePayloadHeaderRow(EnemyBossPatternPresetsPanel panel,
+                                                        SerializedProperty moduleIdProperty,
+                                                        SerializedProperty overridePayloadProperty,
+                                                        EnemyModulesAndPatternsPreset sourcePreset,
+                                                        EnemyPatternModuleCatalogSection section)
+    {
+        VisualElement row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.alignItems = Align.Center;
+        row.style.marginTop = 4f;
+
+        Label payloadHeader = new Label("Override Payload");
+        payloadHeader.style.unityFontStyleAndWeight = FontStyle.Bold;
+        row.Add(payloadHeader);
+
+        Button refreshButton = new Button(() =>
+        {
+            RefreshOverridePayloadFromSource(panel,
+                                             moduleIdProperty,
+                                             overridePayloadProperty,
+                                             sourcePreset,
+                                             section);
+        });
+        refreshButton.text = "Refresh From Source";
+        refreshButton.tooltip = "Replace the current override payload with the selected source module payload.";
+        refreshButton.style.marginLeft = 8f;
+        row.Add(refreshButton);
+        return row;
     }
     #endregion
 
@@ -341,15 +447,34 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     }
 
     /// <summary>
+    /// Writes a float serialized property when available.
+    /// </summary>
+    /// <param name="property">Serialized property to mutate.</param>
+    /// <param name="value">New value.</param>
+    public static void SetFloat(SerializedProperty property, float value)
+    {
+        if (property != null)
+            property.floatValue = value;
+    }
+
+    /// <summary>
     /// Writes the selected module ID into a binding and refreshes dependent boss UI.
     /// </summary>
     /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
     /// <param name="moduleIdProperty">Serialized module ID property.</param>
     /// <param name="isEnabledProperty">Serialized binding enabled property.</param>
+    /// <param name="useOverridePayloadProperty">Serialized override toggle property.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed existing active overrides.</param>
+    /// <param name="section">Catalog section that owns the selected module.</param>
     /// <param name="moduleId">Selected module ID.</param>
     private static void SetBindingModule(EnemyBossPatternPresetsPanel panel,
                                          SerializedProperty moduleIdProperty,
                                          SerializedProperty isEnabledProperty,
+                                         SerializedProperty useOverridePayloadProperty,
+                                         SerializedProperty overridePayloadProperty,
+                                         EnemyModulesAndPatternsPreset sourcePreset,
+                                         EnemyPatternModuleCatalogSection section,
                                          string moduleId)
     {
         if (panel == null || moduleIdProperty == null)
@@ -362,8 +487,88 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
         if (isEnabledProperty != null)
             isEnabledProperty.boolValue = true;
 
+        if (useOverridePayloadProperty != null && useOverridePayloadProperty.boolValue)
+            EnemyBossPatternOverridePayloadSeedUtility.SeedOverridePayloadFromSourceModule(sourcePreset, section, moduleId, overridePayloadProperty);
+
         panel.PresetSerializedObject.ApplyModifiedProperties();
         EnemyBossPatternPresetsPanelSharedUtility.MarkDirtyAndRebuild(panel);
+    }
+
+    /// <summary>
+    /// Updates the override toggle and seeds the payload from the current source module when enabling it.
+    /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="moduleIdProperty">Serialized selected module ID.</param>
+    /// <param name="useOverridePayloadProperty">Serialized override toggle property.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed payload data.</param>
+    /// <param name="section">Catalog section that owns the selected module.</param>
+    /// <param name="enabled">New override toggle state.</param>
+    private static void SetOverridePayloadEnabled(EnemyBossPatternPresetsPanel panel,
+                                                  SerializedProperty moduleIdProperty,
+                                                  SerializedProperty useOverridePayloadProperty,
+                                                  SerializedProperty overridePayloadProperty,
+                                                  EnemyModulesAndPatternsPreset sourcePreset,
+                                                  EnemyPatternModuleCatalogSection section,
+                                                  bool enabled)
+    {
+        if (panel == null || useOverridePayloadProperty == null)
+            return;
+
+        EnemyBossPatternPresetsPanelSharedUtility.RecordSelectedPreset(panel, "Edit Boss Pattern Override Payload");
+        panel.PresetSerializedObject.Update();
+        useOverridePayloadProperty.boolValue = enabled;
+
+        if (enabled)
+            EnemyBossPatternOverridePayloadSeedUtility.SeedOverridePayloadFromSourceModule(sourcePreset, section, ResolveModuleId(moduleIdProperty), overridePayloadProperty);
+
+        panel.PresetSerializedObject.ApplyModifiedProperties();
+
+        if (panel.SelectedPreset != null)
+            EditorUtility.SetDirty(panel.SelectedPreset);
+
+        EnemyBossPatternPresetsPanelSharedUtility.MarkDirtyAndRebuild(panel);
+    }
+
+    /// <summary>
+    /// Replaces an active override payload with the selected source module payload on user request.
+    /// </summary>
+    /// <param name="panel">Owning panel used for serialized context and rebuild callbacks.</param>
+    /// <param name="moduleIdProperty">Serialized selected module ID.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="sourcePreset">Source module catalog used to seed payload data.</param>
+    /// <param name="section">Catalog section that owns the selected module.</param>
+    private static void RefreshOverridePayloadFromSource(EnemyBossPatternPresetsPanel panel,
+                                                         SerializedProperty moduleIdProperty,
+                                                         SerializedProperty overridePayloadProperty,
+                                                         EnemyModulesAndPatternsPreset sourcePreset,
+                                                         EnemyPatternModuleCatalogSection section)
+    {
+        if (panel == null || overridePayloadProperty == null)
+            return;
+
+        EnemyBossPatternPresetsPanelSharedUtility.RecordSelectedPreset(panel, "Refresh Boss Pattern Override Payload");
+        panel.PresetSerializedObject.Update();
+        EnemyBossPatternOverridePayloadSeedUtility.SeedOverridePayloadFromSourceModule(sourcePreset, section, ResolveModuleId(moduleIdProperty), overridePayloadProperty);
+        panel.PresetSerializedObject.ApplyModifiedProperties();
+
+        if (panel.SelectedPreset != null)
+            EditorUtility.SetDirty(panel.SelectedPreset);
+
+        EnemyBossPatternPresetsPanelSharedUtility.MarkDirtyAndRebuild(panel);
+    }
+
+    /// <summary>
+    /// Resolves a safe module ID string from a serialized property.
+    /// </summary>
+    /// <param name="moduleIdProperty">Serialized module ID property.</param>
+    /// <returns>Current module ID, or an empty string when unavailable.</returns>
+    private static string ResolveModuleId(SerializedProperty moduleIdProperty)
+    {
+        if (moduleIdProperty == null)
+            return string.Empty;
+
+        return moduleIdProperty.stringValue;
     }
     #endregion
 

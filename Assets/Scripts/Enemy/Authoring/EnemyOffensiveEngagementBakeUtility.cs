@@ -49,6 +49,73 @@ internal static class EnemyOffensiveEngagementBakeUtility
     }
 
     /// <summary>
+    /// Converts boss pattern-change feedback settings into an ECS config that uses lead-time fields as post-extraction display durations.
+    /// </summary>
+    /// <param name="settings">Resolved visual preset settings block.</param>
+    /// <returns>Baked boss pattern-change feedback config.</returns>
+    public static EnemyBossPatternChangeFeedbackConfig CreateBossPatternChangeFeedbackConfig(EnemyOffensiveEngagementFeedbackSettings settings)
+    {
+        if (settings == null)
+        {
+            settings = DefaultSettings;
+        }
+
+        Vector3 billboardOffset = settings.BillboardLocalOffset;
+        bool hasVisibleChannel = settings.EnableColorBlend || settings.EnableBillboard;
+
+        return new EnemyBossPatternChangeFeedbackConfig
+        {
+            Enabled = hasVisibleChannel ? (byte)1 : (byte)0,
+            EnableColorBlend = settings.EnableColorBlend ? (byte)1 : (byte)0,
+            ColorBlendColor = DamageFlashRuntimeUtility.ToLinearFloat4(settings.ColorBlendColor),
+            ColorBlendDurationSeconds = math.max(0f, settings.ColorBlendLeadTimeSeconds),
+            ColorBlendFadeOutSeconds = math.max(0f, settings.ColorBlendFadeOutSeconds),
+            ColorBlendMaximumBlend = math.saturate(settings.ColorBlendMaximumBlend),
+            EnableBillboard = settings.EnableBillboard ? (byte)1 : (byte)0,
+            BillboardColor = DamageFlashRuntimeUtility.ToLinearFloat4(settings.BillboardColor),
+            BillboardOffset = new float3(billboardOffset.x, billboardOffset.y, billboardOffset.z),
+            BillboardDurationSeconds = math.max(0f, settings.BillboardLeadTimeSeconds),
+            BillboardBaseScale = math.max(0f, settings.BillboardBaseScale),
+            BillboardPulseScaleMultiplier = math.max(0f, settings.BillboardPulseScaleMultiplier),
+            BillboardPulseExpandDurationSeconds = math.max(0f, settings.BillboardPulseExpandDurationSeconds),
+            BillboardPulseContractDurationSeconds = math.max(0f, settings.BillboardPulseContractDurationSeconds)
+        };
+    }
+
+    /// <summary>
+    /// Builds one Core Movement offensive engagement config from a boss module candidate.
+    /// </summary>
+    /// <param name="candidate">Core Movement candidate being compiled.</param>
+    /// <param name="sharedPreset">Shared source preset used to resolve the selected module kind.</param>
+    /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
+    /// <param name="config">Output baked offensive engagement config.</param>
+    /// <returns>True when the candidate exposes a visible activation feedback config.</returns>
+    internal static bool TryBuildCoreMovementConfig(EnemyBossPatternCoreMovementModuleCandidateDefinition candidate,
+                                                    EnemyModulesAndPatternsPreset sharedPreset,
+                                                    EnemyOffensiveEngagementFeedbackSettings globalSettings,
+                                                    out EnemyOffensiveEngagementConfigElement config)
+    {
+        config = default;
+
+        if (candidate == null ||
+            candidate.ModuleMode == EnemyBossPatternModuleMode.NullModule ||
+            !candidate.DisplayBehaviourEngagementTrigger ||
+            candidate.Binding == null)
+        {
+            return false;
+        }
+
+        return TryBuildConfig(candidate.Binding,
+                              sharedPreset,
+                              globalSettings,
+                              candidate.UseEngagementFeedbackOverride,
+                              candidate.EngagementFeedbackOverride,
+                              EnemyPatternModuleCatalogSection.CoreMovement,
+                              EnemyOffensiveEngagementTriggerSource.CoreMovement,
+                              out config);
+    }
+
+    /// <summary>
     /// Builds one short-range offensive engagement config from an explicit pattern assemble slot.
     /// </summary>
     /// <param name="interaction">Short-range interaction slot being compiled.</param>

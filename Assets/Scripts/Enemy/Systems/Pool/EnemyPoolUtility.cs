@@ -2,7 +2,6 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
 
 #region Utilities
 /// <summary>
@@ -112,6 +111,15 @@ public static class EnemyPoolUtility
             if (!entityManager.HasBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity))
                 entityManager.AddBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity);
 
+            if (!entityManager.HasComponent<EnemyElementalRuntimeState>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, new EnemyElementalRuntimeState
+                {
+                    SlowPercent = 0f
+                });
+
+            if (!entityManager.HasBuffer<EnemyElementStackElement>(enemyEntity))
+                entityManager.AddBuffer<EnemyElementStackElement>(enemyEntity);
+
             if (!entityManager.HasComponent<EnemyHealth>(enemyEntity))
                 entityManager.AddComponentData(enemyEntity, new EnemyHealth
                 {
@@ -145,47 +153,7 @@ public static class EnemyPoolUtility
                     ViewEntity = Entity.Null
                 });
 
-            if (!entityManager.HasComponent<EnemyVisualConfig>(enemyEntity))
-                entityManager.AddComponentData(enemyEntity, new EnemyVisualConfig
-                {
-                    Mode = EnemyVisualMode.GpuBaked,
-                    AnimationSpeed = 1f,
-                    GpuLoopDuration = 1f,
-                    MaxVisibleDistance = 55f,
-                    VisibleDistanceHysteresis = 6f,
-                    UseDistanceCulling = 1
-                });
-
-            if (!entityManager.HasComponent<EnemyVisualRuntimeState>(enemyEntity))
-                entityManager.AddComponentData(enemyEntity, new EnemyVisualRuntimeState
-                {
-                    AnimationTime = 0f,
-                    LastSquaredDistanceToPlayer = 0f,
-                    IsVisible = 1,
-                    CompanionInitialized = 0,
-                    AppliedVisibilityPriorityTier = int.MinValue
-                });
-
-            if (!entityManager.HasComponent<EnemyHitVfxConfig>(enemyEntity))
-                entityManager.AddComponentData(enemyEntity, new EnemyHitVfxConfig
-                {
-                    PrefabEntity = Entity.Null,
-                    LifetimeSeconds = 0.35f,
-                    ScaleMultiplier = 1f
-                });
-
-            if (!entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
-                entityManager.AddComponentData(enemyEntity, new EnemyVisualFlashPresentationState
-                {
-                    AppliedBlend = 0f,
-                    AppliedColor = new float4(1f, 1f, 1f, 1f),
-                    OffensiveEngagementColor = new float4(1f, 1f, 1f, 1f),
-                    OffensiveEngagementBlend = 0f,
-                    OffensiveEngagementFadeOutSeconds = 0f
-                });
-
-            if (!entityManager.HasBuffer<DamageFlashRenderTargetElement>(enemyEntity))
-                entityManager.AddBuffer<DamageFlashRenderTargetElement>(enemyEntity);
+            EnemyPoolVisualUtility.EnsureVisualComponents(entityManager, enemyEntity);
 
             if (!entityManager.HasComponent<EnemyActive>(enemyEntity))
                 entityManager.AddComponent<EnemyActive>(enemyEntity);
@@ -200,7 +168,7 @@ public static class EnemyPoolUtility
         }
 
         EnsureCustomMovementTag(entityManager, enemyEntity);
-        EnsureVisualModeTags(entityManager, enemyEntity);
+        EnemyPoolVisualUtility.EnsureVisualModeTags(entityManager, enemyEntity);
     }
 
     /// <summary>
@@ -224,7 +192,7 @@ public static class EnemyPoolUtility
         ResetEnemySimulationState(entityManager, enemyEntity);
         SetEnemyTransformPosition(entityManager, enemyEntity, worldPosition);
         SetEnemyOwnership(entityManager, enemyEntity, spawnerEntity, poolEntity, waveIndex);
-        ResetVisualRuntimeState(entityManager, enemyEntity, 1);
+        EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 1);
         ApplySpawnInactivityState(entityManager, enemyEntity);
         ClearSpawnWarningState(entityManager, enemyEntity);
 
@@ -251,7 +219,7 @@ public static class EnemyPoolUtility
         ResetEnemySimulationState(entityManager, enemyEntity);
         SetEnemyOwnership(entityManager, enemyEntity, spawnerEntity, poolEntity, -1);
         ParkEnemy(entityManager, enemyEntity);
-        ResetVisualRuntimeState(entityManager, enemyEntity, 0);
+        EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 0);
         ClearSpawnWarningState(entityManager, enemyEntity);
         SetSpawnInactivityLock(entityManager, enemyEntity, false);
         entityManager.SetComponentEnabled<EnemyActive>(enemyEntity, false);
@@ -280,7 +248,7 @@ public static class EnemyPoolUtility
         ResetEnemySimulationState(entityManager, enemyEntity);
         SetEnemyOwnership(entityManager, enemyEntity, spawnerEntity, poolEntity, waveIndex);
         ParkEnemy(entityManager, enemyEntity);
-        ResetVisualRuntimeState(entityManager, enemyEntity, 0);
+        EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 0);
         SetSpawnInactivityLock(entityManager, enemyEntity, false);
         ArmSpawnWarningState(entityManager, enemyEntity, warningState);
 
@@ -304,7 +272,7 @@ public static class EnemyPoolUtility
         EnsureEnemyComponents(entityManager, enemyEntity);
         ResetEnemySimulationState(entityManager, enemyEntity);
         SetEnemyTransformPosition(entityManager, enemyEntity, worldPosition);
-        ResetVisualRuntimeState(entityManager, enemyEntity, 1);
+        EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 1);
         ApplySpawnInactivityState(entityManager, enemyEntity);
 
         if (entityManager.HasComponent<EnemyDespawnRequest>(enemyEntity))
@@ -336,26 +304,6 @@ public static class EnemyPoolUtility
         }
     }
 
-    /// <summary>
-    /// Resets presentation runtime state for one enemy instance.
-    /// Called when entering or leaving the active simulation set.
-    /// </summary>
-    /// <param name="entityManager">Entity manager used to mutate visual runtime state.</param>
-    /// <param name="enemyEntity">Enemy instance to reset.</param>
-    /// <param name="isVisible">Target visibility flag after reset.</param>
-    public static void ResetVisualRuntimeState(EntityManager entityManager, Entity enemyEntity, byte isVisible)
-    {
-        if (!entityManager.HasComponent<EnemyVisualRuntimeState>(enemyEntity))
-            return;
-
-        EnemyVisualRuntimeState visualRuntimeState = entityManager.GetComponentData<EnemyVisualRuntimeState>(enemyEntity);
-        visualRuntimeState.AnimationTime = 0f;
-        visualRuntimeState.LastSquaredDistanceToPlayer = 0f;
-        visualRuntimeState.IsVisible = isVisible;
-        visualRuntimeState.CompanionInitialized = 0;
-        visualRuntimeState.AppliedVisibilityPriorityTier = int.MinValue;
-        entityManager.SetComponentData(enemyEntity, visualRuntimeState);
-    }
     #endregion
 
     #region Private Methods
@@ -400,44 +348,6 @@ public static class EnemyPoolUtility
     }
 
     /// <summary>
-    /// Ensures the visual-mode tag set matches the resolved visual configuration.
-    /// </summary>
-    /// <param name="entityManager">Entity manager used to add or remove visual tags.</param>
-    /// <param name="enemyEntity">Enemy instance to inspect.</param>
-    private static void EnsureVisualModeTags(EntityManager entityManager, Entity enemyEntity)
-    {
-        bool hasCompanionVisualTag = entityManager.HasComponent<EnemyVisualCompanionAnimator>(enemyEntity);
-        bool hasGpuVisualTag = entityManager.HasComponent<EnemyVisualGpuBaked>(enemyEntity);
-        bool hasAnimatorComponent = entityManager.HasComponent<Animator>(enemyEntity);
-        EnemyVisualMode visualMode = EnemyVisualMode.GpuBaked;
-
-        if (entityManager.HasComponent<EnemyVisualConfig>(enemyEntity))
-            visualMode = entityManager.GetComponentData<EnemyVisualConfig>(enemyEntity).Mode;
-
-        switch (visualMode)
-        {
-            case EnemyVisualMode.CompanionAnimator:
-                if (!hasAnimatorComponent)
-                    goto default;
-
-                if (hasGpuVisualTag)
-                    entityManager.RemoveComponent<EnemyVisualGpuBaked>(enemyEntity);
-
-                if (!hasCompanionVisualTag)
-                    entityManager.AddComponent<EnemyVisualCompanionAnimator>(enemyEntity);
-                break;
-
-            default:
-                if (hasCompanionVisualTag)
-                    entityManager.RemoveComponent<EnemyVisualCompanionAnimator>(enemyEntity);
-
-                if (!hasGpuVisualTag)
-                    entityManager.AddComponent<EnemyVisualGpuBaked>(enemyEntity);
-                break;
-        }
-    }
-
-    /// <summary>
     /// Resets gameplay runtime state that must start clean every time an enemy is reused.
     /// </summary>
     /// <param name="entityManager">Entity manager used to mutate components and buffers.</param>
@@ -473,6 +383,12 @@ public static class EnemyPoolUtility
         if (entityManager.HasComponent<EnemyBossPatternRuntimeState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultBossPatternRuntimeState());
 
+        if (entityManager.HasBuffer<EnemyBossPatternSlotRuntimeElement>(enemyEntity))
+            ResetBossPatternSlotRuntime(entityManager, enemyEntity);
+
+        if (entityManager.HasComponent<EnemyBossDropRuntimeState>(enemyEntity))
+            ResetBossDropRuntime(entityManager, enemyEntity);
+
         if (entityManager.HasBuffer<EnemyBossMinionSpawnElement>(enemyEntity))
             ResetBossMinionRuntime(entityManager, enemyEntity);
 
@@ -498,42 +414,7 @@ public static class EnemyPoolUtility
         if (entityManager.HasComponent<EnemyHealth>(enemyEntity))
             ResetHealth(entityManager, enemyEntity);
 
-        if (entityManager.HasComponent<DamageFlashState>(enemyEntity))
-        {
-            DamageFlashState damageFlashState = entityManager.GetComponentData<DamageFlashState>(enemyEntity);
-            damageFlashState.RemainingSeconds = 0f;
-            damageFlashState.AppliedBlend = 0f;
-            entityManager.SetComponentData(enemyEntity, damageFlashState);
-        }
-
-        if (entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
-        {
-            EnemyVisualFlashPresentationState visualFlashPresentationState = entityManager.GetComponentData<EnemyVisualFlashPresentationState>(enemyEntity);
-            visualFlashPresentationState.AppliedBlend = 0f;
-            visualFlashPresentationState.AppliedColor = new float4(1f, 1f, 1f, 1f);
-            visualFlashPresentationState.OffensiveEngagementColor = new float4(1f, 1f, 1f, 1f);
-            visualFlashPresentationState.OffensiveEngagementBlend = 0f;
-            visualFlashPresentationState.OffensiveEngagementFadeOutSeconds = 0f;
-            entityManager.SetComponentData(enemyEntity, visualFlashPresentationState);
-        }
-
-        EnemyDamageFlashRenderUtility.ResetGpuFlash(entityManager, enemyEntity);
-
-        if (entityManager.HasComponent<Animator>(enemyEntity))
-        {
-            Animator animator = entityManager.GetComponentObject<Animator>(enemyEntity);
-
-            if (animator != null)
-                ManagedDamageFlashRendererUtility.ApplyToAnimator(animator, Color.white, 0f);
-        }
-
-        if (entityManager.HasComponent<EnemyOffensiveEngagementBillboardView>(enemyEntity))
-        {
-            EnemyOffensiveEngagementBillboardView billboardView = entityManager.GetComponentObject<EnemyOffensiveEngagementBillboardView>(enemyEntity);
-
-            if (billboardView != null)
-                billboardView.Hide();
-        }
+        EnemyPoolVisualUtility.ResetPresentationRuntimeState(entityManager, enemyEntity);
 
         if (entityManager.HasBuffer<EnemyElementStackElement>(enemyEntity))
             entityManager.GetBuffer<EnemyElementStackElement>(enemyEntity).Clear();
@@ -566,11 +447,60 @@ public static class EnemyPoolUtility
             ActiveInteractionIndex = -2,
             ElapsedSeconds = 0f,
             ActiveInteractionElapsedSeconds = 0f,
+            ExtractionElapsedSeconds = 0f,
             TravelledDistance = 0f,
+            DistanceSinceLastExtraction = 0f,
+            LastExtractionMissingHealthPercent = 0f,
+            PlayerDistanceHoldSeconds = 0f,
+            DamageWindowElapsedSeconds = 0f,
+            DamageWindowAccumulated = 0f,
+            PreviousObservedDurability = 0f,
             LastPosition = float3.zero,
             LastObservedDamageLifetimeSeconds = 0f,
             Initialized = 0
         };
+    }
+
+    /// <summary>
+    /// Resets internal boss pattern slot extraction state for a freshly activated pooled boss.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the slot runtime buffer.</param>
+    /// <param name="enemyEntity">Boss entity whose internal slot states are reset.</param>
+    private static void ResetBossPatternSlotRuntime(EntityManager entityManager, Entity enemyEntity)
+    {
+        DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes = entityManager.GetBuffer<EnemyBossPatternSlotRuntimeElement>(enemyEntity);
+
+        for (int index = 0; index < slotRuntimes.Length; index++)
+        {
+            EnemyBossPatternSlotRuntimeElement slotRuntime = slotRuntimes[index];
+            slotRuntime.ActivePatternIndex = -2;
+            slotRuntime.ActiveCandidateIndex = -2;
+            slotRuntime.ActiveCandidateElapsedSeconds = 0f;
+            slotRuntime.ExtractionElapsedSeconds = 0f;
+            slotRuntime.DistanceSinceLastExtraction = 0f;
+            slotRuntime.LastExtractionMissingHealthPercent = 0f;
+            slotRuntime.PlayerDistanceHoldSeconds = 0f;
+            slotRuntime.DamageWindowElapsedSeconds = 0f;
+            slotRuntime.DamageWindowAccumulated = 0f;
+            slotRuntime.PreviousObservedDurability = 0f;
+            slotRuntimes[index] = slotRuntime;
+        }
+    }
+
+    /// <summary>
+    /// Clears boss drop selection state so the next death can extract fresh drop candidates.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate boss drop runtime data.</param>
+    /// <param name="enemyEntity">Boss entity whose drop state is reset.</param>
+    private static void ResetBossDropRuntime(EntityManager entityManager, Entity enemyEntity)
+    {
+        entityManager.SetComponentData(enemyEntity, new EnemyBossDropRuntimeState
+        {
+            SelectionResolved = 0
+        });
+
+        if (entityManager.HasBuffer<EnemyBossSelectedDropCandidateElement>(enemyEntity))
+            entityManager.GetBuffer<EnemyBossSelectedDropCandidateElement>(enemyEntity).Clear();
     }
 
     /// <summary>

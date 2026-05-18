@@ -225,15 +225,15 @@ public static class PlayerPowerUpPassiveBakeUtility
                     if (trailSpawnData == null)
                         break;
 
+                    PlayerPowerUpPassiveTrailBakeUtility.AccumulateTrailSpawnModule(trailSpawnData,
+                                                                                    hasTrailSpawn,
+                                                                                    ref trailSegmentLifetimeSeconds,
+                                                                                    ref trailSpawnDistance,
+                                                                                    ref trailSpawnIntervalSeconds,
+                                                                                    ref trailRadius,
+                                                                                    ref maxTrailSegments,
+                                                                                    ref trailAttachedVfxOffset);
                     hasTrailSpawn = true;
-                    trailSegmentLifetimeSeconds = math.max(trailSegmentLifetimeSeconds, math.max(0.05f, trailSpawnData.TrailSegmentLifetimeSeconds));
-                    trailSpawnDistance = math.max(trailSpawnDistance, math.max(0f, trailSpawnData.TrailSpawnDistance));
-                    trailSpawnIntervalSeconds = math.min(trailSpawnIntervalSeconds, math.max(0.01f, trailSpawnData.TrailSpawnIntervalSeconds));
-                    trailRadius = math.max(trailRadius, math.max(0f, trailSpawnData.TrailRadius));
-                    maxTrailSegments = math.max(maxTrailSegments, math.max(1, trailSpawnData.MaxActiveSegmentsPerPlayer));
-                    trailAttachedVfxOffset = new float3(trailSpawnData.TrailAttachedVfxOffset.x,
-                                                        trailSpawnData.TrailAttachedVfxOffset.y,
-                                                        trailSpawnData.TrailAttachedVfxOffset.z);
                     break;
                 case PowerUpModuleKind.AreaTickApplyElement:
                     PowerUpElementalAreaTickModuleData areaTickData = payload.ElementalAreaTick;
@@ -241,10 +241,12 @@ public static class PlayerPowerUpPassiveBakeUtility
                     if (areaTickData == null)
                         break;
 
+                    PlayerPowerUpPassiveTrailBakeUtility.AccumulateTrailAreaTickModule(areaTickData,
+                                                                                       hasAreaTick,
+                                                                                       ref trailEffect,
+                                                                                       ref trailStacksPerTick,
+                                                                                       ref trailApplyIntervalSeconds);
                     hasAreaTick = true;
-                    trailEffect = PlayerPowerUpBakeSharedUtility.BuildElementalEffectConfig(areaTickData.EffectData);
-                    trailStacksPerTick += math.max(0f, areaTickData.StacksPerTick);
-                    trailApplyIntervalSeconds = math.min(trailApplyIntervalSeconds, math.max(0.01f, areaTickData.ApplyIntervalSeconds));
                     break;
                 case PowerUpModuleKind.DeathExplosion:
                     ExplosionPassiveConfig candidateExplosionConfig = PlayerPowerUpPassiveConfigBuildUtility.BuildExplosionPassiveConfig(authoring,
@@ -632,5 +634,6 @@ public static class PlayerPowerUpPassiveBakeUtility
         };
     }
     #endregion
+
     #endregion
 }

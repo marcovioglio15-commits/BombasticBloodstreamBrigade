@@ -137,7 +137,7 @@ public enum EnemyWeaponInteractionActivationGate
 }
 
 /// <summary>
-/// Declares boss-only interaction triggers layered above the base pattern assemble.
+/// Declares boss-only eligibility criteria used by pattern and module extraction.
 /// </summary>
 public enum EnemyBossPatternInteractionType
 {
@@ -145,7 +145,46 @@ public enum EnemyBossPatternInteractionType
     ElapsedTime = 1,
     TravelledDistance = 2,
     PlayerDistance = 3,
-    RecentlyDamaged = 4
+    RecentlyDamaged = 4,
+    Always = 5
+}
+
+/// <summary>
+/// Declares the player-distance condition used by boss pattern extraction rules.
+/// </summary>
+public enum EnemyBossPatternPlayerDistanceCondition
+{
+    Disabled = 0,
+    BelowThreshold = 1,
+    AboveThreshold = 2
+}
+
+/// <summary>
+/// Declares whether one boss module candidate applies a real module or intentionally clears its slot.
+/// </summary>
+public enum EnemyBossPatternModuleMode
+{
+    NullModule = 0,
+    Module = 1
+}
+
+/// <summary>
+/// Declares boss pattern slots controlled by per-pattern internal extraction.
+/// </summary>
+public enum EnemyBossPatternSlotKind : byte
+{
+    CoreMovement = 0,
+    ShortRangeInteraction = 1,
+    WeaponInteraction = 2
+}
+
+/// <summary>
+/// Declares how boss death drops select their authored candidates.
+/// </summary>
+public enum EnemyBossDropExtractionMode
+{
+    SingleCandidate = 0,
+    SumAllCandidates = 1
 }
 
 /// <summary>

@@ -118,6 +118,15 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
     {
         EnemyBossPatternPresetsPanelMinionUtility.BuildMinionSpawnSection(panel);
     }
+
+    /// <summary>
+    /// Builds the boss drop extraction subsection for a boss pattern preset.
+    /// </summary>
+    /// <param name="panel">Owning panel that provides serialized preset context.</param>
+    public static void BuildDropExtractionSection(EnemyBossPatternPresetsPanel panel)
+    {
+        EnemyBossPatternPresetsPanelDropUtility.BuildDropExtractionSection(panel);
+    }
     #endregion
 
     #region Private Methods

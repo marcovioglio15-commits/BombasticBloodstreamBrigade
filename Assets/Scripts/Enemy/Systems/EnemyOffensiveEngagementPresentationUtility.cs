@@ -18,11 +18,15 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// </summary>
     /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
     /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
     /// <returns>The strongest active color-blend result, or an inactive result when no warning window is currently open.</returns>
     public static EnemyOffensiveEngagementBlendResult ResolveBlendResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                          DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                                         bool hasBossSlotRuntimes,
+                                                                         DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                                          in EnemyPatternConfig patternConfig,
                                                                          in EnemyPatternRuntimeState patternRuntimeState)
     {
@@ -39,8 +43,11 @@ internal static class EnemyOffensiveEngagementPresentationUtility
             }
 
             if (!TryEvaluateWindow(config.TimingMode,
+                                   config.Source,
                                    config.ColorBlendLeadTimeSeconds,
                                    shooterRuntime,
+                                   hasBossSlotRuntimes,
+                                   bossSlotRuntimes,
                                    patternConfig,
                                    patternRuntimeState,
                                    out EnemyOffensiveEngagementWindow window))
@@ -69,11 +76,15 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// </summary>
     /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
     /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
     /// <returns>The strongest active billboard result, or an inactive result when no billboard window is currently open.</returns>
     public static EnemyOffensiveEngagementBillboardResult ResolveBillboardResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                                                 bool hasBossSlotRuntimes,
+                                                                                 DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                                                  in EnemyPatternConfig patternConfig,
                                                                                  in EnemyPatternRuntimeState patternRuntimeState)
     {
@@ -91,8 +102,11 @@ internal static class EnemyOffensiveEngagementPresentationUtility
             }
 
             if (!TryEvaluateWindow(config.TimingMode,
+                                   config.Source,
                                    config.BillboardLeadTimeSeconds,
                                    shooterRuntime,
+                                   hasBossSlotRuntimes,
+                                   bossSlotRuntimes,
                                    patternConfig,
                                    patternRuntimeState,
                                    out EnemyOffensiveEngagementWindow window))
@@ -165,6 +179,57 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
         return blendedValue;
     }
+
+    /// <summary>
+    /// Resolves a looping billboard pulse scale from shared billboard tuning values.
+    /// </summary>
+    /// <param name="baseScale">Base uniform scale applied outside pulse peaks.</param>
+    /// <param name="pulseScaleMultiplier">Peak scale multiplier reached during expansion.</param>
+    /// <param name="expandDurationSeconds">Seconds spent expanding toward the peak scale.</param>
+    /// <param name="contractDurationSeconds">Seconds spent contracting back to base scale.</param>
+    /// <param name="elapsedWindowSeconds">Seconds elapsed since the visible window opened.</param>
+    /// <returns>Final uniform billboard scale for the current frame.</returns>
+    public static float ResolvePulseScale(float baseScale,
+                                          float pulseScaleMultiplier,
+                                          float expandDurationSeconds,
+                                          float contractDurationSeconds,
+                                          float elapsedWindowSeconds)
+    {
+        float safeBaseScale = math.max(0f, baseScale);
+
+        if (safeBaseScale <= 0f)
+        {
+            return 0f;
+        }
+
+        float peakScale = safeBaseScale * math.max(0f, pulseScaleMultiplier);
+        float safeExpandDurationSeconds = math.max(0f, expandDurationSeconds);
+        float safeContractDurationSeconds = math.max(0f, contractDurationSeconds);
+        float pulseDurationSeconds = safeExpandDurationSeconds + safeContractDurationSeconds;
+
+        if (pulseDurationSeconds <= 0f || math.abs(peakScale - safeBaseScale) <= BlendEpsilon)
+        {
+            return safeBaseScale;
+        }
+
+        float clampedElapsedSeconds = math.max(0f, elapsedWindowSeconds);
+        float pulseTimeSeconds = clampedElapsedSeconds % pulseDurationSeconds;
+
+        if (safeExpandDurationSeconds > 0f && pulseTimeSeconds <= safeExpandDurationSeconds)
+        {
+            return math.lerp(safeBaseScale, peakScale, math.saturate(pulseTimeSeconds / safeExpandDurationSeconds));
+        }
+
+        if (safeContractDurationSeconds <= 0f)
+        {
+            return safeBaseScale;
+        }
+
+        float contractTimeSeconds = safeExpandDurationSeconds > 0f
+            ? pulseTimeSeconds - safeExpandDurationSeconds
+            : pulseTimeSeconds;
+        return math.lerp(peakScale, safeBaseScale, math.saturate(contractTimeSeconds / safeContractDurationSeconds));
+    }
     #endregion
 
     #region Private Methods
@@ -172,15 +237,21 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// Evaluates one predictive warning window for the requested timing mode and lead time.
     /// </summary>
     /// <param name="timingMode">Timing model used by the current baked config.</param>
+    /// <param name="source">Source slot that owns the current baked config.</param>
     /// <param name="leadTimeSeconds">Requested lead time for the current visual channel.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
     /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
     /// <param name="window">Active warning window data when evaluation succeeds.</param>
     /// <returns>True when a warning window is currently active for the requested config.</returns>
     private static bool TryEvaluateWindow(EnemyOffensiveEngagementTimingMode timingMode,
+                                          EnemyOffensiveEngagementTriggerSource source,
                                           float leadTimeSeconds,
                                           DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                          bool hasBossSlotRuntimes,
+                                          DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                           in EnemyPatternConfig patternConfig,
                                           in EnemyPatternRuntimeState patternRuntimeState,
                                           out EnemyOffensiveEngagementWindow window)
@@ -193,10 +264,63 @@ internal static class EnemyOffensiveEngagementPresentationUtility
             case EnemyOffensiveEngagementTimingMode.WeaponShot:
                 return TryEvaluateWeaponShotWindow(leadTimeSeconds, shooterRuntime, out window);
 
+            case EnemyOffensiveEngagementTimingMode.ModuleActivation:
+                return TryEvaluateModuleActivationWindow(source,
+                                                         leadTimeSeconds,
+                                                         hasBossSlotRuntimes,
+                                                         bossSlotRuntimes,
+                                                         out window);
+
             default:
                 window = default(EnemyOffensiveEngagementWindow);
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Evaluates the short visual window opened immediately after a boss module candidate becomes active.
+    /// </summary>
+    /// <param name="source">Source slot that owns the active module candidate.</param>
+    /// <param name="durationSeconds">Seconds the activation feedback should remain active.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used to read candidate elapsed time.</param>
+    /// <param name="window">Active activation window data when evaluation succeeds.</param>
+    /// <returns>True when the source slot is inside its activation feedback window.</returns>
+    private static bool TryEvaluateModuleActivationWindow(EnemyOffensiveEngagementTriggerSource source,
+                                                          float durationSeconds,
+                                                          bool hasBossSlotRuntimes,
+                                                          DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
+                                                          out EnemyOffensiveEngagementWindow window)
+    {
+        window = default(EnemyOffensiveEngagementWindow);
+
+        if (!hasBossSlotRuntimes)
+        {
+            return false;
+        }
+
+        EnemyBossPatternSlotKind slotKind = ResolveSlotKind(source);
+
+        for (int slotIndex = 0; slotIndex < bossSlotRuntimes.Length; slotIndex++)
+        {
+            EnemyBossPatternSlotRuntimeElement slotRuntime = bossSlotRuntimes[slotIndex];
+
+            if (slotRuntime.SlotKind != slotKind)
+                continue;
+
+            float safeDurationSeconds = math.max(0f, durationSeconds);
+
+            if (safeDurationSeconds <= 0f || slotRuntime.ActiveCandidateElapsedSeconds > safeDurationSeconds)
+            {
+                return false;
+            }
+
+            window.NormalizedProgress = 1f;
+            window.ElapsedSeconds = math.max(0f, slotRuntime.ActiveCandidateElapsedSeconds);
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -328,40 +452,31 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// <returns>Final uniform billboard scale for the current frame.</returns>
     private static float ResolvePulseScale(EnemyOffensiveEngagementConfigElement config, float elapsedWindowSeconds)
     {
-        float baseScale = math.max(0f, config.BillboardBaseScale);
+        return ResolvePulseScale(config.BillboardBaseScale,
+                                 config.BillboardPulseScaleMultiplier,
+                                 config.BillboardPulseExpandDurationSeconds,
+                                 config.BillboardPulseContractDurationSeconds,
+                                 elapsedWindowSeconds);
+    }
 
-        if (baseScale <= 0f)
+    /// <summary>
+    /// Maps an engagement source to the boss slot that owns activation timing for that source.
+    /// </summary>
+    /// <param name="source">Baked engagement source.</param>
+    /// <returns>Boss slot kind associated with the source.</returns>
+    private static EnemyBossPatternSlotKind ResolveSlotKind(EnemyOffensiveEngagementTriggerSource source)
+    {
+        switch (source)
         {
-            return 0f;
+            case EnemyOffensiveEngagementTriggerSource.CoreMovement:
+                return EnemyBossPatternSlotKind.CoreMovement;
+
+            case EnemyOffensiveEngagementTriggerSource.WeaponInteraction:
+                return EnemyBossPatternSlotKind.WeaponInteraction;
+
+            default:
+                return EnemyBossPatternSlotKind.ShortRangeInteraction;
         }
-
-        float peakScale = baseScale * math.max(0f, config.BillboardPulseScaleMultiplier);
-        float expandDurationSeconds = math.max(0f, config.BillboardPulseExpandDurationSeconds);
-        float contractDurationSeconds = math.max(0f, config.BillboardPulseContractDurationSeconds);
-        float pulseDurationSeconds = expandDurationSeconds + contractDurationSeconds;
-
-        if (pulseDurationSeconds <= 0f || math.abs(peakScale - baseScale) <= BlendEpsilon)
-        {
-            return baseScale;
-        }
-
-        float clampedElapsedSeconds = math.max(0f, elapsedWindowSeconds);
-        float pulseTimeSeconds = clampedElapsedSeconds % pulseDurationSeconds;
-
-        if (expandDurationSeconds > 0f && pulseTimeSeconds <= expandDurationSeconds)
-        {
-            return math.lerp(baseScale, peakScale, math.saturate(pulseTimeSeconds / expandDurationSeconds));
-        }
-
-        if (contractDurationSeconds <= 0f)
-        {
-            return baseScale;
-        }
-
-        float contractTimeSeconds = expandDurationSeconds > 0f
-            ? pulseTimeSeconds - expandDurationSeconds
-            : pulseTimeSeconds;
-        return math.lerp(peakScale, baseScale, math.saturate(contractTimeSeconds / contractDurationSeconds));
     }
     #endregion
 

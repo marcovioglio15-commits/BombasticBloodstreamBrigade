@@ -2,78 +2,178 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Stores the base boss pattern assembled with the same interaction slots used by normal enemies.
+/// Stores the high-level extraction rules used to roll the next eligible boss pattern candidate.
 /// </summary>
 [Serializable]
-public sealed class EnemyBossPatternAssemblyDefinition
+public sealed class EnemyBossPatternExtractionSettings
 {
     #region Fields
 
     #region Serialized Fields
-    [Header("Core Movement")]
-    [Tooltip("Base core movement selection resolved while no higher-priority boss interaction overrides it.")]
-    [SerializeField] private EnemyPatternCoreMovementAssembly coreMovement = new EnemyPatternCoreMovementAssembly();
+    [Header("General Extraction")]
+    [Tooltip("When enabled, a new pattern is extracted as soon as the active pattern is no longer eligible.")]
+    [SerializeField] private bool rerollWhenCurrentPatternBecomesInvalid = true;
 
-    [Header("Short-Range Interaction")]
-    [Tooltip("Optional base short-range interaction that behaves exactly like the normal enemy Pattern Assemble slot.")]
-    [SerializeField] private EnemyPatternShortRangeInteractionAssembly shortRangeInteraction = new EnemyPatternShortRangeInteractionAssembly();
+    [Tooltip("Minimum seconds between two pattern extractions after the current pattern has satisfied its own minimum active duration.")]
+    [SerializeField] private float minimumSecondsBetweenExtractions = 1f;
 
-    [Header("Weapon Interaction")]
-    [Tooltip("Optional base weapon interaction that behaves exactly like the normal enemy Pattern Assemble slot.")]
-    [SerializeField] private EnemyPatternWeaponInteractionAssembly weaponInteraction = new EnemyPatternWeaponInteractionAssembly();
+    [Header("Elapsed Time")]
+    [Tooltip("When enabled, elapsed extraction interval can trigger a new pattern roll.")]
+    [SerializeField] private bool useElapsedIntervalExtraction = true;
+
+    [Tooltip("Seconds after the previous extraction before elapsed time can trigger a new pattern roll.")]
+    [SerializeField] private float elapsedIntervalSeconds = 4f;
+
+    [Header("Missing Health Steps")]
+    [Tooltip("When enabled, crossing missing-health steps can trigger a new pattern roll.")]
+    [SerializeField] private bool useMissingHealthStepExtraction = true;
+
+    [Tooltip("Normalized missing-health step, from 0 to 1, required since the previous extraction.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float missingHealthStepPercent = 0.25f;
+
+    [Header("Travelled Distance")]
+    [Tooltip("When enabled, boss travelled distance since the previous extraction can trigger a new pattern roll.")]
+    [SerializeField] private bool useTravelledDistanceExtraction;
+
+    [Tooltip("Planar boss movement distance required since the previous extraction.")]
+    [SerializeField] private float travelledDistanceSinceLastExtraction = 10f;
+
+    [Header("Player Distance Hold")]
+    [Tooltip("Player-distance hold condition that can trigger a new pattern roll after the threshold is held long enough.")]
+    [SerializeField] private EnemyBossPatternPlayerDistanceCondition playerDistanceCondition = EnemyBossPatternPlayerDistanceCondition.Disabled;
+
+    [Tooltip("Planar player distance threshold used by the hold condition.")]
+    [SerializeField] private float playerDistanceThreshold = 8f;
+
+    [Tooltip("Seconds the player-distance condition must remain true before a new pattern roll can trigger.")]
+    [SerializeField] private float playerDistanceHoldSeconds = 1f;
+
+    [Header("Damage Window")]
+    [Tooltip("When enabled, damage received inside the configured window can trigger a new pattern roll.")]
+    [SerializeField] private bool useDamageWindowExtraction;
+
+    [Tooltip("Seconds used to accumulate received damage for extraction checks.")]
+    [SerializeField] private float damageWindowSeconds = 2f;
+
+    [Tooltip("Damage amount that must be received inside the configured window before a new pattern roll can trigger.")]
+    [SerializeField] private float damageThreshold = 20f;
     #endregion
 
     #endregion
 
     #region Properties
-    public EnemyPatternCoreMovementAssembly CoreMovement
+    public bool RerollWhenCurrentPatternBecomesInvalid
     {
         get
         {
-            return coreMovement;
+            return rerollWhenCurrentPatternBecomesInvalid;
         }
     }
 
-    public EnemyPatternShortRangeInteractionAssembly ShortRangeInteraction
+    public float MinimumSecondsBetweenExtractions
     {
         get
         {
-            return shortRangeInteraction;
+            return minimumSecondsBetweenExtractions;
         }
     }
 
-    public EnemyPatternWeaponInteractionAssembly WeaponInteraction
+    public bool UseElapsedIntervalExtraction
     {
         get
         {
-            return weaponInteraction;
+            return useElapsedIntervalExtraction;
         }
     }
-    #endregion
 
-    #region Methods
-
-    #region Public Methods
-    /// <summary>
-    /// Ensures nested base pattern slots always exist before editor drawing and bake-time compilation.
-    /// </summary>
-    public void Validate()
+    public float ElapsedIntervalSeconds
     {
-        if (coreMovement == null)
-            coreMovement = new EnemyPatternCoreMovementAssembly();
-
-        if (shortRangeInteraction == null)
-            shortRangeInteraction = new EnemyPatternShortRangeInteractionAssembly();
-
-        if (weaponInteraction == null)
-            weaponInteraction = new EnemyPatternWeaponInteractionAssembly();
-
-        coreMovement.Validate();
-        shortRangeInteraction.Validate();
-        weaponInteraction.Validate();
+        get
+        {
+            return elapsedIntervalSeconds;
+        }
     }
-    #endregion
 
+    public bool UseMissingHealthStepExtraction
+    {
+        get
+        {
+            return useMissingHealthStepExtraction;
+        }
+    }
+
+    public float MissingHealthStepPercent
+    {
+        get
+        {
+            return missingHealthStepPercent;
+        }
+    }
+
+    public bool UseTravelledDistanceExtraction
+    {
+        get
+        {
+            return useTravelledDistanceExtraction;
+        }
+    }
+
+    public float TravelledDistanceSinceLastExtraction
+    {
+        get
+        {
+            return travelledDistanceSinceLastExtraction;
+        }
+    }
+
+    public EnemyBossPatternPlayerDistanceCondition PlayerDistanceCondition
+    {
+        get
+        {
+            return playerDistanceCondition;
+        }
+    }
+
+    public float PlayerDistanceThreshold
+    {
+        get
+        {
+            return playerDistanceThreshold;
+        }
+    }
+
+    public float PlayerDistanceHoldSeconds
+    {
+        get
+        {
+            return playerDistanceHoldSeconds;
+        }
+    }
+
+    public bool UseDamageWindowExtraction
+    {
+        get
+        {
+            return useDamageWindowExtraction;
+        }
+    }
+
+    public float DamageWindowSeconds
+    {
+        get
+        {
+            return damageWindowSeconds;
+        }
+    }
+
+    public float DamageThreshold
+    {
+        get
+        {
+            return damageThreshold;
+        }
+    }
     #endregion
 }
 
@@ -132,7 +232,7 @@ public sealed class EnemyBossPatternCoreMovementOverrideAssembly
 }
 
 /// <summary>
-/// Stores one ordered boss-specific interaction that can override selected normal Pattern Assemble slots.
+/// Stores one boss pattern candidate with independent internal extraction per module slot.
 /// </summary>
 [Serializable]
 public sealed class EnemyBossPatternInteractionDefinition
@@ -144,14 +244,17 @@ public sealed class EnemyBossPatternInteractionDefinition
     [Tooltip("Enables this boss interaction during bake and runtime selection.")]
     [SerializeField] private bool enabled = true;
 
-    [Tooltip("Boss-only trigger that decides when this interaction can override the base pattern.")]
-    [SerializeField] private EnemyBossPatternInteractionType interactionType = EnemyBossPatternInteractionType.MissingHealth;
+    [Tooltip("Boss-only eligibility criterion that decides when this pattern candidate can be extracted.")]
+    [SerializeField] private EnemyBossPatternInteractionType interactionType = EnemyBossPatternInteractionType.Always;
 
     [Tooltip("Readable interaction name shown by the Boss Pattern Assemble section.")]
-    [SerializeField] private string displayName = "Missing Health Interaction";
+    [SerializeField] private string displayName = "Always Interaction";
 
     [Tooltip("Minimum seconds the current boss interaction must remain active before another valid interaction can replace it.")]
     [SerializeField] private float minimumActiveSeconds = 1f;
+
+    [Tooltip("Relative weight used when this eligible interaction is part of a pattern extraction roll.")]
+    [SerializeField] private float selectionWeight = 1f;
 
     [Header("Missing Health")]
     [Tooltip("Minimum missing-health percentage, from 0 to 1, required by Missing Health interactions.")]
@@ -187,16 +290,28 @@ public sealed class EnemyBossPatternInteractionDefinition
     [Tooltip("Seconds after receiving damage for which Recently Damaged interactions are considered valid.")]
     [SerializeField] private float recentlyDamagedWindowSeconds = 1.25f;
 
-    [Header("Core Movement Override")]
-    [Tooltip("Optional Core Movement slot override applied while this boss interaction is active.")]
+    [Header("Internal Core Movement Extraction")]
+    [Tooltip("Core Movement extraction candidates used while this pattern candidate remains active.")]
+    [SerializeField] private EnemyBossPatternCoreMovementExtractionDefinition coreMovementExtraction = new EnemyBossPatternCoreMovementExtractionDefinition();
+
+    [Header("Internal Short-Range Extraction")]
+    [Tooltip("Short-Range Interaction extraction candidates used while this pattern candidate remains active.")]
+    [SerializeField] private EnemyBossPatternShortRangeExtractionDefinition shortRangeExtraction = new EnemyBossPatternShortRangeExtractionDefinition();
+
+    [Header("Internal Weapon Extraction")]
+    [Tooltip("Weapon Interaction extraction candidates used while this pattern candidate remains active.")]
+    [SerializeField] private EnemyBossPatternWeaponExtractionDefinition weaponExtraction = new EnemyBossPatternWeaponExtractionDefinition();
+
+    [Tooltip("Hidden legacy Core Movement override migrated into Internal Core Movement Extraction when the new candidate list is empty.")]
+    [HideInInspector]
     [SerializeField] private EnemyBossPatternCoreMovementOverrideAssembly coreMovement = new EnemyBossPatternCoreMovementOverrideAssembly();
 
-    [Header("Short-Range Interaction Override")]
-    [Tooltip("Optional Short-Range Interaction slot override applied while this boss interaction is active.")]
+    [Tooltip("Hidden legacy Short-Range Interaction override migrated into Internal Short-Range Extraction when the new candidate list is empty.")]
+    [HideInInspector]
     [SerializeField] private EnemyPatternShortRangeInteractionAssembly shortRangeInteraction = new EnemyPatternShortRangeInteractionAssembly();
 
-    [Header("Weapon Interaction Override")]
-    [Tooltip("Optional Weapon Interaction slot override applied while this boss interaction is active.")]
+    [Tooltip("Hidden legacy Weapon Interaction override migrated into Internal Weapon Extraction when the new candidate list is empty.")]
+    [HideInInspector]
     [SerializeField] private EnemyPatternWeaponInteractionAssembly weaponInteraction = new EnemyPatternWeaponInteractionAssembly();
     #endregion
 
@@ -232,6 +347,14 @@ public sealed class EnemyBossPatternInteractionDefinition
         get
         {
             return minimumActiveSeconds;
+        }
+    }
+
+    public float SelectionWeight
+    {
+        get
+        {
+            return selectionWeight;
         }
     }
 
@@ -315,6 +438,14 @@ public sealed class EnemyBossPatternInteractionDefinition
         }
     }
 
+    public EnemyBossPatternCoreMovementExtractionDefinition CoreMovementExtraction
+    {
+        get
+        {
+            return coreMovementExtraction;
+        }
+    }
+
     public EnemyPatternShortRangeInteractionAssembly ShortRangeInteraction
     {
         get
@@ -323,11 +454,27 @@ public sealed class EnemyBossPatternInteractionDefinition
         }
     }
 
+    public EnemyBossPatternShortRangeExtractionDefinition ShortRangeExtraction
+    {
+        get
+        {
+            return shortRangeExtraction;
+        }
+    }
+
     public EnemyPatternWeaponInteractionAssembly WeaponInteraction
     {
         get
         {
             return weaponInteraction;
+        }
+    }
+
+    public EnemyBossPatternWeaponExtractionDefinition WeaponExtraction
+    {
+        get
+        {
+            return weaponExtraction;
         }
     }
     #endregion
@@ -343,18 +490,19 @@ public sealed class EnemyBossPatternInteractionDefinition
         if (string.IsNullOrWhiteSpace(displayName))
             displayName = FormatInteractionType(interactionType);
 
-        if (coreMovement == null)
-            coreMovement = new EnemyBossPatternCoreMovementOverrideAssembly();
+        if (coreMovementExtraction == null)
+            coreMovementExtraction = new EnemyBossPatternCoreMovementExtractionDefinition();
 
-        if (shortRangeInteraction == null)
-            shortRangeInteraction = new EnemyPatternShortRangeInteractionAssembly();
+        if (shortRangeExtraction == null)
+            shortRangeExtraction = new EnemyBossPatternShortRangeExtractionDefinition();
 
-        if (weaponInteraction == null)
-            weaponInteraction = new EnemyPatternWeaponInteractionAssembly();
+        if (weaponExtraction == null)
+            weaponExtraction = new EnemyBossPatternWeaponExtractionDefinition();
 
-        coreMovement.Validate();
-        shortRangeInteraction.Validate();
-        weaponInteraction.Validate();
+        MigrateLegacySlotsIfNeeded();
+        coreMovementExtraction.Validate();
+        shortRangeExtraction.Validate();
+        weaponExtraction.Validate();
     }
 
     /// <summary>
@@ -366,6 +514,9 @@ public sealed class EnemyBossPatternInteractionDefinition
     {
         switch (type)
         {
+            case EnemyBossPatternInteractionType.Always:
+                return "Always Interaction";
+
             case EnemyBossPatternInteractionType.ElapsedTime:
                 return "Elapsed Time Interaction";
 
@@ -380,6 +531,38 @@ public sealed class EnemyBossPatternInteractionDefinition
 
             default:
                 return "Missing Health Interaction";
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Migrates hidden legacy one-slot overrides into the new internal extraction lists when needed.
+    /// </summary>
+    private void MigrateLegacySlotsIfNeeded()
+    {
+        if (coreMovement != null)
+        {
+            coreMovement.Validate();
+
+            if (coreMovement.IsEnabled)
+                coreMovementExtraction.TryMigrateLegacyCandidate(coreMovement.Binding, displayName + " Core Movement");
+        }
+
+        if (shortRangeInteraction != null)
+        {
+            shortRangeInteraction.Validate();
+
+            if (shortRangeInteraction.IsEnabled)
+                shortRangeExtraction.TryMigrateLegacyCandidate(shortRangeInteraction, displayName + " Short-Range");
+        }
+
+        if (weaponInteraction != null)
+        {
+            weaponInteraction.Validate();
+
+            if (weaponInteraction.IsEnabled)
+                weaponExtraction.TryMigrateLegacyCandidate(weaponInteraction, displayName + " Weapon");
         }
     }
     #endregion

@@ -1,0 +1,475 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39f6405cc1a3aae4a9b325626981352f, type: 3}
+  m_Name: Immortal Preset
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerProgressionPreset
+  presetId: a44df28e177e4527bc85d398888a1977
+  presetName: Immortal Preset
+  description: 
+  version: 1.0.0
+  scalableStats:
+  - statName: Health
+    statType: 1
+    defaultValue: 999999
+    minimumValue: 1
+    maximumValue: 999999
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: Shield
+    statType: 1
+    defaultValue: 0
+    minimumValue: 0
+    maximumValue: 10
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: MovementSpeed
+    statType: 0
+    defaultValue: 1.5
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: Damage
+    statType: 0
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: FireRate
+    statType: 0
+    defaultValue: 2.5
+    minimumValue: 0.1
+    maximumValue: 8
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: ShotRange
+    statType: 0
+    defaultValue: 0.35
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: GatheringRadius
+    statType: 0
+    defaultValue: 3
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: Luck
+    statType: 0
+    defaultValue: 0
+    minimumValue: 0
+    maximumValue: 100
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: BulletPenetration
+    statType: 1
+    defaultValue: 0
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: ShotgunBarrels
+    statType: 1
+    defaultValue: 1
+    minimumValue: 1
+    maximumValue: 10
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: BulletSizeMultiplier
+    statType: 0
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: InfinitePenetration
+    statType: 2
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: BulletElementType_A
+    statType: 3
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: '"None"'
+  - statName: BulletElementType_B
+    statType: 3
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: '"None"'
+  - statName: BulletElementType_C
+    statType: 3
+    defaultValue: 1
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: '"None"'
+  - statName: LaserWidth
+    statType: 0
+    defaultValue: 5
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: LaserWidth_Small
+    statType: 0
+    defaultValue: 2.5
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: LaserWidth_Big
+    statType: 0
+    defaultValue: 12.5
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: Knockback
+    statType: 0
+    defaultValue: 7
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  scalingRules:
+  - statKey: gamePhasesDefinition.Array.data[0|phaseID:Phase0].requiredExperienceGrouth
+    addScaling: 0
+    formula: '[this] * [FireRate]'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: experiencePickupRadius
+    addScaling: 1
+    formula: '[this] * [GatheringRadius]'
+    debugInConsole: 1
+    debugColor: {r: 0.066037714, g: 0.065317914, b: 0.057004254, a: 1}
+  - statKey: gamePhasesDefinition.Array.data[0|phaseID:Phase0].startingRequiredLevelUpExp
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  gamePhasesDefinition:
+  - phaseID: Phase0
+    startsAtLevel: 0
+    startingRequiredLevelUpExp: 15
+    requiredExperienceGrouth: 0
+    milestones: []
+  - phaseID: Phase1
+    startsAtLevel: 3
+    startingRequiredLevelUpExp: 25
+    requiredExperienceGrouth: 10
+    milestones:
+    - milestoneLevel: 5
+      specialExpRequirement: 98
+      recurring: 0
+      recurrenceIntervalLevels: 1
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 10
+      specialExpRequirement: 210
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 20
+      specialExpRequirement: 462
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+  - phaseID: Phase2
+    startsAtLevel: 21
+    startingRequiredLevelUpExp: 165
+    requiredExperienceGrouth: 15
+    milestones:
+    - milestoneLevel: 30
+      specialExpRequirement: 600
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 40
+      specialExpRequirement: 870
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+  - phaseID: Phase3
+    startsAtLevel: 41
+    startingRequiredLevelUpExp: 435
+    requiredExperienceGrouth: 20
+    milestones:
+    - milestoneLevel: 50
+      specialExpRequirement: 1169
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 60
+      specialExpRequirement: 1511
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+  - phaseID: Phase4
+    startsAtLevel: 61
+    startingRequiredLevelUpExp: 820
+    requiredExperienceGrouth: 25
+    milestones:
+    - milestoneLevel: 70
+      specialExpRequirement: 1836
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 80
+      specialExpRequirement: 2241
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+  - phaseID: Phase5
+    startsAtLevel: 81
+    startingRequiredLevelUpExp: 1275
+    requiredExperienceGrouth: 30
+    milestones:
+    - milestoneLevel: 90
+      specialExpRequirement: 2576
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 100
+      specialExpRequirement: 3035
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+  schedules:
+  - scheduleId: ScheduleRookie
+    sequence:
+    - statName: FireRate
+      applyMode: 0
+      value: 0.2
+    - statName: ShotRange
+      applyMode: 0
+      value: 0.02
+    - statName: MovementSpeed
+      applyMode: 0
+      value: 0.5
+    - statName: Damage
+      applyMode: 0
+      value: 0.3
+    - statName: Luck
+      applyMode: 0
+      value: 1
+  equippedScheduleId: ScheduleRookie
+  comboCounter:
+    isEnabled: 1
+    comboGainPerKill: 10
+    damageBreakMode: 0
+    shieldDamageBreaksCombo: 0
+    preventDecayIntoNonDecayingRanks: 1
+    rankDefinitions:
+    - rankId: D
+      requiredComboValue: 100
+      pointsDecayPerSecond: 0
+      progressiveBoostPercent: 0
+      rankVisuals:
+        badgeSprite: {fileID: 21300000, guid: 3db0b99557ecb974aa8ca90843c8e01b, type: 3}
+        badgeTint: {r: 1, g: 1, b: 1, a: 1}
+        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+        comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
+        progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
+        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+      rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas:
+        - formula: '[GatheringRadius]=[GatheringRadius]*1.2'
+      passivePowerUpUnlocks: []
+    - rankId: C
+      requiredComboValue: 250
+      pointsDecayPerSecond: 0
+      progressiveBoostPercent: 0
+      rankVisuals:
+        badgeSprite: {fileID: 21300000, guid: 62bad9c41e3f4f1489d55d6796073472, type: 3}
+        badgeTint: {r: 1, g: 1, b: 1, a: 1}
+        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+        comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
+        progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
+        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+      rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas:
+        - formula: '[MovementSpeed]=[MovementSpeed]*1.2'
+      passivePowerUpUnlocks: []
+    - rankId: B
+      requiredComboValue: 500
+      pointsDecayPerSecond: 1
+      progressiveBoostPercent: 0
+      rankVisuals:
+        badgeSprite: {fileID: 21300000, guid: 9ec9dadfd7a7b374d8bce46c1ecf2ab6, type: 3}
+        badgeTint: {r: 1, g: 1, b: 1, a: 1}
+        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+        comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
+        progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
+        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+      rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas:
+        - formula: '[ShotRange]=[ShotRange]*1.2'
+      passivePowerUpUnlocks: []
+    - rankId: A
+      requiredComboValue: 1000
+      pointsDecayPerSecond: 2
+      progressiveBoostPercent: 0
+      rankVisuals:
+        badgeSprite: {fileID: 21300000, guid: 83885801007554f42a819aa0c716ed0f, type: 3}
+        badgeTint: {r: 1, g: 1, b: 1, a: 1}
+        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+        comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
+        progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
+        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+      rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas:
+        - formula: '[FireRate]=[FireRate]*1.2'
+      passivePowerUpUnlocks: []
+    - rankId: S
+      requiredComboValue: 1500
+      pointsDecayPerSecond: 5
+      progressiveBoostPercent: 0
+      rankVisuals:
+        badgeSprite: {fileID: 21300000, guid: d991446632b496047ab28173c93bd55b, type: 3}
+        badgeTint: {r: 1, g: 1, b: 1, a: 1}
+        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+        comboValueTextColor: {r: 0.9811321, g: 0.8466484, b: 0.71733713, a: 1}
+        progressFillColor: {r: 0, g: 1, b: 0.07073355, a: 1}
+        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
+      rankBonuses:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas:
+        - formula: '[InfinitePenetration]=true'
+      passivePowerUpUnlocks: []
+  legacyExperienceRequiredPerLevel: 100
+  levelCap: 100
+  experiencePickupRadius: 1
+  milestoneTimeScaleResumeDurationSeconds: 1.5
+  powerUpContainerSettings:
+    containerPrefab: {fileID: 7549901088543619621, guid: 518a26c8b52a63e42a92768c649a250c, type: 3}
+    interactionRadius: 2.25
+    interactionMode: 0
+    storedStateMode: 0
+    interactionLockDuration: 0.25
+    overlayPanelTimeScaleResumeDurationSeconds: 0.2
+    interactActionId: 8b2a0df2-6707-41c3-9c21-fbdf36800b13
+    replacePrimaryActionId: 64d6faaa-5741-466a-80a4-e2f292e14c6a
+    replaceSecondaryActionId: 8c1196ce-eb8c-450a-8df0-1872bf9f1788
+  legacyBaseStats:
+    health: 1e+10

@@ -321,8 +321,21 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
         if (property == null)
             return EnemyBossMinionSpawnTrigger.Interval;
 
-        if (string.Equals(property.name, "interactionType", StringComparison.Ordinal))
-            return (EnemyBossPatternInteractionType)property.enumValueIndex;
+        switch (property.name)
+        {
+            case "interactionType":
+            case "eligibilityType":
+                return (EnemyBossPatternInteractionType)property.enumValueIndex;
+
+            case "playerDistanceCondition":
+                return (EnemyBossPatternPlayerDistanceCondition)property.enumValueIndex;
+
+            case "moduleMode":
+                return (EnemyBossPatternModuleMode)property.enumValueIndex;
+
+            case "extractionMode":
+                return (EnemyBossDropExtractionMode)property.enumValueIndex;
+        }
 
         return ResolveMinionTrigger(property);
     }
@@ -416,6 +429,10 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
     /// <param name="panel">Owning panel.</param>
     public static void MarkDirtyAndRebuild(EnemyBossPatternPresetsPanel panel)
     {
+        if (panel == null)
+            return;
+
+        ManagementToolFoldoutStateUtility.CaptureFoldoutStates(panel.DetailsSectionContentRoot);
         EnemyManagementDraftSession.MarkDirty();
         panel.RefreshPresetList();
         panel.BuildActiveDetailsSection();

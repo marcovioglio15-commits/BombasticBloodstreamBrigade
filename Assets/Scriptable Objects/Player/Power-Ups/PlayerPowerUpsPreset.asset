@@ -20125,9 +20125,10 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: Active_Shotgun
+  primaryActivePowerUpId: ActiveGigaBomb
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveElementalTrail
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

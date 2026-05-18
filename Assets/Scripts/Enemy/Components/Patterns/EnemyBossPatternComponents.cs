@@ -47,22 +47,43 @@ public struct EnemyBossPatternRuntimeState : IComponentData
     public int ActiveInteractionIndex;
     public float ElapsedSeconds;
     public float ActiveInteractionElapsedSeconds;
+    public float ExtractionElapsedSeconds;
     public float TravelledDistance;
+    public float DistanceSinceLastExtraction;
+    public float LastExtractionMissingHealthPercent;
+    public float PlayerDistanceHoldSeconds;
+    public float DamageWindowElapsedSeconds;
+    public float DamageWindowAccumulated;
+    public float PreviousObservedDurability;
     public float3 LastPosition;
     public float LastObservedDamageLifetimeSeconds;
     public byte Initialized;
 }
 
 /// <summary>
-/// Stores the base boss pattern used when no boss-specific interaction is active.
+/// Stores top-level boss pattern extraction settings and the default null pattern state.
 /// </summary>
-public struct EnemyBossPatternBaseConfig : IComponentData
+public struct EnemyBossPatternExtractionConfig : IComponentData
 {
     public byte HasCustomMovement;
+    public byte RerollWhenCurrentPatternBecomesInvalid;
+    public byte UseElapsedIntervalExtraction;
+    public byte UseMissingHealthStepExtraction;
+    public byte UseTravelledDistanceExtraction;
+    public byte UseDamageWindowExtraction;
     public int FirstShooterConfigIndex;
     public int ShooterConfigCount;
     public int FirstOffensiveEngagementConfigIndex;
     public int OffensiveEngagementConfigCount;
+    public EnemyBossPatternPlayerDistanceCondition PlayerDistanceCondition;
+    public float MinimumSecondsBetweenExtractions;
+    public float ElapsedIntervalSeconds;
+    public float MissingHealthStepPercent;
+    public float TravelledDistanceSinceLastExtraction;
+    public float PlayerDistanceThreshold;
+    public float PlayerDistanceHoldSeconds;
+    public float DamageWindowSeconds;
+    public float DamageThreshold;
     public EnemyPatternConfig PatternConfig;
 }
 
@@ -74,6 +95,7 @@ public struct EnemyBossPatternInteractionElement : IBufferElementData
     public int InteractionIndex;
     public EnemyBossPatternInteractionType InteractionType;
     public float MinimumActiveSeconds;
+    public float SelectionWeight;
     public float MinimumMissingHealthPercent;
     public float MaximumMissingHealthPercent;
     public float MinimumElapsedSeconds;
@@ -92,7 +114,77 @@ public struct EnemyBossPatternInteractionElement : IBufferElementData
 }
 
 /// <summary>
-/// Stores shooter configs referenced by the base boss pattern and boss-specific interactions.
+/// Stores extraction settings for one internal boss pattern module slot.
+/// </summary>
+public struct EnemyBossPatternModuleExtractionElement : IBufferElementData
+{
+    public int PatternIndex;
+    public EnemyBossPatternSlotKind SlotKind;
+    public byte RerollWhenCurrentPatternBecomesInvalid;
+    public byte UseElapsedIntervalExtraction;
+    public byte UseMissingHealthStepExtraction;
+    public byte UseTravelledDistanceExtraction;
+    public byte UseDamageWindowExtraction;
+    public EnemyBossPatternPlayerDistanceCondition PlayerDistanceCondition;
+    public float MinimumSecondsBetweenExtractions;
+    public float ElapsedIntervalSeconds;
+    public float MissingHealthStepPercent;
+    public float TravelledDistanceSinceLastExtraction;
+    public float PlayerDistanceThreshold;
+    public float PlayerDistanceHoldSeconds;
+    public float DamageWindowSeconds;
+    public float DamageThreshold;
+}
+
+/// <summary>
+/// Stores one compiled module candidate owned by an internal boss pattern slot.
+/// </summary>
+public struct EnemyBossPatternModuleCandidateElement : IBufferElementData
+{
+    public int PatternIndex;
+    public EnemyBossPatternSlotKind SlotKind;
+    public int CandidateIndex;
+    public EnemyBossPatternInteractionType EligibilityType;
+    public byte IsNullModule;
+    public byte HasCustomMovement;
+    public float MinimumActiveSeconds;
+    public float SelectionWeight;
+    public float MinimumMissingHealthPercent;
+    public float MaximumMissingHealthPercent;
+    public float MinimumElapsedSeconds;
+    public float MaximumElapsedSeconds;
+    public float MinimumTravelledDistance;
+    public float MaximumTravelledDistance;
+    public float MinimumPlayerDistance;
+    public float MaximumPlayerDistance;
+    public float RecentlyDamagedWindowSeconds;
+    public int FirstShooterConfigIndex;
+    public int ShooterConfigCount;
+    public int FirstOffensiveEngagementConfigIndex;
+    public int OffensiveEngagementConfigCount;
+    public EnemyPatternConfig PatternConfig;
+}
+
+/// <summary>
+/// Tracks runtime extraction state for one internal boss pattern slot.
+/// </summary>
+public struct EnemyBossPatternSlotRuntimeElement : IBufferElementData
+{
+    public EnemyBossPatternSlotKind SlotKind;
+    public int ActivePatternIndex;
+    public int ActiveCandidateIndex;
+    public float ActiveCandidateElapsedSeconds;
+    public float ExtractionElapsedSeconds;
+    public float DistanceSinceLastExtraction;
+    public float LastExtractionMissingHealthPercent;
+    public float PlayerDistanceHoldSeconds;
+    public float DamageWindowElapsedSeconds;
+    public float DamageWindowAccumulated;
+    public float PreviousObservedDurability;
+}
+
+/// <summary>
+/// Stores shooter configs referenced by boss module candidates.
 /// </summary>
 public struct EnemyBossPatternShooterConfigElement : IBufferElementData
 {
@@ -100,11 +192,82 @@ public struct EnemyBossPatternShooterConfigElement : IBufferElementData
 }
 
 /// <summary>
-/// Stores offensive engagement configs referenced by the base boss pattern and boss-specific interactions.
+/// Stores offensive engagement configs referenced by boss module candidates.
 /// </summary>
 public struct EnemyBossPatternOffensiveEngagementConfigElement : IBufferElementData
 {
     public EnemyOffensiveEngagementConfigElement Config;
+}
+
+/// <summary>
+/// Stores boss death drop extraction mode baked from the boss pattern preset.
+/// </summary>
+public struct EnemyBossDropExtractionConfig : IComponentData
+{
+    public byte Enabled;
+    public EnemyBossDropExtractionMode ExtractionMode;
+}
+
+/// <summary>
+/// Tracks whether boss death drop candidates have already been selected for the current death event.
+/// </summary>
+public struct EnemyBossDropRuntimeState : IComponentData
+{
+    public byte SelectionResolved;
+}
+
+/// <summary>
+/// Stores one boss drop candidate and its source buffer slices.
+/// </summary>
+public struct EnemyBossDropCandidateElement : IBufferElementData
+{
+    public int CandidateIndex;
+    public byte Enabled;
+    public float SelectionWeight;
+    public int FirstExperienceModuleIndex;
+    public int ExperienceModuleCount;
+    public int FirstExtraComboPointsModuleIndex;
+    public int ExtraComboPointsModuleCount;
+}
+
+/// <summary>
+/// Stores a selected boss drop candidate for the current death event.
+/// </summary>
+public struct EnemyBossSelectedDropCandidateElement : IBufferElementData
+{
+    public int CandidateIndex;
+}
+
+/// <summary>
+/// Stores one boss-owned source experience-drop module before death-time extraction.
+/// </summary>
+public struct EnemyBossDropExperienceModuleElement : IBufferElementData
+{
+    public EnemyExperienceDropModuleElement Module;
+}
+
+/// <summary>
+/// Stores one boss-owned source experience-drop definition before death-time extraction.
+/// </summary>
+public struct EnemyBossDropExperienceDefinitionElement : IBufferElementData
+{
+    public EnemyExperienceDropDefinitionElement Definition;
+}
+
+/// <summary>
+/// Stores one boss-owned source Extra Combo Points module before death-time extraction.
+/// </summary>
+public struct EnemyBossDropExtraComboPointsModuleElement : IBufferElementData
+{
+    public EnemyExtraComboPointsModuleElement Module;
+}
+
+/// <summary>
+/// Stores one boss-owned source Extra Combo Points condition before death-time extraction.
+/// </summary>
+public struct EnemyBossDropExtraComboPointsConditionElement : IBufferElementData
+{
+    public EnemyExtraComboPointsConditionElement Condition;
 }
 
 /// <summary>

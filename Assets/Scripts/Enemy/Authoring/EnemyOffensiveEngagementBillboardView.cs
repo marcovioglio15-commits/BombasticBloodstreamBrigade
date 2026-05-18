@@ -48,10 +48,10 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     #endregion
 
     private EnemyOffensiveEngagementFeedbackSettings globalSettings;
+    private EnemyOffensiveEngagementFeedbackSettings patternChangeSettings;
     private EnemyPatternShortRangeInteractionAssembly shortRangeInteraction;
     private EnemyPatternWeaponInteractionAssembly weaponInteraction;
     private EnemyModulesPatternDefinition selectedPattern;
-    private EnemyBossPatternAssemblyDefinition bossBasePattern;
     private IReadOnlyList<EnemyBossPatternInteractionDefinition> bossInteractions;
     private Sprite cachedSprite;
     private EnemyOffensiveEngagementTriggerSource cachedSource;
@@ -268,10 +268,10 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     private void InvalidateResolvedContext()
     {
         globalSettings = null;
+        patternChangeSettings = null;
         shortRangeInteraction = null;
         weaponInteraction = null;
         selectedPattern = null;
-        bossBasePattern = null;
         bossInteractions = null;
         bossContextResolved = false;
         cachedSprite = null;
@@ -311,7 +311,9 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
         }
 
         EnsureResolvedContext();
-        EnemyOffensiveEngagementFeedbackSettings globalFeedbackSettings = globalSettings;
+        EnemyOffensiveEngagementFeedbackSettings globalFeedbackSettings = source == EnemyOffensiveEngagementTriggerSource.BossPatternChange
+            ? patternChangeSettings
+            : globalSettings;
         EnemyOffensiveEngagementFeedbackSettings resolvedSettings = ResolveSettings(source,
                                                                                    visualSettingsKey,
                                                                                    useOverrideVisualSettings);
@@ -347,6 +349,11 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
                                                                      bool useOverrideVisualSettings)
     {
         EnemyOffensiveEngagementFeedbackSettings resolvedGlobalSettings = globalSettings;
+
+        if (source == EnemyOffensiveEngagementTriggerSource.BossPatternChange)
+        {
+            return patternChangeSettings;
+        }
 
         if (!useOverrideVisualSettings)
         {
@@ -393,71 +400,194 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
     private EnemyOffensiveEngagementFeedbackSettings ResolveBossOverrideSettings(EnemyOffensiveEngagementTriggerSource source,
                                                                                 int visualSettingsKey)
     {
-        if (visualSettingsKey >= 0)
-        {
-            return ResolveBossInteractionOverrideSettings(source, visualSettingsKey);
-        }
+        if (visualSettingsKey < 0)
+            return null;
 
-        return ResolveBossBaseOverrideSettings(source);
+        return ResolveBossModuleOverrideSettings(source, visualSettingsKey);
     }
 
     /// <summary>
-    /// Resolves an override settings block from the base boss pattern.
+    /// Resolves an override settings block from one authored boss module candidate.
     /// </summary>
     /// <param name="source">Source interaction that currently owns the billboard.</param>
-    /// <returns>Base boss override settings, or null when unavailable.</returns>
-    private EnemyOffensiveEngagementFeedbackSettings ResolveBossBaseOverrideSettings(EnemyOffensiveEngagementTriggerSource source)
+    /// <param name="visualSettingsKey">Compiled module candidate index baked into the active config.</param>
+    /// <returns>Boss module override settings, or null when unavailable.</returns>
+    private EnemyOffensiveEngagementFeedbackSettings ResolveBossModuleOverrideSettings(EnemyOffensiveEngagementTriggerSource source,
+                                                                                      int visualSettingsKey)
     {
-        if (bossBasePattern == null)
-        {
+        if (bossInteractions == null || visualSettingsKey < 0)
             return null;
-        }
 
-        switch (source)
+        int candidateCursor = 0;
+
+        for (int interactionIndex = 0; interactionIndex < bossInteractions.Count; interactionIndex++)
         {
-            case EnemyOffensiveEngagementTriggerSource.ShortRangeInteraction:
-                return ResolveShortRangeOverrideSettings(bossBasePattern.ShortRangeInteraction);
+            EnemyBossPatternInteractionDefinition interaction = bossInteractions[interactionIndex];
 
-            case EnemyOffensiveEngagementTriggerSource.WeaponInteraction:
-                return ResolveWeaponOverrideSettings(bossBasePattern.WeaponInteraction);
+            if (interaction == null || !interaction.Enabled)
+                continue;
 
-            default:
-                return null;
+            if (TryResolveCoreCandidateOverride(interaction.CoreMovementExtraction,
+                                                source,
+                                                visualSettingsKey,
+                                                ref candidateCursor,
+                                                out EnemyOffensiveEngagementFeedbackSettings coreSettings))
+            {
+                return coreSettings;
+            }
+
+            if (TryResolveShortRangeCandidateOverride(interaction.ShortRangeExtraction,
+                                                      source,
+                                                      visualSettingsKey,
+                                                      ref candidateCursor,
+                                                      out EnemyOffensiveEngagementFeedbackSettings shortRangeSettings))
+            {
+                return shortRangeSettings;
+            }
+
+            if (TryResolveWeaponCandidateOverride(interaction.WeaponExtraction,
+                                                  source,
+                                                  visualSettingsKey,
+                                                  ref candidateCursor,
+                                                  out EnemyOffensiveEngagementFeedbackSettings weaponSettings))
+            {
+                return weaponSettings;
+            }
         }
+
+        return null;
     }
 
     /// <summary>
-    /// Resolves an override settings block from one authored boss interaction.
+    /// Resolves an override from a Core Movement internal module candidate.
     /// </summary>
-    /// <param name="source">Source interaction that currently owns the billboard.</param>
-    /// <param name="visualSettingsKey">Authored interaction index baked into the active config.</param>
-    /// <returns>Boss interaction override settings, or null when unavailable.</returns>
-    private EnemyOffensiveEngagementFeedbackSettings ResolveBossInteractionOverrideSettings(EnemyOffensiveEngagementTriggerSource source,
-                                                                                           int visualSettingsKey)
+    /// <param name="extraction">Core Movement extraction definition to inspect.</param>
+    /// <param name="source">Current billboard source.</param>
+    /// <param name="visualSettingsKey">Compiled module candidate index baked into the active config.</param>
+    /// <param name="candidateCursor">Mutable compiled candidate cursor.</param>
+    /// <param name="settings">Resolved override settings.</param>
+    /// <returns>True when the baked key maps to this extraction list.</returns>
+    private static bool TryResolveCoreCandidateOverride(EnemyBossPatternCoreMovementExtractionDefinition extraction,
+                                                        EnemyOffensiveEngagementTriggerSource source,
+                                                        int visualSettingsKey,
+                                                        ref int candidateCursor,
+                                                        out EnemyOffensiveEngagementFeedbackSettings settings)
     {
-        if (bossInteractions == null || visualSettingsKey < 0 || visualSettingsKey >= bossInteractions.Count)
+        settings = null;
+        IReadOnlyList<EnemyBossPatternCoreMovementModuleCandidateDefinition> candidates = extraction != null
+            ? extraction.Candidates
+            : null;
+
+        if (candidates == null)
+            return false;
+
+        for (int candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
         {
-            return null;
+            EnemyBossPatternCoreMovementModuleCandidateDefinition candidate = candidates[candidateIndex];
+
+            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+                continue;
+
+            if (candidateCursor == visualSettingsKey)
+            {
+                settings = source == EnemyOffensiveEngagementTriggerSource.CoreMovement
+                    ? ResolveCoreMovementOverrideSettings(candidate)
+                    : null;
+                return true;
+            }
+
+            candidateCursor++;
         }
 
-        EnemyBossPatternInteractionDefinition interaction = bossInteractions[visualSettingsKey];
+        return false;
+    }
 
-        if (interaction == null || !interaction.Enabled)
+    /// <summary>
+    /// Resolves an override from a Short-Range internal module candidate.
+    /// </summary>
+    /// <param name="extraction">Short-Range extraction definition to inspect.</param>
+    /// <param name="source">Current billboard source.</param>
+    /// <param name="visualSettingsKey">Compiled module candidate index baked into the active config.</param>
+    /// <param name="candidateCursor">Mutable compiled candidate cursor.</param>
+    /// <param name="settings">Resolved override settings.</param>
+    /// <returns>True when the baked key maps to this extraction list.</returns>
+    private static bool TryResolveShortRangeCandidateOverride(EnemyBossPatternShortRangeExtractionDefinition extraction,
+                                                              EnemyOffensiveEngagementTriggerSource source,
+                                                              int visualSettingsKey,
+                                                              ref int candidateCursor,
+                                                              out EnemyOffensiveEngagementFeedbackSettings settings)
+    {
+        settings = null;
+        IReadOnlyList<EnemyBossPatternShortRangeModuleCandidateDefinition> candidates = extraction != null
+            ? extraction.Candidates
+            : null;
+
+        if (candidates == null)
+            return false;
+
+        for (int candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
         {
-            return null;
+            EnemyBossPatternShortRangeModuleCandidateDefinition candidate = candidates[candidateIndex];
+
+            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+                continue;
+
+            if (candidateCursor == visualSettingsKey)
+            {
+                settings = source == EnemyOffensiveEngagementTriggerSource.ShortRangeInteraction
+                    ? ResolveShortRangeOverrideSettings(candidate.Interaction)
+                    : null;
+                return true;
+            }
+
+            candidateCursor++;
         }
 
-        switch (source)
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves an override from a Weapon internal module candidate.
+    /// </summary>
+    /// <param name="extraction">Weapon extraction definition to inspect.</param>
+    /// <param name="source">Current billboard source.</param>
+    /// <param name="visualSettingsKey">Compiled module candidate index baked into the active config.</param>
+    /// <param name="candidateCursor">Mutable compiled candidate cursor.</param>
+    /// <param name="settings">Resolved override settings.</param>
+    /// <returns>True when the baked key maps to this extraction list.</returns>
+    private static bool TryResolveWeaponCandidateOverride(EnemyBossPatternWeaponExtractionDefinition extraction,
+                                                          EnemyOffensiveEngagementTriggerSource source,
+                                                          int visualSettingsKey,
+                                                          ref int candidateCursor,
+                                                          out EnemyOffensiveEngagementFeedbackSettings settings)
+    {
+        settings = null;
+        IReadOnlyList<EnemyBossPatternWeaponModuleCandidateDefinition> candidates = extraction != null
+            ? extraction.Candidates
+            : null;
+
+        if (candidates == null)
+            return false;
+
+        for (int candidateIndex = 0; candidateIndex < candidates.Count; candidateIndex++)
         {
-            case EnemyOffensiveEngagementTriggerSource.ShortRangeInteraction:
-                return ResolveShortRangeOverrideSettings(interaction.ShortRangeInteraction);
+            EnemyBossPatternWeaponModuleCandidateDefinition candidate = candidates[candidateIndex];
 
-            case EnemyOffensiveEngagementTriggerSource.WeaponInteraction:
-                return ResolveWeaponOverrideSettings(interaction.WeaponInteraction);
+            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+                continue;
 
-            default:
-                return null;
+            if (candidateCursor == visualSettingsKey)
+            {
+                settings = source == EnemyOffensiveEngagementTriggerSource.WeaponInteraction
+                    ? ResolveWeaponOverrideSettings(candidate.Interaction)
+                    : null;
+                return true;
+            }
+
+            candidateCursor++;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -475,6 +605,23 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
         }
 
         return interaction.EngagementFeedbackOverride;
+    }
+
+    /// <summary>
+    /// Resolves a Core Movement candidate override settings block when the candidate authored one.
+    /// </summary>
+    /// <param name="candidate">Core Movement candidate to inspect.</param>
+    /// <returns>Override settings, or null when the candidate should use global settings.</returns>
+    private static EnemyOffensiveEngagementFeedbackSettings ResolveCoreMovementOverrideSettings(EnemyBossPatternCoreMovementModuleCandidateDefinition candidate)
+    {
+        if (candidate == null ||
+            candidate.ModuleMode == EnemyBossPatternModuleMode.NullModule ||
+            !candidate.UseEngagementFeedbackOverride)
+        {
+            return null;
+        }
+
+        return candidate.EngagementFeedbackOverride;
     }
 
     /// <summary>
@@ -502,6 +649,11 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
         if (globalSettings == null)
         {
             globalSettings = EnemyAuthoringPresetResolverUtility.ResolveOffensiveEngagementFeedbackSettings(masterPreset, visualPreset);
+        }
+
+        if (patternChangeSettings == null)
+        {
+            patternChangeSettings = EnemyAuthoringPresetResolverUtility.ResolveBossPatternChangeFeedbackSettings(masterPreset, visualPreset);
         }
 
         if (selectedPattern == null)
@@ -535,7 +687,6 @@ public sealed class EnemyOffensiveEngagementBillboardView : MonoBehaviour
             return;
         }
 
-        bossBasePattern = resolvedBossPatternPreset.BasePattern;
         bossInteractions = resolvedBossPatternPreset.Interactions;
     }
 

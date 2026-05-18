@@ -32,7 +32,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
             return;
 
         SerializedObject presetSerializedObject = panel.PresetSerializedObject;
-        SerializedProperty basePatternProperty = presetSerializedObject.FindProperty("basePattern");
+        SerializedProperty extractionSettingsProperty = presetSerializedObject.FindProperty("extractionSettings");
         SerializedProperty interactionsProperty = presetSerializedObject.FindProperty("interactions");
         SerializedProperty sourcePatternsProperty = presetSerializedObject.FindProperty("sourcePatternsPreset");
         EnemyModulesAndPatternsPreset sourcePreset = sourcePatternsProperty != null
@@ -42,83 +42,16 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (sourcePreset == null)
             sectionContainer.Add(new HelpBox("Assign a source Modules & Patterns preset before configuring boss Pattern Assemble slots.", HelpBoxMessageType.Warning));
         else
-            sectionContainer.Add(new HelpBox("Bosses use the normal Core Movement, Short-Range Interaction and Weapon Interaction slots. Boss Interactions are ordered override layers such as Missing Health Interaction.", HelpBoxMessageType.Info));
+            sectionContainer.Add(new HelpBox("Bosses use the normal Core Movement, Short-Range Interaction and Weapon Interaction slots. Pattern Extraction rolls among eligible Pattern Candidates instead of always selecting the first valid entry.", HelpBoxMessageType.Info));
 
-        BuildBasePatternCard(panel, basePatternProperty, sourcePreset, sectionContainer);
+        EnemyBossPatternPresetsPanelExtractionUtility.BuildExtractionSettingsCard(panel,
+                                                                                  extractionSettingsProperty,
+                                                                                  sectionContainer);
         BuildInteractionCards(panel, interactionsProperty, sourcePreset, sectionContainer);
-        EnemyBossPatternPresetsPanelWarningUtility.AddPatternWarnings(basePatternProperty, interactionsProperty, sourcePreset, sectionContainer);
-    }
-    #endregion
-
-    #region Base Pattern
-    /// <summary>
-    /// Builds the always-available base pattern assemble card.
-    /// </summary>
-    /// <param name="panel">Owning panel used for rebuild callbacks.</param>
-    /// <param name="basePatternProperty">Serialized base pattern root.</param>
-    /// <param name="sourcePreset">Source module catalog.</param>
-    /// <param name="parent">Parent receiving the card.</param>
-    private static void BuildBasePatternCard(EnemyBossPatternPresetsPanel panel,
-                                             SerializedProperty basePatternProperty,
-                                             EnemyModulesAndPatternsPreset sourcePreset,
-                                             VisualElement parent)
-    {
-        if (basePatternProperty == null || parent == null)
-            return;
-
-        VisualElement card = EnemyBossPatternPresetsPanelSharedUtility.CreateCard();
-        Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(basePatternProperty,
-                                                                                  "Base Pattern Assemble",
-                                                                                  "BossBasePatternAssemble",
-                                                                                  true);
-        card.Add(foldout);
-        BuildBaseCoreMovementSlot(panel, foldout, basePatternProperty.FindPropertyRelative("coreMovement"), sourcePreset);
-        BuildShortRangeSlot(panel,
-                            foldout,
-                            basePatternProperty.FindPropertyRelative("shortRangeInteraction"),
-                            sourcePreset,
-                            "Short-Range Interaction",
-                            "Enable Short-Range Interaction",
-                            "Optional base short-range interaction inherited by boss interactions unless they override it.");
-        BuildWeaponSlot(panel,
-                        foldout,
-                        basePatternProperty.FindPropertyRelative("weaponInteraction"),
-                        sourcePreset,
-                        "Weapon Interaction",
-                        "Enable Weapon Interaction",
-                        "Optional base weapon interaction inherited by boss interactions unless they override it.");
-        parent.Add(card);
-    }
-
-    /// <summary>
-    /// Builds the required base Core Movement slot.
-    /// </summary>
-    /// <param name="panel">Owning panel used for serialized context.</param>
-    /// <param name="parent">Parent receiving controls.</param>
-    /// <param name="coreMovementProperty">Serialized core movement root.</param>
-    /// <param name="sourcePreset">Source module catalog.</param>
-    private static void BuildBaseCoreMovementSlot(EnemyBossPatternPresetsPanel panel,
-                                                  VisualElement parent,
-                                                  SerializedProperty coreMovementProperty,
-                                                  EnemyModulesAndPatternsPreset sourcePreset)
-    {
-        Foldout foldout = CreateSlotFoldout(coreMovementProperty,
-                                            "Core Movement",
-                                            "Always-active base movement used when no boss interaction overrides Core Movement.",
-                                            true);
-
-        if (coreMovementProperty != null)
-        {
-            EnemyBossPatternPresetsPanelModuleUtility.AddModuleBindingSelector(panel,
-                                                                               foldout,
-                                                                               coreMovementProperty.FindPropertyRelative("binding"),
-                                                                               sourcePreset,
-                                                                               EnemyPatternModuleCatalogSection.CoreMovement,
-                                                                               "Core Movement Module",
-                                                                               "Select the base Core Movement module from the source preset.");
-        }
-
-        parent.Add(foldout);
+        EnemyBossPatternPresetsPanelWarningUtility.AddPatternWarnings(interactionsProperty,
+                                                                      extractionSettingsProperty,
+                                                                      sourcePreset,
+                                                                      sectionContainer);
     }
     #endregion
 
@@ -138,7 +71,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (interactionsProperty == null || parent == null)
             return;
 
-        Label header = new Label("Boss Interactions");
+        Label header = new Label("Pattern Candidates");
         header.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
         header.style.marginTop = 8f;
         parent.Add(header);
@@ -157,8 +90,8 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         {
             AddInteraction(panel, interactionsProperty, sourcePreset);
         });
-        addButton.text = "Add Boss Interaction";
-        addButton.tooltip = "Add one ordered boss interaction such as Missing Health Interaction.";
+        addButton.text = "Add Pattern Candidate";
+        addButton.tooltip = "Add one boss pattern candidate with independent eligibility and assembled slot overrides.";
         addButton.style.marginTop = 4f;
         addButton.SetEnabled(sourcePreset != null && EnemyBossPatternPresetsPanelModuleUtility.HasAnySelectableModule(sourcePreset));
         parent.Add(addButton);
@@ -192,28 +125,33 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         SerializedProperty interactionTypeProperty = interactionProperty.FindPropertyRelative("interactionType");
         SerializedProperty displayNameProperty = interactionProperty.FindPropertyRelative("displayName");
         SerializedProperty minimumActiveSecondsProperty = interactionProperty.FindPropertyRelative("minimumActiveSeconds");
+        SerializedProperty selectionWeightProperty = interactionProperty.FindPropertyRelative("selectionWeight");
         EnemyBossPatternInteractionType interactionType = ResolveInteractionType(interactionTypeProperty);
 
-        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, enabledProperty, "Enabled", "Enables this boss interaction during bake and runtime selection."));
-        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, interactionTypeProperty, "Interaction Type", "Boss-only trigger that decides when this interaction can override the base pattern."));
-        EnemyBossPatternPresetsPanelSharedUtility.AddTrackedTextField(panel, foldout, displayNameProperty, "Interaction Name", "Readable interaction name shown by the Boss Pattern Assemble section.", false);
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, enabledProperty, "Enabled", "Enables this pattern candidate during bake and runtime extraction."));
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, interactionTypeProperty, "Eligibility Type", "Boss-only criterion that decides when this pattern candidate can be extracted."));
+        EnemyBossPatternPresetsPanelSharedUtility.AddTrackedTextField(panel, foldout, displayNameProperty, "Candidate Name", "Readable candidate name shown by the Boss Pattern Assemble section.", false);
         AddInteractionTypeFields(panel, foldout, interactionProperty, interactionType);
-        EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, foldout, minimumActiveSecondsProperty, "Minimum Active Seconds", 0f, 20f, "Minimum seconds this interaction remains active before another valid interaction can replace it.");
-        BuildCoreOverrideSlot(panel, foldout, interactionProperty.FindPropertyRelative("coreMovement"), sourcePreset);
-        BuildShortRangeSlot(panel,
-                            foldout,
-                            interactionProperty.FindPropertyRelative("shortRangeInteraction"),
-                            sourcePreset,
-                            "Short-Range Interaction Override",
-                            "Override Short-Range Interaction",
-                            "When enabled, this boss interaction replaces the inherited Short-Range Interaction slot.");
-        BuildWeaponSlot(panel,
-                        foldout,
-                        interactionProperty.FindPropertyRelative("weaponInteraction"),
-                        sourcePreset,
-                        "Weapon Interaction Override",
-                        "Override Weapon Interaction",
-                        "When enabled, this boss interaction replaces the inherited Weapon Interaction slot.");
+        EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, foldout, minimumActiveSecondsProperty, "Minimum Active Seconds", 0f, 20f, "Minimum seconds this pattern remains active before extraction can replace it.");
+        EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, foldout, selectionWeightProperty, "Selection Weight", 0f, 100f, "Relative weight used when this candidate is eligible during a pattern extraction roll.");
+        BuildInternalExtractionSlot(panel,
+                                    foldout,
+                                    interactionProperty.FindPropertyRelative("coreMovementExtraction"),
+                                    sourcePreset,
+                                    EnemyBossPatternSlotKind.CoreMovement,
+                                    "Core Movement Extraction");
+        BuildInternalExtractionSlot(panel,
+                                    foldout,
+                                    interactionProperty.FindPropertyRelative("shortRangeExtraction"),
+                                    sourcePreset,
+                                    EnemyBossPatternSlotKind.ShortRangeInteraction,
+                                    "Short-Range Extraction");
+        BuildInternalExtractionSlot(panel,
+                                    foldout,
+                                    interactionProperty.FindPropertyRelative("weaponExtraction"),
+                                    sourcePreset,
+                                    EnemyBossPatternSlotKind.WeaponInteraction,
+                                    "Weapon Extraction");
         parent.Add(card);
     }
 
@@ -231,6 +169,10 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     {
         switch (interactionType)
         {
+            case EnemyBossPatternInteractionType.Always:
+                parent.Add(new HelpBox("Always candidates are considered during every pattern extraction roll.", HelpBoxMessageType.Info));
+                break;
+
             case EnemyBossPatternInteractionType.ElapsedTime:
                 EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, parent, interactionProperty.FindPropertyRelative("minimumElapsedSeconds"), "Minimum Elapsed Seconds", 0f, DefaultMaximumConditionSeconds, "Minimum seconds since boss spawn required by this interaction.");
                 EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, parent, interactionProperty.FindPropertyRelative("maximumElapsedSeconds"), "Maximum Elapsed Seconds", 0f, DefaultMaximumConditionSeconds, "Maximum seconds since boss spawn allowed by this interaction. Zero disables the upper bound.");
@@ -259,6 +201,33 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     #endregion
 
     #region Slots
+    /// <summary>
+    /// Adds one internal extraction property block for a pattern-owned module slot.
+    /// </summary>
+    /// <param name="panel">Owning boss preset panel.</param>
+    /// <param name="parent">Parent receiving the extraction UI.</param>
+    /// <param name="extractionProperty">Serialized internal extraction root.</param>
+    /// <param name="sourcePreset">Source module catalog used by boss candidates.</param>
+    /// <param name="slotKind">Boss slot controlled by this extraction block.</param>
+    /// <param name="label">User-facing property label.</param>
+    private static void BuildInternalExtractionSlot(EnemyBossPatternPresetsPanel panel,
+                                                    VisualElement parent,
+                                                    SerializedProperty extractionProperty,
+                                                    EnemyModulesAndPatternsPreset sourcePreset,
+                                                    EnemyBossPatternSlotKind slotKind,
+                                                    string label)
+    {
+        if (parent == null || extractionProperty == null)
+            return;
+
+        EnemyBossPatternPresetsPanelCandidateUtility.BuildInternalExtractionSlot(panel,
+                                                                                 parent,
+                                                                                 extractionProperty,
+                                                                                 sourcePreset,
+                                                                                 slotKind,
+                                                                                 label);
+    }
+
     /// <summary>
     /// Builds an optional Core Movement override slot.
     /// </summary>
@@ -306,7 +275,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     /// <param name="title">Foldout title.</param>
     /// <param name="enabledLabel">Enabled toggle label.</param>
     /// <param name="tooltip">Foldout tooltip.</param>
-    private static void BuildShortRangeSlot(EnemyBossPatternPresetsPanel panel,
+    internal static void BuildShortRangeSlot(EnemyBossPatternPresetsPanel panel,
                                             VisualElement parent,
                                             SerializedProperty shortRangeProperty,
                                             EnemyModulesAndPatternsPreset sourcePreset,
@@ -354,7 +323,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     /// <param name="title">Foldout title.</param>
     /// <param name="enabledLabel">Enabled toggle label.</param>
     /// <param name="tooltip">Foldout tooltip.</param>
-    private static void BuildWeaponSlot(EnemyBossPatternPresetsPanel panel,
+    internal static void BuildWeaponSlot(EnemyBossPatternPresetsPanel panel,
                                         VisualElement parent,
                                         SerializedProperty weaponProperty,
                                         EnemyModulesAndPatternsPreset sourcePreset,
@@ -419,13 +388,15 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     /// <param name="panel">Owning panel.</param>
     /// <param name="parent">Parent receiving controls.</param>
     /// <param name="slotProperty">Serialized slot root.</param>
+    /// <param name="sourcePreset">Source module catalog used to resolve the selected module kind.</param>
+    /// <param name="section">Catalog section used by the slot.</param>
     /// <param name="labelPrefix">Slot label prefix.</param>
-    private static void BuildEngagementFeedbackFields(EnemyBossPatternPresetsPanel panel,
-                                                      VisualElement parent,
-                                                      SerializedProperty slotProperty,
-                                                      EnemyModulesAndPatternsPreset sourcePreset,
-                                                      EnemyPatternModuleCatalogSection section,
-                                                      string labelPrefix)
+    internal static void BuildEngagementFeedbackFields(EnemyBossPatternPresetsPanel panel,
+                                                       VisualElement parent,
+                                                       SerializedProperty slotProperty,
+                                                       EnemyModulesAndPatternsPreset sourcePreset,
+                                                       EnemyPatternModuleCatalogSection section,
+                                                       string labelPrefix)
     {
         SerializedProperty displayTriggerProperty = slotProperty.FindPropertyRelative("displayBehaviourEngagementTrigger");
         SerializedProperty useOverrideProperty = slotProperty.FindPropertyRelative("useEngagementFeedbackOverride");
@@ -436,11 +407,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (!supportsFeedback && (displayTriggerProperty == null || !displayTriggerProperty.boolValue))
             return;
 
-        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, displayTriggerProperty, "Display Behaviour Engagement Trigger", "When enabled, this " + labelPrefix + " slot emits offensive engagement feedback before supported behaviour commits."));
+        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, displayTriggerProperty, "Display Behaviour Engagement Trigger", "When enabled, this " + labelPrefix + " slot emits offensive engagement feedback before supported commits or immediately after activation."));
 
         if (!supportsFeedback)
         {
-            parent.Add(new HelpBox(labelPrefix + " offensive engagement feedback is enabled, but the selected module does not expose a predictive timing hook for this slot.", HelpBoxMessageType.Warning));
+            parent.Add(new HelpBox(labelPrefix + " offensive engagement feedback is enabled, but the selected module does not expose an activation or predictive timing hook for this slot.", HelpBoxMessageType.Warning));
             return;
         }
 
@@ -521,26 +492,37 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
                                                      int insertIndex)
     {
         EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(insertedInteraction.FindPropertyRelative("enabled"), true);
-        EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(insertedInteraction.FindPropertyRelative("interactionType"), Convert.ToInt32(EnemyBossPatternInteractionType.MissingHealth));
-        EnemyBossPatternPresetsPanelModuleUtility.SetString(insertedInteraction.FindPropertyRelative("displayName"), "Missing Health Interaction " + (insertIndex + 1));
-        ConfigureDefaultCoreOverride(insertedInteraction.FindPropertyRelative("coreMovement"), sourcePreset);
+        EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(insertedInteraction.FindPropertyRelative("interactionType"), Convert.ToInt32(EnemyBossPatternInteractionType.Always));
+        EnemyBossPatternPresetsPanelModuleUtility.SetString(insertedInteraction.FindPropertyRelative("displayName"), "Always Interaction " + (insertIndex + 1));
+        ConfigureDefaultCoreCandidate(insertedInteraction.FindPropertyRelative("coreMovementExtraction"), sourcePreset);
     }
 
     /// <summary>
-    /// Enables the core override slot on a new interaction when a Core Movement module exists.
+    /// Adds a default Core Movement module candidate to a new pattern candidate when a module exists.
     /// </summary>
-    /// <param name="coreMovementProperty">Serialized core override root.</param>
+    /// <param name="coreExtractionProperty">Serialized core extraction root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
-    private static void ConfigureDefaultCoreOverride(SerializedProperty coreMovementProperty, EnemyModulesAndPatternsPreset sourcePreset)
+    private static void ConfigureDefaultCoreCandidate(SerializedProperty coreExtractionProperty, EnemyModulesAndPatternsPreset sourcePreset)
     {
-        if (coreMovementProperty == null)
+        if (coreExtractionProperty == null)
             return;
 
         if (!EnemyBossPatternPresetsPanelModuleUtility.TryResolveFirstModuleId(sourcePreset, EnemyPatternModuleCatalogSection.CoreMovement, out string moduleId))
             return;
 
-        EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(coreMovementProperty.FindPropertyRelative("isEnabled"), true);
-        EnemyBossPatternPresetsPanelModuleUtility.ConfigureBinding(coreMovementProperty.FindPropertyRelative("binding"), moduleId);
+        SerializedProperty candidatesProperty = coreExtractionProperty.FindPropertyRelative("candidates");
+
+        if (candidatesProperty == null)
+            return;
+
+        candidatesProperty.arraySize = 0;
+        candidatesProperty.InsertArrayElementAtIndex(0);
+        SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(0);
+        SerializedProperty eligibilityProperty = candidateProperty.FindPropertyRelative("eligibility");
+        EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(eligibilityProperty.FindPropertyRelative("enabled"), true);
+        EnemyBossPatternPresetsPanelModuleUtility.SetString(eligibilityProperty.FindPropertyRelative("displayName"), "Default Core Movement");
+        EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(candidateProperty.FindPropertyRelative("moduleMode"), Convert.ToInt32(EnemyBossPatternModuleMode.Module));
+        EnemyBossPatternPresetsPanelModuleUtility.ConfigureBinding(candidateProperty.FindPropertyRelative("binding"), moduleId);
     }
     #endregion
 

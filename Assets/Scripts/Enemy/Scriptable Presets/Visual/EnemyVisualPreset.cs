@@ -383,6 +383,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [FormerlySerializedAs("shooterWarning")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings offensiveEngagementFeedback = new EnemyOffensiveEngagementFeedbackSettings();
 
+    [Tooltip("Boss-only visual feedback shown immediately after a boss pattern extraction changes the active pattern.")]
+    [SerializeField] private EnemyOffensiveEngagementFeedbackSettings bossPatternChangeFeedback = new EnemyOffensiveEngagementFeedbackSettings();
+
     [Tooltip("Prefab and paint metadata block.")]
     [SerializeField] private EnemyVisualPrefabSettings prefabs = new EnemyVisualPrefabSettings();
 
@@ -471,6 +474,14 @@ public sealed class EnemyVisualPreset : ScriptableObject
         }
     }
 
+    public EnemyOffensiveEngagementFeedbackSettings BossPatternChangeFeedback
+    {
+        get
+        {
+            return bossPatternChangeFeedback;
+        }
+    }
+
     public EnemyBossVisualUiSettings BossUi
     {
         get
@@ -519,6 +530,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
         if (offensiveEngagementFeedback == null)
             offensiveEngagementFeedback = new EnemyOffensiveEngagementFeedbackSettings();
 
+        if (bossPatternChangeFeedback == null)
+            bossPatternChangeFeedback = new EnemyOffensiveEngagementFeedbackSettings();
+
         if (prefabs == null)
             prefabs = new EnemyVisualPrefabSettings();
 
@@ -535,6 +549,7 @@ public sealed class EnemyVisualPreset : ScriptableObject
         damageFeedback.Validate();
         outline.Validate();
         offensiveEngagementFeedback.Validate();
+        bossPatternChangeFeedback.Validate();
         prefabs.Validate();
         spawnOverrides.Validate();
         projectileOffscreenWarning.Validate();

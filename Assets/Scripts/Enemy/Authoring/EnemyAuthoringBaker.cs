@@ -124,12 +124,15 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             });
         }
 
-        if (compiledPattern.ShooterConfigs.Count > 0)
+        if (ShouldBakeShooterRuntime(compiledPattern))
         {
             TryBakeShooterRuntime(authoring, entity, compiledPattern);
         }
 
-        TryBakeDropItemsRuntime(authoring, entity, compiledPattern);
+        TryBakeDropItemsRuntime(authoring,
+                                entity,
+                                compiledPattern,
+                                compiledBossPattern != null && compiledBossPattern.BossDropExtractionEnabled);
 
         if (compiledBossPattern != null)
             AppendInitialBossOffensiveEngagementConfigs(compiledBossPattern, offensiveEngagementConfigs);
@@ -266,7 +269,21 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     #region Helpers
     /// <summary>
-    /// Writes the base boss offensive engagement configs into the active runtime buffer used immediately after spawn.
+    /// Resolves whether this enemy needs projectile runtime buffers during bake.
+    /// Boss pattern presets may start with an empty active shooter list while still owning weapon candidates that are applied later.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern result produced from advanced or boss pattern presets.</param>
+    /// <returns>True when shooter configs or deferred shooter runtime settings require projectile ECS support.</returns>
+    private static bool ShouldBakeShooterRuntime(EnemyCompiledPatternBakeResult compiledPattern)
+    {
+        if (compiledPattern == null)
+            return false;
+
+        return compiledPattern.ShooterConfigs.Count > 0 || compiledPattern.HasShooterRuntimeSettings;
+    }
+
+    /// <summary>
+    /// Keeps the active boss offensive engagement buffer empty until the first runtime pattern extraction.
     /// </summary>
     /// <param name="compiledBossPattern">Compiled boss pattern data.</param>
     /// <param name="offensiveEngagementConfigs">Active target buffer populated during bake.</param>
@@ -275,37 +292,6 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     {
         if (compiledBossPattern == null)
             return;
-
-        AppendBossOffensiveEngagementConfigSlice(compiledBossPattern.BaseFirstOffensiveEngagementConfigIndex,
-                                                 compiledBossPattern.BaseOffensiveEngagementConfigCount,
-                                                 compiledBossPattern,
-                                                 offensiveEngagementConfigs);
-    }
-
-    /// <summary>
-    /// Copies one boss-owned offensive engagement config slice into an active runtime buffer.
-    /// </summary>
-    /// <param name="firstConfigIndex">First source config index.</param>
-    /// <param name="configCount">Number of configs to copy.</param>
-    /// <param name="compiledBossPattern">Compiled boss source data.</param>
-    /// <param name="targetConfigs">Active target buffer receiving configs.</param>
-    private static void AppendBossOffensiveEngagementConfigSlice(int firstConfigIndex,
-                                                                 int configCount,
-                                                                 EnemyCompiledBossPatternBakeResult compiledBossPattern,
-                                                                 DynamicBuffer<EnemyOffensiveEngagementConfigElement> targetConfigs)
-    {
-        if (compiledBossPattern == null)
-            return;
-
-        for (int configIndex = 0; configIndex < configCount; configIndex++)
-        {
-            int sourceIndex = firstConfigIndex + configIndex;
-
-            if (sourceIndex < 0 || sourceIndex >= compiledBossPattern.OffensiveEngagementConfigs.Count)
-                continue;
-
-            targetConfigs.Add(compiledBossPattern.OffensiveEngagementConfigs[sourceIndex]);
-        }
     }
 
     /// <summary>
@@ -322,30 +308,78 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return;
 
         AddComponent<EnemyBossTag>(entity);
-        AddComponent(entity, new EnemyBossPatternBaseConfig
+        AddComponent(entity, new EnemyBossPatternExtractionConfig
         {
-            HasCustomMovement = compiledBossPattern.BasePattern.HasCustomMovement ? (byte)1 : (byte)0,
-            FirstShooterConfigIndex = compiledBossPattern.BaseFirstShooterConfigIndex,
-            ShooterConfigCount = compiledBossPattern.BaseShooterConfigCount,
-            FirstOffensiveEngagementConfigIndex = compiledBossPattern.BaseFirstOffensiveEngagementConfigIndex,
-            OffensiveEngagementConfigCount = compiledBossPattern.BaseOffensiveEngagementConfigCount,
-            PatternConfig = compiledBossPattern.BasePattern.PatternConfig
+            HasCustomMovement = compiledBossPattern.InitialPattern.HasCustomMovement ? (byte)1 : (byte)0,
+            RerollWhenCurrentPatternBecomesInvalid = compiledBossPattern.RerollWhenCurrentPatternBecomesInvalid ? (byte)1 : (byte)0,
+            UseElapsedIntervalExtraction = compiledBossPattern.UseElapsedIntervalExtraction ? (byte)1 : (byte)0,
+            UseMissingHealthStepExtraction = compiledBossPattern.UseMissingHealthStepExtraction ? (byte)1 : (byte)0,
+            UseTravelledDistanceExtraction = compiledBossPattern.UseTravelledDistanceExtraction ? (byte)1 : (byte)0,
+            UseDamageWindowExtraction = compiledBossPattern.UseDamageWindowExtraction ? (byte)1 : (byte)0,
+            FirstShooterConfigIndex = 0,
+            ShooterConfigCount = 0,
+            FirstOffensiveEngagementConfigIndex = 0,
+            OffensiveEngagementConfigCount = 0,
+            PlayerDistanceCondition = compiledBossPattern.PlayerDistanceCondition,
+            MinimumSecondsBetweenExtractions = compiledBossPattern.MinimumSecondsBetweenExtractions,
+            ElapsedIntervalSeconds = compiledBossPattern.ElapsedIntervalSeconds,
+            MissingHealthStepPercent = compiledBossPattern.MissingHealthStepPercent,
+            TravelledDistanceSinceLastExtraction = compiledBossPattern.TravelledDistanceSinceLastExtraction,
+            PlayerDistanceThreshold = compiledBossPattern.PlayerDistanceThreshold,
+            PlayerDistanceHoldSeconds = compiledBossPattern.PlayerDistanceHoldSeconds,
+            DamageWindowSeconds = compiledBossPattern.DamageWindowSeconds,
+            DamageThreshold = compiledBossPattern.DamageThreshold,
+            PatternConfig = compiledBossPattern.InitialPattern.PatternConfig
         });
         AddComponent(entity, new EnemyBossPatternRuntimeState
         {
-            ActiveInteractionIndex = -1,
+            ActiveInteractionIndex = -2,
             ElapsedSeconds = 0f,
             ActiveInteractionElapsedSeconds = 0f,
+            ExtractionElapsedSeconds = 0f,
             TravelledDistance = 0f,
+            DistanceSinceLastExtraction = 0f,
+            LastExtractionMissingHealthPercent = 0f,
+            PlayerDistanceHoldSeconds = 0f,
+            DamageWindowElapsedSeconds = 0f,
+            DamageWindowAccumulated = 0f,
+            PreviousObservedDurability = 0f,
             LastPosition = float3.zero,
             LastObservedDamageLifetimeSeconds = 0f,
             Initialized = 0
+        });
+        EnemyOffensiveEngagementFeedbackSettings patternChangeFeedbackSettings =
+            EnemyAuthoringPresetResolverUtility.ResolveBossPatternChangeFeedbackSettings(authoring.MasterPreset,
+                                                                                        authoring.VisualPreset);
+        AddComponent(entity, EnemyOffensiveEngagementBakeUtility.CreateBossPatternChangeFeedbackConfig(patternChangeFeedbackSettings));
+        AddComponent(entity, new EnemyBossPatternChangeFeedbackState
+        {
+            ElapsedSeconds = 0f,
+            RemainingSeconds = 0f,
+            DisplayedBlend = 0f,
+            DisplayedColor = float4.zero,
+            FadeOutSeconds = 0f
         });
 
         DynamicBuffer<EnemyBossPatternInteractionElement> interactionBuffer = AddBuffer<EnemyBossPatternInteractionElement>(entity);
 
         for (int interactionIndex = 0; interactionIndex < compiledBossPattern.Interactions.Count; interactionIndex++)
             interactionBuffer.Add(compiledBossPattern.Interactions[interactionIndex]);
+
+        DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractionBuffer = AddBuffer<EnemyBossPatternModuleExtractionElement>(entity);
+
+        for (int extractionIndex = 0; extractionIndex < compiledBossPattern.ModuleExtractions.Count; extractionIndex++)
+            moduleExtractionBuffer.Add(compiledBossPattern.ModuleExtractions[extractionIndex]);
+
+        DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidateBuffer = AddBuffer<EnemyBossPatternModuleCandidateElement>(entity);
+
+        for (int candidateIndex = 0; candidateIndex < compiledBossPattern.ModuleCandidates.Count; candidateIndex++)
+            moduleCandidateBuffer.Add(compiledBossPattern.ModuleCandidates[candidateIndex]);
+
+        DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimeBuffer = AddBuffer<EnemyBossPatternSlotRuntimeElement>(entity);
+        AppendDefaultBossSlotRuntime(slotRuntimeBuffer, EnemyBossPatternSlotKind.CoreMovement);
+        AppendDefaultBossSlotRuntime(slotRuntimeBuffer, EnemyBossPatternSlotKind.ShortRangeInteraction);
+        AppendDefaultBossSlotRuntime(slotRuntimeBuffer, EnemyBossPatternSlotKind.WeaponInteraction);
 
         DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterBuffer = AddBuffer<EnemyBossPatternShooterConfigElement>(entity);
 
@@ -367,6 +401,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             });
         }
 
+        TryBakeBossDropExtraction(entity, compiledBossPattern);
         DynamicBuffer<EnemyBossMinionSpawnElement> minionSpawnBuffer = AddBuffer<EnemyBossMinionSpawnElement>(entity);
         AddBuffer<EnemyBossPendingMinionSpawnElement>(entity);
 
@@ -375,6 +410,95 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         AddComponent(entity, BuildBossHudConfig(authoring));
         TryBakeBossHudManagedConfig(authoring, entity);
+    }
+
+    /// <summary>
+    /// Adds one default internal slot runtime entry used by boss module extraction.
+    /// </summary>
+    /// <param name="slotRuntimeBuffer">Runtime slot buffer receiving the entry.</param>
+    /// <param name="slotKind">Slot represented by the runtime entry.</param>
+    private static void AppendDefaultBossSlotRuntime(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimeBuffer,
+                                                     EnemyBossPatternSlotKind slotKind)
+    {
+        slotRuntimeBuffer.Add(new EnemyBossPatternSlotRuntimeElement
+        {
+            SlotKind = slotKind,
+            ActivePatternIndex = -2,
+            ActiveCandidateIndex = -2,
+            ActiveCandidateElapsedSeconds = 0f,
+            ExtractionElapsedSeconds = 0f,
+            DistanceSinceLastExtraction = 0f,
+            LastExtractionMissingHealthPercent = 0f,
+            PlayerDistanceHoldSeconds = 0f,
+            DamageWindowElapsedSeconds = 0f,
+            DamageWindowAccumulated = 0f,
+            PreviousObservedDurability = 0f
+        });
+    }
+
+    /// <summary>
+    /// Writes boss-specific drop extraction source buffers used to rebuild standard drop buffers on death.
+    /// </summary>
+    /// <param name="entity">Enemy entity being baked.</param>
+    /// <param name="compiledBossPattern">Compiled boss pattern data.</param>
+    private void TryBakeBossDropExtraction(Entity entity, EnemyCompiledBossPatternBakeResult compiledBossPattern)
+    {
+        if (compiledBossPattern == null || !compiledBossPattern.BossDropExtractionEnabled)
+            return;
+
+        AddComponent(entity, new EnemyBossDropExtractionConfig
+        {
+            Enabled = 1,
+            ExtractionMode = compiledBossPattern.BossDropExtractionMode
+        });
+        AddComponent(entity, new EnemyBossDropRuntimeState
+        {
+            SelectionResolved = 0
+        });
+
+        DynamicBuffer<EnemyBossDropCandidateElement> candidateBuffer = AddBuffer<EnemyBossDropCandidateElement>(entity);
+        DynamicBuffer<EnemyBossSelectedDropCandidateElement> selectedCandidateBuffer = AddBuffer<EnemyBossSelectedDropCandidateElement>(entity);
+        DynamicBuffer<EnemyBossDropExperienceModuleElement> experienceModuleBuffer = AddBuffer<EnemyBossDropExperienceModuleElement>(entity);
+        DynamicBuffer<EnemyBossDropExperienceDefinitionElement> experienceDefinitionBuffer = AddBuffer<EnemyBossDropExperienceDefinitionElement>(entity);
+        DynamicBuffer<EnemyBossDropExtraComboPointsModuleElement> extraComboPointsModuleBuffer = AddBuffer<EnemyBossDropExtraComboPointsModuleElement>(entity);
+        DynamicBuffer<EnemyBossDropExtraComboPointsConditionElement> extraComboPointsConditionBuffer = AddBuffer<EnemyBossDropExtraComboPointsConditionElement>(entity);
+
+        selectedCandidateBuffer.Clear();
+
+        for (int candidateIndex = 0; candidateIndex < compiledBossPattern.DropCandidates.Count; candidateIndex++)
+            candidateBuffer.Add(compiledBossPattern.DropCandidates[candidateIndex]);
+
+        for (int moduleIndex = 0; moduleIndex < compiledBossPattern.BossDropExperienceModules.Count; moduleIndex++)
+        {
+            experienceModuleBuffer.Add(new EnemyBossDropExperienceModuleElement
+            {
+                Module = compiledBossPattern.BossDropExperienceModules[moduleIndex]
+            });
+        }
+
+        for (int definitionIndex = 0; definitionIndex < compiledBossPattern.BossDropExperienceDefinitions.Count; definitionIndex++)
+        {
+            experienceDefinitionBuffer.Add(new EnemyBossDropExperienceDefinitionElement
+            {
+                Definition = compiledBossPattern.BossDropExperienceDefinitions[definitionIndex]
+            });
+        }
+
+        for (int moduleIndex = 0; moduleIndex < compiledBossPattern.BossDropExtraComboPointsModules.Count; moduleIndex++)
+        {
+            extraComboPointsModuleBuffer.Add(new EnemyBossDropExtraComboPointsModuleElement
+            {
+                Module = compiledBossPattern.BossDropExtraComboPointsModules[moduleIndex]
+            });
+        }
+
+        for (int conditionIndex = 0; conditionIndex < compiledBossPattern.BossDropExtraComboPointsConditions.Count; conditionIndex++)
+        {
+            extraComboPointsConditionBuffer.Add(new EnemyBossDropExtraComboPointsConditionElement
+            {
+                Condition = compiledBossPattern.BossDropExtraComboPointsConditions[conditionIndex]
+            });
+        }
     }
 
     /// <summary>
@@ -668,7 +792,17 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         AddBuffer<ProjectilePoolElement>(entity);
     }
 
-    private void TryBakeDropItemsRuntime(EnemyAuthoring authoring, Entity entity, EnemyCompiledPatternBakeResult compiledPattern)
+    /// <summary>
+    /// Bakes standard drop runtime buffers, optionally keeping empty buffers for boss death-time extraction rewrites.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used for prefab validation.</param>
+    /// <param name="entity">Enemy entity receiving drop config and buffers.</param>
+    /// <param name="compiledPattern">Compiled pattern providing normal or boss-union drop modules.</param>
+    /// <param name="forceEmptyRuntimeBuffers">True when boss death extraction must rewrite drop buffers at runtime.</param>
+    private void TryBakeDropItemsRuntime(EnemyAuthoring authoring,
+                                         Entity entity,
+                                         EnemyCompiledPatternBakeResult compiledPattern,
+                                         bool forceEmptyRuntimeBuffers)
     {
         if (authoring == null)
             return;
@@ -799,12 +933,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             dropItemsConfig.ExtraComboPointsModuleCount = stagedExtraComboPointsModules.Count;
         }
 
-        if (dropItemsConfig.HasExperienceDrops == 0 && dropItemsConfig.HasExtraComboPoints == 0)
+        if (dropItemsConfig.HasExperienceDrops == 0 && dropItemsConfig.HasExtraComboPoints == 0 && !forceEmptyRuntimeBuffers)
             return;
 
         AddComponent(entity, dropItemsConfig);
 
-        if (stagedExperienceModules.Count > 0)
+        if (stagedExperienceModules.Count > 0 || forceEmptyRuntimeBuffers)
         {
             DynamicBuffer<EnemyExperienceDropModuleElement> experienceModulesBuffer = AddBuffer<EnemyExperienceDropModuleElement>(entity);
             DynamicBuffer<EnemyExperienceDropDefinitionElement> experienceDefinitionsBuffer = AddBuffer<EnemyExperienceDropDefinitionElement>(entity);
@@ -816,7 +950,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                 experienceDefinitionsBuffer.Add(stagedExperienceDefinitions[definitionIndex]);
         }
 
-        if (stagedExtraComboPointsModules.Count > 0)
+        if (stagedExtraComboPointsModules.Count > 0 || forceEmptyRuntimeBuffers)
         {
             DynamicBuffer<EnemyExtraComboPointsModuleElement> extraComboPointsModulesBuffer = AddBuffer<EnemyExtraComboPointsModuleElement>(entity);
             DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointsConditionsBuffer = AddBuffer<EnemyExtraComboPointsConditionElement>(entity);

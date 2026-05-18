@@ -27,20 +27,13 @@ internal static class EnemyBossPatternBakeUtility
         if (preset == null)
             return result;
 
+        ConfigureExtractionSettings(preset.ExtractionSettings, result);
         EnemyModulesAndPatternsPreset sharedPreset = preset.SourcePatternsPreset;
 
         if (sharedPreset != null)
         {
-            result.BasePattern = CompileBasePattern(sharedPreset, preset.BasePattern);
-            TryAssignShooterRuntimeSettings(result.BasePattern, result);
-            result.BaseFirstShooterConfigIndex = AppendShooterConfigs(result.BasePattern, result);
-            result.BaseShooterConfigCount = result.BasePattern.ShooterConfigs.Count;
-            List<EnemyOffensiveEngagementConfigElement> baseEngagementConfigs = CompileBaseEngagementConfigs(sharedPreset,
-                                                                                                             preset.BasePattern,
-                                                                                                             globalEngagementSettings);
-            result.BaseFirstOffensiveEngagementConfigIndex = AppendOffensiveEngagementConfigs(baseEngagementConfigs, result);
-            result.BaseOffensiveEngagementConfigCount = baseEngagementConfigs.Count;
-            CompileInteractions(sharedPreset, preset.Interactions, baseEngagementConfigs, globalEngagementSettings, result);
+            CompileInteractions(sharedPreset, preset.Interactions, globalEngagementSettings, result);
+            EnemyBossDropExtractionBakeUtility.Compile(sharedPreset, preset.DropExtraction, minionPrefabResolver, result);
             ConfigureInitialPattern(result);
         }
 
@@ -51,39 +44,13 @@ internal static class EnemyBossPatternBakeUtility
 
     #region Pattern Compile
     /// <summary>
-    /// Compiles the always-available base boss pattern from normal Core, Short-Range and Weapon slots.
-    /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="basePattern">Base boss assembly to compile.</param>
-    /// <returns>Compiled base pattern result.</returns>
-    private static EnemyCompiledPatternBakeResult CompileBasePattern(EnemyModulesAndPatternsPreset sharedPreset,
-                                                                     EnemyBossPatternAssemblyDefinition basePattern)
-    {
-        EnemyCompiledPatternBakeResult result = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
-
-        if (sharedPreset == null || basePattern == null)
-            return result;
-
-        EnemyPatternCoreMovementAssembly coreMovement = basePattern.CoreMovement;
-
-        if (coreMovement != null)
-            EnemyModulesAndPatternsBakeUtility.TryApplyCoreMovementModule(sharedPreset, coreMovement.Binding, ref result);
-
-        ApplyShortRangeSlot(sharedPreset, basePattern.ShortRangeInteraction, ref result.PatternConfig);
-        ApplyWeaponSlot(sharedPreset, basePattern.WeaponInteraction, ref result);
-        result.HasCustomMovement = EnemyBossPatternConfigUtility.RequiresCustomMovement(in result.PatternConfig);
-        return result;
-    }
-
-    /// <summary>
-    /// Compiles all ordered boss-specific interactions and appends their shooter config slices.
+    /// Compiles all boss pattern candidates and their internal module candidate buffers.
     /// </summary>
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="interactions">Ordered boss interaction definitions.</param>
     /// <param name="result">Mutable boss compile result.</param>
     private static void CompileInteractions(EnemyModulesAndPatternsPreset sharedPreset,
                                             IReadOnlyList<EnemyBossPatternInteractionDefinition> interactions,
-                                            IReadOnlyList<EnemyOffensiveEngagementConfigElement> baseEngagementConfigs,
                                             EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
                                             EnemyCompiledBossPatternBakeResult result)
     {
@@ -97,20 +64,13 @@ internal static class EnemyBossPatternBakeUtility
             if (interaction == null || !interaction.Enabled)
                 continue;
 
-            EnemyCompiledPatternBakeResult interactionPattern = CompileInteractionPattern(sharedPreset, result.BasePattern, interaction);
-            TryAssignShooterRuntimeSettings(interactionPattern, result);
-            int firstShooterConfigIndex = AppendShooterConfigs(interactionPattern, result);
-            List<EnemyOffensiveEngagementConfigElement> engagementConfigs = CompileInteractionEngagementConfigs(sharedPreset,
-                                                                                                               baseEngagementConfigs,
-                                                                                                               interaction,
-                                                                                                               interactionIndex,
-                                                                                                               globalEngagementSettings);
-            int firstEngagementConfigIndex = AppendOffensiveEngagementConfigs(engagementConfigs, result);
+            int patternBufferIndex = result.Interactions.Count;
             result.Interactions.Add(new EnemyBossPatternInteractionElement
             {
                 InteractionIndex = math.max(0, interactionIndex),
                 InteractionType = interaction.InteractionType,
                 MinimumActiveSeconds = math.max(0f, interaction.MinimumActiveSeconds),
+                SelectionWeight = ResolveSelectionWeight(interaction.SelectionWeight),
                 MinimumMissingHealthPercent = math.saturate(interaction.MinimumMissingHealthPercent),
                 MaximumMissingHealthPercent = math.saturate(interaction.MaximumMissingHealthPercent),
                 MinimumElapsedSeconds = math.max(0f, interaction.MinimumElapsedSeconds),
@@ -120,47 +80,70 @@ internal static class EnemyBossPatternBakeUtility
                 MinimumPlayerDistance = math.max(0f, interaction.MinimumPlayerDistance),
                 MaximumPlayerDistance = math.max(0f, interaction.MaximumPlayerDistance),
                 RecentlyDamagedWindowSeconds = math.max(0f, interaction.RecentlyDamagedWindowSeconds),
-                HasCustomMovement = interactionPattern.HasCustomMovement ? (byte)1 : (byte)0,
-                FirstShooterConfigIndex = firstShooterConfigIndex,
-                ShooterConfigCount = interactionPattern.ShooterConfigs.Count,
-                FirstOffensiveEngagementConfigIndex = firstEngagementConfigIndex,
-                OffensiveEngagementConfigCount = engagementConfigs.Count,
-                PatternConfig = interactionPattern.PatternConfig
+                HasCustomMovement = 0,
+                FirstShooterConfigIndex = 0,
+                ShooterConfigCount = 0,
+                FirstOffensiveEngagementConfigIndex = 0,
+                OffensiveEngagementConfigCount = 0,
+                PatternConfig = EnemyPatternDefaultsUtility.CreatePatternConfig()
             });
+            EnemyBossPatternModuleBakeUtility.CompilePatternModuleCandidates(sharedPreset,
+                                                                             interaction,
+                                                                             patternBufferIndex,
+                                                                             globalEngagementSettings,
+                                                                             result);
         }
     }
 
     /// <summary>
-    /// Compiles one boss interaction by starting from the base pattern and applying only enabled override slots.
+    /// Copies high-level pattern extraction settings into the compiled boss result.
     /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="basePattern">Compiled base pattern used as inherited fallback.</param>
-    /// <param name="interaction">Boss-specific interaction to compile.</param>
-    /// <returns>Compiled interaction pattern result.</returns>
-    private static EnemyCompiledPatternBakeResult CompileInteractionPattern(EnemyModulesAndPatternsPreset sharedPreset,
-                                                                           EnemyCompiledPatternBakeResult basePattern,
-                                                                           EnemyBossPatternInteractionDefinition interaction)
+    /// <param name="settings">Source extraction settings from the boss preset.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    internal static void ConfigureExtractionSettings(EnemyBossPatternExtractionSettings settings,
+                                                     EnemyCompiledBossPatternBakeResult result)
     {
-        bool hasWeaponOverride = interaction != null &&
-                                 interaction.WeaponInteraction != null &&
-                                 interaction.WeaponInteraction.IsEnabled;
-        EnemyCompiledPatternBakeResult result = CloneBasePattern(basePattern, !hasWeaponOverride);
+        if (result == null)
+            return;
 
-        if (sharedPreset == null || interaction == null)
-            return result;
+        if (settings == null)
+        {
+            result.RerollWhenCurrentPatternBecomesInvalid = true;
+            result.UseElapsedIntervalExtraction = true;
+            result.ElapsedIntervalSeconds = 4f;
+            result.UseMissingHealthStepExtraction = true;
+            result.MissingHealthStepPercent = 0.25f;
+            result.MinimumSecondsBetweenExtractions = 1f;
+            return;
+        }
 
-        EnemyBossPatternCoreMovementOverrideAssembly coreMovement = interaction.CoreMovement;
+        result.RerollWhenCurrentPatternBecomesInvalid = settings.RerollWhenCurrentPatternBecomesInvalid;
+        result.MinimumSecondsBetweenExtractions = math.max(0f, settings.MinimumSecondsBetweenExtractions);
+        result.UseElapsedIntervalExtraction = settings.UseElapsedIntervalExtraction;
+        result.ElapsedIntervalSeconds = math.max(0f, settings.ElapsedIntervalSeconds);
+        result.UseMissingHealthStepExtraction = settings.UseMissingHealthStepExtraction;
+        result.MissingHealthStepPercent = math.saturate(settings.MissingHealthStepPercent);
+        result.UseTravelledDistanceExtraction = settings.UseTravelledDistanceExtraction;
+        result.TravelledDistanceSinceLastExtraction = math.max(0f, settings.TravelledDistanceSinceLastExtraction);
+        result.PlayerDistanceCondition = settings.PlayerDistanceCondition;
+        result.PlayerDistanceThreshold = math.max(0f, settings.PlayerDistanceThreshold);
+        result.PlayerDistanceHoldSeconds = math.max(0f, settings.PlayerDistanceHoldSeconds);
+        result.UseDamageWindowExtraction = settings.UseDamageWindowExtraction;
+        result.DamageWindowSeconds = math.max(0f, settings.DamageWindowSeconds);
+        result.DamageThreshold = math.max(0f, settings.DamageThreshold);
+    }
 
-        if (coreMovement != null && coreMovement.IsEnabled)
-            EnemyModulesAndPatternsBakeUtility.TryApplyCoreMovementModule(sharedPreset, coreMovement.Binding, ref result);
+    /// <summary>
+    /// Resolves a safe selection weight while preserving legacy assets that predate the field.
+    /// </summary>
+    /// <param name="selectionWeight">Authored selection weight.</param>
+    /// <returns>Positive weight used by runtime extraction.</returns>
+    internal static float ResolveSelectionWeight(float selectionWeight)
+    {
+        if (selectionWeight > 0f)
+            return selectionWeight;
 
-        ApplyShortRangeSlot(sharedPreset, interaction.ShortRangeInteraction, ref result.PatternConfig);
-
-        if (hasWeaponOverride)
-            ApplyWeaponSlot(sharedPreset, interaction.WeaponInteraction, ref result);
-
-        result.HasCustomMovement = EnemyBossPatternConfigUtility.RequiresCustomMovement(in result.PatternConfig);
-        return result;
+        return 1f;
     }
 
     /// <summary>
@@ -169,9 +152,9 @@ internal static class EnemyBossPatternBakeUtility
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="shortRangeInteraction">Short-range slot to apply.</param>
     /// <param name="patternConfig">Mutable compiled pattern config.</param>
-    private static void ApplyShortRangeSlot(EnemyModulesAndPatternsPreset sharedPreset,
-                                            EnemyPatternShortRangeInteractionAssembly shortRangeInteraction,
-                                            ref EnemyPatternConfig patternConfig)
+    internal static void ApplyShortRangeSlot(EnemyModulesAndPatternsPreset sharedPreset,
+                                             EnemyPatternShortRangeInteractionAssembly shortRangeInteraction,
+                                             ref EnemyPatternConfig patternConfig)
     {
         if (sharedPreset == null || shortRangeInteraction == null || !shortRangeInteraction.IsEnabled)
             return;
@@ -189,9 +172,9 @@ internal static class EnemyBossPatternBakeUtility
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="weaponInteraction">Weapon slot to apply.</param>
     /// <param name="result">Mutable compiled pattern result.</param>
-    private static void ApplyWeaponSlot(EnemyModulesAndPatternsPreset sharedPreset,
-                                        EnemyPatternWeaponInteractionAssembly weaponInteraction,
-                                        ref EnemyCompiledPatternBakeResult result)
+    internal static void ApplyWeaponSlot(EnemyModulesAndPatternsPreset sharedPreset,
+                                         EnemyPatternWeaponInteractionAssembly weaponInteraction,
+                                         ref EnemyCompiledPatternBakeResult result)
     {
         if (sharedPreset == null || weaponInteraction == null || !weaponInteraction.IsEnabled)
             return;
@@ -210,42 +193,12 @@ internal static class EnemyBossPatternBakeUtility
     }
 
     /// <summary>
-    /// Clones the base pattern config and optionally copies inherited shooter configs for interaction layers.
-    /// </summary>
-    /// <param name="basePattern">Compiled base pattern to clone.</param>
-    /// <param name="inheritWeapon">True when base shooter configs should remain active for the interaction.</param>
-    /// <returns>A mutable cloned pattern result.</returns>
-    private static EnemyCompiledPatternBakeResult CloneBasePattern(EnemyCompiledPatternBakeResult basePattern, bool inheritWeapon)
-    {
-        EnemyCompiledPatternBakeResult result = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
-
-        if (basePattern == null)
-            return result;
-
-        result.PatternConfig = basePattern.PatternConfig;
-        result.HasCustomMovement = basePattern.HasCustomMovement;
-        result.DropItemsConfig = basePattern.DropItemsConfig;
-
-        if (!inheritWeapon)
-            return result;
-
-        for (int shooterIndex = 0; shooterIndex < basePattern.ShooterConfigs.Count; shooterIndex++)
-            result.ShooterConfigs.Add(basePattern.ShooterConfigs[shooterIndex]);
-
-        result.ShooterProjectilePrefab = basePattern.ShooterProjectilePrefab;
-        result.ShooterProjectilePoolInitialCapacity = basePattern.ShooterProjectilePoolInitialCapacity;
-        result.ShooterProjectilePoolExpandBatch = basePattern.ShooterProjectilePoolExpandBatch;
-        result.HasShooterRuntimeSettings = basePattern.HasShooterRuntimeSettings;
-        return result;
-    }
-
-    /// <summary>
     /// Appends one compiled pattern shooter slice to the boss-owned source buffer.
     /// </summary>
     /// <param name="compiledPattern">Compiled pattern providing shooter configs.</param>
     /// <param name="result">Mutable boss compile result.</param>
     /// <returns>First appended shooter config index.</returns>
-    private static int AppendShooterConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
+    internal static int AppendShooterConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
     {
         if (compiledPattern == null || result == null)
             return 0;
@@ -264,8 +217,8 @@ internal static class EnemyBossPatternBakeUtility
     /// <param name="engagementConfigs">Compiled engagement configs for one boss layer.</param>
     /// <param name="result">Mutable boss compile result.</param>
     /// <returns>First appended engagement config index.</returns>
-    private static int AppendOffensiveEngagementConfigs(IReadOnlyList<EnemyOffensiveEngagementConfigElement> engagementConfigs,
-                                                        EnemyCompiledBossPatternBakeResult result)
+    internal static int AppendOffensiveEngagementConfigs(IReadOnlyList<EnemyOffensiveEngagementConfigElement> engagementConfigs,
+                                                         EnemyCompiledBossPatternBakeResult result)
     {
         if (engagementConfigs == null || result == null)
             return 0;
@@ -279,171 +232,6 @@ internal static class EnemyBossPatternBakeUtility
     }
 
     /// <summary>
-    /// Compiles the offensive engagement configs owned by the always-available base boss pattern.
-    /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="basePattern">Base boss assembly to inspect.</param>
-    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
-    /// <returns>Ordered base engagement configs.</returns>
-    private static List<EnemyOffensiveEngagementConfigElement> CompileBaseEngagementConfigs(EnemyModulesAndPatternsPreset sharedPreset,
-                                                                                            EnemyBossPatternAssemblyDefinition basePattern,
-                                                                                            EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings)
-    {
-        List<EnemyOffensiveEngagementConfigElement> configs = new List<EnemyOffensiveEngagementConfigElement>(2);
-
-        if (sharedPreset == null || basePattern == null)
-            return configs;
-
-        AppendShortRangeEngagementConfig(sharedPreset, basePattern.ShortRangeInteraction, globalEngagementSettings, -1, configs);
-        AppendWeaponEngagementConfig(sharedPreset, basePattern.WeaponInteraction, globalEngagementSettings, -1, configs);
-        return configs;
-    }
-
-    /// <summary>
-    /// Compiles the offensive engagement configs for one boss interaction, inheriting base configs unless the slot is overridden.
-    /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="baseEngagementConfigs">Base configs inherited by interactions without slot overrides.</param>
-    /// <param name="interaction">Boss interaction being compiled.</param>
-    /// <param name="interactionIndex">Authored interaction index used by managed visual override resolution.</param>
-    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
-    /// <returns>Ordered engagement configs for the interaction layer.</returns>
-    private static List<EnemyOffensiveEngagementConfigElement> CompileInteractionEngagementConfigs(EnemyModulesAndPatternsPreset sharedPreset,
-                                                                                                   IReadOnlyList<EnemyOffensiveEngagementConfigElement> baseEngagementConfigs,
-                                                                                                   EnemyBossPatternInteractionDefinition interaction,
-                                                                                                   int interactionIndex,
-                                                                                                   EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings)
-    {
-        List<EnemyOffensiveEngagementConfigElement> configs = CloneEngagementConfigs(baseEngagementConfigs);
-
-        if (sharedPreset == null || interaction == null)
-            return configs;
-
-        EnemyPatternShortRangeInteractionAssembly shortRangeInteraction = interaction.ShortRangeInteraction;
-
-        if (shortRangeInteraction != null && shortRangeInteraction.IsEnabled)
-        {
-            RemoveConfigsBySource(configs, EnemyOffensiveEngagementTriggerSource.ShortRangeInteraction);
-            AppendShortRangeEngagementConfig(sharedPreset,
-                                             shortRangeInteraction,
-                                             globalEngagementSettings,
-                                             interactionIndex,
-                                             configs);
-        }
-
-        EnemyPatternWeaponInteractionAssembly weaponInteraction = interaction.WeaponInteraction;
-
-        if (weaponInteraction != null && weaponInteraction.IsEnabled)
-        {
-            RemoveConfigsBySource(configs, EnemyOffensiveEngagementTriggerSource.WeaponInteraction);
-            AppendWeaponEngagementConfig(sharedPreset,
-                                         weaponInteraction,
-                                         globalEngagementSettings,
-                                         interactionIndex,
-                                         configs);
-        }
-
-        return configs;
-    }
-
-    /// <summary>
-    /// Appends one short-range engagement config when the slot uses a supported module and visible feedback channel.
-    /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="shortRangeInteraction">Short-range slot being compiled.</param>
-    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
-    /// <param name="visualSettingsKey">Boss visual override key baked into the config.</param>
-    /// <param name="configs">Target config list.</param>
-    private static void AppendShortRangeEngagementConfig(EnemyModulesAndPatternsPreset sharedPreset,
-                                                         EnemyPatternShortRangeInteractionAssembly shortRangeInteraction,
-                                                         EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
-                                                         int visualSettingsKey,
-                                                         List<EnemyOffensiveEngagementConfigElement> configs)
-    {
-        if (configs == null)
-            return;
-
-        if (!EnemyOffensiveEngagementBakeUtility.TryBuildShortRangeConfig(shortRangeInteraction,
-                                                                          sharedPreset,
-                                                                          globalEngagementSettings,
-                                                                          out EnemyOffensiveEngagementConfigElement config))
-        {
-            return;
-        }
-
-        config.VisualSettingsKey = visualSettingsKey;
-        configs.Add(config);
-    }
-
-    /// <summary>
-    /// Appends one weapon engagement config when the slot uses a supported module and visible feedback channel.
-    /// </summary>
-    /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
-    /// <param name="weaponInteraction">Weapon slot being compiled.</param>
-    /// <param name="globalEngagementSettings">Generic feedback settings resolved from the visual preset.</param>
-    /// <param name="visualSettingsKey">Boss visual override key baked into the config.</param>
-    /// <param name="configs">Target config list.</param>
-    private static void AppendWeaponEngagementConfig(EnemyModulesAndPatternsPreset sharedPreset,
-                                                     EnemyPatternWeaponInteractionAssembly weaponInteraction,
-                                                     EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
-                                                     int visualSettingsKey,
-                                                     List<EnemyOffensiveEngagementConfigElement> configs)
-    {
-        if (configs == null)
-            return;
-
-        if (!EnemyOffensiveEngagementBakeUtility.TryBuildWeaponConfig(weaponInteraction,
-                                                                      sharedPreset,
-                                                                      globalEngagementSettings,
-                                                                      out EnemyOffensiveEngagementConfigElement config))
-        {
-            return;
-        }
-
-        config.VisualSettingsKey = visualSettingsKey;
-        configs.Add(config);
-    }
-
-    /// <summary>
-    /// Copies inherited engagement configs so interaction edits do not mutate the base layer list.
-    /// </summary>
-    /// <param name="sourceConfigs">Source configs to copy.</param>
-    /// <returns>Mutable cloned config list.</returns>
-    private static List<EnemyOffensiveEngagementConfigElement> CloneEngagementConfigs(IReadOnlyList<EnemyOffensiveEngagementConfigElement> sourceConfigs)
-    {
-        int capacity = sourceConfigs != null ? sourceConfigs.Count : 0;
-        List<EnemyOffensiveEngagementConfigElement> configs = new List<EnemyOffensiveEngagementConfigElement>(capacity);
-
-        if (sourceConfigs == null)
-            return configs;
-
-        for (int configIndex = 0; configIndex < sourceConfigs.Count; configIndex++)
-            configs.Add(sourceConfigs[configIndex]);
-
-        return configs;
-    }
-
-    /// <summary>
-    /// Removes inherited engagement configs for the source overridden by an interaction slot.
-    /// </summary>
-    /// <param name="configs">Mutable config list.</param>
-    /// <param name="source">Interaction source to remove.</param>
-    private static void RemoveConfigsBySource(List<EnemyOffensiveEngagementConfigElement> configs,
-                                              EnemyOffensiveEngagementTriggerSource source)
-    {
-        if (configs == null)
-            return;
-
-        for (int configIndex = configs.Count - 1; configIndex >= 0; configIndex--)
-        {
-            if (configs[configIndex].Source != source)
-                continue;
-
-            configs.RemoveAt(configIndex);
-        }
-    }
-
-    /// <summary>
     /// Configures the normal enemy pattern output used by the authoring baker as the boss spawn baseline.
     /// </summary>
     /// <param name="result">Mutable boss compile result.</param>
@@ -452,27 +240,28 @@ internal static class EnemyBossPatternBakeUtility
         if (result == null)
             return;
 
-        result.InitialPattern = CloneBasePattern(result.BasePattern, true);
+        result.InitialPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
         result.InitialPattern.ShooterProjectilePrefab = result.ShooterProjectilePrefab;
         result.InitialPattern.ShooterProjectilePoolInitialCapacity = result.ShooterProjectilePoolInitialCapacity;
         result.InitialPattern.ShooterProjectilePoolExpandBatch = result.ShooterProjectilePoolExpandBatch;
         result.InitialPattern.HasShooterRuntimeSettings = result.HasShooterRuntimeSettings;
-        result.InitialPattern.HasCustomMovement = result.BasePattern.HasCustomMovement || ResolveAnyInteractionHasCustomMovement(result);
+        result.InitialPattern.HasCustomMovement = ResolveAnyModuleCandidateHasCustomMovement(result);
+        EnemyBossDropExtractionBakeUtility.CopyBossDropUnionToInitialPattern(result);
     }
 
     /// <summary>
-    /// Checks whether any compiled boss interaction requires the custom movement system.
+    /// Checks whether any compiled boss module candidate requires the custom movement system.
     /// </summary>
     /// <param name="result">Compiled boss result.</param>
-    /// <returns>True when any interaction needs custom pattern movement.</returns>
-    private static bool ResolveAnyInteractionHasCustomMovement(EnemyCompiledBossPatternBakeResult result)
+    /// <returns>True when any module candidate needs custom pattern movement.</returns>
+    private static bool ResolveAnyModuleCandidateHasCustomMovement(EnemyCompiledBossPatternBakeResult result)
     {
         if (result == null)
             return false;
 
-        for (int interactionIndex = 0; interactionIndex < result.Interactions.Count; interactionIndex++)
+        for (int candidateIndex = 0; candidateIndex < result.ModuleCandidates.Count; candidateIndex++)
         {
-            if (result.Interactions[interactionIndex].HasCustomMovement != 0)
+            if (result.ModuleCandidates[candidateIndex].HasCustomMovement != 0)
                 return true;
         }
 
@@ -554,8 +343,8 @@ internal static class EnemyBossPatternBakeUtility
     /// </summary>
     /// <param name="compiledPattern">Compiled pattern that may contain shooter runtime settings.</param>
     /// <param name="result">Mutable boss bake result.</param>
-    private static void TryAssignShooterRuntimeSettings(EnemyCompiledPatternBakeResult compiledPattern,
-                                                        EnemyCompiledBossPatternBakeResult result)
+    internal static void TryAssignShooterRuntimeSettings(EnemyCompiledPatternBakeResult compiledPattern,
+                                                         EnemyCompiledBossPatternBakeResult result)
     {
         if (compiledPattern == null || result == null)
             return;
@@ -579,19 +368,38 @@ internal static class EnemyBossPatternBakeUtility
 internal sealed class EnemyCompiledBossPatternBakeResult
 {
     #region Fields
-    public EnemyCompiledPatternBakeResult BasePattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
     public EnemyCompiledPatternBakeResult InitialPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
+    public EnemyCompiledPatternBakeResult BossDropUnionPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
     public readonly List<EnemyBossPatternInteractionElement> Interactions = new List<EnemyBossPatternInteractionElement>();
+    public readonly List<EnemyBossPatternModuleExtractionElement> ModuleExtractions = new List<EnemyBossPatternModuleExtractionElement>();
+    public readonly List<EnemyBossPatternModuleCandidateElement> ModuleCandidates = new List<EnemyBossPatternModuleCandidateElement>();
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
     public readonly List<EnemyOffensiveEngagementConfigElement> OffensiveEngagementConfigs = new List<EnemyOffensiveEngagementConfigElement>();
     public readonly List<EnemyBossMinionSpawnElement> MinionSpawns = new List<EnemyBossMinionSpawnElement>();
+    public readonly List<EnemyBossDropCandidateElement> DropCandidates = new List<EnemyBossDropCandidateElement>();
+    public readonly List<EnemyExperienceDropModuleElement> BossDropExperienceModules = new List<EnemyExperienceDropModuleElement>();
+    public readonly List<EnemyExperienceDropDefinitionElement> BossDropExperienceDefinitions = new List<EnemyExperienceDropDefinitionElement>();
+    public readonly List<EnemyExtraComboPointsModuleElement> BossDropExtraComboPointsModules = new List<EnemyExtraComboPointsModuleElement>();
+    public readonly List<EnemyExtraComboPointsConditionElement> BossDropExtraComboPointsConditions = new List<EnemyExtraComboPointsConditionElement>();
     public GameObject ShooterProjectilePrefab;
     public int ShooterProjectilePoolInitialCapacity;
     public int ShooterProjectilePoolExpandBatch;
     public bool HasShooterRuntimeSettings;
-    public int BaseFirstShooterConfigIndex;
-    public int BaseShooterConfigCount;
-    public int BaseFirstOffensiveEngagementConfigIndex;
-    public int BaseOffensiveEngagementConfigCount;
+    public bool BossDropExtractionEnabled;
+    public EnemyBossDropExtractionMode BossDropExtractionMode;
+    public bool RerollWhenCurrentPatternBecomesInvalid;
+    public bool UseElapsedIntervalExtraction;
+    public bool UseMissingHealthStepExtraction;
+    public bool UseTravelledDistanceExtraction;
+    public bool UseDamageWindowExtraction;
+    public EnemyBossPatternPlayerDistanceCondition PlayerDistanceCondition;
+    public float MinimumSecondsBetweenExtractions;
+    public float ElapsedIntervalSeconds;
+    public float MissingHealthStepPercent;
+    public float TravelledDistanceSinceLastExtraction;
+    public float PlayerDistanceThreshold;
+    public float PlayerDistanceHoldSeconds;
+    public float DamageWindowSeconds;
+    public float DamageThreshold;
     #endregion
 }
