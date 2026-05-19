@@ -62,6 +62,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
         ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
         ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneTimeScaleResumeStateLookup = SystemAPI.GetComponentLookup<PlayerMilestoneTimeScaleResumeState>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
@@ -266,6 +267,9 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             selectedCatalogEntry.IsUnlocked = 1;
             selectedCatalogEntry.PendingInitialCharacterTuningApply = 0;
             unlockCatalogBuffer[selectedCatalogIndex] = selectedCatalogEntry;
+            PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(selectedCatalogIndex,
+                                                                              unlockCatalogBuffer,
+                                                                              elapsedTime);
 
             powerUpsConfigLookup[entity] = powerUpsConfigValue;
             powerUpsStateLookup[entity] = powerUpsStateValue;

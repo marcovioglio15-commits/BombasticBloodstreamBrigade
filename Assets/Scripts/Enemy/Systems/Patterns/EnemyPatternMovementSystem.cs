@@ -552,9 +552,8 @@ public partial struct EnemyPatternMovementSystem : ISystem
                             currentPatternRuntimeState.WanderRetryTimer = math.max(currentPatternRuntimeState.WanderRetryTimer,
                                                                                   activePatternConfig.BasicBlockedPathRetryDelay);
 
-                            if ((activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
-                                 activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward) &&
-                                expandedWallClearance)
+                            if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
+                                activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
                             {
                                 float allowedDisplacementDistance = math.length(allowedDisplacement);
                                 float blockedDisplacementRatio = EnemyPatternMovementRuntimeUtility.ResolveBlockedDisplacementRatio(requestedDisplacementDistance, allowedDisplacementDistance);

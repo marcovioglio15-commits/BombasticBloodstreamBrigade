@@ -23,10 +23,16 @@ internal static class EnemyDropItemsBakeUtility
     {
         return new EnemyDropItemsConfig
         {
+            ModuleCombineMode = EnemyDropItemsModuleCombineMode.AllModules,
             HasExperienceDrops = 0,
             HasExtraComboPoints = 0,
+            HasRecoveryDrops = 0,
             ExperienceModuleCount = 0,
             ExtraComboPointsModuleCount = 0,
+            RecoveryModuleCount = 0,
+            SelectionModuleCount = 0,
+            MinimumSelectedModules = 0,
+            MaximumSelectedModules = 0,
             EstimatedDropsPerDeath = 0
         };
     }
@@ -36,24 +42,52 @@ internal static class EnemyDropItemsBakeUtility
     /// </summary>
     /// <param name="payload">Effective payload block resolved from a module definition or binding override.</param>
     /// <param name="result">Mutable compiled result receiving module data.</param>
-    public static void TryAppendModule(EnemyPatternModulePayloadData payload,
+    /// <returns>True when a valid Drop Items module was appended.</returns>
+    public static bool TryAppendModule(EnemyPatternModulePayloadData payload,
                                        ref EnemyCompiledPatternBakeResult result)
     {
-        if (payload == null || payload.DropItems == null)
-            return;
+        return TryAppendModule(payload, 1f, ref result);
+    }
+
+    /// <summary>
+    /// Appends one compiled Drop Items payload with weighted module-selection metadata.
+    /// </summary>
+    /// <param name="payload">Effective payload block resolved from a module definition or binding override.</param>
+    /// <param name="selectionWeight">Relative weight used by weighted module combine modes.</param>
+    /// <param name="result">Mutable compiled result receiving module data.</param>
+    /// <returns>True when a valid Drop Items module was appended.</returns>
+    public static bool TryAppendModule(EnemyPatternModulePayloadData payload,
+                                       float selectionWeight,
+                                       ref EnemyCompiledPatternBakeResult result)
+    {
+        if (payload == null || payload.DropItems == null || result == null)
+            return false;
 
         EnemyDropItemsPayloadKind payloadKind = ResolveDropItemsPayloadKind(payload.DropItems.DropPayloadKind);
+        int previousModuleCount = ResolveModuleCount(payloadKind, result);
 
         switch (payloadKind)
         {
             case EnemyDropItemsPayloadKind.ExtraComboPoints:
                 TryAppendExtraComboPointsModule(payload.DropItems.ExtraComboPoints, ref result);
-                return;
+                break;
+
+            case EnemyDropItemsPayloadKind.Recovery:
+                TryAppendRecoveryModule(payload.DropItems.Recovery, ref result);
+                break;
 
             default:
                 TryAppendExperienceModule(payload.DropItems.Experience, ref result);
-                return;
+                break;
         }
+
+        int currentModuleCount = ResolveModuleCount(payloadKind, result);
+
+        if (currentModuleCount <= previousModuleCount)
+            return false;
+
+        ApplyModuleSelectionWeight(payloadKind, currentModuleCount - 1, selectionWeight, ref result);
+        return true;
     }
 
     /// <summary>
@@ -67,6 +101,7 @@ internal static class EnemyDropItemsBakeUtility
         {
             case EnemyDropItemsPayloadKind.Experience:
             case EnemyDropItemsPayloadKind.ExtraComboPoints:
+            case EnemyDropItemsPayloadKind.Recovery:
                 return payloadKind;
 
             default:
@@ -113,9 +148,88 @@ internal static class EnemyDropItemsBakeUtility
                 return EnemyExtraComboPointsConditionCombineMode.MultiplyMatchingConditions;
         }
     }
+
+    /// <summary>
+    /// Resolves one legal Drop Items module combine mode authored in shared pattern assemblies.
+    /// </summary>
+    /// <param name="combineMode">Authored combine mode candidate.</param>
+    /// <returns>Sanitized combine mode used by bake/runtime.</returns>
+    public static EnemyDropItemsModuleCombineMode ResolveModuleCombineMode(EnemyDropItemsModuleCombineMode combineMode)
+    {
+        switch (combineMode)
+        {
+            case EnemyDropItemsModuleCombineMode.AllModules:
+            case EnemyDropItemsModuleCombineMode.SingleWeightedModule:
+            case EnemyDropItemsModuleCombineMode.WeightedSubset:
+                return combineMode;
+
+            default:
+                return EnemyDropItemsModuleCombineMode.AllModules;
+        }
+    }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Returns the current compiled module count for one Drop Items payload kind.
+    /// </summary>
+    /// <param name="payloadKind">Payload kind whose module list is inspected.</param>
+    /// <param name="result">Compiled result owning the module lists.</param>
+    /// <returns>Current module count for the requested payload kind.</returns>
+    private static int ResolveModuleCount(EnemyDropItemsPayloadKind payloadKind, EnemyCompiledPatternBakeResult result)
+    {
+        if (result == null)
+            return 0;
+
+        switch (payloadKind)
+        {
+            case EnemyDropItemsPayloadKind.ExtraComboPoints:
+                return result.ExtraComboPointsModules.Count;
+
+            case EnemyDropItemsPayloadKind.Recovery:
+                return result.RecoveryDropModules.Count;
+
+            default:
+                return result.ExperienceDropModules.Count;
+        }
+    }
+
+    /// <summary>
+    /// Writes the weighted-selection value onto the just-appended compiled module.
+    /// </summary>
+    /// <param name="payloadKind">Payload kind whose module list receives metadata.</param>
+    /// <param name="moduleIndex">Type-local module index to update.</param>
+    /// <param name="selectionWeight">Authored relative module-selection weight.</param>
+    /// <param name="result">Compiled result owning the module lists.</param>
+    private static void ApplyModuleSelectionWeight(EnemyDropItemsPayloadKind payloadKind,
+                                                   int moduleIndex,
+                                                   float selectionWeight,
+                                                   ref EnemyCompiledPatternBakeResult result)
+    {
+        float resolvedSelectionWeight = math.max(0.0001f, selectionWeight);
+
+        switch (payloadKind)
+        {
+            case EnemyDropItemsPayloadKind.ExtraComboPoints:
+                EnemyCompiledExtraComboPointsModule extraComboPointsModule = result.ExtraComboPointsModules[moduleIndex];
+                extraComboPointsModule.SelectionWeight = resolvedSelectionWeight;
+                result.ExtraComboPointsModules[moduleIndex] = extraComboPointsModule;
+                return;
+
+            case EnemyDropItemsPayloadKind.Recovery:
+                EnemyCompiledRecoveryDropModule recoveryModule = result.RecoveryDropModules[moduleIndex];
+                recoveryModule.SelectionWeight = resolvedSelectionWeight;
+                result.RecoveryDropModules[moduleIndex] = recoveryModule;
+                return;
+
+            default:
+                EnemyCompiledExperienceDropModule experienceModule = result.ExperienceDropModules[moduleIndex];
+                experienceModule.SelectionWeight = resolvedSelectionWeight;
+                result.ExperienceDropModules[moduleIndex] = experienceModule;
+                return;
+        }
+    }
+
     /// <summary>
     /// Appends one compiled experience-drop module to the bake result.
     /// </summary>
@@ -149,7 +263,8 @@ internal static class EnemyDropItemsBakeUtility
                 : 0.16f,
             DefinitionStartIndex = result.ExperienceDropDefinitions.Count,
             DefinitionCount = 0,
-            EstimatedDropsPerDeath = 0
+            EstimatedDropsPerDeath = 0,
+            SelectionWeight = 1f
         };
 
         IReadOnlyList<EnemyExperienceDropDefinitionData> definitions = experiencePayload.DropDefinitions;
@@ -197,6 +312,81 @@ internal static class EnemyDropItemsBakeUtility
     }
 
     /// <summary>
+    /// Appends one compiled health/shield recovery-drop module to the bake result.
+    /// </summary>
+    /// <param name="recoveryPayload">Recovery payload block resolved from authoring.</param>
+    /// <param name="result">Mutable compiled result receiving module data.</param>
+    private static void TryAppendRecoveryModule(EnemyRecoveryDropPayload recoveryPayload,
+                                                ref EnemyCompiledPatternBakeResult result)
+    {
+        if (recoveryPayload == null)
+            return;
+
+        int minimumDropCount = math.max(0, recoveryPayload.MinimumDropCount);
+        int maximumDropCount = math.max(minimumDropCount, recoveryPayload.MaximumDropCount);
+
+        if (maximumDropCount <= 0)
+            return;
+
+        EnemyExperienceDropCollectionSettings collectionMovement = recoveryPayload.CollectionMovement;
+        EnemyCompiledRecoveryDropModule compiledModule = new EnemyCompiledRecoveryDropModule
+        {
+            MinimumDropCount = minimumDropCount,
+            MaximumDropCount = maximumDropCount,
+            Distribution = math.clamp(recoveryPayload.DropsDistribution, 0f, 1f),
+            DropRadius = math.max(0f, recoveryPayload.DropRadius),
+            AttractionSpeed = collectionMovement != null ? math.max(0f, collectionMovement.MoveSpeed) : 0f,
+            CollectDistance = collectionMovement != null ? math.max(0.01f, collectionMovement.CollectDistance) : 0.3f,
+            CollectDistancePerPlayerSpeed = collectionMovement != null ? math.max(0f, collectionMovement.CollectDistancePerPlayerSpeed) : 0.05f,
+            SpawnAnimationMinDuration = collectionMovement != null ? math.max(0f, collectionMovement.SpawnAnimationMinDuration) : 0.08f,
+            SpawnAnimationMaxDuration = collectionMovement != null
+                ? math.max(math.max(0f, collectionMovement.SpawnAnimationMinDuration), collectionMovement.SpawnAnimationMaxDuration)
+                : 0.16f,
+            DefinitionStartIndex = result.RecoveryDropDefinitions.Count,
+            DefinitionCount = 0,
+            EstimatedDropsPerDeath = maximumDropCount,
+            SelectionWeight = 1f
+        };
+
+        IReadOnlyList<EnemyRecoveryDropDefinitionData> definitions = recoveryPayload.DropDefinitions;
+
+        if (definitions != null)
+        {
+            for (int definitionIndex = 0; definitionIndex < definitions.Count; definitionIndex++)
+            {
+                EnemyRecoveryDropDefinitionData definition = definitions[definitionIndex];
+
+                if (definition == null)
+                    continue;
+
+                float healthRestoreAmount = math.max(0f, definition.HealthRestoreAmount);
+                float shieldRestoreAmount = math.max(0f, definition.ShieldRestoreAmount);
+
+                if (healthRestoreAmount <= 0f && shieldRestoreAmount <= 0f)
+                    continue;
+
+                result.RecoveryDropDefinitions.Add(new EnemyCompiledRecoveryDropDefinition
+                {
+                    Prefab = definition.DropPrefab,
+                    HealthRestoreAmount = healthRestoreAmount,
+                    ShieldRestoreAmount = shieldRestoreAmount
+                });
+            }
+        }
+
+        compiledModule.DefinitionCount = result.RecoveryDropDefinitions.Count - compiledModule.DefinitionStartIndex;
+
+        if (compiledModule.DefinitionCount <= 0)
+            return;
+
+        result.RecoveryDropModules.Add(compiledModule);
+        result.DropItemsConfig.HasRecoveryDrops = 1;
+        result.DropItemsConfig.RecoveryModuleCount = result.RecoveryDropModules.Count;
+        result.DropItemsConfig.EstimatedDropsPerDeath = AddEstimatedDropCount(result.DropItemsConfig.EstimatedDropsPerDeath,
+                                                                              compiledModule.EstimatedDropsPerDeath);
+    }
+
+    /// <summary>
     /// Appends one compiled Extra Combo Points module to the bake result.
     /// </summary>
     /// <param name="extraComboPointsPayload">Extra Combo Points payload block resolved from authoring.</param>
@@ -214,7 +404,8 @@ internal static class EnemyDropItemsBakeUtility
             MaximumFinalMultiplier = extraComboPointsPayload.MaximumFinalMultiplier,
             ConditionCombineMode = ResolveConditionCombineMode(extraComboPointsPayload.ConditionCombineMode),
             ConditionStartIndex = result.ExtraComboPointsConditions.Count,
-            ConditionCount = 0
+            ConditionCount = 0,
+            SelectionWeight = 1f
         };
 
         IReadOnlyList<EnemyExtraComboPointsConditionData> conditions = extraComboPointsPayload.Conditions;
@@ -322,6 +513,7 @@ public struct EnemyCompiledExperienceDropModule
     public int DefinitionStartIndex;
     public int DefinitionCount;
     public int EstimatedDropsPerDeath;
+    public float SelectionWeight;
     #endregion
 }
 
@@ -337,6 +529,40 @@ public struct EnemyCompiledExperienceDropDefinition
 }
 
 /// <summary>
+/// Stores one compiled health/shield recovery-drop module before entity conversion in baker.
+/// </summary>
+public struct EnemyCompiledRecoveryDropModule
+{
+    #region Fields
+    public int MinimumDropCount;
+    public int MaximumDropCount;
+    public float Distribution;
+    public float DropRadius;
+    public float AttractionSpeed;
+    public float CollectDistance;
+    public float CollectDistancePerPlayerSpeed;
+    public float SpawnAnimationMinDuration;
+    public float SpawnAnimationMaxDuration;
+    public int DefinitionStartIndex;
+    public int DefinitionCount;
+    public int EstimatedDropsPerDeath;
+    public float SelectionWeight;
+    #endregion
+}
+
+/// <summary>
+/// Stores one compiled health/shield recovery drop-definition entry before entity conversion in baker.
+/// </summary>
+public struct EnemyCompiledRecoveryDropDefinition
+{
+    #region Fields
+    public GameObject Prefab;
+    public float HealthRestoreAmount;
+    public float ShieldRestoreAmount;
+    #endregion
+}
+
+/// <summary>
 /// Stores one compiled Extra Combo Points module before ECS buffer conversion in baker.
 /// </summary>
 public struct EnemyCompiledExtraComboPointsModule
@@ -348,6 +574,7 @@ public struct EnemyCompiledExtraComboPointsModule
     public EnemyExtraComboPointsConditionCombineMode ConditionCombineMode;
     public int ConditionStartIndex;
     public int ConditionCount;
+    public float SelectionWeight;
     #endregion
 }
 

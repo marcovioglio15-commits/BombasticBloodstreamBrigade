@@ -130,7 +130,8 @@ public enum EnemyShortRangeDashPhase : byte
 public enum EnemyDropItemsPayloadKind
 {
     Experience = 0,
-    ExtraComboPoints = 1
+    ExtraComboPoints = 1,
+    Recovery = 2
 }
 
 /// <summary>
@@ -153,6 +154,16 @@ public enum EnemyExtraComboPointsConditionCombineMode
     MultiplyMatchingConditions = 0,
     HighestMatchingMultiplier = 1,
     LowestMatchingMultiplier = 2
+}
+
+/// <summary>
+/// Declares how multiple Drop Items module bindings inside one pattern are resolved at enemy death.
+/// </summary>
+public enum EnemyDropItemsModuleCombineMode
+{
+    AllModules = 0,
+    SingleWeightedModule = 1,
+    WeightedSubset = 2
 }
 
 /// <summary>

@@ -4,7 +4,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// Moves active experience drops toward the player and grants experience on collection.
+/// Moves active reward drops toward the player and grants their payload on collection.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyExperienceDropSpawnSystem))]
@@ -35,6 +35,8 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                           .WithAll<PlayerMovementState>()
                           .WithAll<PlayerExperienceCollection>()
                           .WithAll<PlayerExperience>()
+                          .WithAll<PlayerHealth>()
+                          .WithAll<PlayerShield>()
                           .WithAll<PlayerLevel>()
                           .WithAll<PlayerProgressionConfig>()
                           .WithAll<PlayerRuntimeGamePhaseElement>()
@@ -70,6 +72,8 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
         DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases = entityManager.GetBuffer<PlayerRuntimeGamePhaseElement>(playerEntity);
         PlayerLevel playerLevel = entityManager.GetComponentData<PlayerLevel>(playerEntity);
         PlayerExperience playerExperience = entityManager.GetComponentData<PlayerExperience>(playerEntity);
+        PlayerHealth playerHealth = entityManager.GetComponentData<PlayerHealth>(playerEntity);
+        PlayerShield playerShield = entityManager.GetComponentData<PlayerShield>(playerEntity);
         float remainingExperienceCapacity = PlayerProgressionPhaseUtility.ResolveRemainingExperienceUntilLevelCap(progressionConfig,
                                                                                                                    runtimeGamePhases,
                                                                                                                    playerLevel.Current,
@@ -82,6 +86,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
         float pickupRadiusSquared = pickupRadius * pickupRadius;
         float grantedExperience = 0f;
+        bool healthChanged = false;
+        bool shieldChanged = false;
+        DynamicBuffer<GameAudioEventRequest> audioRequests = default;
+        bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         BufferLookup<EnemyExperienceDropPoolElement> poolLookup = SystemAPI.GetBufferLookup<EnemyExperienceDropPoolElement>(false);
 
         foreach ((RefRW<EnemyExperienceDrop> dropData,
@@ -119,7 +127,20 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             float collectDistance = baseCollectDistance + (playerSpeed * collectDistancePerPlayerSpeed);
             float collectDistanceSquared = collectDistance * collectDistance;
 
-            if (remainingExperienceCapacity <= PrecisionEpsilon)
+            if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Experience &&
+                remainingExperienceCapacity <= PrecisionEpsilon)
+            {
+                if (currentDropData.IsAttracting != 0)
+                {
+                    currentDropData.IsAttracting = 0;
+                    dropData.ValueRW = currentDropData;
+                }
+
+                continue;
+            }
+
+            if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Recovery &&
+                !CanRecoveryDropAffectPlayer(in currentDropData, in playerHealth, in playerShield))
             {
                 if (currentDropData.IsAttracting != 0)
                 {
@@ -132,9 +153,21 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
             if (distanceSquared <= collectDistanceSquared)
             {
-                float collectedExperience = math.max(0f, currentDropData.ExperienceAmount);
-                grantedExperience += collectedExperience;
-                remainingExperienceCapacity -= collectedExperience;
+                if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Experience)
+                {
+                    float collectedExperience = math.max(0f, currentDropData.ExperienceAmount);
+                    grantedExperience += collectedExperience;
+                    remainingExperienceCapacity -= collectedExperience;
+                }
+                else
+                {
+                    ApplyRecoveryDrop(in currentDropData,
+                                      ref playerHealth,
+                                      ref playerShield,
+                                      ref healthChanged,
+                                      ref shieldChanged);
+                }
+
                 LocalTransform parkedTransform = dropTransform.ValueRO;
                 parkedTransform.Position = DropParkingPosition;
                 dropTransform.ValueRW = parkedTransform;
@@ -158,10 +191,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
             bool isAttracting = currentDropData.IsAttracting != 0;
 
-            if (isAttracting == false && distanceSquared <= pickupRadiusSquared)
+            if (!isAttracting && distanceSquared <= pickupRadiusSquared)
                 isAttracting = true;
 
-            if (isAttracting == false)
+            if (!isAttracting)
                 continue;
 
             currentDropData.IsAttracting = 1;
@@ -201,10 +234,111 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
         }
 
         if (grantedExperience <= PrecisionEpsilon)
+        {
+            if (healthChanged)
+                entityManager.SetComponentData(playerEntity, playerHealth);
+
+            if (shieldChanged)
+                entityManager.SetComponentData(playerEntity, playerShield);
+
+            EnqueueRecoveryAudio(healthChanged,
+                                 shieldChanged,
+                                 playerPosition,
+                                 audioRequests,
+                                 canEnqueueAudioRequests);
             return;
+        }
 
         playerExperience.Current += grantedExperience;
         entityManager.SetComponentData(playerEntity, playerExperience);
+
+        if (healthChanged)
+            entityManager.SetComponentData(playerEntity, playerHealth);
+
+        if (shieldChanged)
+            entityManager.SetComponentData(playerEntity, playerShield);
+
+        EnqueueRecoveryAudio(healthChanged,
+                             shieldChanged,
+                             playerPosition,
+                             audioRequests,
+                             canEnqueueAudioRequests);
+    }
+    #endregion
+
+    #region Recovery
+    /// <summary>
+    /// Resolves whether a recovery drop can currently change player health or shield.
+    /// </summary>
+    /// <param name="dropData">Drop payload being tested.</param>
+    /// <param name="playerHealth">Current player health state.</param>
+    /// <param name="playerShield">Current player shield state.</param>
+    /// <returns>True when collecting the drop would restore at least one resource.</returns>
+    private static bool CanRecoveryDropAffectPlayer(in EnemyExperienceDrop dropData,
+                                                    in PlayerHealth playerHealth,
+                                                    in PlayerShield playerShield)
+    {
+        bool canRestoreHealth = dropData.HealthRestoreAmount > 0f &&
+                                playerHealth.Current < math.max(0f, playerHealth.Max);
+        bool canRestoreShield = dropData.ShieldRestoreAmount > 0f &&
+                                playerShield.Current < math.max(0f, playerShield.Max);
+        return canRestoreHealth || canRestoreShield;
+    }
+
+    /// <summary>
+    /// Applies one recovery drop payload to player health and shield using current max values as caps.
+    /// </summary>
+    /// <param name="dropData">Drop payload being collected.</param>
+    /// <param name="playerHealth">Mutable player health state.</param>
+    /// <param name="playerShield">Mutable player shield state.</param>
+    /// <param name="healthChanged">Mutable flag set when health changed during this frame.</param>
+    /// <param name="shieldChanged">Mutable flag set when shield changed during this frame.</param>
+    private static void ApplyRecoveryDrop(in EnemyExperienceDrop dropData,
+                                          ref PlayerHealth playerHealth,
+                                          ref PlayerShield playerShield,
+                                          ref bool healthChanged,
+                                          ref bool shieldChanged)
+    {
+        float maxHealth = math.max(0f, playerHealth.Max);
+        float maxShield = math.max(0f, playerShield.Max);
+        float nextHealth = math.min(maxHealth, math.max(0f, playerHealth.Current) + math.max(0f, dropData.HealthRestoreAmount));
+        float nextShield = math.min(maxShield, math.max(0f, playerShield.Current) + math.max(0f, dropData.ShieldRestoreAmount));
+
+        if (nextHealth > playerHealth.Current + PrecisionEpsilon)
+        {
+            playerHealth.Current = nextHealth;
+            healthChanged = true;
+        }
+
+        if (nextShield > playerShield.Current + PrecisionEpsilon)
+        {
+            playerShield.Current = nextShield;
+            shieldChanged = true;
+        }
+    }
+
+    /// <summary>
+    /// Enqueues recharge audio for recovery pickups that changed player resources.
+    /// </summary>
+    /// <param name="healthChanged">True when health was restored.</param>
+    /// <param name="shieldChanged">True when shield was restored.</param>
+    /// <param name="playerPosition">Current player world position.</param>
+    /// <param name="audioRequests">Optional audio request buffer.</param>
+    /// <param name="canEnqueueAudioRequests">True when audioRequests is available.</param>
+    private static void EnqueueRecoveryAudio(bool healthChanged,
+                                             bool shieldChanged,
+                                             float3 playerPosition,
+                                             DynamicBuffer<GameAudioEventRequest> audioRequests,
+                                             bool canEnqueueAudioRequests)
+    {
+        if (!canEnqueueAudioRequests)
+            return;
+
+        if (healthChanged)
+            GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerHealthRecharge, playerPosition);
+
+        if (shieldChanged)
+            GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShieldRecharge, playerPosition);
     }
     #endregion
 

@@ -37,7 +37,9 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> interactionConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionLock>(false);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         foreach ((DynamicBuffer<PlayerPowerUpContainerSwapCommand> swapCommands,
                   RefRW<PlayerPowerUpsConfig> powerUpsConfig,
@@ -73,6 +75,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
                 PlayerDroppedPowerUpContainerContent containerContent = droppedContainerContentLookup[swapCommand.ContainerEntity];
                 PlayerStoredActivePowerUpData storedPowerUp = containerContent.StoredPowerUp;
+                FixedString64Bytes acquiredPowerUpId = storedPowerUp.SlotConfig.PowerUpId;
 
                 if (!PlayerPowerUpLoadoutRuntimeUtility.TrySwapStoredPowerUpWithSlot(ref storedPowerUp,
                                                                                      swapCommand.TargetSlotIndex,
@@ -91,6 +94,15 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 {
                     containerContent.StoredPowerUp = storedPowerUp;
                     droppedContainerContentLookup[swapCommand.ContainerEntity] = containerContent;
+                }
+
+                if (unlockCatalogLookup.HasBuffer(playerEntity))
+                {
+                    DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[playerEntity];
+                    PlayerPowerUpStealCooldownRuntimeUtility.TryMarkPowerUpAcquired(acquiredPowerUpId,
+                                                                                    PlayerPowerUpUnlockKind.Active,
+                                                                                    unlockCatalog,
+                                                                                    elapsedTime);
                 }
 
                 ApplyInteractionLock(playerEntity,

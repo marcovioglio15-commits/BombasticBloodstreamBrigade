@@ -241,6 +241,169 @@ public sealed class EnemyExperienceDropPayload
 }
 
 /// <summary>
+/// Declares one drop-definition entry for health and shield recovery drops.
+/// </summary>
+[Serializable]
+public sealed class EnemyRecoveryDropDefinitionData
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Prefab spawned for this recovery drop entry.")]
+    [SerializeField] private GameObject dropPrefab;
+
+    [Tooltip("Health restored when this drop is collected by the player.")]
+    [SerializeField] private float healthRestoreAmount = 5f;
+
+    [Tooltip("Shield restored when this drop is collected by the player.")]
+    [SerializeField] private float shieldRestoreAmount;
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public GameObject DropPrefab
+    {
+        get
+        {
+            return dropPrefab;
+        }
+    }
+
+    public float HealthRestoreAmount
+    {
+        get
+        {
+            return healthRestoreAmount;
+        }
+    }
+
+    public float ShieldRestoreAmount
+    {
+        get
+        {
+            return shieldRestoreAmount;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Validation
+    /// <summary>
+    /// Preserves one recovery drop-definition entry while keeping validation hooks consistent with other drop definitions.
+    /// </summary>
+    public void Validate()
+    {
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Stores recovery drop payload values used by DropItems modules.
+/// </summary>
+[Serializable]
+public sealed class EnemyRecoveryDropPayload
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Definitions catalog used to compose spawned health and shield recovery drops.")]
+    [SerializeField] private List<EnemyRecoveryDropDefinitionData> dropDefinitions = new List<EnemyRecoveryDropDefinitionData>();
+
+    [Tooltip("Minimum number of recovery pickup instances spawned when this module resolves.")]
+    [Min(0)]
+    [SerializeField] private int minimumDropCount = 1;
+
+    [Tooltip("Maximum number of recovery pickup instances spawned when this module resolves.")]
+    [Min(0)]
+    [SerializeField] private int maximumDropCount = 1;
+
+    [Tooltip("Definition selection bias: 0 favors low restorative value entries, 1 favors high restorative value entries.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float dropsDistribution = 0.5f;
+
+    [Tooltip("Radius around the enemy used to distribute spawned recovery drops uniformly.")]
+    [SerializeField] private float dropRadius = 0.6f;
+
+    [Tooltip("Collection movement settings applied to spawned recovery drops.")]
+    [SerializeField] private EnemyExperienceDropCollectionSettings collectionMovement = new EnemyExperienceDropCollectionSettings();
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public IReadOnlyList<EnemyRecoveryDropDefinitionData> DropDefinitions
+    {
+        get
+        {
+            return dropDefinitions;
+        }
+    }
+
+    public int MinimumDropCount
+    {
+        get
+        {
+            return minimumDropCount;
+        }
+    }
+
+    public int MaximumDropCount
+    {
+        get
+        {
+            return maximumDropCount;
+        }
+    }
+
+    public float DropsDistribution
+    {
+        get
+        {
+            return dropsDistribution;
+        }
+    }
+
+    public float DropRadius
+    {
+        get
+        {
+            return dropRadius;
+        }
+    }
+
+    public EnemyExperienceDropCollectionSettings CollectionMovement
+    {
+        get
+        {
+            return collectionMovement;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Validation
+    /// <summary>
+    /// Ensures recovery payload references remain structurally valid without snapping authored settings.
+    /// </summary>
+    public void Validate()
+    {
+        if (dropDefinitions == null)
+            dropDefinitions = new List<EnemyRecoveryDropDefinitionData>();
+
+        if (collectionMovement == null)
+            collectionMovement = new EnemyExperienceDropCollectionSettings();
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
 /// Stores one metric-driven combo-points response evaluated when the enemy dies.
 /// </summary>
 [Serializable]
@@ -470,6 +633,9 @@ public sealed class EnemyDropItemsModuleData
 
     [Tooltip("Extra Combo Points payload used when Drop Payload Kind is Extra Combo Points.")]
     [SerializeField] private EnemyExtraComboPointsPayload extraComboPoints = new EnemyExtraComboPointsPayload();
+
+    [Tooltip("Recovery payload used when Drop Payload Kind is Recovery.")]
+    [SerializeField] private EnemyRecoveryDropPayload recovery = new EnemyRecoveryDropPayload();
     #endregion
 
     #endregion
@@ -498,6 +664,14 @@ public sealed class EnemyDropItemsModuleData
             return extraComboPoints;
         }
     }
+
+    public EnemyRecoveryDropPayload Recovery
+    {
+        get
+        {
+            return recovery;
+        }
+    }
     #endregion
 
     #region Methods
@@ -515,8 +689,12 @@ public sealed class EnemyDropItemsModuleData
         if (extraComboPoints == null)
             extraComboPoints = new EnemyExtraComboPointsPayload();
 
+        if (recovery == null)
+            recovery = new EnemyRecoveryDropPayload();
+
         experience.Validate();
         extraComboPoints.Validate();
+        recovery.Validate();
     }
     #endregion
 

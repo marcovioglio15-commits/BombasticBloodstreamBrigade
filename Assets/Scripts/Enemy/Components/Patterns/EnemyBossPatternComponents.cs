@@ -238,6 +238,11 @@ public struct EnemyBossDropCandidateElement : IBufferElementData
     public int ExperienceModuleCount;
     public int FirstExtraComboPointsModuleIndex;
     public int ExtraComboPointsModuleCount;
+    public int FirstRecoveryModuleIndex;
+    public int RecoveryModuleCount;
+    public EnemyDropItemsModuleCombineMode ModuleCombineMode;
+    public int MinimumSelectedModules;
+    public int MaximumSelectedModules;
 }
 
 /// <summary>
@@ -262,6 +267,22 @@ public struct EnemyBossDropExperienceModuleElement : IBufferElementData
 public struct EnemyBossDropExperienceDefinitionElement : IBufferElementData
 {
     public EnemyExperienceDropDefinitionElement Definition;
+}
+
+/// <summary>
+/// Stores one boss-owned source recovery-drop module before death-time extraction.
+/// </summary>
+public struct EnemyBossDropRecoveryModuleElement : IBufferElementData
+{
+    public EnemyRecoveryDropModuleElement Module;
+}
+
+/// <summary>
+/// Stores one boss-owned source recovery-drop definition before death-time extraction.
+/// </summary>
+public struct EnemyBossDropRecoveryDefinitionElement : IBufferElementData
+{
+    public EnemyRecoveryDropDefinitionElement Definition;
 }
 
 /// <summary>

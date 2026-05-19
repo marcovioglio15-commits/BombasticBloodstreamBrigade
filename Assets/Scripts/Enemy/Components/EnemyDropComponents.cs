@@ -8,11 +8,36 @@ using Unity.Mathematics;
 /// </summary>
 public struct EnemyDropItemsConfig : IComponentData
 {
+    public EnemyDropItemsModuleCombineMode ModuleCombineMode;
     public byte HasExperienceDrops;
     public byte HasExtraComboPoints;
+    public byte HasRecoveryDrops;
     public int ExperienceModuleCount;
     public int ExtraComboPointsModuleCount;
+    public int RecoveryModuleCount;
+    public int SelectionModuleCount;
+    public int MinimumSelectedModules;
+    public int MaximumSelectedModules;
     public int EstimatedDropsPerDeath;
+}
+
+/// <summary>
+/// Maps one authored Drop Items module entry to its runtime payload buffer for weighted death-time selection.
+/// </summary>
+public struct EnemyDropItemsModuleSelectionElement : IBufferElementData
+{
+    public EnemyDropItemsPayloadKind PayloadKind;
+    public int ModuleIndex;
+    public float SelectionWeight;
+}
+
+/// <summary>
+/// Declares the runtime reward payload carried by one pooled drop entity.
+/// </summary>
+public enum EnemyDropPickupRewardKind : byte
+{
+    Experience = 0,
+    Recovery = 1
 }
 
 /// <summary>
@@ -33,6 +58,7 @@ public struct EnemyExperienceDropModuleElement : IBufferElementData
     public int DefinitionStartIndex;
     public int DefinitionCount;
     public int EstimatedDropsPerDeath;
+    public float SelectionWeight;
 }
 
 /// <summary>
@@ -42,6 +68,37 @@ public struct EnemyExperienceDropDefinitionElement : IBufferElementData
 {
     public Entity PrefabEntity;
     public float ExperienceAmount;
+}
+
+/// <summary>
+/// Stores one baked health/shield recovery-drop module entry.
+/// Definition indices address a slice inside EnemyRecoveryDropDefinitionElement.
+/// </summary>
+public struct EnemyRecoveryDropModuleElement : IBufferElementData
+{
+    public int MinimumDropCount;
+    public int MaximumDropCount;
+    public float Distribution;
+    public float DropRadius;
+    public float AttractionSpeed;
+    public float CollectDistance;
+    public float CollectDistancePerPlayerSpeed;
+    public float SpawnAnimationMinDuration;
+    public float SpawnAnimationMaxDuration;
+    public int DefinitionStartIndex;
+    public int DefinitionCount;
+    public int EstimatedDropsPerDeath;
+    public float SelectionWeight;
+}
+
+/// <summary>
+/// Stores one baked health/shield recovery drop-definition entry.
+/// </summary>
+public struct EnemyRecoveryDropDefinitionElement : IBufferElementData
+{
+    public Entity PrefabEntity;
+    public float HealthRestoreAmount;
+    public float ShieldRestoreAmount;
 }
 
 /// <summary>
@@ -56,6 +113,7 @@ public struct EnemyExtraComboPointsModuleElement : IBufferElementData
     public EnemyExtraComboPointsConditionCombineMode ConditionCombineMode;
     public int ConditionStartIndex;
     public int ConditionCount;
+    public float SelectionWeight;
 }
 
 /// <summary>
@@ -77,7 +135,10 @@ public struct EnemyExtraComboPointsConditionElement : IBufferElementData
 /// </summary>
 public struct EnemyExperienceDrop : IComponentData
 {
+    public EnemyDropPickupRewardKind RewardKind;
     public float ExperienceAmount;
+    public float HealthRestoreAmount;
+    public float ShieldRestoreAmount;
     public float AttractionSpeed;
     public float CollectDistance;
     public float CollectDistancePerPlayerSpeed;

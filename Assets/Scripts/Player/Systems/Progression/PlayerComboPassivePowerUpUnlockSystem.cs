@@ -46,6 +46,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         foreach ((RefRW<PlayerComboCounterState> comboCounterState,
                   RefRO<PlayerRuntimeComboCounterConfig> runtimeConfig,
@@ -90,6 +91,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
                                    passiveGrants,
                                    unlockCatalog,
                                    equippedPassiveTools,
+                                   elapsedTime,
                                    ref mutablePassiveToolsState);
             mutableComboState.ActivePassiveUnlockRankIndex = activeRankIndex;
             mutableComboState.PassiveUnlockSignature = desiredSignature;
@@ -109,6 +111,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
     /// <param name="passiveGrants">Mutable combo passive grant buffer.</param>
     /// <param name="unlockCatalog">Mutable runtime power-up unlock catalog.</param>
     /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used as anti-steal cooldown origin for new grants.</param>
     /// <param name="passiveToolsState">Mutable aggregate passive state.</param>
     private static void ReconcilePassiveGrants(int activeRankIndex,
                                                DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
@@ -116,6 +119,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
                                                DynamicBuffer<PlayerComboPassivePowerUpGrantElement> passiveGrants,
                                                DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                               float elapsedTime,
                                                ref PlayerPassiveToolsState passiveToolsState)
     {
         RemoveObsoleteGrants(activeRankIndex,
@@ -131,6 +135,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
                          passiveGrants,
                          unlockCatalog,
                          equippedPassiveTools,
+                         elapsedTime,
                          ref passiveToolsState);
     }
 
@@ -143,6 +148,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
     /// <param name="passiveGrants">Mutable combo passive grant buffer.</param>
     /// <param name="unlockCatalog">Mutable runtime power-up unlock catalog.</param>
     /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used as anti-steal cooldown origin for new grants.</param>
     /// <param name="passiveToolsState">Mutable aggregate passive state.</param>
     private static void AddMissingGrants(int activeRankIndex,
                                          DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
@@ -150,6 +156,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
                                          DynamicBuffer<PlayerComboPassivePowerUpGrantElement> passiveGrants,
                                          DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                         float elapsedTime,
                                          ref PlayerPassiveToolsState passiveToolsState)
     {
         if (activeRankIndex < 0 || !runtimeRanks.IsCreated || !runtimePassiveUnlocks.IsCreated)
@@ -190,6 +197,7 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
                                                                                             unlockCatalog,
                                                                                             equippedPassiveTools,
                                                                                             ref passiveToolsState,
+                                                                                            elapsedTime,
                                                                                             out string _,
                                                                                             out bool equippedOnGrant))
                 {

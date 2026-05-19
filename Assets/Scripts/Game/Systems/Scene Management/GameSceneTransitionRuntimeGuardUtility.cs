@@ -33,7 +33,7 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     /// </summary>
     /// <param name="entityManager">EntityManager that owns the query.</param>
     /// <param name="transitionStateQuery">Query containing GameSceneTransitionState.</param>
-    /// <returns>True while scenes can still be loading, unloading or settling behind black.</returns>
+    /// <returns>True while scenes can still be loading or unloading before the post-readiness reveal window.</returns>
     public static bool ShouldBlockGameplay(EntityManager entityManager, EntityQuery transitionStateQuery)
     {
         if (!TryGetTransitionState(entityManager, transitionStateQuery, out GameSceneTransitionState transitionState))
@@ -59,13 +59,25 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     /// <summary>
     /// Resolves whether the default-world transition phase must block gameplay simulation.
     /// </summary>
-    /// <returns>True while scenes can still be loading, unloading or settling behind black.</returns>
+    /// <returns>True while scenes can still be loading or unloading before the post-readiness reveal window.</returns>
     public static bool ShouldBlockDefaultWorldGameplay()
     {
         if (!TryGetDefaultTransitionState(out GameSceneTransitionState transitionState))
             return false;
 
         return ShouldBlockGameplay(transitionState);
+    }
+
+    /// <summary>
+    /// Resolves whether the default-world player systems should remain frozen by the active scene transition.
+    /// </summary>
+    /// <returns>True while scene content is not ready for visible player simulation.</returns>
+    public static bool ShouldBlockDefaultWorldPlayerGameplay()
+    {
+        if (!TryGetDefaultTransitionState(out GameSceneTransitionState transitionState))
+            return false;
+
+        return ShouldBlockPlayerGameplay(transitionState);
     }
     #endregion
 
@@ -140,8 +152,29 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     /// Resolves whether a transition state is still in a phase that can expose invalid scene data.
     /// </summary>
     /// <param name="transitionState">Current scene transition state.</param>
-    /// <returns>True when gameplay systems should remain frozen.</returns>
+    /// <returns>True when gameplay systems should remain frozen until post-readiness reveal phases.</returns>
     private static bool ShouldBlockGameplay(GameSceneTransitionState transitionState)
+    {
+        if (transitionState.IsTransitioning == 0)
+            return false;
+
+        switch (transitionState.Phase)
+        {
+            case GameSceneTransitionPhase.HoldBlack:
+            case GameSceneTransitionPhase.FadeIn:
+                return false;
+
+            default:
+                return true;
+        }
+    }
+
+    /// <summary>
+    /// Resolves whether player simulation should stay locked for the current transition phase.
+    /// </summary>
+    /// <param name="transitionState">Current scene transition state.</param>
+    /// <returns>True until the target scene has passed readiness and fade-in begins.</returns>
+    private static bool ShouldBlockPlayerGameplay(GameSceneTransitionState transitionState)
     {
         if (transitionState.IsTransitioning == 0)
             return false;

@@ -43,6 +43,7 @@ public partial struct EnemyPowerUpStealerRecoverySystem : ISystem
         ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup = SystemAPI.GetComponentLookup<EnemyPowerUpStealerVisualState>(false);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         float deltaTime = SystemAPI.Time.DeltaTime;
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         foreach ((DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                   RefRO<EnemyHealth> enemyHealth,
@@ -64,6 +65,7 @@ public partial struct EnemyPowerUpStealerRecoverySystem : ISystem
                                                                                           deltaTime,
                                                                                           in physicsWorldSingleton,
                                                                                           hasPhysicsWorld,
+                                                                                          elapsedTime,
                                                                                           stealerRuntime,
                                                                                           ref visualStateLookup,
                                                                                           ref playerAccess,
@@ -87,6 +89,7 @@ public partial struct EnemyPowerUpStealerRecoverySystem : ISystem
                                                                                in physicsWorldSingleton,
                                                                                hasPhysicsWorld,
                                                                                forceActiveContainerDrop,
+                                                                               elapsedTime,
                                                                                stealerRuntime,
                                                                                ref visualStateLookup,
                                                                                ref playerAccess,

@@ -20,7 +20,7 @@ internal static class PlayerGameplayPauseUtility
     /// <returns>True when simulation-facing gameplay state must remain frozen for the current frame.</returns>
     public static bool IsHardGameplayPauseActive()
     {
-        return IsTimeScaleHardPaused() || GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldGameplay();
+        return IsTimeScaleHardPaused() || GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPlayerGameplay();
     }
 
     /// <summary>

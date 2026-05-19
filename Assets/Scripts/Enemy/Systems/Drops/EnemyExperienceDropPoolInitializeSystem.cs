@@ -67,7 +67,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
     {
         EnsureRegistrySingleton(ref state);
 
-        if (TryGetRegistryEntity(out Entity registryEntity) == false)
+        if (!TryGetRegistryEntity(out Entity registryEntity))
             return;
 
         EntityManager entityManager = state.EntityManager;
@@ -98,7 +98,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
         if (registry.Initialized != 0)
             return;
 
-        if (InitializePools(entityManager, registryEntity, MaxDropPoolPrewarmEntitiesPerFrame) == false)
+        if (!InitializePools(entityManager, registryEntity, MaxDropPoolPrewarmEntitiesPerFrame))
             return;
 
         registry.Initialized = 1;
@@ -115,7 +115,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
 
     private void EnsureRegistrySingleton(ref SystemState state)
     {
-        if (registryQuery.IsEmptyIgnoreFilter == false)
+        if (!registryQuery.IsEmptyIgnoreFilter)
             return;
 
         Entity registryEntity = state.EntityManager.CreateEntity();
@@ -203,83 +203,137 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
                 continue;
 
             EnemyDropItemsConfig dropItemsConfig = entityManager.GetComponentData<EnemyDropItemsConfig>(enemyPrefab);
+            bool hasExperienceDropModules = dropItemsConfig.HasExperienceDrops != 0 && dropItemsConfig.ExperienceModuleCount > 0;
+            bool hasRecoveryDropModules = dropItemsConfig.HasRecoveryDrops != 0 && dropItemsConfig.RecoveryModuleCount > 0;
 
-            if (dropItemsConfig.HasExperienceDrops == 0 || dropItemsConfig.ExperienceModuleCount <= 0)
+            if (!hasExperienceDropModules && !hasRecoveryDropModules)
                 continue;
 
-            if (!entityManager.HasBuffer<EnemyExperienceDropModuleElement>(enemyPrefab))
-                continue;
-
-            DynamicBuffer<EnemyExperienceDropModuleElement> experienceModules = entityManager.GetBuffer<EnemyExperienceDropModuleElement>(enemyPrefab);
-
-            if (!entityManager.HasBuffer<EnemyExperienceDropDefinitionElement>(enemyPrefab))
-                continue;
-
-            DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions = entityManager.GetBuffer<EnemyExperienceDropDefinitionElement>(enemyPrefab);
-
-            if (experienceModules.Length <= 0 || definitions.Length <= 0)
-                continue;
-
-            for (int moduleIndex = 0; moduleIndex < experienceModules.Length; moduleIndex++)
+            if (hasExperienceDropModules &&
+                entityManager.HasBuffer<EnemyExperienceDropModuleElement>(enemyPrefab) &&
+                entityManager.HasBuffer<EnemyExperienceDropDefinitionElement>(enemyPrefab))
             {
-                EnemyExperienceDropModuleElement experienceModule = experienceModules[moduleIndex];
-                int definitionCount = math.max(0, experienceModule.DefinitionCount);
+                DynamicBuffer<EnemyExperienceDropModuleElement> experienceModules = entityManager.GetBuffer<EnemyExperienceDropModuleElement>(enemyPrefab);
+                DynamicBuffer<EnemyExperienceDropDefinitionElement> definitions = entityManager.GetBuffer<EnemyExperienceDropDefinitionElement>(enemyPrefab);
 
-                if (definitionCount <= 0 || experienceModule.MaximumTotalExperienceDrop <= 0f)
-                    continue;
-
-                int estimatedDropsPerDeath = math.max(1, experienceModule.EstimatedDropsPerDeath);
-
-                if (experienceModule.EstimatedDropsPerDeath <= 0)
+                for (int moduleIndex = 0; moduleIndex < experienceModules.Length; moduleIndex++)
                 {
-                    float deliveredExperience;
-                    float absoluteError;
-                    estimatedDropsPerDeath = EnemyExperienceDropDistributionUtility.EstimateDropsPerDeath(definitions,
-                                                                                                           experienceModule.DefinitionStartIndex,
-                                                                                                           definitionCount,
-                                                                                                           experienceModule.MaximumTotalExperienceDrop,
-                                                                                                           experienceModule.Distribution,
-                                                                                                           out deliveredExperience,
-                                                                                                           out absoluteError);
-                    estimatedDropsPerDeath = math.max(1, estimatedDropsPerDeath);
-                }
+                    EnemyExperienceDropModuleElement experienceModule = experienceModules[moduleIndex];
+                    int definitionCount = math.max(0, experienceModule.DefinitionCount);
 
-                int initialCapacityPerPrefab = EstimateInitialCapacity(requirement.TotalPlannedCount, estimatedDropsPerDeath);
-                int expandBatchPerPrefab = EstimateExpandBatch(spawner.ExpandBatchPerPrefab, estimatedDropsPerDeath);
-                int definitionStartIndex = math.max(0, experienceModule.DefinitionStartIndex);
-                int definitionEndIndex = math.min(definitions.Length, definitionStartIndex + definitionCount);
-
-                for (int definitionIndex = definitionStartIndex; definitionIndex < definitionEndIndex; definitionIndex++)
-                {
-                    EnemyExperienceDropDefinitionElement definition = definitions[definitionIndex];
-
-                    if (definition.PrefabEntity == Entity.Null)
+                    if (definitionCount <= 0 || experienceModule.MaximumTotalExperienceDrop <= 0f)
                         continue;
 
-                    if (definition.ExperienceAmount <= 0f)
-                        continue;
+                    int estimatedDropsPerDeath = math.max(1, experienceModule.EstimatedDropsPerDeath);
 
-                    PoolBuildSettings currentSettings;
-
-                    if (poolSettingsByPrefab.TryGetValue(definition.PrefabEntity, out currentSettings))
+                    if (experienceModule.EstimatedDropsPerDeath <= 0)
                     {
-                        currentSettings.InitialCapacity += initialCapacityPerPrefab;
-
-                        if (expandBatchPerPrefab > currentSettings.ExpandBatch)
-                            currentSettings.ExpandBatch = expandBatchPerPrefab;
-
-                        poolSettingsByPrefab[definition.PrefabEntity] = currentSettings;
-                        continue;
+                        float deliveredExperience;
+                        float absoluteError;
+                        estimatedDropsPerDeath = EnemyExperienceDropDistributionUtility.EstimateDropsPerDeath(definitions,
+                                                                                                               experienceModule.DefinitionStartIndex,
+                                                                                                               definitionCount,
+                                                                                                               experienceModule.MaximumTotalExperienceDrop,
+                                                                                                               experienceModule.Distribution,
+                                                                                                               out deliveredExperience,
+                                                                                                               out absoluteError);
+                        estimatedDropsPerDeath = math.max(1, estimatedDropsPerDeath);
                     }
 
-                    poolSettingsByPrefab[definition.PrefabEntity] = new PoolBuildSettings
+                    int initialCapacityPerPrefab = EstimateInitialCapacity(requirement.TotalPlannedCount, estimatedDropsPerDeath);
+                    int expandBatchPerPrefab = EstimateExpandBatch(spawner.ExpandBatchPerPrefab, estimatedDropsPerDeath);
+                    int definitionStartIndex = math.max(0, experienceModule.DefinitionStartIndex);
+                    int definitionEndIndex = math.min(definitions.Length, definitionStartIndex + definitionCount);
+
+                    for (int definitionIndex = definitionStartIndex; definitionIndex < definitionEndIndex; definitionIndex++)
                     {
-                        InitialCapacity = initialCapacityPerPrefab,
-                        ExpandBatch = expandBatchPerPrefab
-                    };
+                        EnemyExperienceDropDefinitionElement definition = definitions[definitionIndex];
+
+                        if (definition.PrefabEntity == Entity.Null)
+                            continue;
+
+                        if (definition.ExperienceAmount <= 0f)
+                            continue;
+
+                        AddOrUpdatePoolSettings(definition.PrefabEntity,
+                                                initialCapacityPerPrefab,
+                                                expandBatchPerPrefab,
+                                                poolSettingsByPrefab);
+                    }
+                }
+            }
+
+            if (hasRecoveryDropModules &&
+                entityManager.HasBuffer<EnemyRecoveryDropModuleElement>(enemyPrefab) &&
+                entityManager.HasBuffer<EnemyRecoveryDropDefinitionElement>(enemyPrefab))
+            {
+                DynamicBuffer<EnemyRecoveryDropModuleElement> recoveryModules = entityManager.GetBuffer<EnemyRecoveryDropModuleElement>(enemyPrefab);
+                DynamicBuffer<EnemyRecoveryDropDefinitionElement> recoveryDefinitions = entityManager.GetBuffer<EnemyRecoveryDropDefinitionElement>(enemyPrefab);
+
+                for (int moduleIndex = 0; moduleIndex < recoveryModules.Length; moduleIndex++)
+                {
+                    EnemyRecoveryDropModuleElement recoveryModule = recoveryModules[moduleIndex];
+                    int definitionCount = math.max(0, recoveryModule.DefinitionCount);
+
+                    if (definitionCount <= 0 || recoveryModule.MaximumDropCount <= 0)
+                        continue;
+
+                    int estimatedDropsPerDeath = math.max(1, recoveryModule.EstimatedDropsPerDeath);
+                    int initialCapacityPerPrefab = EstimateInitialCapacity(requirement.TotalPlannedCount, estimatedDropsPerDeath);
+                    int expandBatchPerPrefab = EstimateExpandBatch(spawner.ExpandBatchPerPrefab, estimatedDropsPerDeath);
+                    int definitionStartIndex = math.max(0, recoveryModule.DefinitionStartIndex);
+                    int definitionEndIndex = math.min(recoveryDefinitions.Length, definitionStartIndex + definitionCount);
+
+                    for (int definitionIndex = definitionStartIndex; definitionIndex < definitionEndIndex; definitionIndex++)
+                    {
+                        EnemyRecoveryDropDefinitionElement definition = recoveryDefinitions[definitionIndex];
+
+                        if (definition.PrefabEntity == Entity.Null)
+                            continue;
+
+                        if (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f)
+                            continue;
+
+                        AddOrUpdatePoolSettings(definition.PrefabEntity,
+                                                initialCapacityPerPrefab,
+                                                expandBatchPerPrefab,
+                                                poolSettingsByPrefab);
+                    }
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Adds or expands one prefab pool sizing entry.
+    /// </summary>
+    /// <param name="prefabEntity">Drop prefab entity that owns the pool.</param>
+    /// <param name="initialCapacity">Initial capacity contribution.</param>
+    /// <param name="expandBatch">Expansion batch contribution.</param>
+    /// <param name="poolSettingsByPrefab">Mutable pool settings dictionary.</param>
+    private static void AddOrUpdatePoolSettings(Entity prefabEntity,
+                                                int initialCapacity,
+                                                int expandBatch,
+                                                Dictionary<Entity, PoolBuildSettings> poolSettingsByPrefab)
+    {
+        PoolBuildSettings currentSettings;
+
+        if (poolSettingsByPrefab.TryGetValue(prefabEntity, out currentSettings))
+        {
+            currentSettings.InitialCapacity += initialCapacity;
+
+            if (expandBatch > currentSettings.ExpandBatch)
+                currentSettings.ExpandBatch = expandBatch;
+
+            poolSettingsByPrefab[prefabEntity] = currentSettings;
+            return;
+        }
+
+        poolSettingsByPrefab[prefabEntity] = new PoolBuildSettings
+        {
+            InitialCapacity = initialCapacity,
+            ExpandBatch = expandBatch
+        };
     }
 
     /// <summary>
@@ -353,7 +407,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
                                                     Entity registryEntity,
                                                     Dictionary<Entity, PoolBuildSettings> poolSettingsByPrefab)
     {
-        if (entityManager.HasBuffer<EnemyExperienceDropPoolMapElement>(registryEntity) == false)
+        if (!entityManager.HasBuffer<EnemyExperienceDropPoolMapElement>(registryEntity))
             return poolSettingsByPrefab.Count <= 0;
 
         DynamicBuffer<EnemyExperienceDropPoolMapElement> poolMap = entityManager.GetBuffer<EnemyExperienceDropPoolMapElement>(registryEntity);
@@ -371,7 +425,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
             if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
                 return false;
 
-            if (entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity) == false)
+            if (!entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity))
                 return false;
 
             EnemyExperienceDropPoolState poolState = entityManager.GetComponentData<EnemyExperienceDropPoolState>(poolEntity);
@@ -450,10 +504,10 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
 
             if (EnemyExperienceDropPoolUtility.TryResolvePoolEntity(poolMap, prefabEntity, out poolEntity))
             {
-                if (poolEntity == Entity.Null || entityManager.Exists(poolEntity) == false)
+                if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
                     continue;
 
-                if (entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity) == false)
+                if (!entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity))
                     continue;
 
                 EnemyExperienceDropPoolState poolState = entityManager.GetComponentData<EnemyExperienceDropPoolState>(poolEntity);
@@ -503,10 +557,10 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
             EnemyExperienceDropPoolMapElement mapElement = poolMap[mapIndex];
             Entity poolEntity = mapElement.PoolEntity;
 
-            if (poolEntity == Entity.Null || entityManager.Exists(poolEntity) == false)
+            if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
                 continue;
 
-            if (entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity) == false)
+            if (!entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity))
                 continue;
 
             EnemyExperienceDropPoolState poolState = entityManager.GetComponentData<EnemyExperienceDropPoolState>(poolEntity);
@@ -555,7 +609,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
 
     private static bool AreAllPoolsInitialized(EntityManager entityManager, Entity registryEntity)
     {
-        if (entityManager.HasBuffer<EnemyExperienceDropPoolMapElement>(registryEntity) == false)
+        if (!entityManager.HasBuffer<EnemyExperienceDropPoolMapElement>(registryEntity))
             return true;
 
         DynamicBuffer<EnemyExperienceDropPoolMapElement> poolMap = entityManager.GetBuffer<EnemyExperienceDropPoolMapElement>(registryEntity);
@@ -564,10 +618,10 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
         {
             Entity poolEntity = poolMap[mapIndex].PoolEntity;
 
-            if (poolEntity == Entity.Null || entityManager.Exists(poolEntity) == false)
+            if (poolEntity == Entity.Null || !entityManager.Exists(poolEntity))
                 continue;
 
-            if (entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity) == false)
+            if (!entityManager.HasComponent<EnemyExperienceDropPoolState>(poolEntity))
                 continue;
 
             if (entityManager.GetComponentData<EnemyExperienceDropPoolState>(poolEntity).Initialized == 0)

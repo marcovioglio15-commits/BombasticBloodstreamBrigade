@@ -519,6 +519,8 @@ internal static class EnemyModulesAndPatternsBakeUtility
         if (dropItems == null || !dropItems.IsEnabled || dropItems.Modules == null)
             return;
 
+        ConfigureDropItemsModuleSelection(dropItems, ref result);
+
         IReadOnlyList<EnemyPatternModuleBinding> moduleBindings = dropItems.Modules;
 
         for (int moduleIndex = 0; moduleIndex < moduleBindings.Count; moduleIndex++)
@@ -537,8 +539,25 @@ internal static class EnemyModulesAndPatternsBakeUtility
                 continue;
 
             EnemyPatternModulePayloadData resolvedPayload = EnemyAdvancedPatternBakeUtility.ResolveBindingPayload(moduleDefinition, binding);
-            EnemyDropItemsBakeUtility.TryAppendModule(resolvedPayload, ref result);
+            EnemyDropItemsBakeUtility.TryAppendModule(resolvedPayload, binding.SelectionWeight, ref result);
         }
+    }
+
+    /// <summary>
+    /// Copies shared Drop Items module-selection settings into the compiled drop summary config.
+    /// </summary>
+    /// <param name="dropItems">Authored Drop Items assembly.</param>
+    /// <param name="result">Mutable compiled result receiving runtime selection settings.</param>
+    private static void ConfigureDropItemsModuleSelection(EnemyPatternDropItemsAssembly dropItems,
+                                                         ref EnemyCompiledPatternBakeResult result)
+    {
+        if (dropItems == null || result == null)
+            return;
+
+        result.DropItemsConfig.ModuleCombineMode = EnemyDropItemsBakeUtility.ResolveModuleCombineMode(dropItems.ModuleCombineMode);
+        result.DropItemsConfig.MinimumSelectedModules = math.max(0, dropItems.MinimumSelectedModules);
+        result.DropItemsConfig.MaximumSelectedModules = math.max(result.DropItemsConfig.MinimumSelectedModules,
+                                                                 dropItems.MaximumSelectedModules);
     }
 
     /// <summary>

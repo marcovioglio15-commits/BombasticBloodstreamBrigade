@@ -17,6 +17,7 @@ internal static class EnemyPowerUpStealerPassiveCatalogRuntimeUtility
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
     /// <param name="config">Stealer config containing the within-category selection mode.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to avoid stealing tool-backed passives through the catalog fallback.</param>
     /// <param name="runtime">Mutable Stealer runtime entry receiving the stolen payload.</param>
     /// <param name="playerAccess">Mutable player passive accessors.</param>
@@ -26,6 +27,7 @@ internal static class EnemyPowerUpStealerPassiveCatalogRuntimeUtility
                                                          in EnemyRuntimeState enemyRuntimeState,
                                                          int stealerIndex,
                                                          in EnemyPowerUpStealerConfigElement config,
+                                                         float elapsedTime,
                                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                          ref EnemyPowerUpStealerRuntimeElement runtime,
                                                          ref EnemyPowerUpStealerPlayerAccess playerAccess)
@@ -33,6 +35,8 @@ internal static class EnemyPowerUpStealerPassiveCatalogRuntimeUtility
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
         int catalogIndex = EnemyPowerUpStealerSelectionUtility.ResolvePassiveCatalogIndexToSteal(unlockCatalog,
                                                                                                  equippedPassiveTools,
+                                                                                                 config.AcquisitionStealCooldownSeconds,
+                                                                                                 elapsedTime,
                                                                                                  enemyEntity,
                                                                                                  in enemyRuntimeState,
                                                                                                  stealerIndex,

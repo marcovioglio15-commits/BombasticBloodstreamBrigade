@@ -10,8 +10,8 @@ using Unity.Mathematics;
 public partial struct EnemyPoolInitializeSystem : ISystem
 {
     #region Constants
-    private const int MaxInitialPoolEntitiesPerFrame = 1024;
-    private const int MaxInitialPoolEntitiesPerPoolPerFrame = 256;
+    private const int MaxInitialPoolEntitiesPerFrame = 128;
+    private const int MaxInitialPoolEntitiesPerPoolPerFrame = 32;
     #endregion
 
     #region Fields
@@ -40,9 +40,7 @@ public partial struct EnemyPoolInitializeSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
-        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
         int remainingInitializationBudget = MaxInitialPoolEntitiesPerFrame;
-        int pendingInitializationCount = 0;
         NativeArray<Entity> spawnerEntities = initializeQuery.ToEntityArray(Allocator.Temp);
 
         try
@@ -146,11 +144,10 @@ public partial struct EnemyPoolInitializeSystem : ISystem
 
                 if (!allPoolsReady)
                 {
-                    pendingInitializationCount++;
                     continue;
                 }
 
-                FinalizeSpawnerInitialization(entityManager, spawnerEntity, spawnerState, elapsedTime);
+                FinalizeSpawnerInitialization(entityManager, spawnerEntity, spawnerState);
             }
         }
         finally
@@ -239,20 +236,19 @@ public partial struct EnemyPoolInitializeSystem : ISystem
     }
 
     /// <summary>
-    /// Marks one spawner as fully initialized and records the logical spawner start time.
+    /// Marks one spawner as pool-ready while leaving logical wave time to the gameplay spawn system.
     /// </summary>
     /// <param name="entityManager">Entity manager used to write the state.</param>
     /// <param name="spawnerEntity">Spawner whose initialization is complete.</param>
     /// <param name="spawnerState">Current mutable spawner state.</param>
-    /// <param name="elapsedTime">Current elapsed world time.</param>
     private static void FinalizeSpawnerInitialization(EntityManager entityManager,
                                                       Entity spawnerEntity,
-                                                      EnemySpawnerState spawnerState,
-                                                      float elapsedTime)
+                                                      EnemySpawnerState spawnerState)
     {
         EnemySpawnerState nextState = spawnerState;
         nextState.Initialized = 1;
-        nextState.StartTime = elapsedTime;
+        nextState.StartTime = 0f;
+        nextState.StartTimeInitialized = 0;
         nextState.AliveCount = math.max(0, nextState.AliveCount);
         entityManager.SetComponentData(spawnerEntity, nextState);
     }

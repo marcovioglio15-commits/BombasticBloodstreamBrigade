@@ -55,6 +55,7 @@ public partial struct EnemyKilledEventsSystem : ISystem
         ComponentLookup<EnemyDropRewardMultiplier> rewardMultiplierLookup = SystemAPI.GetComponentLookup<EnemyDropRewardMultiplier>(true);
         BufferLookup<EnemyExtraComboPointsModuleElement> extraComboPointsModuleLookup = SystemAPI.GetBufferLookup<EnemyExtraComboPointsModuleElement>(true);
         BufferLookup<EnemyExtraComboPointsConditionElement> extraComboPointsConditionLookup = SystemAPI.GetBufferLookup<EnemyExtraComboPointsConditionElement>(true);
+        BufferLookup<EnemyDropItemsModuleSelectionElement> dropItemsSelectionModuleLookup = SystemAPI.GetBufferLookup<EnemyDropItemsModuleSelectionElement>(true);
 
         foreach ((RefRO<EnemyDespawnRequest> despawnRequest,
                   RefRO<EnemyData> enemyData,
@@ -68,12 +69,15 @@ public partial struct EnemyKilledEventsSystem : ISystem
                 continue;
 
             float3 killedEventPosition = ResolveKilledEventPosition(enemyTransform.ValueRO.Position, enemyData.ValueRO.BodyRadius);
+            int killedEventIndex = killedEventsBuffer.Length;
             float comboPointMultiplier = ResolveComboPointMultiplier(enemyEntity,
+                                                                    killedEventIndex,
                                                                     in runtimeStateLookup,
                                                                     in dropItemsConfigLookup,
                                                                     in rewardMultiplierLookup,
                                                                     in extraComboPointsModuleLookup,
-                                                                    in extraComboPointsConditionLookup);
+                                                                    in extraComboPointsConditionLookup,
+                                                                    in dropItemsSelectionModuleLookup);
 
             killedEventsBuffer.Add(new EnemyKilledEventElement
             {
@@ -102,18 +106,22 @@ public partial struct EnemyKilledEventsSystem : ISystem
     /// Resolves the combo-points multiplier granted by the killed enemy from its baked Extra Combo Points modules.
     /// </summary>
     /// <param name="enemyEntity">Killed enemy entity.</param>
+    /// <param name="killEventIndex">Killed-event index inside the current frame.</param>
     /// <param name="runtimeStateLookup">Lookup used to read enemy runtime timing state.</param>
     /// <param name="dropItemsConfigLookup">Lookup used to read drop-items summary flags.</param>
     /// <param name="rewardMultiplierLookup">Lookup used to read optional special reward multipliers.</param>
     /// <param name="extraComboPointsModuleLookup">Lookup used to read Extra Combo Points module buffers.</param>
     /// <param name="extraComboPointsConditionLookup">Lookup used to read Extra Combo Points condition buffers.</param>
+    /// <param name="dropItemsSelectionModuleLookup">Lookup used to read unified Drop Items selection buffers.</param>
     /// <returns>Resolved combo-points multiplier granted by the kill.</returns>
     private static float ResolveComboPointMultiplier(Entity enemyEntity,
+                                                     int killEventIndex,
                                                      in ComponentLookup<EnemyRuntimeState> runtimeStateLookup,
                                                      in ComponentLookup<EnemyDropItemsConfig> dropItemsConfigLookup,
                                                      in ComponentLookup<EnemyDropRewardMultiplier> rewardMultiplierLookup,
                                                      in BufferLookup<EnemyExtraComboPointsModuleElement> extraComboPointsModuleLookup,
-                                                     in BufferLookup<EnemyExtraComboPointsConditionElement> extraComboPointsConditionLookup)
+                                                     in BufferLookup<EnemyExtraComboPointsConditionElement> extraComboPointsConditionLookup,
+                                                     in BufferLookup<EnemyDropItemsModuleSelectionElement> dropItemsSelectionModuleLookup)
     {
         if (!runtimeStateLookup.HasComponent(enemyEntity) || !dropItemsConfigLookup.HasComponent(enemyEntity))
             return 1f;
@@ -122,6 +130,7 @@ public partial struct EnemyKilledEventsSystem : ISystem
         EnemyDropItemsConfig dropItemsConfig = dropItemsConfigLookup[enemyEntity];
         DynamicBuffer<EnemyExtraComboPointsModuleElement> extraComboPointsModules = default;
         DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointsConditions = default;
+        DynamicBuffer<EnemyDropItemsModuleSelectionElement> selectionModules = default;
 
         if (extraComboPointsModuleLookup.HasBuffer(enemyEntity))
             extraComboPointsModules = extraComboPointsModuleLookup[enemyEntity];
@@ -129,10 +138,16 @@ public partial struct EnemyKilledEventsSystem : ISystem
         if (extraComboPointsConditionLookup.HasBuffer(enemyEntity))
             extraComboPointsConditions = extraComboPointsConditionLookup[enemyEntity];
 
+        if (dropItemsSelectionModuleLookup.HasBuffer(enemyEntity))
+            selectionModules = dropItemsSelectionModuleLookup[enemyEntity];
+
         float comboMultiplier = EnemyExtraComboPointsRuntimeUtility.ResolveKillComboPointMultiplier(in runtimeState,
                                                                                                     in dropItemsConfig,
                                                                                                     extraComboPointsModules,
-                                                                                                    extraComboPointsConditions);
+                                                                                                    extraComboPointsConditions,
+                                                                                                    selectionModules,
+                                                                                                    enemyEntity,
+                                                                                                    killEventIndex);
 
         if (!rewardMultiplierLookup.HasComponent(enemyEntity))
             return comboMultiplier;

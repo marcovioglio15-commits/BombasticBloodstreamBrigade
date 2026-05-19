@@ -192,9 +192,11 @@ MonoBehaviour:
           stacksPerHit: 1
       powerUpStealer:
         triggerMode: 1
+        consumeModuleActivationAttemptOnSpawnOnly: 0
         targetKind: 2
         selectionMode: 0
         activeTargetBiasPercent: 50
+        acquisitionStealCooldownSeconds: 3
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -220,6 +222,18 @@ MonoBehaviour:
           minimumFinalMultiplier: 0
           maximumFinalMultiplier: 4
           conditions: []
+        recovery:
+          dropDefinitions: []
+          minimumDropCount: 1
+          maximumDropCount: 1
+          dropsDistribution: 0.5
+          dropRadius: 0.6
+          collectionMovement:
+            moveSpeed: 8
+            collectDistance: 0.3
+            collectDistancePerPlayerSpeed: 0.05
+            spawnAnimationMinDuration: 0.08
+            spawnAnimationMaxDuration: 0.16
   - moduleId: Module_Grunt
     displayName: Grunt
     moduleKind: 1
@@ -389,9 +403,11 @@ MonoBehaviour:
           stacksPerHit: 1
       powerUpStealer:
         triggerMode: 1
+        consumeModuleActivationAttemptOnSpawnOnly: 0
         targetKind: 2
         selectionMode: 0
         activeTargetBiasPercent: 50
+        acquisitionStealCooldownSeconds: 3
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -417,6 +433,18 @@ MonoBehaviour:
           minimumFinalMultiplier: 0
           maximumFinalMultiplier: 4
           conditions: []
+        recovery:
+          dropDefinitions: []
+          minimumDropCount: 1
+          maximumDropCount: 1
+          dropsDistribution: 0.5
+          dropRadius: 0.6
+          collectionMovement:
+            moveSpeed: 8
+            collectDistance: 0.3
+            collectDistancePerPlayerSpeed: 0.05
+            spawnAnimationMinDuration: 0.08
+            spawnAnimationMaxDuration: 0.16
   - moduleId: Module_Wanderer
     displayName: Wanderer
     moduleKind: 2
@@ -586,9 +614,11 @@ MonoBehaviour:
           stacksPerHit: 1
       powerUpStealer:
         triggerMode: 1
+        consumeModuleActivationAttemptOnSpawnOnly: 0
         targetKind: 2
         selectionMode: 0
         activeTargetBiasPercent: 50
+        acquisitionStealCooldownSeconds: 3
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -614,6 +644,18 @@ MonoBehaviour:
           minimumFinalMultiplier: 0
           maximumFinalMultiplier: 4
           conditions: []
+        recovery:
+          dropDefinitions: []
+          minimumDropCount: 1
+          maximumDropCount: 1
+          dropsDistribution: 0.5
+          dropRadius: 0.6
+          collectionMovement:
+            moveSpeed: 8
+            collectDistance: 0.3
+            collectDistancePerPlayerSpeed: 0.05
+            spawnAnimationMinDuration: 0.08
+            spawnAnimationMaxDuration: 0.16
   - moduleId: Module_Shooter
     displayName: Shooter
     moduleKind: 3
@@ -783,9 +825,11 @@ MonoBehaviour:
           stacksPerHit: 1
       powerUpStealer:
         triggerMode: 1
+        consumeModuleActivationAttemptOnSpawnOnly: 0
         targetKind: 2
         selectionMode: 0
         activeTargetBiasPercent: 50
+        acquisitionStealCooldownSeconds: 3
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -811,6 +855,18 @@ MonoBehaviour:
           minimumFinalMultiplier: 0
           maximumFinalMultiplier: 4
           conditions: []
+        recovery:
+          dropDefinitions: []
+          minimumDropCount: 1
+          maximumDropCount: 1
+          dropsDistribution: 0.5
+          dropRadius: 0.6
+          collectionMovement:
+            moveSpeed: 8
+            collectDistance: 0.3
+            collectDistancePerPlayerSpeed: 0.05
+            spawnAnimationMinDuration: 0.08
+            spawnAnimationMaxDuration: 0.16
   - moduleId: Module_DropItems
     displayName: Drop Items
     moduleKind: 4
@@ -980,9 +1036,11 @@ MonoBehaviour:
           stacksPerHit: 1
       powerUpStealer:
         triggerMode: 1
+        consumeModuleActivationAttemptOnSpawnOnly: 0
         targetKind: 2
         selectionMode: 0
         activeTargetBiasPercent: 50
+        acquisitionStealCooldownSeconds: 3
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -1014,6 +1072,18 @@ MonoBehaviour:
           minimumFinalMultiplier: 0
           maximumFinalMultiplier: 4
           conditions: []
+        recovery:
+          dropDefinitions: []
+          minimumDropCount: 1
+          maximumDropCount: 1
+          dropsDistribution: 0.5
+          dropRadius: 0.6
+          collectionMovement:
+            moveSpeed: 8
+            collectDistance: 0.3
+            collectDistancePerPlayerSpeed: 0.05
+            spawnAnimationMinDuration: 0.08
+            spawnAnimationMaxDuration: 0.16
   patterns:
   - patternId: Pattern_Shooter
     displayName: Default Shooter
@@ -1023,6 +1093,7 @@ MonoBehaviour:
     moduleBindings:
     - moduleId: Module_Wanderer
       isEnabled: 1
+      selectionWeight: 1
       useOverridePayload: 0
       overridePayload:
         stationary:
@@ -1189,9 +1260,11 @@ MonoBehaviour:
             stacksPerHit: 1
         powerUpStealer:
           triggerMode: 1
+          consumeModuleActivationAttemptOnSpawnOnly: 0
           targetKind: 2
           selectionMode: 0
           activeTargetBiasPercent: 50
+          acquisitionStealCooldownSeconds: 3
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0
@@ -1217,8 +1290,21 @@ MonoBehaviour:
             minimumFinalMultiplier: 0
             maximumFinalMultiplier: 4
             conditions: []
+          recovery:
+            dropDefinitions: []
+            minimumDropCount: 1
+            maximumDropCount: 1
+            dropsDistribution: 0.5
+            dropRadius: 0.6
+            collectionMovement:
+              moveSpeed: 8
+              collectDistance: 0.3
+              collectDistancePerPlayerSpeed: 0.05
+              spawnAnimationMinDuration: 0.08
+              spawnAnimationMaxDuration: 0.16
     - moduleId: Module_Shooter
       isEnabled: 1
+      selectionWeight: 1
       useOverridePayload: 0
       overridePayload:
         stationary:
@@ -1385,9 +1471,11 @@ MonoBehaviour:
             stacksPerHit: 1
         powerUpStealer:
           triggerMode: 1
+          consumeModuleActivationAttemptOnSpawnOnly: 0
           targetKind: 2
           selectionMode: 0
           activeTargetBiasPercent: 50
+          acquisitionStealCooldownSeconds: 3
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0
@@ -1413,8 +1501,21 @@ MonoBehaviour:
             minimumFinalMultiplier: 0
             maximumFinalMultiplier: 4
             conditions: []
+          recovery:
+            dropDefinitions: []
+            minimumDropCount: 1
+            maximumDropCount: 1
+            dropsDistribution: 0.5
+            dropRadius: 0.6
+            collectionMovement:
+              moveSpeed: 8
+              collectDistance: 0.3
+              collectDistancePerPlayerSpeed: 0.05
+              spawnAnimationMinDuration: 0.08
+              spawnAnimationMaxDuration: 0.16
     - moduleId: Module_DropItems
       isEnabled: 1
+      selectionWeight: 1
       useOverridePayload: 0
       overridePayload:
         stationary:
@@ -1581,9 +1682,11 @@ MonoBehaviour:
             stacksPerHit: 1
         powerUpStealer:
           triggerMode: 1
+          consumeModuleActivationAttemptOnSpawnOnly: 0
           targetKind: 2
           selectionMode: 0
           activeTargetBiasPercent: 50
+          acquisitionStealCooldownSeconds: 3
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0
@@ -1609,3 +1712,15 @@ MonoBehaviour:
             minimumFinalMultiplier: 0
             maximumFinalMultiplier: 4
             conditions: []
+          recovery:
+            dropDefinitions: []
+            minimumDropCount: 1
+            maximumDropCount: 1
+            dropsDistribution: 0.5
+            dropRadius: 0.6
+            collectionMovement:
+              moveSpeed: 8
+              collectDistance: 0.3
+              collectDistancePerPlayerSpeed: 0.05
+              spawnAnimationMinDuration: 0.08
+              spawnAnimationMaxDuration: 0.16

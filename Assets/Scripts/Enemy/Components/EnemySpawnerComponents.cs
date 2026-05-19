@@ -22,6 +22,7 @@ public struct EnemySpawnerState : IComponentData
     public float StartTime;
     public int AliveCount;
     public byte Initialized;
+    public byte StartTimeInitialized;
 }
 
 /// <summary>

@@ -52,8 +52,12 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         SerializedProperty dropPayloadKindProperty = dropItemsProperty.FindPropertyRelative("dropPayloadKind");
         SerializedProperty experienceProperty = dropItemsProperty.FindPropertyRelative("experience");
         SerializedProperty extraComboPointsProperty = dropItemsProperty.FindPropertyRelative("extraComboPoints");
+        SerializedProperty recoveryProperty = dropItemsProperty.FindPropertyRelative("recovery");
 
-        if (dropPayloadKindProperty == null || experienceProperty == null || extraComboPointsProperty == null)
+        if (dropPayloadKindProperty == null ||
+            experienceProperty == null ||
+            extraComboPointsProperty == null ||
+            recoveryProperty == null)
         {
             HelpBox missingFieldsBox = new HelpBox("DropItems payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(missingFieldsBox);
@@ -184,10 +188,22 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             });
         }
 
-        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(dropPayloadKindProperty, experienceFoldout, extraComboPointsFoldout);
+        Foldout recoveryFoldout = CreatePayloadFoldout(recoveryProperty, "Recovery", "RecoveryDrops");
+        payloadContainer.Add(recoveryFoldout);
+        EnemyRecoveryDropPayloadDrawerUtility.BuildRecoveryDropPayloadEditor(recoveryProperty,
+                                                                             recoveryFoldout,
+                                                                             payloadContainer);
+
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(dropPayloadKindProperty,
+                                                                                experienceFoldout,
+                                                                                extraComboPointsFoldout,
+                                                                                recoveryFoldout);
         payloadContainer.TrackPropertyValue(dropPayloadKindProperty, changedProperty =>
         {
-            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(changedProperty, experienceFoldout, extraComboPointsFoldout);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateDropPayloadVisibility(changedProperty,
+                                                                                    experienceFoldout,
+                                                                                    extraComboPointsFoldout,
+                                                                                    recoveryFoldout);
         });
 
         return true;
@@ -561,7 +577,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
     /// <param name="title">Visible foldout title.</param>
     /// <param name="suffix">Local suffix used to distinguish sibling foldouts.</param>
     /// <returns>Configured foldout element.</returns>
-    private static Foldout CreatePayloadFoldout(SerializedProperty property, string title, string suffix)
+    internal static Foldout CreatePayloadFoldout(SerializedProperty property, string title, string suffix)
     {
         Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(property, title, "Payload" + suffix, true);
         foldout.tooltip = "Groups " + title + " payload settings.";

@@ -38,11 +38,17 @@ internal static class EnemyExtraComboPointsRuntimeUtility
     /// <param name="dropItemsConfig">Summary drop-items flags baked on the enemy.</param>
     /// <param name="extraComboPointModules">Compiled Extra Combo Points module buffer owned by the enemy.</param>
     /// <param name="extraComboPointConditions">Compiled Extra Combo Points condition buffer owned by the enemy.</param>
+    /// <param name="selectionModules">Compiled Drop Items module selection buffer owned by the enemy.</param>
+    /// <param name="enemyEntity">Killed enemy entity used to seed deterministic module selection.</param>
+    /// <param name="killEventIndex">Killed-event index inside the current frame.</param>
     /// <returns>Final non-negative combo-points multiplier granted by the kill.</returns>
     public static float ResolveKillComboPointMultiplier(in EnemyRuntimeState runtimeState,
                                                         in EnemyDropItemsConfig dropItemsConfig,
                                                         DynamicBuffer<EnemyExtraComboPointsModuleElement> extraComboPointModules,
-                                                        DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions)
+                                                        DynamicBuffer<EnemyExtraComboPointsConditionElement> extraComboPointConditions,
+                                                        DynamicBuffer<EnemyDropItemsModuleSelectionElement> selectionModules,
+                                                        Entity enemyEntity,
+                                                        int killEventIndex)
     {
         if (dropItemsConfig.HasExtraComboPoints == 0 || !extraComboPointModules.IsCreated || extraComboPointModules.Length <= 0)
             return DefaultKillMultiplier;
@@ -51,6 +57,16 @@ internal static class EnemyExtraComboPointsRuntimeUtility
 
         for (int moduleIndex = 0; moduleIndex < extraComboPointModules.Length; moduleIndex++)
         {
+            if (!EnemyDropItemsModuleSelectionUtility.ShouldResolveModule(enemyEntity,
+                                                                          killEventIndex,
+                                                                          in dropItemsConfig,
+                                                                          selectionModules,
+                                                                          EnemyDropItemsPayloadKind.ExtraComboPoints,
+                                                                          moduleIndex))
+            {
+                continue;
+            }
+
             float moduleMultiplier = ResolveModuleMultiplier(in runtimeState,
                                                             extraComboPointModules[moduleIndex],
                                                             extraComboPointConditions);

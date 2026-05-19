@@ -43,6 +43,7 @@ internal static class EnemyBossDropExtractionBakeUtility
             EnemyCompiledPatternBakeResult compiledCandidate = CompileDropCandidate(sharedPreset, candidate.DropItems);
             int firstExperienceModuleIndex = result.BossDropExperienceModules.Count;
             int firstExtraComboPointsModuleIndex = result.BossDropExtraComboPointsModules.Count;
+            int firstRecoveryModuleIndex = result.BossDropRecoveryModules.Count;
             AppendCompiledDropSource(compiledCandidate, prefabResolver, result);
             AppendCompiledDropUnion(compiledCandidate, result.BossDropUnionPattern);
             result.DropCandidates.Add(new EnemyBossDropCandidateElement
@@ -53,7 +54,12 @@ internal static class EnemyBossDropExtractionBakeUtility
                 FirstExperienceModuleIndex = firstExperienceModuleIndex,
                 ExperienceModuleCount = result.BossDropExperienceModules.Count - firstExperienceModuleIndex,
                 FirstExtraComboPointsModuleIndex = firstExtraComboPointsModuleIndex,
-                ExtraComboPointsModuleCount = result.BossDropExtraComboPointsModules.Count - firstExtraComboPointsModuleIndex
+                ExtraComboPointsModuleCount = result.BossDropExtraComboPointsModules.Count - firstExtraComboPointsModuleIndex,
+                FirstRecoveryModuleIndex = firstRecoveryModuleIndex,
+                RecoveryModuleCount = result.BossDropRecoveryModules.Count - firstRecoveryModuleIndex,
+                ModuleCombineMode = compiledCandidate.DropItemsConfig.ModuleCombineMode,
+                MinimumSelectedModules = compiledCandidate.DropItemsConfig.MinimumSelectedModules,
+                MaximumSelectedModules = compiledCandidate.DropItemsConfig.MaximumSelectedModules
             });
         }
     }
@@ -86,6 +92,10 @@ internal static class EnemyBossDropExtractionBakeUtility
         if (sharedPreset == null || dropItems == null || !dropItems.IsEnabled || dropItems.Modules == null)
             return result;
 
+        result.DropItemsConfig.ModuleCombineMode = EnemyDropItemsBakeUtility.ResolveModuleCombineMode(dropItems.ModuleCombineMode);
+        result.DropItemsConfig.MinimumSelectedModules = math.max(0, dropItems.MinimumSelectedModules);
+        result.DropItemsConfig.MaximumSelectedModules = math.max(result.DropItemsConfig.MinimumSelectedModules,
+                                                                 dropItems.MaximumSelectedModules);
         IReadOnlyList<EnemyPatternModuleBinding> moduleBindings = dropItems.Modules;
 
         for (int moduleIndex = 0; moduleIndex < moduleBindings.Count; moduleIndex++)
@@ -104,7 +114,7 @@ internal static class EnemyBossDropExtractionBakeUtility
                 continue;
 
             EnemyPatternModulePayloadData resolvedPayload = EnemyAdvancedPatternBakeUtility.ResolveBindingPayload(moduleDefinition, binding);
-            EnemyDropItemsBakeUtility.TryAppendModule(resolvedPayload, ref result);
+            EnemyDropItemsBakeUtility.TryAppendModule(resolvedPayload, binding.SelectionWeight, ref result);
         }
 
         return result;
@@ -126,6 +136,7 @@ internal static class EnemyBossDropExtractionBakeUtility
             return;
 
         AppendExperienceSource(compiledCandidate, prefabResolver, result);
+        AppendRecoverySource(compiledCandidate, prefabResolver, result);
         AppendExtraComboPointsSource(compiledCandidate, result);
     }
 
@@ -186,7 +197,75 @@ internal static class EnemyBossDropExtractionBakeUtility
                 SpawnAnimationMaxDuration = math.max(math.max(0f, compiledModule.SpawnAnimationMinDuration), compiledModule.SpawnAnimationMaxDuration),
                 DefinitionStartIndex = targetDefinitionStartIndex,
                 DefinitionCount = targetDefinitionCount,
-                EstimatedDropsPerDeath = math.max(0, compiledModule.EstimatedDropsPerDeath)
+                EstimatedDropsPerDeath = math.max(0, compiledModule.EstimatedDropsPerDeath),
+                SelectionWeight = math.max(0.0001f, compiledModule.SelectionWeight)
+            });
+        }
+    }
+
+    /// <summary>
+    /// Converts compiled recovery drop modules into boss-owned source buffers.
+    /// </summary>
+    /// <param name="compiledCandidate">Compiled candidate drop modules.</param>
+    /// <param name="prefabResolver">Callback that converts a drop prefab GameObject to an entity prefab.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    private static void AppendRecoverySource(EnemyCompiledPatternBakeResult compiledCandidate,
+                                             System.Func<GameObject, Entity> prefabResolver,
+                                             EnemyCompiledBossPatternBakeResult result)
+    {
+        for (int moduleIndex = 0; moduleIndex < compiledCandidate.RecoveryDropModules.Count; moduleIndex++)
+        {
+            EnemyCompiledRecoveryDropModule compiledModule = compiledCandidate.RecoveryDropModules[moduleIndex];
+            int sourceDefinitionStartIndex = math.max(0, compiledModule.DefinitionStartIndex);
+            int sourceDefinitionEndIndex = math.min(compiledCandidate.RecoveryDropDefinitions.Count,
+                                                    sourceDefinitionStartIndex + math.max(0, compiledModule.DefinitionCount));
+            int targetDefinitionStartIndex = result.BossDropRecoveryDefinitions.Count;
+
+            for (int definitionIndex = sourceDefinitionStartIndex; definitionIndex < sourceDefinitionEndIndex; definitionIndex++)
+            {
+                EnemyCompiledRecoveryDropDefinition definition = compiledCandidate.RecoveryDropDefinitions[definitionIndex];
+
+                if (definition.Prefab == null ||
+                    (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f))
+                {
+                    continue;
+                }
+
+                Entity prefabEntity = prefabResolver != null
+                    ? prefabResolver(definition.Prefab)
+                    : Entity.Null;
+
+                if (prefabEntity == Entity.Null)
+                    continue;
+
+                result.BossDropRecoveryDefinitions.Add(new EnemyRecoveryDropDefinitionElement
+                {
+                    PrefabEntity = prefabEntity,
+                    HealthRestoreAmount = math.max(0f, definition.HealthRestoreAmount),
+                    ShieldRestoreAmount = math.max(0f, definition.ShieldRestoreAmount)
+                });
+            }
+
+            int targetDefinitionCount = result.BossDropRecoveryDefinitions.Count - targetDefinitionStartIndex;
+
+            if (targetDefinitionCount <= 0)
+                continue;
+
+            result.BossDropRecoveryModules.Add(new EnemyRecoveryDropModuleElement
+            {
+                MinimumDropCount = math.max(0, compiledModule.MinimumDropCount),
+                MaximumDropCount = math.max(math.max(0, compiledModule.MinimumDropCount), compiledModule.MaximumDropCount),
+                Distribution = math.clamp(compiledModule.Distribution, 0f, 1f),
+                DropRadius = math.max(0f, compiledModule.DropRadius),
+                AttractionSpeed = math.max(0f, compiledModule.AttractionSpeed),
+                CollectDistance = math.max(0.01f, compiledModule.CollectDistance),
+                CollectDistancePerPlayerSpeed = math.max(0f, compiledModule.CollectDistancePerPlayerSpeed),
+                SpawnAnimationMinDuration = math.max(0f, compiledModule.SpawnAnimationMinDuration),
+                SpawnAnimationMaxDuration = math.max(math.max(0f, compiledModule.SpawnAnimationMinDuration), compiledModule.SpawnAnimationMaxDuration),
+                DefinitionStartIndex = targetDefinitionStartIndex,
+                DefinitionCount = targetDefinitionCount,
+                EstimatedDropsPerDeath = math.max(0, compiledModule.EstimatedDropsPerDeath),
+                SelectionWeight = math.max(0.0001f, compiledModule.SelectionWeight)
             });
         }
     }
@@ -229,7 +308,8 @@ internal static class EnemyBossDropExtractionBakeUtility
                 MaximumFinalMultiplier = compiledModule.MaximumFinalMultiplier,
                 ConditionCombineMode = compiledModule.ConditionCombineMode,
                 ConditionStartIndex = targetConditionStartIndex,
-                ConditionCount = result.BossDropExtraComboPointsConditions.Count - targetConditionStartIndex
+                ConditionCount = result.BossDropExtraComboPointsConditions.Count - targetConditionStartIndex,
+                SelectionWeight = math.max(0.0001f, compiledModule.SelectionWeight)
             });
         }
     }
@@ -247,6 +327,7 @@ internal static class EnemyBossDropExtractionBakeUtility
             return;
 
         AppendExperienceUnion(source, target);
+        AppendRecoveryUnion(source, target);
         AppendExtraComboPointsUnion(source, target);
     }
 
@@ -273,6 +354,34 @@ internal static class EnemyBossDropExtractionBakeUtility
             target.ExperienceDropModules.Add(sourceModule);
             target.DropItemsConfig.HasExperienceDrops = 1;
             target.DropItemsConfig.ExperienceModuleCount = target.ExperienceDropModules.Count;
+            target.DropItemsConfig.EstimatedDropsPerDeath = EnemyAuthoringValidationUtility.AddEstimatedCount(target.DropItemsConfig.EstimatedDropsPerDeath,
+                                                                                                              sourceModule.EstimatedDropsPerDeath);
+        }
+    }
+
+    /// <summary>
+    /// Appends compiled recovery modules into the union target.
+    /// </summary>
+    /// <param name="source">Compiled source drop modules.</param>
+    /// <param name="target">Compiled target result receiving modules.</param>
+    private static void AppendRecoveryUnion(EnemyCompiledPatternBakeResult source, EnemyCompiledPatternBakeResult target)
+    {
+        for (int moduleIndex = 0; moduleIndex < source.RecoveryDropModules.Count; moduleIndex++)
+        {
+            EnemyCompiledRecoveryDropModule sourceModule = source.RecoveryDropModules[moduleIndex];
+            int sourceDefinitionStartIndex = math.max(0, sourceModule.DefinitionStartIndex);
+            int sourceDefinitionEndIndex = math.min(source.RecoveryDropDefinitions.Count,
+                                                    sourceDefinitionStartIndex + math.max(0, sourceModule.DefinitionCount));
+            int targetDefinitionStartIndex = target.RecoveryDropDefinitions.Count;
+
+            for (int definitionIndex = sourceDefinitionStartIndex; definitionIndex < sourceDefinitionEndIndex; definitionIndex++)
+                target.RecoveryDropDefinitions.Add(source.RecoveryDropDefinitions[definitionIndex]);
+
+            sourceModule.DefinitionStartIndex = targetDefinitionStartIndex;
+            sourceModule.DefinitionCount = target.RecoveryDropDefinitions.Count - targetDefinitionStartIndex;
+            target.RecoveryDropModules.Add(sourceModule);
+            target.DropItemsConfig.HasRecoveryDrops = 1;
+            target.DropItemsConfig.RecoveryModuleCount = target.RecoveryDropModules.Count;
             target.DropItemsConfig.EstimatedDropsPerDeath = EnemyAuthoringValidationUtility.AddEstimatedCount(target.DropItemsConfig.EstimatedDropsPerDeath,
                                                                                                               sourceModule.EstimatedDropsPerDeath);
         }

@@ -19,6 +19,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// <param name="physicsWorldSingleton">Physics world used to ground dropped active containers.</param>
     /// <param name="hasPhysicsWorld">True when physicsWorldSingleton is valid.</param>
     /// <param name="forceActiveContainerDrop">True when stolen active power-ups must be dropped as containers instead of restored directly.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used when a payload is directly reacquired by the player.</param>
     /// <param name="stealerRuntime">Mutable Stealer runtime buffer on the enemy.</param>
     /// <param name="visualStateLookup">Enemy visual state lookup used for icon cleanup.</param>
     /// <param name="playerAccess">Mutable player loadout and passive accessors.</param>
@@ -29,6 +30,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                 in PhysicsWorldSingleton physicsWorldSingleton,
                                                 bool hasPhysicsWorld,
                                                 bool forceActiveContainerDrop,
+                                                float elapsedTime,
                                                 DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                 ref ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup,
                                                 ref EnemyPowerUpStealerPlayerAccess playerAccess,
@@ -48,6 +50,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                    in physicsWorldSingleton,
                                    hasPhysicsWorld,
                                    forceActiveContainerDrop,
+                                   elapsedTime,
                                    ref playerAccess,
                                    ref commandBuffer))
             {
@@ -73,6 +76,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// <param name="deltaTime">Scaled delta time used by timed damage windows.</param>
     /// <param name="physicsWorldSingleton">Physics world used to ground dropped active containers.</param>
     /// <param name="hasPhysicsWorld">True when physicsWorldSingleton is valid.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used when a payload is directly reacquired by the player.</param>
     /// <param name="stealerRuntime">Mutable Stealer runtime buffer on the enemy.</param>
     /// <param name="visualStateLookup">Enemy visual state lookup used for icon cleanup.</param>
     /// <param name="playerAccess">Mutable player loadout and passive accessors.</param>
@@ -84,6 +88,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                            float deltaTime,
                                                            in PhysicsWorldSingleton physicsWorldSingleton,
                                                            bool hasPhysicsWorld,
+                                                           float elapsedTime,
                                                            DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                            ref ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup,
                                                            ref EnemyPowerUpStealerPlayerAccess playerAccess,
@@ -111,6 +116,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                    in physicsWorldSingleton,
                                    hasPhysicsWorld,
                                    false,
+                                   elapsedTime,
                                    ref playerAccess,
                                    ref commandBuffer))
             {
@@ -227,6 +233,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// <param name="physicsWorldSingleton">Physics world used to ground dropped containers.</param>
     /// <param name="hasPhysicsWorld">True when physicsWorldSingleton is valid.</param>
     /// <param name="forceContainerDrop">True when active payloads must always become a dropped container.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used when a payload is directly reacquired by the player.</param>
     /// <param name="playerAccess">Mutable player loadout and passive accessors.</param>
     /// <param name="commandBuffer">ECB used to spawn dropped active containers.</param>
     /// <returns>True when the payload was restored or dropped.</returns>
@@ -235,13 +242,14 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                           in PhysicsWorldSingleton physicsWorldSingleton,
                                           bool hasPhysicsWorld,
                                           bool forceContainerDrop,
+                                          float elapsedTime,
                                           ref EnemyPowerUpStealerPlayerAccess playerAccess,
                                           ref EntityCommandBuffer commandBuffer)
     {
         switch (runtime.StolenKind)
         {
             case PlayerPowerUpUnlockKind.Passive:
-                return TryRestorePassivePowerUp(in runtime, ref playerAccess);
+                return TryRestorePassivePowerUp(in runtime, elapsedTime, ref playerAccess);
 
             default:
                 return TryRestoreActivePowerUp(in runtime,
@@ -249,6 +257,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                in physicsWorldSingleton,
                                                hasPhysicsWorld,
                                                forceContainerDrop,
+                                               elapsedTime,
                                                ref playerAccess,
                                                ref commandBuffer);
         }
@@ -262,6 +271,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// <param name="physicsWorldSingleton">Physics world used to ground dropped containers.</param>
     /// <param name="hasPhysicsWorld">True when physicsWorldSingleton is valid.</param>
     /// <param name="forceContainerDrop">True when the active must always become a world container.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used when the active is directly restored.</param>
     /// <param name="playerAccess">Mutable player loadout accessors.</param>
     /// <param name="commandBuffer">ECB used to spawn dropped active containers.</param>
     /// <returns>True when the active payload was recovered or dropped.</returns>
@@ -270,6 +280,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                 in PhysicsWorldSingleton physicsWorldSingleton,
                                                 bool hasPhysicsWorld,
                                                 bool forceContainerDrop,
+                                                float elapsedTime,
                                                 ref EnemyPowerUpStealerPlayerAccess playerAccess,
                                                 ref EntityCommandBuffer commandBuffer)
     {
@@ -298,6 +309,10 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
         {
             playerAccess.PowerUpsConfigLookup[playerEntity] = powerUpsConfig;
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
+            MarkActivePowerUpRecovered(playerEntity,
+                                       runtime.PowerUpId,
+                                       elapsedTime,
+                                       ref playerAccess);
             return true;
         }
 
@@ -323,6 +338,10 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
         {
             playerAccess.PowerUpsConfigLookup[playerEntity] = powerUpsConfig;
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
+            MarkActivePowerUpRecovered(playerEntity,
+                                       runtime.PowerUpId,
+                                       elapsedTime,
+                                       ref playerAccess);
             return true;
         }
 
@@ -333,9 +352,11 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// Restores a stolen passive power-up to the player's passive buffer and catalog ownership state.
     /// </summary>
     /// <param name="runtime">Stealer runtime holding the passive payload.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used when the passive is restored.</param>
     /// <param name="playerAccess">Mutable player passive accessors.</param>
     /// <returns>True when the passive payload was restored.</returns>
     private static bool TryRestorePassivePowerUp(in EnemyPowerUpStealerRuntimeElement runtime,
+                                                 float elapsedTime,
                                                  ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         Entity playerEntity = runtime.PlayerEntity;
@@ -374,10 +395,35 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
             catalogEntry.IsUnlocked = 1;
             catalogEntry.PendingInitialCharacterTuningApply = 0;
             unlockCatalog[catalogIndex] = catalogEntry;
+            PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(catalogIndex,
+                                                                              unlockCatalog,
+                                                                              elapsedTime);
         }
 
         playerAccess.PassiveToolsStateLookup[playerEntity] = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
         return true;
+    }
+
+    /// <summary>
+    /// Marks a directly restored active power-up as recently acquired for Stealer cooldown protection.
+    /// </summary>
+    /// <param name="playerEntity">Player entity that received the active power-up.</param>
+    /// <param name="powerUpId">Restored active power-up id.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used as the cooldown origin.</param>
+    /// <param name="playerAccess">Mutable player catalog accessor.</param>
+    private static void MarkActivePowerUpRecovered(Entity playerEntity,
+                                                   FixedString64Bytes powerUpId,
+                                                   float elapsedTime,
+                                                   ref EnemyPowerUpStealerPlayerAccess playerAccess)
+    {
+        if (!playerAccess.UnlockCatalogLookup.HasBuffer(playerEntity))
+            return;
+
+        DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
+        PlayerPowerUpStealCooldownRuntimeUtility.TryMarkPowerUpAcquired(powerUpId,
+                                                                        PlayerPowerUpUnlockKind.Active,
+                                                                        unlockCatalog,
+                                                                        elapsedTime);
     }
 
     /// <summary>

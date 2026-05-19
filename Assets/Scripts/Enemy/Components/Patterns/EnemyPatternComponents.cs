@@ -172,7 +172,9 @@ public struct EnemyPowerUpStealerConfigElement : IBufferElementData
     public EnemyPowerUpStealTriggerMode TriggerMode;
     public EnemyPowerUpStealTargetKind TargetKind;
     public EnemyPowerUpStealSelectionMode SelectionMode;
+    public byte ConsumeModuleActivationAttemptOnSpawnOnly;
     public float ActiveTargetBiasPercent;
+    public float AcquisitionStealCooldownSeconds;
     public byte UseMinimumRange;
     public float MinimumRange;
     public byte UseMaximumRange;

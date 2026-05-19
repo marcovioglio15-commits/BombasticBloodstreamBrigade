@@ -243,6 +243,7 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
         IReadOnlyList<EnemyPatternModuleBinding> moduleBindings = dropItemsAssembly.Modules;
         bool hasEnabledModule = false;
+        EnemyDropItemsModuleCombineMode combineMode = dropItemsAssembly.ModuleCombineMode;
 
         if (moduleBindings == null)
         {
@@ -258,6 +259,14 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
                 continue;
 
             hasEnabledModule = true;
+
+            if ((combineMode == EnemyDropItemsModuleCombineMode.SingleWeightedModule ||
+                 combineMode == EnemyDropItemsModuleCombineMode.WeightedSubset) &&
+                binding.SelectionWeight <= 0f)
+            {
+                warnings.Add(string.Format("Shared pattern '{0}' enables weighted Drop Items selection, but module #{1} has a non-positive Selection Weight.", patternName, moduleIndex + 1));
+            }
+
             EnemyPatternModuleDefinition definition = preset.ResolveModuleDefinitionById(binding.ModuleId);
 
             if (definition == null)
@@ -274,6 +283,15 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
 
         if (!hasEnabledModule)
             warnings.Add(string.Format("Shared pattern '{0}' enables Drop Items but no enabled module binding is assigned.", patternName));
+
+        if (combineMode != EnemyDropItemsModuleCombineMode.WeightedSubset)
+            return;
+
+        if (dropItemsAssembly.MinimumSelectedModules < 0)
+            warnings.Add(string.Format("Shared pattern '{0}' has a negative Drop Items Minimum Selected Modules value.", patternName));
+
+        if (dropItemsAssembly.MaximumSelectedModules < dropItemsAssembly.MinimumSelectedModules)
+            warnings.Add(string.Format("Shared pattern '{0}' has Drop Items Maximum Selected Modules below the minimum.", patternName));
     }
 
     /// <summary>

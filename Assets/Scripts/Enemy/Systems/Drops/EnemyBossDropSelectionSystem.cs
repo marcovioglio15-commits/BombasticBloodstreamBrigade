@@ -54,19 +54,27 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
             DynamicBuffer<EnemyBossSelectedDropCandidateElement> selectedCandidates = entityManager.GetBuffer<EnemyBossSelectedDropCandidateElement>(bossEntity);
             DynamicBuffer<EnemyBossDropExperienceModuleElement> sourceExperienceModules = entityManager.GetBuffer<EnemyBossDropExperienceModuleElement>(bossEntity);
             DynamicBuffer<EnemyBossDropExperienceDefinitionElement> sourceExperienceDefinitions = entityManager.GetBuffer<EnemyBossDropExperienceDefinitionElement>(bossEntity);
+            DynamicBuffer<EnemyBossDropRecoveryModuleElement> sourceRecoveryModules = entityManager.GetBuffer<EnemyBossDropRecoveryModuleElement>(bossEntity);
+            DynamicBuffer<EnemyBossDropRecoveryDefinitionElement> sourceRecoveryDefinitions = entityManager.GetBuffer<EnemyBossDropRecoveryDefinitionElement>(bossEntity);
             DynamicBuffer<EnemyBossDropExtraComboPointsModuleElement> sourceExtraComboPointsModules = entityManager.GetBuffer<EnemyBossDropExtraComboPointsModuleElement>(bossEntity);
             DynamicBuffer<EnemyBossDropExtraComboPointsConditionElement> sourceExtraComboPointsConditions = entityManager.GetBuffer<EnemyBossDropExtraComboPointsConditionElement>(bossEntity);
             DynamicBuffer<EnemyExperienceDropModuleElement> targetExperienceModules = ResolveWritableBuffer<EnemyExperienceDropModuleElement>(entityManager, commandBuffer, bossEntity);
             DynamicBuffer<EnemyExperienceDropDefinitionElement> targetExperienceDefinitions = ResolveWritableBuffer<EnemyExperienceDropDefinitionElement>(entityManager, commandBuffer, bossEntity);
+            DynamicBuffer<EnemyRecoveryDropModuleElement> targetRecoveryModules = ResolveWritableBuffer<EnemyRecoveryDropModuleElement>(entityManager, commandBuffer, bossEntity);
+            DynamicBuffer<EnemyRecoveryDropDefinitionElement> targetRecoveryDefinitions = ResolveWritableBuffer<EnemyRecoveryDropDefinitionElement>(entityManager, commandBuffer, bossEntity);
             DynamicBuffer<EnemyExtraComboPointsModuleElement> targetExtraComboPointsModules = ResolveWritableBuffer<EnemyExtraComboPointsModuleElement>(entityManager, commandBuffer, bossEntity);
             DynamicBuffer<EnemyExtraComboPointsConditionElement> targetExtraComboPointsConditions = ResolveWritableBuffer<EnemyExtraComboPointsConditionElement>(entityManager, commandBuffer, bossEntity);
+            DynamicBuffer<EnemyDropItemsModuleSelectionElement> targetSelectionModules = ResolveWritableBuffer<EnemyDropItemsModuleSelectionElement>(entityManager, commandBuffer, bossEntity);
             EnemyDropItemsConfig dropItemsConfig = EnemyDropItemsBakeUtility.CreateDefaultConfig();
 
             selectedCandidates.Clear();
             targetExperienceModules.Clear();
             targetExperienceDefinitions.Clear();
+            targetRecoveryModules.Clear();
+            targetRecoveryDefinitions.Clear();
             targetExtraComboPointsModules.Clear();
             targetExtraComboPointsConditions.Clear();
+            targetSelectionModules.Clear();
             SelectCandidates(candidates,
                              selectedCandidates,
                              extractionConfig.ValueRO.ExtractionMode,
@@ -76,13 +84,19 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
                                    selectedCandidates,
                                    sourceExperienceModules,
                                    sourceExperienceDefinitions,
+                                   sourceRecoveryModules,
+                                   sourceRecoveryDefinitions,
                                    sourceExtraComboPointsModules,
                                    sourceExtraComboPointsConditions,
                                    targetExperienceModules,
                                    targetExperienceDefinitions,
+                                   targetRecoveryModules,
+                                   targetRecoveryDefinitions,
                                    targetExtraComboPointsModules,
                                    targetExtraComboPointsConditions,
+                                   targetSelectionModules,
                                    ref dropItemsConfig);
+            FinalizeDropSelectionConfig(targetSelectionModules.Length, ref dropItemsConfig);
             ApplyDropItemsConfig(entityManager, commandBuffer, bossEntity, dropItemsConfig);
 
             EnemyBossDropRuntimeState resolvedState = runtimeState.ValueRO;
@@ -182,25 +196,37 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
     /// <param name="selectedCandidates">Selected candidate indices.</param>
     /// <param name="sourceExperienceModules">Boss-owned source experience modules.</param>
     /// <param name="sourceExperienceDefinitions">Boss-owned source experience definitions.</param>
+    /// <param name="sourceRecoveryModules">Boss-owned source recovery modules.</param>
+    /// <param name="sourceRecoveryDefinitions">Boss-owned source recovery definitions.</param>
     /// <param name="sourceExtraComboPointsModules">Boss-owned source Extra Combo Points modules.</param>
     /// <param name="sourceExtraComboPointsConditions">Boss-owned source Extra Combo Points conditions.</param>
     /// <param name="targetExperienceModules">Standard target experience modules.</param>
     /// <param name="targetExperienceDefinitions">Standard target experience definitions.</param>
+    /// <param name="targetRecoveryModules">Standard target recovery modules.</param>
+    /// <param name="targetRecoveryDefinitions">Standard target recovery definitions.</param>
     /// <param name="targetExtraComboPointsModules">Standard target Extra Combo Points modules.</param>
     /// <param name="targetExtraComboPointsConditions">Standard target Extra Combo Points conditions.</param>
+    /// <param name="targetSelectionModules">Standard target Drop Items module-selection entries.</param>
     /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
     private static void CopySelectedCandidates(DynamicBuffer<EnemyBossDropCandidateElement> candidates,
                                                DynamicBuffer<EnemyBossSelectedDropCandidateElement> selectedCandidates,
                                                DynamicBuffer<EnemyBossDropExperienceModuleElement> sourceExperienceModules,
                                                DynamicBuffer<EnemyBossDropExperienceDefinitionElement> sourceExperienceDefinitions,
+                                               DynamicBuffer<EnemyBossDropRecoveryModuleElement> sourceRecoveryModules,
+                                               DynamicBuffer<EnemyBossDropRecoveryDefinitionElement> sourceRecoveryDefinitions,
                                                DynamicBuffer<EnemyBossDropExtraComboPointsModuleElement> sourceExtraComboPointsModules,
                                                DynamicBuffer<EnemyBossDropExtraComboPointsConditionElement> sourceExtraComboPointsConditions,
                                                DynamicBuffer<EnemyExperienceDropModuleElement> targetExperienceModules,
                                                DynamicBuffer<EnemyExperienceDropDefinitionElement> targetExperienceDefinitions,
+                                               DynamicBuffer<EnemyRecoveryDropModuleElement> targetRecoveryModules,
+                                               DynamicBuffer<EnemyRecoveryDropDefinitionElement> targetRecoveryDefinitions,
                                                DynamicBuffer<EnemyExtraComboPointsModuleElement> targetExtraComboPointsModules,
                                                DynamicBuffer<EnemyExtraComboPointsConditionElement> targetExtraComboPointsConditions,
+                                               DynamicBuffer<EnemyDropItemsModuleSelectionElement> targetSelectionModules,
                                                ref EnemyDropItemsConfig dropItemsConfig)
     {
+        ApplySelectedCandidateSelectionMode(candidates, selectedCandidates, ref dropItemsConfig);
+
         for (int selectedIndex = 0; selectedIndex < selectedCandidates.Length; selectedIndex++)
         {
             int candidateIndex = selectedCandidates[selectedIndex].CandidateIndex;
@@ -214,13 +240,73 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
                                     sourceExperienceDefinitions,
                                     targetExperienceModules,
                                     targetExperienceDefinitions,
+                                    targetSelectionModules,
                                     ref dropItemsConfig);
+            CopyRecoveryCandidate(candidate,
+                                  sourceRecoveryModules,
+                                  sourceRecoveryDefinitions,
+                                  targetRecoveryModules,
+                                  targetRecoveryDefinitions,
+                                  targetSelectionModules,
+                                  ref dropItemsConfig);
             CopyExtraComboPointsCandidate(candidate,
                                           sourceExtraComboPointsModules,
                                           sourceExtraComboPointsConditions,
                                           targetExtraComboPointsModules,
                                           targetExtraComboPointsConditions,
+                                          targetSelectionModules,
                                           ref dropItemsConfig);
+        }
+    }
+
+    /// <summary>
+    /// Copies one candidate's recovery module slice into the standard target buffers.
+    /// </summary>
+    /// <param name="candidate">Selected boss drop candidate.</param>
+    /// <param name="sourceModules">Boss-owned source recovery modules.</param>
+    /// <param name="sourceDefinitions">Boss-owned source recovery definitions.</param>
+    /// <param name="targetModules">Standard target recovery modules.</param>
+    /// <param name="targetDefinitions">Standard target recovery definitions.</param>
+    /// <param name="targetSelectionModules">Standard target Drop Items module-selection entries.</param>
+    /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
+    private static void CopyRecoveryCandidate(EnemyBossDropCandidateElement candidate,
+                                              DynamicBuffer<EnemyBossDropRecoveryModuleElement> sourceModules,
+                                              DynamicBuffer<EnemyBossDropRecoveryDefinitionElement> sourceDefinitions,
+                                              DynamicBuffer<EnemyRecoveryDropModuleElement> targetModules,
+                                              DynamicBuffer<EnemyRecoveryDropDefinitionElement> targetDefinitions,
+                                              DynamicBuffer<EnemyDropItemsModuleSelectionElement> targetSelectionModules,
+                                              ref EnemyDropItemsConfig dropItemsConfig)
+    {
+        int firstModuleIndex = math.max(0, candidate.FirstRecoveryModuleIndex);
+        int moduleEndIndex = math.min(sourceModules.Length, firstModuleIndex + math.max(0, candidate.RecoveryModuleCount));
+
+        for (int moduleIndex = firstModuleIndex; moduleIndex < moduleEndIndex; moduleIndex++)
+        {
+            EnemyRecoveryDropModuleElement sourceModule = sourceModules[moduleIndex].Module;
+            int sourceDefinitionStartIndex = math.max(0, sourceModule.DefinitionStartIndex);
+            int sourceDefinitionEndIndex = math.min(sourceDefinitions.Length,
+                                                    sourceDefinitionStartIndex + math.max(0, sourceModule.DefinitionCount));
+            int targetDefinitionStartIndex = targetDefinitions.Length;
+
+            for (int definitionIndex = sourceDefinitionStartIndex; definitionIndex < sourceDefinitionEndIndex; definitionIndex++)
+                targetDefinitions.Add(sourceDefinitions[definitionIndex].Definition);
+
+            sourceModule.DefinitionStartIndex = targetDefinitionStartIndex;
+            sourceModule.DefinitionCount = targetDefinitions.Length - targetDefinitionStartIndex;
+
+            if (sourceModule.DefinitionCount <= 0)
+                continue;
+
+            int targetModuleIndex = targetModules.Length;
+            targetModules.Add(sourceModule);
+            AddDropItemsSelectionModule(targetSelectionModules,
+                                        EnemyDropItemsPayloadKind.Recovery,
+                                        targetModuleIndex,
+                                        sourceModule.SelectionWeight);
+            dropItemsConfig.HasRecoveryDrops = 1;
+            dropItemsConfig.RecoveryModuleCount = targetModules.Length;
+            dropItemsConfig.EstimatedDropsPerDeath = EnemyAuthoringValidationUtility.AddEstimatedCount(dropItemsConfig.EstimatedDropsPerDeath,
+                                                                                                       sourceModule.EstimatedDropsPerDeath);
         }
     }
 
@@ -232,12 +318,14 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
     /// <param name="sourceDefinitions">Boss-owned source experience definitions.</param>
     /// <param name="targetModules">Standard target experience modules.</param>
     /// <param name="targetDefinitions">Standard target experience definitions.</param>
+    /// <param name="targetSelectionModules">Standard target Drop Items module-selection entries.</param>
     /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
     private static void CopyExperienceCandidate(EnemyBossDropCandidateElement candidate,
                                                 DynamicBuffer<EnemyBossDropExperienceModuleElement> sourceModules,
                                                 DynamicBuffer<EnemyBossDropExperienceDefinitionElement> sourceDefinitions,
                                                 DynamicBuffer<EnemyExperienceDropModuleElement> targetModules,
                                                 DynamicBuffer<EnemyExperienceDropDefinitionElement> targetDefinitions,
+                                                DynamicBuffer<EnemyDropItemsModuleSelectionElement> targetSelectionModules,
                                                 ref EnemyDropItemsConfig dropItemsConfig)
     {
         int firstModuleIndex = math.max(0, candidate.FirstExperienceModuleIndex);
@@ -260,7 +348,12 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
             if (sourceModule.DefinitionCount <= 0)
                 continue;
 
+            int targetModuleIndex = targetModules.Length;
             targetModules.Add(sourceModule);
+            AddDropItemsSelectionModule(targetSelectionModules,
+                                        EnemyDropItemsPayloadKind.Experience,
+                                        targetModuleIndex,
+                                        sourceModule.SelectionWeight);
             dropItemsConfig.HasExperienceDrops = 1;
             dropItemsConfig.ExperienceModuleCount = targetModules.Length;
             dropItemsConfig.EstimatedDropsPerDeath = EnemyAuthoringValidationUtility.AddEstimatedCount(dropItemsConfig.EstimatedDropsPerDeath,
@@ -276,12 +369,14 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
     /// <param name="sourceConditions">Boss-owned source Extra Combo Points conditions.</param>
     /// <param name="targetModules">Standard target Extra Combo Points modules.</param>
     /// <param name="targetConditions">Standard target Extra Combo Points conditions.</param>
+    /// <param name="targetSelectionModules">Standard target Drop Items module-selection entries.</param>
     /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
     private static void CopyExtraComboPointsCandidate(EnemyBossDropCandidateElement candidate,
                                                       DynamicBuffer<EnemyBossDropExtraComboPointsModuleElement> sourceModules,
                                                       DynamicBuffer<EnemyBossDropExtraComboPointsConditionElement> sourceConditions,
                                                       DynamicBuffer<EnemyExtraComboPointsModuleElement> targetModules,
                                                       DynamicBuffer<EnemyExtraComboPointsConditionElement> targetConditions,
+                                                      DynamicBuffer<EnemyDropItemsModuleSelectionElement> targetSelectionModules,
                                                       ref EnemyDropItemsConfig dropItemsConfig)
     {
         int firstModuleIndex = math.max(0, candidate.FirstExtraComboPointsModuleIndex);
@@ -300,7 +395,12 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
 
             sourceModule.ConditionStartIndex = targetConditionStartIndex;
             sourceModule.ConditionCount = targetConditions.Length - targetConditionStartIndex;
+            int targetModuleIndex = targetModules.Length;
             targetModules.Add(sourceModule);
+            AddDropItemsSelectionModule(targetSelectionModules,
+                                        EnemyDropItemsPayloadKind.ExtraComboPoints,
+                                        targetModuleIndex,
+                                        sourceModule.SelectionWeight);
             dropItemsConfig.HasExtraComboPoints = 1;
             dropItemsConfig.ExtraComboPointsModuleCount = targetModules.Length;
         }
@@ -308,6 +408,85 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Applies per-candidate Drop Items module selection only when one candidate owns the final drop set.
+    /// </summary>
+    /// <param name="candidates">Available boss drop candidates.</param>
+    /// <param name="selectedCandidates">Selected candidate indices.</param>
+    /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
+    private static void ApplySelectedCandidateSelectionMode(DynamicBuffer<EnemyBossDropCandidateElement> candidates,
+                                                           DynamicBuffer<EnemyBossSelectedDropCandidateElement> selectedCandidates,
+                                                           ref EnemyDropItemsConfig dropItemsConfig)
+    {
+        if (selectedCandidates.Length != 1)
+            return;
+
+        int candidateIndex = selectedCandidates[0].CandidateIndex;
+
+        if (candidateIndex < 0 || candidateIndex >= candidates.Length)
+            return;
+
+        EnemyBossDropCandidateElement candidate = candidates[candidateIndex];
+        dropItemsConfig.ModuleCombineMode = EnemyDropItemsBakeUtility.ResolveModuleCombineMode(candidate.ModuleCombineMode);
+        dropItemsConfig.MinimumSelectedModules = math.max(0, candidate.MinimumSelectedModules);
+        dropItemsConfig.MaximumSelectedModules = math.max(dropItemsConfig.MinimumSelectedModules,
+                                                          candidate.MaximumSelectedModules);
+    }
+
+    /// <summary>
+    /// Appends one standard Drop Items module-selection entry while copying selected boss drop modules.
+    /// </summary>
+    /// <param name="selectionModules">Target selection buffer receiving the entry.</param>
+    /// <param name="payloadKind">Runtime payload kind owned by the copied module.</param>
+    /// <param name="moduleIndex">Type-local module index inside the matching target payload buffer.</param>
+    /// <param name="selectionWeight">Relative module-selection weight copied from the source module.</param>
+    private static void AddDropItemsSelectionModule(DynamicBuffer<EnemyDropItemsModuleSelectionElement> selectionModules,
+                                                    EnemyDropItemsPayloadKind payloadKind,
+                                                    int moduleIndex,
+                                                    float selectionWeight)
+    {
+        selectionModules.Add(new EnemyDropItemsModuleSelectionElement
+        {
+            PayloadKind = payloadKind,
+            ModuleIndex = math.max(0, moduleIndex),
+            SelectionWeight = math.max(0.0001f, selectionWeight)
+        });
+    }
+
+    /// <summary>
+    /// Finalizes selected boss drop module-selection counts after target buffers have been rebuilt.
+    /// </summary>
+    /// <param name="selectionModuleCount">Amount of copied module-selection entries.</param>
+    /// <param name="dropItemsConfig">Mutable standard drop summary config.</param>
+    private static void FinalizeDropSelectionConfig(int selectionModuleCount, ref EnemyDropItemsConfig dropItemsConfig)
+    {
+        int sanitizedSelectionModuleCount = math.max(0, selectionModuleCount);
+        dropItemsConfig.SelectionModuleCount = sanitizedSelectionModuleCount;
+
+        if (dropItemsConfig.ModuleCombineMode == EnemyDropItemsModuleCombineMode.AllModules)
+        {
+            dropItemsConfig.MinimumSelectedModules = sanitizedSelectionModuleCount;
+            dropItemsConfig.MaximumSelectedModules = sanitizedSelectionModuleCount;
+            return;
+        }
+
+        if (dropItemsConfig.ModuleCombineMode == EnemyDropItemsModuleCombineMode.SingleWeightedModule)
+        {
+            int selectedModuleCount = sanitizedSelectionModuleCount > 0 ? 1 : 0;
+            dropItemsConfig.MinimumSelectedModules = selectedModuleCount;
+            dropItemsConfig.MaximumSelectedModules = selectedModuleCount;
+            return;
+        }
+
+        dropItemsConfig.MinimumSelectedModules = math.clamp(dropItemsConfig.MinimumSelectedModules,
+                                                            0,
+                                                            sanitizedSelectionModuleCount);
+        dropItemsConfig.MaximumSelectedModules = math.clamp(math.max(dropItemsConfig.MinimumSelectedModules,
+                                                                     dropItemsConfig.MaximumSelectedModules),
+                                                            0,
+                                                            sanitizedSelectionModuleCount);
+    }
+
     /// <summary>
     /// Resolves one writable dynamic buffer, deferring structural creation until the entity query has finished.
     /// </summary>
@@ -356,7 +535,9 @@ public partial struct EnemyBossDropSelectionSystem : ISystem
         if (candidate.Enabled == 0)
             return false;
 
-        return candidate.ExperienceModuleCount > 0 || candidate.ExtraComboPointsModuleCount > 0;
+        return candidate.ExperienceModuleCount > 0 ||
+               candidate.ExtraComboPointsModuleCount > 0 ||
+               candidate.RecoveryModuleCount > 0;
     }
 
     /// <summary>

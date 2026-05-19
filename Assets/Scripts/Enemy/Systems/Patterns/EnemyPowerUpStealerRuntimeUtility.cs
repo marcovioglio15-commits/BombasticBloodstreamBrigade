@@ -20,6 +20,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// <param name="patternRuntimeState">Pattern runtime state used by activation gates.</param>
     /// <param name="enemyHealth">Enemy health used to seed damage-based recovery thresholds after a successful steal.</param>
     /// <param name="triggerMode">Trigger being evaluated this frame.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="stealerConfigs">Compiled Stealer configs on the enemy.</param>
     /// <param name="stealerRuntime">Mutable Stealer runtime buffer on the enemy.</param>
     /// <param name="visualStateLookup">Enemy visual state lookup used for stolen icon presentation.</param>
@@ -33,16 +34,23 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                           in EnemyPatternRuntimeState patternRuntimeState,
                                           in EnemyHealth enemyHealth,
                                           EnemyPowerUpStealTriggerMode triggerMode,
+                                          float elapsedTime,
                                           DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                           DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                           ref ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup,
                                           ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         if (!CanAccessPlayer(playerEntity, ref playerAccess))
+        {
+            ConsumeModuleActivationAttempts(triggerMode, stealerConfigs, stealerRuntime);
             return false;
+        }
 
         if (HasAnyStolenPowerUp(stealerRuntime))
+        {
+            ConsumeModuleActivationAttempts(triggerMode, stealerConfigs, stealerRuntime);
             return false;
+        }
 
         int stealerCount = math.min(stealerConfigs.Length, stealerRuntime.Length);
         for (int stealerIndex = 0; stealerIndex < stealerCount; stealerIndex++)
@@ -53,12 +61,20 @@ internal static class EnemyPowerUpStealerRuntimeUtility
             if (!CanEvaluateTrigger(in config, in runtime, triggerMode))
                 continue;
 
+            bool consumeModuleActivationAttempt = ShouldConsumeModuleActivationAttempt(in config, triggerMode);
+
             if (!AreActivationGatesValid(in config,
                                          in enemyRuntimeState,
                                          in patternRuntimeState,
                                          enemyPosition,
                                          playerPosition))
             {
+                if (consumeModuleActivationAttempt)
+                {
+                    runtime.HasTriggeredOnce = 1;
+                    stealerRuntime[stealerIndex] = runtime;
+                }
+
                 continue;
             }
 
@@ -67,11 +83,15 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                           in enemyRuntimeState,
                                           stealerIndex,
                                           in config,
+                                          elapsedTime,
                                           ref runtime,
                                           ref playerAccess);
 
-            if (stolen && config.TriggerMode != EnemyPowerUpStealTriggerMode.OnEveryPlayerHit)
+            if ((stolen && config.TriggerMode != EnemyPowerUpStealTriggerMode.OnEveryPlayerHit) ||
+                (consumeModuleActivationAttempt && !stolen))
+            {
                 runtime.HasTriggeredOnce = 1;
+            }
 
             if (stolen)
             {
@@ -82,10 +102,60 @@ internal static class EnemyPowerUpStealerRuntimeUtility
             stealerRuntime[stealerIndex] = runtime;
 
             if (stolen)
+            {
+                ConsumeModuleActivationAttempts(triggerMode, stealerConfigs, stealerRuntime);
                 return true;
+            }
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Marks every spawn-only module-activation Stealer entry as consumed when the activation attempt cannot continue.
+    /// </summary>
+    /// <param name="triggerMode">Trigger currently being evaluated by the caller.</param>
+    /// <param name="stealerConfigs">Compiled Stealer configs on the enemy.</param>
+    /// <param name="stealerRuntime">Mutable Stealer runtime entries updated in place.</param>
+    private static void ConsumeModuleActivationAttempts(EnemyPowerUpStealTriggerMode triggerMode,
+                                                        DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
+                                                        DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime)
+    {
+        int stealerCount = math.min(stealerConfigs.Length, stealerRuntime.Length);
+
+        for (int stealerIndex = 0; stealerIndex < stealerCount; stealerIndex++)
+        {
+            EnemyPowerUpStealerConfigElement config = stealerConfigs[stealerIndex];
+
+            if (!ShouldConsumeModuleActivationAttempt(in config, triggerMode))
+                continue;
+
+            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[stealerIndex];
+
+            if (runtime.HasTriggeredOnce != 0)
+                continue;
+
+            runtime.HasTriggeredOnce = 1;
+            stealerRuntime[stealerIndex] = runtime;
+        }
+    }
+
+    /// <summary>
+    /// Resolves whether one module-activation Stealer config consumes its trigger even when no target is stolen.
+    /// </summary>
+    /// <param name="config">Stealer config being evaluated.</param>
+    /// <param name="triggerMode">Trigger requested by the caller.</param>
+    /// <returns>True when the current activation attempt should be treated as one-shot.</returns>
+    private static bool ShouldConsumeModuleActivationAttempt(in EnemyPowerUpStealerConfigElement config,
+                                                            EnemyPowerUpStealTriggerMode triggerMode)
+    {
+        if (triggerMode != EnemyPowerUpStealTriggerMode.OnModuleActivation)
+            return false;
+
+        if (config.TriggerMode != EnemyPowerUpStealTriggerMode.OnModuleActivation)
+            return false;
+
+        return config.ConsumeModuleActivationAttemptOnSpawnOnly != 0;
     }
 
     /// <summary>
@@ -190,6 +260,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary target-bias selection per activation.</param>
     /// <param name="stealerIndex">Index of the Stealer module being evaluated.</param>
     /// <param name="config">Stealer config being evaluated.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="runtime">Mutable Stealer runtime entry receiving the stolen payload.</param>
     /// <param name="playerAccess">Mutable player loadout and passive accessors.</param>
     /// <returns>True when one power-up was stolen.</returns>
@@ -198,6 +269,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                         in EnemyRuntimeState enemyRuntimeState,
                                         int stealerIndex,
                                         in EnemyPowerUpStealerConfigElement config,
+                                        float elapsedTime,
                                         ref EnemyPowerUpStealerRuntimeElement runtime,
                                         ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
@@ -209,6 +281,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                              in enemyRuntimeState,
                                              stealerIndex,
                                              in config,
+                                             elapsedTime,
                                              ref runtime,
                                              ref playerAccess);
 
@@ -218,6 +291,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                               in enemyRuntimeState,
                                               stealerIndex,
                                               in config,
+                                              elapsedTime,
                                               ref runtime,
                                               ref playerAccess);
 
@@ -227,6 +301,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                       in enemyRuntimeState,
                                       stealerIndex,
                                       in config,
+                                      elapsedTime,
                                       ref runtime,
                                       ref playerAccess);
         }
@@ -240,6 +315,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary target-bias selection per activation.</param>
     /// <param name="stealerIndex">Index of the Stealer module being evaluated.</param>
     /// <param name="config">Stealer config containing the active-target bias percentage.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="runtime">Mutable Stealer runtime entry receiving the stolen payload.</param>
     /// <param name="playerAccess">Mutable player loadout and passive accessors.</param>
     /// <returns>True when either biased path steals one power-up.</returns>
@@ -248,6 +324,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                        in EnemyRuntimeState enemyRuntimeState,
                                        int stealerIndex,
                                        in EnemyPowerUpStealerConfigElement config,
+                                       float elapsedTime,
                                        ref EnemyPowerUpStealerRuntimeElement runtime,
                                        ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
@@ -258,6 +335,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                       in enemyRuntimeState,
                                       stealerIndex,
                                       in config,
+                                      elapsedTime,
                                       ref runtime,
                                       ref playerAccess))
                 return true;
@@ -267,6 +345,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                           in enemyRuntimeState,
                                           stealerIndex,
                                           in config,
+                                          elapsedTime,
                                           ref runtime,
                                           ref playerAccess);
         }
@@ -276,6 +355,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                    in enemyRuntimeState,
                                    stealerIndex,
                                    in config,
+                                   elapsedTime,
                                    ref runtime,
                                    ref playerAccess))
             return true;
@@ -285,6 +365,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                      in enemyRuntimeState,
                                      stealerIndex,
                                      in config,
+                                     elapsedTime,
                                      ref runtime,
                                      ref playerAccess);
     }
@@ -293,6 +374,11 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// Removes one active slot from the player and stores it on the Stealer runtime.
     /// </summary>
     /// <param name="playerEntity">Player entity being stolen from.</param>
+    /// <param name="enemyEntity">Enemy entity used to seed deterministic active selection.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic selection by activation time.</param>
+    /// <param name="stealerIndex">Index of the Stealer module being evaluated.</param>
+    /// <param name="config">Stealer config containing selection and anti-steal cooldown settings.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="runtime">Mutable Stealer runtime entry receiving the active payload.</param>
     /// <param name="playerAccess">Mutable player loadout accessors.</param>
     /// <returns>True when an active slot was stolen.</returns>
@@ -301,13 +387,18 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                               in EnemyRuntimeState enemyRuntimeState,
                                               int stealerIndex,
                                               in EnemyPowerUpStealerConfigElement config,
+                                              float elapsedTime,
                                               ref EnemyPowerUpStealerRuntimeElement runtime,
                                               ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         PlayerPowerUpsConfig powerUpsConfig = playerAccess.PowerUpsConfigLookup[playerEntity];
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
+        DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
         int slotIndex = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotToSteal(in powerUpsConfig,
                                                                                      in powerUpsState,
+                                                                                     unlockCatalog,
+                                                                                     config.AcquisitionStealCooldownSeconds,
+                                                                                     elapsedTime,
                                                                                      enemyEntity,
                                                                                      in enemyRuntimeState,
                                                                                      stealerIndex,
@@ -347,6 +438,11 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// Removes one equipped passive power-up from the player and stores it on the Stealer runtime.
     /// </summary>
     /// <param name="playerEntity">Player entity being stolen from.</param>
+    /// <param name="enemyEntity">Enemy entity used to seed deterministic passive selection.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic selection by activation time.</param>
+    /// <param name="stealerIndex">Index of the Stealer module being evaluated.</param>
+    /// <param name="config">Stealer config containing selection and anti-steal cooldown settings.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time used by acquisition anti-steal cooldowns.</param>
     /// <param name="runtime">Mutable Stealer runtime entry receiving the passive payload.</param>
     /// <param name="playerAccess">Mutable player passive accessors.</param>
     /// <returns>True when a passive power-up was stolen.</returns>
@@ -355,13 +451,18 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                                in EnemyRuntimeState enemyRuntimeState,
                                                int stealerIndex,
                                                in EnemyPowerUpStealerConfigElement config,
+                                               float elapsedTime,
                                                ref EnemyPowerUpStealerRuntimeElement runtime,
                                                ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
+        DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
 
         int passiveIndex = equippedPassiveTools.Length > 0
             ? EnemyPowerUpStealerSelectionUtility.ResolvePassiveIndexToSteal(equippedPassiveTools,
+                                                                             unlockCatalog,
+                                                                             config.AcquisitionStealCooldownSeconds,
+                                                                             elapsedTime,
                                                                              enemyEntity,
                                                                              in enemyRuntimeState,
                                                                              stealerIndex,
@@ -374,12 +475,13 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                                                                                      in enemyRuntimeState,
                                                                                                      stealerIndex,
                                                                                                      in config,
+                                                                                                     elapsedTime,
                                                                                                      equippedPassiveTools,
                                                                                                      ref runtime,
                                                                                                      ref playerAccess);
 
         EquippedPassiveToolElement stolenPassive = equippedPassiveTools[passiveIndex];
-        int catalogIndex = FindCatalogIndex(stolenPassive.PowerUpId, PlayerPowerUpUnlockKind.Passive, playerAccess.UnlockCatalogLookup[playerEntity]);
+        int catalogIndex = FindCatalogIndex(stolenPassive.PowerUpId, PlayerPowerUpUnlockKind.Passive, unlockCatalog);
         int originalUnlockCount = 0;
         equippedPassiveTools.RemoveAt(passiveIndex);
         PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
@@ -387,7 +489,6 @@ internal static class EnemyPowerUpStealerRuntimeUtility
 
         if (catalogIndex >= 0)
         {
-            DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
             PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
             originalUnlockCount = math.max(0, catalogEntry.CurrentUnlockCount);
             catalogEntry.CurrentUnlockCount = 0;

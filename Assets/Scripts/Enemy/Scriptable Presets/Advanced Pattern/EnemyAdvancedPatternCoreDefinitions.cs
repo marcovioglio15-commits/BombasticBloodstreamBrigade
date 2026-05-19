@@ -266,6 +266,9 @@ public sealed class EnemyPatternModuleBinding
     [Tooltip("When disabled, this binding is ignored during compile.")]
     [SerializeField] private bool isEnabled = true;
 
+    [Tooltip("Relative selection weight used by Drop Items assemblies when their combine mode selects a weighted module or subset.")]
+    [SerializeField] private float selectionWeight = 1f;
+
     [Tooltip("When enabled, the override payload below replaces the module definition payload.")]
     [SerializeField] private bool useOverridePayload;
 
@@ -289,6 +292,14 @@ public sealed class EnemyPatternModuleBinding
         get
         {
             return isEnabled;
+        }
+    }
+
+    public float SelectionWeight
+    {
+        get
+        {
+            return selectionWeight;
         }
     }
 
@@ -321,6 +332,15 @@ public sealed class EnemyPatternModuleBinding
     {
         moduleId = moduleIdValue;
         isEnabled = isEnabledValue;
+    }
+
+    /// <summary>
+    /// Configures the relative Drop Items selection weight without changing module identity.
+    /// </summary>
+    /// <param name="selectionWeightValue">Relative weighted-selection value used by Drop Items assemblies.</param>
+    public void ConfigureSelectionWeight(float selectionWeightValue)
+    {
+        selectionWeight = selectionWeightValue;
     }
 
     /// <summary>

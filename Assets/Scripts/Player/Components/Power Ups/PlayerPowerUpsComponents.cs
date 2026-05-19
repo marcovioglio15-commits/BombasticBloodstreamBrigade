@@ -92,6 +92,7 @@ public struct PlayerPowerUpUnlockCatalogElement : IBufferElementData
     public byte PendingInitialCharacterTuningApply;
     public int CurrentUnlockCount;
     public int MaximumUnlockCount;
+    public float LastAcquiredTime;
     public int CharacterTuningFormulaStartIndex;
     public int CharacterTuningFormulaCount;
     public PlayerPowerUpSlotConfig ActiveSlotConfig;

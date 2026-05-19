@@ -11,6 +11,8 @@ public partial struct EnemySpawnSystem : ISystem
 {
     #region Constants
     private const float MinimumWarningRadius = 0.12f;
+    private const int MaxSpawnReservationsPerFrame = 32;
+    private const int MaxSpawnActivationsPerFrame = 32;
     #endregion
 
     #region Fields
@@ -47,11 +49,17 @@ public partial struct EnemySpawnSystem : ISystem
     {
         EntityManager entityManager = state.EntityManager;
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
+        int remainingReservationBudget = MaxSpawnReservationsPerFrame;
+        int remainingActivationBudget = MaxSpawnActivationsPerFrame;
         entityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         NativeArray<Entity> spawnerEntities = spawnerQuery.ToEntityArray(state.WorldUpdateAllocator);
 
         for (int spawnerIndex = 0; spawnerIndex < spawnerEntities.Length; spawnerIndex++)
-            ProcessSpawner(entityManager, spawnerEntities[spawnerIndex], elapsedTime);
+            ProcessSpawner(entityManager,
+                           spawnerEntities[spawnerIndex],
+                           elapsedTime,
+                           ref remainingReservationBudget,
+                           ref remainingActivationBudget);
     }
     #endregion
 
@@ -62,9 +70,13 @@ public partial struct EnemySpawnSystem : ISystem
     /// <param name="entityManager">Entity manager used to access components and buffers.</param>
     /// <param name="spawnerEntity">Spawner entity being processed.</param>
     /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="remainingReservationBudget">Mutable frame budget for spawn-warning reservations.</param>
+    /// <param name="remainingActivationBudget">Mutable frame budget for enemy activations.</param>
     private static void ProcessSpawner(EntityManager entityManager,
                                        Entity spawnerEntity,
-                                       float elapsedTime)
+                                       float elapsedTime,
+                                       ref int remainingReservationBudget,
+                                       ref int remainingActivationBudget)
     {
         if (!entityManager.Exists(spawnerEntity))
             return;
@@ -73,6 +85,8 @@ public partial struct EnemySpawnSystem : ISystem
 
         if (spawnerState.Initialized == 0)
             return;
+
+        EnsureSpawnerStartTimeInitialized(ref spawnerState, elapsedTime);
 
         EnemySpawnWarningConfig warningConfig = entityManager.GetComponentData<EnemySpawnWarningConfig>(spawnerEntity);
         float4x4 localToWorld = entityManager.GetComponentData<LocalToWorld>(spawnerEntity).Value;
@@ -103,7 +117,8 @@ public partial struct EnemySpawnSystem : ISystem
                                      elapsedTime,
                                      definition,
                                      warningConfig,
-                                     ref runtime);
+                                     ref runtime,
+                                     ref remainingReservationBudget);
 
                 if (runtime.Started != 0)
                 {
@@ -114,7 +129,8 @@ public partial struct EnemySpawnSystem : ISystem
                                       definition,
                                       warningConfig,
                                       ref runtime,
-                                      ref spawnerState);
+                                      ref spawnerState,
+                                      ref remainingActivationBudget);
                 }
             }
 
@@ -123,6 +139,20 @@ public partial struct EnemySpawnSystem : ISystem
         }
 
         entityManager.SetComponentData(spawnerEntity, spawnerState);
+    }
+
+    /// <summary>
+    /// Arms the logical wave clock on the first gameplay tick after pool readiness and transition guards allow simulation.
+    /// </summary>
+    /// <param name="spawnerState">Mutable spawner state receiving the start timestamp.</param>
+    /// <param name="elapsedTime">Current world elapsed time used as the logical wave origin.</param>
+    private static void EnsureSpawnerStartTimeInitialized(ref EnemySpawnerState spawnerState, float elapsedTime)
+    {
+        if (spawnerState.StartTimeInitialized != 0)
+            return;
+
+        spawnerState.StartTime = elapsedTime;
+        spawnerState.StartTimeInitialized = 1;
     }
 
     /// <summary>
@@ -192,7 +222,7 @@ public partial struct EnemySpawnSystem : ISystem
     }
 
     /// <summary>
-    /// Reserves every upcoming spawn event whose warning lead window has opened.
+    /// Reserves upcoming spawn events whose warning lead window has opened, up to the current frame budget.
     /// </summary>
     /// <param name="entityManager">Entity manager used to access pools and enemy instances.</param>
     /// <param name="spawnerEntity">Spawner that owns the wave.</param>
@@ -201,13 +231,15 @@ public partial struct EnemySpawnSystem : ISystem
     /// <param name="definition">Immutable definition of the wave.</param>
     /// <param name="warningConfig">Spawner-level fallback warning tuning.</param>
     /// <param name="runtime">Mutable runtime state for the wave.</param>
+    /// <param name="remainingReservationBudget">Mutable frame budget for structural reservation work.</param>
     private static void ReserveUpcomingEvents(EntityManager entityManager,
                                               Entity spawnerEntity,
                                               float4x4 localToWorld,
                                               float elapsedTime,
                                               EnemySpawnerWaveDefinitionElement definition,
                                               EnemySpawnWarningConfig warningConfig,
-                                              ref EnemySpawnerWaveRuntimeElement runtime)
+                                              ref EnemySpawnerWaveRuntimeElement runtime,
+                                              ref int remainingReservationBudget)
     {
         float actualWaveSpawnStartTime = ResolveWaveActualSpawnStartTime(runtime, definition);
 
@@ -237,6 +269,9 @@ public partial struct EnemySpawnSystem : ISystem
                 continue;
             }
 
+            if (remainingReservationBudget <= 0)
+                break;
+
             Entity poolEntity;
             DynamicBuffer<EnemySpawnerPrefabPoolMapElement> poolMap = entityManager.GetBuffer<EnemySpawnerPrefabPoolMapElement>(spawnerEntity);
 
@@ -264,11 +299,12 @@ public partial struct EnemySpawnSystem : ISystem
             waveEvent.ReservedEnemyEntity = enemyEntity;
             SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
             runtime.NextWarningEventIndex++;
+            remainingReservationBudget--;
         }
     }
 
     /// <summary>
-    /// Activates every reserved event whose due time has been reached at the current frame.
+    /// Activates reserved events whose due time has been reached, up to the current frame budget.
     /// </summary>
     /// <param name="entityManager">Entity manager used to access pools and enemy instances.</param>
     /// <param name="spawnerEntity">Spawner that owns the wave.</param>
@@ -278,6 +314,7 @@ public partial struct EnemySpawnSystem : ISystem
     /// <param name="warningConfig">Immutable warning tuning baked from authoring.</param>
     /// <param name="runtime">Mutable runtime state for the processed wave.</param>
     /// <param name="spawnerState">Mutable global spawner state.</param>
+    /// <param name="remainingActivationBudget">Mutable frame budget for structural activation work.</param>
     private static void ActivateDueEvents(EntityManager entityManager,
                                           Entity spawnerEntity,
                                           float4x4 localToWorld,
@@ -285,7 +322,8 @@ public partial struct EnemySpawnSystem : ISystem
                                           EnemySpawnerWaveDefinitionElement definition,
                                           EnemySpawnWarningConfig warningConfig,
                                           ref EnemySpawnerWaveRuntimeElement runtime,
-                                          ref EnemySpawnerState spawnerState)
+                                          ref EnemySpawnerState spawnerState,
+                                          ref int remainingActivationBudget)
     {
         while (runtime.NextEventIndex < definition.EventCount)
         {
@@ -302,6 +340,9 @@ public partial struct EnemySpawnSystem : ISystem
             float dueTime = runtime.SpawnStartTime + math.max(0f, waveEvent.RelativeTime);
 
             if (elapsedTime < dueTime)
+                break;
+
+            if (remainingActivationBudget <= 0)
                 break;
 
             float3 worldPosition = math.transform(localToWorld, waveEvent.LocalSpawnPosition);
@@ -340,6 +381,7 @@ public partial struct EnemySpawnSystem : ISystem
             runtime.AliveCount++;
             runtime.SpawnedCount++;
             spawnerState.AliveCount++;
+            remainingActivationBudget--;
 
             if (runtime.NextWarningEventIndex < runtime.NextEventIndex)
                 runtime.NextWarningEventIndex = runtime.NextEventIndex;

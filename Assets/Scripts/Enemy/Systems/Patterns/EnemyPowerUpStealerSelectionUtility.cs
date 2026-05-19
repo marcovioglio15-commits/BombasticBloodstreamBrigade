@@ -14,6 +14,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="powerUpsConfig">Current player active loadout.</param>
     /// <param name="powerUpsState">Current player active runtime state containing equip-order markers.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
@@ -21,13 +24,22 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// <returns>0 for primary, 1 for secondary, or -1 when no active slot exists.</returns>
     public static int ResolveActiveSlotToSteal(in PlayerPowerUpsConfig powerUpsConfig,
                                                in PlayerPowerUpsState powerUpsState,
+                                               DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                               float acquisitionStealCooldownSeconds,
+                                               float elapsedTime,
                                                Entity enemyEntity,
                                                in EnemyRuntimeState enemyRuntimeState,
                                                int stealerIndex,
                                                EnemyPowerUpStealSelectionMode selectionMode)
     {
-        bool hasPrimary = powerUpsConfig.PrimarySlot.IsDefined != 0;
-        bool hasSecondary = powerUpsConfig.SecondarySlot.IsDefined != 0;
+        bool hasPrimary = IsActiveSlotEligibleForSteal(in powerUpsConfig.PrimarySlot,
+                                                       unlockCatalog,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime);
+        bool hasSecondary = IsActiveSlotEligibleForSteal(in powerUpsConfig.SecondarySlot,
+                                                         unlockCatalog,
+                                                         acquisitionStealCooldownSeconds,
+                                                         elapsedTime);
 
         if (!hasPrimary && !hasSecondary)
             return -1;
@@ -133,12 +145,18 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Resolves the passive buffer index selected for stealing according to the configured within-category mode.
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned for eligible entries.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
     /// <param name="selectionMode">Within-category selection mode configured by the module.</param>
     /// <returns>Selected passive buffer index, or -1 when no valid passive can be stolen.</returns>
     public static int ResolvePassiveIndexToSteal(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                 DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                 float acquisitionStealCooldownSeconds,
+                                                 float elapsedTime,
                                                  Entity enemyEntity,
                                                  in EnemyRuntimeState enemyRuntimeState,
                                                  int stealerIndex,
@@ -147,16 +165,25 @@ internal static class EnemyPowerUpStealerSelectionUtility
         switch (selectionMode)
         {
             case EnemyPowerUpStealSelectionMode.LastObtained:
-                return ResolveLastEligiblePassiveIndex(equippedPassiveTools);
+                return ResolveLastEligiblePassiveIndex(equippedPassiveTools,
+                                                       unlockCatalog,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime);
 
             case EnemyPowerUpStealSelectionMode.Random:
                 return ResolveRandomEligiblePassiveIndex(equippedPassiveTools,
+                                                         unlockCatalog,
+                                                         acquisitionStealCooldownSeconds,
+                                                         elapsedTime,
                                                          enemyEntity,
                                                          in enemyRuntimeState,
                                                          stealerIndex);
 
             default:
-                return ResolveFirstEligiblePassiveIndex(equippedPassiveTools);
+                return ResolveFirstEligiblePassiveIndex(equippedPassiveTools,
+                                                        unlockCatalog,
+                                                        acquisitionStealCooldownSeconds,
+                                                        elapsedTime);
         }
     }
 
@@ -165,6 +192,8 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="unlockCatalog">Player unlock catalog scanned for owned passive entries.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude tool-backed passives already handled by the primary path.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
@@ -172,6 +201,8 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// <returns>Selected unlock catalog index, or -1 when no catalog-only passive can be stolen.</returns>
     public static int ResolvePassiveCatalogIndexToSteal(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                        float acquisitionStealCooldownSeconds,
+                                                        float elapsedTime,
                                                         Entity enemyEntity,
                                                         in EnemyRuntimeState enemyRuntimeState,
                                                         int stealerIndex,
@@ -180,17 +211,25 @@ internal static class EnemyPowerUpStealerSelectionUtility
         switch (selectionMode)
         {
             case EnemyPowerUpStealSelectionMode.LastObtained:
-                return ResolveLastEligiblePassiveCatalogIndex(unlockCatalog, equippedPassiveTools);
+                return ResolveLastEligiblePassiveCatalogIndex(unlockCatalog,
+                                                              equippedPassiveTools,
+                                                              acquisitionStealCooldownSeconds,
+                                                              elapsedTime);
 
             case EnemyPowerUpStealSelectionMode.Random:
                 return ResolveRandomEligiblePassiveCatalogIndex(unlockCatalog,
                                                                 equippedPassiveTools,
+                                                                acquisitionStealCooldownSeconds,
+                                                                elapsedTime,
                                                                 enemyEntity,
                                                                 in enemyRuntimeState,
                                                                 stealerIndex);
 
             default:
-                return ResolveFirstEligiblePassiveCatalogIndex(unlockCatalog, equippedPassiveTools);
+                return ResolveFirstEligiblePassiveCatalogIndex(unlockCatalog,
+                                                               equippedPassiveTools,
+                                                               acquisitionStealCooldownSeconds,
+                                                               elapsedTime);
         }
     }
 
@@ -198,12 +237,21 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Finds the oldest eligible passive in acquisition-buffer order.
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned from front to back.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>First eligible passive index, or -1 when none exists.</returns>
-    private static int ResolveFirstEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+    private static int ResolveFirstEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                        DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                        float acquisitionStealCooldownSeconds,
+                                                        float elapsedTime)
     {
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex]))
+            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+                                           unlockCatalog,
+                                           acquisitionStealCooldownSeconds,
+                                           elapsedTime))
                 continue;
 
             return passiveIndex;
@@ -217,15 +265,22 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="unlockCatalog">Unlock catalog scanned from front to back.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude tool-backed passives.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>First eligible catalog index, or -1 when none exists.</returns>
     private static int ResolveFirstEligiblePassiveCatalogIndex(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
-                                                               DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+                                                               DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                               float acquisitionStealCooldownSeconds,
+                                                               float elapsedTime)
     {
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
             PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
 
-            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry, equippedPassiveTools))
+            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
+                                                       equippedPassiveTools,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime))
                 continue;
 
             return catalogIndex;
@@ -238,12 +293,21 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Finds the newest eligible passive in acquisition-buffer order.
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned from back to front.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Last eligible passive index, or -1 when none exists.</returns>
-    private static int ResolveLastEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+    private static int ResolveLastEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                       DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                       float acquisitionStealCooldownSeconds,
+                                                       float elapsedTime)
     {
         for (int passiveIndex = equippedPassiveTools.Length - 1; passiveIndex >= 0; passiveIndex--)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex]))
+            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+                                           unlockCatalog,
+                                           acquisitionStealCooldownSeconds,
+                                           elapsedTime))
                 continue;
 
             return passiveIndex;
@@ -257,15 +321,22 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="unlockCatalog">Unlock catalog scanned from back to front.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude tool-backed passives.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Last eligible catalog index, or -1 when none exists.</returns>
     private static int ResolveLastEligiblePassiveCatalogIndex(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
-                                                              DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+                                                              DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                              float acquisitionStealCooldownSeconds,
+                                                              float elapsedTime)
     {
         for (int catalogIndex = unlockCatalog.Length - 1; catalogIndex >= 0; catalogIndex--)
         {
             PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
 
-            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry, equippedPassiveTools))
+            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
+                                                       equippedPassiveTools,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime))
                 continue;
 
             return catalogIndex;
@@ -278,16 +349,25 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Samples one eligible passive by deterministic random index without allocating temporary collections.
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned for eligible entries.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
     /// <returns>Random eligible passive index, or -1 when none exists.</returns>
     private static int ResolveRandomEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                         float acquisitionStealCooldownSeconds,
+                                                         float elapsedTime,
                                                          Entity enemyEntity,
                                                          in EnemyRuntimeState enemyRuntimeState,
                                                          int stealerIndex)
     {
-        int eligibleCount = CountEligiblePassives(equippedPassiveTools);
+        int eligibleCount = CountEligiblePassives(equippedPassiveTools,
+                                                  unlockCatalog,
+                                                  acquisitionStealCooldownSeconds,
+                                                  elapsedTime);
 
         if (eligibleCount <= 0)
             return -1;
@@ -298,7 +378,10 @@ internal static class EnemyPowerUpStealerSelectionUtility
 
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex]))
+            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+                                           unlockCatalog,
+                                           acquisitionStealCooldownSeconds,
+                                           elapsedTime))
                 continue;
 
             if (currentEligibleIndex == targetEligibleIndex)
@@ -315,17 +398,24 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="unlockCatalog">Unlock catalog scanned for eligible passive ownership.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude tool-backed passives.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
     /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
     /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
     /// <returns>Random eligible catalog index, or -1 when none exists.</returns>
     private static int ResolveRandomEligiblePassiveCatalogIndex(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                                 DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                                float acquisitionStealCooldownSeconds,
+                                                                float elapsedTime,
                                                                 Entity enemyEntity,
                                                                 in EnemyRuntimeState enemyRuntimeState,
                                                                 int stealerIndex)
     {
-        int eligibleCount = CountEligiblePassiveCatalogEntries(unlockCatalog, equippedPassiveTools);
+        int eligibleCount = CountEligiblePassiveCatalogEntries(unlockCatalog,
+                                                               equippedPassiveTools,
+                                                               acquisitionStealCooldownSeconds,
+                                                               elapsedTime);
 
         if (eligibleCount <= 0)
             return -1;
@@ -338,7 +428,10 @@ internal static class EnemyPowerUpStealerSelectionUtility
         {
             PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
 
-            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry, equippedPassiveTools))
+            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
+                                                       equippedPassiveTools,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime))
                 continue;
 
             if (currentEligibleIndex == targetEligibleIndex)
@@ -354,14 +447,23 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Counts valid passives available for Stealer selection.
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer to scan.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Number of eligible passive entries.</returns>
-    private static int CountEligiblePassives(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+    private static int CountEligiblePassives(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                             float acquisitionStealCooldownSeconds,
+                                             float elapsedTime)
     {
         int eligibleCount = 0;
 
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex]))
+            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+                                           unlockCatalog,
+                                           acquisitionStealCooldownSeconds,
+                                           elapsedTime))
                 continue;
 
             eligibleCount += 1;
@@ -375,9 +477,13 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="unlockCatalog">Unlock catalog to scan.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude already handled passives.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Number of eligible catalog-only passive entries.</returns>
     private static int CountEligiblePassiveCatalogEntries(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
-                                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+                                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                          float acquisitionStealCooldownSeconds,
+                                                          float elapsedTime)
     {
         int eligibleCount = 0;
 
@@ -385,7 +491,10 @@ internal static class EnemyPowerUpStealerSelectionUtility
         {
             PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
 
-            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry, equippedPassiveTools))
+            if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
+                                                       equippedPassiveTools,
+                                                       acquisitionStealCooldownSeconds,
+                                                       elapsedTime))
                 continue;
 
             eligibleCount += 1;
@@ -398,10 +507,23 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Checks whether a passive entry has a stable PowerUpId, including catalog-driven passives without a runtime tool.
     /// </summary>
     /// <param name="passive">Passive entry being inspected.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>True when the passive can be identified, stolen, and restored.</returns>
-    private static bool IsPassiveEligibleForSteal(EquippedPassiveToolElement passive)
+    private static bool IsPassiveEligibleForSteal(EquippedPassiveToolElement passive,
+                                                  DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                  float acquisitionStealCooldownSeconds,
+                                                  float elapsedTime)
     {
-        return passive.PowerUpId.Length > 0;
+        if (passive.PowerUpId.Length <= 0)
+            return false;
+
+        return !PlayerPowerUpStealCooldownRuntimeUtility.IsPowerUpProtectedFromSteal(passive.PowerUpId,
+                                                                                     PlayerPowerUpUnlockKind.Passive,
+                                                                                     unlockCatalog,
+                                                                                     acquisitionStealCooldownSeconds,
+                                                                                     elapsedTime);
     }
 
     /// <summary>
@@ -409,9 +531,13 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="catalogEntry">Unlock catalog entry inspected for ownership and payload kind.</param>
     /// <param name="equippedPassiveTools">Equipped passive buffer used to exclude passives already handled by tool removal.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>True when the entry can be stolen through catalog ownership mutation.</returns>
     private static bool IsPassiveCatalogEntryEligibleForSteal(in PlayerPowerUpUnlockCatalogElement catalogEntry,
-                                                              DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+                                                              DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                              float acquisitionStealCooldownSeconds,
+                                                              float elapsedTime)
     {
         if (catalogEntry.UnlockKind != PlayerPowerUpUnlockKind.Passive)
             return false;
@@ -422,7 +548,40 @@ internal static class EnemyPowerUpStealerSelectionUtility
         if (catalogEntry.CurrentUnlockCount <= 0)
             return false;
 
+        if (PlayerPowerUpStealCooldownRuntimeUtility.IsPowerUpProtectedFromSteal(in catalogEntry,
+                                                                                 acquisitionStealCooldownSeconds,
+                                                                                 elapsedTime))
+            return false;
+
         return !EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(catalogEntry.PowerUpId, equippedPassiveTools);
+    }
+    #endregion
+
+    #region Protection
+    /// <summary>
+    /// Checks whether one active slot is defined and outside the anti-steal acquisition cooldown.
+    /// </summary>
+    /// <param name="slotConfig">Active slot config to inspect.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to resolve acquisition time.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
+    /// <returns>True when the active slot can be stolen.</returns>
+    private static bool IsActiveSlotEligibleForSteal(in PlayerPowerUpSlotConfig slotConfig,
+                                                     DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                     float acquisitionStealCooldownSeconds,
+                                                     float elapsedTime)
+    {
+        if (slotConfig.IsDefined == 0)
+            return false;
+
+        if (slotConfig.PowerUpId.Length <= 0)
+            return true;
+
+        return !PlayerPowerUpStealCooldownRuntimeUtility.IsPowerUpProtectedFromSteal(slotConfig.PowerUpId,
+                                                                                     PlayerPowerUpUnlockKind.Active,
+                                                                                     unlockCatalog,
+                                                                                     acquisitionStealCooldownSeconds,
+                                                                                     elapsedTime);
     }
     #endregion
 

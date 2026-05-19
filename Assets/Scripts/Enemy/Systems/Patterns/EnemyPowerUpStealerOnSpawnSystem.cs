@@ -60,6 +60,7 @@ public partial struct EnemyPowerUpStealerModuleActivationSystem : ISystem
             ContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true)
         };
         ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup = SystemAPI.GetComponentLookup<EnemyPowerUpStealerVisualState>(false);
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         foreach ((RefRO<EnemyRuntimeState> enemyRuntimeState,
                   RefRO<EnemyPatternRuntimeState> patternRuntimeState,
@@ -86,6 +87,7 @@ public partial struct EnemyPowerUpStealerModuleActivationSystem : ISystem
                                                                  in patternRuntimeState.ValueRO,
                                                                  in enemyHealth.ValueRO,
                                                                  EnemyPowerUpStealTriggerMode.OnModuleActivation,
+                                                                 elapsedTime,
                                                                  stealerConfigs,
                                                                  stealerRuntime,
                                                                  ref visualStateLookup,

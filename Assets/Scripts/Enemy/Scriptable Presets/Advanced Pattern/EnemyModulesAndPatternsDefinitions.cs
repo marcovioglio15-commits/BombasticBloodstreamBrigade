@@ -409,6 +409,15 @@ public sealed class EnemyPatternDropItemsAssembly
     [Tooltip("Enables one drop-items module for this pattern.")]
     [SerializeField] private bool isEnabled;
 
+    [Tooltip("Strategy used to resolve enabled Drop Items modules when this enemy dies.")]
+    [SerializeField] private EnemyDropItemsModuleCombineMode moduleCombineMode = EnemyDropItemsModuleCombineMode.AllModules;
+
+    [Tooltip("Minimum amount of Drop Items modules selected when Module Combine Mode is Weighted Subset.")]
+    [SerializeField] private int minimumSelectedModules = 1;
+
+    [Tooltip("Maximum amount of Drop Items modules selected when Module Combine Mode is Weighted Subset.")]
+    [SerializeField] private int maximumSelectedModules = 1;
+
     [Tooltip("Drop-items module bindings resolved from Drop Items definitions. Multiple modules can coexist on the same pattern.")]
     [SerializeField] private List<EnemyPatternModuleBinding> modules = new List<EnemyPatternModuleBinding>();
 
@@ -436,6 +445,30 @@ public sealed class EnemyPatternDropItemsAssembly
             return modules;
         }
     }
+
+    public EnemyDropItemsModuleCombineMode ModuleCombineMode
+    {
+        get
+        {
+            return moduleCombineMode;
+        }
+    }
+
+    public int MinimumSelectedModules
+    {
+        get
+        {
+            return minimumSelectedModules;
+        }
+    }
+
+    public int MaximumSelectedModules
+    {
+        get
+        {
+            return maximumSelectedModules;
+        }
+    }
     #endregion
 
     #region Methods
@@ -448,6 +481,21 @@ public sealed class EnemyPatternDropItemsAssembly
     public void Configure(bool isEnabledValue)
     {
         isEnabled = isEnabledValue;
+    }
+
+    /// <summary>
+    /// Configures how enabled Drop Items modules are combined when the enemy dies.
+    /// </summary>
+    /// <param name="moduleCombineModeValue">Requested module combination mode.</param>
+    /// <param name="minimumSelectedModulesValue">Minimum weighted-subset module count.</param>
+    /// <param name="maximumSelectedModulesValue">Maximum weighted-subset module count.</param>
+    public void ConfigureModuleSelection(EnemyDropItemsModuleCombineMode moduleCombineModeValue,
+                                         int minimumSelectedModulesValue,
+                                         int maximumSelectedModulesValue)
+    {
+        moduleCombineMode = moduleCombineModeValue;
+        minimumSelectedModules = minimumSelectedModulesValue;
+        maximumSelectedModules = maximumSelectedModulesValue;
     }
 
     /// <summary>

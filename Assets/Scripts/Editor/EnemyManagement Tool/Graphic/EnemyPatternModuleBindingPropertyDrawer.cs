@@ -38,11 +38,13 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
         VisualElement root = new VisualElement();
         SerializedProperty moduleIdProperty = property.FindPropertyRelative("moduleId");
         SerializedProperty enabledProperty = property.FindPropertyRelative("isEnabled");
+        SerializedProperty selectionWeightProperty = property.FindPropertyRelative("selectionWeight");
         SerializedProperty useOverridePayloadProperty = property.FindPropertyRelative("useOverridePayload");
         SerializedProperty overridePayloadProperty = property.FindPropertyRelative("overridePayload");
 
         if (moduleIdProperty == null ||
             enabledProperty == null ||
+            selectionWeightProperty == null ||
             useOverridePayloadProperty == null ||
             overridePayloadProperty == null)
         {
@@ -65,6 +67,9 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
 
         if (ShouldShowBindingEnabledToggle(presentationContext))
             EnemyAdvancedPatternDrawerUtility.AddField(root, enabledProperty, "Enable Module Binding");
+
+        if (presentationContext == BindingPresentationContext.DropItemsAssembly)
+            EnemyAdvancedPatternDrawerUtility.AddField(root, selectionWeightProperty, "Selection Weight");
 
         EnemyAdvancedPatternDrawerUtility.AddField(root, useOverridePayloadProperty, "Use Override Payload");
 
@@ -368,7 +373,7 @@ public sealed class EnemyPatternModuleBindingPropertyDrawer : PropertyDrawer
         if (propertyPath.Contains("weaponInteraction.binding"))
             return BindingPresentationContext.WeaponInteractionAssembly;
 
-        if (propertyPath.Contains("dropItems.binding"))
+        if (propertyPath.Contains("dropItems.binding") || propertyPath.Contains("dropItems.modules"))
             return BindingPresentationContext.DropItemsAssembly;
 
         return BindingPresentationContext.Generic;

@@ -69,6 +69,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
                                              unlockCatalog,
                                              equippedPassiveTools,
                                              ref passiveToolsState,
+                                             -1f,
                                              out applyTarget,
                                              out bool _);
     }
@@ -87,6 +88,34 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
                                                      DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                      DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                      ref PlayerPassiveToolsState passiveToolsState,
+                                                     out string applyTarget,
+                                                     out bool equippedOnGrant)
+    {
+        return TryAcquirePassiveCatalogEntry(catalogIndex,
+                                             unlockCatalog,
+                                             equippedPassiveTools,
+                                             ref passiveToolsState,
+                                             -1f,
+                                             out applyTarget,
+                                             out equippedOnGrant);
+    }
+
+    /// <summary>
+    /// Acquires one passive catalog entry and records the acquisition time for Power-Up Stealer cooldown protection.
+    /// </summary>
+    /// <param name="catalogIndex">Runtime unlock catalog index to acquire.</param>
+    /// <param name="unlockCatalog">Mutable runtime unlock catalog updated with unlock ownership.</param>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive tool buffer.</param>
+    /// <param name="passiveToolsState">Mutable aggregated passive state rebuilt when a tool is equipped.</param>
+    /// <param name="acquisitionTime">Gameplay elapsed time used as the anti-steal cooldown origin, or negative to leave it unchanged.</param>
+    /// <param name="applyTarget">Debug label describing the passive apply result.</param>
+    /// <param name="equippedOnGrant">True when this acquisition added the passive tool to the equipped buffer.</param>
+    /// <returns>True when the catalog entry ownership changed; otherwise false.</returns>
+    public static bool TryAcquirePassiveCatalogEntry(int catalogIndex,
+                                                     DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                     ref PlayerPassiveToolsState passiveToolsState,
+                                                     float acquisitionTime,
                                                      out string applyTarget,
                                                      out bool equippedOnGrant)
     {
@@ -136,6 +165,12 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
         catalogEntry.IsUnlocked = 1;
         catalogEntry.PendingInitialCharacterTuningApply = 0;
         unlockCatalog[catalogIndex] = catalogEntry;
+
+        if (acquisitionTime >= 0f)
+            PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(catalogIndex,
+                                                                              unlockCatalog,
+                                                                              acquisitionTime);
+
         return true;
     }
 

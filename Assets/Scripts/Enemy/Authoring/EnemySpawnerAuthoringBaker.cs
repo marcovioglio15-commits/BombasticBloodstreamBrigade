@@ -49,7 +49,8 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
         {
             StartTime = 0f,
             AliveCount = 0,
-            Initialized = 0
+            Initialized = 0,
+            StartTimeInitialized = 0
         });
 
         DynamicBuffer<EnemySpawnerWaveDefinitionElement> waveDefinitionBuffer = AddBuffer<EnemySpawnerWaveDefinitionElement>(spawnerEntity);

@@ -13,6 +13,9 @@ public sealed class EnemyPowerUpStealerModuleData
     [Tooltip("When this module attempts to steal one eligible player power-up. Module Activation fires when the module becomes active, including boss extraction re-activation.")]
     [SerializeField] private EnemyPowerUpStealTriggerMode triggerMode = EnemyPowerUpStealTriggerMode.OnFirstPlayerHit;
 
+    [Tooltip("When enabled with Trigger Mode set to On Module Activation, the activation attempt is consumed immediately and will not retry later when cooldowns or targets change.")]
+    [SerializeField] private bool consumeModuleActivationAttemptOnSpawnOnly;
+
     [Tooltip("Which player power-up category can be stolen by this module.")]
     [SerializeField] private EnemyPowerUpStealTargetKind targetKind = EnemyPowerUpStealTargetKind.ActiveOrPassive;
 
@@ -22,6 +25,10 @@ public sealed class EnemyPowerUpStealerModuleData
     [Tooltip("Percentage chance to try an active power-up before a passive one when Target Kind is Active Or Passive. Runtime falls back to the other category if the preferred one is unavailable.")]
     [Range(0f, 100f)]
     [SerializeField] private float activeTargetBiasPercent = 50f;
+
+    [Tooltip("Seconds after player acquisition or recovery during which this module cannot steal that specific power-up.")]
+    [Min(0f)]
+    [SerializeField] private float acquisitionStealCooldownSeconds = 3f;
 
     [Header("Recovery")]
     [Tooltip("When enabled, the stolen power-up is returned after the enemy loses the configured percentage of max health after the steal.")]
@@ -62,6 +69,14 @@ public sealed class EnemyPowerUpStealerModuleData
         }
     }
 
+    public bool ConsumeModuleActivationAttemptOnSpawnOnly
+    {
+        get
+        {
+            return consumeModuleActivationAttemptOnSpawnOnly;
+        }
+    }
+
     public EnemyPowerUpStealSelectionMode SelectionMode
     {
         get
@@ -75,6 +90,14 @@ public sealed class EnemyPowerUpStealerModuleData
         get
         {
             return activeTargetBiasPercent;
+        }
+    }
+
+    public float AcquisitionStealCooldownSeconds
+    {
+        get
+        {
+            return acquisitionStealCooldownSeconds;
         }
     }
 

@@ -219,6 +219,7 @@ public static class PlayerPowerUpCatalogBakeUtility
                 PendingInitialCharacterTuningApply = 0,
                 CurrentUnlockCount = 0,
                 MaximumUnlockCount = ResolveMaximumUnlockCount(preset, powerUp),
+                LastAcquiredTime = 0f,
                 CharacterTuningFormulaStartIndex = powerUpCharacterTuningFormulaBuffer.Length,
                 CharacterTuningFormulaCount = AppendCharacterTuningFormulas(preset, powerUp, powerUpCharacterTuningFormulaBuffer),
                 ActiveSlotConfig = default,

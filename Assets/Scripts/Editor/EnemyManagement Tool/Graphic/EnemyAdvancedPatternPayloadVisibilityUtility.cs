@@ -94,9 +94,11 @@ internal static class EnemyAdvancedPatternPayloadVisibilityUtility
     /// <param name="dropPayloadKindProperty">Drop payload kind property.</param>
     /// <param name="experienceFoldout">Experience settings foldout.</param>
     /// <param name="extraComboPointsFoldout">Extra Combo Points settings foldout.</param>
+    /// <param name="recoveryFoldout">Recovery settings foldout.</param>
     public static void UpdateDropPayloadVisibility(SerializedProperty dropPayloadKindProperty,
                                                    VisualElement experienceFoldout,
-                                                   VisualElement extraComboPointsFoldout)
+                                                   VisualElement extraComboPointsFoldout,
+                                                   VisualElement recoveryFoldout)
     {
         EnemyDropItemsPayloadKind payloadKind = EnemyDropItemsPayloadKind.Experience;
 
@@ -108,6 +110,9 @@ internal static class EnemyAdvancedPatternPayloadVisibilityUtility
 
         if (extraComboPointsFoldout != null)
             extraComboPointsFoldout.style.display = payloadKind == EnemyDropItemsPayloadKind.ExtraComboPoints ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (recoveryFoldout != null)
+            recoveryFoldout.style.display = payloadKind == EnemyDropItemsPayloadKind.Recovery ? DisplayStyle.Flex : DisplayStyle.None;
     }
     #endregion
 

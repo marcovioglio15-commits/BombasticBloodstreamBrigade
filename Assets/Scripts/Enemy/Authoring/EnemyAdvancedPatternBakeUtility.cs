@@ -592,7 +592,9 @@ public static class EnemyAdvancedPatternBakeUtility
             TriggerMode = ResolvePowerUpStealTriggerMode(stealerData.TriggerMode),
             TargetKind = ResolvePowerUpStealTargetKind(stealerData.TargetKind),
             SelectionMode = ResolvePowerUpStealSelectionMode(stealerData.SelectionMode),
+            ConsumeModuleActivationAttemptOnSpawnOnly = stealerData.ConsumeModuleActivationAttemptOnSpawnOnly ? (byte)1 : (byte)0,
             ActiveTargetBiasPercent = math.clamp(stealerData.ActiveTargetBiasPercent, 0f, 100f),
+            AcquisitionStealCooldownSeconds = math.max(0f, stealerData.AcquisitionStealCooldownSeconds),
             UseMinimumRange = 0,
             MinimumRange = 0f,
             UseMaximumRange = 0,
@@ -728,6 +730,8 @@ public sealed class EnemyCompiledPatternBakeResult
     public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyCompiledExperienceDropModule> ExperienceDropModules = new List<EnemyCompiledExperienceDropModule>();
     public readonly List<EnemyCompiledExperienceDropDefinition> ExperienceDropDefinitions = new List<EnemyCompiledExperienceDropDefinition>();
+    public readonly List<EnemyCompiledRecoveryDropModule> RecoveryDropModules = new List<EnemyCompiledRecoveryDropModule>();
+    public readonly List<EnemyCompiledRecoveryDropDefinition> RecoveryDropDefinitions = new List<EnemyCompiledRecoveryDropDefinition>();
     public readonly List<EnemyCompiledExtraComboPointsModule> ExtraComboPointsModules = new List<EnemyCompiledExtraComboPointsModule>();
     public readonly List<EnemyCompiledExtraComboPointsCondition> ExtraComboPointsConditions = new List<EnemyCompiledExtraComboPointsCondition>();
     #endregion

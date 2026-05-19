@@ -429,6 +429,8 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public readonly List<EnemyBossDropCandidateElement> DropCandidates = new List<EnemyBossDropCandidateElement>();
     public readonly List<EnemyExperienceDropModuleElement> BossDropExperienceModules = new List<EnemyExperienceDropModuleElement>();
     public readonly List<EnemyExperienceDropDefinitionElement> BossDropExperienceDefinitions = new List<EnemyExperienceDropDefinitionElement>();
+    public readonly List<EnemyRecoveryDropModuleElement> BossDropRecoveryModules = new List<EnemyRecoveryDropModuleElement>();
+    public readonly List<EnemyRecoveryDropDefinitionElement> BossDropRecoveryDefinitions = new List<EnemyRecoveryDropDefinitionElement>();
     public readonly List<EnemyExtraComboPointsModuleElement> BossDropExtraComboPointsModules = new List<EnemyExtraComboPointsModuleElement>();
     public readonly List<EnemyExtraComboPointsConditionElement> BossDropExtraComboPointsConditions = new List<EnemyExtraComboPointsConditionElement>();
     public GameObject ShooterProjectilePrefab;
