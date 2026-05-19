@@ -42,17 +42,17 @@ MonoBehaviour:
     formula: '[ShotgunBarrels]*5'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[7|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[1|moduleId:Module_ProjectilesPatternCone].overridePayload.projectilePatternCone.projectileCount
+  - statKey: passivePowerUps.Array.data[8|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[1|moduleId:Module_ProjectilesPatternCone].overridePayload.projectilePatternCone.projectileCount
     addScaling: 1
     formula: '[ShotgunBarrels]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[7|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[1|moduleId:Module_ProjectilesPatternCone].overridePayload.projectilePatternCone.coneAngleDegrees
+  - statKey: passivePowerUps.Array.data[8|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[1|moduleId:Module_ProjectilesPatternCone].overridePayload.projectilePatternCone.coneAngleDegrees
     addScaling: 1
     formula: '[ShotgunBarrels]*5'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[7|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[2|moduleId:ModuleStackable].overridePayload.stackable.maxAcquisitions
+  - statKey: passivePowerUps.Array.data[8|powerUpId:Passive_AdditionalBarrel].moduleBindings.Array.data[2|moduleId:ModuleStackable].overridePayload.stackable.maxAcquisitions
     addScaling: 0
     formula: 
     debugInConsole: 0
@@ -82,7 +82,7 @@ MonoBehaviour:
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.bodyWidthMultiplier
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.bodyWidthMultiplier
     addScaling: 1
     formula: '[LaserWidth_Small]'
     debugInConsole: 0
@@ -97,37 +97,37 @@ MonoBehaviour:
     formula: '[LaserWidth]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.damageTickIntervalSeconds
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.damageTickIntervalSeconds
     addScaling: 1
     formula: '1/[FireRate]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickDamageLengthTolerance
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickDamageLengthTolerance
     addScaling: 0
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.virtualProjectileSpeedMultiplier
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.virtualProjectileSpeedMultiplier
     addScaling: 0
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.flowPulseFrequency
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.flowPulseFrequency
     addScaling: 0
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormRingFrequency
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormRingFrequency
     addScaling: 0
     formula: '[ShotRange]*2'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTwistSpeed
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTwistSpeed
     addScaling: 0
     formula: '[FireRate]*4'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[15|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickTravelSpeed
+  - statKey: passivePowerUps.Array.data[17|powerUpId:Passive_LaserBeam].moduleBindings.Array.data[0|moduleId:Module_LaserBeam].overridePayload.laserBeam.stormTickTravelSpeed
     addScaling: 0
     formula: 
     debugInConsole: 0
@@ -157,25 +157,25 @@ MonoBehaviour:
     entries:
     - entryKind: 0
       powerUpId: ActiveBasicDash
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 0
       powerUpId: ActivePortableHealthPack
       selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_HealthIncrease
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 0
       powerUpId: Active_Shotgun
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 0
       powerUpId: Active_DamageBoost
-      selectionWeight: 6
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_MovementSpeed
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_GatheringRadius
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: PassiveBouncingProjectiles
       selectionWeight: 6
@@ -184,22 +184,28 @@ MonoBehaviour:
       selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_Shield
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_DamageIncrease
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_MegaProjectiles
-      selectionWeight: 7
+      selectionWeight: 6
+    - entryKind: 1
+      powerUpId: Passive_MicroProjectiles
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: PassiveOrbitalProjectiles
       selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_ElementalBullets_Fire
-      selectionWeight: 7
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_FireRate
-      selectionWeight: 7
+      selectionWeight: 6
+    - entryKind: 1
+      powerUpId: Passive_Range
+      selectionWeight: 6
   - tierId: Milestone_Tier4-5
     entries:
     - entryKind: 0
@@ -15465,9 +15471,284 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
-          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*1.5'
-          - formula: '[Damage]=[Damage]*1.5'
-          - formula: '[FireRate]=[FireRate]*0.8'
+          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*2'
+          - formula: '[LaserWidth_Small]=[LaserWidth_Small]*5'
+          - formula: '[Damage]=[Damage]*1.4'
+          - formula: '[FireRate]=[FireRate]*0.7'
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0.01
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0.05
+          radius: 0.1
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0.01
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0.05
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0.01
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0.1
+          spiralClockwise: 0
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 1
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 2
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 0.4
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.05
+          bubbleDriftSpeed: 1.4
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0.05
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0.01
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 1
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0.1
+            maximumStacks: 0.1
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0.01
+            dotDurationSeconds: 0.05
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0.05
+          stacksPerTick: 0
+          applyIntervalSeconds: 0.01
+        stackable:
+          maxAcquisitions: 2
+    unreplaceable: 0
+  - commonData:
+      powerUpId: Passive_MicroProjectiles
+      displayName: Micro Projectiles
+      description: Size doesn't matter, it's the fire rate that is important.
+      icon: {fileID: 21300000, guid: ffcc72bbb2321fa47bd5cfbc44c0a586, type: 3}
+      dropPools: []
+      dropTier: 1
+      purchaseCost: 0
+    moduleBindings:
+    - bindingId: ede2a6ac660a43278f25f1f78f716e43
+      moduleId: Module_Character Tuning
+      stage: 6
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 1
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0.35
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*0.3'
+          - formula: '[LaserWidth_Small]=[LaserWidth_Small]*0.1'
+          - formula: '[Damage]=[Damage]*0.5'
+          - formula: '[FireRate]=[FireRate]*1.3'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
@@ -17596,6 +17877,538 @@ MonoBehaviour:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[FireRate]=[FireRate]+0.5'
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0.01
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0.05
+          radius: 0.1
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0.01
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0.05
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0.01
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0.1
+          spiralClockwise: 0
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 1
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 2
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 0.4
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.05
+          bubbleDriftSpeed: 1.4
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0.05
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0.01
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 1
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0.1
+            maximumStacks: 0.1
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0.01
+            dotDurationSeconds: 0.05
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0.05
+          stacksPerTick: 0
+          applyIntervalSeconds: 0.01
+        stackable:
+          maxAcquisitions: 2
+    - bindingId: 3a8ecf3b41ba43ec91009c91ac2a4364
+      moduleId: ModuleStackable
+      stage: 6
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 1
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0.35
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0.01
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0.05
+          radius: 0.1
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0.01
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0.05
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0.01
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0.01
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0.1
+          spiralClockwise: 0
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 1
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 2
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 0.4
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.05
+          bubbleDriftSpeed: 1.4
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0.05
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0.01
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 1
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0.1
+            maximumStacks: 0.1
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0.01
+            dotDurationSeconds: 0.05
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0.05
+          stacksPerTick: 0
+          applyIntervalSeconds: 0.01
+        stackable:
+          maxAcquisitions: 10
+    unreplaceable: 0
+  - commonData:
+      powerUpId: Passive_Range
+      displayName: Range Increase
+      description: Increase your Range.
+      icon: {fileID: 21300000, guid: 7e750fd851942a34583ffeadd6caf82a, type: 3}
+      dropPools: []
+      dropTier: 1
+      purchaseCost: 0
+    moduleBindings:
+    - bindingId: 61ab5c4e3976460ca2b3a0b8fa721f5d
+      moduleId: Module_Character Tuning
+      stage: 6
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0.45
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 1
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0.35
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[ShotRange]=[ShotRange]+0.05'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}

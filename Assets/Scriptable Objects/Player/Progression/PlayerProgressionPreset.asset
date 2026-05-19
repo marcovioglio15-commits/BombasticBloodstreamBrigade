@@ -101,6 +101,13 @@ MonoBehaviour:
     maximumValue: 1000000
     defaultBooleanValue: 0
     defaultTokenValue: 
+  - statName: Knockback
+    statType: 0
+    defaultValue: 7
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
   - statName: BulletElementType_A
     statType: 3
     defaultValue: 1
@@ -139,13 +146,6 @@ MonoBehaviour:
   - statName: LaserWidth_Big
     statType: 0
     defaultValue: 50
-    minimumValue: -1000000
-    maximumValue: 1000000
-    defaultBooleanValue: 0
-    defaultTokenValue: 
-  - statName: Knockback
-    statType: 0
-    defaultValue: 7
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0

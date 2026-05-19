@@ -215,7 +215,7 @@ MonoBehaviour:
     maxHealthAdjustmentMode: 2
     maxShield: 0
     maxShieldAdjustmentMode: 2
-    graceTimeSeconds: 0.75
+    graceTimeSeconds: 1
     legacyHealthMigrated: 1
   scalingRules:
   - statKey: healthStatistics.maxHealth
