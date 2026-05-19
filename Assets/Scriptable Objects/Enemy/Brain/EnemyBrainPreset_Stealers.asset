@@ -17,8 +17,8 @@ MonoBehaviour:
   description: 
   version: 1.0.0
   movement:
-    moveSpeed: 15
-    maxSpeed: 15
+    moveSpeed: 10
+    maxSpeed: 10
     acceleration: 40
     deceleration: 20
     inactivityTime: 0.08
@@ -41,5 +41,5 @@ MonoBehaviour:
     areaAmountPerTickPercent: 0
     areaTickInterval: 1
   healthStatistics:
-    maxHealth: 1
+    maxHealth: 40
     maxShield: 0

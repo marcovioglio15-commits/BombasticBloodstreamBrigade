@@ -704,7 +704,7 @@ PrefabInstance:
     - target: {fileID: -5754084199372789682, guid: 4b712e1f4accd6f41af3a3c671e705d9, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 3351290352400371533, guid: aef341c0a8342e34cb2f89d9a22ef42d, type: 3}
+      objectReference: {fileID: 6609971133581999664, guid: 71de2e31c4d43a744b998f2108e1fccb, type: 3}
     - target: {fileID: 919132149155446097, guid: 4b712e1f4accd6f41af3a3c671e705d9, type: 3}
       propertyPath: m_Name
       value: SM_EnemyCowardSad
