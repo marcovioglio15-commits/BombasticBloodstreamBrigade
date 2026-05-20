@@ -932,10 +932,19 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         }
 
         Entity bombPrefabEntity = GetEntity(bombPrefabObject, TransformUsageFlags.Dynamic);
+        GameObject explosionVfxPrefabObject = compiledPattern.BombardierExplosionVfxPrefab;
+        Entity explosionVfxPrefabEntity = ResolveBombardierExplosionVfxPrefabEntity(authoring, explosionVfxPrefabObject);
+
         AddComponent(entity, new EnemyBombardierBombPrefab
         {
-            PrefabEntity = bombPrefabEntity
+            PrefabEntity = bombPrefabEntity,
+            ExplosionVfxPrefabEntity = explosionVfxPrefabEntity,
+            ExplosionVfxPrefab = explosionVfxPrefabObject,
+            ScaleExplosionVfxToDamageRadius = compiledPattern.BombardierScaleExplosionVfxToDamageRadius ? (byte)1 : (byte)0,
+            ExplosionVfxScaleMultiplier = math.max(0.01f, compiledPattern.BombardierExplosionVfxScaleMultiplier)
         });
+
+        TryBakeBombardierExplosionVfxRuntime(entity, explosionVfxPrefabEntity, explosionVfxPrefabObject);
     }
 
     /// <summary>
@@ -1309,6 +1318,66 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         }
 
         return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+    }
+
+    /// <summary>
+    /// Resolves the optional Bombardier explosion VFX prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <param name="candidatePrefab">Candidate explosion VFX prefab.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
+    private Entity ResolveBombardierExplosionVfxPrefabEntity(EnemyAuthoring authoring, GameObject candidatePrefab)
+    {
+        if (candidatePrefab == null)
+            return Entity.Null;
+
+        if (EnemyAuthoringValidationUtility.IsInvalidRuntimePrefab(authoring, candidatePrefab))
+        {
+#if UNITY_EDITOR
+            if (authoring != null)
+                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid Bombardier explosion VFX prefab '{0}' on '{1}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", candidatePrefab.name, authoring.name), authoring);
+#endif
+            return Entity.Null;
+        }
+
+        return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+    }
+
+    /// <summary>
+    /// Adds the shared managed VFX request buffers needed by Bombardier explosion VFX playback.
+    /// </summary>
+    /// <param name="entity">Enemy entity that owns Bombardier bomb requests.</param>
+    /// <param name="prefabEntity">Resolved explosion VFX prefab entity.</param>
+    /// <param name="sourcePrefab">Source prefab asset stored for managed runtime instantiation.</param>
+    private void TryBakeBombardierExplosionVfxRuntime(Entity entity, Entity prefabEntity, GameObject sourcePrefab)
+    {
+        if (prefabEntity == Entity.Null || sourcePrefab == null)
+            return;
+
+        AddBuffer<PlayerPowerUpVfxSpawnRequest>(entity);
+        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+        prefabBindings.Add(new PlayerPowerUpVfxPrefabBindingElement
+        {
+            PrefabEntity = prefabEntity,
+            Prefab = sourcePrefab
+        });
+        AddComponent(entity, BuildBombardierExplosionVfxCapConfig());
+    }
+
+    /// <summary>
+    /// Builds conservative one-shot VFX caps for enemy-authored Bombardier explosion feedback.
+    /// </summary>
+    /// <returns>Runtime VFX cap config shared with the managed VFX pool.</returns>
+    private static PlayerPowerUpVfxCapConfig BuildBombardierExplosionVfxCapConfig()
+    {
+        return new PlayerPowerUpVfxCapConfig
+        {
+            MaxSamePrefabPerCell = 6,
+            CellSize = 2.5f,
+            MaxAttachedSamePrefabPerTarget = 1,
+            MaxActiveOneShotVfx = 400,
+            RefreshAttachedLifetimeOnCapHit = 1
+        };
     }
 
     private Entity RegisterStatusBarsViewEntity(EnemyWorldSpaceStatusBarsView statusBarsView)

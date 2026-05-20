@@ -12,6 +12,15 @@ public sealed class EnemyBombardierRuntimeBombPayload
     #region Serialized Fields
     [Tooltip("Bomb prefab instantiated for each Bombardier launch. The prefab should be a lightweight visual entity without EnemyAuthoring or PlayerAuthoring.")]
     [SerializeField] private GameObject bombPrefab;
+
+    [Tooltip("Optional one-shot VFX prefab spawned at the bomb landing position when the explosion is resolved.")]
+    [SerializeField] private GameObject explosionVfxPrefab;
+
+    [Tooltip("When enabled, the explosion VFX uniform scale is multiplied by the authored Damage Radius.")]
+    [SerializeField] private bool scaleExplosionVfxToDamageRadius = true;
+
+    [Tooltip("Additional uniform scale multiplier applied to the explosion VFX after optional radius scaling.")]
+    [SerializeField] private float explosionVfxScaleMultiplier = 1f;
     #endregion
 
     #endregion
@@ -22,6 +31,30 @@ public sealed class EnemyBombardierRuntimeBombPayload
         get
         {
             return bombPrefab;
+        }
+    }
+
+    public GameObject ExplosionVfxPrefab
+    {
+        get
+        {
+            return explosionVfxPrefab;
+        }
+    }
+
+    public bool ScaleExplosionVfxToDamageRadius
+    {
+        get
+        {
+            return scaleExplosionVfxToDamageRadius;
+        }
+    }
+
+    public float ExplosionVfxScaleMultiplier
+    {
+        get
+        {
+            return explosionVfxScaleMultiplier;
         }
     }
     #endregion

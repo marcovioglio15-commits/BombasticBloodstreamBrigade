@@ -183,9 +183,21 @@ internal static class EnemyBombardierPayloadDrawerUtility
     private static void BuildRuntime(VisualElement payloadContainer, SerializedProperty bombardierProperty)
     {
         SerializedProperty runtimeBombProperty = bombardierProperty.FindPropertyRelative("runtimeBomb");
+        SerializedProperty explosionVfxPrefabProperty = runtimeBombProperty.FindPropertyRelative("explosionVfxPrefab");
         Foldout runtimeFoldout = EnemyAdvancedPatternPayloadDrawerUtility.CreatePayloadFoldout(runtimeBombProperty, "Runtime Bomb", "BombardierRuntimeBomb");
+        VisualElement explosionVfxSettingsContainer = new VisualElement();
+        explosionVfxSettingsContainer.style.marginLeft = 12f;
         payloadContainer.Add(runtimeFoldout);
         EnemyAdvancedPatternDrawerUtility.AddField(runtimeFoldout, runtimeBombProperty.FindPropertyRelative("bombPrefab"), "Bomb Prefab");
+        EnemyAdvancedPatternDrawerUtility.AddField(runtimeFoldout, explosionVfxPrefabProperty, "Explosion VFX Prefab");
+        runtimeFoldout.Add(explosionVfxSettingsContainer);
+        EnemyAdvancedPatternDrawerUtility.AddField(explosionVfxSettingsContainer, runtimeBombProperty.FindPropertyRelative("scaleExplosionVfxToDamageRadius"), "Scale VFX To Damage Radius");
+        EnemyAdvancedPatternDrawerUtility.AddField(explosionVfxSettingsContainer, runtimeBombProperty.FindPropertyRelative("explosionVfxScaleMultiplier"), "Explosion VFX Scale Multiplier");
+        UpdateObjectReferenceContainerVisibility(explosionVfxPrefabProperty, explosionVfxSettingsContainer);
+        runtimeFoldout.TrackPropertyValue(explosionVfxPrefabProperty, changedProperty =>
+        {
+            UpdateObjectReferenceContainerVisibility(changedProperty, explosionVfxSettingsContainer);
+        });
     }
 
     /// <summary>
@@ -273,6 +285,9 @@ internal static class EnemyBombardierPayloadDrawerUtility
 
         if (runtimeBombProperty.FindPropertyRelative("bombPrefab").objectReferenceValue == null)
             warnings.Add("Bomb Prefab is missing; Bombardier requests will be discarded at runtime.");
+
+        if (runtimeBombProperty.FindPropertyRelative("explosionVfxPrefab").objectReferenceValue != null)
+            AddPositiveWarning(warnings, runtimeBombProperty.FindPropertyRelative("explosionVfxScaleMultiplier"), "Explosion VFX Scale Multiplier should be greater than 0 when an explosion VFX prefab is assigned.");
 
         if (warningProperty.FindPropertyRelative("enableLandingWarning").boolValue)
         {
@@ -366,6 +381,20 @@ internal static class EnemyBombardierPayloadDrawerUtility
 
         if (apexContainer != null)
             apexContainer.style.display = trajectoryMode == EnemyBombardierTrajectoryMode.FixedApexHeight ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Shows a dependent settings container only when the owning object reference is assigned.
+    /// </summary>
+    /// <param name="objectReferenceProperty">Object reference controlling the dependent settings.</param>
+    /// <param name="container">Dependent settings container.</param>
+    private static void UpdateObjectReferenceContainerVisibility(SerializedProperty objectReferenceProperty, VisualElement container)
+    {
+        if (container == null)
+            return;
+
+        bool hasReference = objectReferenceProperty != null && objectReferenceProperty.objectReferenceValue != null;
+        container.style.display = hasReference ? DisplayStyle.Flex : DisplayStyle.None;
     }
     #endregion
 

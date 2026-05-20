@@ -75,6 +75,12 @@ public partial struct EnemyBombardierRequestSystem : ISystem
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         BufferLookup<EnemyShooterConfigElement> shooterConfigLookup = SystemAPI.GetBufferLookup<EnemyShooterConfigElement>(true);
+        EnemyNavigationGridState navigationGridState = default;
+        DynamicBuffer<EnemyNavigationCellElement> navigationCells = default;
+        bool navigationReady = SystemAPI.TryGetSingleton<EnemyNavigationGridState>(out navigationGridState) &&
+                               SystemAPI.TryGetSingletonBuffer<EnemyNavigationCellElement>(out navigationCells) &&
+                               navigationGridState.Initialized != 0 &&
+                               navigationGridState.FlowReady != 0;
 
         foreach ((DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
                   DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
@@ -161,6 +167,9 @@ public partial struct EnemyBombardierRequestSystem : ISystem
                                                              targetingMode,
                                                              enemyPosition,
                                                              playerPosition,
+                                                             navigationReady,
+                                                             in navigationGridState,
+                                                             navigationCells,
                                                              ref random);
                 }
 
@@ -183,7 +192,10 @@ public partial struct EnemyBombardierRequestSystem : ISystem
                                                                              ref aimPriority);
                     }
 
-                    if (runtime.RemainingBurstLaunches > 0)
+                    bool shouldCaptureActiveAimDirection = runtime.RemainingBurstLaunches > 0 &&
+                                                           bombardierConfig.MovementPolicy == EnemyShooterMovementPolicy.StopWhileAiming;
+
+                    if (shouldCaptureActiveAimDirection)
                     {
                         EnemyBombardierRequestUtility.TryCaptureAimDirection(aimDirection,
                                                                              bombardierConfig.MovementPolicy,
@@ -201,12 +213,18 @@ public partial struct EnemyBombardierRequestSystem : ISystem
                                                                                                        targetingMode,
                                                                                                        enemyPosition,
                                                                                                        playerPosition,
+                                                                                                       navigationReady,
+                                                                                                       in navigationGridState,
+                                                                                                       navigationCells,
                                                                                                        ref random);
                     EnemyBombardierRequestUtility.EnqueueLaunchRequests(mutableLaunchRequests,
                                                                        enemyEntity,
                                                                        enemyPosition,
                                                                        targetPosition,
                                                                        in bombardierConfig,
+                                                                       navigationReady,
+                                                                       in navigationGridState,
+                                                                       navigationCells,
                                                                        ref random);
 
                     if (canEnqueueAudioRequests)

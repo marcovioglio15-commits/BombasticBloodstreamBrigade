@@ -286,6 +286,9 @@ internal static class EnemyBossPatternBakeUtility
         result.InitialPattern.ShooterProjectilePoolExpandBatch = result.ShooterProjectilePoolExpandBatch;
         result.InitialPattern.HasShooterRuntimeSettings = result.HasShooterRuntimeSettings;
         result.InitialPattern.BombardierBombPrefab = result.BombardierBombPrefab;
+        result.InitialPattern.BombardierExplosionVfxPrefab = result.BombardierExplosionVfxPrefab;
+        result.InitialPattern.BombardierScaleExplosionVfxToDamageRadius = result.BombardierScaleExplosionVfxToDamageRadius;
+        result.InitialPattern.BombardierExplosionVfxScaleMultiplier = result.BombardierExplosionVfxScaleMultiplier;
         result.InitialPattern.HasBombardierRuntimeSettings = result.HasBombardierRuntimeSettings;
         result.InitialPattern.HasCustomMovement = ResolveAnyModuleCandidateHasCustomMovement(result);
         EnemyBossDropExtractionBakeUtility.CopyBossDropUnionToInitialPattern(result);
@@ -445,6 +448,9 @@ internal static class EnemyBossPatternBakeUtility
             return;
 
         result.BombardierBombPrefab = compiledPattern.BombardierBombPrefab;
+        result.BombardierExplosionVfxPrefab = compiledPattern.BombardierExplosionVfxPrefab;
+        result.BombardierScaleExplosionVfxToDamageRadius = compiledPattern.BombardierScaleExplosionVfxToDamageRadius;
+        result.BombardierExplosionVfxScaleMultiplier = compiledPattern.BombardierExplosionVfxScaleMultiplier;
         result.HasBombardierRuntimeSettings = true;
     }
     #endregion
@@ -480,6 +486,9 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public int ShooterProjectilePoolExpandBatch;
     public bool HasShooterRuntimeSettings;
     public GameObject BombardierBombPrefab;
+    public GameObject BombardierExplosionVfxPrefab;
+    public bool BombardierScaleExplosionVfxToDamageRadius;
+    public float BombardierExplosionVfxScaleMultiplier;
     public bool HasBombardierRuntimeSettings;
     public bool BossDropExtractionEnabled;
     public EnemyBossDropExtractionMode BossDropExtractionMode;

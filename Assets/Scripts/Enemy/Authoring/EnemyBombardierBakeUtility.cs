@@ -106,6 +106,9 @@ internal static class EnemyBombardierBakeUtility
             return;
 
         result.BombardierBombPrefab = bombPrefab;
+        result.BombardierExplosionVfxPrefab = runtimePayload.ExplosionVfxPrefab;
+        result.BombardierScaleExplosionVfxToDamageRadius = runtimePayload.ScaleExplosionVfxToDamageRadius;
+        result.BombardierExplosionVfxScaleMultiplier = math.max(0.01f, runtimePayload.ExplosionVfxScaleMultiplier);
         result.HasBombardierRuntimeSettings = true;
     }
 

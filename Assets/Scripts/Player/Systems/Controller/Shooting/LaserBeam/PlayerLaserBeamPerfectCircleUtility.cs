@@ -20,7 +20,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
 
     #region Public Methods
     /// <summary>
-    /// Resolves one Laser Beam lane by sampling the Perfect Circle projectile path over the current active-time window.
+    /// Resolves one Laser Beam lane by sampling the Perfect Circle projectile path over the current beam travel budget.
     /// </summary>
     /// <param name="laneBuffer">Output segment buffer.</param>
     /// <param name="laneIndex">Stable lane index assigned to all appended segments.</param>
@@ -29,9 +29,10 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// <param name="shooterEntity">Player entity used for deterministic seed reconstruction.</param>
     /// <param name="shooterPosition">Current shooter position used by orbit phases.</param>
     /// <param name="shooterVelocity">Current shooter velocity used during the radial entry phase.</param>
-    /// <param name="startPoint">World-space lane origin.</param>
-    /// <param name="direction">Current lane forward direction.</param>
+    /// <param name="startPoint">World-space lane origin used by the deterministic orbit sampler.</param>
+    /// <param name="direction">Initial radial direction of the sampled lane, or zero to use the deterministic orbital seed.</param>
     /// <param name="activeSeconds">Consecutive active time currently accumulated by the beam.</param>
+    /// <param name="travelDistanceLimit">Current beam travel budget resolved from projectile speed, range and lifetime.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
     /// <param name="speedMultiplier">Beam-local speed multiplier applied on top of Perfect Circle motion speeds.</param>
@@ -54,6 +55,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                                                             float3 startPoint,
                                                             float3 direction,
                                                             float activeSeconds,
+                                                            float travelDistanceLimit,
                                                             float rangeLimit,
                                                             float lifetimeLimit,
                                                             float speedMultiplier,
@@ -67,7 +69,9 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                                                             bool wallsEnabled)
     {
         reachedVirtualDespawn = false;
-        float maximumSimulationSeconds = ResolveMaximumSimulationSeconds(activeSeconds, lifetimeLimit);
+        float absoluteMaximumTravelDistance = ResolveMaximumTravelDistance(rangeLimit, lifetimeLimit);
+        float maximumTravelDistance = ResolveMaximumTravelDistance(travelDistanceLimit, rangeLimit, lifetimeLimit);
+        float maximumSimulationSeconds = ResolveMaximumSimulationSeconds(maximumTravelDistance);
 
         if (maximumSimulationSeconds <= 0f)
             return false;
@@ -79,7 +83,6 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                                                                                   startPoint,
                                                                                   direction,
                                                                                   speedMultiplier);
-        float maximumTravelDistance = ResolveMaximumTravelDistance(rangeLimit, lifetimeLimit);
         float simulatedSeconds = 0f;
         float accumulatedDistance = 0f;
         float3 currentPosition = startPoint;
@@ -192,7 +195,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                              terminalNormal);
         bool reachedLifetimeCap = lifetimeLimit > 0f && activeSeconds >= lifetimeLimit;
         bool reachedRangeCap = rangeLimit > 0f &&
-                               accumulatedDistance + PlayerLaserBeamUtility.MinimumTravelDistance >= maximumTravelDistance;
+                               accumulatedDistance + PlayerLaserBeamUtility.MinimumTravelDistance >= absoluteMaximumTravelDistance;
         reachedVirtualDespawn = terminalBlockedByWall || reachedLifetimeCap || reachedRangeCap;
         return laneBuffer.Length > laneStartIndex;
     }
@@ -202,26 +205,41 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// <summary>
     /// Resolves the effective simulation time window allowed for the current beam lane.
     /// </summary>
-    /// <param name="activeSeconds">Consecutive active time currently accumulated by the beam.</param>
-    /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
+    /// <param name="maximumTravelDistance">Distance budget that the sampler needs to consume.</param>
     /// <returns>The time window that can still produce valid geometry.</returns>
-    private static float ResolveMaximumSimulationSeconds(float activeSeconds,
-                                                         float lifetimeLimit)
+    private static float ResolveMaximumSimulationSeconds(float maximumTravelDistance)
     {
-        float maximumSimulationSeconds = math.max(0f, activeSeconds);
+        if (maximumTravelDistance <= PlayerLaserBeamUtility.MinimumTravelDistance)
+            return 0f;
 
-        if (lifetimeLimit > 0f)
-            maximumSimulationSeconds = math.min(maximumSimulationSeconds, lifetimeLimit);
-
-        return maximumSimulationSeconds;
+        return MaximumSimulationIterations * MaximumSimulationDeltaTime;
     }
 
     /// <summary>
-    /// Resolves the maximum path distance allowed by projectile range or the beam fallback cap when no range or lifetime exists.
+    /// Resolves the maximum path distance allowed by current beam growth, projectile range or the fallback cap.
     /// </summary>
+    /// <param name="travelDistanceLimit">Current beam travel budget resolved by the simulation system.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
     /// <returns>The maximum path distance that can be sampled for the current lane.</returns>
+    private static float ResolveMaximumTravelDistance(float travelDistanceLimit,
+                                                      float rangeLimit,
+                                                      float lifetimeLimit)
+    {
+        float requestedTravelDistance = PlayerLaserBeamUtility.ClampRequestedTravelDistance(travelDistanceLimit);
+
+        if (requestedTravelDistance <= PlayerLaserBeamUtility.MinimumTravelDistance)
+            return 0f;
+
+        return math.min(requestedTravelDistance, ResolveMaximumTravelDistance(rangeLimit, lifetimeLimit));
+    }
+
+    /// <summary>
+    /// Resolves the absolute path distance allowed by projectile range or the beam fallback cap when no range or lifetime exists.
+    /// </summary>
+    /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
+    /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
+    /// <returns>The absolute maximum path distance that can be sampled for the current lane.</returns>
     private static float ResolveMaximumTravelDistance(float rangeLimit,
                                                       float lifetimeLimit)
     {
@@ -293,7 +311,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     }
 
     /// <summary>
-    /// Rebuilds the initial Perfect Circle runtime state exactly as spawned projectiles do before their first simulation step.
+    /// Rebuilds the initial Perfect Circle runtime state for deterministic beam sampling before the first simulation step.
     /// </summary>
     /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
     /// <param name="laneIndex">Stable lane index used as request index surrogate.</param>

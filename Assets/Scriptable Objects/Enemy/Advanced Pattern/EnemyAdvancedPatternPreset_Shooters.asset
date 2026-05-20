@@ -219,6 +219,9 @@ MonoBehaviour:
         bombScaleMultiplier: 1
         runtimeBomb:
           bombPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleExplosionVfxToDamageRadius: 1
+          explosionVfxScaleMultiplier: 1
         landingWarning:
           enableLandingWarning: 1
           warningLeadTimeSeconds: 0.75
@@ -468,6 +471,9 @@ MonoBehaviour:
         bombScaleMultiplier: 1
         runtimeBomb:
           bombPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleExplosionVfxToDamageRadius: 1
+          explosionVfxScaleMultiplier: 1
         landingWarning:
           enableLandingWarning: 1
           warningLeadTimeSeconds: 0.75
@@ -717,6 +723,9 @@ MonoBehaviour:
         bombScaleMultiplier: 1
         runtimeBomb:
           bombPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleExplosionVfxToDamageRadius: 1
+          explosionVfxScaleMultiplier: 1
         landingWarning:
           enableLandingWarning: 1
           warningLeadTimeSeconds: 0.75
@@ -966,6 +975,9 @@ MonoBehaviour:
         bombScaleMultiplier: 1
         runtimeBomb:
           bombPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleExplosionVfxToDamageRadius: 1
+          explosionVfxScaleMultiplier: 1
         landingWarning:
           enableLandingWarning: 1
           warningLeadTimeSeconds: 0.75
@@ -1215,6 +1227,9 @@ MonoBehaviour:
         bombScaleMultiplier: 1
         runtimeBomb:
           bombPrefab: {fileID: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleExplosionVfxToDamageRadius: 1
+          explosionVfxScaleMultiplier: 1
         landingWarning:
           enableLandingWarning: 1
           warningLeadTimeSeconds: 0.75
@@ -1477,6 +1492,9 @@ MonoBehaviour:
           bombScaleMultiplier: 1
           runtimeBomb:
             bombPrefab: {fileID: 0}
+            explosionVfxPrefab: {fileID: 0}
+            scaleExplosionVfxToDamageRadius: 1
+            explosionVfxScaleMultiplier: 1
           landingWarning:
             enableLandingWarning: 1
             warningLeadTimeSeconds: 0.75
@@ -1726,6 +1744,9 @@ MonoBehaviour:
           bombScaleMultiplier: 1
           runtimeBomb:
             bombPrefab: {fileID: 0}
+            explosionVfxPrefab: {fileID: 0}
+            scaleExplosionVfxToDamageRadius: 1
+            explosionVfxScaleMultiplier: 1
           landingWarning:
             enableLandingWarning: 1
             warningLeadTimeSeconds: 0.75
@@ -1975,6 +1996,9 @@ MonoBehaviour:
           bombScaleMultiplier: 1
           runtimeBomb:
             bombPrefab: {fileID: 0}
+            explosionVfxPrefab: {fileID: 0}
+            scaleExplosionVfxToDamageRadius: 1
+            explosionVfxScaleMultiplier: 1
           landingWarning:
             enableLandingWarning: 1
             warningLeadTimeSeconds: 0.75

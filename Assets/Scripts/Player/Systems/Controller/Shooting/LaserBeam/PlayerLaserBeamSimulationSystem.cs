@@ -255,21 +255,19 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             }
 
             float3 baseDirection = PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO);
-            float travelDistance = hasPerfectCircle
-                ? 0f
-                : hasTriggeredActiveLaser
-                    ? PlayerLaserBeamUtility.ResolveMaximumTravelDistance(projectileSpeed,
-                                                                         projectileTemplate.Range,
-                                                                         projectileTemplate.Lifetime)
-                    : PlayerLaserBeamUtility.ResolveTravelDistance(currentLaserBeamState.ConsecutiveActiveElapsed,
-                                                                   projectileSpeed,
-                                                                   projectileTemplate.Range,
-                                                                   projectileTemplate.Lifetime);
+            float travelDistance = hasTriggeredActiveLaser
+                ? PlayerLaserBeamUtility.ResolveMaximumTravelDistance(projectileSpeed,
+                                                                     projectileTemplate.Range,
+                                                                     projectileTemplate.Lifetime)
+                : PlayerLaserBeamUtility.ResolveTravelDistance(currentLaserBeamState.ConsecutiveActiveElapsed,
+                                                               projectileSpeed,
+                                                               projectileTemplate.Range,
+                                                               projectileTemplate.Lifetime);
             float chargeImpulseWidthMultiplier = !hasTriggeredActiveLaser && hasChargeImpulse
                 ? math.max(1f, currentLaserBeamState.ChargeImpulseWidthMultiplier)
                 : 1f;
 
-            if (!hasTriggeredActiveLaser && !hasPerfectCircle && hasChargeImpulse)
+            if (!hasTriggeredActiveLaser && hasChargeImpulse)
                 travelDistance = math.max(travelDistance, currentLaserBeamState.ChargeImpulseTravelDistance);
 
             float collisionRadius = PlayerLaserBeamUtility.ResolveCollisionRadius(projectileTemplate.ScaleMultiplier,
@@ -361,7 +359,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="spawnPosition">World-space origin of the lane.</param>
     /// <param name="direction">World-space forward direction of the lane.</param>
     /// <param name="activeSeconds">Current uninterrupted active time.</param>
-    /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
+    /// <param name="travelDistance">Current beam travel budget used by straight and Perfect Circle lane builders.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
     /// <param name="speedMultiplier">Beam-local speed multiplier applied to motion simulation.</param>
@@ -414,10 +412,11 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                                                                           isSplitChild,
                                                                                           shooterEntity,
                                                                                           shooterPosition,
-                                                                                          shooterVelocity,
+                                                                                          float3.zero,
                                                                                           spawnPosition,
                                                                                           direction,
                                                                                           activeSeconds,
+                                                                                          travelDistance,
                                                                                           rangeLimit,
                                                                                           lifetimeLimit,
                                                                                           speedMultiplier,

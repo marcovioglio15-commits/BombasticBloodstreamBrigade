@@ -61,7 +61,7 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
             for (int requestIndex = 0; requestIndex < launchRequests.Length; requestIndex++)
                 SpawnBomb(entityManager,
                           commandBuffer,
-                          prefabEntity,
+                          in bombPrefab.ValueRO,
                           ownerEntity,
                           launchRequests[requestIndex],
                           elapsedTime);
@@ -80,17 +80,18 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
     /// </summary>
     /// <param name="entityManager">Entity manager used for prefab component checks.</param>
     /// <param name="commandBuffer">Command buffer receiving structural changes.</param>
-    /// <param name="prefabEntity">Bomb prefab entity.</param>
+    /// <param name="bombPrefab">Bomb prefab binding and optional explosion VFX binding.</param>
     /// <param name="ownerEntity">Enemy owner entity.</param>
     /// <param name="request">Launch request to convert.</param>
     /// <param name="elapsedTime">Current elapsed world time.</param>
     private static void SpawnBomb(EntityManager entityManager,
                                   EntityCommandBuffer commandBuffer,
-                                  Entity prefabEntity,
+                                  in EnemyBombardierBombPrefab bombPrefab,
                                   Entity ownerEntity,
                                   in EnemyBombardierLaunchRequest request,
                                   float elapsedTime)
     {
+        Entity prefabEntity = bombPrefab.PrefabEntity;
         TrajectorySolution trajectory = ResolveTrajectory(in request);
         Entity bombEntity = commandBuffer.Instantiate(prefabEntity);
         LocalTransform bombTransform = BuildTransform(entityManager,
@@ -100,6 +101,8 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
         EnemyBombardierBomb bomb = new EnemyBombardierBomb
         {
             OwnerEntity = ownerEntity,
+            ExplosionVfxPrefabEntity = bombPrefab.ExplosionVfxPrefabEntity,
+            ExplosionVfxPrefab = bombPrefab.ExplosionVfxPrefab,
             LaunchPosition = request.LaunchPosition,
             LandingPosition = request.LandingPosition,
             Velocity = trajectory.Velocity,
@@ -110,6 +113,8 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
             ExplosionDelayElapsedSeconds = 0f,
             Damage = math.max(0f, request.Damage),
             DamageRadius = math.max(0f, request.DamageRadius),
+            ScaleExplosionVfxToDamageRadius = bombPrefab.ScaleExplosionVfxToDamageRadius,
+            ExplosionVfxScaleMultiplier = math.max(0.01f, bombPrefab.ExplosionVfxScaleMultiplier),
             HasImpacted = 0,
             HasExploded = 0,
             WarningFadeOutEndTime = elapsedTime + trajectory.FlightDurationSeconds + math.max(0f, request.WarningFadeOutSeconds)

@@ -105,6 +105,9 @@ public static class EnemyAdvancedPatternBakeUtility
         result.ShooterProjectilePoolExpandBatch = preset != null ? math.max(1, preset.LegacyShooterProjectilePoolExpandBatch) : 1;
         result.HasShooterRuntimeSettings = false;
         result.BombardierBombPrefab = null;
+        result.BombardierExplosionVfxPrefab = null;
+        result.BombardierScaleExplosionVfxToDamageRadius = true;
+        result.BombardierExplosionVfxScaleMultiplier = 1f;
         result.HasBombardierRuntimeSettings = false;
         result.DropItemsConfig = EnemyDropItemsBakeUtility.CreateDefaultConfig();
         return result;
@@ -733,6 +736,9 @@ public sealed class EnemyCompiledPatternBakeResult
     public int ShooterProjectilePoolExpandBatch;
     public bool HasShooterRuntimeSettings;
     public GameObject BombardierBombPrefab;
+    public GameObject BombardierExplosionVfxPrefab;
+    public bool BombardierScaleExplosionVfxToDamageRadius;
+    public float BombardierExplosionVfxScaleMultiplier;
     public bool HasBombardierRuntimeSettings;
     public EnemyDropItemsConfig DropItemsConfig;
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();

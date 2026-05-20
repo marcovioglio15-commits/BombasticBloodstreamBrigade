@@ -1,5 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 #region Enemy Bombardier Components
 /// <summary>
@@ -102,6 +103,10 @@ public struct EnemyBombardierLaunchRequest : IBufferElementData
 public struct EnemyBombardierBombPrefab : IComponentData
 {
     public Entity PrefabEntity;
+    public Entity ExplosionVfxPrefabEntity;
+    public UnityObjectRef<GameObject> ExplosionVfxPrefab;
+    public byte ScaleExplosionVfxToDamageRadius;
+    public float ExplosionVfxScaleMultiplier;
 }
 
 /// <summary>
@@ -110,6 +115,8 @@ public struct EnemyBombardierBombPrefab : IComponentData
 public struct EnemyBombardierBomb : IComponentData
 {
     public Entity OwnerEntity;
+    public Entity ExplosionVfxPrefabEntity;
+    public UnityObjectRef<GameObject> ExplosionVfxPrefab;
     public float3 LaunchPosition;
     public float3 LandingPosition;
     public float3 Velocity;
@@ -120,6 +127,8 @@ public struct EnemyBombardierBomb : IComponentData
     public float ExplosionDelayElapsedSeconds;
     public float Damage;
     public float DamageRadius;
+    public byte ScaleExplosionVfxToDamageRadius;
+    public float ExplosionVfxScaleMultiplier;
     public byte HasImpacted;
     public byte HasExploded;
     public float WarningFadeOutEndTime;
