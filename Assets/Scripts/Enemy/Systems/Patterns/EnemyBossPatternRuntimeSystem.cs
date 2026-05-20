@@ -37,6 +37,7 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
         state.RequireForUpdate<EnemyBossPatternModuleCandidateElement>();
         state.RequireForUpdate<EnemyBossPatternSlotRuntimeElement>();
         state.RequireForUpdate<EnemyBossPatternOffensiveEngagementConfigElement>();
+        state.RequireForUpdate<EnemyBossPatternBombardierConfigElement>();
         state.RequireForUpdate<EnemyBossPatternPowerUpStealerConfigElement>();
     }
 
@@ -80,10 +81,13 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                             .WithAll<EnemyBossPatternModuleCandidateElement>()
                             .WithAll<EnemyBossPatternSlotRuntimeElement>()
                             .WithAll<EnemyBossPatternShooterConfigElement>()
+                            .WithAll<EnemyBossPatternBombardierConfigElement>()
                             .WithAll<EnemyBossPatternPowerUpStealerConfigElement>()
                              .WithAll<EnemyBossPatternOffensiveEngagementConfigElement>()
                              .WithAll<EnemyShooterConfigElement>()
                              .WithAll<EnemyShooterRuntimeElement>()
+                             .WithAll<EnemyBombardierConfigElement>()
+                             .WithAll<EnemyBombardierRuntimeElement>()
                              .WithAll<EnemyPowerUpStealerConfigElement>()
                              .WithAll<EnemyPowerUpStealerRuntimeElement>()
                              .WithAll<EnemyOffensiveEngagementConfigElement>()
@@ -95,10 +99,13 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
             DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates = entityManager.GetBuffer<EnemyBossPatternModuleCandidateElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes = entityManager.GetBuffer<EnemyBossPatternSlotRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs = entityManager.GetBuffer<EnemyBossPatternShooterConfigElement>(bossEntity);
+            DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierConfigs = entityManager.GetBuffer<EnemyBossPatternBombardierConfigElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs = entityManager.GetBuffer<EnemyBossPatternPowerUpStealerConfigElement>(bossEntity);
             DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs = entityManager.GetBuffer<EnemyBossPatternOffensiveEngagementConfigElement>(bossEntity);
             DynamicBuffer<EnemyShooterConfigElement> shooterConfigs = entityManager.GetBuffer<EnemyShooterConfigElement>(bossEntity);
             DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = entityManager.GetBuffer<EnemyShooterRuntimeElement>(bossEntity);
+            DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs = entityManager.GetBuffer<EnemyBombardierConfigElement>(bossEntity);
+            DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime = entityManager.GetBuffer<EnemyBombardierRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs = entityManager.GetBuffer<EnemyPowerUpStealerConfigElement>(bossEntity);
             DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = entityManager.GetBuffer<EnemyPowerUpStealerRuntimeElement>(bossEntity);
             DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs = entityManager.GetBuffer<EnemyOffensiveEngagementConfigElement>(bossEntity);
@@ -122,10 +129,13 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                                moduleCandidates,
                                                                slotRuntimes,
                                                                bossShooterConfigs,
+                                                               bossBombardierConfigs,
                                                                bossStealerConfigs,
                                                                bossEngagementConfigs,
                                                                shooterConfigs,
                                                                shooterRuntime,
+                                                               bombardierConfigs,
+                                                               bombardierRuntime,
                                                                stealerConfigs,
                                                                stealerRuntime,
                                                                engagementConfigs,
@@ -247,9 +257,15 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
     /// <param name="moduleCandidates">Compiled module candidates for each internal boss slot.</param>
     /// <param name="slotRuntimes">Mutable runtime state for internal boss slots.</param>
     /// <param name="bossShooterConfigs">Boss-owned shooter config source buffer.</param>
+    /// <param name="bossBombardierConfigs">Boss-owned Bombardier config source buffer.</param>
+    /// <param name="bossStealerConfigs">Boss-owned Power-Up Stealer config source buffer.</param>
     /// <param name="bossEngagementConfigs">Boss-owned engagement config source buffer.</param>
     /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
     /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
+    /// <param name="bombardierConfigs">Runtime Bombardier config target buffer.</param>
+    /// <param name="bombardierRuntime">Runtime Bombardier state target buffer.</param>
+    /// <param name="stealerConfigs">Runtime Power-Up Stealer config target buffer.</param>
+    /// <param name="stealerRuntime">Runtime Power-Up Stealer state target buffer.</param>
     /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
     /// <param name="extractionConfig">Boss pattern extraction settings.</param>
     /// <param name="health">Boss health state.</param>
@@ -266,10 +282,13 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                  DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                                  DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                  DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                                 DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierConfigs,
                                                  DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                                  DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                                  DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                 DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
+                                                 DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                  DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                                  DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                  DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
@@ -300,7 +319,8 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
             EnemyBossPatternModuleSelectionRuntimeUtility.CanSwitchActivePatternSlots(slotRuntimes,
                                                                                       moduleCandidates,
                                                                                       in patternRuntimeState,
-                                                                                      shooterRuntime))
+                                                                                      shooterRuntime,
+                                                                                      bombardierRuntime))
         {
             int selectedInteractionIndex = EnemyBossPatternSelectionRuntimeUtility.ResolveSelectedInteractionIndex(interactions,
                                                                                                                    in runtimeState,
@@ -329,11 +349,14 @@ public partial struct EnemyBossPatternRuntimeSystem : ISystem
                                                                                           moduleExtractions,
                                                                                           moduleCandidates,
                                                                                           bossShooterConfigs,
+                                                                                          bossBombardierConfigs,
                                                                                           bossStealerConfigs,
                                                                                           bossEngagementConfigs,
                                                                                           slotRuntimes,
                                                                                           shooterConfigs,
                                                                                           shooterRuntime,
+                                                                                          bombardierConfigs,
+                                                                                          bombardierRuntime,
                                                                                           stealerConfigs,
                                                                                           stealerRuntime,
                                                                                           engagementConfigs,

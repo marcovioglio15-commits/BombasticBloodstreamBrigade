@@ -193,6 +193,7 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
                 choices.Add(EnemyPatternModuleKind.Shooter);
+                choices.Add(EnemyPatternModuleKind.Bombardier);
                 choices.Add(EnemyPatternModuleKind.PowerUpStealer);
                 break;
 
@@ -260,6 +261,9 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
                 return editorMode == EnemyAdvancedPatternPayloadEditorMode.WeaponInteraction
                     ? "Shooter: emits projectiles while the Weapon Interaction category decides when range gates are valid."
                     : "Shooter: emits periodic projectiles with burst and elemental options.";
+
+            case EnemyPatternModuleKind.Bombardier:
+                return "Bombardier: launches parabolic bombs with in-reach and out-of-reach targeting, clustered or radial bursts, landing warnings and delayed impact explosions.";
 
             case EnemyPatternModuleKind.PowerUpStealer:
                 return "Power-Up Stealer: steals one player active or passive power-up through the Weapon Interaction slot and keeps it unavailable until recovery.";

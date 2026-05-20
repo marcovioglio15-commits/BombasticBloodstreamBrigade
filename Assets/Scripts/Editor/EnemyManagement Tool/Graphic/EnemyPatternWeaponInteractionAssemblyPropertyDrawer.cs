@@ -99,7 +99,7 @@ public sealed class EnemyPatternWeaponInteractionAssemblyPropertyDrawer : Proper
                                                    displayBehaviourEngagementTriggerProperty,
                                                    "Display Behaviour Engagement Trigger");
 
-        HelpBox unsupportedModuleBox = new HelpBox("Display Behaviour Engagement Trigger supports Shooter and Power-Up Stealer in the Weapon Interaction slot.", HelpBoxMessageType.Warning);
+        HelpBox unsupportedModuleBox = new HelpBox("Display Behaviour Engagement Trigger supports Shooter, Bombardier and Power-Up Stealer in the Weapon Interaction slot.", HelpBoxMessageType.Warning);
         unsupportedModuleBox.style.marginTop = 4f;
         settingsContainer.Add(unsupportedModuleBox);
 

@@ -178,7 +178,9 @@ public static class PlayerProjectileRequestUtility
                             in template,
                             penetrationMode,
                             maxPenetrations,
-                            isSplitChild);
+                            isSplitChild,
+                            0,
+                            1);
             return;
         }
 
@@ -200,7 +202,9 @@ public static class PlayerProjectileRequestUtility
                             in template,
                             penetrationMode,
                             maxPenetrations,
-                            isSplitChild);
+                            isSplitChild,
+                            projectileIndex,
+                            projectileCount);
         }
     }
 
@@ -214,14 +218,19 @@ public static class PlayerProjectileRequestUtility
     /// <param name="penetrationMode">Penetration mode assigned to the entry.</param>
     /// <param name="maxPenetrations">Maximum penetrations assigned to the entry.</param>
     /// <param name="isSplitChild">Flag propagated to the entry.</param>
+    /// <param name="orbitLayerIndex">Stable orbital layer index used by Perfect Circle trajectories.</param>
+    /// <param name="orbitLayerCount">Total number of orbital layers emitted by the current request group.</param>
     public static void AddShootRequest(ref DynamicBuffer<ShootRequest> shootRequests,
                                        float3 position,
                                        float3 direction,
                                        in PlayerProjectileRequestTemplate template,
                                        ProjectilePenetrationMode penetrationMode,
                                        int maxPenetrations,
-                                       byte isSplitChild)
+                                       byte isSplitChild,
+                                       int orbitLayerIndex = 0,
+                                       int orbitLayerCount = 1)
     {
+        int safeOrbitLayerCount = math.max(1, orbitLayerCount);
         shootRequests.Add(new ShootRequest
         {
             Position = position,
@@ -241,6 +250,8 @@ public static class PlayerProjectileRequestUtility
             KnockbackStackingMode = template.Knockback.StackingMode,
             InheritPlayerSpeed = template.InheritPlayerSpeed,
             IsSplitChild = isSplitChild,
+            OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
+            OrbitLayerCount = safeOrbitLayerCount,
             ElementalPayloadOverride = template.ElementalPayloadOverride
         });
     }

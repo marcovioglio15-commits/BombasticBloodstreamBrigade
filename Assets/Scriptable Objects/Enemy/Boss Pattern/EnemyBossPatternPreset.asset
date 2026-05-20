@@ -248,6 +248,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 100
                   impedimentDurationSeconds: 2
                 stacksPerHit: 1
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -457,6 +495,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 0
                   impedimentDurationSeconds: 0
                 stacksPerHit: 0
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -666,6 +742,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 0
                   impedimentDurationSeconds: 0
                 stacksPerHit: 0
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -949,6 +1063,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -1198,6 +1350,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -1470,6 +1660,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -1725,6 +1953,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -1980,6 +2246,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -2158,6 +2462,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -2355,6 +2697,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -2558,6 +2938,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -2781,6 +3199,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 0
                   impedimentDurationSeconds: 0
                 stacksPerHit: 0
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -3064,6 +3520,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -3336,6 +3830,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -3591,6 +4123,44 @@ MonoBehaviour:
                     impedimentMaxSlowPercent: 100
                     impedimentDurationSeconds: 2
                   stacksPerHit: 1
+              bombardier:
+                aimPolicy: 0
+                movementPolicy: 0
+                fireInterval: 2
+                burstCount: 1
+                aimWindupSeconds: 0.45
+                preLaunchStopSeconds: 0.35
+                postLaunchStopSeconds: 0.15
+                intraBurstDelay: 0.15
+                inReachTargetingMode: 1
+                outOfReachTargetingMode: 0
+                launchPattern: 0
+                bombsPerLaunch: 1
+                landingSpreadRadius: 1.25
+                radialPatternRadius: 2
+                randomMinimumDistance: 2
+                randomMaximumDistance: 8
+                trajectoryMode: 0
+                flightDurationSeconds: 1.15
+                gravity: 16
+                apexHeight: 3
+                launchHeightOffset: 0.65
+                landingHeightOffset: 0
+                damage: 12
+                damageRadius: 1.75
+                impactExplosionDelaySeconds: 0
+                bombScaleMultiplier: 1
+                runtimeBomb:
+                  bombPrefab: {fileID: 0}
+                landingWarning:
+                  enableLandingWarning: 1
+                  warningLeadTimeSeconds: 0.75
+                  warningRadiusScale: 1
+                  ringWidth: 0.08
+                  heightOffset: 0.04
+                  maximumAlpha: 0.85
+                  fadeOutSeconds: 0.12
+                  color: {r: 1, g: 0.35, b: 0.05, a: 1}
               powerUpStealer:
                 triggerMode: 1
                 consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -3769,6 +4339,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -3966,6 +4574,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -4169,6 +4815,44 @@ MonoBehaviour:
                 impedimentMaxSlowPercent: 0
                 impedimentDurationSeconds: 0
               stacksPerHit: 0
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 1
             consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -4393,6 +5077,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 100
                   impedimentDurationSeconds: 2
                 stacksPerHit: 1
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0
@@ -4611,6 +5333,44 @@ MonoBehaviour:
                   impedimentMaxSlowPercent: 100
                   impedimentDurationSeconds: 2
                 stacksPerHit: 1
+            bombardier:
+              aimPolicy: 0
+              movementPolicy: 0
+              fireInterval: 2
+              burstCount: 1
+              aimWindupSeconds: 0.45
+              preLaunchStopSeconds: 0.35
+              postLaunchStopSeconds: 0.15
+              intraBurstDelay: 0.15
+              inReachTargetingMode: 1
+              outOfReachTargetingMode: 0
+              launchPattern: 0
+              bombsPerLaunch: 1
+              landingSpreadRadius: 1.25
+              radialPatternRadius: 2
+              randomMinimumDistance: 2
+              randomMaximumDistance: 8
+              trajectoryMode: 0
+              flightDurationSeconds: 1.15
+              gravity: 16
+              apexHeight: 3
+              launchHeightOffset: 0.65
+              landingHeightOffset: 0
+              damage: 12
+              damageRadius: 1.75
+              impactExplosionDelaySeconds: 0
+              bombScaleMultiplier: 1
+              runtimeBomb:
+                bombPrefab: {fileID: 0}
+              landingWarning:
+                enableLandingWarning: 1
+                warningLeadTimeSeconds: 0.75
+                warningRadiusScale: 1
+                ringWidth: 0.08
+                heightOffset: 0.04
+                maximumAlpha: 0.85
+                fadeOutSeconds: 0.12
+                color: {r: 1, g: 0.35, b: 0.05, a: 1}
             powerUpStealer:
               triggerMode: 1
               consumeModuleActivationAttemptOnSpawnOnly: 0

@@ -46,6 +46,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         Transform cameraTransform = ResolveMainCameraTransform((float)SystemAPI.Time.ElapsedTime);
         BufferLookup<EnemyOffensiveEngagementConfigElement> offensiveConfigLookup = SystemAPI.GetBufferLookup<EnemyOffensiveEngagementConfigElement>(true);
         BufferLookup<EnemyShooterRuntimeElement> shooterRuntimeLookup = SystemAPI.GetBufferLookup<EnemyShooterRuntimeElement>(true);
+        BufferLookup<EnemyBombardierRuntimeElement> bombardierRuntimeLookup = SystemAPI.GetBufferLookup<EnemyBombardierRuntimeElement>(true);
         BufferLookup<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimeLookup = SystemAPI.GetBufferLookup<EnemyBossPatternSlotRuntimeElement>(true);
         ComponentLookup<EnemyPatternConfig> patternConfigLookup = SystemAPI.GetComponentLookup<EnemyPatternConfig>(true);
         ComponentLookup<EnemyPatternRuntimeState> patternRuntimeStateLookup = SystemAPI.GetComponentLookup<EnemyPatternRuntimeState>(true);
@@ -71,6 +72,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         {
             DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs = offensiveConfigLookup[enemyEntity];
             DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = shooterRuntimeLookup[enemyEntity];
+            DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime = bombardierRuntimeLookup[enemyEntity];
             bool hasBossSlotRuntimes = bossSlotRuntimeLookup.HasBuffer(enemyEntity);
             DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes = hasBossSlotRuntimes
                 ? bossSlotRuntimeLookup[enemyEntity]
@@ -82,6 +84,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
             EnemyVisualFlashPresentationState currentPresentationState = visualFlashPresentationState.ValueRO;
             EnemyOffensiveEngagementBlendResult offensiveBlendResult = EnemyOffensiveEngagementPresentationUtility.ResolveBlendResult(offensiveEngagementConfigs,
                                                                                                                                      shooterRuntime,
+                                                                                                                                     bombardierRuntime,
                                                                                                                                      hasBossSlotRuntimes,
                                                                                                                                      bossSlotRuntimes,
                                                                                                                                      in currentPatternConfig,
@@ -105,6 +108,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                    cameraTransform,
                                    offensiveEngagementConfigs,
                                    shooterRuntime,
+                                   bombardierRuntime,
                                    hasBossSlotRuntimes,
                                    bossSlotRuntimes,
                                    in currentPatternConfig,
@@ -339,6 +343,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
     /// <param name="offensiveEngagementConfigs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
     /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
     /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
@@ -352,6 +357,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                                Transform cameraTransform,
                                                DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs,
                                                DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                               DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                bool hasBossSlotRuntimes,
                                                DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                in EnemyPatternConfig patternConfig,
@@ -384,6 +390,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
         EnemyOffensiveEngagementBillboardResult billboardResult = EnemyOffensiveEngagementPresentationUtility.ResolveBillboardResult(offensiveEngagementConfigs,
                                                                                                                                    shooterRuntime,
+                                                                                                                                   bombardierRuntime,
                                                                                                                                    hasBossSlotRuntimes,
                                                                                                                                    bossSlotRuntimes,
                                                                                                                                    in patternConfig,

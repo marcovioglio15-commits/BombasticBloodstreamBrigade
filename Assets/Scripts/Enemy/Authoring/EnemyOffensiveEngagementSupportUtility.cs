@@ -101,6 +101,7 @@ public static class EnemyOffensiveEngagementSupportUtility
         switch (moduleKind)
         {
             case EnemyPatternModuleKind.Shooter:
+            case EnemyPatternModuleKind.Bombardier:
                 return EnemyOffensiveEngagementTimingMode.WeaponShot;
 
             case EnemyPatternModuleKind.PowerUpStealer:

@@ -69,6 +69,8 @@ public struct ShootRequest : IBufferElementData
     public ProjectileKnockbackStackingMode KnockbackStackingMode;
     public byte InheritPlayerSpeed;
     public byte IsSplitChild;
+    public int OrbitLayerIndex;
+    public int OrbitLayerCount;
     public ProjectileElementalPayload ElementalPayloadOverride;
 }
 
@@ -172,6 +174,8 @@ public struct ProjectilePerfectCircleState : IComponentData
     public float3 RadialDirection;
     public float3 EntryVelocity;
     public float OrbitPlaneHeight;
+    public int OrbitLayerIndex;
+    public int OrbitLayerCount;
 }
 
 /// <summary>

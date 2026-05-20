@@ -75,6 +75,10 @@ public static class EnemyAdvancedPatternBakeUtility
                         TryAddShooterModule(resolvedPayload, result.ShooterConfigs, ref result);
                         break;
 
+                    case EnemyPatternModuleKind.Bombardier:
+                        EnemyBombardierBakeUtility.TryAddBombardierModule(resolvedPayload, result.BombardierConfigs, ref result);
+                        break;
+
                     case EnemyPatternModuleKind.PowerUpStealer:
                         TryAddPowerUpStealerModule(resolvedPayload, result.PowerUpStealerConfigs);
                         break;
@@ -100,6 +104,8 @@ public static class EnemyAdvancedPatternBakeUtility
         result.ShooterProjectilePoolInitialCapacity = preset != null ? math.max(0, preset.LegacyShooterProjectilePoolInitialCapacity) : 0;
         result.ShooterProjectilePoolExpandBatch = preset != null ? math.max(1, preset.LegacyShooterProjectilePoolExpandBatch) : 1;
         result.HasShooterRuntimeSettings = false;
+        result.BombardierBombPrefab = null;
+        result.HasBombardierRuntimeSettings = false;
         result.DropItemsConfig = EnemyDropItemsBakeUtility.CreateDefaultConfig();
         return result;
     }
@@ -428,6 +434,7 @@ public static class EnemyAdvancedPatternBakeUtility
             case EnemyPatternModuleKind.Coward:
             case EnemyPatternModuleKind.ShortRangeDash:
             case EnemyPatternModuleKind.Shooter:
+            case EnemyPatternModuleKind.Bombardier:
             case EnemyPatternModuleKind.PowerUpStealer:
             case EnemyPatternModuleKind.DropItems:
                 return moduleKind;
@@ -725,8 +732,11 @@ public sealed class EnemyCompiledPatternBakeResult
     public int ShooterProjectilePoolInitialCapacity;
     public int ShooterProjectilePoolExpandBatch;
     public bool HasShooterRuntimeSettings;
+    public GameObject BombardierBombPrefab;
+    public bool HasBombardierRuntimeSettings;
     public EnemyDropItemsConfig DropItemsConfig;
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
+    public readonly List<EnemyBombardierConfigElement> BombardierConfigs = new List<EnemyBombardierConfigElement>();
     public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyCompiledExperienceDropModule> ExperienceDropModules = new List<EnemyCompiledExperienceDropModule>();
     public readonly List<EnemyCompiledExperienceDropDefinition> ExperienceDropDefinitions = new List<EnemyCompiledExperienceDropDefinition>();

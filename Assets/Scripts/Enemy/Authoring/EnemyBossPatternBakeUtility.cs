@@ -83,6 +83,8 @@ internal static class EnemyBossPatternBakeUtility
                 HasCustomMovement = 0,
                 FirstShooterConfigIndex = 0,
                 ShooterConfigCount = 0,
+                FirstBombardierConfigIndex = 0,
+                BombardierConfigCount = 0,
                 FirstOffensiveEngagementConfigIndex = 0,
                 OffensiveEngagementConfigCount = 0,
                 PatternConfig = EnemyPatternDefaultsUtility.CreatePatternConfig()
@@ -212,6 +214,25 @@ internal static class EnemyBossPatternBakeUtility
     }
 
     /// <summary>
+    /// Appends one compiled pattern Bombardier slice to the boss-owned source buffer.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern providing Bombardier configs.</param>
+    /// <param name="result">Mutable boss compile result.</param>
+    /// <returns>First appended Bombardier config index.</returns>
+    internal static int AppendBombardierConfigs(EnemyCompiledPatternBakeResult compiledPattern, EnemyCompiledBossPatternBakeResult result)
+    {
+        if (compiledPattern == null || result == null)
+            return 0;
+
+        int firstBombardierConfigIndex = result.BombardierConfigs.Count;
+
+        for (int bombardierIndex = 0; bombardierIndex < compiledPattern.BombardierConfigs.Count; bombardierIndex++)
+            result.BombardierConfigs.Add(compiledPattern.BombardierConfigs[bombardierIndex]);
+
+        return firstBombardierConfigIndex;
+    }
+
+    /// <summary>
     /// Appends one compiled pattern Power-Up Stealer slice to the boss-owned source buffer.
     /// </summary>
     /// <param name="compiledPattern">Compiled pattern providing Power-Up Stealer configs.</param>
@@ -264,6 +285,8 @@ internal static class EnemyBossPatternBakeUtility
         result.InitialPattern.ShooterProjectilePoolInitialCapacity = result.ShooterProjectilePoolInitialCapacity;
         result.InitialPattern.ShooterProjectilePoolExpandBatch = result.ShooterProjectilePoolExpandBatch;
         result.InitialPattern.HasShooterRuntimeSettings = result.HasShooterRuntimeSettings;
+        result.InitialPattern.BombardierBombPrefab = result.BombardierBombPrefab;
+        result.InitialPattern.HasBombardierRuntimeSettings = result.HasBombardierRuntimeSettings;
         result.InitialPattern.HasCustomMovement = ResolveAnyModuleCandidateHasCustomMovement(result);
         EnemyBossDropExtractionBakeUtility.CopyBossDropUnionToInitialPattern(result);
     }
@@ -406,6 +429,24 @@ internal static class EnemyBossPatternBakeUtility
         result.ShooterProjectilePoolExpandBatch = compiledPattern.ShooterProjectilePoolExpandBatch;
         result.HasShooterRuntimeSettings = true;
     }
+
+    /// <summary>
+    /// Copies the first available Bombardier runtime bomb settings from a compiled pattern into the boss result.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern that may contain Bombardier runtime settings.</param>
+    /// <param name="result">Mutable boss bake result.</param>
+    internal static void TryAssignBombardierRuntimeSettings(EnemyCompiledPatternBakeResult compiledPattern,
+                                                            EnemyCompiledBossPatternBakeResult result)
+    {
+        if (compiledPattern == null || result == null)
+            return;
+
+        if (result.HasBombardierRuntimeSettings || !compiledPattern.HasBombardierRuntimeSettings)
+            return;
+
+        result.BombardierBombPrefab = compiledPattern.BombardierBombPrefab;
+        result.HasBombardierRuntimeSettings = true;
+    }
     #endregion
 
     #endregion
@@ -423,6 +464,7 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public readonly List<EnemyBossPatternModuleExtractionElement> ModuleExtractions = new List<EnemyBossPatternModuleExtractionElement>();
     public readonly List<EnemyBossPatternModuleCandidateElement> ModuleCandidates = new List<EnemyBossPatternModuleCandidateElement>();
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
+    public readonly List<EnemyBombardierConfigElement> BombardierConfigs = new List<EnemyBombardierConfigElement>();
     public readonly List<EnemyPowerUpStealerConfigElement> PowerUpStealerConfigs = new List<EnemyPowerUpStealerConfigElement>();
     public readonly List<EnemyOffensiveEngagementConfigElement> OffensiveEngagementConfigs = new List<EnemyOffensiveEngagementConfigElement>();
     public readonly List<EnemyBossMinionSpawnElement> MinionSpawns = new List<EnemyBossMinionSpawnElement>();
@@ -437,6 +479,8 @@ internal sealed class EnemyCompiledBossPatternBakeResult
     public int ShooterProjectilePoolInitialCapacity;
     public int ShooterProjectilePoolExpandBatch;
     public bool HasShooterRuntimeSettings;
+    public GameObject BombardierBombPrefab;
+    public bool HasBombardierRuntimeSettings;
     public bool BossDropExtractionEnabled;
     public EnemyBossDropExtractionMode BossDropExtractionMode;
     public bool RerollWhenCurrentPatternBecomesInvalid;

@@ -150,9 +150,13 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
                                                            VisualElement parent)
     {
         GameObject firstProjectilePrefab = null;
+        GameObject firstBombPrefab = null;
         bool hasShooterSlot = false;
+        bool hasBombardierSlot = false;
         bool hasMissingProjectilePrefab = false;
+        bool hasMissingBombPrefab = false;
         bool hasConflictingProjectilePrefab = false;
+        bool hasConflictingBombPrefab = false;
 
         if (interactionsProperty != null)
         {
@@ -166,16 +170,20 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
                 InspectWeaponExtraction(interactionProperty.FindPropertyRelative("weaponExtraction"),
                                         sourcePreset,
                                         ref firstProjectilePrefab,
+                                        ref firstBombPrefab,
                                         ref hasShooterSlot,
+                                        ref hasBombardierSlot,
                                         ref hasMissingProjectilePrefab,
-                                        ref hasConflictingProjectilePrefab);
+                                        ref hasMissingBombPrefab,
+                                        ref hasConflictingProjectilePrefab,
+                                        ref hasConflictingBombPrefab);
             }
         }
 
-        if (!hasShooterSlot)
+        if (!hasShooterSlot && !hasBombardierSlot)
             return;
 
-        if (firstProjectilePrefab == null)
+        if (hasShooterSlot && firstProjectilePrefab == null)
             parent.Add(new HelpBox("Weapon Interaction slots are enabled, but none resolves a Runtime Projectile prefab. Assign a prefab in the source Shooter module or in the slot override payload.", HelpBoxMessageType.Warning));
 
         if (hasMissingProjectilePrefab && firstProjectilePrefab != null)
@@ -183,6 +191,15 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
         if (hasConflictingProjectilePrefab)
             parent.Add(new HelpBox("Enabled Weapon Interaction slots resolve different Runtime Projectile prefabs. The current ECS shooter runtime owns one projectile prefab pool per enemy, so boss weapon slots should share the same Runtime Projectile prefab and use projectile payload tuning for variations.", HelpBoxMessageType.Warning));
+
+        if (hasBombardierSlot && firstBombPrefab == null)
+            parent.Add(new HelpBox("Weapon Interaction slots are enabled, but none resolves a Runtime Bomb prefab. Assign a prefab in the source Bombardier module or in the slot override payload.", HelpBoxMessageType.Warning));
+
+        if (hasMissingBombPrefab && firstBombPrefab != null)
+            parent.Add(new HelpBox("One or more enabled Bombardier weapon slots resolve without a Runtime Bomb prefab. Those launch requests will be discarded at runtime.", HelpBoxMessageType.Info));
+
+        if (hasConflictingBombPrefab)
+            parent.Add(new HelpBox("Enabled Bombardier weapon slots resolve different Runtime Bomb prefabs. The current boss Bombardier runtime owns one bomb prefab binding per enemy, so boss weapon slots should share the same Runtime Bomb prefab and use payload tuning for variations.", HelpBoxMessageType.Warning));
     }
     #endregion
 
@@ -193,15 +210,23 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     /// <param name="weaponExtractionProperty">Serialized weapon extraction root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
+    /// <param name="firstBombPrefab">First resolved Bombardier bomb prefab.</param>
     /// <param name="hasShooterSlot">Tracks whether any enabled weapon slot resolves to Shooter.</param>
+    /// <param name="hasBombardierSlot">Tracks whether any enabled weapon slot resolves to Bombardier.</param>
     /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
+    /// <param name="hasMissingBombPrefab">Tracks missing Bombardier prefab slots.</param>
     /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
+    /// <param name="hasConflictingBombPrefab">Tracks conflicting Bombardier prefab slots.</param>
     private static void InspectWeaponExtraction(SerializedProperty weaponExtractionProperty,
                                                 EnemyModulesAndPatternsPreset sourcePreset,
                                                 ref GameObject firstProjectilePrefab,
+                                                ref GameObject firstBombPrefab,
                                                 ref bool hasShooterSlot,
+                                                ref bool hasBombardierSlot,
                                                 ref bool hasMissingProjectilePrefab,
-                                                ref bool hasConflictingProjectilePrefab)
+                                                ref bool hasMissingBombPrefab,
+                                                ref bool hasConflictingProjectilePrefab,
+                                                ref bool hasConflictingBombPrefab)
     {
         SerializedProperty candidatesProperty = weaponExtractionProperty != null
             ? weaponExtractionProperty.FindPropertyRelative("candidates")
@@ -226,33 +251,56 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
             InspectWeaponSlot(candidateProperty != null ? candidateProperty.FindPropertyRelative("interaction") : null,
                               sourcePreset,
                               ref firstProjectilePrefab,
+                              ref firstBombPrefab,
                               ref hasShooterSlot,
+                              ref hasBombardierSlot,
                               ref hasMissingProjectilePrefab,
-                              ref hasConflictingProjectilePrefab);
+                              ref hasMissingBombPrefab,
+                              ref hasConflictingProjectilePrefab,
+                              ref hasConflictingBombPrefab);
         }
     }
 
     /// <summary>
-    /// Inspects one serialized weapon slot for projectile prefab availability and conflicts.
+    /// Inspects one serialized weapon slot for weapon runtime prefab availability and conflicts.
     /// </summary>
     /// <param name="weaponSlotProperty">Serialized weapon slot root.</param>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="firstProjectilePrefab">First resolved projectile prefab.</param>
+    /// <param name="firstBombPrefab">First resolved Bombardier bomb prefab.</param>
     /// <param name="hasShooterSlot">Tracks whether any enabled weapon slot resolves to Shooter.</param>
+    /// <param name="hasBombardierSlot">Tracks whether any enabled weapon slot resolves to Bombardier.</param>
     /// <param name="hasMissingProjectilePrefab">Tracks missing prefab slots.</param>
+    /// <param name="hasMissingBombPrefab">Tracks missing Bombardier prefab slots.</param>
     /// <param name="hasConflictingProjectilePrefab">Tracks conflicting prefab slots.</param>
+    /// <param name="hasConflictingBombPrefab">Tracks conflicting Bombardier prefab slots.</param>
     private static void InspectWeaponSlot(SerializedProperty weaponSlotProperty,
                                           EnemyModulesAndPatternsPreset sourcePreset,
                                           ref GameObject firstProjectilePrefab,
+                                          ref GameObject firstBombPrefab,
                                           ref bool hasShooterSlot,
+                                          ref bool hasBombardierSlot,
                                           ref bool hasMissingProjectilePrefab,
-                                          ref bool hasConflictingProjectilePrefab)
+                                          ref bool hasMissingBombPrefab,
+                                          ref bool hasConflictingProjectilePrefab,
+                                          ref bool hasConflictingBombPrefab)
     {
         if (!IsEnabledSlot(weaponSlotProperty))
             return;
 
         if (!TryResolveWeaponModuleKind(weaponSlotProperty.FindPropertyRelative("binding"), sourcePreset, out EnemyPatternModuleKind moduleKind))
             return;
+
+        if (moduleKind == EnemyPatternModuleKind.Bombardier)
+        {
+            InspectBombardierPrefab(weaponSlotProperty,
+                                    sourcePreset,
+                                    ref firstBombPrefab,
+                                    ref hasBombardierSlot,
+                                    ref hasMissingBombPrefab,
+                                    ref hasConflictingBombPrefab);
+            return;
+        }
 
         if (moduleKind != EnemyPatternModuleKind.Shooter)
             return;
@@ -274,6 +322,41 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
 
         if (firstProjectilePrefab != projectilePrefab)
             hasConflictingProjectilePrefab = true;
+    }
+
+    /// <summary>
+    /// Inspects one Bombardier weapon slot for bomb prefab availability and conflicts.
+    /// </summary>
+    /// <param name="weaponSlotProperty">Serialized weapon slot root.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="firstBombPrefab">First resolved Bombardier bomb prefab.</param>
+    /// <param name="hasBombardierSlot">Tracks whether any enabled weapon slot resolves to Bombardier.</param>
+    /// <param name="hasMissingBombPrefab">Tracks missing Bombardier prefab slots.</param>
+    /// <param name="hasConflictingBombPrefab">Tracks conflicting Bombardier prefab slots.</param>
+    private static void InspectBombardierPrefab(SerializedProperty weaponSlotProperty,
+                                                EnemyModulesAndPatternsPreset sourcePreset,
+                                                ref GameObject firstBombPrefab,
+                                                ref bool hasBombardierSlot,
+                                                ref bool hasMissingBombPrefab,
+                                                ref bool hasConflictingBombPrefab)
+    {
+        hasBombardierSlot = true;
+
+        if (!TryResolveWeaponRuntimeBomb(weaponSlotProperty.FindPropertyRelative("binding"), sourcePreset, out GameObject bombPrefab) ||
+            bombPrefab == null)
+        {
+            hasMissingBombPrefab = true;
+            return;
+        }
+
+        if (firstBombPrefab == null)
+        {
+            firstBombPrefab = bombPrefab;
+            return;
+        }
+
+        if (firstBombPrefab != bombPrefab)
+            hasConflictingBombPrefab = true;
     }
 
     /// <summary>
@@ -352,6 +435,39 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
     }
 
     /// <summary>
+    /// Resolves the Runtime Bomb prefab used by one weapon binding, including payload overrides.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized weapon binding.</param>
+    /// <param name="sourcePreset">Source module catalog.</param>
+    /// <param name="bombPrefab">Output bomb prefab reference.</param>
+    /// <returns>True when a Bombardier payload was resolved, even if the prefab reference is empty.</returns>
+    private static bool TryResolveWeaponRuntimeBomb(SerializedProperty bindingProperty,
+                                                    EnemyModulesAndPatternsPreset sourcePreset,
+                                                    out GameObject bombPrefab)
+    {
+        bombPrefab = null;
+
+        if (!TryResolveWeaponModuleDefinition(bindingProperty, sourcePreset, out EnemyPatternModuleDefinition moduleDefinition))
+            return false;
+
+        SerializedProperty useOverridePayloadProperty = bindingProperty.FindPropertyRelative("useOverridePayload");
+
+        if (useOverridePayloadProperty != null && useOverridePayloadProperty.boolValue)
+            return TryReadOverrideRuntimeBomb(bindingProperty.FindPropertyRelative("overridePayload"), out bombPrefab);
+
+        if (moduleDefinition.ModuleKind != EnemyPatternModuleKind.Bombardier)
+            return false;
+
+        EnemyPatternModulePayloadData payloadData = moduleDefinition.Data;
+
+        if (payloadData == null || payloadData.Bombardier == null || payloadData.Bombardier.RuntimeBomb == null)
+            return false;
+
+        bombPrefab = payloadData.Bombardier.RuntimeBomb.BombPrefab;
+        return true;
+    }
+
+    /// <summary>
     /// Reads the nested Runtime Projectile prefab from a serialized override payload.
     /// </summary>
     /// <param name="overridePayloadProperty">Serialized override payload root.</param>
@@ -377,6 +493,35 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
             return false;
 
         projectilePrefab = projectilePrefabProperty.objectReferenceValue as GameObject;
+        return true;
+    }
+
+    /// <summary>
+    /// Reads the nested Runtime Bomb prefab from a serialized override payload.
+    /// </summary>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="bombPrefab">Output bomb prefab reference.</param>
+    /// <returns>True when the override payload path exists.</returns>
+    private static bool TryReadOverrideRuntimeBomb(SerializedProperty overridePayloadProperty,
+                                                   out GameObject bombPrefab)
+    {
+        bombPrefab = null;
+
+        if (overridePayloadProperty == null)
+            return false;
+
+        SerializedProperty bombardierProperty = overridePayloadProperty.FindPropertyRelative("bombardier");
+        SerializedProperty runtimeBombProperty = bombardierProperty != null
+            ? bombardierProperty.FindPropertyRelative("runtimeBomb")
+            : null;
+        SerializedProperty bombPrefabProperty = runtimeBombProperty != null
+            ? runtimeBombProperty.FindPropertyRelative("bombPrefab")
+            : null;
+
+        if (bombPrefabProperty == null)
+            return false;
+
+        bombPrefab = bombPrefabProperty.objectReferenceValue as GameObject;
         return true;
     }
     #endregion

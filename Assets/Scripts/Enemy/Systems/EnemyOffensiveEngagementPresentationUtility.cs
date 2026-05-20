@@ -18,6 +18,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// </summary>
     /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
     /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
     /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
@@ -25,6 +26,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// <returns>The strongest active color-blend result, or an inactive result when no warning window is currently open.</returns>
     public static EnemyOffensiveEngagementBlendResult ResolveBlendResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                          DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                                         DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                                          bool hasBossSlotRuntimes,
                                                                          DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                                          in EnemyPatternConfig patternConfig,
@@ -46,6 +48,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
                                    config.Source,
                                    config.ColorBlendLeadTimeSeconds,
                                    shooterRuntime,
+                                   bombardierRuntime,
                                    hasBossSlotRuntimes,
                                    bossSlotRuntimes,
                                    patternConfig,
@@ -76,6 +79,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// </summary>
     /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
     /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
     /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
@@ -83,6 +87,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// <returns>The strongest active billboard result, or an inactive result when no billboard window is currently open.</returns>
     public static EnemyOffensiveEngagementBillboardResult ResolveBillboardResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
                                                                                  DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                                                 DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                                                  bool hasBossSlotRuntimes,
                                                                                  DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                                                                  in EnemyPatternConfig patternConfig,
@@ -105,6 +110,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
                                    config.Source,
                                    config.BillboardLeadTimeSeconds,
                                    shooterRuntime,
+                                   bombardierRuntime,
                                    hasBossSlotRuntimes,
                                    bossSlotRuntimes,
                                    patternConfig,
@@ -240,6 +246,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// <param name="source">Source slot that owns the current baked config.</param>
     /// <param name="leadTimeSeconds">Requested lead time for the current visual channel.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
     /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
     /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
@@ -250,6 +257,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
                                           EnemyOffensiveEngagementTriggerSource source,
                                           float leadTimeSeconds,
                                           DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                          DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                           bool hasBossSlotRuntimes,
                                           DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
                                           in EnemyPatternConfig patternConfig,
@@ -262,7 +270,7 @@ internal static class EnemyOffensiveEngagementPresentationUtility
                 return TryEvaluateShortRangeDashWindow(leadTimeSeconds, patternConfig, patternRuntimeState, out window);
 
             case EnemyOffensiveEngagementTimingMode.WeaponShot:
-                return TryEvaluateWeaponShotWindow(leadTimeSeconds, shooterRuntime, out window);
+                return TryEvaluateWeaponShotWindow(leadTimeSeconds, shooterRuntime, bombardierRuntime, out window);
 
             case EnemyOffensiveEngagementTimingMode.ModuleActivation:
                 return TryEvaluateModuleActivationWindow(source,
@@ -370,10 +378,12 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// </summary>
     /// <param name="leadTimeSeconds">Requested visual lead time for idle pre-burst windows.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer.</param>
     /// <param name="window">Active warning window data when evaluation succeeds.</param>
     /// <returns>True when at least one shooter slot is currently inside a valid warning window.</returns>
     private static bool TryEvaluateWeaponShotWindow(float leadTimeSeconds,
                                                     DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                    DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                     out EnemyOffensiveEngagementWindow window)
     {
         window = default(EnemyOffensiveEngagementWindow);
@@ -428,6 +438,51 @@ internal static class EnemyOffensiveEngagementPresentationUtility
             {
                 continue;
             }
+
+            hasActiveWindow = true;
+            bestProgress = candidateProgress;
+            bestElapsedSeconds = candidateElapsedSeconds;
+        }
+
+        for (int bombardierIndex = 0; bombardierIndex < bombardierRuntime.Length; bombardierIndex++)
+        {
+            EnemyBombardierRuntimeElement runtime = bombardierRuntime[bombardierIndex];
+
+            if (runtime.IsLaunchAllowed == 0)
+                continue;
+
+            float candidateProgress = 0f;
+            float candidateElapsedSeconds = 0f;
+            bool hasCandidateWindow = false;
+
+            if (runtime.RemainingBurstLaunches > 0 && runtime.LaunchesCompletedInCurrentBurst <= 0)
+            {
+                float windupDurationSeconds = math.max(0f, runtime.BurstWindupDurationSeconds);
+
+                if (windupDurationSeconds > 0f)
+                {
+                    float timeUntilCommitSeconds = math.clamp(runtime.NextBombInBurstTimer, 0f, windupDurationSeconds);
+                    candidateProgress = 1f - math.saturate(timeUntilCommitSeconds / windupDurationSeconds);
+                    candidateElapsedSeconds = math.max(0f, windupDurationSeconds - timeUntilCommitSeconds);
+                    hasCandidateWindow = true;
+                }
+            }
+            else if (runtime.RemainingBurstLaunches <= 0 &&
+                     safeLeadTimeSeconds > 0f &&
+                     runtime.NextBurstTimer > 0f &&
+                     runtime.NextBurstTimer <= safeLeadTimeSeconds)
+            {
+                float timeUntilCommitSeconds = math.clamp(runtime.NextBurstTimer, 0f, safeLeadTimeSeconds);
+                candidateProgress = 1f - math.saturate(timeUntilCommitSeconds / safeLeadTimeSeconds);
+                candidateElapsedSeconds = math.max(0f, safeLeadTimeSeconds - timeUntilCommitSeconds);
+                hasCandidateWindow = true;
+            }
+
+            if (!hasCandidateWindow)
+                continue;
+
+            if (candidateProgress <= bestProgress)
+                continue;
 
             hasActiveWindow = true;
             bestProgress = candidateProgress;

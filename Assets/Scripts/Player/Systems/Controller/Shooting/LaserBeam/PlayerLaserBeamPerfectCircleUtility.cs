@@ -24,6 +24,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// </summary>
     /// <param name="laneBuffer">Output segment buffer.</param>
     /// <param name="laneIndex">Stable lane index assigned to all appended segments.</param>
+    /// <param name="laneCount">Total number of sibling lanes emitted by the current beam group.</param>
     /// <param name="isSplitChild">True when the lane belongs to one split child branch.</param>
     /// <param name="shooterEntity">Player entity used for deterministic seed reconstruction.</param>
     /// <param name="shooterPosition">Current shooter position used by orbit phases.</param>
@@ -31,7 +32,6 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// <param name="startPoint">World-space lane origin.</param>
     /// <param name="direction">Current lane forward direction.</param>
     /// <param name="activeSeconds">Consecutive active time currently accumulated by the beam.</param>
-    /// <param name="globalTime">Current world elapsed time in seconds.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
     /// <param name="speedMultiplier">Beam-local speed multiplier applied on top of Perfect Circle motion speeds.</param>
@@ -46,6 +46,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// <returns>True when at least one beam segment was appended.</returns>
     internal static bool TryAppendPerfectCircleLaneSegments(ref DynamicBuffer<PlayerLaserBeamLaneElement> laneBuffer,
                                                             int laneIndex,
+                                                            int laneCount,
                                                             bool isSplitChild,
                                                             Entity shooterEntity,
                                                             float3 shooterPosition,
@@ -53,7 +54,6 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                                                             float3 startPoint,
                                                             float3 direction,
                                                             float activeSeconds,
-                                                            float globalTime,
                                                             float rangeLimit,
                                                             float lifetimeLimit,
                                                             float speedMultiplier,
@@ -74,11 +74,11 @@ internal static class PlayerLaserBeamPerfectCircleUtility
 
         ProjectilePerfectCircleState perfectCircleState = BuildPerfectCircleState(in perfectCircleConfig,
                                                                                   laneIndex,
+                                                                                  laneCount,
                                                                                   shooterEntity,
                                                                                   startPoint,
                                                                                   direction,
                                                                                   speedMultiplier);
-        float activationStartGlobalTime = globalTime - math.max(0f, activeSeconds);
         float maximumTravelDistance = ResolveMaximumTravelDistance(rangeLimit, lifetimeLimit);
         float simulatedSeconds = 0f;
         float accumulatedDistance = 0f;
@@ -93,11 +93,11 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                simulationIterationCount < MaximumSimulationIterations)
         {
             simulationIterationCount++;
-            float sampleGlobalTime = activationStartGlobalTime + simulatedSeconds;
+            float sampleTrajectoryTime = simulatedSeconds;
             float simulationDeltaTime = ResolveSimulationDeltaTime(in perfectCircleState,
                                                                   in perfectCircleConfig,
                                                                   speedMultiplier,
-                                                                  sampleGlobalTime);
+                                                                  sampleTrajectoryTime);
             float remainingSeconds = maximumSimulationSeconds - simulatedSeconds;
 
             if (simulationDeltaTime > remainingSeconds)
@@ -111,7 +111,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
                                                         shooterVelocity,
                                                         currentPosition,
                                                         simulationDeltaTime,
-                                                        sampleGlobalTime + simulationDeltaTime,
+                                                        sampleTrajectoryTime + simulationDeltaTime,
                                                         speedMultiplier,
                                                         in perfectCircleConfig);
             float3 requestedDisplacement = nextPosition - currentPosition;
@@ -297,6 +297,7 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// </summary>
     /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
     /// <param name="laneIndex">Stable lane index used as request index surrogate.</param>
+    /// <param name="laneCount">Total number of sibling lanes emitted by the current beam group.</param>
     /// <param name="shooterEntity">Player entity used for deterministic seed reconstruction.</param>
     /// <param name="startPoint">World-space origin used as entry origin.</param>
     /// <param name="direction">Initial radial direction of the sampled lane.</param>
@@ -304,11 +305,14 @@ internal static class PlayerLaserBeamPerfectCircleUtility
     /// <returns>One initialized Perfect Circle state ready for sampled simulation.</returns>
     private static ProjectilePerfectCircleState BuildPerfectCircleState(in PerfectCirclePassiveConfig perfectCircleConfig,
                                                                         int laneIndex,
+                                                                        int laneCount,
                                                                         Entity shooterEntity,
                                                                         float3 startPoint,
                                                                         float3 direction,
                                                                         float speedMultiplier)
     {
+        int safeLaneCount = math.max(1, laneCount);
+        int safeLaneIndex = math.abs(laneIndex) % safeLaneCount;
         float seed = laneIndex + shooterEntity.Index * 13f;
         float angleRadians = math.radians(math.max(0f, perfectCircleConfig.GoldenAngleDegrees) * seed);
         float3 radialDirection = direction;
@@ -331,7 +335,9 @@ internal static class PlayerLaserBeamPerfectCircleUtility
             AccumulatedOrbitRadians = 0f,
             RadialDirection = radialDirection,
             EntryVelocity = radialDirection * radialEntrySpeed,
-            OrbitPlaneHeight = 0f
+            OrbitPlaneHeight = 0f,
+            OrbitLayerIndex = safeLaneIndex,
+            OrbitLayerCount = safeLaneCount
         };
     }
 

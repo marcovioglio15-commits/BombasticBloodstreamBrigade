@@ -310,6 +310,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                                                           request.Position,
                                                                                           direction,
                                                                                           projectileData.Velocity,
+                                                                                          request.OrbitLayerIndex,
+                                                                                          request.OrbitLayerCount,
                                                                                           passiveToolsState.HasPerfectCircle != 0);
                 perfectCircleLookup[projectileEntity] = perfectCircleState;
 
@@ -472,11 +474,14 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                                         float3 spawnPosition,
                                                                         float3 direction,
                                                                         float3 entryVelocity,
+                                                                        int orbitLayerIndex,
+                                                                        int orbitLayerCount,
                                                                         bool isEnabled)
     {
         if (!isEnabled)
             return default;
 
+        int safeOrbitLayerCount = math.max(1, orbitLayerCount);
         float seed = requestIndex + shooterEntity.Index * 13f;
         float angleRadians = math.radians(math.max(0f, perfectCircleConfig.GoldenAngleDegrees) * seed);
         float3 radialDirection = direction;
@@ -499,7 +504,9 @@ public partial struct ProjectileSpawnSystem : ISystem
             AccumulatedOrbitRadians = 0f,
             RadialDirection = radialDirection,
             EntryVelocity = entryVelocity,
-            OrbitPlaneHeight = 0f
+            OrbitPlaneHeight = 0f,
+            OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
+            OrbitLayerCount = safeOrbitLayerCount
         };
     }
 

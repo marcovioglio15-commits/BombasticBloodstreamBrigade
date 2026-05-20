@@ -12,7 +12,8 @@ public enum EnemyPatternModuleKind
     DropItems = 4,
     Coward = 5,
     ShortRangeDash = 6,
-    PowerUpStealer = 7
+    PowerUpStealer = 7,
+    Bombardier = 8
 }
 
 /// <summary>
@@ -79,6 +80,35 @@ public enum EnemyShooterShotPattern
 {
     ForwardSpread = 0,
     RadialBurst = 1
+}
+
+/// <summary>
+/// Declares how Bombardier modules select landing targets in a reach state.
+/// </summary>
+public enum EnemyBombardierTargetingMode
+{
+    Disabled = 0,
+    Player = 1,
+    RandomAroundEnemy = 2,
+    RandomAroundPlayer = 3
+}
+
+/// <summary>
+/// Declares how one Bombardier launch distributes its bomb group.
+/// </summary>
+public enum EnemyBombardierLaunchPattern
+{
+    Cluster = 0,
+    Radial = 1
+}
+
+/// <summary>
+/// Declares how Bombardier trajectory velocity is solved.
+/// </summary>
+public enum EnemyBombardierTrajectoryMode
+{
+    FixedFlightTimeAndGravity = 0,
+    FixedApexHeight = 1
 }
 
 /// <summary>

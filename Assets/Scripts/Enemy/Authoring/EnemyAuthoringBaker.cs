@@ -105,6 +105,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         DynamicBuffer<EnemyShooterConfigElement> shooterConfigs = AddBuffer<EnemyShooterConfigElement>(entity);
         DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime = AddBuffer<EnemyShooterRuntimeElement>(entity);
+        DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs = AddBuffer<EnemyBombardierConfigElement>(entity);
+        DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime = AddBuffer<EnemyBombardierRuntimeElement>(entity);
+        AddBuffer<EnemyBombardierLaunchRequest>(entity);
         DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs = AddBuffer<EnemyPowerUpStealerConfigElement>(entity);
         DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime = AddBuffer<EnemyPowerUpStealerRuntimeElement>(entity);
         DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs = AddBuffer<EnemyOffensiveEngagementConfigElement>(entity);
@@ -126,6 +129,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             });
         }
 
+        for (int bombardierIndex = 0; bombardierIndex < compiledPattern.BombardierConfigs.Count; bombardierIndex++)
+        {
+            bombardierConfigs.Add(compiledPattern.BombardierConfigs[bombardierIndex]);
+            bombardierRuntime.Add(CreateDefaultBombardierRuntime());
+        }
+
         for (int stealerIndex = 0; stealerIndex < compiledPattern.PowerUpStealerConfigs.Count; stealerIndex++)
         {
             stealerConfigs.Add(compiledPattern.PowerUpStealerConfigs[stealerIndex]);
@@ -142,6 +151,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         if (ShouldBakeShooterRuntime(compiledPattern))
         {
             TryBakeShooterRuntime(authoring, entity, compiledPattern);
+        }
+
+        if (ShouldBakeBombardierRuntime(compiledPattern))
+        {
+            TryBakeBombardierRuntime(authoring, entity, compiledPattern);
         }
 
         TryBakeDropItemsRuntime(authoring,
@@ -301,6 +315,42 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
+    /// Resolves whether this enemy needs Bombardier runtime prefab support during bake.
+    /// Boss pattern presets may start with an empty active Bombardier list while still owning weapon candidates that are applied later.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern result produced from advanced or boss pattern presets.</param>
+    /// <returns>True when Bombardier configs or deferred runtime settings require bomb ECS support.</returns>
+    private static bool ShouldBakeBombardierRuntime(EnemyCompiledPatternBakeResult compiledPattern)
+    {
+        if (compiledPattern == null)
+            return false;
+
+        return compiledPattern.BombardierConfigs.Count > 0 || compiledPattern.HasBombardierRuntimeSettings;
+    }
+
+    /// <summary>
+    /// Creates a clean Bombardier runtime state for a freshly baked module.
+    /// </summary>
+    /// <returns>Default Bombardier runtime element.</returns>
+    private static EnemyBombardierRuntimeElement CreateDefaultBombardierRuntime()
+    {
+        return new EnemyBombardierRuntimeElement
+        {
+            NextBurstTimer = 0f,
+            NextBombInBurstTimer = 0f,
+            PostLaunchStopTimer = 0f,
+            RemainingBurstLaunches = 0,
+            LaunchesCompletedInCurrentBurst = 0,
+            BurstWindupDurationSeconds = 0f,
+            IsPlayerInReach = 0,
+            IsLaunchAllowed = 0,
+            LockedTargetPosition = float3.zero,
+            HasLockedTargetPosition = 0,
+            RandomState = 0u
+        };
+    }
+
+    /// <summary>
     /// Keeps the active boss offensive engagement buffer empty until the first runtime pattern extraction.
     /// </summary>
     /// <param name="compiledBossPattern">Compiled boss pattern data.</param>
@@ -336,6 +386,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             UseDamageWindowExtraction = compiledBossPattern.UseDamageWindowExtraction ? (byte)1 : (byte)0,
             FirstShooterConfigIndex = 0,
             ShooterConfigCount = 0,
+            FirstBombardierConfigIndex = 0,
+            BombardierConfigCount = 0,
             FirstOffensiveEngagementConfigIndex = 0,
             OffensiveEngagementConfigCount = 0,
             PlayerDistanceCondition = compiledBossPattern.PlayerDistanceCondition,
@@ -406,6 +458,16 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             bossShooterBuffer.Add(new EnemyBossPatternShooterConfigElement
             {
                 ShooterConfig = compiledBossPattern.ShooterConfigs[shooterIndex]
+            });
+        }
+
+        DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierBuffer = AddBuffer<EnemyBossPatternBombardierConfigElement>(entity);
+
+        for (int bombardierIndex = 0; bombardierIndex < compiledBossPattern.BombardierConfigs.Count; bombardierIndex++)
+        {
+            bossBombardierBuffer.Add(new EnemyBossPatternBombardierConfigElement
+            {
+                BombardierConfig = compiledBossPattern.BombardierConfigs[bombardierIndex]
             });
         }
 
@@ -836,6 +898,44 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         });
         AddBuffer<ShootRequest>(entity);
         AddBuffer<ProjectilePoolElement>(entity);
+    }
+
+    /// <summary>
+    /// Bakes Bombardier runtime prefab binding used by enemy bomb spawn systems.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used for prefab validation.</param>
+    /// <param name="entity">Enemy entity receiving the Bombardier prefab binding.</param>
+    /// <param name="compiledPattern">Compiled pattern providing Bombardier runtime prefab settings.</param>
+    private void TryBakeBombardierRuntime(EnemyAuthoring authoring, Entity entity, EnemyCompiledPatternBakeResult compiledPattern)
+    {
+        if (authoring == null)
+            return;
+
+        if (compiledPattern == null)
+            return;
+
+        GameObject bombPrefabObject = compiledPattern.BombardierBombPrefab;
+
+        if (EnemyAuthoringValidationUtility.IsInvalidBombardierBombPrefab(authoring, bombPrefabObject))
+        {
+#if UNITY_EDITOR
+            if (bombPrefabObject == null)
+                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Bombardier modules are active on '{0}', but Runtime Bomb prefab is not assigned in the resolved Bombardier payload.", authoring.name), authoring);
+            else
+                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid Runtime Bomb prefab '{0}' on '{1}'. Assign a dedicated bomb prefab without authoring components.", bombPrefabObject.name, authoring.name), authoring);
+#endif
+            AddComponent(entity, new EnemyBombardierBombPrefab
+            {
+                PrefabEntity = Entity.Null
+            });
+            return;
+        }
+
+        Entity bombPrefabEntity = GetEntity(bombPrefabObject, TransformUsageFlags.Dynamic);
+        AddComponent(entity, new EnemyBombardierBombPrefab
+        {
+            PrefabEntity = bombPrefabEntity
+        });
     }
 
     /// <summary>

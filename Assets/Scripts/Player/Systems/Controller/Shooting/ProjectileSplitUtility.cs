@@ -51,7 +51,7 @@ public static class ProjectileSplitUtility
 
         Entity shooterEntity = projectileOwner.ShooterEntity;
 
-        if (shootRequestLookup.HasBuffer(shooterEntity) == false)
+        if (!shootRequestLookup.HasBuffer(shooterEntity))
             return;
 
         DynamicBuffer<ShootRequest> shootRequests = shootRequestLookup[shooterEntity];
@@ -160,7 +160,9 @@ public static class ProjectileSplitUtility
                                  splitScaleMultiplier,
                                  in sourceProjectile,
                                  in elementalPayload,
-                                 inheritPlayerSpeed);
+                                 inheritPlayerSpeed,
+                                 splitIndex,
+                                 splitCount);
         }
     }
 
@@ -179,6 +181,7 @@ public static class ProjectileSplitUtility
                                                     byte inheritPlayerSpeed)
     {
         float baseAngleDegrees = ResolveDirectionAngleDegrees(baseDirection);
+        int splitCount = math.max(1, splitState.CustomAnglesDegrees.Length);
 
         for (int splitIndex = 0; splitIndex < splitState.CustomAnglesDegrees.Length; splitIndex++)
         {
@@ -195,7 +198,9 @@ public static class ProjectileSplitUtility
                                  splitScaleMultiplier,
                                  in sourceProjectile,
                                  in elementalPayload,
-                                 inheritPlayerSpeed);
+                                 inheritPlayerSpeed,
+                                 splitIndex,
+                                 splitCount);
         }
     }
 
@@ -210,8 +215,11 @@ public static class ProjectileSplitUtility
                                              float splitScaleMultiplier,
                                              in Projectile sourceProjectile,
                                              in ProjectileElementalPayload elementalPayload,
-                                             byte inheritPlayerSpeed)
+                                             byte inheritPlayerSpeed,
+                                             int orbitLayerIndex,
+                                             int orbitLayerCount)
     {
+        int safeOrbitLayerCount = math.max(1, orbitLayerCount);
         shootRequests.Add(new ShootRequest
         {
             Position = spawnPosition,
@@ -231,6 +239,8 @@ public static class ProjectileSplitUtility
             KnockbackStackingMode = sourceProjectile.KnockbackStackingMode,
             InheritPlayerSpeed = inheritPlayerSpeed,
             IsSplitChild = 1,
+            OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
+            OrbitLayerCount = safeOrbitLayerCount,
             ElementalPayloadOverride = elementalPayload
         });
     }

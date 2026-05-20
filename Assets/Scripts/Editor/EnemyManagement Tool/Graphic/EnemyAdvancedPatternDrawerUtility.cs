@@ -141,6 +141,11 @@ public static class EnemyAdvancedPatternDrawerUtility
                                                                                          payloadContainer,
                                                                                          editorMode == EnemyAdvancedPatternPayloadEditorMode.Full);
 
+            case EnemyPatternModuleKind.Bombardier:
+                return EnemyBombardierPayloadDrawerUtility.BuildPayloadEditor(payloadDataProperty,
+                                                                              payloadContainer,
+                                                                              editorMode == EnemyAdvancedPatternPayloadEditorMode.Full);
+
             case EnemyPatternModuleKind.PowerUpStealer:
                 return EnemyPowerUpStealerPayloadDrawerUtility.BuildPayloadEditor(payloadDataProperty,
                                                                                   payloadContainer);
@@ -339,6 +344,7 @@ public static class EnemyAdvancedPatternDrawerUtility
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
                 return moduleKind == EnemyPatternModuleKind.Shooter ||
+                       moduleKind == EnemyPatternModuleKind.Bombardier ||
                        moduleKind == EnemyPatternModuleKind.PowerUpStealer;
 
             default:

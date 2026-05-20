@@ -84,27 +84,44 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
                 continue;
             }
 
-            EnemySpawnWarningRingView view = GetOrCreateView(enemyEntity);
+            RenderWarningView(enemyEntity,
+                              currentWarningState.WorldPosition,
+                              currentWarningState.HeightOffset,
+                              currentWarningState.Radius,
+                              currentWarningState.RingWidth,
+                              currentWarningState.Color,
+                              opacity,
+                              widthScale);
+        }
 
-            if (view == null)
+        foreach ((RefRO<EnemyBombardierWarningState> warningState,
+                  Entity bombEntity) in SystemAPI.Query<RefRO<EnemyBombardierWarningState>>()
+                                                .WithEntityAccess())
+        {
+            EnemyBombardierWarningState currentWarningState = warningState.ValueRO;
+
+            if (ShouldDisableWarningState(in currentWarningState, elapsedTime))
+            {
+                entityManager.SetComponentEnabled<EnemyBombardierWarningState>(bombEntity, false);
                 continue;
+            }
 
-            float3 warningPosition = currentWarningState.WorldPosition;
-            Vector3 worldPosition = new Vector3(warningPosition.x,
-                                                warningPosition.y + math.max(0f, currentWarningState.HeightOffset),
-                                                warningPosition.z);
-            Color ringColor = new Color(currentWarningState.Color.x,
-                                        currentWarningState.Color.y,
-                                        currentWarningState.Color.z,
-                                        currentWarningState.Color.w);
+            if (!TryResolveWarningVisualState(in currentWarningState,
+                                              elapsedTime,
+                                              out float opacity,
+                                              out float widthScale))
+            {
+                continue;
+            }
 
-            view.Render(worldPosition,
-                        currentWarningState.Radius,
-                        math.max(MinimumRingWidth, currentWarningState.RingWidth),
-                        ringColor,
-                        opacity,
-                        widthScale);
-            visibleEnemyEntities.Add(enemyEntity);
+            RenderWarningView(bombEntity,
+                              currentWarningState.WorldPosition,
+                              currentWarningState.HeightOffset,
+                              currentWarningState.Radius,
+                              currentWarningState.RingWidth,
+                              currentWarningState.Color,
+                              opacity,
+                              widthScale);
         }
 
         RecycleHiddenViews();
@@ -138,6 +155,26 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
     /// <param name="elapsedTime">Current elapsed world time.</param>
     /// <returns>True when the warning state should be disabled immediately, otherwise false.</returns>
     private static bool ShouldDisableWarningState(in EnemySpawnWarningState warningState, float elapsedTime)
+    {
+        if (warningState.MaximumAlpha <= 0f)
+            return true;
+
+        if (warningState.Radius <= 0f)
+            return true;
+
+        if (warningState.RingWidth <= 0f)
+            return true;
+
+        return elapsedTime > warningState.FadeOutEndTime;
+    }
+
+    /// <summary>
+    /// Resolves whether one Bombardier warning state should be disabled because it can no longer produce visible output.
+    /// </summary>
+    /// <param name="warningState">Current warning payload stored on the bomb.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <returns>True when the warning state should be disabled immediately, otherwise false.</returns>
+    private static bool ShouldDisableWarningState(in EnemyBombardierWarningState warningState, float elapsedTime)
     {
         if (warningState.MaximumAlpha <= 0f)
             return true;
@@ -193,6 +230,91 @@ public partial struct EnemySpawnWarningPresentationSystem : ISystem
         opacity = warningState.MaximumAlpha * normalizedFade;
         widthScale = math.lerp(0.82f, 1.18f, normalizedFade);
         return opacity > 0f;
+    }
+
+    /// <summary>
+    /// Resolves the live opacity and width scale of one Bombardier landing warning at the current frame.
+    /// </summary>
+    /// <param name="warningState">Current warning payload stored on the bomb.</param>
+    /// <param name="elapsedTime">Current elapsed world time.</param>
+    /// <param name="opacity">Resolved output opacity for the current frame.</param>
+    /// <param name="widthScale">Resolved output width multiplier for the current frame.</param>
+    /// <returns>True when the warning should be visible during this frame, otherwise false.</returns>
+    private static bool TryResolveWarningVisualState(in EnemyBombardierWarningState warningState,
+                                                     float elapsedTime,
+                                                     out float opacity,
+                                                     out float widthScale)
+    {
+        if (elapsedTime < warningState.WarningStartTime || elapsedTime > warningState.FadeOutEndTime)
+        {
+            opacity = 0f;
+            widthScale = 0f;
+            return false;
+        }
+
+        if (elapsedTime <= warningState.ImpactTime)
+        {
+            float normalizedProgress = warningState.LeadTimeSeconds <= 0f
+                ? 1f
+                : math.saturate((elapsedTime - warningState.WarningStartTime) / math.max(MinimumLeadDurationSeconds, warningState.LeadTimeSeconds));
+            float smoothedProgress = normalizedProgress * normalizedProgress * (3f - 2f * normalizedProgress);
+            opacity = warningState.MaximumAlpha * math.lerp(0.18f, 1f, smoothedProgress);
+            widthScale = math.lerp(0.8f, 1.18f, smoothedProgress);
+            return true;
+        }
+
+        if (warningState.FadeOutSeconds <= 0f)
+        {
+            opacity = 0f;
+            widthScale = 0f;
+            return false;
+        }
+
+        float normalizedFade = 1f - math.saturate((elapsedTime - warningState.ImpactTime) / math.max(MinimumFadeDurationSeconds, warningState.FadeOutSeconds));
+        opacity = warningState.MaximumAlpha * normalizedFade;
+        widthScale = math.lerp(0.82f, 1.18f, normalizedFade);
+        return opacity > 0f;
+    }
+
+    /// <summary>
+    /// Renders one resolved warning ring and marks the owner as visible for this frame.
+    /// </summary>
+    /// <param name="ownerEntity">Entity that owns the warning view.</param>
+    /// <param name="warningPosition">Warning world position.</param>
+    /// <param name="heightOffset">Vertical render offset.</param>
+    /// <param name="radius">Warning radius.</param>
+    /// <param name="ringWidth">Warning line width.</param>
+    /// <param name="warningColor">Warning color.</param>
+    /// <param name="opacity">Resolved opacity.</param>
+    /// <param name="widthScale">Resolved width scale.</param>
+    private static void RenderWarningView(Entity ownerEntity,
+                                          float3 warningPosition,
+                                          float heightOffset,
+                                          float radius,
+                                          float ringWidth,
+                                          float4 warningColor,
+                                          float opacity,
+                                          float widthScale)
+    {
+        EnemySpawnWarningRingView view = GetOrCreateView(ownerEntity);
+
+        if (view == null)
+            return;
+
+        Vector3 worldPosition = new Vector3(warningPosition.x,
+                                            warningPosition.y + math.max(0f, heightOffset),
+                                            warningPosition.z);
+        Color ringColor = new Color(warningColor.x,
+                                    warningColor.y,
+                                    warningColor.z,
+                                    warningColor.w);
+        view.Render(worldPosition,
+                    radius,
+                    math.max(MinimumRingWidth, ringWidth),
+                    ringColor,
+                    opacity,
+                    widthScale);
+        visibleEnemyEntities.Add(ownerEntity);
     }
     #endregion
 

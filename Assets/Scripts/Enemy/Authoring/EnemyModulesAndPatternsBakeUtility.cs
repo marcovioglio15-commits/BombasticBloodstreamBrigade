@@ -217,6 +217,18 @@ internal static class EnemyModulesAndPatternsBakeUtility
                                                  recentlyDamagedWindowSeconds,
                                                  ref result);
 
+            case EnemyPatternModuleKind.Bombardier:
+                return TryAddBombardierWeaponModule(resolvedPayload,
+                                                    useMinimumRange,
+                                                    minimumRange,
+                                                    useMaximumRange,
+                                                    maximumRange,
+                                                    exclusiveLookDirectionControl,
+                                                    activationGates,
+                                                    maximumActivationSpeed,
+                                                    recentlyDamagedWindowSeconds,
+                                                    ref result);
+
             case EnemyPatternModuleKind.PowerUpStealer:
                 return TryAddPowerUpStealerWeaponModule(resolvedPayload,
                                                         useMinimumRange,
@@ -283,6 +295,52 @@ internal static class EnemyModulesAndPatternsBakeUtility
     }
 
     /// <summary>
+    /// Appends one Bombardier module and applies shared Weapon Interaction gating.
+    /// </summary>
+    /// <param name="resolvedPayload">Resolved Bombardier payload.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    /// <param name="result">Mutable compiled result.</param>
+    /// <returns>True when a Bombardier config was appended.</returns>
+    private static bool TryAddBombardierWeaponModule(EnemyPatternModulePayloadData resolvedPayload,
+                                                     bool useMinimumRange,
+                                                     float minimumRange,
+                                                     bool useMaximumRange,
+                                                     float maximumRange,
+                                                     bool exclusiveLookDirectionControl,
+                                                     EnemyWeaponInteractionActivationGate activationGates,
+                                                     float maximumActivationSpeed,
+                                                     float recentlyDamagedWindowSeconds,
+                                                     ref EnemyCompiledPatternBakeResult result)
+    {
+        int previousConfigCount = result.BombardierConfigs.Count;
+        EnemyBombardierBakeUtility.TryAddBombardierModule(resolvedPayload, result.BombardierConfigs, ref result);
+
+        for (int bombardierIndex = previousConfigCount; bombardierIndex < result.BombardierConfigs.Count; bombardierIndex++)
+        {
+            EnemyBombardierConfigElement bombardierConfig = result.BombardierConfigs[bombardierIndex];
+            ApplyWeaponGates(ref bombardierConfig,
+                             useMinimumRange,
+                             minimumRange,
+                             useMaximumRange,
+                             maximumRange,
+                             exclusiveLookDirectionControl,
+                             activationGates,
+                             maximumActivationSpeed,
+                             recentlyDamagedWindowSeconds);
+            result.BombardierConfigs[bombardierIndex] = bombardierConfig;
+        }
+
+        return result.BombardierConfigs.Count > previousConfigCount;
+    }
+
+    /// <summary>
     /// Appends one Power-Up Stealer module and applies shared Weapon Interaction gating.
     /// </summary>
     /// <param name="resolvedPayload">Resolved Power-Up Stealer payload.</param>
@@ -341,6 +399,38 @@ internal static class EnemyModulesAndPatternsBakeUtility
     /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
     /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
     private static void ApplyWeaponGates(ref EnemyShooterConfigElement config,
+                                         bool useMinimumRange,
+                                         float minimumRange,
+                                         bool useMaximumRange,
+                                         float maximumRange,
+                                         bool exclusiveLookDirectionControl,
+                                         EnemyWeaponInteractionActivationGate activationGates,
+                                         float maximumActivationSpeed,
+                                         float recentlyDamagedWindowSeconds)
+    {
+        config.UseMinimumRange = useMinimumRange ? (byte)1 : (byte)0;
+        config.MinimumRange = math.max(0f, minimumRange);
+        config.UseMaximumRange = useMaximumRange ? (byte)1 : (byte)0;
+        config.MaximumRange = math.max(config.MinimumRange, maximumRange);
+        config.ExclusiveLookDirectionControl = exclusiveLookDirectionControl ? (byte)1 : (byte)0;
+        config.ActivationGates = ResolveWeaponActivationGates(activationGates);
+        config.MaximumActivationSpeed = math.max(0f, maximumActivationSpeed);
+        config.RecentlyDamagedWindowSeconds = math.max(0f, recentlyDamagedWindowSeconds);
+    }
+
+    /// <summary>
+    /// Applies shared Weapon Interaction gates to one Bombardier config.
+    /// </summary>
+    /// <param name="config">Mutable Bombardier config.</param>
+    /// <param name="useMinimumRange">True when minimum range gating should be applied.</param>
+    /// <param name="minimumRange">Authored minimum player range.</param>
+    /// <param name="useMaximumRange">True when maximum range gating should be applied.</param>
+    /// <param name="maximumRange">Authored maximum player range.</param>
+    /// <param name="exclusiveLookDirectionControl">True when this weapon controls look direction while active.</param>
+    /// <param name="activationGates">Additional non-range activation gates.</param>
+    /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
+    /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
+    private static void ApplyWeaponGates(ref EnemyBombardierConfigElement config,
                                          bool useMinimumRange,
                                          float minimumRange,
                                          bool useMaximumRange,

@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03ce30e7ff27e12418b7854dd61a2d7d, type: 3}
+  m_Name: EnemyMasterPreset_Bombardier
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyMasterPreset
+  presetId: 3716e28db4624eb48636fea200d5c3be
+  presetName: EnemyMasterPreset_Bombardier
+  description: 
+  version: 1.0.0
+  brainPreset: {fileID: 11400000, guid: 70b160fb1f353f3449f7b75702559c63, type: 2}
+  visualPreset: {fileID: 11400000, guid: 1ede018a3cf18394081ed775b363c058, type: 2}
+  advancedPatternPreset: {fileID: 11400000, guid: f23fe12b4ef061a4580720e1e969de2c, type: 2}
+  bossPatternPreset: {fileID: 0}
+  testUiSettings:
+    worldOffset: {x: 0, y: 1.8, z: 0}
+    rootWidthPixels: 120
+    rootHeightPixels: 26
+    worldScale: 0.01
+    canvasSortingOrder: 4000
+    healthBarWidthPixels: 108
+    healthBarHeightPixels: 8
+    healthBarYOffsetPixels: 5
+    shieldBarWidthPixels: 108
+    shieldBarHeightPixels: 6
+    shieldBarYOffsetPixels: -5
+    healthFillColor: {r: 0.95, g: 0.2, b: 0.2, a: 1}
+    healthBackgroundColor: {r: 0, g: 0, b: 0, a: 0.55}
+    shieldFillColor: {r: 0.2, g: 0.85, b: 1, a: 1}
+    shieldBackgroundColor: {r: 0, g: 0, b: 0, a: 0.45}
+    hideShieldWhenEmpty: 1
+    hideWhenEnemyInactive: 1
+    hideWhenEnemyCulled: 0
+    smoothingSeconds: 0
+    shieldSmoothingSeconds: 0.08
+    billboardToCamera: 1
+    billboardYawOnly: 0

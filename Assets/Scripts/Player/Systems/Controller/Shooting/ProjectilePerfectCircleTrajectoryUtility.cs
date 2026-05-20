@@ -31,6 +31,21 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
     }
 
     /// <summary>
+    /// Resolves the circular orbit radius for one layered projectile state.
+    /// </summary>
+    /// <param name="globalTime">Absolute or local trajectory time used by the radius pulse.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <param name="perfectCircleState">Runtime state containing the requested orbital layer.</param>
+    /// <returns>Layer-adjusted circular orbit radius.</returns>
+    public static float ResolveCircularOrbitRadius(float globalTime,
+                                                   in PerfectCirclePassiveConfig perfectCircleConfig,
+                                                   in ProjectilePerfectCircleState perfectCircleState)
+    {
+        float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig);
+        return ResolveLayeredOrbitRadius(orbitRadius, in perfectCircleState);
+    }
+
+    /// <summary>
     /// Resolves the radial distance at which the path should leave the straight entry phase and begin orbit blending.
     /// </summary>
     /// <param name="globalTime">Absolute world time used by pulsing-circle mode.</param>
@@ -39,12 +54,28 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
     public static float ResolveOrbitEntryThreshold(float globalTime,
                                                    in PerfectCirclePassiveConfig perfectCircleConfig)
     {
+        ProjectilePerfectCircleState defaultState = default;
+        return ResolveOrbitEntryThreshold(globalTime, in perfectCircleConfig, in defaultState);
+    }
+
+    /// <summary>
+    /// Resolves the radial distance at which one layered path should leave the straight entry phase.
+    /// </summary>
+    /// <param name="globalTime">Absolute or local trajectory time used by pulsing-circle mode.</param>
+    /// <param name="perfectCircleConfig">Aggregated Perfect Circle configuration.</param>
+    /// <param name="perfectCircleState">Runtime state containing the requested orbital layer.</param>
+    /// <returns>Layer-adjusted orbit-entry threshold distance.</returns>
+    public static float ResolveOrbitEntryThreshold(float globalTime,
+                                                   in PerfectCirclePassiveConfig perfectCircleConfig,
+                                                   in ProjectilePerfectCircleState perfectCircleState)
+    {
         switch (perfectCircleConfig.PathMode)
         {
             case ProjectileOrbitPathMode.GoldenSpiral:
-                return math.max(MinimumOrbitRadius, perfectCircleConfig.SpiralStartRadius);
+                float spiralStartRadius = math.max(MinimumOrbitRadius, perfectCircleConfig.SpiralStartRadius);
+                return ResolveLayeredOrbitRadius(spiralStartRadius, in perfectCircleState);
             default:
-                float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig);
+                float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig, in perfectCircleState);
                 float orbitEntryRatio = math.clamp(perfectCircleConfig.OrbitEntryRatio, 0f, 1f);
                 return math.max(MinimumOrbitRadius, orbitRadius * orbitEntryRatio);
         }
@@ -90,7 +121,7 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
                                                              perfectCircleState.CurrentRadius));
                     break;
                 default:
-                    float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig);
+                    float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig, in perfectCircleState);
                     effectiveLinearSpeed = math.max(MinimumOrbitRadius,
                                                     perfectCircleConfig.OrbitalSpeed * effectiveSpeedMultiplier);
 
@@ -187,6 +218,26 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
 
     #region Private Methods
     /// <summary>
+    /// Applies the projectile orbital layer as an outward radius offset so sibling barrels form concentric paths.
+    /// </summary>
+    /// <param name="baseRadius">Authored radius before layer separation.</param>
+    /// <param name="perfectCircleState">Runtime state containing the requested orbital layer.</param>
+    /// <returns>Layer-adjusted radius.</returns>
+    private static float ResolveLayeredOrbitRadius(float baseRadius,
+                                                   in ProjectilePerfectCircleState perfectCircleState)
+    {
+        float safeBaseRadius = math.max(MinimumOrbitRadius, baseRadius);
+        int layerCount = math.max(1, perfectCircleState.OrbitLayerCount);
+
+        if (layerCount <= 1)
+            return safeBaseRadius;
+
+        int layerIndex = math.clamp(perfectCircleState.OrbitLayerIndex, 0, layerCount - 1);
+        float layerSpacing = math.max(0.35f, safeBaseRadius * 0.22f);
+        return safeBaseRadius + layerSpacing * layerIndex;
+    }
+
+    /// <summary>
     /// Resolves a safe radial direction for the current trajectory state.
     /// </summary>
     /// <param name="perfectCircleState">Mutable Perfect Circle state that stores the radial direction.</param>
@@ -230,7 +281,7 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
                                              out bool reachedOrbitEntry)
     {
         float radialSpeed = math.max(0f, perfectCircleConfig.RadialEntrySpeed * math.max(0f, speedMultiplier));
-        float orbitEntryThreshold = ResolveOrbitEntryThreshold(globalTime, in perfectCircleConfig);
+        float orbitEntryThreshold = ResolveOrbitEntryThreshold(globalTime, in perfectCircleConfig, in perfectCircleState);
         perfectCircleState.CurrentRadius += radialSpeed * deltaTime;
         perfectCircleState.EntryOrigin += shooterInheritedVelocity * deltaTime;
         perfectCircleState.RadialDirection = entryDirection;
@@ -330,7 +381,7 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
                                                        float speedMultiplier,
                                                        in PerfectCirclePassiveConfig perfectCircleConfig)
     {
-        float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig);
+        float orbitRadius = ResolveCircularOrbitRadius(globalTime, in perfectCircleConfig, in perfectCircleState);
         float orbitSpeed = math.max(0f, perfectCircleConfig.OrbitalSpeed * math.max(0f, speedMultiplier));
         float angularSpeed = orbitRadius > 0.001f ? orbitSpeed / orbitRadius : 0f;
         float angularStep = angularSpeed * deltaTime;
@@ -370,8 +421,10 @@ internal static class ProjectilePerfectCircleTrajectoryUtility
     {
         const float GoldenRatio = 1.61803398875f;
 
-        float spiralStartRadius = math.max(MinimumOrbitRadius, perfectCircleConfig.SpiralStartRadius);
-        float spiralMaximumRadius = math.max(spiralStartRadius, perfectCircleConfig.SpiralMaximumRadius);
+        float baseSpiralStartRadius = math.max(MinimumOrbitRadius, perfectCircleConfig.SpiralStartRadius);
+        float baseSpiralMaximumRadius = math.max(baseSpiralStartRadius, perfectCircleConfig.SpiralMaximumRadius);
+        float spiralStartRadius = ResolveLayeredOrbitRadius(baseSpiralStartRadius, in perfectCircleState);
+        float spiralMaximumRadius = ResolveLayeredOrbitRadius(baseSpiralMaximumRadius, in perfectCircleState);
         float angularSpeedRadiansPerSecond = math.radians(math.max(0f,
                                                                    perfectCircleConfig.SpiralAngularSpeedDegreesPerSecond *
                                                                    math.max(0f, speedMultiplier)));

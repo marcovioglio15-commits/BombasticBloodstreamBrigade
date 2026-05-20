@@ -100,6 +100,8 @@ internal static class EnemyBossPatternModuleBakeUtility
                                                               0,
                                                               0,
                                                               0,
+                                                              0,
+                                                              0,
                                                               firstEngagementConfigIndex,
                                                               engagementConfigs.Count));
         }
@@ -171,6 +173,8 @@ internal static class EnemyBossPatternModuleBakeUtility
                                                               0,
                                                               0,
                                                               0,
+                                                              0,
+                                                              0,
                                                               firstEngagementConfigIndex,
                                                               engagementConfigs.Count));
         }
@@ -218,6 +222,7 @@ internal static class EnemyBossPatternModuleBakeUtility
             {
                 EnemyBossPatternBakeUtility.ApplyWeaponSlot(sharedPreset, candidate.Interaction, ref compiledPattern);
                 EnemyBossPatternBakeUtility.TryAssignShooterRuntimeSettings(compiledPattern, result);
+                EnemyBossPatternBakeUtility.TryAssignBombardierRuntimeSettings(compiledPattern, result);
 
                 if (EnemyOffensiveEngagementBakeUtility.TryBuildWeaponConfig(candidate.Interaction,
                                                                              sharedPreset,
@@ -230,6 +235,7 @@ internal static class EnemyBossPatternModuleBakeUtility
             }
 
             int firstShooterConfigIndex = EnemyBossPatternBakeUtility.AppendShooterConfigs(compiledPattern, result);
+            int firstBombardierConfigIndex = EnemyBossPatternBakeUtility.AppendBombardierConfigs(compiledPattern, result);
             int firstStealerConfigIndex = EnemyBossPatternBakeUtility.AppendPowerUpStealerConfigs(compiledPattern, result);
             int firstEngagementConfigIndex = EnemyBossPatternBakeUtility.AppendOffensiveEngagementConfigs(engagementConfigs, result);
             result.ModuleCandidates.Add(BuildCandidateElement(patternIndex,
@@ -240,6 +246,8 @@ internal static class EnemyBossPatternModuleBakeUtility
                                                               compiledPattern,
                                                               firstShooterConfigIndex,
                                                               compiledPattern.ShooterConfigs.Count,
+                                                              firstBombardierConfigIndex,
+                                                              compiledPattern.BombardierConfigs.Count,
                                                               firstStealerConfigIndex,
                                                               compiledPattern.PowerUpStealerConfigs.Count,
                                                               firstEngagementConfigIndex,
@@ -327,6 +335,8 @@ internal static class EnemyBossPatternModuleBakeUtility
     /// <param name="compiledPattern">Compiled module pattern data.</param>
     /// <param name="firstShooterConfigIndex">First boss-owned shooter config index.</param>
     /// <param name="shooterConfigCount">Number of shooter configs owned by the candidate.</param>
+    /// <param name="firstBombardierConfigIndex">First boss-owned Bombardier config index.</param>
+    /// <param name="bombardierConfigCount">Number of Bombardier configs owned by the candidate.</param>
     /// <param name="firstStealerConfigIndex">First boss-owned Power-Up Stealer config index.</param>
     /// <param name="stealerConfigCount">Number of Power-Up Stealer configs owned by the candidate.</param>
     /// <param name="firstEngagementConfigIndex">First boss-owned engagement config index.</param>
@@ -340,6 +350,8 @@ internal static class EnemyBossPatternModuleBakeUtility
                                                                                 EnemyCompiledPatternBakeResult compiledPattern,
                                                                                 int firstShooterConfigIndex,
                                                                                 int shooterConfigCount,
+                                                                                int firstBombardierConfigIndex,
+                                                                                int bombardierConfigCount,
                                                                                 int firstStealerConfigIndex,
                                                                                 int stealerConfigCount,
                                                                                 int firstEngagementConfigIndex,
@@ -366,6 +378,8 @@ internal static class EnemyBossPatternModuleBakeUtility
             RecentlyDamagedWindowSeconds = math.max(0f, eligibility.RecentlyDamagedWindowSeconds),
             FirstShooterConfigIndex = firstShooterConfigIndex,
             ShooterConfigCount = math.max(0, shooterConfigCount),
+            FirstBombardierConfigIndex = firstBombardierConfigIndex,
+            BombardierConfigCount = math.max(0, bombardierConfigCount),
             FirstPowerUpStealerConfigIndex = firstStealerConfigIndex,
             PowerUpStealerConfigCount = math.max(0, stealerConfigCount),
             FirstOffensiveEngagementConfigIndex = firstEngagementConfigIndex,

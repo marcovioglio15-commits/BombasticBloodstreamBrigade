@@ -35,17 +35,19 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="candidates">Compiled module candidates.</param>
     /// <param name="patternRuntimeState">Current movement pattern runtime state.</param>
     /// <param name="shooterRuntime">Current shooter runtime state.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime state.</param>
     /// <returns>True when the top-level pattern can switch without cutting an active module mid-interaction.</returns>
     public static bool CanSwitchActivePatternSlots(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                    DynamicBuffer<EnemyBossPatternModuleCandidateElement> candidates,
                                                    in EnemyPatternRuntimeState patternRuntimeState,
-                                                   DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime)
+                                                   DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                   DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime)
     {
         for (int slotIndex = 0; slotIndex < slotRuntimes.Length; slotIndex++)
         {
             EnemyBossPatternSlotRuntimeElement slotRuntime = slotRuntimes[slotIndex];
 
-            if (!CanSwitchSlot(in slotRuntime, candidates, in patternRuntimeState, shooterRuntime))
+            if (!CanSwitchSlot(in slotRuntime, candidates, in patternRuntimeState, shooterRuntime, bombardierRuntime))
                 return false;
         }
 
@@ -59,10 +61,16 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="moduleExtractions">Compiled extraction settings per pattern slot.</param>
     /// <param name="moduleCandidates">Compiled module candidates.</param>
     /// <param name="bossShooterConfigs">Boss-owned shooter config source buffer.</param>
+    /// <param name="bossBombardierConfigs">Boss-owned Bombardier config source buffer.</param>
+    /// <param name="bossStealerConfigs">Boss-owned Power-Up Stealer config source buffer.</param>
     /// <param name="bossEngagementConfigs">Boss-owned engagement config source buffer.</param>
     /// <param name="slotRuntimes">Mutable slot runtime buffer.</param>
     /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
     /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
+    /// <param name="bombardierConfigs">Runtime Bombardier config target buffer.</param>
+    /// <param name="bombardierRuntime">Runtime Bombardier state target buffer.</param>
+    /// <param name="stealerConfigs">Runtime Power-Up Stealer config target buffer.</param>
+    /// <param name="stealerRuntime">Runtime Power-Up Stealer state target buffer.</param>
     /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
     /// <param name="health">Boss health state.</param>
     /// <param name="enemyRuntime">Enemy runtime state used by recent-damage eligibility.</param>
@@ -77,11 +85,14 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                                                     DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractions,
                                                     DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                                     DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                                    DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierConfigs,
                                                     DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                                     DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                                     DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                                     DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                                     DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                    DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
+                                                    DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                                     DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                                     DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                                     DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
@@ -99,6 +110,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             return ClearRuntimeModules(slotRuntimes,
                                        shooterConfigs,
                                        shooterRuntime,
+                                       bombardierConfigs,
+                                       bombardierRuntime,
                                        stealerConfigs,
                                        stealerRuntime,
                                        engagementConfigs,
@@ -135,7 +148,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                                                    bossPosition,
                                                    playerPosition,
                                                    in patternRuntimeState,
-                                                   shooterRuntime);
+                                                   shooterRuntime,
+                                                   bombardierRuntime);
             slotRuntimes[slotIndex] = slotRuntime;
 
             if (!changed)
@@ -162,10 +176,13 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             ApplySelectedModules(slotRuntimes,
                                  moduleCandidates,
                                  bossShooterConfigs,
+                                 bossBombardierConfigs,
                                  bossStealerConfigs,
                                  bossEngagementConfigs,
                                  shooterConfigs,
                                  shooterRuntime,
+                                 bombardierConfigs,
+                                 bombardierRuntime,
                                  stealerConfigs,
                                  stealerRuntime,
                                  engagementConfigs,
@@ -287,6 +304,7 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="playerPosition">Current player position.</param>
     /// <param name="patternRuntimeState">Current movement pattern runtime state.</param>
     /// <param name="shooterRuntime">Current shooter runtime state.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime state.</param>
     /// <returns>True when the active candidate changed.</returns>
     private static bool TryResolveSlotSelection(ref EnemyBossPatternSlotRuntimeElement slotRuntime,
                                                 DynamicBuffer<EnemyBossPatternModuleExtractionElement> moduleExtractions,
@@ -297,7 +315,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                                                 float3 bossPosition,
                                                 float3 playerPosition,
                                                 in EnemyPatternRuntimeState patternRuntimeState,
-                                                DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime)
+                                                DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime)
     {
         if (!ShouldExtractSlot(slotRuntime,
                                moduleExtractions,
@@ -311,7 +330,7 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             return false;
         }
 
-        if (!CanSwitchSlot(in slotRuntime, moduleCandidates, in patternRuntimeState, shooterRuntime))
+        if (!CanSwitchSlot(in slotRuntime, moduleCandidates, in patternRuntimeState, shooterRuntime, bombardierRuntime))
             return false;
 
         int selectedCandidateIndex = ResolveSelectedCandidateIndex(moduleCandidates,
@@ -461,6 +480,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="slotRuntimes">Mutable slot runtime buffer.</param>
     /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
     /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
+    /// <param name="bombardierConfigs">Runtime Bombardier config target buffer.</param>
+    /// <param name="bombardierRuntime">Runtime Bombardier state target buffer.</param>
     /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
     /// <param name="patternConfig">Runtime pattern config component.</param>
     /// <param name="patternRuntimeState">Runtime pattern state component.</param>
@@ -468,6 +489,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     private static bool ClearRuntimeModules(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                             DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                             DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                            DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
+                                            DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                             DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                             DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                             DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
@@ -497,6 +520,8 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
         patternRuntimeState = EnemyPatternDefaultsUtility.CreatePatternRuntimeState();
         shooterConfigs.Clear();
         shooterRuntime.Clear();
+        bombardierConfigs.Clear();
+        bombardierRuntime.Clear();
         stealerConfigs.Clear();
         stealerRuntime.Clear();
         engagementConfigs.Clear();
@@ -509,9 +534,15 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="slotRuntimes">Current slot runtime states.</param>
     /// <param name="moduleCandidates">Compiled module candidates.</param>
     /// <param name="bossShooterConfigs">Boss-owned shooter source buffer.</param>
+    /// <param name="bossBombardierConfigs">Boss-owned Bombardier source buffer.</param>
+    /// <param name="bossStealerConfigs">Boss-owned Power-Up Stealer source buffer.</param>
     /// <param name="bossEngagementConfigs">Boss-owned engagement source buffer.</param>
     /// <param name="shooterConfigs">Runtime shooter config target buffer.</param>
     /// <param name="shooterRuntime">Runtime shooter state target buffer.</param>
+    /// <param name="bombardierConfigs">Runtime Bombardier config target buffer.</param>
+    /// <param name="bombardierRuntime">Runtime Bombardier state target buffer.</param>
+    /// <param name="stealerConfigs">Runtime Power-Up Stealer config target buffer.</param>
+    /// <param name="stealerRuntime">Runtime Power-Up Stealer state target buffer.</param>
     /// <param name="engagementConfigs">Runtime engagement config target buffer.</param>
     /// <param name="movementChanged">True when core or short-range movement changed.</param>
     /// <param name="weaponChanged">True when weapon module changed.</param>
@@ -520,10 +551,13 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     private static void ApplySelectedModules(DynamicBuffer<EnemyBossPatternSlotRuntimeElement> slotRuntimes,
                                              DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                              DynamicBuffer<EnemyBossPatternShooterConfigElement> bossShooterConfigs,
+                                             DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierConfigs,
                                              DynamicBuffer<EnemyBossPatternPowerUpStealerConfigElement> bossStealerConfigs,
                                              DynamicBuffer<EnemyBossPatternOffensiveEngagementConfigElement> bossEngagementConfigs,
                                              DynamicBuffer<EnemyShooterConfigElement> shooterConfigs,
                                              DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                             DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
+                                             DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
                                              DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                              DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
                                              DynamicBuffer<EnemyOffensiveEngagementConfigElement> engagementConfigs,
@@ -562,6 +596,7 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
         if (weaponChanged)
         {
             ApplyShooterConfigs(hasWeaponConfig, in weaponCandidate, bossShooterConfigs, shooterConfigs, shooterRuntime);
+            ApplyBombardierConfigs(hasWeaponConfig, in weaponCandidate, bossBombardierConfigs, bombardierConfigs, bombardierRuntime);
             ApplyPowerUpStealerConfigs(hasWeaponConfig, in weaponCandidate, bossStealerConfigs, stealerConfigs, stealerRuntime);
         }
 
@@ -624,6 +659,38 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
 
             shooterConfigs.Add(bossShooterConfigs[sourceIndex].ShooterConfig);
             shooterRuntime.Add(CreateDefaultShooterRuntime());
+        }
+    }
+
+    /// <summary>
+    /// Rebuilds runtime Bombardier buffers from the selected weapon candidate.
+    /// </summary>
+    /// <param name="hasWeaponConfig">True when weaponCandidate contains a real module.</param>
+    /// <param name="weaponCandidate">Selected weapon candidate.</param>
+    /// <param name="bossBombardierConfigs">Boss-owned Bombardier source buffer.</param>
+    /// <param name="bombardierConfigs">Runtime Bombardier config target buffer.</param>
+    /// <param name="bombardierRuntime">Runtime Bombardier state target buffer.</param>
+    private static void ApplyBombardierConfigs(bool hasWeaponConfig,
+                                               in EnemyBossPatternModuleCandidateElement weaponCandidate,
+                                               DynamicBuffer<EnemyBossPatternBombardierConfigElement> bossBombardierConfigs,
+                                               DynamicBuffer<EnemyBombardierConfigElement> bombardierConfigs,
+                                               DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime)
+    {
+        bombardierConfigs.Clear();
+        bombardierRuntime.Clear();
+
+        if (!hasWeaponConfig)
+            return;
+
+        for (int bombardierIndex = 0; bombardierIndex < weaponCandidate.BombardierConfigCount; bombardierIndex++)
+        {
+            int sourceIndex = weaponCandidate.FirstBombardierConfigIndex + bombardierIndex;
+
+            if (sourceIndex < 0 || sourceIndex >= bossBombardierConfigs.Length)
+                continue;
+
+            bombardierConfigs.Add(bossBombardierConfigs[sourceIndex].BombardierConfig);
+            bombardierRuntime.Add(CreateDefaultBombardierRuntime());
         }
     }
 
@@ -921,11 +988,13 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     /// <param name="moduleCandidates">Compiled module candidates.</param>
     /// <param name="patternRuntimeState">Current movement pattern runtime state.</param>
     /// <param name="shooterRuntime">Current shooter runtime state.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime state.</param>
     /// <returns>True when the slot can safely switch candidates.</returns>
     private static bool CanSwitchSlot(in EnemyBossPatternSlotRuntimeElement slotRuntime,
                                       DynamicBuffer<EnemyBossPatternModuleCandidateElement> moduleCandidates,
                                       in EnemyPatternRuntimeState patternRuntimeState,
-                                      DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime)
+                                      DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                      DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime)
     {
         if (slotRuntime.ActiveCandidateIndex < 0)
             return true;
@@ -945,7 +1014,7 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                 return IsShortRangeInteractionComplete(in activeCandidate.PatternConfig, in patternRuntimeState);
 
             case EnemyBossPatternSlotKind.WeaponInteraction:
-                return IsWeaponInteractionComplete(shooterRuntime);
+                return IsWeaponInteractionComplete(shooterRuntime, bombardierRuntime);
 
             default:
                 return true;
@@ -993,11 +1062,13 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
     }
 
     /// <summary>
-    /// Checks whether every active shooter module has finished its current burst and post-fire lock.
+    /// Checks whether every active weapon module has finished its current burst and post-commit lock.
     /// </summary>
     /// <param name="shooterRuntime">Current shooter runtime buffer.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer.</param>
     /// <returns>True when Weapon Interaction can switch.</returns>
-    private static bool IsWeaponInteractionComplete(DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime)
+    private static bool IsWeaponInteractionComplete(DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                    DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime)
     {
         for (int shooterIndex = 0; shooterIndex < shooterRuntime.Length; shooterIndex++)
         {
@@ -1006,6 +1077,18 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             if (runtime.RemainingBurstShots > 0 ||
                 runtime.NextShotInBurstTimer > 0f ||
                 runtime.PostFireStopTimer > 0f)
+            {
+                return false;
+            }
+        }
+
+        for (int bombardierIndex = 0; bombardierIndex < bombardierRuntime.Length; bombardierIndex++)
+        {
+            EnemyBombardierRuntimeElement runtime = bombardierRuntime[bombardierIndex];
+
+            if (runtime.RemainingBurstLaunches > 0 ||
+                runtime.NextBombInBurstTimer > 0f ||
+                runtime.PostLaunchStopTimer > 0f)
             {
                 return false;
             }
@@ -1153,6 +1236,28 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
             IsPlayerInRange = 0,
             LockedAimDirection = float3.zero,
             HasLockedAimDirection = 0
+        };
+    }
+
+    /// <summary>
+    /// Creates a clean Bombardier runtime state for a freshly selected weapon candidate.
+    /// </summary>
+    /// <returns>Default Bombardier runtime element.</returns>
+    private static EnemyBombardierRuntimeElement CreateDefaultBombardierRuntime()
+    {
+        return new EnemyBombardierRuntimeElement
+        {
+            NextBurstTimer = 0f,
+            NextBombInBurstTimer = 0f,
+            PostLaunchStopTimer = 0f,
+            RemainingBurstLaunches = 0,
+            LaunchesCompletedInCurrentBurst = 0,
+            BurstWindupDurationSeconds = 0f,
+            IsPlayerInReach = 0,
+            IsLaunchAllowed = 0,
+            LockedTargetPosition = float3.zero,
+            HasLockedTargetPosition = 0,
+            RandomState = 0u
         };
     }
 

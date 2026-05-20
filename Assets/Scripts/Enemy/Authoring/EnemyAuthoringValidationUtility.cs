@@ -17,22 +17,18 @@ internal static class EnemyAuthoringValidationUtility
     /// <returns>True when the prefab is invalid for bake.</returns>
     public static bool IsInvalidShooterProjectilePrefab(EnemyAuthoring authoring, GameObject projectilePrefabObject)
     {
-        if (projectilePrefabObject == null)
-            return true;
+        return IsInvalidRuntimePrefab(authoring, projectilePrefabObject);
+    }
 
-        if (authoring != null && projectilePrefabObject == authoring.gameObject)
-            return true;
-
-        if (projectilePrefabObject.scene.IsValid())
-            return true;
-
-        if (projectilePrefabObject.GetComponent<EnemyAuthoring>() != null)
-            return true;
-
-        if (projectilePrefabObject.GetComponent<PlayerAuthoring>() != null)
-            return true;
-
-        return false;
+    /// <summary>
+    /// Validates whether the authored Bombardier bomb prefab can be converted safely.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component that owns the reference.</param>
+    /// <param name="bombPrefabObject">Candidate bomb prefab.</param>
+    /// <returns>True when the prefab is invalid for bake.</returns>
+    public static bool IsInvalidBombardierBombPrefab(EnemyAuthoring authoring, GameObject bombPrefabObject)
+    {
+        return IsInvalidRuntimePrefab(authoring, bombPrefabObject);
     }
 
     /// <summary>
@@ -69,19 +65,30 @@ internal static class EnemyAuthoringValidationUtility
     /// <returns>True when the prefab is invalid for bake.</returns>
     public static bool IsInvalidHitVfxPrefab(EnemyAuthoring authoring, GameObject hitVfxPrefabObject)
     {
-        if (hitVfxPrefabObject == null)
+        return IsInvalidRuntimePrefab(authoring, hitVfxPrefabObject);
+    }
+
+    /// <summary>
+    /// Validates shared runtime prefab constraints used by projectile, bomb and VFX bake paths.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component that owns the reference.</param>
+    /// <param name="prefabObject">Candidate prefab object.</param>
+    /// <returns>True when the prefab cannot be converted safely.</returns>
+    public static bool IsInvalidRuntimePrefab(EnemyAuthoring authoring, GameObject prefabObject)
+    {
+        if (prefabObject == null)
             return true;
 
-        if (authoring != null && hitVfxPrefabObject == authoring.gameObject)
+        if (authoring != null && prefabObject == authoring.gameObject)
             return true;
 
-        if (hitVfxPrefabObject.scene.IsValid())
+        if (prefabObject.scene.IsValid())
             return true;
 
-        if (hitVfxPrefabObject.GetComponent<EnemyAuthoring>() != null)
+        if (prefabObject.GetComponent<EnemyAuthoring>() != null)
             return true;
 
-        if (hitVfxPrefabObject.GetComponent<PlayerAuthoring>() != null)
+        if (prefabObject.GetComponent<PlayerAuthoring>() != null)
             return true;
 
         return false;

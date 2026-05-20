@@ -73,6 +73,8 @@ public struct EnemyBossPatternExtractionConfig : IComponentData
     public byte UseDamageWindowExtraction;
     public int FirstShooterConfigIndex;
     public int ShooterConfigCount;
+    public int FirstBombardierConfigIndex;
+    public int BombardierConfigCount;
     public int FirstOffensiveEngagementConfigIndex;
     public int OffensiveEngagementConfigCount;
     public EnemyBossPatternPlayerDistanceCondition PlayerDistanceCondition;
@@ -108,6 +110,8 @@ public struct EnemyBossPatternInteractionElement : IBufferElementData
     public byte HasCustomMovement;
     public int FirstShooterConfigIndex;
     public int ShooterConfigCount;
+    public int FirstBombardierConfigIndex;
+    public int BombardierConfigCount;
     public int FirstOffensiveEngagementConfigIndex;
     public int OffensiveEngagementConfigCount;
     public EnemyPatternConfig PatternConfig;
@@ -160,6 +164,8 @@ public struct EnemyBossPatternModuleCandidateElement : IBufferElementData
     public float RecentlyDamagedWindowSeconds;
     public int FirstShooterConfigIndex;
     public int ShooterConfigCount;
+    public int FirstBombardierConfigIndex;
+    public int BombardierConfigCount;
     public int FirstPowerUpStealerConfigIndex;
     public int PowerUpStealerConfigCount;
     public int FirstOffensiveEngagementConfigIndex;

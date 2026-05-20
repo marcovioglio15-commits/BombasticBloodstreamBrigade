@@ -48,7 +48,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             return;
 
         float deltaTime = SystemAPI.Time.DeltaTime;
-        float globalTime = (float)SystemAPI.Time.ElapsedTime;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
 
@@ -293,6 +292,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 bool reachedVirtualDespawn;
                 TryAppendLane(ref mutableLaserBeamLanes,
                               laneIndex,
+                              primaryLaneCount,
                               false,
                               playerEntity,
                               localTransform.ValueRO.Position,
@@ -300,7 +300,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                               laneSpawnPosition,
                               laneDirection,
                               currentLaserBeamState.ConsecutiveActiveElapsed,
-                              globalTime,
                               travelDistance,
                               projectileTemplate.Range,
                               projectileTemplate.Lifetime,
@@ -327,7 +326,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                       currentMovementState.Velocity,
                                       primaryLaneCount,
                                       currentLaserBeamState.ConsecutiveActiveElapsed,
-                                      globalTime,
                                       travelDistance,
                                       projectileTemplate.Range,
                                       projectileTemplate.Lifetime,
@@ -355,6 +353,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// </summary>
     /// <param name="laserBeamLanes">Output lane buffer for the current player.</param>
     /// <param name="laneIndex">Stable lane index assigned to the lane.</param>
+    /// <param name="laneCount">Total sibling lane count used by layered orbital paths.</param>
     /// <param name="isSplitChild">True when the lane belongs to one split branch.</param>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="shooterPosition">Current player position.</param>
@@ -362,7 +361,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="spawnPosition">World-space origin of the lane.</param>
     /// <param name="direction">World-space forward direction of the lane.</param>
     /// <param name="activeSeconds">Current uninterrupted active time.</param>
-    /// <param name="globalTime">Current elapsed world time.</param>
     /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
@@ -380,6 +378,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <returns>True when at least one lane segment was appended.</returns>
     private static bool TryAppendLane(ref DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                       int laneIndex,
+                                      int laneCount,
                                       bool isSplitChild,
                                       Entity shooterEntity,
                                       float3 shooterPosition,
@@ -387,7 +386,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                       float3 spawnPosition,
                                       float3 direction,
                                       float activeSeconds,
-                                      float globalTime,
                                       float travelDistance,
                                       float rangeLimit,
                                       float lifetimeLimit,
@@ -412,6 +410,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         {
             return PlayerLaserBeamPerfectCircleUtility.TryAppendPerfectCircleLaneSegments(ref laserBeamLanes,
                                                                                           laneIndex,
+                                                                                          laneCount,
                                                                                           isSplitChild,
                                                                                           shooterEntity,
                                                                                           shooterPosition,
@@ -419,7 +418,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                                                                           spawnPosition,
                                                                                           direction,
                                                                                           activeSeconds,
-                                                                                          globalTime,
                                                                                           rangeLimit,
                                                                                           lifetimeLimit,
                                                                                           speedMultiplier,
@@ -475,7 +473,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="shooterVelocity">Current player velocity.</param>
     /// <param name="primaryLaneCount">Number of primary lanes already present in the buffer.</param>
     /// <param name="activeSeconds">Current uninterrupted active time.</param>
-    /// <param name="globalTime">Current elapsed world time.</param>
     /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the parent lanes.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the parent lanes.</param>
@@ -496,7 +493,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                               float3 shooterVelocity,
                                               int primaryLaneCount,
                                               float activeSeconds,
-                                              float globalTime,
                                               float travelDistance,
                                               float rangeLimit,
                                               float lifetimeLimit,
@@ -538,13 +534,13 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                         float3 childDirection = PlayerLaserBeamStateUtility.RotatePlanarDirection(terminalSegment.Direction, angleDegrees);
                         AppendSplitChildLane(ref laserBeamLanes,
                                              nextLaneIndex,
+                                             math.max(1, splittingProjectilesConfig.CustomAnglesDegrees.Length),
                                              shooterEntity,
                                              shooterPosition,
                                              shooterVelocity,
                                              terminalSegment.EndPoint,
                                              childDirection,
                                              activeSeconds,
-                                             globalTime,
                                              travelDistance,
                                              rangeLimit,
                                              lifetimeLimit,
@@ -572,13 +568,13 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                         float3 childDirection = PlayerLaserBeamStateUtility.RotatePlanarDirection(terminalSegment.Direction, angleDegrees);
                         AppendSplitChildLane(ref laserBeamLanes,
                                              nextLaneIndex,
+                                             splitCount,
                                              shooterEntity,
                                              shooterPosition,
                                              shooterVelocity,
                                              terminalSegment.EndPoint,
                                              childDirection,
                                              activeSeconds,
-                                             globalTime,
                                              travelDistance,
                                              rangeLimit,
                                              lifetimeLimit,
@@ -605,13 +601,13 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// </summary>
     /// <param name="laserBeamLanes">Output lane buffer.</param>
     /// <param name="laneIndex">Stable lane index assigned to the split branch.</param>
+    /// <param name="laneCount">Total sibling split-lane count used by layered orbital paths.</param>
     /// <param name="shooterEntity">Player entity owning the beam.</param>
     /// <param name="shooterPosition">Current player position.</param>
     /// <param name="shooterVelocity">Current player velocity.</param>
     /// <param name="spawnPosition">World-space origin of the split branch.</param>
     /// <param name="direction">World-space forward direction of the split branch.</param>
     /// <param name="activeSeconds">Current uninterrupted active time.</param>
-    /// <param name="globalTime">Current elapsed world time.</param>
     /// <param name="parentTravelDistance">Straight-line travel budget inherited from the parent lane.</param>
     /// <param name="parentRangeLimit">Effective projectile range inherited from the parent lane.</param>
     /// <param name="parentLifetimeLimit">Effective projectile lifetime inherited from the parent lane.</param>
@@ -627,13 +623,13 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="wallsEnabled">True when wall clipping should be evaluated.</param>
     private static void AppendSplitChildLane(ref DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                                              int laneIndex,
+                                             int laneCount,
                                              Entity shooterEntity,
                                              float3 shooterPosition,
                                              float3 shooterVelocity,
                                              float3 spawnPosition,
                                              float3 direction,
                                              float activeSeconds,
-                                             float globalTime,
                                              float parentTravelDistance,
                                              float parentRangeLimit,
                                              float parentLifetimeLimit,
@@ -662,6 +658,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         float splitSpeedMultiplier = math.max(0f, speedMultiplier) * math.max(0f, splittingProjectilesConfig.SplitSpeedMultiplier);
         TryAppendLane(ref laserBeamLanes,
                       laneIndex,
+                      laneCount,
                       true,
                       shooterEntity,
                       shooterPosition,
@@ -669,7 +666,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                       spawnPosition,
                       direction,
                       activeSeconds,
-                      globalTime,
                       splitTravelDistance,
                       splitRangeLimit,
                       splitLifetimeLimit,
@@ -685,7 +681,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                       out _,
                       wallsEnabled);
     }
-
     #endregion
 
     #endregion
