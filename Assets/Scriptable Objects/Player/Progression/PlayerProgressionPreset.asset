@@ -205,6 +205,20 @@ MonoBehaviour:
       skipCompensationResources: []
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
+    - milestoneLevel: 15
+      specialExpRequirement: 250
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
     - milestoneLevel: 20
       specialExpRequirement: 300
       recurring: 0
