@@ -15745,7 +15745,7 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
-          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*0.3'
+          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*0.5'
           - formula: '[LaserWidth_Small]=[LaserWidth_Small]*0.1'
           - formula: '[Damage]=[Damage]*0.5'
           - formula: '[FireRate]=[FireRate]*1.3'
