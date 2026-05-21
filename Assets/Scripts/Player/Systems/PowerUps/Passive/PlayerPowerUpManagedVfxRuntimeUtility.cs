@@ -148,7 +148,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             {
                 if (capConfig.RefreshAttachedLifetimeOnCapHit != 0 && existingInstance != null)
                 {
-                    RefreshLifetime(existingInstance, request.LifetimeSeconds);
+                    RefreshAttachedInstance(existingInstance, in request);
                     refreshedExistingInstance = true;
                 }
 
@@ -223,7 +223,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             RootBaseLocalScale = instanceObject.transform.localScale,
             ParticleSystems = particleSystems,
             TrailRenderers = trailRenderers,
-            TrailRendererBaseWidths = BuildTrailRendererBaseWidths(trailRenderers)
+            TrailRendererBaseWidths = BuildTrailRendererBaseWidths(trailRenderers),
+            TrailRendererBaseTimes = BuildTrailRendererBaseTimes(trailRenderers)
         };
     }
 
@@ -249,6 +250,27 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     }
 
     /// <summary>
+    /// Caches authored trail retention times so pooled VFX can restore source prefab history settings.
+    /// </summary>
+    /// <param name="trailRenderers">Trail renderers collected from the spawned VFX instance.</param>
+    /// <returns>Retention times matching the renderer array order.</returns>
+    private static float[] BuildTrailRendererBaseTimes(TrailRenderer[] trailRenderers)
+    {
+        if (trailRenderers == null || trailRenderers.Length <= 0)
+            return null;
+
+        float[] baseTimes = new float[trailRenderers.Length];
+
+        for (int trailIndex = 0; trailIndex < trailRenderers.Length; trailIndex++)
+        {
+            TrailRenderer trailRenderer = trailRenderers[trailIndex];
+            baseTimes[trailIndex] = trailRenderer != null ? trailRenderer.time : 0f;
+        }
+
+        return baseTimes;
+    }
+
+    /// <summary>
     /// Applies request data to one newly active managed VFX instance.
     /// </summary>
     /// <param name="instance">Managed VFX instance being configured.</param>
@@ -271,7 +293,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                                                   request.Position,
                                                                   request.Rotation,
                                                                   math.max(MinimumScale, request.UniformScale),
-                                                                  request.TrailRendererWidthOverride);
+                                                                  request.TrailRendererWidthOverride,
+                                                                  request.TrailRendererTimeOverrideSeconds);
 
         if (!instance.InstanceObject.activeSelf)
             instance.InstanceObject.SetActive(true);
@@ -464,19 +487,22 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     }
 
     /// <summary>
-    /// Extends an existing attached VFX lifetime when cap refresh is enabled.
+    /// Refreshes an existing attached VFX when cap refresh is enabled.
     /// </summary>
     /// <param name="instance">Existing attached VFX instance.</param>
-    /// <param name="requestedLifetimeSeconds">Lifetime requested by the rejected spawn request.</param>
-    private static void RefreshLifetime(PlayerPowerUpManagedVfxInstance instance,
-                                        float requestedLifetimeSeconds)
+    /// <param name="request">Request rejected by the attached VFX cap.</param>
+    private static void RefreshAttachedInstance(PlayerPowerUpManagedVfxInstance instance,
+                                                in PlayerPowerUpVfxSpawnRequest request)
     {
-        float desiredLifetime = math.max(MinimumLifetimeSeconds, requestedLifetimeSeconds);
+        float desiredLifetime = math.max(MinimumLifetimeSeconds, request.LifetimeSeconds);
 
-        if (desiredLifetime <= instance.RemainingSeconds)
-            return;
+        if (desiredLifetime > instance.RemainingSeconds)
+            instance.RemainingSeconds = desiredLifetime;
 
-        instance.RemainingSeconds = desiredLifetime;
+        PlayerPowerUpManagedVfxPresentationUtility.ApplyTrailRendererSettings(instance,
+                                                                               math.max(MinimumScale, request.UniformScale),
+                                                                               request.TrailRendererWidthOverride,
+                                                                               request.TrailRendererTimeOverrideSeconds);
     }
     #endregion
 

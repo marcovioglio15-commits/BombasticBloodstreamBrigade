@@ -13837,7 +13837,7 @@ MonoBehaviour:
               damagePerTick: 4
               applyIntervalSeconds: 0.55
               minimumMovementSpeed: 0.1
-              trailSegmentVfxPrefab: {fileID: 0}
+              trailSegmentVfxPrefab: {fileID: 5679156216372977872, guid: 92d93d035892fff40a63205dfd234520, type: 3}
               scaleTrailSegmentVfxToRadius: 1
               trailSegmentVfxScaleMultiplier: 1
               debugDrawSegments: 1
@@ -17135,7 +17135,7 @@ MonoBehaviour:
               cornerNudgeDistance: 0.08
               ignoreSteeringAndPriority: 0
             acid:
-              trailSegmentLifetimeSeconds: 3
+              trailSegmentLifetimeSeconds: 12
               trailSpawnDistance: 0.75
               trailSpawnIntervalSeconds: 0.18
               trailRadius: 0.5

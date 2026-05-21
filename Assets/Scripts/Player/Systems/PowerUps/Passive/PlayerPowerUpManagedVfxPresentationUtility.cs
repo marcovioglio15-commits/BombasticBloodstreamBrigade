@@ -17,18 +17,23 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     /// <param name="rotation">World rotation.</param>
     /// <param name="uniformScale">Uniform local scale.</param>
     /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to preserve authored scaling.</param>
+    /// <param name="trailRendererTimeOverrideSeconds">Positive trail history time override, or zero to preserve authored retention.</param>
     public static void ApplyTransform(PlayerPowerUpManagedVfxInstance instance,
                                       float3 position,
                                       quaternion rotation,
                                       float uniformScale,
-                                      float trailRendererWidthOverride)
+                                      float trailRendererWidthOverride,
+                                      float trailRendererTimeOverrideSeconds)
     {
         Transform instanceTransform = instance.InstanceTransform;
         instanceTransform.position = ToVector3(position);
         instanceTransform.rotation = ToQuaternion(rotation);
         ApplyParticleSystemScaling(instance);
         instanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
-        ApplyTrailRendererScaling(instance, uniformScale, trailRendererWidthOverride);
+        ApplyTrailRendererSettings(instance,
+                                   uniformScale,
+                                   trailRendererWidthOverride,
+                                   trailRendererTimeOverrideSeconds);
     }
 
     /// <summary>
@@ -68,14 +73,16 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     }
 
     /// <summary>
-    /// Applies request scale or an explicit width override because TrailRenderer width is authored in world units.
+    /// Applies width and retention overrides to trail renderers without clearing their current history.
     /// </summary>
     /// <param name="instance">Managed VFX instance whose trail renderers are being prepared.</param>
     /// <param name="uniformScale">Uniform scale requested by gameplay.</param>
     /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to scale authored widths.</param>
-    private static void ApplyTrailRendererScaling(PlayerPowerUpManagedVfxInstance instance,
+    /// <param name="trailRendererTimeOverrideSeconds">Positive trail history time override, or zero to restore authored retention.</param>
+    public static void ApplyTrailRendererSettings(PlayerPowerUpManagedVfxInstance instance,
                                                   float uniformScale,
-                                                  float trailRendererWidthOverride)
+                                                  float trailRendererWidthOverride,
+                                                  float trailRendererTimeOverrideSeconds)
     {
         if (instance.TrailRenderers == null)
             return;
@@ -90,11 +97,17 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
             if (trailRendererWidthOverride > 0f)
             {
                 trailRenderer.widthMultiplier = Mathf.Max(0.0001f, trailRendererWidthOverride);
-                continue;
+            }
+            else
+            {
+                float baseWidth = ResolveTrailRendererBaseWidth(instance, trailIndex, trailRenderer);
+                trailRenderer.widthMultiplier = Mathf.Max(0.0001f, baseWidth * uniformScale);
             }
 
-            float baseWidth = ResolveTrailRendererBaseWidth(instance, trailIndex, trailRenderer);
-            trailRenderer.widthMultiplier = Mathf.Max(0.0001f, baseWidth * uniformScale);
+            trailRenderer.time = ResolveTrailRendererTime(instance,
+                                                          trailIndex,
+                                                          trailRenderer,
+                                                          trailRendererTimeOverrideSeconds);
         }
     }
     #endregion
@@ -213,6 +226,32 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
         }
 
         return Mathf.Max(0.0001f, instance.TrailRendererBaseWidths[trailIndex]);
+    }
+
+    /// <summary>
+    /// Resolves requested or authored trail history retention for one renderer.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached trail retention values.</param>
+    /// <param name="trailIndex">Trail renderer index inside the cached renderer array.</param>
+    /// <param name="trailRenderer">Trail renderer used as fallback when cache data is missing.</param>
+    /// <param name="trailRendererTimeOverrideSeconds">Positive runtime trail retention override.</param>
+    /// <returns>Trail history retention in seconds.</returns>
+    private static float ResolveTrailRendererTime(PlayerPowerUpManagedVfxInstance instance,
+                                                  int trailIndex,
+                                                  TrailRenderer trailRenderer,
+                                                  float trailRendererTimeOverrideSeconds)
+    {
+        if (trailRendererTimeOverrideSeconds > 0f)
+            return trailRendererTimeOverrideSeconds;
+
+        if (instance.TrailRendererBaseTimes == null ||
+            trailIndex < 0 ||
+            trailIndex >= instance.TrailRendererBaseTimes.Length)
+        {
+            return trailRenderer.time;
+        }
+
+        return Mathf.Max(0f, instance.TrailRendererBaseTimes[trailIndex]);
     }
 
     /// <summary>

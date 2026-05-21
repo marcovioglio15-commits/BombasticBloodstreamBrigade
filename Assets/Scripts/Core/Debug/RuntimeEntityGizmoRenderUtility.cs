@@ -352,7 +352,9 @@ public static class RuntimeEntityGizmoRenderUtility
                     {
                         EnemyPatternConfig patternConfig = entityManager.GetComponentData<EnemyPatternConfig>(enemyEntity);
 
-                        if (patternConfig.AcidTrailEnabled != 0 && patternConfig.AcidTrailDebugDrawSegments != 0)
+                        if (patternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid &&
+                            patternConfig.AcidTrailEnabled != 0 &&
+                            patternConfig.AcidTrailDebugDrawSegments != 0)
                             drewEnemyGizmo |= DrawAcidTrailSegments(primitiveDrawer, entityManager.GetBuffer<EnemyAcidTrailSegmentElement>(enemyEntity));
                     }
                 }

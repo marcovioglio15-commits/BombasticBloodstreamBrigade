@@ -146,6 +146,7 @@ public static class EnemyAdvancedPatternBakeUtility
             return;
 
         selectedPriority = candidatePriority;
+        EnemyAcidTrailBakeUtility.Disable(ref patternConfig);
 
         switch (moduleKind)
         {
