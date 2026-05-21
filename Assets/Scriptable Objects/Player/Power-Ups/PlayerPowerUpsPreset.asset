@@ -15092,7 +15092,7 @@ MonoBehaviour:
       moduleId: Module_ProjectileSplit
       stage: 7
       isEnabled: 1
-      useOverridePayload: 0
+      useOverridePayload: 1
       overridePayload:
         holdCharge:
           requiredCharge: 500
@@ -15269,17 +15269,17 @@ MonoBehaviour:
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
         projectileSplit:
-          triggerMode: 0
+          triggerMode: 2
           directionMode: 0
-          splitProjectileCount: 2
-          splitOffsetDegrees: 0
+          splitProjectileCount: 4
+          splitOffsetDegrees: 45
           customAnglesDegrees:
           - -20
           - 20
-          splitDamagePercentFromOriginal: 50
-          splitSizePercentFromOriginal: 75
-          splitSpeedPercentFromOriginal: 85
-          splitLifetimePercentFromOriginal: 65
+          splitDamagePercentFromOriginal: 15
+          splitSizePercentFromOriginal: 50
+          splitSpeedPercentFromOriginal: 100
+          splitLifetimePercentFromOriginal: 25
         laserBeam:
           damageMultiplier: 1
           continuousDamagePerSecondMultiplier: 0.28
@@ -21492,9 +21492,10 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
-  secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  primaryActivePowerUpId: Active_Shotgun
+  secondaryActivePowerUpId: ActiveChargeShot
+  equippedPassivePowerUpIds:
+  - PassiveSplittingProjectiles
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
