@@ -174,11 +174,11 @@ MonoBehaviour:
     milestones: []
   - phaseID: Phase1
     startsAtLevel: 3
-    startingRequiredLevelUpExp: 25
-    requiredExperienceGrouth: 10
+    startingRequiredLevelUpExp: 20
+    requiredExperienceGrouth: 5
     milestones:
     - milestoneLevel: 5
-      specialExpRequirement: 100
+      specialExpRequirement: 50
       recurring: 0
       recurrenceIntervalLevels: 1
       powerUpUnlocks:
@@ -192,35 +192,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 10
-      specialExpRequirement: 200
-      recurring: 0
-      recurrenceIntervalLevels: 5
-      powerUpUnlocks:
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      skipCompensationResources: []
-      legacyPowerUpUnlockRollCount: 0
-      legacyMilestoneTierRolls: []
-    - milestoneLevel: 15
-      specialExpRequirement: 250
-      recurring: 0
-      recurrenceIntervalLevels: 5
-      powerUpUnlocks:
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      - dropPoolId: Milestone
-        legacyTierRolls: []
-      skipCompensationResources: []
-      legacyPowerUpUnlockRollCount: 0
-      legacyMilestoneTierRolls: []
-    - milestoneLevel: 20
-      specialExpRequirement: 300
+      specialExpRequirement: 100
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -234,12 +206,26 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
   - phaseID: Phase2
-    startsAtLevel: 21
-    startingRequiredLevelUpExp: 165
-    requiredExperienceGrouth: 10
+    startsAtLevel: 19
+    startingRequiredLevelUpExp: 150
+    requiredExperienceGrouth: 5
     milestones:
+    - milestoneLevel: 20
+      specialExpRequirement: 150
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
     - milestoneLevel: 30
-      specialExpRequirement: 450
+      specialExpRequirement: 235
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -253,7 +239,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 40
-      specialExpRequirement: 600
+      specialExpRequirement: 315
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -268,11 +254,11 @@ MonoBehaviour:
       legacyMilestoneTierRolls: []
   - phaseID: Phase3
     startsAtLevel: 41
-    startingRequiredLevelUpExp: 435
-    requiredExperienceGrouth: 15
+    startingRequiredLevelUpExp: 190
+    requiredExperienceGrouth: 10
     milestones:
     - milestoneLevel: 50
-      specialExpRequirement: 800
+      specialExpRequirement: 400
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -286,7 +272,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 60
-      specialExpRequirement: 1000
+      specialExpRequirement: 500
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -301,11 +287,11 @@ MonoBehaviour:
       legacyMilestoneTierRolls: []
   - phaseID: Phase4
     startsAtLevel: 61
-    startingRequiredLevelUpExp: 820
-    requiredExperienceGrouth: 20
+    startingRequiredLevelUpExp: 370
+    requiredExperienceGrouth: 10
     milestones:
     - milestoneLevel: 70
-      specialExpRequirement: 1200
+      specialExpRequirement: 650
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -319,7 +305,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 80
-      specialExpRequirement: 1450
+      specialExpRequirement: 800
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -334,11 +320,11 @@ MonoBehaviour:
       legacyMilestoneTierRolls: []
   - phaseID: Phase5
     startsAtLevel: 81
-    startingRequiredLevelUpExp: 1275
-    requiredExperienceGrouth: 25
+    startingRequiredLevelUpExp: 555
+    requiredExperienceGrouth: 15
     milestones:
     - milestoneLevel: 90
-      specialExpRequirement: 1700
+      specialExpRequirement: 1000
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -352,7 +338,7 @@ MonoBehaviour:
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
     - milestoneLevel: 100
-      specialExpRequirement: 2000
+      specialExpRequirement: 1200
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:

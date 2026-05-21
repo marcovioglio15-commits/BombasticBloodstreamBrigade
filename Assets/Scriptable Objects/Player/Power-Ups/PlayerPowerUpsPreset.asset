@@ -21492,10 +21492,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: Active_Shotgun
-  secondaryActivePowerUpId: ActiveChargeShot
-  equippedPassivePowerUpIds:
-  - PassiveSplittingProjectiles
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
