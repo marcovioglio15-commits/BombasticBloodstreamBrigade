@@ -521,6 +521,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public quaternion Rotation;
     public float UniformScale;
     public float TrailRendererWidthOverride;
+    public float TrailRendererTimeOverrideSeconds;
     public float LifetimeSeconds;
     public Entity FollowTargetEntity;
     public float3 FollowPositionOffset;

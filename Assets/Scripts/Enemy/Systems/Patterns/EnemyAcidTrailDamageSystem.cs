@@ -226,7 +226,9 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
                              DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
                              in EnemyPatternConfig patternConfig)
         {
-            if (patternConfig.AcidTrailEnabled == 0 || segments.Length <= 0)
+            if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid ||
+                patternConfig.AcidTrailEnabled == 0 ||
+                segments.Length <= 0)
             {
                 ResetPlayerOverlap(ref patternRuntimeState);
                 return;

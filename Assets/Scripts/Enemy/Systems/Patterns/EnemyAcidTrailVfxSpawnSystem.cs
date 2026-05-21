@@ -48,7 +48,9 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
         {
             EnemyPatternConfig config = patternConfig.ValueRO;
 
-            if (config.AcidTrailEnabled == 0 || config.AcidTrailVfxPrefabEntity == Entity.Null)
+            if (config.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid ||
+                config.AcidTrailEnabled == 0 ||
+                config.AcidTrailVfxPrefabEntity == Entity.Null)
                 continue;
 
             EnqueueMissingSegmentVfx(segments,
@@ -75,6 +77,8 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
                                                  uint spawnVersion,
                                                  in EnemyPatternConfig config)
     {
+        float trailRendererTimeOverrideSeconds = ResolveTrailRendererTimeOverrideSeconds(segments, in config);
+
         for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
         {
             EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
@@ -87,6 +91,7 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
             vfxRequests.Add(BuildVfxRequest(in segment,
                                             enemyEntity,
                                             spawnVersion,
+                                            trailRendererTimeOverrideSeconds,
                                             in config));
         }
     }
@@ -97,11 +102,13 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
     /// <param name="segment">Acid segment being represented visually.</param>
     /// <param name="enemyEntity">Enemy entity followed by the attached trail renderer.</param>
     /// <param name="spawnVersion">Enemy spawn version used to validate pooled-owner lifetime.</param>
+    /// <param name="trailRendererTimeOverrideSeconds">Runtime trail retention aligned to retained damage sections.</param>
     /// <param name="config">Resolved Acid Wanderer pattern config.</param>
     /// <returns>Managed VFX request consumed by the shared VFX spawn system.</returns>
     private static PlayerPowerUpVfxSpawnRequest BuildVfxRequest(in EnemyAcidTrailSegmentElement segment,
                                                                 Entity enemyEntity,
                                                                 uint spawnVersion,
+                                                                float trailRendererTimeOverrideSeconds,
                                                                 in EnemyPatternConfig config)
     {
         float scaleMultiplier = math.max(MinimumVfxScale, config.AcidTrailVfxScaleMultiplier);
@@ -122,6 +129,7 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
             Rotation = quaternion.identity,
             UniformScale = math.max(MinimumVfxScale, scaleMultiplier),
             TrailRendererWidthOverride = trailWidthOverride,
+            TrailRendererTimeOverrideSeconds = trailRendererTimeOverrideSeconds,
             LifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, segment.RemainingLifetime),
             FollowTargetEntity = enemyEntity,
             FollowPositionOffset = float3.zero,
@@ -129,6 +137,39 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
             FollowValidationSpawnVersion = spawnVersion,
             Velocity = float3.zero
         };
+    }
+
+    /// <summary>
+    /// Resolves trail history retention from the active Acid damage sections currently kept by one owner.
+    /// </summary>
+    /// <param name="segments">Retained Acid damage sections ordered from oldest to newest.</param>
+    /// <param name="config">Resolved Acid Wanderer pattern config.</param>
+    /// <returns>Trail renderer history time in seconds.</returns>
+    private static float ResolveTrailRendererTimeOverrideSeconds(DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
+                                                                 in EnemyPatternConfig config)
+    {
+        float segmentLifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, config.AcidTrailSegmentLifetimeSeconds);
+        int maximumRetainedSegments = math.max(1, config.AcidTrailMaxActiveSegments);
+
+        if (segments.Length < maximumRetainedSegments || segments.Length <= 1)
+            return segmentLifetimeSeconds;
+
+        float oldestSegmentAge = ResolveSegmentAgeSeconds(segments[0], segmentLifetimeSeconds);
+        float nextSegmentAge = ResolveSegmentAgeSeconds(segments[1], segmentLifetimeSeconds);
+        float oldestSectionAge = oldestSegmentAge + math.max(0f, oldestSegmentAge - nextSegmentAge);
+        return math.clamp(oldestSectionAge, MinimumVfxLifetimeSeconds, segmentLifetimeSeconds);
+    }
+
+    /// <summary>
+    /// Resolves elapsed age for one retained Acid section from its copied lifetime payload.
+    /// </summary>
+    /// <param name="segment">Retained Acid damage section.</param>
+    /// <param name="segmentLifetimeSeconds">Configured full lifetime copied into fresh Acid sections.</param>
+    /// <returns>Elapsed section age in seconds.</returns>
+    private static float ResolveSegmentAgeSeconds(in EnemyAcidTrailSegmentElement segment,
+                                                  float segmentLifetimeSeconds)
+    {
+        return math.max(0f, segmentLifetimeSeconds - math.clamp(segment.RemainingLifetime, 0f, segmentLifetimeSeconds));
     }
     #endregion
 

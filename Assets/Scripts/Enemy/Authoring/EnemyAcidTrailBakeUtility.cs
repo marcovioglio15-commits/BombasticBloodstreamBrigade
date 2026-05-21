@@ -9,19 +9,17 @@ internal static class EnemyAcidTrailBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Applies authored acid trail payload values to the compiled pattern config.
+    /// Copies authored acid trail payload values without activating runtime trail emission.
     /// </summary>
     /// <param name="acid">Authored acid payload, or null when unavailable.</param>
     /// <param name="patternConfig">Mutable compiled pattern config receiving the acid fields.</param>
     public static void ApplyPayload(EnemyWandererAcidPayload acid, ref EnemyPatternConfig patternConfig)
     {
-        if (acid == null)
-        {
-            patternConfig.AcidTrailEnabled = 0;
-            return;
-        }
+        Disable(ref patternConfig);
 
-        patternConfig.AcidTrailEnabled = 1;
+        if (acid == null)
+            return;
+
         patternConfig.AcidTrailSegmentLifetimeSeconds = math.max(0.05f, acid.TrailSegmentLifetimeSeconds);
         patternConfig.AcidTrailSpawnDistance = math.max(0f, acid.TrailSpawnDistance);
         patternConfig.AcidTrailSpawnIntervalSeconds = math.max(0f, acid.TrailSpawnIntervalSeconds);
@@ -43,6 +41,15 @@ internal static class EnemyAcidTrailBakeUtility
     public static void Enable(ref EnemyPatternConfig patternConfig)
     {
         patternConfig.AcidTrailEnabled = 1;
+    }
+
+    /// <summary>
+    /// Disables Acid trail runtime emission before a non-Acid movement module becomes active.
+    /// </summary>
+    /// <param name="patternConfig">Mutable compiled pattern config receiving the disabled flag.</param>
+    public static void Disable(ref EnemyPatternConfig patternConfig)
+    {
+        patternConfig.AcidTrailEnabled = 0;
     }
     #endregion
 

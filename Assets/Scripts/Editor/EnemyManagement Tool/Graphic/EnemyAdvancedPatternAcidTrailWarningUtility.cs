@@ -131,7 +131,7 @@ internal static class EnemyAdvancedPatternAcidTrailWarningUtility
         if (!canEmitEveryMovementFrame || maxSegmentsProperty.intValue <= 0)
             return;
 
-        warningLines.Add("Dense Spawn Distance with zero Spawn Interval can exhaust Max Active Segments before Segment Lifetime ends. Visible trail sections may stop dealing damage early.");
+        warningLines.Add("Dense Spawn Distance with zero Spawn Interval can exhaust Max Active Segments before Segment Lifetime ends and truncate retained Acid hazard history.");
     }
 
     /// <summary>

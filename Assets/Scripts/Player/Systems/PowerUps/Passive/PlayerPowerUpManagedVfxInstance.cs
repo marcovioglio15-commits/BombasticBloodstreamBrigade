@@ -15,6 +15,7 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public ParticleSystem[] ParticleSystems;
     public TrailRenderer[] TrailRenderers;
     public float[] TrailRendererBaseWidths;
+    public float[] TrailRendererBaseTimes;
     public Entity PrefabEntity;
     public float RemainingSeconds;
     public Entity FollowTargetEntity;

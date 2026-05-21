@@ -87,7 +87,8 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
         {
             CompactSegments(segments, DeltaTime);
 
-            if (patternConfig.AcidTrailEnabled == 0)
+            if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid ||
+                patternConfig.AcidTrailEnabled == 0)
             {
                 ResetState(ref patternRuntimeState, segments);
                 return;
