@@ -76,9 +76,7 @@ public struct EnemyExperienceDropDefinitionElement : IBufferElementData
 /// </summary>
 public struct EnemyRecoveryDropModuleElement : IBufferElementData
 {
-    public int MinimumDropCount;
-    public int MaximumDropCount;
-    public float Distribution;
+    public float DropChance;
     public float DropRadius;
     public float AttractionSpeed;
     public float CollectDistance;
@@ -99,6 +97,7 @@ public struct EnemyRecoveryDropDefinitionElement : IBufferElementData
     public Entity PrefabEntity;
     public float HealthRestoreAmount;
     public float ShieldRestoreAmount;
+    public int Count;
 }
 
 /// <summary>

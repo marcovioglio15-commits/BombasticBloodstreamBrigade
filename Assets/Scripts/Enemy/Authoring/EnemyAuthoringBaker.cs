@@ -1145,7 +1145,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         {
             EnemyCompiledRecoveryDropModule compiledModule = compiledPattern.RecoveryDropModules[moduleIndex];
 
-            if (compiledModule.MaximumDropCount <= 0)
+            if (compiledModule.DropChance <= 0f)
                 continue;
 
             int stagedDefinitionStartIndex = stagedRecoveryDefinitions.Count;
@@ -1171,8 +1171,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
                 float healthRestoreAmount = math.max(0f, compiledDefinition.HealthRestoreAmount);
                 float shieldRestoreAmount = math.max(0f, compiledDefinition.ShieldRestoreAmount);
+                int dropCount = math.max(0, compiledDefinition.Count);
 
-                if (healthRestoreAmount <= 0f && shieldRestoreAmount <= 0f)
+                if (dropCount <= 0 || (healthRestoreAmount <= 0f && shieldRestoreAmount <= 0f))
                     continue;
 
                 Entity dropPrefabEntity = GetEntity(dropPrefab, TransformUsageFlags.Dynamic);
@@ -1180,7 +1181,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                 {
                     PrefabEntity = dropPrefabEntity,
                     HealthRestoreAmount = healthRestoreAmount,
-                    ShieldRestoreAmount = shieldRestoreAmount
+                    ShieldRestoreAmount = shieldRestoreAmount,
+                    Count = dropCount
                 });
             }
 
@@ -1189,15 +1191,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             if (stagedDefinitionCount <= 0)
                 continue;
 
-            int minimumDropCount = math.max(0, compiledModule.MinimumDropCount);
-            int maximumDropCount = math.max(minimumDropCount, compiledModule.MaximumDropCount);
-
             int stagedModuleIndex = stagedRecoveryModules.Count;
             stagedRecoveryModules.Add(new EnemyRecoveryDropModuleElement
             {
-                MinimumDropCount = minimumDropCount,
-                MaximumDropCount = maximumDropCount,
-                Distribution = math.clamp(compiledModule.Distribution, 0f, 1f),
+                DropChance = math.clamp(compiledModule.DropChance, 0f, 1f),
                 DropRadius = math.max(0f, compiledModule.DropRadius),
                 AttractionSpeed = math.max(0f, compiledModule.AttractionSpeed),
                 CollectDistance = math.max(0.01f, compiledModule.CollectDistance),

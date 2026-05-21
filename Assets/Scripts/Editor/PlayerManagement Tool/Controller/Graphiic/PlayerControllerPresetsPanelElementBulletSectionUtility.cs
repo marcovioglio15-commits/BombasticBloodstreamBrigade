@@ -86,7 +86,7 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         elementSettingsFoldout.Add(appliedElementsFoldout);
 
         Foldout elementBehavioursFoldout = CreateNestedFoldout("Element Behaviour");
-        List<ElementBehaviourFoldoutEntry> behaviourFoldouts = new List<ElementBehaviourFoldoutEntry>(4);
+        List<ElementBehaviourFoldoutEntry> behaviourFoldouts = new List<ElementBehaviourFoldoutEntry>(3);
         behaviourFoldouts.Add(BuildElementBehaviourFoldout(elementBehavioursProperty.FindPropertyRelative("fire"),
                                                            appliedElementsProperty,
                                                            scalingRulesProperty,
@@ -102,11 +102,6 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
                                                            scalingRulesProperty,
                                                            "Poison",
                                                            PlayerProjectileAppliedElement.Poison));
-        behaviourFoldouts.Add(BuildElementBehaviourFoldout(elementBehavioursProperty.FindPropertyRelative("custom"),
-                                                           appliedElementsProperty,
-                                                           scalingRulesProperty,
-                                                           "Custom",
-                                                           PlayerProjectileAppliedElement.Custom));
 
         for (int foldoutIndex = 0; foldoutIndex < behaviourFoldouts.Count; foldoutIndex++)
         {
@@ -124,7 +119,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         {
             string warningMessage = BuildAppliedElementsWarningMessage(appliedElementsProperty);
             bool hasAnyAppliedElement = HasAnyAppliedElement(appliedElementsProperty);
+            bool hasAnySupportedBehaviourElement = HasAnySupportedElementBehaviour(appliedElementsProperty);
             appliedElementsInfoBox.style.display = hasAnyAppliedElement ? DisplayStyle.None : DisplayStyle.Flex;
+            elementBehavioursFoldout.style.display = hasAnySupportedBehaviourElement ? DisplayStyle.Flex : DisplayStyle.None;
             appliedElementsWarningBox.text = warningMessage;
             appliedElementsWarningBox.style.display = string.IsNullOrWhiteSpace(warningMessage) ? DisplayStyle.None : DisplayStyle.Flex;
         };
@@ -239,57 +236,59 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         HelpBox validationWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         behaviourFoldout.Add(validationWarningBox);
 
+        Foldout coreFoldout = CreateNestedFoldout("Core");
+        behaviourFoldout.Add(coreFoldout);
         VisualElement effectKindField = CreateField(effectKindProperty,
                                                     scalingRulesProperty,
                                                     "Effect Kind",
                                                     "Selects whether this element applies dots damage or an impediment-style slow effect.");
-        behaviourFoldout.Add(effectKindField);
+        coreFoldout.Add(effectKindField);
 
         VisualElement procModeField = CreateField(procModeProperty,
                                                   scalingRulesProperty,
                                                   "Proc Mode",
                                                   "Defines how stacks behave before and at threshold.");
-        behaviourFoldout.Add(procModeField);
+        coreFoldout.Add(procModeField);
 
         VisualElement reapplyModeField = CreateField(reapplyModeProperty,
                                                      scalingRulesProperty,
                                                      "Reapply Mode",
                                                      "Defines how the same effect behaves when new hits arrive during an active proc.");
-        behaviourFoldout.Add(reapplyModeField);
+        coreFoldout.Add(reapplyModeField);
 
         VisualElement stacksPerHitField = CreateField(stacksPerHitProperty,
                                                       scalingRulesProperty,
                                                       "Stacks Per Hit",
                                                       "Stacks added by each valid projectile hit.");
-        behaviourFoldout.Add(stacksPerHitField);
+        coreFoldout.Add(stacksPerHitField);
 
+        Foldout stackingFoldout = CreateNestedFoldout("Stacking");
+        behaviourFoldout.Add(stackingFoldout);
         VisualElement procThresholdStacksField = CreateField(procThresholdStacksProperty,
                                                              scalingRulesProperty,
                                                              "Proc Threshold Stacks",
                                                              "Stacks required to trigger the threshold proc.");
-        behaviourFoldout.Add(procThresholdStacksField);
+        stackingFoldout.Add(procThresholdStacksField);
 
         VisualElement maximumStacksField = CreateField(maximumStacksProperty,
                                                        scalingRulesProperty,
                                                        "Maximum Stacks",
                                                        "Maximum stacks that can be stored on a target for this element.");
-        behaviourFoldout.Add(maximumStacksField);
+        stackingFoldout.Add(maximumStacksField);
 
         VisualElement stackDecayPerSecondField = CreateField(stackDecayPerSecondProperty,
                                                              scalingRulesProperty,
                                                              "Stack Decay Per Second",
                                                              "Amount of stored stacks removed per second while the target is not refreshed.");
-        behaviourFoldout.Add(stackDecayPerSecondField);
+        stackingFoldout.Add(stackDecayPerSecondField);
 
         VisualElement consumeStacksOnProcField = CreateField(consumeStacksOnProcProperty,
                                                              scalingRulesProperty,
                                                              "Consume Stacks On Proc",
                                                              "When enabled, a threshold proc consumes the configured threshold amount of stacks.");
-        behaviourFoldout.Add(consumeStacksOnProcField);
+        stackingFoldout.Add(consumeStacksOnProcField);
 
-        VisualElement dotsContainer = new VisualElement();
-        dotsContainer.style.flexDirection = FlexDirection.Column;
-        dotsContainer.style.marginLeft = 8f;
+        Foldout dotsContainer = CreateNestedFoldout("Dots Effect");
         VisualElement dotDamagePerTickField = CreateField(dotDamagePerTickProperty,
                                                           scalingRulesProperty,
                                                           "Dot Damage Per Tick",
@@ -307,9 +306,7 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         dotsContainer.Add(dotDurationSecondsField);
         behaviourFoldout.Add(dotsContainer);
 
-        VisualElement impedimentContainer = new VisualElement();
-        impedimentContainer.style.flexDirection = FlexDirection.Column;
-        impedimentContainer.style.marginLeft = 8f;
+        Foldout impedimentContainer = CreateNestedFoldout("Impediment Effect");
         VisualElement impedimentSlowPercentPerStackField = CreateField(impedimentSlowPercentPerStackProperty,
                                                                        scalingRulesProperty,
                                                                        "Impediment Slow Percent Per Stack",
@@ -335,8 +332,11 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         Action refreshBehaviourView = () =>
         {
             ElementalEffectKind effectKind = (ElementalEffectKind)effectKindProperty.enumValueIndex;
+            ElementalProcMode procMode = (ElementalProcMode)procModeProperty.enumValueIndex;
             bool isActiveElement = ContainsAppliedElement(appliedElementsProperty, representedElement);
-            string warningMessage = BuildElementBehaviourWarningMessage(stacksPerHitProperty,
+            string warningMessage = BuildElementBehaviourWarningMessage(effectKind,
+                                                                       procMode,
+                                                                       stacksPerHitProperty,
                                                                        procThresholdStacksProperty,
                                                                        maximumStacksProperty,
                                                                        stackDecayPerSecondProperty,
@@ -348,9 +348,14 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
                                                                        impedimentMaxSlowPercentProperty,
                                                                        impedimentDurationSecondsProperty);
 
+            behaviourFoldout.style.display = isActiveElement ? DisplayStyle.Flex : DisplayStyle.None;
             inactiveInfoBox.style.display = isActiveElement ? DisplayStyle.None : DisplayStyle.Flex;
             dotsContainer.style.display = effectKind == ElementalEffectKind.Dots ? DisplayStyle.Flex : DisplayStyle.None;
             impedimentContainer.style.display = effectKind == ElementalEffectKind.Impediment ? DisplayStyle.Flex : DisplayStyle.None;
+            impedimentSlowPercentPerStackField.style.display = effectKind == ElementalEffectKind.Impediment &&
+                                                               procMode == ElementalProcMode.ProgressiveUntilThreshold
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
             validationWarningBox.text = warningMessage;
             validationWarningBox.style.display = string.IsNullOrWhiteSpace(warningMessage) ? DisplayStyle.None : DisplayStyle.Flex;
         };
@@ -396,6 +401,10 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
             if (appliedElement == PlayerProjectileAppliedElement.None)
                 continue;
 
+            AppendWarningLine(warningBuilder,
+                              appliedElement == PlayerProjectileAppliedElement.Custom,
+                              "Custom no longer has a dedicated Element Behaviour section. Use Fire, Ice or Poison for default projectile elements.");
+
             if (visitedElements.Add(appliedElement))
                 continue;
 
@@ -410,6 +419,8 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
     /// <summary>
     /// Builds warning text for one per-element behaviour block.
     /// </summary>
+    /// <param name="effectKind">Current effect kind used to scope effect-specific warnings.</param>
+    /// <param name="procMode">Current proc mode used to scope progressive-only warnings.</param>
     /// <param name="stacksPerHitProperty">Serialized stacks per hit property.</param>
     /// <param name="procThresholdStacksProperty">Serialized threshold property.</param>
     /// <param name="maximumStacksProperty">Serialized maximum stacks property.</param>
@@ -422,7 +433,9 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
     /// <param name="impedimentMaxSlowPercentProperty">Serialized max slow property.</param>
     /// <param name="impedimentDurationSecondsProperty">Serialized impediment duration property.</param>
     /// <returns>Warning text, or an empty string when the authored values are coherent.</returns>
-    private static string BuildElementBehaviourWarningMessage(SerializedProperty stacksPerHitProperty,
+    private static string BuildElementBehaviourWarningMessage(ElementalEffectKind effectKind,
+                                                              ElementalProcMode procMode,
+                                                              SerializedProperty stacksPerHitProperty,
                                                               SerializedProperty procThresholdStacksProperty,
                                                               SerializedProperty maximumStacksProperty,
                                                               SerializedProperty stackDecayPerSecondProperty,
@@ -442,19 +455,32 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
                           maximumStacksProperty.floatValue > 0f && procThresholdStacksProperty.floatValue > maximumStacksProperty.floatValue,
                           "Maximum Stacks is lower than Proc Threshold Stacks, so the runtime effect will clamp the threshold.");
         AppendWarningLine(warningBuilder, stackDecayPerSecondProperty.floatValue < 0f, "Stack Decay Per Second should be >= 0.");
-        AppendWarningLine(warningBuilder, dotDamagePerTickProperty.floatValue < 0f, "Dot Damage Per Tick should be >= 0.");
-        AppendWarningLine(warningBuilder, dotTickIntervalProperty.floatValue < 0.01f, "Dot Tick Interval should be >= 0.01 seconds.");
-        AppendWarningLine(warningBuilder, dotDurationSecondsProperty.floatValue < 0.05f, "Dot Duration Seconds should be >= 0.05 seconds.");
-        AppendWarningLine(warningBuilder,
-                          impedimentSlowPercentPerStackProperty.floatValue < 0f || impedimentSlowPercentPerStackProperty.floatValue > 100f,
-                          "Impediment Slow Percent Per Stack should stay within 0-100.");
-        AppendWarningLine(warningBuilder,
-                          impedimentProcSlowPercentProperty.floatValue < 0f || impedimentProcSlowPercentProperty.floatValue > 100f,
-                          "Impediment Proc Slow Percent should stay within 0-100.");
-        AppendWarningLine(warningBuilder,
-                          impedimentMaxSlowPercentProperty.floatValue < 0f || impedimentMaxSlowPercentProperty.floatValue > 100f,
-                          "Impediment Max Slow Percent should stay within 0-100.");
-        AppendWarningLine(warningBuilder, impedimentDurationSecondsProperty.floatValue < 0.05f, "Impediment Duration Seconds should be >= 0.05 seconds.");
+
+        if (effectKind == ElementalEffectKind.Dots)
+        {
+            AppendWarningLine(warningBuilder, dotDamagePerTickProperty.floatValue < 0f, "Dot Damage Per Tick should be >= 0.");
+            AppendWarningLine(warningBuilder, dotTickIntervalProperty.floatValue < 0.01f, "Dot Tick Interval should be >= 0.01 seconds.");
+            AppendWarningLine(warningBuilder, dotDurationSecondsProperty.floatValue < 0.05f, "Dot Duration Seconds should be >= 0.05 seconds.");
+        }
+
+        if (effectKind == ElementalEffectKind.Impediment)
+        {
+            if (procMode == ElementalProcMode.ProgressiveUntilThreshold)
+            {
+                AppendWarningLine(warningBuilder,
+                                  impedimentSlowPercentPerStackProperty.floatValue < 0f || impedimentSlowPercentPerStackProperty.floatValue > 100f,
+                                  "Impediment Slow Percent Per Stack should stay within 0-100.");
+            }
+
+            AppendWarningLine(warningBuilder,
+                              impedimentProcSlowPercentProperty.floatValue < 0f || impedimentProcSlowPercentProperty.floatValue > 100f,
+                              "Impediment Proc Slow Percent should stay within 0-100.");
+            AppendWarningLine(warningBuilder,
+                              impedimentMaxSlowPercentProperty.floatValue < 0f || impedimentMaxSlowPercentProperty.floatValue > 100f,
+                              "Impediment Max Slow Percent should stay within 0-100.");
+            AppendWarningLine(warningBuilder, impedimentDurationSecondsProperty.floatValue < 0.05f, "Impediment Duration Seconds should be >= 0.05 seconds.");
+        }
+
         return warningBuilder.ToString().TrimEnd();
     }
 
@@ -474,6 +500,18 @@ internal static class PlayerControllerPresetsPanelElementBulletSectionUtility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Reports whether at least one authored slot uses a default element that still has a dedicated behaviour section.
+    /// </summary>
+    /// <param name="appliedElementsProperty">Serialized fixed element slot array.</param>
+    /// <returns>True when Fire, Ice or Poison is assigned to at least one slot.</returns>
+    private static bool HasAnySupportedElementBehaviour(SerializedProperty appliedElementsProperty)
+    {
+        return ContainsAppliedElement(appliedElementsProperty, PlayerProjectileAppliedElement.Fire) ||
+               ContainsAppliedElement(appliedElementsProperty, PlayerProjectileAppliedElement.Ice) ||
+               ContainsAppliedElement(appliedElementsProperty, PlayerProjectileAppliedElement.Poison);
     }
 
     /// <summary>

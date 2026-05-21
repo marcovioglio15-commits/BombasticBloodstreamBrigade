@@ -272,9 +272,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -537,9 +535,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -802,9 +798,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -1067,9 +1061,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -1332,9 +1324,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -1599,9 +1589,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -1864,9 +1852,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -2129,9 +2115,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -2395,9 +2379,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -2660,9 +2642,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -2925,9 +2905,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -3197,9 +3175,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -3471,9 +3447,8 @@ MonoBehaviour:
           - dropPrefab: {fileID: 6858454939034102764, guid: b1f8b984875b05149a11ac902663992b, type: 3}
             healthRestoreAmount: 0.1
             shieldRestoreAmount: 0
-          minimumDropCount: 0
-          maximumDropCount: 3
-          dropsDistribution: 0.5
+            dropCount: 1
+          dropChancePercent: 100
           dropRadius: 2
           collectionMovement:
             moveSpeed: 12
@@ -3742,9 +3717,7 @@ MonoBehaviour:
           conditions: []
         recovery:
           dropDefinitions: []
-          minimumDropCount: 1
-          maximumDropCount: 1
-          dropsDistribution: 0.5
+          dropChancePercent: 100
           dropRadius: 0.6
           collectionMovement:
             moveSpeed: 8
@@ -4014,9 +3987,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -4301,9 +4272,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -4594,9 +4563,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -4865,9 +4832,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -5131,9 +5096,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -5402,9 +5365,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -5689,9 +5650,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -5982,9 +5941,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -6253,9 +6210,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -6519,9 +6474,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -6790,9 +6743,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -7077,9 +7028,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -7370,9 +7319,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -7641,9 +7588,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -7907,9 +7852,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -8178,9 +8121,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -8483,9 +8424,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -8776,9 +8715,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -9047,9 +8984,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -9342,9 +9277,7 @@ MonoBehaviour:
                   m_RotationOrder: 4
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -9608,9 +9541,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -9880,9 +9811,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -10167,9 +10096,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -10460,9 +10387,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -10737,9 +10662,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -11003,9 +10926,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -11275,9 +11196,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -11562,9 +11481,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -11855,9 +11772,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -12126,9 +12041,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -12392,9 +12305,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -12664,9 +12575,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -12951,9 +12860,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -13244,9 +13151,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -13515,9 +13420,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -13781,9 +13684,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -14052,9 +13953,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -14339,9 +14238,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -14632,9 +14529,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -14903,9 +14798,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -15168,9 +15061,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -15434,9 +15325,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -15705,9 +15594,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -15992,9 +15879,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -16285,9 +16170,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -16556,9 +16439,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -16821,9 +16702,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -17087,9 +16966,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -17358,9 +17235,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -17645,9 +17520,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -17938,9 +17811,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -18209,9 +18080,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -18453,7 +18322,7 @@ MonoBehaviour:
             recoveryDamageWindowPercent: 20
             recoveryDamageWindowSeconds: 5
           dropItems:
-            dropPayloadKind: 0
+            dropPayloadKind: 2
             experience:
               dropDefinitions: []
               complessiveExperienceDropMinimum: 10
@@ -18473,10 +18342,12 @@ MonoBehaviour:
               maximumFinalMultiplier: 4
               conditions: []
             recovery:
-              dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropDefinitions:
+              - dropPrefab: {fileID: 0}
+                healthRestoreAmount: 0
+                shieldRestoreAmount: 0
+                dropCount: 0
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8
@@ -18740,9 +18611,7 @@ MonoBehaviour:
               conditions: []
             recovery:
               dropDefinitions: []
-              minimumDropCount: 1
-              maximumDropCount: 1
-              dropsDistribution: 0.5
+              dropChancePercent: 100
               dropRadius: 0.6
               collectionMovement:
                 moveSpeed: 8

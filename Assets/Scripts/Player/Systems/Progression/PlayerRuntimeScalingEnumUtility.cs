@@ -139,6 +139,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe ElementType from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static ElementType ResolveElementType(float value)
+    {
+        return (ElementType)ResolveEnumIndex(value, 3);
+    }
+
+    /// <summary>
     /// Resolves a safe ElementalProcMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

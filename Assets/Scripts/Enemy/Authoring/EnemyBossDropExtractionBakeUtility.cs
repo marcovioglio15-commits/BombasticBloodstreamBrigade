@@ -226,6 +226,7 @@ internal static class EnemyBossDropExtractionBakeUtility
                 EnemyCompiledRecoveryDropDefinition definition = compiledCandidate.RecoveryDropDefinitions[definitionIndex];
 
                 if (definition.Prefab == null ||
+                    definition.Count <= 0 ||
                     (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f))
                 {
                     continue;
@@ -242,7 +243,8 @@ internal static class EnemyBossDropExtractionBakeUtility
                 {
                     PrefabEntity = prefabEntity,
                     HealthRestoreAmount = math.max(0f, definition.HealthRestoreAmount),
-                    ShieldRestoreAmount = math.max(0f, definition.ShieldRestoreAmount)
+                    ShieldRestoreAmount = math.max(0f, definition.ShieldRestoreAmount),
+                    Count = math.max(0, definition.Count)
                 });
             }
 
@@ -253,9 +255,7 @@ internal static class EnemyBossDropExtractionBakeUtility
 
             result.BossDropRecoveryModules.Add(new EnemyRecoveryDropModuleElement
             {
-                MinimumDropCount = math.max(0, compiledModule.MinimumDropCount),
-                MaximumDropCount = math.max(math.max(0, compiledModule.MinimumDropCount), compiledModule.MaximumDropCount),
-                Distribution = math.clamp(compiledModule.Distribution, 0f, 1f),
+                DropChance = math.clamp(compiledModule.DropChance, 0f, 1f),
                 DropRadius = math.max(0f, compiledModule.DropRadius),
                 AttractionSpeed = math.max(0f, compiledModule.AttractionSpeed),
                 CollectDistance = math.max(0.01f, compiledModule.CollectDistance),

@@ -122,15 +122,13 @@ internal static class EnemyRecoveryDropSpawnUtility
         if (definitionCount <= 0 || remainingFrameDropSpawnBudget <= 0)
             return;
 
-        int dropCount = ResolveRecoveryDropCount(killedEvent.EnemyEntity,
-                                                 killEventIndex,
-                                                 moduleIndex,
-                                                 recoveryModule.MinimumDropCount,
-                                                 recoveryModule.MaximumDropCount);
-        dropCount = math.min(dropCount, EnemyDropSpawnRuntimeUtility.MaxSpawnStepsPerEnemy);
-
-        if (dropCount <= 0)
+        if (!ShouldDropRecoveryModule(killedEvent.EnemyEntity,
+                                      killEventIndex,
+                                      moduleIndex,
+                                      recoveryModule.DropChance))
+        {
             return;
+        }
 
         float dropRadius = math.max(0f, recoveryModule.DropRadius);
         float attractionSpeed = math.max(0f, recoveryModule.AttractionSpeed);
@@ -138,56 +136,66 @@ internal static class EnemyRecoveryDropSpawnUtility
         float collectDistancePerPlayerSpeed = math.max(0f, recoveryModule.CollectDistancePerPlayerSpeed);
         float spawnAnimationMinDuration = math.max(0f, recoveryModule.SpawnAnimationMinDuration);
         float spawnAnimationMaxDuration = math.max(spawnAnimationMinDuration, recoveryModule.SpawnAnimationMaxDuration);
+        int definitionStartIndex = math.max(0, recoveryModule.DefinitionStartIndex);
+        int definitionEndIndex = math.min(definitions.Length, definitionStartIndex + definitionCount);
+        int spawnedDropIndex = 0;
 
-        for (int dropIndex = 0; dropIndex < dropCount; dropIndex++)
+        for (int definitionIndex = definitionStartIndex; definitionIndex < definitionEndIndex; definitionIndex++)
         {
             if (remainingFrameDropSpawnBudget <= 0)
                 break;
 
-            int definitionIndex = ResolveRecoveryDefinitionIndex(definitions,
-                                                                 recoveryModule.DefinitionStartIndex,
-                                                                 definitionCount,
-                                                                 recoveryModule.Distribution,
-                                                                 ResolveRecoveryDefinitionSeed(killedEvent.EnemyEntity,
-                                                                                               killEventIndex,
-                                                                                               moduleIndex,
-                                                                                               dropIndex));
-
-            if (definitionIndex < 0)
+            if (spawnedDropIndex >= EnemyDropSpawnRuntimeUtility.MaxSpawnStepsPerEnemy)
                 break;
 
             EnemyRecoveryDropDefinitionElement definition = definitions[definitionIndex];
+            int definitionDropCount = math.max(0, definition.Count);
 
-            if (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f)
+            if (definitionDropCount <= 0 ||
+                (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f))
+            {
                 continue;
+            }
 
             Entity poolEntity;
 
             if (!EnemyExperienceDropPoolUtility.TryResolvePoolEntity(poolMap, definition.PrefabEntity, out poolEntity))
-                break;
+                continue;
 
-            Entity dropEntity;
+            for (int dropIndex = 0; dropIndex < definitionDropCount; dropIndex++)
+            {
+                if (remainingFrameDropSpawnBudget <= 0)
+                    break;
 
-            if (!EnemyExperienceDropPoolUtility.TryAcquireDrop(entityManager,
-                                                               poolEntity,
-                                                               out dropEntity,
-                                                               ref remainingRuntimeDropPoolExpansionBudget))
-                break;
+                if (spawnedDropIndex >= EnemyDropSpawnRuntimeUtility.MaxSpawnStepsPerEnemy)
+                    break;
 
-            ActivateRecoveryDrop(entityManager,
-                                 dropEntity,
-                                 poolEntity,
-                                 in definition,
-                                 killedEvent.Position,
-                                 moduleIndex,
-                                 dropIndex,
-                                 dropRadius,
-                                 attractionSpeed,
-                                 collectDistance,
-                                 collectDistancePerPlayerSpeed,
-                                 spawnAnimationMinDuration,
-                                 spawnAnimationMaxDuration);
-            remainingFrameDropSpawnBudget--;
+                Entity dropEntity;
+
+                if (!EnemyExperienceDropPoolUtility.TryAcquireDrop(entityManager,
+                                                                   poolEntity,
+                                                                   out dropEntity,
+                                                                   ref remainingRuntimeDropPoolExpansionBudget))
+                {
+                    return;
+                }
+
+                ActivateRecoveryDrop(entityManager,
+                                     dropEntity,
+                                     poolEntity,
+                                     in definition,
+                                     killedEvent.Position,
+                                     moduleIndex,
+                                     spawnedDropIndex,
+                                     dropRadius,
+                                     attractionSpeed,
+                                     collectDistance,
+                                     collectDistancePerPlayerSpeed,
+                                     spawnAnimationMinDuration,
+                                     spawnAnimationMaxDuration);
+                remainingFrameDropSpawnBudget--;
+                spawnedDropIndex++;
+            }
         }
     }
 
@@ -253,112 +261,47 @@ internal static class EnemyRecoveryDropSpawnUtility
 
     #region Selection
     /// <summary>
-    /// Resolves a deterministic recovery drop count inside the authored module range.
+    /// Resolves whether one recovery module should emit its fixed definition counts for this kill event.
     /// </summary>
-    /// <param name="enemyEntity">Killed enemy entity used to seed selection.</param>
+    /// <param name="enemyEntity">Killed enemy entity used to seed the drop chance.</param>
     /// <param name="killEventIndex">Index of the kill event inside the current frame snapshot.</param>
     /// <param name="moduleIndex">Recovery module index used to decorrelate sibling modules.</param>
-    /// <param name="minimumDropCount">Minimum authored drop count.</param>
-    /// <param name="maximumDropCount">Maximum authored drop count.</param>
-    /// <returns>Resolved non-negative pickup count.</returns>
-    private static int ResolveRecoveryDropCount(Entity enemyEntity,
-                                                int killEventIndex,
-                                                int moduleIndex,
-                                                int minimumDropCount,
-                                                int maximumDropCount)
+    /// <param name="dropChance">Normalized 0-1 module chance.</param>
+    /// <returns>True when the fixed recovery payload should be spawned.</returns>
+    private static bool ShouldDropRecoveryModule(Entity enemyEntity,
+                                                 int killEventIndex,
+                                                 int moduleIndex,
+                                                 float dropChance)
     {
-        int sanitizedMinimumDropCount = math.max(0, minimumDropCount);
-        int sanitizedMaximumDropCount = math.max(sanitizedMinimumDropCount, maximumDropCount);
+        float clampedDropChance = math.clamp(dropChance, 0f, 1f);
 
-        if (sanitizedMaximumDropCount <= sanitizedMinimumDropCount)
-            return sanitizedMinimumDropCount;
+        if (clampedDropChance <= 0f)
+            return false;
 
-        Unity.Mathematics.Random random = new Unity.Mathematics.Random(EnemyDropSpawnRuntimeUtility.ResolveDropTotalRandomSeed(enemyEntity,
-                                                                                                                                killEventIndex,
-                                                                                                                                moduleIndex + 7919));
-        return random.NextInt(sanitizedMinimumDropCount, sanitizedMaximumDropCount + 1);
+        if (clampedDropChance >= 1f)
+            return true;
+
+        Unity.Mathematics.Random random = new Unity.Mathematics.Random(ResolveRecoveryModuleChanceSeed(enemyEntity,
+                                                                                                       killEventIndex,
+                                                                                                       moduleIndex));
+        return random.NextFloat() <= clampedDropChance;
     }
 
     /// <summary>
-    /// Selects one recovery definition using a two-pass weighted scan without temporary allocations.
+    /// Builds a deterministic non-zero seed for one recovery module chance roll.
     /// </summary>
-    /// <param name="definitions">Recovery definitions snapshot.</param>
-    /// <param name="definitionStartIndex">First definition index owned by the module.</param>
-    /// <param name="definitionCount">Number of definitions owned by the module.</param>
-    /// <param name="distribution">Bias where 0 favors low restorative values and 1 favors high restorative values.</param>
-    /// <param name="seed">Deterministic non-zero random seed.</param>
-    /// <returns>Selected definition index, or -1 when no valid definition exists.</returns>
-    private static int ResolveRecoveryDefinitionIndex(NativeArray<EnemyRecoveryDropDefinitionElement> definitions,
-                                                      int definitionStartIndex,
-                                                      int definitionCount,
-                                                      float distribution,
-                                                      uint seed)
-    {
-        int startIndex = math.max(0, definitionStartIndex);
-        int endIndex = math.min(definitions.Length, startIndex + math.max(0, definitionCount));
-        float clampedDistribution = math.clamp(distribution, 0f, 1f);
-        float totalWeight = 0f;
-
-        for (int definitionIndex = startIndex; definitionIndex < endIndex; definitionIndex++)
-        {
-            EnemyRecoveryDropDefinitionElement definition = definitions[definitionIndex];
-            totalWeight += ResolveRecoveryDefinitionWeight(in definition, clampedDistribution);
-        }
-
-        if (totalWeight <= EnemyDropSpawnRuntimeUtility.PrecisionEpsilon)
-            return -1;
-
-        Unity.Mathematics.Random random = new Unity.Mathematics.Random(seed);
-        float roll = random.NextFloat(0f, totalWeight);
-        float cumulativeWeight = 0f;
-
-        for (int definitionIndex = startIndex; definitionIndex < endIndex; definitionIndex++)
-        {
-            EnemyRecoveryDropDefinitionElement definition = definitions[definitionIndex];
-            cumulativeWeight += ResolveRecoveryDefinitionWeight(in definition, clampedDistribution);
-
-            if (roll <= cumulativeWeight)
-                return definitionIndex;
-        }
-
-        return endIndex - 1;
-    }
-
-    /// <summary>
-    /// Resolves one definition selection weight from its combined restorative value.
-    /// </summary>
-    /// <param name="definition">Recovery definition being weighted.</param>
-    /// <param name="distribution">Bias where 0 favors low restorative values and 1 favors high restorative values.</param>
-    /// <returns>Positive selection weight for valid recovery definitions, otherwise zero.</returns>
-    private static float ResolveRecoveryDefinitionWeight(in EnemyRecoveryDropDefinitionElement definition, float distribution)
-    {
-        float combinedRestoreAmount = math.max(0f, definition.HealthRestoreAmount) + math.max(0f, definition.ShieldRestoreAmount);
-
-        if (combinedRestoreAmount <= 0f)
-            return 0f;
-
-        float lowValueWeight = 1f / math.max(0.01f, combinedRestoreAmount);
-        float highValueWeight = math.max(0.01f, combinedRestoreAmount);
-        return math.lerp(lowValueWeight, highValueWeight, math.saturate(distribution));
-    }
-
-    /// <summary>
-    /// Builds a deterministic non-zero seed for one recovery definition draw.
-    /// </summary>
-    /// <param name="enemyEntity">Killed enemy entity used to seed selection.</param>
+    /// <param name="enemyEntity">Killed enemy entity used to seed the module chance.</param>
     /// <param name="killEventIndex">Index of the kill event inside the current frame snapshot.</param>
     /// <param name="moduleIndex">Recovery module index.</param>
-    /// <param name="dropIndex">Pickup index inside the module.</param>
     /// <returns>Non-zero deterministic random seed.</returns>
-    private static uint ResolveRecoveryDefinitionSeed(Entity enemyEntity,
-                                                      int killEventIndex,
-                                                      int moduleIndex,
-                                                      int dropIndex)
+    private static uint ResolveRecoveryModuleChanceSeed(Entity enemyEntity,
+                                                       int killEventIndex,
+                                                       int moduleIndex)
     {
         uint seed = math.hash(new int4(enemyEntity.Index,
                                        enemyEntity.Version,
                                        math.max(0, killEventIndex) + moduleIndex * 397,
-                                       math.max(0, dropIndex) + 297121507));
+                                       297121507));
 
         if (seed == 0u)
             return 1u;

@@ -111,6 +111,9 @@ public sealed class PowerUpHealMissingHealthModuleData
     #endregion
 }
 
+/// <summary>
+/// Stores the modular passive payload that applies an elemental effect to enemies inside trail-area ticks.
+/// </summary>
 [Serializable]
 public sealed class PowerUpElementalAreaTickModuleData
 {
@@ -158,6 +161,12 @@ public sealed class PowerUpElementalAreaTickModuleData
     #region Methods
 
     #region Setup
+    /// <summary>
+    /// Replaces the authored area-tick payload values when preset setup utilities need to seed a module definition.
+    /// </summary>
+    /// <param name="effectDataValue">Elemental effect payload assigned to each area tick.</param>
+    /// <param name="stacksPerTickValue">Stack amount applied by each tick.</param>
+    /// <param name="applyIntervalSecondsValue">Seconds between applications while targets remain inside the area.</param>
     public void Configure(ElementalEffectDefinitionData effectDataValue, float stacksPerTickValue, float applyIntervalSecondsValue)
     {
         effectData = effectDataValue;
@@ -167,18 +176,13 @@ public sealed class PowerUpElementalAreaTickModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps required references initialized without snapping authored values that the tool reports through warnings.
+    /// </summary>
     public void Validate()
     {
         if (effectData == null)
             effectData = new ElementalEffectDefinitionData();
-
-        effectData.Validate();
-
-        if (stacksPerTick < 0f)
-            stacksPerTick = 0f;
-
-        if (applyIntervalSeconds < 0.01f)
-            applyIntervalSeconds = 0.01f;
     }
     #endregion
 

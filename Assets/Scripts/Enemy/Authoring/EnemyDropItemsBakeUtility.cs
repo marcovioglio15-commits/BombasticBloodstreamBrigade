@@ -322,18 +322,15 @@ internal static class EnemyDropItemsBakeUtility
         if (recoveryPayload == null)
             return;
 
-        int minimumDropCount = math.max(0, recoveryPayload.MinimumDropCount);
-        int maximumDropCount = math.max(minimumDropCount, recoveryPayload.MaximumDropCount);
+        float dropChance = math.clamp(recoveryPayload.DropChancePercent * 0.01f, 0f, 1f);
 
-        if (maximumDropCount <= 0)
+        if (dropChance <= 0f)
             return;
 
         EnemyExperienceDropCollectionSettings collectionMovement = recoveryPayload.CollectionMovement;
         EnemyCompiledRecoveryDropModule compiledModule = new EnemyCompiledRecoveryDropModule
         {
-            MinimumDropCount = minimumDropCount,
-            MaximumDropCount = maximumDropCount,
-            Distribution = math.clamp(recoveryPayload.DropsDistribution, 0f, 1f),
+            DropChance = dropChance,
             DropRadius = math.max(0f, recoveryPayload.DropRadius),
             AttractionSpeed = collectionMovement != null ? math.max(0f, collectionMovement.MoveSpeed) : 0f,
             CollectDistance = collectionMovement != null ? math.max(0.01f, collectionMovement.CollectDistance) : 0.3f,
@@ -344,7 +341,7 @@ internal static class EnemyDropItemsBakeUtility
                 : 0.16f,
             DefinitionStartIndex = result.RecoveryDropDefinitions.Count,
             DefinitionCount = 0,
-            EstimatedDropsPerDeath = maximumDropCount,
+            EstimatedDropsPerDeath = 0,
             SelectionWeight = 1f
         };
 
@@ -365,12 +362,20 @@ internal static class EnemyDropItemsBakeUtility
                 if (healthRestoreAmount <= 0f && shieldRestoreAmount <= 0f)
                     continue;
 
+                int dropCount = math.max(0, definition.DropCount);
+
+                if (dropCount <= 0)
+                    continue;
+
                 result.RecoveryDropDefinitions.Add(new EnemyCompiledRecoveryDropDefinition
                 {
                     Prefab = definition.DropPrefab,
                     HealthRestoreAmount = healthRestoreAmount,
-                    ShieldRestoreAmount = shieldRestoreAmount
+                    ShieldRestoreAmount = shieldRestoreAmount,
+                    Count = dropCount
                 });
+                compiledModule.EstimatedDropsPerDeath = AddEstimatedDropCount(compiledModule.EstimatedDropsPerDeath,
+                                                                               dropCount);
             }
         }
 
@@ -534,9 +539,7 @@ public struct EnemyCompiledExperienceDropDefinition
 public struct EnemyCompiledRecoveryDropModule
 {
     #region Fields
-    public int MinimumDropCount;
-    public int MaximumDropCount;
-    public float Distribution;
+    public float DropChance;
     public float DropRadius;
     public float AttractionSpeed;
     public float CollectDistance;
@@ -559,6 +562,7 @@ public struct EnemyCompiledRecoveryDropDefinition
     public GameObject Prefab;
     public float HealthRestoreAmount;
     public float ShieldRestoreAmount;
+    public int Count;
     #endregion
 }
 

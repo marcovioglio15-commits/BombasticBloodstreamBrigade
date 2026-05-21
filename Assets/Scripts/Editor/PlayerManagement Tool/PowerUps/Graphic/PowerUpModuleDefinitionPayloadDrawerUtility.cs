@@ -76,6 +76,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.LaserBeam:
                 BuildLaserBeamPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.AreaTickApplyElement:
+                BuildAreaTickApplyElementPayloadUi(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.Stackable:
                 BuildStackablePayloadUi(payloadContainer, payloadProperty);
                 return;
@@ -151,6 +154,149 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     #endregion
 
     #region Specialized Payloads
+    /// <summary>
+    /// Builds the AreaTickApplyElement payload UI with scaling-aware nested fields and context-sensitive effect sections.
+    /// </summary>
+    /// <param name="payloadContainer">Container receiving the area-tick controls.</param>
+    /// <param name="areaTickPayloadProperty">Serialized AreaTickApplyElement payload property.</param>
+    private static void BuildAreaTickApplyElementPayloadUi(VisualElement payloadContainer, SerializedProperty areaTickPayloadProperty)
+    {
+        if (payloadContainer == null || areaTickPayloadProperty == null)
+            return;
+
+        SerializedProperty effectDataProperty = areaTickPayloadProperty.FindPropertyRelative("effectData");
+        SerializedProperty stacksPerTickProperty = areaTickPayloadProperty.FindPropertyRelative("stacksPerTick");
+        SerializedProperty applyIntervalSecondsProperty = areaTickPayloadProperty.FindPropertyRelative("applyIntervalSeconds");
+
+        if (effectDataProperty == null ||
+            stacksPerTickProperty == null ||
+            applyIntervalSecondsProperty == null)
+        {
+            HelpBox errorBox = new HelpBox("Area Tick Apply Element payload fields are missing.", HelpBoxMessageType.Warning);
+            payloadContainer.Add(errorBox);
+            return;
+        }
+
+        Foldout tickFoldout = CreatePayloadFoldout("Tick", true);
+        payloadContainer.Add(tickFoldout);
+        VisualElement stacksPerTickField = AddField(tickFoldout, stacksPerTickProperty, "Stacks Per Tick");
+        VisualElement applyIntervalSecondsField = AddField(tickFoldout, applyIntervalSecondsProperty, "Apply Interval Seconds");
+
+        SerializedProperty elementTypeProperty = effectDataProperty.FindPropertyRelative("elementType");
+        SerializedProperty effectKindProperty = effectDataProperty.FindPropertyRelative("effectKind");
+        SerializedProperty procModeProperty = effectDataProperty.FindPropertyRelative("procMode");
+        SerializedProperty reapplyModeProperty = effectDataProperty.FindPropertyRelative("reapplyMode");
+        SerializedProperty procThresholdStacksProperty = effectDataProperty.FindPropertyRelative("procThresholdStacks");
+        SerializedProperty maximumStacksProperty = effectDataProperty.FindPropertyRelative("maximumStacks");
+        SerializedProperty stackDecayPerSecondProperty = effectDataProperty.FindPropertyRelative("stackDecayPerSecond");
+        SerializedProperty consumeStacksOnProcProperty = effectDataProperty.FindPropertyRelative("consumeStacksOnProc");
+        SerializedProperty dotDamagePerTickProperty = effectDataProperty.FindPropertyRelative("dotDamagePerTick");
+        SerializedProperty dotTickIntervalProperty = effectDataProperty.FindPropertyRelative("dotTickInterval");
+        SerializedProperty dotDurationSecondsProperty = effectDataProperty.FindPropertyRelative("dotDurationSeconds");
+        SerializedProperty impedimentSlowPercentPerStackProperty = effectDataProperty.FindPropertyRelative("impedimentSlowPercentPerStack");
+        SerializedProperty impedimentProcSlowPercentProperty = effectDataProperty.FindPropertyRelative("impedimentProcSlowPercent");
+        SerializedProperty impedimentMaxSlowPercentProperty = effectDataProperty.FindPropertyRelative("impedimentMaxSlowPercent");
+        SerializedProperty impedimentDurationSecondsProperty = effectDataProperty.FindPropertyRelative("impedimentDurationSeconds");
+
+        if (elementTypeProperty == null ||
+            effectKindProperty == null ||
+            procModeProperty == null ||
+            reapplyModeProperty == null ||
+            procThresholdStacksProperty == null ||
+            maximumStacksProperty == null ||
+            stackDecayPerSecondProperty == null ||
+            consumeStacksOnProcProperty == null ||
+            dotDamagePerTickProperty == null ||
+            dotTickIntervalProperty == null ||
+            dotDurationSecondsProperty == null ||
+            impedimentSlowPercentPerStackProperty == null ||
+            impedimentProcSlowPercentProperty == null ||
+            impedimentMaxSlowPercentProperty == null ||
+            impedimentDurationSecondsProperty == null)
+        {
+            HelpBox errorBox = new HelpBox("Area Tick elemental effect fields are missing.", HelpBoxMessageType.Warning);
+            payloadContainer.Add(errorBox);
+            return;
+        }
+
+        Foldout elementFoldout = CreatePayloadFoldout("Element Behaviour", true);
+        payloadContainer.Add(elementFoldout);
+        VisualElement elementTypeField = AddField(elementFoldout, elementTypeProperty, "Element Type");
+        VisualElement effectKindField = AddField(elementFoldout, effectKindProperty, "Effect Kind");
+        VisualElement procModeField = AddField(elementFoldout, procModeProperty, "Proc Mode");
+        VisualElement reapplyModeField = AddField(elementFoldout, reapplyModeProperty, "Reapply Mode");
+
+        Foldout stackingFoldout = CreatePayloadFoldout("Stacking", true);
+        payloadContainer.Add(stackingFoldout);
+        VisualElement procThresholdStacksField = AddField(stackingFoldout, procThresholdStacksProperty, "Proc Threshold Stacks");
+        VisualElement maximumStacksField = AddField(stackingFoldout, maximumStacksProperty, "Maximum Stacks");
+        VisualElement stackDecayPerSecondField = AddField(stackingFoldout, stackDecayPerSecondProperty, "Stack Decay Per Second");
+        VisualElement consumeStacksOnProcField = AddField(stackingFoldout, consumeStacksOnProcProperty, "Consume Stacks On Proc");
+
+        Foldout dotsFoldout = CreatePayloadFoldout("Dots Effect", false);
+        payloadContainer.Add(dotsFoldout);
+        VisualElement dotDamagePerTickField = AddField(dotsFoldout, dotDamagePerTickProperty, "Dot Damage Per Tick");
+        VisualElement dotTickIntervalField = AddField(dotsFoldout, dotTickIntervalProperty, "Dot Tick Interval");
+        VisualElement dotDurationSecondsField = AddField(dotsFoldout, dotDurationSecondsProperty, "Dot Duration Seconds");
+
+        Foldout impedimentFoldout = CreatePayloadFoldout("Impediment Effect", false);
+        payloadContainer.Add(impedimentFoldout);
+        VisualElement impedimentSlowPercentPerStackField = AddField(impedimentFoldout, impedimentSlowPercentPerStackProperty, "Slow Percent Per Stack");
+        VisualElement impedimentProcSlowPercentField = AddField(impedimentFoldout, impedimentProcSlowPercentProperty, "Proc Slow Percent");
+        VisualElement impedimentMaxSlowPercentField = AddField(impedimentFoldout, impedimentMaxSlowPercentProperty, "Max Slow Percent");
+        VisualElement impedimentDurationSecondsField = AddField(impedimentFoldout, impedimentDurationSecondsProperty, "Duration Seconds");
+
+        HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        payloadContainer.Add(warningBox);
+
+        Action refreshView = () =>
+        {
+            ElementalEffectKind effectKind = (ElementalEffectKind)effectKindProperty.enumValueIndex;
+            ElementalProcMode procMode = (ElementalProcMode)procModeProperty.enumValueIndex;
+            dotsFoldout.style.display = effectKind == ElementalEffectKind.Dots ? DisplayStyle.Flex : DisplayStyle.None;
+            impedimentFoldout.style.display = effectKind == ElementalEffectKind.Impediment ? DisplayStyle.Flex : DisplayStyle.None;
+            impedimentSlowPercentPerStackField.style.display = effectKind == ElementalEffectKind.Impediment &&
+                                                               procMode == ElementalProcMode.ProgressiveUntilThreshold
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            RefreshAreaTickApplyElementWarnings(stacksPerTickProperty,
+                                                applyIntervalSecondsProperty,
+                                                elementTypeProperty,
+                                                effectKindProperty,
+                                                procModeProperty,
+                                                procThresholdStacksProperty,
+                                                maximumStacksProperty,
+                                                stackDecayPerSecondProperty,
+                                                dotDamagePerTickProperty,
+                                                dotTickIntervalProperty,
+                                                dotDurationSecondsProperty,
+                                                impedimentSlowPercentPerStackProperty,
+                                                impedimentProcSlowPercentProperty,
+                                                impedimentMaxSlowPercentProperty,
+                                                impedimentDurationSecondsProperty,
+                                                warningBox);
+        };
+
+        RegisterRefreshCallback(stacksPerTickField, refreshView);
+        RegisterRefreshCallback(applyIntervalSecondsField, refreshView);
+        RegisterRefreshCallback(elementTypeField, refreshView);
+        RegisterRefreshCallback(effectKindField, refreshView);
+        RegisterRefreshCallback(procModeField, refreshView);
+        RegisterRefreshCallback(reapplyModeField, refreshView);
+        RegisterRefreshCallback(procThresholdStacksField, refreshView);
+        RegisterRefreshCallback(maximumStacksField, refreshView);
+        RegisterRefreshCallback(stackDecayPerSecondField, refreshView);
+        RegisterRefreshCallback(consumeStacksOnProcField, refreshView);
+        RegisterRefreshCallback(dotDamagePerTickField, refreshView);
+        RegisterRefreshCallback(dotTickIntervalField, refreshView);
+        RegisterRefreshCallback(dotDurationSecondsField, refreshView);
+        RegisterRefreshCallback(impedimentSlowPercentPerStackField, refreshView);
+        RegisterRefreshCallback(impedimentProcSlowPercentField, refreshView);
+        RegisterRefreshCallback(impedimentMaxSlowPercentField, refreshView);
+        RegisterRefreshCallback(impedimentDurationSecondsField, refreshView);
+        refreshView();
+    }
+
     private static void BuildHoldChargePayloadUi(VisualElement payloadContainer, SerializedProperty holdChargePayloadProperty)
     {
         if (payloadContainer == null || holdChargePayloadProperty == null)
@@ -1008,9 +1154,161 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         elementalPayloadContainer.style.display = applyElementalOnHitProperty.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
     }
+
+    /// <summary>
+    /// Creates a compact nested payload foldout used to group related settings inside specialized module drawers.
+    /// </summary>
+    /// <param name="title">Foldout title shown in the tool.</param>
+    /// <param name="expanded">Initial expanded state.</param>
+    /// <returns>Configured foldout ready to receive fields.</returns>
+    private static Foldout CreatePayloadFoldout(string title, bool expanded)
+    {
+        Foldout foldout = new Foldout();
+        foldout.text = title;
+        foldout.value = expanded;
+        foldout.style.marginLeft = 8f;
+        return foldout;
+    }
+
+    /// <summary>
+    /// Registers one serialized-property refresh callback on a scaling-aware field.
+    /// </summary>
+    /// <param name="field">Field that emits SerializedPropertyChangeEvent.</param>
+    /// <param name="refreshAction">Action used to update dependent visibility and warnings.</param>
+    private static void RegisterRefreshCallback(VisualElement field, Action refreshAction)
+    {
+        if (field == null || refreshAction == null)
+            return;
+
+        field.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            refreshAction();
+        });
+    }
     #endregion
 
     #region Warnings
+    /// <summary>
+    /// Refreshes validation warnings for AreaTickApplyElement payload fields without mutating serialized values.
+    /// </summary>
+    /// <param name="stacksPerTickProperty">Serialized Stacks Per Tick field.</param>
+    /// <param name="applyIntervalSecondsProperty">Serialized Apply Interval Seconds field.</param>
+    /// <param name="elementTypeProperty">Serialized Element Type enum.</param>
+    /// <param name="effectKindProperty">Serialized Effect Kind enum.</param>
+    /// <param name="procModeProperty">Serialized Proc Mode enum.</param>
+    /// <param name="procThresholdStacksProperty">Serialized Proc Threshold Stacks field.</param>
+    /// <param name="maximumStacksProperty">Serialized Maximum Stacks field.</param>
+    /// <param name="stackDecayPerSecondProperty">Serialized Stack Decay Per Second field.</param>
+    /// <param name="dotDamagePerTickProperty">Serialized Dot Damage Per Tick field.</param>
+    /// <param name="dotTickIntervalProperty">Serialized Dot Tick Interval field.</param>
+    /// <param name="dotDurationSecondsProperty">Serialized Dot Duration Seconds field.</param>
+    /// <param name="impedimentSlowPercentPerStackProperty">Serialized progressive slow field.</param>
+    /// <param name="impedimentProcSlowPercentProperty">Serialized proc slow field.</param>
+    /// <param name="impedimentMaxSlowPercentProperty">Serialized max slow field.</param>
+    /// <param name="impedimentDurationSecondsProperty">Serialized impediment duration field.</param>
+    /// <param name="warningBox">HelpBox receiving the current warning text.</param>
+    private static void RefreshAreaTickApplyElementWarnings(SerializedProperty stacksPerTickProperty,
+                                                            SerializedProperty applyIntervalSecondsProperty,
+                                                            SerializedProperty elementTypeProperty,
+                                                            SerializedProperty effectKindProperty,
+                                                            SerializedProperty procModeProperty,
+                                                            SerializedProperty procThresholdStacksProperty,
+                                                            SerializedProperty maximumStacksProperty,
+                                                            SerializedProperty stackDecayPerSecondProperty,
+                                                            SerializedProperty dotDamagePerTickProperty,
+                                                            SerializedProperty dotTickIntervalProperty,
+                                                            SerializedProperty dotDurationSecondsProperty,
+                                                            SerializedProperty impedimentSlowPercentPerStackProperty,
+                                                            SerializedProperty impedimentProcSlowPercentProperty,
+                                                            SerializedProperty impedimentMaxSlowPercentProperty,
+                                                            SerializedProperty impedimentDurationSecondsProperty,
+                                                            HelpBox warningBox)
+    {
+        if (warningBox == null)
+            return;
+
+        List<string> warningLines = new List<string>();
+        ElementalEffectKind effectKind = effectKindProperty != null
+            ? (ElementalEffectKind)effectKindProperty.enumValueIndex
+            : ElementalEffectKind.Dots;
+        ElementalProcMode procMode = procModeProperty != null
+            ? (ElementalProcMode)procModeProperty.enumValueIndex
+            : ElementalProcMode.ThresholdOnly;
+
+        if (stacksPerTickProperty != null && stacksPerTickProperty.floatValue < 0f)
+            warningLines.Add("Stacks Per Tick should be >= 0.");
+
+        if (applyIntervalSecondsProperty != null && applyIntervalSecondsProperty.floatValue < 0.01f)
+            warningLines.Add("Apply Interval Seconds should be >= 0.01.");
+
+        if (elementTypeProperty != null && (ElementType)elementTypeProperty.enumValueIndex == ElementType.Custom)
+            warningLines.Add("Custom Element Type is legacy-only here; prefer Fire, Ice or Poison for AreaTickApplyElement.");
+
+        if (procThresholdStacksProperty != null && procThresholdStacksProperty.floatValue < 0.1f)
+            warningLines.Add("Proc Threshold Stacks should be >= 0.1.");
+
+        if (maximumStacksProperty != null && maximumStacksProperty.floatValue < 0.1f)
+            warningLines.Add("Maximum Stacks should be >= 0.1.");
+
+        if (procThresholdStacksProperty != null &&
+            maximumStacksProperty != null &&
+            maximumStacksProperty.floatValue > 0f &&
+            procThresholdStacksProperty.floatValue > maximumStacksProperty.floatValue)
+        {
+            warningLines.Add("Maximum Stacks is lower than Proc Threshold Stacks, so runtime scaling will clamp the maximum.");
+        }
+
+        if (stackDecayPerSecondProperty != null && stackDecayPerSecondProperty.floatValue < 0f)
+            warningLines.Add("Stack Decay Per Second should be >= 0.");
+
+        if (effectKind == ElementalEffectKind.Dots)
+        {
+            if (dotDamagePerTickProperty != null && dotDamagePerTickProperty.floatValue < 0f)
+                warningLines.Add("Dot Damage Per Tick should be >= 0.");
+
+            if (dotTickIntervalProperty != null && dotTickIntervalProperty.floatValue < 0.01f)
+                warningLines.Add("Dot Tick Interval should be >= 0.01.");
+
+            if (dotDurationSecondsProperty != null && dotDurationSecondsProperty.floatValue < 0.05f)
+                warningLines.Add("Dot Duration Seconds should be >= 0.05.");
+        }
+
+        if (effectKind == ElementalEffectKind.Impediment)
+        {
+            if (procMode == ElementalProcMode.ProgressiveUntilThreshold &&
+                impedimentSlowPercentPerStackProperty != null &&
+                (impedimentSlowPercentPerStackProperty.floatValue < 0f || impedimentSlowPercentPerStackProperty.floatValue > 100f))
+            {
+                warningLines.Add("Slow Percent Per Stack should stay within 0-100.");
+            }
+
+            if (impedimentProcSlowPercentProperty != null &&
+                (impedimentProcSlowPercentProperty.floatValue < 0f || impedimentProcSlowPercentProperty.floatValue > 100f))
+            {
+                warningLines.Add("Proc Slow Percent should stay within 0-100.");
+            }
+
+            if (impedimentMaxSlowPercentProperty != null &&
+                (impedimentMaxSlowPercentProperty.floatValue < 0f || impedimentMaxSlowPercentProperty.floatValue > 100f))
+            {
+                warningLines.Add("Max Slow Percent should stay within 0-100.");
+            }
+
+            if (impedimentDurationSecondsProperty != null && impedimentDurationSecondsProperty.floatValue < 0.05f)
+                warningLines.Add("Impediment Duration Seconds should be >= 0.05.");
+        }
+
+        if (warningLines.Count <= 0)
+        {
+            warningBox.text = string.Empty;
+            warningBox.style.display = DisplayStyle.None;
+            return;
+        }
+
+        warningBox.text = string.Join("\n", warningLines);
+        warningBox.style.display = DisplayStyle.Flex;
+    }
+
     /// <summary>
     /// Refreshes validation warnings for hold-charge payload fields without mutating serialized values.
     /// </summary>

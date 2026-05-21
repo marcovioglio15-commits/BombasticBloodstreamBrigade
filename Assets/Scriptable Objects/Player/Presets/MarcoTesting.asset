@@ -115,7 +115,7 @@ MonoBehaviour:
       range: 20
       lifetime: 2
       damage: 3
-      appliedElements: 010000000000000000000000
+      appliedElements: 010000000200000003000000
       elementBehaviours:
         fire:
           effectKind: 0

@@ -10,6 +10,7 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     #region Constants
     private const string PassiveLaserBeamPayloadPrefix = "laserBeam.";
     private const string HoldChargeChargedLaserBeamPayloadPrefix = "holdCharge.chargedLaserBeam.";
+    private const string ElementalAreaTickEffectPrefix = "elementalAreaTick.effectData.";
     #endregion
 
     #region Methods
@@ -304,6 +305,18 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                    resolvedValue,
                                    ref passiveToolConfig.LaserBeam))
             return;
+
+        ElementalEffectConfig elementalAreaTickEffect = passiveToolConfig.ElementalTrail.Effect;
+
+        if (TryApplyElementalEffectValue(payloadPath,
+                                         ElementalAreaTickEffectPrefix,
+                                         resolvedValue,
+                                         ref elementalAreaTickEffect))
+        {
+            NormalizeElementalEffectStackBounds(ref elementalAreaTickEffect);
+            passiveToolConfig.ElementalTrail.Effect = elementalAreaTickEffect;
+            return;
+        }
 
         switch (payloadPath)
         {
@@ -645,6 +658,117 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
+    /// Applies one numeric Add Scaling value to a shared elemental effect payload.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="prefix">Path prefix that identifies the owning effect payload namespace.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="effectConfig">Mutable elemental effect config being rebuilt from immutable baseline data.</param>
+    /// <returns>True when the path matched an elemental effect field and was applied.</returns>
+    private static bool TryApplyElementalEffectValue(string payloadPath,
+                                                     string prefix,
+                                                     float resolvedValue,
+                                                     ref ElementalEffectConfig effectConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
+            return false;
+
+        if (!payloadPath.StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+
+        string effectFieldPath = payloadPath.Substring(prefix.Length);
+
+        switch (effectFieldPath)
+        {
+            case "elementType":
+                effectConfig.ElementType = PlayerRuntimeScalingEnumUtility.ResolveElementType(resolvedValue);
+                return true;
+            case "effectKind":
+                effectConfig.EffectKind = PlayerRuntimeScalingEnumUtility.ResolveElementalEffectKind(resolvedValue);
+                return true;
+            case "procMode":
+                effectConfig.ProcMode = PlayerRuntimeScalingEnumUtility.ResolveElementalProcMode(resolvedValue);
+                return true;
+            case "reapplyMode":
+                effectConfig.ReapplyMode = PlayerRuntimeScalingEnumUtility.ResolveElementalProcReapplyMode(resolvedValue);
+                return true;
+            case "procThresholdStacks":
+                effectConfig.ProcThresholdStacks = math.max(0.1f, resolvedValue);
+                return true;
+            case "maximumStacks":
+                effectConfig.MaximumStacks = math.max(0.1f, resolvedValue);
+                return true;
+            case "stackDecayPerSecond":
+                effectConfig.StackDecayPerSecond = math.max(0f, resolvedValue);
+                return true;
+            case "dotDamagePerTick":
+                effectConfig.DotDamagePerTick = math.max(0f, resolvedValue);
+                return true;
+            case "dotTickInterval":
+                effectConfig.DotTickInterval = math.max(0.01f, resolvedValue);
+                return true;
+            case "dotDurationSeconds":
+                effectConfig.DotDurationSeconds = math.max(0.05f, resolvedValue);
+                return true;
+            case "impedimentSlowPercentPerStack":
+                effectConfig.ImpedimentSlowPercentPerStack = math.clamp(resolvedValue, 0f, 100f);
+                return true;
+            case "impedimentProcSlowPercent":
+                effectConfig.ImpedimentProcSlowPercent = math.clamp(resolvedValue, 0f, 100f);
+                return true;
+            case "impedimentMaxSlowPercent":
+                effectConfig.ImpedimentMaxSlowPercent = math.clamp(resolvedValue, 0f, 100f);
+                return true;
+            case "impedimentDurationSeconds":
+                effectConfig.ImpedimentDurationSeconds = math.max(0.05f, resolvedValue);
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Applies one boolean Add Scaling value to a shared elemental effect payload.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="prefix">Path prefix that identifies the owning effect payload namespace.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="effectConfig">Mutable elemental effect config being rebuilt from immutable baseline data.</param>
+    /// <returns>True when the path matched an elemental effect boolean field and was applied.</returns>
+    private static bool TryApplyElementalEffectBooleanValue(string payloadPath,
+                                                            string prefix,
+                                                            bool resolvedValue,
+                                                            ref ElementalEffectConfig effectConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
+            return false;
+
+        if (!payloadPath.StartsWith(prefix, StringComparison.Ordinal))
+            return false;
+
+        string effectFieldPath = payloadPath.Substring(prefix.Length);
+
+        switch (effectFieldPath)
+        {
+            case "consumeStacksOnProc":
+                effectConfig.ConsumeStacksOnProc = resolvedValue ? (byte)1 : (byte)0;
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Keeps elemental stack threshold and maximum values coherent after independent runtime scaling rewrites.
+    /// </summary>
+    /// <param name="effectConfig">Mutable elemental effect config receiving stack bounds normalization.</param>
+    private static void NormalizeElementalEffectStackBounds(ref ElementalEffectConfig effectConfig)
+    {
+        effectConfig.ProcThresholdStacks = math.max(0.1f, effectConfig.ProcThresholdStacks);
+        effectConfig.MaximumStacks = math.max(effectConfig.ProcThresholdStacks, math.max(0.1f, effectConfig.MaximumStacks));
+    }
+
+    /// <summary>
     /// Applies one resolved boolean Add Scaling value to an active-slot runtime config field.
     /// </summary>
     /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
@@ -710,6 +834,18 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                                           resolvedValue,
                                           ref passiveToolConfig.LaserBeam))
             return;
+
+        ElementalEffectConfig elementalAreaTickEffect = passiveToolConfig.ElementalTrail.Effect;
+
+        if (TryApplyElementalEffectBooleanValue(payloadPath,
+                                                ElementalAreaTickEffectPrefix,
+                                                resolvedValue,
+                                                ref elementalAreaTickEffect))
+        {
+            NormalizeElementalEffectStackBounds(ref elementalAreaTickEffect);
+            passiveToolConfig.ElementalTrail.Effect = elementalAreaTickEffect;
+            return;
+        }
 
         switch (payloadPath)
         {

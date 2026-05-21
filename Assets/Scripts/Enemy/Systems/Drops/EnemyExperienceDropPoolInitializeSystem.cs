@@ -275,7 +275,7 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
                     EnemyRecoveryDropModuleElement recoveryModule = recoveryModules[moduleIndex];
                     int definitionCount = math.max(0, recoveryModule.DefinitionCount);
 
-                    if (definitionCount <= 0 || recoveryModule.MaximumDropCount <= 0)
+                    if (definitionCount <= 0 || recoveryModule.DropChance <= 0f)
                         continue;
 
                     int estimatedDropsPerDeath = math.max(1, recoveryModule.EstimatedDropsPerDeath);
@@ -291,8 +291,11 @@ public partial struct EnemyExperienceDropPoolInitializeSystem : ISystem
                         if (definition.PrefabEntity == Entity.Null)
                             continue;
 
-                        if (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f)
+                        if (definition.Count <= 0 ||
+                            (definition.HealthRestoreAmount <= 0f && definition.ShieldRestoreAmount <= 0f))
+                        {
                             continue;
+                        }
 
                         AddOrUpdatePoolSettings(definition.PrefabEntity,
                                                 initialCapacityPerPrefab,

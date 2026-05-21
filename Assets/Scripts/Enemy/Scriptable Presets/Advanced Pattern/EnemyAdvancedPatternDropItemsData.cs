@@ -257,6 +257,10 @@ public sealed class EnemyRecoveryDropDefinitionData
 
     [Tooltip("Shield restored when this drop is collected by the player.")]
     [SerializeField] private float shieldRestoreAmount;
+
+    [Tooltip("Fixed number of pickups spawned from this definition when the owning recovery module succeeds its drop chance.")]
+    [Min(0)]
+    [SerializeField] private int dropCount = 1;
     #endregion
 
     #endregion
@@ -283,6 +287,14 @@ public sealed class EnemyRecoveryDropDefinitionData
         get
         {
             return shieldRestoreAmount;
+        }
+    }
+
+    public int DropCount
+    {
+        get
+        {
+            return dropCount;
         }
     }
     #endregion
@@ -313,17 +325,9 @@ public sealed class EnemyRecoveryDropPayload
     [Tooltip("Definitions catalog used to compose spawned health and shield recovery drops.")]
     [SerializeField] private List<EnemyRecoveryDropDefinitionData> dropDefinitions = new List<EnemyRecoveryDropDefinitionData>();
 
-    [Tooltip("Minimum number of recovery pickup instances spawned when this module resolves.")]
-    [Min(0)]
-    [SerializeField] private int minimumDropCount = 1;
-
-    [Tooltip("Maximum number of recovery pickup instances spawned when this module resolves.")]
-    [Min(0)]
-    [SerializeField] private int maximumDropCount = 1;
-
-    [Tooltip("Definition selection bias: 0 favors low restorative value entries, 1 favors high restorative value entries.")]
-    [Range(0f, 1f)]
-    [SerializeField] private float dropsDistribution = 0.5f;
+    [Tooltip("Chance in percent that this recovery module drops any configured recovery definitions.")]
+    [Range(0f, 100f)]
+    [SerializeField] private float dropChancePercent = 100f;
 
     [Tooltip("Radius around the enemy used to distribute spawned recovery drops uniformly.")]
     [SerializeField] private float dropRadius = 0.6f;
@@ -343,27 +347,11 @@ public sealed class EnemyRecoveryDropPayload
         }
     }
 
-    public int MinimumDropCount
+    public float DropChancePercent
     {
         get
         {
-            return minimumDropCount;
-        }
-    }
-
-    public int MaximumDropCount
-    {
-        get
-        {
-            return maximumDropCount;
-        }
-    }
-
-    public float DropsDistribution
-    {
-        get
-        {
-            return dropsDistribution;
+            return dropChancePercent;
         }
     }
 

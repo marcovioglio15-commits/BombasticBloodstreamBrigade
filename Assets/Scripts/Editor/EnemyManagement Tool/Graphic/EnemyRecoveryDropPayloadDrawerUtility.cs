@@ -22,16 +22,12 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
                                                       VisualElement payloadContainer)
     {
         SerializedProperty dropDefinitionsProperty = recoveryProperty.FindPropertyRelative("dropDefinitions");
-        SerializedProperty minimumDropCountProperty = recoveryProperty.FindPropertyRelative("minimumDropCount");
-        SerializedProperty maximumDropCountProperty = recoveryProperty.FindPropertyRelative("maximumDropCount");
-        SerializedProperty dropsDistributionProperty = recoveryProperty.FindPropertyRelative("dropsDistribution");
+        SerializedProperty dropChancePercentProperty = recoveryProperty.FindPropertyRelative("dropChancePercent");
         SerializedProperty dropRadiusProperty = recoveryProperty.FindPropertyRelative("dropRadius");
         SerializedProperty collectionMovementProperty = recoveryProperty.FindPropertyRelative("collectionMovement");
 
         if (dropDefinitionsProperty == null ||
-            minimumDropCountProperty == null ||
-            maximumDropCountProperty == null ||
-            dropsDistributionProperty == null ||
+            dropChancePercentProperty == null ||
             dropRadiusProperty == null ||
             collectionMovementProperty == null)
         {
@@ -41,17 +37,14 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
 
         AddRecoveryDefinitionSection(recoveryFoldout, dropDefinitionsProperty);
         AddRecoveryCoreFields(recoveryFoldout,
-                              minimumDropCountProperty,
-                              maximumDropCountProperty,
-                              dropsDistributionProperty,
+                              dropChancePercentProperty,
                               dropRadiusProperty);
         AddRecoveryMovementSection(recoveryFoldout, collectionMovementProperty);
         AddRecoveryWarningTracking(recoveryProperty,
                                    payloadContainer,
                                    recoveryFoldout,
                                    dropDefinitionsProperty,
-                                   minimumDropCountProperty,
-                                   maximumDropCountProperty);
+                                   dropChancePercentProperty);
     }
     #endregion
 
@@ -72,22 +65,16 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     }
 
     /// <summary>
-    /// Adds scalar recovery drop-count, distribution, and spread fields.
+    /// Adds scalar recovery chance and spread fields.
     /// </summary>
     /// <param name="recoveryFoldout">Recovery root foldout.</param>
-    /// <param name="minimumDropCountProperty">Serialized minimum drop count.</param>
-    /// <param name="maximumDropCountProperty">Serialized maximum drop count.</param>
-    /// <param name="dropsDistributionProperty">Serialized definition selection distribution.</param>
+    /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
     /// <param name="dropRadiusProperty">Serialized spawn radius.</param>
     private static void AddRecoveryCoreFields(Foldout recoveryFoldout,
-                                              SerializedProperty minimumDropCountProperty,
-                                              SerializedProperty maximumDropCountProperty,
-                                              SerializedProperty dropsDistributionProperty,
+                                              SerializedProperty dropChancePercentProperty,
                                               SerializedProperty dropRadiusProperty)
     {
-        EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, minimumDropCountProperty, "Minimum Drop Count");
-        EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, maximumDropCountProperty, "Maximum Drop Count");
-        EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, dropsDistributionProperty, "Drops Distribution");
+        EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, dropChancePercentProperty, "Drop Chance %");
         EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, dropRadiusProperty, "Drop Radius");
     }
 
@@ -119,37 +106,26 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// <param name="payloadContainer">Root payload container used to track serialized changes.</param>
     /// <param name="recoveryFoldout">Recovery root foldout.</param>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
-    /// <param name="minimumDropCountProperty">Serialized minimum drop count.</param>
-    /// <param name="maximumDropCountProperty">Serialized maximum drop count.</param>
+    /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
     private static void AddRecoveryWarningTracking(SerializedProperty recoveryProperty,
                                                    VisualElement payloadContainer,
                                                    Foldout recoveryFoldout,
                                                    SerializedProperty dropDefinitionsProperty,
-                                                   SerializedProperty minimumDropCountProperty,
-                                                   SerializedProperty maximumDropCountProperty)
+                                                   SerializedProperty dropChancePercentProperty)
     {
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         warningBox.style.marginTop = 4f;
         recoveryFoldout.Add(warningBox);
         RefreshRecoveryDropWarnings(dropDefinitionsProperty,
-                                    minimumDropCountProperty,
-                                    maximumDropCountProperty,
+                                    dropChancePercentProperty,
                                     warningBox);
 
         if (payloadContainer == null)
             return;
 
-        payloadContainer.TrackPropertyValue(minimumDropCountProperty, changedProperty =>
+        payloadContainer.TrackPropertyValue(dropChancePercentProperty, changedProperty =>
         {
             RefreshRecoveryDropWarnings(dropDefinitionsProperty,
-                                        changedProperty,
-                                        maximumDropCountProperty,
-                                        warningBox);
-        });
-        payloadContainer.TrackPropertyValue(maximumDropCountProperty, changedProperty =>
-        {
-            RefreshRecoveryDropWarnings(dropDefinitionsProperty,
-                                        minimumDropCountProperty,
                                         changedProperty,
                                         warningBox);
         });
@@ -159,8 +135,7 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
             payloadContainer.TrackSerializedObjectValue(recoveryProperty.serializedObject, changedObject =>
             {
                 RefreshRecoveryDropWarnings(dropDefinitionsProperty,
-                                            minimumDropCountProperty,
-                                            maximumDropCountProperty,
+                                            dropChancePercentProperty,
                                             warningBox);
             });
         }
@@ -170,20 +145,17 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// Refreshes recovery-drop warnings without mutating authored values.
     /// </summary>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
-    /// <param name="minimumDropCountProperty">Serialized minimum drop count.</param>
-    /// <param name="maximumDropCountProperty">Serialized maximum drop count.</param>
+    /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
     private static void RefreshRecoveryDropWarnings(SerializedProperty dropDefinitionsProperty,
-                                                    SerializedProperty minimumDropCountProperty,
-                                                    SerializedProperty maximumDropCountProperty,
+                                                    SerializedProperty dropChancePercentProperty,
                                                     HelpBox warningBox)
     {
         if (warningBox == null)
             return;
 
         string warningText = ResolveRecoveryDropWarning(dropDefinitionsProperty,
-                                                        minimumDropCountProperty,
-                                                        maximumDropCountProperty);
+                                                        dropChancePercentProperty);
 
         if (string.IsNullOrEmpty(warningText))
         {
@@ -200,26 +172,19 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// Builds a compact validation message for recovery-drop payload settings.
     /// </summary>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
-    /// <param name="minimumDropCountProperty">Serialized minimum drop count.</param>
-    /// <param name="maximumDropCountProperty">Serialized maximum drop count.</param>
+    /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
     /// <returns>Warning text, or an empty string when the payload is coherent.</returns>
     private static string ResolveRecoveryDropWarning(SerializedProperty dropDefinitionsProperty,
-                                                     SerializedProperty minimumDropCountProperty,
-                                                     SerializedProperty maximumDropCountProperty)
+                                                     SerializedProperty dropChancePercentProperty)
     {
-        if (minimumDropCountProperty != null && minimumDropCountProperty.intValue < 0)
-            return "Minimum Drop Count is negative. Runtime treats it as zero.";
+        if (dropChancePercentProperty != null && dropChancePercentProperty.floatValue < 0f)
+            return "Drop Chance % is below 0. Runtime treats it as 0%.";
 
-        if (maximumDropCountProperty != null && maximumDropCountProperty.intValue < 0)
-            return "Maximum Drop Count is negative. Runtime treats it as zero.";
-
-        if (minimumDropCountProperty != null &&
-            maximumDropCountProperty != null &&
-            maximumDropCountProperty.intValue < minimumDropCountProperty.intValue)
-            return "Maximum Drop Count is lower than Minimum Drop Count.";
+        if (dropChancePercentProperty != null && dropChancePercentProperty.floatValue > 100f)
+            return "Drop Chance % is above 100. Runtime treats it as 100%.";
 
         if (!HasPositiveRecoveryDefinition(dropDefinitionsProperty))
-            return "No valid recovery drop definition is available: assign at least one entry with positive Health Restore Amount or Shield Restore Amount.";
+            return "No valid recovery drop definition is available: assign at least one entry with positive Drop Count and positive Health Restore Amount or Shield Restore Amount.";
 
         return string.Empty;
     }
@@ -228,7 +193,7 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// Checks whether the serialized recovery definition list contains at least one useful payload.
     /// </summary>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
-    /// <returns>True when at least one definition can restore health or shield.</returns>
+    /// <returns>True when at least one definition can spawn and restore health or shield.</returns>
     private static bool HasPositiveRecoveryDefinition(SerializedProperty dropDefinitionsProperty)
     {
         if (dropDefinitionsProperty == null || !dropDefinitionsProperty.isArray)
@@ -241,12 +206,14 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
             if (definitionProperty == null)
                 continue;
 
+            SerializedProperty dropCountProperty = definitionProperty.FindPropertyRelative("dropCount");
             SerializedProperty healthRestoreAmountProperty = definitionProperty.FindPropertyRelative("healthRestoreAmount");
             SerializedProperty shieldRestoreAmountProperty = definitionProperty.FindPropertyRelative("shieldRestoreAmount");
+            int dropCount = dropCountProperty != null ? dropCountProperty.intValue : 0;
             float healthRestoreAmount = healthRestoreAmountProperty != null ? healthRestoreAmountProperty.floatValue : 0f;
             float shieldRestoreAmount = shieldRestoreAmountProperty != null ? shieldRestoreAmountProperty.floatValue : 0f;
 
-            if (healthRestoreAmount > 0f || shieldRestoreAmount > 0f)
+            if (dropCount > 0 && (healthRestoreAmount > 0f || shieldRestoreAmount > 0f))
                 return true;
         }
 
