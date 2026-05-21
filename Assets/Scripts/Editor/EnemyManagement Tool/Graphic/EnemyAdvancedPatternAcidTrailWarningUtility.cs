@@ -7,6 +7,10 @@ using UnityEngine.UIElements;
 /// </summary>
 internal static class EnemyAdvancedPatternAcidTrailWarningUtility
 {
+    #region Constants
+    private const float DenseSpawnDistanceWarningThreshold = 0.1f;
+    #endregion
+
     #region Methods
 
     #region Public Methods
@@ -27,9 +31,10 @@ internal static class EnemyAdvancedPatternAcidTrailWarningUtility
             AddNonPositiveWarning(acidProperty, "trailSegmentLifetimeSeconds", "Segment Lifetime Seconds", "segments expire immediately", warningLines);
             AddNonPositiveWarning(acidProperty, "trailRadius", "Trail Radius", "segments cannot overlap the player", warningLines);
             AddNonPositiveWarning(acidProperty, "damagePerTick", "Damage Per Tick", "acid trail will not damage the player", warningLines);
-            AddNonPositiveWarning(acidProperty, "applyIntervalSeconds", "Apply Interval Seconds", "runtime will use the minimum safe tick interval", warningLines);
+            AddNonPositiveWarning(acidProperty, "applyIntervalSeconds", "Apply Interval Seconds", "runtime will use the minimum safe overlap cooldown", warningLines);
             AddSegmentCapWarning(acidProperty, warningLines);
             AddDensityWarning(acidProperty, warningLines);
+            AddRetentionWarning(acidProperty, warningLines);
             AddMissingVfxWarning(acidProperty, warningLines);
             AddNonPositiveWarning(acidProperty, "trailSegmentVfxScaleMultiplier", "VFX Scale Multiplier", "runtime will use the minimum safe visual scale", warningLines);
         }
@@ -100,6 +105,33 @@ internal static class EnemyAdvancedPatternAcidTrailWarningUtility
         {
             warningLines.Add("Spawn Distance and Spawn Interval are both zero or negative. Runtime will clamp timing, but this setup can create dense trails.");
         }
+    }
+
+    /// <summary>
+    /// Adds a warning when dense trail emissions can evict damaging sections before their authored lifetime.
+    /// </summary>
+    /// <param name="acidProperty">Serialized Acid payload parent.</param>
+    /// <param name="warningLines">Mutable warning list.</param>
+    private static void AddRetentionWarning(SerializedProperty acidProperty, List<string> warningLines)
+    {
+        SerializedProperty spawnDistanceProperty = acidProperty.FindPropertyRelative("trailSpawnDistance");
+        SerializedProperty spawnIntervalProperty = acidProperty.FindPropertyRelative("trailSpawnIntervalSeconds");
+        SerializedProperty maxSegmentsProperty = acidProperty.FindPropertyRelative("maxActiveSegmentsPerEnemy");
+
+        if (spawnDistanceProperty == null ||
+            spawnIntervalProperty == null ||
+            maxSegmentsProperty == null)
+        {
+            return;
+        }
+
+        bool canEmitEveryMovementFrame = spawnIntervalProperty.floatValue <= 0f &&
+                                         spawnDistanceProperty.floatValue <= DenseSpawnDistanceWarningThreshold;
+
+        if (!canEmitEveryMovementFrame || maxSegmentsProperty.intValue <= 0)
+            return;
+
+        warningLines.Add("Dense Spawn Distance with zero Spawn Interval can exhaust Max Active Segments before Segment Lifetime ends. Visible trail sections may stop dealing damage early.");
     }
 
     /// <summary>

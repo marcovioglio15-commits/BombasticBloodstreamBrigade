@@ -9,8 +9,8 @@ public static class EnemyPatternCowardSharedUtility
 {
     #region Constants
     private const float DirectionEpsilon = 1e-6f;
-    private const float RetreatClearanceMultiplier = 1.35f;
-    private const float RetreatClearanceBodyRadiusMultiplier = 0.35f;
+    private const float RetreatClearanceMultiplier = 1.72f;
+    private const float RetreatClearanceBodyRadiusMultiplier = 0.85f;
     #endregion
 
     #region Methods

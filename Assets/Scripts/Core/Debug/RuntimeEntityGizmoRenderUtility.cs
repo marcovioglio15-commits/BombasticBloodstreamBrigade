@@ -377,7 +377,7 @@ public static class RuntimeEntityGizmoRenderUtility
     }
 
     /// <summary>
-    /// Draws active Acid Wanderer hazard segments as planar discs when the enemy wander debug toggle is enabled.
+    /// Draws active Acid Wanderer hazard sections as planar capsule guides when the enemy wander debug toggle is enabled.
     /// </summary>
     /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
     /// <param name="segments">Per-enemy acid trail buffer read from ECS.</param>
@@ -394,7 +394,9 @@ public static class RuntimeEntityGizmoRenderUtility
             if (segment.Radius <= 0f || segment.RemainingLifetime <= 0f)
                 continue;
 
-            primitiveDrawer.DrawWireDisc(ToVector3(segment.Position), segment.Radius, EnemyAcidTrailSegmentColor);
+            primitiveDrawer.DrawWireDisc(ToVector3(segment.StartPosition), segment.Radius, EnemyAcidTrailSegmentColor);
+            primitiveDrawer.DrawWireDisc(ToVector3(segment.EndPosition), segment.Radius, EnemyAcidTrailSegmentColor);
+            primitiveDrawer.DrawLink(ToVector3(segment.StartPosition), ToVector3(segment.EndPosition), EnemyAcidTrailSegmentColor);
             drewSegment = true;
         }
 

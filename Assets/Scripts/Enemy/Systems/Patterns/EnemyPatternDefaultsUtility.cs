@@ -131,7 +131,9 @@ internal static class EnemyPatternDefaultsUtility
             DvdInitialized = 0,
             AcidLastSpawnPosition = float3.zero,
             AcidSpawnTimer = 0f,
-            AcidInitialized = 0
+            AcidPlayerDamageCooldown = 0f,
+            AcidInitialized = 0,
+            AcidPlayerOverlapping = 0
         };
     }
 

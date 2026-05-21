@@ -15,6 +15,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 {
     #region Constants
     private const int MaximumSupportedSplitChildLanes = 24;
+    private const float PerfectCircleTrajectorySpeedMultiplier = 1f;
     #endregion
 
     #region Methods
@@ -301,7 +302,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                               travelDistance,
                               projectileTemplate.Range,
                               projectileTemplate.Lifetime,
-                              virtualProjectileSpeedMultiplier,
                               collisionRadius,
                               bodyWidth,
                               1f,
@@ -327,7 +327,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                       travelDistance,
                                       projectileTemplate.Range,
                                       projectileTemplate.Lifetime,
-                                      virtualProjectileSpeedMultiplier,
                                       collisionRadius,
                                       bodyWidth,
                                       maximumBounceSegments,
@@ -362,7 +361,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="travelDistance">Current beam travel budget used by straight and Perfect Circle lane builders.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the beam.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the beam.</param>
-    /// <param name="speedMultiplier">Beam-local speed multiplier applied to motion simulation.</param>
     /// <param name="collisionRadius">Effective gameplay width of the lane.</param>
     /// <param name="bodyWidth">Effective visual width of the lane.</param>
     /// <param name="damageMultiplier">Lane-local damage multiplier.</param>
@@ -387,7 +385,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                       float travelDistance,
                                       float rangeLimit,
                                       float lifetimeLimit,
-                                      float speedMultiplier,
                                       float collisionRadius,
                                       float bodyWidth,
                                       float damageMultiplier,
@@ -406,6 +403,8 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
         if (hasPerfectCircle)
         {
+            // Regular Perfect Circle projectiles always advance with authored orbital speeds. Laser virtual speed grows
+            // the visible travel budget only, otherwise Shot Range formulas also deform orbital beam geometry.
             return PlayerLaserBeamPerfectCircleUtility.TryAppendPerfectCircleLaneSegments(ref laserBeamLanes,
                                                                                           laneIndex,
                                                                                           laneCount,
@@ -419,7 +418,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                                                                           travelDistance,
                                                                                           rangeLimit,
                                                                                           lifetimeLimit,
-                                                                                          speedMultiplier,
+                                                                                          PerfectCircleTrajectorySpeedMultiplier,
                                                                                           safeCollisionRadius,
                                                                                           safeBodyWidth,
                                                                                           safeDamageMultiplier,
@@ -475,7 +474,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="travelDistance">Straight-line travel budget used when Perfect Circle is disabled.</param>
     /// <param name="rangeLimit">Effective projectile range inherited by the parent lanes.</param>
     /// <param name="lifetimeLimit">Effective projectile lifetime inherited by the parent lanes.</param>
-    /// <param name="speedMultiplier">Beam-local speed multiplier inherited by the parent lanes.</param>
     /// <param name="collisionRadius">Effective gameplay width inherited by the parent lanes.</param>
     /// <param name="bodyWidth">Effective visual width inherited by the parent lanes.</param>
     /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by straight-line mode.</param>
@@ -495,7 +493,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                               float travelDistance,
                                               float rangeLimit,
                                               float lifetimeLimit,
-                                              float speedMultiplier,
                                               float collisionRadius,
                                               float bodyWidth,
                                               int maximumBounceSegments,
@@ -543,7 +540,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                              travelDistance,
                                              rangeLimit,
                                              lifetimeLimit,
-                                             speedMultiplier,
                                              collisionRadius,
                                              bodyWidth,
                                              maximumBounceSegments,
@@ -577,7 +573,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                              travelDistance,
                                              rangeLimit,
                                              lifetimeLimit,
-                                             speedMultiplier,
                                              collisionRadius,
                                              bodyWidth,
                                              maximumBounceSegments,
@@ -610,7 +605,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="parentTravelDistance">Straight-line travel budget inherited from the parent lane.</param>
     /// <param name="parentRangeLimit">Effective projectile range inherited from the parent lane.</param>
     /// <param name="parentLifetimeLimit">Effective projectile lifetime inherited from the parent lane.</param>
-    /// <param name="speedMultiplier">Beam-local speed multiplier inherited from the parent lane.</param>
     /// <param name="parentCollisionRadius">Effective gameplay width inherited from the parent lane.</param>
     /// <param name="parentBodyWidth">Effective visual width inherited from the parent lane.</param>
     /// <param name="maximumBounceSegments">Maximum reflected wall segments supported by straight-line mode.</param>
@@ -632,7 +626,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                              float parentTravelDistance,
                                              float parentRangeLimit,
                                              float parentLifetimeLimit,
-                                             float speedMultiplier,
                                              float parentCollisionRadius,
                                              float parentBodyWidth,
                                              int maximumBounceSegments,
@@ -654,7 +647,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                                         parentBodyWidth * math.max(0.01f, splittingProjectilesConfig.SplitSizeMultiplier));
         float splitRangeLimit = parentRangeLimit > 0f ? parentRangeLimit * splitLifetimeMultiplier : 0f;
         float splitLifetimeLimit = parentLifetimeLimit > 0f ? parentLifetimeLimit * splitLifetimeMultiplier : 0f;
-        float splitSpeedMultiplier = math.max(0f, speedMultiplier) * math.max(0f, splittingProjectilesConfig.SplitSpeedMultiplier);
         TryAppendLane(ref laserBeamLanes,
                       laneIndex,
                       laneCount,
@@ -668,7 +660,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                       splitTravelDistance,
                       splitRangeLimit,
                       splitLifetimeLimit,
-                      splitSpeedMultiplier,
                       splitCollisionRadius,
                       splitBodyWidth,
                       math.max(0f, splittingProjectilesConfig.SplitDamageMultiplier),

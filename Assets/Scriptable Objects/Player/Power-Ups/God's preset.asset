@@ -20137,8 +20137,7 @@ MonoBehaviour:
   - Passive_AdditionalBarrel
   - Passive_MegaProjectiles
   - Passive_FireRate
-  - PassiveBouncingProjectiles
-  - PassiveSplittingProjectiles
+  - PassiveOrbitalProjectiles
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

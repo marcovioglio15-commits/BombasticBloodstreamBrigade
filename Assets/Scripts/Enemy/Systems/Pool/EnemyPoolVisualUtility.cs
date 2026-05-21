@@ -50,6 +50,17 @@ public static class EnemyPoolVisualUtility
                 ScaleMultiplier = 1f
             });
 
+        if (!entityManager.HasComponent<EnemySpawnVfxConfig>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, new EnemySpawnVfxConfig
+            {
+                PrefabEntity = Entity.Null,
+                Prefab = default,
+                Timing = EnemySpawnVfxTiming.OnSpawn,
+                SpawnOffset = float3.zero,
+                LifetimeSeconds = 0.5f,
+                ScaleMultiplier = 1f
+            });
+
         if (!entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
             entityManager.AddComponentData(enemyEntity, CreateDefaultVisualFlashPresentationState());
 

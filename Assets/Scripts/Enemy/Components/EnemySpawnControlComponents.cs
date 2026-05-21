@@ -26,4 +26,12 @@ public struct EnemySpawnWarningState : IComponentData, IEnableableComponent
     public float MaximumAlpha;
     public float4 Color;
 }
+
+/// <summary>
+/// Tracks whether the warning-phase spawn VFX has already been queued for the current pooled enemy reuse.
+/// </summary>
+public struct EnemySpawnVfxRuntimeState : IComponentData
+{
+    public byte WarningVfxQueued;
+}
 #endregion

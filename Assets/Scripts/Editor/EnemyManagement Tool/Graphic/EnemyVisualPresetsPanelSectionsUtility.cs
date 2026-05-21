@@ -136,7 +136,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                BuildBossPatternChangeFeedbackSubSection(panel));
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.Prefabs,
-                               "Prefabs",
+                               "Prefabs & VFX",
                                EnemyVisualPresetsPanelPrefabsSectionUtility.BuildPrefabsSubSection(panel));
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.SpawnOverrides,

@@ -24,12 +24,12 @@ MonoBehaviour:
     inactivityTime: 0.08
     rotationSpeedDegreesPerSecond: 0
     priorityTier: 0
-    steeringAggressiveness: 2
+    steeringAggressiveness: 1
     minimumWallDistance: 1
     disablePlayerKnockback: 0
   steering:
-    separationRadius: 1.5
-    separationWeight: 8
+    separationRadius: 1.1
+    separationWeight: 1
     bodyRadius: 0.55
   tacticalNavigation:
     candidateBudget: 2

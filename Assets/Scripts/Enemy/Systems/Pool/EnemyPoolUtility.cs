@@ -191,6 +191,12 @@ public static class EnemyPoolUtility
             if (!entityManager.HasComponent<EnemySpawnWarningState>(enemyEntity))
                 entityManager.AddComponent<EnemySpawnWarningState>(enemyEntity);
 
+            if (!entityManager.HasComponent<EnemySpawnVfxRuntimeState>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, new EnemySpawnVfxRuntimeState
+                {
+                    WarningVfxQueued = 0
+                });
+
             entityManager.AddComponent<EnemyPoolValidated>(enemyEntity);
         }
 
@@ -222,6 +228,8 @@ public static class EnemyPoolUtility
         EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 1);
         ApplySpawnInactivityState(entityManager, enemyEntity);
         ClearSpawnWarningState(entityManager, enemyEntity);
+        EnemySpawnVfxRuntimeUtility.ResetState(entityManager, enemyEntity);
+        EnemySpawnVfxRuntimeUtility.TryEnqueueForActivation(entityManager, enemyEntity, worldPosition);
 
         if (entityManager.HasComponent<EnemyDespawnRequest>(enemyEntity))
             entityManager.RemoveComponent<EnemyDespawnRequest>(enemyEntity);
@@ -248,6 +256,7 @@ public static class EnemyPoolUtility
         ParkEnemy(entityManager, enemyEntity);
         EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 0);
         ClearSpawnWarningState(entityManager, enemyEntity);
+        EnemySpawnVfxRuntimeUtility.ResetState(entityManager, enemyEntity);
         SetSpawnInactivityLock(entityManager, enemyEntity, false);
         entityManager.SetComponentEnabled<EnemyActive>(enemyEntity, false);
     }
@@ -263,21 +272,30 @@ public static class EnemyPoolUtility
     /// <param name="waveIndex">Wave index that will own the enemy once activated.</param>
     /// <param name="worldPosition">Final world-space spawn position that must match the warning ring.</param>
     /// <param name="warningState">Fully resolved warning state used by presentation until fade-out completion.</param>
+    /// <param name="queueWarningSpawnVfx">True when warning-timed spawn VFX should be queued during reservation.</param>
     public static void ReserveEnemyForSpawn(EntityManager entityManager,
                                             Entity enemyEntity,
                                             Entity spawnerEntity,
                                             Entity poolEntity,
                                             int waveIndex,
                                             float3 worldPosition,
-                                            EnemySpawnWarningState warningState)
+                                            EnemySpawnWarningState warningState,
+                                            bool queueWarningSpawnVfx)
     {
         EnsureEnemyComponents(entityManager, enemyEntity);
         ResetEnemySimulationState(entityManager, enemyEntity);
+        EnemySpawnVfxRuntimeUtility.ResetState(entityManager, enemyEntity);
         SetEnemyOwnership(entityManager, enemyEntity, spawnerEntity, poolEntity, waveIndex);
         ParkEnemy(entityManager, enemyEntity);
         EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 0);
         SetSpawnInactivityLock(entityManager, enemyEntity, false);
         ArmSpawnWarningState(entityManager, enemyEntity, warningState);
+
+        if (queueWarningSpawnVfx)
+            EnemySpawnVfxRuntimeUtility.TryEnqueueForReservation(entityManager,
+                                                                  enemyEntity,
+                                                                  worldPosition,
+                                                                  in warningState);
 
         if (entityManager.HasComponent<EnemyDespawnRequest>(enemyEntity))
             entityManager.RemoveComponent<EnemyDespawnRequest>(enemyEntity);
@@ -301,6 +319,7 @@ public static class EnemyPoolUtility
         SetEnemyTransformPosition(entityManager, enemyEntity, worldPosition);
         EnemyPoolVisualUtility.ResetVisualRuntimeState(entityManager, enemyEntity, 1);
         ApplySpawnInactivityState(entityManager, enemyEntity);
+        EnemySpawnVfxRuntimeUtility.TryEnqueueForActivation(entityManager, enemyEntity, worldPosition);
 
         if (entityManager.HasComponent<EnemyDespawnRequest>(enemyEntity))
             entityManager.RemoveComponent<EnemyDespawnRequest>(enemyEntity);

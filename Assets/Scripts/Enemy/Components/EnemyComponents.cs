@@ -135,6 +135,28 @@ public struct EnemyHitVfxConfig : IComponentData
 }
 
 /// <summary>
+/// Defines when the optional enemy spawn VFX is requested.
+/// </summary>
+public enum EnemySpawnVfxTiming : byte
+{
+    OnSpawn = 0,
+    WithSpawnWarning = 1
+}
+
+/// <summary>
+/// Stores optional one-shot VFX settings used when an enemy enters the playable area.
+/// </summary>
+public struct EnemySpawnVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> Prefab;
+    public EnemySpawnVfxTiming Timing;
+    public float3 SpawnOffset;
+    public float LifetimeSeconds;
+    public float ScaleMultiplier;
+}
+
+/// <summary>
 /// Stores the entity that owns the world-space status bars companion view for an enemy.
 /// </summary>
 public struct EnemyWorldSpaceStatusBarsLink : IComponentData

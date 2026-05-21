@@ -117,7 +117,9 @@ public struct EnemyPatternRuntimeState : IComponentData
     public byte DvdInitialized;
     public float3 AcidLastSpawnPosition;
     public float AcidSpawnTimer;
+    public float AcidPlayerDamageCooldown;
     public byte AcidInitialized;
+    public byte AcidPlayerOverlapping;
 }
 
 /// <summary>
@@ -126,11 +128,11 @@ public struct EnemyPatternRuntimeState : IComponentData
 [InternalBufferCapacity(8)]
 public struct EnemyAcidTrailSegmentElement : IBufferElementData
 {
-    public float3 Position;
+    public float3 StartPosition;
+    public float3 EndPosition;
     public float Radius;
     public float RemainingLifetime;
     public float ApplyIntervalSeconds;
-    public float ApplyTimer;
     public float DamagePerTick;
     public byte VfxSpawned;
 }

@@ -10,7 +10,7 @@ public static class EnemyPatternCowardMovementUtility
 {
     #region Constants
     private const float DirectionEpsilon = 1e-6f;
-    private const float ClearancePredictionMinimumSeconds = 0.1f;
+    private const float ClearancePredictionMinimumSeconds = 0.22f;
     private const float PathBlockedAllowanceRatio = 0.94f;
     private const float WallProbeSeconds = 0.28f;
     private const float MinimumWallProbeDistance = 0.45f;
@@ -144,9 +144,11 @@ public static class EnemyPatternCowardMovementUtility
                                                                                                       out float _,
                                                                                                       out float _,
                                                                                                       in occupancyContext);
-            float3 yieldCorrectionVelocity = EnemyPatternWandererMovementUtility.ComposeYieldCorrectionVelocity(desiredVelocity,
-                                                                                                                yieldClearanceVelocity,
-                                                                                                                resolvedSteeringAggressiveness);
+            float3 yieldCorrectionVelocity = ComposeCurvedAvoidanceVelocity(enemyEntity,
+                                                                            desiredVelocity,
+                                                                            yieldClearanceVelocity,
+                                                                            desiredSpeed,
+                                                                            resolvedSteeringAggressiveness);
 
             if (math.lengthsq(yieldCorrectionVelocity) > DirectionEpsilon)
             {
@@ -507,9 +509,60 @@ public static class EnemyPatternCowardMovementUtility
         if (math.lengthsq(clearanceVelocity) <= DirectionEpsilon)
             return baseVelocity;
 
-        return EnemyPatternWandererMovementUtility.ComposeYieldCorrectionVelocity(baseVelocity,
-                                                                                  clearanceVelocity,
-                                                                                  steeringAggressiveness);
+        return ComposeCurvedAvoidanceVelocity(enemyEntity,
+                                              baseVelocity,
+                                              clearanceVelocity,
+                                              desiredSpeed,
+                                              steeringAggressiveness);
+    }
+
+    /// <summary>
+    /// Composes retreat motion with lateral clearance so Cowards curve around neighbors instead of snapping directly away.
+    /// </summary>
+    /// <param name="enemyEntity">Current enemy entity used to choose a deterministic passing side.</param>
+    /// <param name="baseVelocity">Base retreat or target-following velocity before avoidance.</param>
+    /// <param name="clearanceVelocity">Local clearance velocity resolved from nearby enemies.</param>
+    /// <param name="desiredSpeed">Current desired movement speed.</param>
+    /// <param name="steeringAggressiveness">Resolved steering aggressiveness scalar.</param>
+    /// <returns>Curved avoidance velocity.</returns>
+    private static float3 ComposeCurvedAvoidanceVelocity(Entity enemyEntity,
+                                                         float3 baseVelocity,
+                                                         float3 clearanceVelocity,
+                                                         float desiredSpeed,
+                                                         float steeringAggressiveness)
+    {
+        float clearanceSpeed = math.length(clearanceVelocity);
+
+        if (clearanceSpeed <= DirectionEpsilon)
+            return baseVelocity;
+
+        float baseSpeed = math.length(baseVelocity);
+        float resolvedDesiredSpeed = math.max(math.max(0f, desiredSpeed), baseSpeed);
+        float3 clearanceDirection = clearanceVelocity / math.max(clearanceSpeed, DirectionEpsilon);
+
+        if (baseSpeed <= DirectionEpsilon)
+            return clearanceDirection * math.max(clearanceSpeed, resolvedDesiredSpeed * 0.72f);
+
+        float3 baseDirection = baseVelocity / math.max(baseSpeed, DirectionEpsilon);
+        float3 tangentDirection = new float3(-clearanceDirection.z, 0f, clearanceDirection.x);
+
+        if (EnemyPatternCowardSharedUtility.ResolveOrbitSign(enemyEntity) < 0f)
+            tangentDirection = -tangentDirection;
+
+        if (math.dot(tangentDirection, baseDirection) < 0f)
+            tangentDirection = -tangentDirection;
+
+        float aggressiveness01 = math.saturate(steeringAggressiveness / 2.5f);
+        float clearanceRatio = math.saturate(clearanceSpeed / math.max(0.01f, resolvedDesiredSpeed));
+        float forwardWeight = math.lerp(0.84f, 0.58f, clearanceRatio);
+        float clearanceWeight = math.lerp(0.72f, 1.08f, aggressiveness01);
+        float tangentWeight = math.lerp(0.3f, 0.58f, aggressiveness01) + clearanceRatio * 0.28f;
+        float3 resolvedDirection = math.normalizesafe(baseDirection * forwardWeight +
+                                                     clearanceDirection * clearanceWeight +
+                                                     tangentDirection * tangentWeight,
+                                                     baseDirection);
+        float minimumSpeedRatio = math.lerp(0.62f, 0.82f, aggressiveness01);
+        return resolvedDirection * math.max(baseSpeed, resolvedDesiredSpeed * minimumSpeedRatio);
     }
     #endregion
 

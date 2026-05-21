@@ -270,7 +270,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTransform(instance,
                                                                   request.Position,
                                                                   request.Rotation,
-                                                                  math.max(MinimumScale, request.UniformScale));
+                                                                  math.max(MinimumScale, request.UniformScale),
+                                                                  request.TrailRendererWidthOverride);
 
         if (!instance.InstanceObject.activeSelf)
             instance.InstanceObject.SetActive(true);

@@ -281,6 +281,21 @@ public sealed class EnemyVisualPrefabSettings
     [Tooltip("Uniform scale multiplier applied to the spawned hit VFX instance.")]
     [SerializeField] private float hitVfxScaleMultiplier = 1f;
 
+    [Tooltip("Optional one-shot VFX prefab spawned when this enemy appears or when its spawn warning starts.")]
+    [SerializeField] private GameObject spawnVfxPrefab;
+
+    [Tooltip("Controls whether the optional spawn VFX is requested at activation time or together with the spawn warning.")]
+    [SerializeField] private EnemySpawnVfxTiming spawnVfxTiming = EnemySpawnVfxTiming.OnSpawn;
+
+    [Tooltip("World-space offset added to the reserved or activated enemy spawn position before spawning the optional spawn VFX.")]
+    [SerializeField] private Vector3 spawnVfxSpawnOffset;
+
+    [Tooltip("Lifetime in seconds assigned to an On Spawn optional spawn VFX instance. Warning-timed spawn VFX use the resolved spawn-warning lead time instead.")]
+    [SerializeField] private float spawnVfxLifetimeSeconds = 0.5f;
+
+    [Tooltip("Uniform scale multiplier applied to each optional spawn VFX instance.")]
+    [SerializeField] private float spawnVfxScaleMultiplier = 1f;
+
     [Tooltip("Color used by the wave painter and scene preview for this enemy type.")]
     [SerializeField] private Color spawnPaintColor = new Color(1f, 0.3f, 0.3f, 1f);
     #endregion
@@ -325,6 +340,46 @@ public sealed class EnemyVisualPrefabSettings
         get
         {
             return hitVfxScaleMultiplier;
+        }
+    }
+
+    public GameObject SpawnVfxPrefab
+    {
+        get
+        {
+            return spawnVfxPrefab;
+        }
+    }
+
+    public EnemySpawnVfxTiming SpawnVfxTiming
+    {
+        get
+        {
+            return spawnVfxTiming;
+        }
+    }
+
+    public Vector3 SpawnVfxSpawnOffset
+    {
+        get
+        {
+            return spawnVfxSpawnOffset;
+        }
+    }
+
+    public float SpawnVfxLifetimeSeconds
+    {
+        get
+        {
+            return spawnVfxLifetimeSeconds;
+        }
+    }
+
+    public float SpawnVfxScaleMultiplier
+    {
+        get
+        {
+            return spawnVfxScaleMultiplier;
         }
     }
 

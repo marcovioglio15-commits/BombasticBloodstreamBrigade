@@ -94,7 +94,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         }
 
         EnemyPatternConfig resolvedPatternConfig = compiledPattern.PatternConfig;
-        bool shouldBakeManagedVfxRuntime = ShouldBakeEnemyManagedVfxRuntime(compiledPattern, in resolvedPatternConfig);
+        bool shouldBakeManagedVfxRuntime = ShouldBakeEnemyManagedVfxRuntime(authoring,
+                                                                            compiledPattern,
+                                                                            in resolvedPatternConfig);
         DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> managedVfxPrefabBindings = default;
 
         if (shouldBakeManagedVfxRuntime)
@@ -218,6 +220,27 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             LifetimeSeconds = math.max(0.05f, authoring.HitVfxLifetimeSeconds),
             ScaleMultiplier = math.max(0.01f, authoring.HitVfxScaleMultiplier)
         });
+
+        Entity spawnVfxPrefabEntity = ResolveSpawnVfxPrefabEntity(authoring);
+        Vector3 spawnVfxSpawnOffset = authoring.SpawnVfxSpawnOffset;
+        AddComponent(entity, new EnemySpawnVfxConfig
+        {
+            PrefabEntity = spawnVfxPrefabEntity,
+            Prefab = authoring.SpawnVfxPrefab,
+            Timing = ResolveSpawnVfxTiming(authoring.SpawnVfxTiming),
+            SpawnOffset = new float3(spawnVfxSpawnOffset.x, spawnVfxSpawnOffset.y, spawnVfxSpawnOffset.z),
+            LifetimeSeconds = math.max(0.05f, authoring.SpawnVfxLifetimeSeconds),
+            ScaleMultiplier = math.max(0.01f, authoring.SpawnVfxScaleMultiplier)
+        });
+        AddComponent(entity, new EnemySpawnVfxRuntimeState
+        {
+            WarningVfxQueued = 0
+        });
+        TryBakeSpawnVfxRuntime(managedVfxPrefabBindings,
+                               shouldBakeManagedVfxRuntime,
+                               spawnVfxPrefabEntity,
+                               authoring.SpawnVfxPrefab);
+
         AddComponent(entity, BuildProjectileOffscreenWarningConfig(authoring));
         TryBakeProjectileOffscreenWarningManagedConfig(authoring, entity);
 
@@ -351,12 +374,17 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <summary>
     /// Resolves whether this enemy needs managed VFX request buffers for enemy-authored one-shot visuals.
     /// </summary>
+    /// <param name="authoring">Source enemy authoring component used to resolve visual-preset spawn VFX needs.</param>
     /// <param name="compiledPattern">Compiled pattern result produced from advanced or boss pattern presets.</param>
     /// <param name="patternConfig">Resolved pattern config before it is written to the enemy entity.</param>
     /// <returns>True when at least one enemy module has an assigned managed VFX prefab.</returns>
-    private static bool ShouldBakeEnemyManagedVfxRuntime(EnemyCompiledPatternBakeResult compiledPattern,
+    private static bool ShouldBakeEnemyManagedVfxRuntime(EnemyAuthoring authoring,
+                                                         EnemyCompiledPatternBakeResult compiledPattern,
                                                          in EnemyPatternConfig patternConfig)
     {
+        if (authoring != null && authoring.SpawnVfxPrefab != null)
+            return true;
+
         if (compiledPattern == null)
             return false;
 
@@ -1347,25 +1375,76 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                                             sanitizedSelectionModuleCount);
     }
 
+    /// <summary>
+    /// Resolves the optional Hit VFX prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
     private Entity ResolveHitVfxPrefabEntity(EnemyAuthoring authoring)
     {
         if (authoring == null)
             return Entity.Null;
 
-        GameObject candidatePrefab = authoring.HitVfxPrefab;
+        return ResolveRuntimeVfxPrefabEntity(authoring, authoring.HitVfxPrefab, "enemy hit VFX");
+    }
 
+    /// <summary>
+    /// Resolves the optional Spawn VFX prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
+    private Entity ResolveSpawnVfxPrefabEntity(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return Entity.Null;
+
+        return ResolveRuntimeVfxPrefabEntity(authoring, authoring.SpawnVfxPrefab, "enemy spawn VFX");
+    }
+
+    /// <summary>
+    /// Resolves a runtime VFX prefab into an ECS prefab entity while emitting a context-specific bake warning.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <param name="candidatePrefab">Candidate runtime VFX prefab.</param>
+    /// <param name="contextLabel">Human-readable VFX context used by bake warnings.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
+    private Entity ResolveRuntimeVfxPrefabEntity(EnemyAuthoring authoring,
+                                                 GameObject candidatePrefab,
+                                                 string contextLabel)
+    {
         if (candidatePrefab == null)
             return Entity.Null;
 
-        if (EnemyAuthoringValidationUtility.IsInvalidHitVfxPrefab(authoring, candidatePrefab))
+        if (EnemyAuthoringValidationUtility.IsInvalidRuntimePrefab(authoring, candidatePrefab))
         {
 #if UNITY_EDITOR
-            Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid enemy hit VFX prefab '{0}' on '{1}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", candidatePrefab.name, authoring.name), authoring);
+            if (authoring != null)
+            {
+                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid {0} prefab '{1}' on '{2}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", contextLabel, candidatePrefab.name, authoring.name), authoring);
+            }
 #endif
             return Entity.Null;
         }
 
         return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+    }
+
+    /// <summary>
+    /// Resolves invalid authored spawn-VFX timing values to the conservative spawn-time path for baking.
+    /// </summary>
+    /// <param name="timing">Authored spawn VFX timing value.</param>
+    /// <returns>Runtime-supported spawn VFX timing.</returns>
+    private static EnemySpawnVfxTiming ResolveSpawnVfxTiming(EnemySpawnVfxTiming timing)
+    {
+        switch (timing)
+        {
+            case EnemySpawnVfxTiming.OnSpawn:
+            case EnemySpawnVfxTiming.WithSpawnWarning:
+                return timing;
+
+            default:
+                return EnemySpawnVfxTiming.OnSpawn;
+        }
     }
 
     /// <summary>
@@ -1376,19 +1455,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
     private Entity ResolveBombardierExplosionVfxPrefabEntity(EnemyAuthoring authoring, GameObject candidatePrefab)
     {
-        if (candidatePrefab == null)
-            return Entity.Null;
-
-        if (EnemyAuthoringValidationUtility.IsInvalidRuntimePrefab(authoring, candidatePrefab))
-        {
-#if UNITY_EDITOR
-            if (authoring != null)
-                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid Bombardier explosion VFX prefab '{0}' on '{1}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", candidatePrefab.name, authoring.name), authoring);
-#endif
-            return Entity.Null;
-        }
-
-        return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+        return ResolveRuntimeVfxPrefabEntity(authoring, candidatePrefab, "Bombardier explosion VFX");
     }
 
     /// <summary>
@@ -1449,19 +1516,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
     private Entity ResolveAcidTrailVfxPrefabEntity(EnemyAuthoring authoring, GameObject candidatePrefab)
     {
-        if (candidatePrefab == null)
-            return Entity.Null;
-
-        if (EnemyAuthoringValidationUtility.IsInvalidRuntimePrefab(authoring, candidatePrefab))
-        {
-#if UNITY_EDITOR
-            if (authoring != null)
-                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid Acid Wanderer trail VFX prefab '{0}' on '{1}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", candidatePrefab.name, authoring.name), authoring);
-#endif
-            return Entity.Null;
-        }
-
-        return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+        return ResolveRuntimeVfxPrefabEntity(authoring, candidatePrefab, "Acid Wanderer trail VFX");
     }
 
     /// <summary>
@@ -1475,6 +1530,24 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                                              bool canBakeManagedVfx,
                                                              Entity prefabEntity,
                                                              GameObject sourcePrefab)
+    {
+        if (!canBakeManagedVfx)
+            return;
+
+        AppendManagedVfxPrefabBinding(prefabBindings, prefabEntity, sourcePrefab);
+    }
+
+    /// <summary>
+    /// Adds Spawn VFX prefab bindings to the shared enemy managed VFX runtime.
+    /// </summary>
+    /// <param name="prefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
+    /// <param name="prefabEntity">Resolved spawn VFX prefab entity.</param>
+    /// <param name="sourcePrefab">Source prefab asset stored for managed runtime instantiation.</param>
+    private static void TryBakeSpawnVfxRuntime(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                               bool canBakeManagedVfx,
+                                               Entity prefabEntity,
+                                               GameObject sourcePrefab)
     {
         if (!canBakeManagedVfx)
             return;

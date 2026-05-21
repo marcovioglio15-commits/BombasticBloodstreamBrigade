@@ -13,7 +13,7 @@ public static class EnemyPatternCowardSelectionUtility
     private const float RetreatNavigationGainNormalization = 6f;
     private const float OpenSpaceProbeMaximumDistance = 1.6f;
     private const int OpenSpaceSampleCount = 4;
-    private const float CandidateClearanceProbeSpeedMinimum = 0.75f;
+    private const float CandidateClearanceProbeSpeedMinimum = 1.35f;
     #endregion
 
     #region Methods
@@ -66,7 +66,7 @@ public static class EnemyPatternCowardSelectionUtility
         float maximumDistance = math.max(minimumDistance, patternConfig.BasicMaximumTravelDistance);
         float minimumEnemyClearance = EnemyPatternCowardSharedUtility.ResolveRetreatEnemyClearance(bodyRadius,
                                                                                                    patternConfig.BasicMinimumEnemyClearance);
-        float trajectoryPredictionTime = math.max(0f, patternConfig.BasicTrajectoryPredictionTime);
+        float trajectoryPredictionTime = math.max(0.2f, patternConfig.BasicTrajectoryPredictionTime);
         float freeTrajectoryPreference = math.max(0f, patternConfig.BasicFreeTrajectoryPreference);
         float retreatDirectionPreference = math.max(0f, patternConfig.CowardRetreatDirectionPreference);
         float openSpacePreference = math.max(0f, patternConfig.CowardOpenSpacePreference);

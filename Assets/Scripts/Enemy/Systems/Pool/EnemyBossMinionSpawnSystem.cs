@@ -623,7 +623,8 @@ public partial struct EnemyBossMinionSpawnSystem : ISystem
                                                   rule.PoolEntity,
                                                   -1,
                                                   spawnPosition,
-                                                  warningState);
+                                                  warningState,
+                                                  elapsedTime < activationTime);
             EnemyBossMinionPoolUtility.ApplyMinionMetadata(entityManager,
                                                            minionEntity,
                                                            bossEntity,

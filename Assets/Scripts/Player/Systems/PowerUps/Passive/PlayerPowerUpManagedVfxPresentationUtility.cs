@@ -16,18 +16,19 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     /// <param name="position">World position.</param>
     /// <param name="rotation">World rotation.</param>
     /// <param name="uniformScale">Uniform local scale.</param>
+    /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to preserve authored scaling.</param>
     public static void ApplyTransform(PlayerPowerUpManagedVfxInstance instance,
                                       float3 position,
                                       quaternion rotation,
-                                      float uniformScale)
+                                      float uniformScale,
+                                      float trailRendererWidthOverride)
     {
         Transform instanceTransform = instance.InstanceTransform;
         instanceTransform.position = ToVector3(position);
         instanceTransform.rotation = ToQuaternion(rotation);
-        instanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
-
         ApplyParticleSystemScaling(instance);
-        ApplyTrailRendererScaling(instance, uniformScale);
+        instanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
+        ApplyTrailRendererScaling(instance, uniformScale, trailRendererWidthOverride);
     }
 
     /// <summary>
@@ -67,11 +68,14 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     }
 
     /// <summary>
-    /// Applies request scale to trail widths because TrailRenderer width is authored in world units.
+    /// Applies request scale or an explicit width override because TrailRenderer width is authored in world units.
     /// </summary>
     /// <param name="instance">Managed VFX instance whose trail renderers are being prepared.</param>
     /// <param name="uniformScale">Uniform scale requested by gameplay.</param>
-    private static void ApplyTrailRendererScaling(PlayerPowerUpManagedVfxInstance instance, float uniformScale)
+    /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to scale authored widths.</param>
+    private static void ApplyTrailRendererScaling(PlayerPowerUpManagedVfxInstance instance,
+                                                  float uniformScale,
+                                                  float trailRendererWidthOverride)
     {
         if (instance.TrailRenderers == null)
             return;
@@ -82,6 +86,12 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
 
             if (trailRenderer == null)
                 continue;
+
+            if (trailRendererWidthOverride > 0f)
+            {
+                trailRenderer.widthMultiplier = Mathf.Max(0.0001f, trailRendererWidthOverride);
+                continue;
+            }
 
             float baseWidth = ResolveTrailRendererBaseWidth(instance, trailIndex, trailRenderer);
             trailRenderer.widthMultiplier = Mathf.Max(0.0001f, baseWidth * uniformScale);

@@ -17,6 +17,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultVisibleDistanceHysteresis = 6f;
     private const float DefaultHitVfxLifetimeSeconds = 0.35f;
     private const float DefaultHitVfxScaleMultiplier = 1f;
+    private const float DefaultSpawnVfxLifetimeSeconds = 0.5f;
+    private const float DefaultSpawnVfxScaleMultiplier = 1f;
     private static readonly Color DefaultDamageFlashColor = new Color(1f, 0.15f, 0.15f, 1f);
     private static readonly Color DefaultOutlineColor = Color.black;
     private const float DefaultDamageFlashDurationSeconds = 0.06f;
@@ -626,6 +628,71 @@ public sealed class EnemyAuthoring : MonoBehaviour
                 return DefaultHitVfxScaleMultiplier;
 
             return settings.HitVfxScaleMultiplier;
+        }
+    }
+
+    public GameObject SpawnVfxPrefab
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return null;
+
+            return settings.SpawnVfxPrefab;
+        }
+    }
+
+    public EnemySpawnVfxTiming SpawnVfxTiming
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return EnemySpawnVfxTiming.OnSpawn;
+
+            return settings.SpawnVfxTiming;
+        }
+    }
+
+    public float SpawnVfxLifetimeSeconds
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return DefaultSpawnVfxLifetimeSeconds;
+
+            return settings.SpawnVfxLifetimeSeconds;
+        }
+    }
+
+    public Vector3 SpawnVfxSpawnOffset
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return Vector3.zero;
+
+            return settings.SpawnVfxSpawnOffset;
+        }
+    }
+
+    public float SpawnVfxScaleMultiplier
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return DefaultSpawnVfxScaleMultiplier;
+
+            return settings.SpawnVfxScaleMultiplier;
         }
     }
 

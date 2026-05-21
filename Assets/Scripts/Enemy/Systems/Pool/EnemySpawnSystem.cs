@@ -295,7 +295,8 @@ public partial struct EnemySpawnSystem : ISystem
                                                   poolEntity,
                                                   waveEvent.WaveIndex,
                                                   worldPosition,
-                                                  warningState);
+                                                  warningState,
+                                                  elapsedTime < spawnTime);
             waveEvent.ReservedEnemyEntity = enemyEntity;
             SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
             runtime.NextWarningEventIndex++;
@@ -371,7 +372,8 @@ public partial struct EnemySpawnSystem : ISystem
                                                       poolEntity,
                                                       waveEvent.WaveIndex,
                                                       worldPosition,
-                                                      warningState);
+                                                      warningState,
+                                                      false);
             }
 
             EnemyPoolUtility.ActivateReservedEnemy(entityManager, enemyEntity, worldPosition);

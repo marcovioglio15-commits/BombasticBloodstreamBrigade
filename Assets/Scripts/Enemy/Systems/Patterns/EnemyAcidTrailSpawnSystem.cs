@@ -138,7 +138,10 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
                 return;
             }
 
-            AddSegment(segments, enemyPosition, in patternConfig);
+            AddSegment(segments,
+                       patternRuntimeState.AcidLastSpawnPosition,
+                       enemyPosition,
+                       in patternConfig);
             patternRuntimeState.AcidLastSpawnPosition = enemyPosition;
             patternRuntimeState.AcidSpawnTimer = math.max(MinimumSpawnIntervalSeconds, patternConfig.AcidTrailSpawnIntervalSeconds);
         }
@@ -177,16 +180,20 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
             segments.Clear();
             patternRuntimeState.AcidInitialized = 0;
             patternRuntimeState.AcidSpawnTimer = 0f;
+            patternRuntimeState.AcidPlayerDamageCooldown = 0f;
+            patternRuntimeState.AcidPlayerOverlapping = 0;
         }
 
         /// <summary>
         /// Appends one gameplay segment after enforcing the configured per-enemy segment cap.
         /// </summary>
         /// <param name="segments">Per-enemy acid segment buffer receiving the new segment.</param>
-        /// <param name="position">World-space position of the emitted segment.</param>
+        /// <param name="startPosition">World-space position of the previous acid emission point.</param>
+        /// <param name="endPosition">World-space position of the current acid emission point.</param>
         /// <param name="patternConfig">Compiled acid settings copied into the segment payload.</param>
         private static void AddSegment(DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
-                                       float3 position,
+                                       float3 startPosition,
+                                       float3 endPosition,
                                        in EnemyPatternConfig patternConfig)
         {
             int maxActiveSegments = math.max(1, patternConfig.AcidTrailMaxActiveSegments);
@@ -196,11 +203,11 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
 
             segments.Add(new EnemyAcidTrailSegmentElement
             {
-                Position = position,
+                StartPosition = startPosition,
+                EndPosition = endPosition,
                 Radius = math.max(0f, patternConfig.AcidTrailRadius),
                 RemainingLifetime = math.max(MinimumSegmentLifetimeSeconds, patternConfig.AcidTrailSegmentLifetimeSeconds),
                 ApplyIntervalSeconds = math.max(MinimumSpawnIntervalSeconds, patternConfig.AcidTrailApplyIntervalSeconds),
-                ApplyTimer = 0f,
                 DamagePerTick = math.max(0f, patternConfig.AcidTrailDamagePerTick),
                 VfxSpawned = 0
             });

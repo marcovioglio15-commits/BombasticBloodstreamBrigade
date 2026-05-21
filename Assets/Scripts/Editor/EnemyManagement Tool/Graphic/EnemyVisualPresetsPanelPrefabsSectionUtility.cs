@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the themed Prefabs subsection for enemy visual presets.
+/// Builds the themed Prefabs & VFX subsection for enemy visual presets.
 /// </summary>
 internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
 {
@@ -16,13 +16,13 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds prefab, hit VFX, and paint-metadata controls for the selected enemy visual preset.
+    /// Builds prefab, optional VFX, and paint-metadata controls for the selected enemy visual preset.
     /// </summary>
     /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
     /// <returns>Prefabs subsection content grouped by themed foldouts.</returns>
     public static VisualElement BuildPrefabsSubSection(EnemyVisualPresetsPanel panel)
     {
-        VisualElement container = EnemyVisualPresetsPanelSectionsUtility.CreateSubSectionContainer("Prefabs");
+        VisualElement container = EnemyVisualPresetsPanelSectionsUtility.CreateSubSectionContainer("Prefabs & VFX");
 
         if (panel == null || panel.PresetSerializedObject == null)
             return container;
@@ -35,6 +35,7 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         // Keep each concern in a separate foldout so dense visual presets stay scannable.
         container.Add(BuildEnemyPrefabFoldout(panel, prefabsProperty));
         container.Add(BuildHitVfxFoldout(panel, prefabsProperty));
+        container.Add(BuildSpawnVfxFoldout(panel, prefabsProperty));
         container.Add(BuildPaintMetadataFoldout(panel, prefabsProperty));
         return container;
     }
@@ -70,54 +71,58 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     /// <returns>Foldout containing hit VFX controls.</returns>
     private static Foldout BuildHitVfxFoldout(EnemyVisualPresetsPanel panel, SerializedProperty prefabsProperty)
     {
-        Foldout foldout = CreatePrefabFoldout(prefabsProperty,
-                                              "Hit VFX",
-                                              "HitVfx",
-                                              "One-shot visual feedback spawned when player projectiles damage this enemy.");
-        SerializedProperty hitVfxPrefabProperty = prefabsProperty.FindPropertyRelative("hitVfxPrefab");
-        AddReactivePropertyField(panel,
-                                 foldout,
-                                 hitVfxPrefabProperty,
-                                 "Hit VFX Prefab",
-                                 "Optional one-shot VFX prefab spawned every time this enemy receives a projectile hit.");
-        HelpBox missingPrefabBox = new HelpBox("Assign a Hit VFX prefab to enable spawn offset, lifetime, and scale controls.",
-                                               HelpBoxMessageType.Info);
-        VisualElement detailsContainer = new VisualElement();
-        VisualElement warningsContainer = new VisualElement();
+        return BuildOptionalVfxFoldout(panel,
+                                       prefabsProperty,
+                                       "Hit VFX",
+                                       "HitVfx",
+                                       "One-shot visual feedback spawned when player projectiles damage this enemy.",
+                                       "hitVfxPrefab",
+                                       "Hit VFX Prefab",
+                                       "Optional one-shot VFX prefab spawned every time this enemy receives a projectile hit.",
+                                       "Assign a Hit VFX prefab to enable spawn offset, lifetime, and scale controls.",
+                                       string.Empty,
+                                       string.Empty,
+                                       string.Empty,
+                                       "hitVfxSpawnOffset",
+                                       "Hit VFX Spawn Offset",
+                                       "World-space offset added to the resolved impact position before spawning the enemy hit VFX.",
+                                       "hitVfxLifetimeSeconds",
+                                       "Hit VFX Lifetime Seconds",
+                                       "Lifetime in seconds assigned to each spawned hit VFX instance.",
+                                       "hitVfxScaleMultiplier",
+                                       "Hit VFX Scale Multiplier",
+                                       "Uniform scale multiplier applied to the spawned hit VFX instance.");
+    }
 
-        foldout.Add(missingPrefabBox);
-        foldout.Add(detailsContainer);
-        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                detailsContainer,
-                                                                prefabsProperty,
-                                                                "hitVfxSpawnOffset",
-                                                                "Hit VFX Spawn Offset",
-                                                                "World-space offset added to the resolved impact position before spawning the enemy hit VFX.");
-        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                detailsContainer,
-                                                                prefabsProperty,
-                                                                "hitVfxLifetimeSeconds",
-                                                                "Hit VFX Lifetime Seconds",
-                                                                "Lifetime in seconds assigned to each spawned hit VFX instance.");
-        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                detailsContainer,
-                                                                prefabsProperty,
-                                                                "hitVfxScaleMultiplier",
-                                                                "Hit VFX Scale Multiplier",
-                                                                "Uniform scale multiplier applied to the spawned hit VFX instance.");
-        detailsContainer.Add(warningsContainer);
-        RefreshHitVfxDetailsVisibility(hitVfxPrefabProperty,
-                                       missingPrefabBox,
-                                       detailsContainer,
-                                       warningsContainer,
-                                       prefabsProperty);
-        TrackHitVfxDependentFields(foldout,
-                                   prefabsProperty,
-                                   hitVfxPrefabProperty,
-                                   missingPrefabBox,
-                                   detailsContainer,
-                                   warningsContainer);
-        return foldout;
+    /// <summary>
+    /// Builds spawn VFX controls and hides dependent settings until a VFX prefab is assigned.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <returns>Foldout containing spawn VFX controls.</returns>
+    private static Foldout BuildSpawnVfxFoldout(EnemyVisualPresetsPanel panel, SerializedProperty prefabsProperty)
+    {
+        return BuildOptionalVfxFoldout(panel,
+                                       prefabsProperty,
+                                       "Spawn VFX",
+                                       "SpawnVfx",
+                                       "Optional one-shot visual feedback spawned when this enemy appears or when its spawn warning starts.",
+                                       "spawnVfxPrefab",
+                                       "Spawn VFX Prefab",
+                                       "Optional one-shot VFX prefab spawned when this enemy appears or when its spawn warning starts.",
+                                       "Assign a Spawn VFX prefab to enable timing, spawn offset, lifetime, and scale controls.",
+                                       "spawnVfxTiming",
+                                       "Spawn VFX Timing",
+                                       "Controls whether the optional spawn VFX is requested at activation time or together with the spawn warning.",
+                                       "spawnVfxSpawnOffset",
+                                       "Spawn VFX Spawn Offset",
+                                       "World-space offset added to the reserved or activated enemy spawn position before spawning the optional spawn VFX.",
+                                       "spawnVfxLifetimeSeconds",
+                                       "Spawn VFX Lifetime Seconds",
+                                       "Lifetime in seconds assigned to an On Spawn optional spawn VFX instance. Warning-timed spawn VFX use the resolved spawn-warning lead time instead.",
+                                       "spawnVfxScaleMultiplier",
+                                       "Spawn VFX Scale Multiplier",
+                                       "Uniform scale multiplier applied to each optional spawn VFX instance.");
     }
 
     /// <summary>
@@ -143,6 +148,125 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     #endregion
 
     #region Field Helpers
+    /// <summary>
+    /// Builds one optional VFX foldout with prefab-gated timing, offset, lifetime, scale and warning controls.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <param name="foldoutTitle">Visible foldout title.</param>
+    /// <param name="stateSuffix">Stable suffix used for persisted foldout state.</param>
+    /// <param name="foldoutTooltip">Tooltip explaining the foldout.</param>
+    /// <param name="prefabPropertyName">Relative prefab property name.</param>
+    /// <param name="prefabLabel">Visible prefab field label.</param>
+    /// <param name="prefabTooltip">Tooltip explaining the prefab field.</param>
+    /// <param name="missingPrefabMessage">Info message shown while no prefab is assigned.</param>
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <param name="timingLabel">Optional visible timing field label.</param>
+    /// <param name="timingTooltip">Optional tooltip explaining the timing field.</param>
+    /// <param name="offsetPropertyName">Relative offset property name.</param>
+    /// <param name="offsetLabel">Visible offset field label.</param>
+    /// <param name="offsetTooltip">Tooltip explaining the offset field.</param>
+    /// <param name="lifetimePropertyName">Relative lifetime property name.</param>
+    /// <param name="lifetimeLabel">Visible lifetime field label.</param>
+    /// <param name="lifetimeTooltip">Tooltip explaining the lifetime field.</param>
+    /// <param name="scalePropertyName">Relative scale property name.</param>
+    /// <param name="scaleLabel">Visible scale field label.</param>
+    /// <param name="scaleTooltip">Tooltip explaining the scale field.</param>
+    /// <returns>Configured optional VFX foldout.</returns>
+    private static Foldout BuildOptionalVfxFoldout(EnemyVisualPresetsPanel panel,
+                                                   SerializedProperty prefabsProperty,
+                                                   string foldoutTitle,
+                                                   string stateSuffix,
+                                                   string foldoutTooltip,
+                                                   string prefabPropertyName,
+                                                   string prefabLabel,
+                                                   string prefabTooltip,
+                                                   string missingPrefabMessage,
+                                                   string timingPropertyName,
+                                                   string timingLabel,
+                                                   string timingTooltip,
+                                                   string offsetPropertyName,
+                                                   string offsetLabel,
+                                                   string offsetTooltip,
+                                                   string lifetimePropertyName,
+                                                   string lifetimeLabel,
+                                                   string lifetimeTooltip,
+                                                   string scalePropertyName,
+                                                   string scaleLabel,
+                                                   string scaleTooltip)
+    {
+        Foldout foldout = CreatePrefabFoldout(prefabsProperty, foldoutTitle, stateSuffix, foldoutTooltip);
+        SerializedProperty vfxPrefabProperty = prefabsProperty.FindPropertyRelative(prefabPropertyName);
+        AddReactivePropertyField(panel, foldout, vfxPrefabProperty, prefabLabel, prefabTooltip);
+
+        HelpBox missingPrefabBox = new HelpBox(missingPrefabMessage, HelpBoxMessageType.Info);
+        VisualElement detailsContainer = new VisualElement();
+        VisualElement lifetimeFieldContainer = new VisualElement();
+        VisualElement warningsContainer = new VisualElement();
+
+        foldout.Add(missingPrefabBox);
+        foldout.Add(detailsContainer);
+
+        if (!string.IsNullOrEmpty(timingPropertyName))
+        {
+            EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                    detailsContainer,
+                                                                    prefabsProperty,
+                                                                    timingPropertyName,
+                                                                    timingLabel,
+                                                                    timingTooltip);
+        }
+
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                detailsContainer,
+                                                                prefabsProperty,
+                                                                offsetPropertyName,
+                                                                offsetLabel,
+                                                                offsetTooltip);
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                lifetimeFieldContainer,
+                                                                prefabsProperty,
+                                                                lifetimePropertyName,
+                                                                lifetimeLabel,
+                                                                lifetimeTooltip);
+        detailsContainer.Add(lifetimeFieldContainer);
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                detailsContainer,
+                                                                prefabsProperty,
+                                                                scalePropertyName,
+                                                                scaleLabel,
+                                                                scaleTooltip);
+        detailsContainer.Add(warningsContainer);
+        RefreshOptionalVfxDetailsVisibility(vfxPrefabProperty,
+                                            missingPrefabBox,
+                                            detailsContainer,
+                                            lifetimeFieldContainer,
+                                            warningsContainer,
+                                            prefabsProperty,
+                                            timingPropertyName,
+                                            offsetPropertyName,
+                                            offsetLabel,
+                                            lifetimePropertyName,
+                                            lifetimeLabel,
+                                            scalePropertyName,
+                                            scaleLabel);
+        TrackOptionalVfxDependentFields(foldout,
+                                        prefabsProperty,
+                                        vfxPrefabProperty,
+                                        missingPrefabBox,
+                                        detailsContainer,
+                                        lifetimeFieldContainer,
+                                        warningsContainer,
+                                        timingPropertyName,
+                                        offsetPropertyName,
+                                        offsetLabel,
+                                        lifetimePropertyName,
+                                        lifetimeLabel,
+                                        scalePropertyName,
+                                        scaleLabel);
+        return foldout;
+    }
+
     /// <summary>
     /// Adds a property field that marks preset state dirty without rebuilding the active details view.
     /// </summary>
@@ -171,53 +295,141 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     }
 
     /// <summary>
-    /// Tracks hit VFX properties that affect local visibility or warning presentation.
+    /// Tracks optional VFX properties that affect local visibility or warning presentation.
     /// </summary>
     /// <param name="root">Root element used to register UI Toolkit property trackers.</param>
     /// <param name="prefabsProperty">Serialized prefab settings block.</param>
-    /// <param name="hitVfxPrefabProperty">Serialized Hit VFX prefab property.</param>
-    /// <param name="missingPrefabBox">Info box shown while no Hit VFX prefab is assigned.</param>
-    /// <param name="detailsContainer">Container holding dependent Hit VFX controls.</param>
+    /// <param name="vfxPrefabProperty">Serialized optional VFX prefab property.</param>
+    /// <param name="missingPrefabBox">Info box shown while no VFX prefab is assigned.</param>
+    /// <param name="detailsContainer">Container holding dependent VFX controls.</param>
+    /// <param name="lifetimeFieldContainer">Container holding the optional lifetime control.</param>
     /// <param name="warningsContainer">Container receiving current authored-value warnings.</param>
-    private static void TrackHitVfxDependentFields(VisualElement root,
-                                                   SerializedProperty prefabsProperty,
-                                                   SerializedProperty hitVfxPrefabProperty,
-                                                   HelpBox missingPrefabBox,
-                                                   VisualElement detailsContainer,
-                                                   VisualElement warningsContainer)
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <param name="offsetPropertyName">Relative offset property name.</param>
+    /// <param name="offsetLabel">Visible offset field label used in warnings.</param>
+    /// <param name="lifetimePropertyName">Relative lifetime property name.</param>
+    /// <param name="lifetimeLabel">Visible lifetime field label used in warnings.</param>
+    /// <param name="scalePropertyName">Relative scale property name.</param>
+    /// <param name="scaleLabel">Visible scale field label used in warnings.</param>
+    private static void TrackOptionalVfxDependentFields(VisualElement root,
+                                                        SerializedProperty prefabsProperty,
+                                                        SerializedProperty vfxPrefabProperty,
+                                                        HelpBox missingPrefabBox,
+                                                        VisualElement detailsContainer,
+                                                        VisualElement lifetimeFieldContainer,
+                                                        VisualElement warningsContainer,
+                                                        string timingPropertyName,
+                                                        string offsetPropertyName,
+                                                        string offsetLabel,
+                                                        string lifetimePropertyName,
+                                                        string lifetimeLabel,
+                                                        string scalePropertyName,
+                                                        string scaleLabel)
     {
         if (root == null || prefabsProperty == null)
             return;
 
-        if (hitVfxPrefabProperty != null)
+        if (vfxPrefabProperty != null)
         {
-            root.TrackPropertyValue(hitVfxPrefabProperty, changedProperty =>
+            root.TrackPropertyValue(vfxPrefabProperty, changedProperty =>
             {
-                RefreshHitVfxDetailsVisibility(changedProperty,
-                                               missingPrefabBox,
-                                               detailsContainer,
-                                               warningsContainer,
-                                               prefabsProperty);
+                RefreshOptionalVfxDetailsVisibility(changedProperty,
+                                                    missingPrefabBox,
+                                                    detailsContainer,
+                                                    lifetimeFieldContainer,
+                                                    warningsContainer,
+                                                    prefabsProperty,
+                                                    timingPropertyName,
+                                                    offsetPropertyName,
+                                                    offsetLabel,
+                                                    lifetimePropertyName,
+                                                    lifetimeLabel,
+                                                    scalePropertyName,
+                                                    scaleLabel);
             });
         }
 
-        TrackHitVfxWarningField(root, prefabsProperty, "hitVfxSpawnOffset", warningsContainer);
-        TrackHitVfxWarningField(root, prefabsProperty, "hitVfxLifetimeSeconds", warningsContainer);
-        TrackHitVfxWarningField(root, prefabsProperty, "hitVfxScaleMultiplier", warningsContainer);
+        TrackOptionalVfxWarningField(root,
+                                     prefabsProperty,
+                                     timingPropertyName,
+                                     warningsContainer,
+                                     lifetimeFieldContainer,
+                                     timingPropertyName,
+                                     offsetPropertyName,
+                                     offsetLabel,
+                                     lifetimePropertyName,
+                                     lifetimeLabel,
+                                     scalePropertyName,
+                                     scaleLabel);
+        TrackOptionalVfxWarningField(root,
+                                     prefabsProperty,
+                                     offsetPropertyName,
+                                     warningsContainer,
+                                     lifetimeFieldContainer,
+                                     timingPropertyName,
+                                     offsetPropertyName,
+                                     offsetLabel,
+                                     lifetimePropertyName,
+                                     lifetimeLabel,
+                                     scalePropertyName,
+                                     scaleLabel);
+        TrackOptionalVfxWarningField(root,
+                                     prefabsProperty,
+                                     lifetimePropertyName,
+                                     warningsContainer,
+                                     lifetimeFieldContainer,
+                                     timingPropertyName,
+                                     offsetPropertyName,
+                                     offsetLabel,
+                                     lifetimePropertyName,
+                                     lifetimeLabel,
+                                     scalePropertyName,
+                                     scaleLabel);
+        TrackOptionalVfxWarningField(root,
+                                     prefabsProperty,
+                                     scalePropertyName,
+                                     warningsContainer,
+                                     lifetimeFieldContainer,
+                                     timingPropertyName,
+                                     offsetPropertyName,
+                                     offsetLabel,
+                                     lifetimePropertyName,
+                                     lifetimeLabel,
+                                     scalePropertyName,
+                                     scaleLabel);
     }
 
     /// <summary>
-    /// Tracks one Hit VFX warning source and refreshes the local warning container when it changes.
+    /// Tracks one optional VFX warning source and refreshes the local warning container when it changes.
     /// </summary>
     /// <param name="root">Root element used to register UI Toolkit property trackers.</param>
     /// <param name="prefabsProperty">Serialized prefab settings block.</param>
     /// <param name="relativePropertyName">Relative property name to track.</param>
     /// <param name="warningsContainer">Container receiving current authored-value warnings.</param>
-    private static void TrackHitVfxWarningField(VisualElement root,
-                                                SerializedProperty prefabsProperty,
-                                                string relativePropertyName,
-                                                VisualElement warningsContainer)
+    /// <param name="lifetimeFieldContainer">Container holding the optional lifetime control.</param>
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <param name="offsetPropertyName">Relative offset property name.</param>
+    /// <param name="offsetLabel">Visible offset field label used in warnings.</param>
+    /// <param name="lifetimePropertyName">Relative lifetime property name.</param>
+    /// <param name="lifetimeLabel">Visible lifetime field label used in warnings.</param>
+    /// <param name="scalePropertyName">Relative scale property name.</param>
+    /// <param name="scaleLabel">Visible scale field label used in warnings.</param>
+    private static void TrackOptionalVfxWarningField(VisualElement root,
+                                                     SerializedProperty prefabsProperty,
+                                                     string relativePropertyName,
+                                                     VisualElement warningsContainer,
+                                                     VisualElement lifetimeFieldContainer,
+                                                     string timingPropertyName,
+                                                     string offsetPropertyName,
+                                                     string offsetLabel,
+                                                     string lifetimePropertyName,
+                                                     string lifetimeLabel,
+                                                     string scalePropertyName,
+                                                     string scaleLabel)
     {
+        if (string.IsNullOrEmpty(relativePropertyName))
+            return;
+
         SerializedProperty trackedProperty = prefabsProperty.FindPropertyRelative(relativePropertyName);
 
         if (trackedProperty == null)
@@ -225,33 +437,106 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
 
         root.TrackPropertyValue(trackedProperty, changedProperty =>
         {
-            RefreshHitVfxWarnings(prefabsProperty, warningsContainer);
+            RefreshOptionalVfxLifetimeVisibility(prefabsProperty,
+                                                 lifetimeFieldContainer,
+                                                 timingPropertyName);
+            RefreshOptionalVfxWarnings(prefabsProperty,
+                                       warningsContainer,
+                                       timingPropertyName,
+                                       offsetPropertyName,
+                                       offsetLabel,
+                                       lifetimePropertyName,
+                                       lifetimeLabel,
+                                       scalePropertyName,
+                                       scaleLabel);
         });
     }
 
     /// <summary>
-    /// Updates local Hit VFX dependent controls without rebuilding the whole visual preset section.
+    /// Updates optional VFX dependent controls without rebuilding the whole visual preset section.
     /// </summary>
-    /// <param name="hitVfxPrefabProperty">Serialized Hit VFX prefab property.</param>
-    /// <param name="missingPrefabBox">Info box shown while no Hit VFX prefab is assigned.</param>
-    /// <param name="detailsContainer">Container holding dependent Hit VFX controls.</param>
+    /// <param name="vfxPrefabProperty">Serialized optional VFX prefab property.</param>
+    /// <param name="missingPrefabBox">Info box shown while no VFX prefab is assigned.</param>
+    /// <param name="detailsContainer">Container holding dependent VFX controls.</param>
+    /// <param name="lifetimeFieldContainer">Container holding the optional lifetime control.</param>
     /// <param name="warningsContainer">Container receiving current authored-value warnings.</param>
     /// <param name="prefabsProperty">Serialized prefab settings block.</param>
-    private static void RefreshHitVfxDetailsVisibility(SerializedProperty hitVfxPrefabProperty,
-                                                       HelpBox missingPrefabBox,
-                                                       VisualElement detailsContainer,
-                                                       VisualElement warningsContainer,
-                                                       SerializedProperty prefabsProperty)
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <param name="offsetPropertyName">Relative offset property name.</param>
+    /// <param name="offsetLabel">Visible offset field label used in warnings.</param>
+    /// <param name="lifetimePropertyName">Relative lifetime property name.</param>
+    /// <param name="lifetimeLabel">Visible lifetime field label used in warnings.</param>
+    /// <param name="scalePropertyName">Relative scale property name.</param>
+    /// <param name="scaleLabel">Visible scale field label used in warnings.</param>
+    private static void RefreshOptionalVfxDetailsVisibility(SerializedProperty vfxPrefabProperty,
+                                                            HelpBox missingPrefabBox,
+                                                            VisualElement detailsContainer,
+                                                            VisualElement lifetimeFieldContainer,
+                                                            VisualElement warningsContainer,
+                                                            SerializedProperty prefabsProperty,
+                                                            string timingPropertyName,
+                                                            string offsetPropertyName,
+                                                            string offsetLabel,
+                                                            string lifetimePropertyName,
+                                                            string lifetimeLabel,
+                                                            string scalePropertyName,
+                                                            string scaleLabel)
     {
-        bool hasHitVfxPrefab = hitVfxPrefabProperty != null && hitVfxPrefabProperty.objectReferenceValue != null;
+        bool hasVfxPrefab = vfxPrefabProperty != null && vfxPrefabProperty.objectReferenceValue != null;
 
         if (missingPrefabBox != null)
-            missingPrefabBox.style.display = hasHitVfxPrefab ? DisplayStyle.None : DisplayStyle.Flex;
+            missingPrefabBox.style.display = hasVfxPrefab ? DisplayStyle.None : DisplayStyle.Flex;
 
         if (detailsContainer != null)
-            detailsContainer.style.display = hasHitVfxPrefab ? DisplayStyle.Flex : DisplayStyle.None;
+            detailsContainer.style.display = hasVfxPrefab ? DisplayStyle.Flex : DisplayStyle.None;
 
-        RefreshHitVfxWarnings(hasHitVfxPrefab ? prefabsProperty : null, warningsContainer);
+        RefreshOptionalVfxLifetimeVisibility(prefabsProperty,
+                                             lifetimeFieldContainer,
+                                             timingPropertyName);
+        RefreshOptionalVfxWarnings(hasVfxPrefab ? prefabsProperty : null,
+                                   warningsContainer,
+                                   timingPropertyName,
+                                   offsetPropertyName,
+                                   offsetLabel,
+                                   lifetimePropertyName,
+                                   lifetimeLabel,
+                                   scalePropertyName,
+                                   scaleLabel);
+    }
+
+    /// <summary>
+    /// Hides lifetime controls when spawn-warning timing makes the warning interval authoritative.
+    /// </summary>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <param name="lifetimeFieldContainer">Container holding the optional lifetime control.</param>
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    private static void RefreshOptionalVfxLifetimeVisibility(SerializedProperty prefabsProperty,
+                                                             VisualElement lifetimeFieldContainer,
+                                                             string timingPropertyName)
+    {
+        if (lifetimeFieldContainer == null)
+            return;
+
+        lifetimeFieldContainer.style.display = UsesSpawnWarningLifetime(prefabsProperty, timingPropertyName)
+            ? DisplayStyle.None
+            : DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// Returns whether the optional VFX timing delegates lifetime ownership to an active spawn warning.
+    /// </summary>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <returns>True when a spawn VFX uses warning-timed lifetime.</returns>
+    private static bool UsesSpawnWarningLifetime(SerializedProperty prefabsProperty, string timingPropertyName)
+    {
+        if (prefabsProperty == null || string.IsNullOrEmpty(timingPropertyName))
+            return false;
+
+        SerializedProperty timingProperty = prefabsProperty.FindPropertyRelative(timingPropertyName);
+        if (timingProperty == null || timingProperty.propertyType != SerializedPropertyType.Enum)
+            return false;
+        return timingProperty.enumValueIndex == (int)EnemySpawnVfxTiming.WithSpawnWarning;
     }
 
     /// <summary>
@@ -297,11 +582,26 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
 
     #region Warnings
     /// <summary>
-    /// Adds warnings for authored hit VFX values without mutating serialized data.
+    /// Adds warnings for authored optional VFX values without mutating serialized data.
     /// </summary>
     /// <param name="prefabsProperty">Serialized prefab settings block.</param>
     /// <param name="container">Parent element receiving warning boxes.</param>
-    private static void RefreshHitVfxWarnings(SerializedProperty prefabsProperty, VisualElement container)
+    /// <param name="timingPropertyName">Optional relative timing property name.</param>
+    /// <param name="offsetPropertyName">Relative offset property name.</param>
+    /// <param name="offsetLabel">Visible offset field label used in warnings.</param>
+    /// <param name="lifetimePropertyName">Relative lifetime property name.</param>
+    /// <param name="lifetimeLabel">Visible lifetime field label used in warnings.</param>
+    /// <param name="scalePropertyName">Relative scale property name.</param>
+    /// <param name="scaleLabel">Visible scale field label used in warnings.</param>
+    private static void RefreshOptionalVfxWarnings(SerializedProperty prefabsProperty,
+                                                   VisualElement container,
+                                                   string timingPropertyName,
+                                                   string offsetPropertyName,
+                                                   string offsetLabel,
+                                                   string lifetimePropertyName,
+                                                   string lifetimeLabel,
+                                                   string scalePropertyName,
+                                                   string scaleLabel)
     {
         if (container == null)
             return;
@@ -311,18 +611,52 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         if (prefabsProperty == null)
             return;
 
+        AddInvalidEnumWarning(prefabsProperty,
+                              container,
+                              timingPropertyName,
+                              "Spawn VFX Timing uses an unsupported enum value.");
+        if (!UsesSpawnWarningLifetime(prefabsProperty, timingPropertyName))
+        {
+            EnemyVisualPresetsPanelSectionsUtility.AddNonPositiveValueWarning(prefabsProperty,
+                                                                              container,
+                                                                              lifetimePropertyName,
+                                                                              lifetimeLabel + " should be greater than zero.");
+        }
         EnemyVisualPresetsPanelSectionsUtility.AddNonPositiveValueWarning(prefabsProperty,
                                                                           container,
-                                                                          "hitVfxLifetimeSeconds",
-                                                                          "Hit VFX Lifetime Seconds should be greater than zero.");
-        EnemyVisualPresetsPanelSectionsUtility.AddNonPositiveValueWarning(prefabsProperty,
-                                                                          container,
-                                                                          "hitVfxScaleMultiplier",
-                                                                          "Hit VFX Scale Multiplier should be greater than zero.");
+                                                                          scalePropertyName,
+                                                                          scaleLabel + " should be greater than zero.");
         AddInvalidVector3Warning(prefabsProperty,
                                  container,
-                                 "hitVfxSpawnOffset",
-                                 "Hit VFX Spawn Offset contains invalid numeric values.");
+                                 offsetPropertyName,
+                                 offsetLabel + " contains invalid numeric values.");
+    }
+
+    /// <summary>
+    /// Adds a warning when an enum property contains an unsupported serialized value.
+    /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    /// <param name="relativePropertyName">Relative enum property name.</param>
+    /// <param name="message">Warning text.</param>
+    private static void AddInvalidEnumWarning(SerializedProperty parentProperty,
+                                              VisualElement container,
+                                              string relativePropertyName,
+                                              string message)
+    {
+        if (string.IsNullOrEmpty(relativePropertyName))
+            return;
+
+        SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
+        if (property == null)
+            return;
+        if (property.propertyType != SerializedPropertyType.Enum)
+            return;
+
+        if (property.enumValueIndex >= 0 && property.enumValueIndex < property.enumDisplayNames.Length)
+            return;
+
+        container.Add(new HelpBox(message, HelpBoxMessageType.Warning));
     }
 
     /// <summary>

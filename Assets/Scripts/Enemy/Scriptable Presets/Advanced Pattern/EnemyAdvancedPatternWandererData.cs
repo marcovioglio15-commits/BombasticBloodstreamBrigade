@@ -327,7 +327,7 @@ public sealed class EnemyWandererAcidPayload
     [Range(0f, 100f)]
     [SerializeField] private float damagePerTick = 4f;
 
-    [Tooltip("Seconds between damage ticks while the player overlaps an acid segment.")]
+    [Tooltip("Seconds before acid trail damage can be reapplied while the player remains on the same trail after the entry hit.")]
     [Range(0.01f, 4f)]
     [SerializeField] private float applyIntervalSeconds = 0.55f;
 

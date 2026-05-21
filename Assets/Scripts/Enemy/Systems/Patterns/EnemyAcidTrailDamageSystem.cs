@@ -6,7 +6,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// Applies periodic player damage from active Acid Wanderer trail segments.
+/// Applies Acid Wanderer trail entry damage and overlap cooldown damage to the player.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyContactDamageSystem))]
@@ -36,7 +36,7 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
             .WithAll<PlayerControllerConfig, LocalTransform, PlayerHealth, PlayerShield, PlayerRuntimeHealthStatisticsConfig, PlayerDamageGraceState>()
             .Build();
         acidTrailQuery = SystemAPI.QueryBuilder()
-            .WithAll<EnemyPatternConfig, EnemyAcidTrailSegmentElement, EnemyActive>()
+            .WithAll<EnemyPatternConfig, EnemyPatternRuntimeState, EnemyAcidTrailSegmentElement, EnemyActive>()
             .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>()
             .Build();
 
@@ -90,16 +90,18 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         if (!entityManager.Exists(playerEntity))
             return;
 
+        bool canApplyDamage = true;
+
         if (dashStateLookup.HasComponent(playerEntity))
         {
             PlayerDashState dashState = dashStateLookup[playerEntity];
 
             if (dashState.RemainingInvulnerability > 0f)
-                return;
+                canApplyDamage = false;
         }
 
         if (PlayerDamageUtility.IsDamageGraceActive(in playerDamageGraceState, elapsedTime))
-            return;
+            canApplyDamage = false;
 
         if (playerHealth.Current <= 0f)
             return;
@@ -121,6 +123,7 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         {
             PlayerPosition = playerTransform.Position,
             DeltaTime = deltaTime,
+            PlayerDamageAllowed = canApplyDamage ? (byte)1 : (byte)0,
             AccumulatedDamage = accumulatedDamage
         };
         JobHandle damageHandle = damageJob.Schedule(state.Dependency);
@@ -210,66 +213,162 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
     {
         public float3 PlayerPosition;
         public float DeltaTime;
+        public byte PlayerDamageAllowed;
         public NativeReference<float> AccumulatedDamage;
 
         /// <summary>
-        /// Advances segment tick timers and accumulates damage from segments overlapping the player point.
+        /// Tracks one owner-level trail overlap window and accumulates entry or cooldown damage when it becomes due.
         /// </summary>
+        /// <param name="patternRuntimeState">Mutable owner state retaining player overlap and damage cooldown.</param>
         /// <param name="segments">Per-enemy acid segment buffer evaluated for overlap.</param>
         /// <param name="patternConfig">Compiled pattern config used to skip non-acid enemies.</param>
-        private void Execute(DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
+        private void Execute(ref EnemyPatternRuntimeState patternRuntimeState,
+                             DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
                              in EnemyPatternConfig patternConfig)
         {
-            if (patternConfig.AcidTrailEnabled == 0)
+            if (patternConfig.AcidTrailEnabled == 0 || segments.Length <= 0)
+            {
+                ResetPlayerOverlap(ref patternRuntimeState);
                 return;
+            }
 
-            float damage = AccumulatedDamage.Value;
+            bool playerOverlapsTrail = false;
+            float damagePerTick = 0f;
+            float applyIntervalSeconds = 0f;
 
+            // Merge every section owned by this Acid Wanderer into one continuous hazard overlap.
             for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
             {
                 EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
-                segment.ApplyTimer -= DeltaTime;
 
-                int pendingApplyCount = ResolvePendingApplyCount(ref segment);
+                if (!IsDamageSectionUsable(in segment))
+                    continue;
 
-                if (pendingApplyCount > 0 && segment.DamagePerTick > 0f && segment.Radius > 0f)
-                {
-                    float3 delta = PlayerPosition - segment.Position;
-                    delta.y = 0f;
-                    float radius = math.max(0f, segment.Radius);
+                if (!IsPlayerOverlappingSection(PlayerPosition, in segment))
+                    continue;
 
-                    if (math.lengthsq(delta) <= radius * radius)
-                        damage += math.max(0f, segment.DamagePerTick) * pendingApplyCount;
-                }
-
-                segments[segmentIndex] = segment;
+                playerOverlapsTrail = true;
+                damagePerTick = math.max(damagePerTick, segment.DamagePerTick);
+                applyIntervalSeconds = ResolveApplyIntervalSeconds(applyIntervalSeconds, segment.ApplyIntervalSeconds);
             }
 
-            AccumulatedDamage.Value = damage;
+            if (!playerOverlapsTrail)
+            {
+                ResetPlayerOverlap(ref patternRuntimeState);
+                return;
+            }
+
+            bool playerEnteredTrail = patternRuntimeState.AcidPlayerOverlapping == 0;
+            patternRuntimeState.AcidPlayerOverlapping = 1;
+
+            if (playerEnteredTrail)
+            {
+                patternRuntimeState.AcidPlayerDamageCooldown = 0f;
+                TryAccumulateReadyDamage(ref patternRuntimeState,
+                                         damagePerTick,
+                                         applyIntervalSeconds);
+                return;
+            }
+
+            patternRuntimeState.AcidPlayerDamageCooldown = math.max(0f, patternRuntimeState.AcidPlayerDamageCooldown - DeltaTime);
+            TryAccumulateReadyDamage(ref patternRuntimeState,
+                                     damagePerTick,
+                                     applyIntervalSeconds);
         }
 
         /// <summary>
-        /// Converts an overdue segment timer into one or more fixed-interval damage applications.
+        /// Applies one due owner-level Acid tick and starts the next overlap cooldown when player damage is allowed.
         /// </summary>
-        /// <param name="segment">Mutable acid segment whose apply timer is advanced.</param>
-        /// <returns>Number of fixed damage applications due this frame.</returns>
-        private static int ResolvePendingApplyCount(ref EnemyAcidTrailSegmentElement segment)
+        /// <param name="patternRuntimeState">Mutable owner state retaining the current Acid cooldown.</param>
+        /// <param name="damagePerTick">Resolved Acid damage for the current owner overlap.</param>
+        /// <param name="applyIntervalSeconds">Cooldown started after an accepted due damage request.</param>
+        private void TryAccumulateReadyDamage(ref EnemyPatternRuntimeState patternRuntimeState,
+                                              float damagePerTick,
+                                              float applyIntervalSeconds)
         {
-            float applyIntervalSeconds = math.max(MinimumApplyIntervalSeconds, segment.ApplyIntervalSeconds);
-            segment.ApplyIntervalSeconds = applyIntervalSeconds;
+            if (patternRuntimeState.AcidPlayerDamageCooldown > 0f)
+                return;
 
-            if (segment.ApplyTimer > 0f)
-                return 0;
+            if (PlayerDamageAllowed == 0 || damagePerTick <= 0f)
+                return;
 
-            float overdueSeconds = -segment.ApplyTimer;
-            int additionalApplyCount = (int)math.floor(overdueSeconds / applyIntervalSeconds);
-            int applyCount = 1 + math.max(0, additionalApplyCount);
-            segment.ApplyTimer += applyCount * applyIntervalSeconds;
+            AccumulatedDamage.Value += math.max(0f, damagePerTick);
+            patternRuntimeState.AcidPlayerDamageCooldown = math.max(MinimumApplyIntervalSeconds, applyIntervalSeconds);
+        }
 
-            if (segment.ApplyTimer <= 0f)
-                segment.ApplyTimer = applyIntervalSeconds;
+        /// <summary>
+        /// Clears owner-level Acid overlap data when the player is no longer on any retained section.
+        /// </summary>
+        /// <param name="patternRuntimeState">Mutable owner state cleared for the next trail entry.</param>
+        private static void ResetPlayerOverlap(ref EnemyPatternRuntimeState patternRuntimeState)
+        {
+            patternRuntimeState.AcidPlayerDamageCooldown = 0f;
+            patternRuntimeState.AcidPlayerOverlapping = 0;
+        }
 
-            return applyCount;
+        /// <summary>
+        /// Returns whether one retained Acid section still carries a valid damage payload.
+        /// </summary>
+        /// <param name="segment">Retained Acid section being evaluated.</param>
+        /// <returns>True when the section can contribute to player overlap damage.</returns>
+        private static bool IsDamageSectionUsable(in EnemyAcidTrailSegmentElement segment)
+        {
+            return segment.RemainingLifetime > 0f &&
+                   segment.DamagePerTick > 0f &&
+                   segment.Radius > 0f;
+        }
+
+        /// <summary>
+        /// Returns whether the player point is inside the planar capsule represented by one Acid section.
+        /// </summary>
+        /// <param name="position">World-space player point evaluated on the XZ plane.</param>
+        /// <param name="segment">Retained Acid section being evaluated.</param>
+        /// <returns>True when the player point is inside the Acid section radius.</returns>
+        private static bool IsPlayerOverlappingSection(float3 position, in EnemyAcidTrailSegmentElement segment)
+        {
+            float radius = math.max(0f, segment.Radius);
+            return ResolvePlanarDistanceSquaredToSegment(position,
+                                                         segment.StartPosition,
+                                                         segment.EndPosition) <= radius * radius;
+        }
+
+        /// <summary>
+        /// Resolves the shortest retained overlap cooldown when neighboring Acid sections carry different values.
+        /// </summary>
+        /// <param name="currentIntervalSeconds">Shortest interval already found for this owner overlap.</param>
+        /// <param name="candidateIntervalSeconds">Interval copied into the currently overlapping Acid section.</param>
+        /// <returns>Shortest safe overlap cooldown in seconds.</returns>
+        private static float ResolveApplyIntervalSeconds(float currentIntervalSeconds, float candidateIntervalSeconds)
+        {
+            float safeCandidateIntervalSeconds = math.max(MinimumApplyIntervalSeconds, candidateIntervalSeconds);
+
+            if (currentIntervalSeconds <= 0f)
+                return safeCandidateIntervalSeconds;
+
+            return math.min(currentIntervalSeconds, safeCandidateIntervalSeconds);
+        }
+
+        /// <summary>
+        /// Resolves the squared planar distance between the player point and one emitted acid path section.
+        /// </summary>
+        /// <param name="position">World-space point being tested against the trail section.</param>
+        /// <param name="startPosition">World-space start of the emitted trail section.</param>
+        /// <param name="endPosition">World-space end of the emitted trail section.</param>
+        /// <returns>Squared distance on the XZ plane.</returns>
+        private static float ResolvePlanarDistanceSquaredToSegment(float3 position,
+                                                                   float3 startPosition,
+                                                                   float3 endPosition)
+        {
+            float2 sectionStart = startPosition.xz;
+            float2 sectionDelta = endPosition.xz - sectionStart;
+            float sectionLengthSquared = math.lengthsq(sectionDelta);
+
+            if (sectionLengthSquared <= math.EPSILON)
+                return math.distancesq(position.xz, sectionStart);
+
+            float normalizedProjection = math.saturate(math.dot(position.xz - sectionStart, sectionDelta) / sectionLengthSquared);
+            float2 closestPoint = sectionStart + sectionDelta * normalizedProjection;
+            return math.distancesq(position.xz, closestPoint);
         }
     }
     #endregion

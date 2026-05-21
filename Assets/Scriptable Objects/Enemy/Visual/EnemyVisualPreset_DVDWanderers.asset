@@ -67,6 +67,11 @@ MonoBehaviour:
     hitVfxSpawnOffset: {x: 0, y: 0, z: 0}
     hitVfxLifetimeSeconds: 0.35
     hitVfxScaleMultiplier: 2
+    spawnVfxPrefab: {fileID: 2040413616577321599, guid: e5dba0b55037b004495d5cd35d65c05b, type: 3}
+    spawnVfxTiming: 1
+    spawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
+    spawnVfxLifetimeSeconds: 0.5
+    spawnVfxScaleMultiplier: 2
     spawnPaintColor: {r: 0.95, g: 0.8, b: 0.24, a: 1}
   spawnOverrides:
     overrideSpawnOffset: 0

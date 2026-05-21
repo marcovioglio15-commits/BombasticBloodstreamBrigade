@@ -184,6 +184,56 @@ public static class EnemyPatternCowardUtility
         patternRuntimeState.CowardLastResolvedVelocity = recoveryDirection * math.max(0f, desiredSpeed) * MinimumRecoverySpeedRatio;
         patternRuntimeState.CowardHasResolvedVelocity = math.lengthsq(recoveryDirection) > DirectionEpsilon ? (byte)1 : (byte)0;
     }
+
+    /// <summary>
+    /// Resolves a visual-facing velocity from Coward movement memory so transient avoidance corrections do not flip look direction.
+    /// </summary>
+    /// <param name="patternRuntimeState">Current Coward runtime state containing the last accepted movement velocity.</param>
+    /// <param name="candidateVelocity">Candidate facing velocity produced by movement and knockback systems.</param>
+    /// <returns>Stable planar facing velocity.</returns>
+    public static float3 ResolveStableLookVelocity(in EnemyPatternRuntimeState patternRuntimeState, float3 candidateVelocity)
+    {
+        if (patternRuntimeState.CowardHasResolvedVelocity == 0)
+            return candidateVelocity;
+
+        float stableSpeed = math.length(patternRuntimeState.CowardLastResolvedVelocity);
+
+        if (stableSpeed <= DirectionEpsilon)
+            return candidateVelocity;
+
+        float candidateSpeed = math.length(candidateVelocity);
+        float3 stableDirection = patternRuntimeState.CowardLastResolvedVelocity / math.max(stableSpeed, DirectionEpsilon);
+
+        if (candidateSpeed <= DirectionEpsilon)
+            return stableDirection * stableSpeed;
+
+        float3 candidateDirection = candidateVelocity / math.max(candidateSpeed, DirectionEpsilon);
+        float alignment = math.dot(stableDirection, candidateDirection);
+
+        if (alignment < 0.45f)
+            return stableDirection * math.max(candidateSpeed, stableSpeed * 0.85f);
+
+        float3 resolvedDirection = math.normalizesafe(stableDirection * 0.68f + candidateDirection * 0.32f,
+                                                     candidateDirection);
+        return resolvedDirection * candidateSpeed;
+    }
+
+    /// <summary>
+    /// Resolves a stronger local-clearance blend used by Cowards to begin curving around neighbors earlier.
+    /// </summary>
+    /// <param name="patternConfig">Current compiled Coward pattern config.</param>
+    /// <param name="steeringAggressiveness">Resolved steering aggressiveness scalar.</param>
+    /// <param name="priorityYieldUrgency">Current local priority-yield urgency.</param>
+    /// <returns>Clearance blend factor for Coward movement composition.</returns>
+    public static float ResolveAvoidanceBlend(in EnemyPatternConfig patternConfig,
+                                              float steeringAggressiveness,
+                                              float priorityYieldUrgency)
+    {
+        float aggressiveness01 = math.saturate(steeringAggressiveness / 2.5f);
+        float freeTrajectoryPreference = math.max(0f, patternConfig.BasicFreeTrajectoryPreference);
+        float anticipationBlend = 0.18f + freeTrajectoryPreference * 0.2f + math.saturate(priorityYieldUrgency) * 0.32f;
+        return math.saturate(anticipationBlend * math.lerp(0.88f, 1.35f, aggressiveness01));
+    }
     #endregion
 
     #region Private Methods
