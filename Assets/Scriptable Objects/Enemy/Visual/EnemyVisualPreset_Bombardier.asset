@@ -72,7 +72,7 @@ MonoBehaviour:
     spawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
     spawnVfxLifetimeSeconds: 0.5
     spawnVfxScaleMultiplier: 2
-    spawnPaintColor: {r: 0.9598134, g: 0.2980392, b: 1, a: 1}
+    spawnPaintColor: {r: 0.9245283, g: 0.6657766, b: 0.8592506, a: 1}
   spawnOverrides:
     overrideSpawnOffset: 0
     spawnOffset: {x: 0, y: 0, z: 0}
