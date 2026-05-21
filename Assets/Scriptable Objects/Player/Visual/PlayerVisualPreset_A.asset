@@ -38,8 +38,8 @@ MonoBehaviour:
     procVfxPrefab: {fileID: 2694951299509519808, guid: 7125792ca8c2d604bbed7dd0d11cba03, type: 3}
     procVfxScaleMultiplier: 1
   - elementType: 1
-    spawnStackVfx: 0
-    stackVfxPrefab: {fileID: 0}
+    spawnStackVfx: 1
+    stackVfxPrefab: {fileID: 2694951299509519808, guid: 7125792ca8c2d604bbed7dd0d11cba03, type: 3}
     stackVfxScaleMultiplier: 1
     spawnProcVfx: 0
     procVfxPrefab: {fileID: 0}

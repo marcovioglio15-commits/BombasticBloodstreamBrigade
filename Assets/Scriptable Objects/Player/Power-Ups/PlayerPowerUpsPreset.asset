@@ -7083,14 +7083,14 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
-          requiredCharge: 90
-          maximumCharge: 90
-          chargeRatePerSecond: 30
-          decayAfterRelease: 1
+          requiredCharge: 50
+          maximumCharge: 50
+          chargeRatePerSecond: 25
+          decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
-          laserDurationSeconds: 0.75
+          laserDurationSeconds: 0.5
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.7
           chargedLaserBeam:
@@ -11419,15 +11419,15 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 20
-          activationCost: 20
+          maximumEnergy: 25
+          activationCost: 25
           maintenanceCostPerSecond: 0
           isToggleable: 0
           maintenanceTicksPerSecond: 4
           minimumActivationEnergyPercent: 0
-          chargeType: 0
+          chargeType: 1
           chargePerTrigger: 1
-          cooldownSeconds: 1
+          cooldownSeconds: 0
           allowRechargeDuringToggleStartupLock: 0
         suppressShooting:
           suppressBaseShootingWhileActive: 1
@@ -12219,8 +12219,8 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
-          activationCost: 5
-          maintenanceCostPerSecond: 5
+          activationCost: 10
+          maintenanceCostPerSecond: 10
           isToggleable: 1
           maintenanceTicksPerSecond: 5
           minimumActivationEnergyPercent: 0
@@ -12530,8 +12530,8 @@ MonoBehaviour:
           invulnerabilityExtraTime: 0.1
         bulletTime:
           duration: 3
-          enemySlowPercent: 80
-          transitionTimeSeconds: 1
+          enemySlowPercent: 50
+          transitionTimeSeconds: 0.5
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13015,11 +13015,11 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 20
-          activationCost: 2
-          maintenanceCostPerSecond: 2
+          activationCost: 4
+          maintenanceCostPerSecond: 4
           isToggleable: 1
           maintenanceTicksPerSecond: 5
-          minimumActivationEnergyPercent: 0
+          minimumActivationEnergyPercent: 20
           chargeType: 1
           chargePerTrigger: 1
           cooldownSeconds: 1
@@ -13297,7 +13297,7 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
-          - formula: '[Damage]=[Damage]+3'
+          - formula: '[Damage]=[Damage]+2.5'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 1.2}
@@ -13729,7 +13729,7 @@ MonoBehaviour:
       moduleId: Module_AreaTickApplyElement
       stage: 7
       isEnabled: 1
-      useOverridePayload: 0
+      useOverridePayload: 1
       overridePayload:
         holdCharge:
           requiredCharge: 500
@@ -13971,18 +13971,18 @@ MonoBehaviour:
             elementType: 0
             effectKind: 0
             procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 5
-            maximumStacks: 20
-            stackDecayPerSecond: 1
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 4
+            reapplyMode: 1
+            procThresholdStacks: 1
+            maximumStacks: 1
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 1
+            dotDamagePerTick: 1
             dotTickInterval: 0.5
             dotDurationSeconds: 2
-            impedimentSlowPercentPerStack: 10
-            impedimentProcSlowPercent: 50
-            impedimentMaxSlowPercent: 100
-            impedimentDurationSeconds: 2
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0.05
           stacksPerTick: 1
           applyIntervalSeconds: 0.2
         stackable:

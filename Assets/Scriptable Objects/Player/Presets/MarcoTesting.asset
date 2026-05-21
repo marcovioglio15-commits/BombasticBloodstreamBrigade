@@ -120,13 +120,13 @@ MonoBehaviour:
         fire:
           effectKind: 0
           procMode: 0
-          reapplyMode: 0
+          reapplyMode: 1
           stacksPerHit: 1
           procThresholdStacks: 1
-          maximumStacks: 20
-          stackDecayPerSecond: 1
+          maximumStacks: 1
+          stackDecayPerSecond: 0
           consumeStacksOnProc: 1
-          dotDamagePerTick: 4
+          dotDamagePerTick: 1
           dotTickInterval: 0.5
           dotDurationSeconds: 2
           impedimentSlowPercentPerStack: 10
@@ -134,21 +134,21 @@ MonoBehaviour:
           impedimentMaxSlowPercent: 100
           impedimentDurationSeconds: 2
         ice:
-          effectKind: 0
-          procMode: 0
+          effectKind: 1
+          procMode: 1
           reapplyMode: 0
           stacksPerHit: 1
-          procThresholdStacks: 1
-          maximumStacks: 20
-          stackDecayPerSecond: 1
+          procThresholdStacks: 3
+          maximumStacks: 3
+          stackDecayPerSecond: 0.35
           consumeStacksOnProc: 1
           dotDamagePerTick: 4
           dotTickInterval: 0.5
           dotDurationSeconds: 2
-          impedimentSlowPercentPerStack: 10
-          impedimentProcSlowPercent: 50
-          impedimentMaxSlowPercent: 100
-          impedimentDurationSeconds: 2
+          impedimentSlowPercentPerStack: 30
+          impedimentProcSlowPercent: 90
+          impedimentMaxSlowPercent: 90
+          impedimentDurationSeconds: 3
         poison:
           effectKind: 0
           procMode: 0
@@ -326,6 +326,11 @@ MonoBehaviour:
   - statKey: shootingSettings.values.knockback.strength
     addScaling: 1
     formula: '[Knockback]'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: shootingSettings.values.elementBehaviours.fire.dotDamagePerTick
+    addScaling: 1
+    formula: '[Damage]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   elementalPayloadScalingMigrated: 1
