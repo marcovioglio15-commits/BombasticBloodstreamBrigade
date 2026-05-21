@@ -181,6 +181,14 @@ public static class EnemyPatternCowardMovementUtility
 
             if (targetDirectionBroken || targetDeadlocked)
             {
+                if (patternRuntimeState.CowardRetargetLockTimer > 0f && math.lengthsq(retryFallbackVelocity) > DirectionEpsilon)
+                {
+                    float lockedRetrySeconds = math.max(0.06f, patternConfig.BasicBlockedPathRetryDelay * 0.55f);
+                    patternRuntimeState.WanderRetryTimer = math.max(patternRuntimeState.WanderRetryTimer, lockedRetrySeconds);
+                    resolvedVelocity = retryFallbackVelocity;
+                    return true;
+                }
+
                 patternRuntimeState.WanderHasTarget = 0;
                 patternRuntimeState.WanderWaitTimer = math.max(patternRuntimeState.WanderWaitTimer,
                                                                EnemyPatternCowardSharedUtility.ResolveDecisionCooldown(enemyEntity,

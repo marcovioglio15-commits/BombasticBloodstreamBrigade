@@ -674,8 +674,9 @@ public sealed class EnemyBrainPresetsPanel
     {
         Movement = 0,
         Steering = 1,
-        Damage = 2,
-        HealthStatistics = 3
+        TacticalNavigation = 2,
+        Damage = 3,
+        HealthStatistics = 4
     }
 
 

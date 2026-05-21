@@ -20137,7 +20137,6 @@ MonoBehaviour:
   - Passive_AdditionalBarrel
   - Passive_MegaProjectiles
   - Passive_FireRate
-  - PassiveOrbitalProjectiles
   - PassiveBouncingProjectiles
   - PassiveSplittingProjectiles
   passiveTools:

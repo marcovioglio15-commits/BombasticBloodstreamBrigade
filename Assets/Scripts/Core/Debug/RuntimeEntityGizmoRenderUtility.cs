@@ -33,6 +33,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private static readonly Color EnemySeparationRadiusColor = new Color(0.24f, 0.72f, 1f, 0.94f);
     private static readonly Color EnemyWanderTargetColor = new Color(0.36f, 1f, 0.82f, 0.94f);
     private static readonly Color EnemyShortRangeDashTargetColor = new Color(1f, 0.42f, 0.78f, 0.94f);
+    private static readonly Color EnemyAcidTrailSegmentColor = new Color(0.58f, 1f, 0.18f, 0.82f);
     private static readonly Color SpawnerSpawnRadiusColor = new Color(0.2f, 0.9f, 0.42f, 0.94f);
     private static readonly Color SpawnerDespawnRadiusColor = new Color(1f, 0.66f, 0.24f, 0.94f);
     private static readonly Color BombRadiusColor = new Color(1f, 0.4f, 0.12f, 0.94f);
@@ -345,6 +346,15 @@ public static class RuntimeEntityGizmoRenderUtility
                             drewEnemyGizmo = true;
                         }
                     }
+
+                    if (entityManager.HasComponent<EnemyPatternConfig>(enemyEntity) &&
+                        entityManager.HasBuffer<EnemyAcidTrailSegmentElement>(enemyEntity))
+                    {
+                        EnemyPatternConfig patternConfig = entityManager.GetComponentData<EnemyPatternConfig>(enemyEntity);
+
+                        if (patternConfig.AcidTrailEnabled != 0 && patternConfig.AcidTrailDebugDrawSegments != 0)
+                            drewEnemyGizmo |= DrawAcidTrailSegments(primitiveDrawer, entityManager.GetBuffer<EnemyAcidTrailSegmentElement>(enemyEntity));
+                    }
                 }
 
                 if (!drewEnemyGizmo)
@@ -364,6 +374,31 @@ public static class RuntimeEntityGizmoRenderUtility
             if (enemyEntities.IsCreated)
                 enemyEntities.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Draws active Acid Wanderer hazard segments as planar discs when the enemy wander debug toggle is enabled.
+    /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="segments">Per-enemy acid trail buffer read from ECS.</param>
+    /// <returns>True when at least one active segment was drawn.</returns>
+    private static bool DrawAcidTrailSegments(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
+                                              DynamicBuffer<EnemyAcidTrailSegmentElement> segments)
+    {
+        bool drewSegment = false;
+
+        for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
+        {
+            EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
+
+            if (segment.Radius <= 0f || segment.RemainingLifetime <= 0f)
+                continue;
+
+            primitiveDrawer.DrawWireDisc(ToVector3(segment.Position), segment.Radius, EnemyAcidTrailSegmentColor);
+            drewSegment = true;
+        }
+
+        return drewSegment;
     }
     #endregion
 

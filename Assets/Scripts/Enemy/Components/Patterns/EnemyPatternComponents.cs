@@ -73,6 +73,19 @@ public struct EnemyPatternConfig : IComponentData
     public float DvdFixedInitialDirectionDegrees;
     public float DvdCornerNudgeDistance;
     public byte DvdIgnoreSteeringAndPriority;
+    public byte AcidTrailEnabled;
+    public float AcidTrailSegmentLifetimeSeconds;
+    public float AcidTrailSpawnDistance;
+    public float AcidTrailSpawnIntervalSeconds;
+    public float AcidTrailRadius;
+    public int AcidTrailMaxActiveSegments;
+    public float AcidTrailDamagePerTick;
+    public float AcidTrailApplyIntervalSeconds;
+    public float AcidTrailMinimumMovementSpeed;
+    public byte AcidTrailDebugDrawSegments;
+    public Entity AcidTrailVfxPrefabEntity;
+    public byte AcidTrailScaleVfxToRadius;
+    public float AcidTrailVfxScaleMultiplier;
 }
 
 /// <summary>
@@ -96,8 +109,58 @@ public struct EnemyPatternRuntimeState : IComponentData
     public byte WanderInitialized;
     public float3 CowardPatrolAnchorPosition;
     public byte CowardPatrolAnchorInitialized;
+    public float3 CowardLastResolvedVelocity;
+    public float CowardRetargetLockTimer;
+    public float CowardRecoveryTimer;
+    public byte CowardHasResolvedVelocity;
     public float3 DvdDirection;
     public byte DvdInitialized;
+    public float3 AcidLastSpawnPosition;
+    public float AcidSpawnTimer;
+    public byte AcidInitialized;
+}
+
+/// <summary>
+/// Stores one active acid trail segment emitted by an Acid Wanderer enemy.
+/// </summary>
+[InternalBufferCapacity(8)]
+public struct EnemyAcidTrailSegmentElement : IBufferElementData
+{
+    public float3 Position;
+    public float Radius;
+    public float RemainingLifetime;
+    public float ApplyIntervalSeconds;
+    public float ApplyTimer;
+    public float DamagePerTick;
+    public byte VfxSpawned;
+}
+
+/// <summary>
+/// Stores compact tactical navigation weights baked from the enemy brain preset.
+/// </summary>
+public struct EnemyTacticalNavigationConfig : IComponentData
+{
+    public EnemyTacticalCandidateBudget CandidateBudget;
+    public float NavigationInfluence;
+    public float PredictionHorizonSeconds;
+    public float SidePassPreference;
+    public float CrowdLanePreference;
+    public float WallTangentPreference;
+    public float OscillationDamping;
+    public float StuckRecoverySeconds;
+}
+
+/// <summary>
+/// Stores short-lived movement memory used to reduce direction flipping and wall-stuck loops.
+/// </summary>
+public struct EnemyNavigationRuntimeState : IComponentData
+{
+    public float3 LastDesiredDirection;
+    public float3 LastResolvedPosition;
+    public float PathCommitTimer;
+    public float StuckTimer;
+    public sbyte LastSideSign;
+    public byte HadValidDirection;
 }
 
 /// <summary>

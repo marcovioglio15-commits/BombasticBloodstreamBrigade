@@ -43,6 +43,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             AreaAmountPerTickPercent = math.max(0f, authoring.AreaAmountPerTickPercent),
             AreaTickInterval = math.max(0.01f, authoring.AreaTickInterval)
         });
+        AddComponent(entity, EnemyTacticalNavigationBakeUtility.BuildConfig(authoring));
+        AddComponent(entity, EnemyPatternDefaultsUtility.CreateNavigationRuntimeState());
 
         float bakedHealth = math.max(1f, authoring.MaxHealth);
         float bakedShield = math.max(0f, authoring.MaxShield);
@@ -91,8 +93,22 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                 compiledPattern = compiledBossPattern.InitialPattern;
         }
 
-        AddComponent(entity, compiledPattern.PatternConfig);
+        EnemyPatternConfig resolvedPatternConfig = compiledPattern.PatternConfig;
+        bool shouldBakeManagedVfxRuntime = ShouldBakeEnemyManagedVfxRuntime(compiledPattern, in resolvedPatternConfig);
+        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> managedVfxPrefabBindings = default;
+
+        if (shouldBakeManagedVfxRuntime)
+            managedVfxPrefabBindings = BakeEnemyManagedVfxRuntime(entity);
+
+        TryBakeAcidTrailVfxRuntime(authoring,
+                                   compiledPattern,
+                                   ref resolvedPatternConfig,
+                                   managedVfxPrefabBindings,
+                                   shouldBakeManagedVfxRuntime);
+
+        AddComponent(entity, resolvedPatternConfig);
         AddComponent(entity, EnemyPatternDefaultsUtility.CreatePatternRuntimeState());
+        AddBuffer<EnemyAcidTrailSegmentElement>(entity);
         AddComponent(entity, new EnemyShooterControlState
         {
             MovementLocked = 0,
@@ -155,7 +171,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         if (ShouldBakeBombardierRuntime(compiledPattern))
         {
-            TryBakeBombardierRuntime(authoring, entity, compiledPattern);
+            TryBakeBombardierRuntime(authoring,
+                                     entity,
+                                     compiledPattern,
+                                     managedVfxPrefabBindings,
+                                     shouldBakeManagedVfxRuntime);
         }
 
         TryBakeDropItemsRuntime(authoring,
@@ -326,6 +346,25 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return false;
 
         return compiledPattern.BombardierConfigs.Count > 0 || compiledPattern.HasBombardierRuntimeSettings;
+    }
+
+    /// <summary>
+    /// Resolves whether this enemy needs managed VFX request buffers for enemy-authored one-shot visuals.
+    /// </summary>
+    /// <param name="compiledPattern">Compiled pattern result produced from advanced or boss pattern presets.</param>
+    /// <param name="patternConfig">Resolved pattern config before it is written to the enemy entity.</param>
+    /// <returns>True when at least one enemy module has an assigned managed VFX prefab.</returns>
+    private static bool ShouldBakeEnemyManagedVfxRuntime(EnemyCompiledPatternBakeResult compiledPattern,
+                                                         in EnemyPatternConfig patternConfig)
+    {
+        if (compiledPattern == null)
+            return false;
+
+        if (compiledPattern.BombardierExplosionVfxPrefab != null)
+            return true;
+
+        return patternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid &&
+               compiledPattern.AcidTrailSegmentVfxPrefab != null;
     }
 
     /// <summary>
@@ -906,7 +945,13 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <param name="authoring">Source authoring component used for prefab validation.</param>
     /// <param name="entity">Enemy entity receiving the Bombardier prefab binding.</param>
     /// <param name="compiledPattern">Compiled pattern providing Bombardier runtime prefab settings.</param>
-    private void TryBakeBombardierRuntime(EnemyAuthoring authoring, Entity entity, EnemyCompiledPatternBakeResult compiledPattern)
+    /// <param name="managedVfxPrefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
+    private void TryBakeBombardierRuntime(EnemyAuthoring authoring,
+                                          Entity entity,
+                                          EnemyCompiledPatternBakeResult compiledPattern,
+                                          DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> managedVfxPrefabBindings,
+                                          bool canBakeManagedVfx)
     {
         if (authoring == null)
             return;
@@ -944,7 +989,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             ExplosionVfxScaleMultiplier = math.max(0.01f, compiledPattern.BombardierExplosionVfxScaleMultiplier)
         });
 
-        TryBakeBombardierExplosionVfxRuntime(entity, explosionVfxPrefabEntity, explosionVfxPrefabObject);
+        TryBakeBombardierExplosionVfxRuntime(managedVfxPrefabBindings,
+                                             canBakeManagedVfx,
+                                             explosionVfxPrefabEntity,
+                                             explosionVfxPrefabObject);
     }
 
     /// <summary>
@@ -1344,38 +1392,136 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
-    /// Adds the shared managed VFX request buffers needed by Bombardier explosion VFX playback.
+    /// Adds shared managed VFX buffers used by enemy-authored one-shot visual requests.
     /// </summary>
-    /// <param name="entity">Enemy entity that owns Bombardier bomb requests.</param>
+    /// <param name="entity">Enemy entity receiving the managed VFX runtime buffers.</param>
+    /// <returns>Prefab binding buffer used by module-specific bake helpers.</returns>
+    private DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> BakeEnemyManagedVfxRuntime(Entity entity)
+    {
+        AddBuffer<PlayerPowerUpVfxSpawnRequest>(entity);
+        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+        AddComponent(entity, BuildEnemyManagedVfxCapConfig());
+        return prefabBindings;
+    }
+
+    /// <summary>
+    /// Resolves and stores Acid Wanderer trail VFX data in the compiled pattern config.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <param name="compiledPattern">Compiled pattern providing Acid VFX authoring settings.</param>
+    /// <param name="patternConfig">Mutable pattern config receiving the resolved VFX prefab entity.</param>
+    /// <param name="managedVfxPrefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
+    private void TryBakeAcidTrailVfxRuntime(EnemyAuthoring authoring,
+                                            EnemyCompiledPatternBakeResult compiledPattern,
+                                            ref EnemyPatternConfig patternConfig,
+                                            DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> managedVfxPrefabBindings,
+                                            bool canBakeManagedVfx)
+    {
+        patternConfig.AcidTrailVfxPrefabEntity = Entity.Null;
+
+        if (!canBakeManagedVfx)
+            return;
+
+        if (compiledPattern == null)
+            return;
+
+        if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid)
+            return;
+
+        GameObject acidVfxPrefab = compiledPattern.AcidTrailSegmentVfxPrefab;
+        Entity acidVfxPrefabEntity = ResolveAcidTrailVfxPrefabEntity(authoring, acidVfxPrefab);
+
+        if (acidVfxPrefabEntity == Entity.Null || acidVfxPrefab == null)
+            return;
+
+        patternConfig.AcidTrailVfxPrefabEntity = acidVfxPrefabEntity;
+        patternConfig.AcidTrailScaleVfxToRadius = compiledPattern.AcidTrailScaleSegmentVfxToRadius ? (byte)1 : (byte)0;
+        patternConfig.AcidTrailVfxScaleMultiplier = math.max(0.01f, compiledPattern.AcidTrailSegmentVfxScaleMultiplier);
+        AppendManagedVfxPrefabBinding(managedVfxPrefabBindings, acidVfxPrefabEntity, acidVfxPrefab);
+    }
+
+    /// <summary>
+    /// Resolves the optional Acid Wanderer trail VFX prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <param name="candidatePrefab">Candidate trail segment VFX prefab.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
+    private Entity ResolveAcidTrailVfxPrefabEntity(EnemyAuthoring authoring, GameObject candidatePrefab)
+    {
+        if (candidatePrefab == null)
+            return Entity.Null;
+
+        if (EnemyAuthoringValidationUtility.IsInvalidRuntimePrefab(authoring, candidatePrefab))
+        {
+#if UNITY_EDITOR
+            if (authoring != null)
+                Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid Acid Wanderer trail VFX prefab '{0}' on '{1}'. Assign a prefab asset without EnemyAuthoring or PlayerAuthoring components.", candidatePrefab.name, authoring.name), authoring);
+#endif
+            return Entity.Null;
+        }
+
+        return GetEntity(candidatePrefab, TransformUsageFlags.Dynamic);
+    }
+
+    /// <summary>
+    /// Adds Bombardier explosion VFX prefab bindings to the shared enemy managed VFX runtime.
+    /// </summary>
+    /// <param name="prefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
     /// <param name="prefabEntity">Resolved explosion VFX prefab entity.</param>
     /// <param name="sourcePrefab">Source prefab asset stored for managed runtime instantiation.</param>
-    private void TryBakeBombardierExplosionVfxRuntime(Entity entity, Entity prefabEntity, GameObject sourcePrefab)
+    private static void TryBakeBombardierExplosionVfxRuntime(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                                             bool canBakeManagedVfx,
+                                                             Entity prefabEntity,
+                                                             GameObject sourcePrefab)
+    {
+        if (!canBakeManagedVfx)
+            return;
+
+        AppendManagedVfxPrefabBinding(prefabBindings, prefabEntity, sourcePrefab);
+    }
+
+    /// <summary>
+    /// Adds one managed VFX prefab binding when an equivalent binding does not already exist.
+    /// </summary>
+    /// <param name="prefabBindings">Shared managed VFX prefab binding buffer.</param>
+    /// <param name="prefabEntity">Resolved VFX prefab entity.</param>
+    /// <param name="sourcePrefab">Source prefab asset stored for managed runtime instantiation.</param>
+    private static void AppendManagedVfxPrefabBinding(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                                      Entity prefabEntity,
+                                                      GameObject sourcePrefab)
     {
         if (prefabEntity == Entity.Null || sourcePrefab == null)
             return;
 
-        AddBuffer<PlayerPowerUpVfxSpawnRequest>(entity);
-        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+        for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
+        {
+            PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
+
+            if (binding.PrefabEntity == prefabEntity)
+                return;
+        }
+
         prefabBindings.Add(new PlayerPowerUpVfxPrefabBindingElement
         {
             PrefabEntity = prefabEntity,
             Prefab = sourcePrefab
         });
-        AddComponent(entity, BuildBombardierExplosionVfxCapConfig());
     }
 
     /// <summary>
-    /// Builds conservative one-shot VFX caps for enemy-authored Bombardier explosion feedback.
+    /// Builds conservative one-shot VFX caps for enemy-authored visual feedback.
     /// </summary>
     /// <returns>Runtime VFX cap config shared with the managed VFX pool.</returns>
-    private static PlayerPowerUpVfxCapConfig BuildBombardierExplosionVfxCapConfig()
+    private static PlayerPowerUpVfxCapConfig BuildEnemyManagedVfxCapConfig()
     {
         return new PlayerPowerUpVfxCapConfig
         {
-            MaxSamePrefabPerCell = 6,
-            CellSize = 2.5f,
+            MaxSamePrefabPerCell = 10,
+            CellSize = 1.75f,
             MaxAttachedSamePrefabPerTarget = 1,
-            MaxActiveOneShotVfx = 400,
+            MaxActiveOneShotVfx = 700,
             RefreshAttachedLifetimeOnCapHit = 1
         };
     }

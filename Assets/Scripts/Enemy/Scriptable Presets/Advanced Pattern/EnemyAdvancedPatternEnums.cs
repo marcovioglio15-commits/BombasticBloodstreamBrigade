@@ -52,7 +52,8 @@ public enum EnemyPowerUpStealSelectionMode
 public enum EnemyWandererMode
 {
     Basic = 0,
-    Dvd = 1
+    Dvd = 1,
+    Acid = 2
 }
 
 /// <summary>
@@ -121,7 +122,18 @@ public enum EnemyCompiledMovementPatternKind : byte
     WandererBasic = 2,
     WandererDvd = 3,
     Coward = 4,
-    ShortRangeDash = 5
+    ShortRangeDash = 5,
+    WandererAcid = 6
+}
+
+/// <summary>
+/// Declares how many tactical movement candidates an enemy can evaluate at its current steering LOD.
+/// </summary>
+public enum EnemyTacticalCandidateBudget : byte
+{
+    Low = 0,
+    Balanced = 1,
+    High = 2
 }
 
 /// <summary>

@@ -31,6 +31,15 @@ MonoBehaviour:
     separationRadius: 1.1
     separationWeight: 2
     bodyRadius: 0.55
+  tacticalNavigation:
+    candidateBudget: 2
+    navigationInfluence: 0.72
+    predictionHorizonSeconds: 0.42
+    sidePassPreference: 0.48
+    crowdLanePreference: 0.58
+    wallTangentPreference: 0.64
+    oscillationDamping: 0.7
+    stuckRecoverySeconds: 0.42
   damage:
     contactDamageEnabled: 1
     contactRadius: 0.8

@@ -60,6 +60,16 @@ public static class EnemyAuthoringPresetResolverUtility
         return resolvedBrainPreset.Steering;
     }
 
+    public static EnemyBrainTacticalNavigationSettings ResolveTacticalNavigationSettings(EnemyMasterPreset masterPreset, EnemyBrainPreset fallbackBrainPreset)
+    {
+        EnemyBrainPreset resolvedBrainPreset = ResolveBrainPreset(masterPreset, fallbackBrainPreset);
+
+        if (resolvedBrainPreset == null)
+            return null;
+
+        return resolvedBrainPreset.TacticalNavigation;
+    }
+
     public static EnemyBrainDamageSettings ResolveDamageSettings(EnemyMasterPreset masterPreset, EnemyBrainPreset fallbackBrainPreset)
     {
         EnemyBrainPreset resolvedBrainPreset = ResolveBrainPreset(masterPreset, fallbackBrainPreset);

@@ -19,7 +19,8 @@ internal static class EnemyAdvancedPatternPayloadVisibilityUtility
     /// <param name="dvdFoldout">DVD foldout element.</param>
     public static void UpdateWandererModeVisibility(SerializedProperty modeProperty,
                                                     VisualElement basicFoldout,
-                                                    VisualElement dvdFoldout)
+                                                    VisualElement dvdFoldout,
+                                                    VisualElement acidFoldout)
     {
         EnemyWandererMode mode = EnemyWandererMode.Basic;
 
@@ -27,10 +28,13 @@ internal static class EnemyAdvancedPatternPayloadVisibilityUtility
             mode = (EnemyWandererMode)modeProperty.enumValueIndex;
 
         if (basicFoldout != null)
-            basicFoldout.style.display = mode == EnemyWandererMode.Basic ? DisplayStyle.Flex : DisplayStyle.None;
+            basicFoldout.style.display = mode == EnemyWandererMode.Basic || mode == EnemyWandererMode.Acid ? DisplayStyle.Flex : DisplayStyle.None;
 
         if (dvdFoldout != null)
             dvdFoldout.style.display = mode == EnemyWandererMode.Dvd ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (acidFoldout != null)
+            acidFoldout.style.display = mode == EnemyWandererMode.Acid ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     /// <summary>

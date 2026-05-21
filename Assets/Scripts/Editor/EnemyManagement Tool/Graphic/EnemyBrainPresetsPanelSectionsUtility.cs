@@ -127,6 +127,7 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
 
         AddBrainSubSectionTab(panel, EnemyBrainPresetsPanel.BrainSubSectionType.Movement, "Movement", BuildMovementSubSection(panel));
         AddBrainSubSectionTab(panel, EnemyBrainPresetsPanel.BrainSubSectionType.Steering, "Steering", BuildSteeringSubSection(panel));
+        AddBrainSubSectionTab(panel, EnemyBrainPresetsPanel.BrainSubSectionType.TacticalNavigation, "Tactical Navigation", BuildTacticalNavigationSubSection(panel));
         AddBrainSubSectionTab(panel, EnemyBrainPresetsPanel.BrainSubSectionType.Damage, "Damage", BuildDamageSubSection(panel));
         AddBrainSubSectionTab(panel, EnemyBrainPresetsPanel.BrainSubSectionType.HealthStatistics, "Health Statistics", BuildHealthStatisticsSubSection(panel));
 
@@ -256,6 +257,51 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Adds one bound float slider with input field, tooltip, and draft-dirty tracking.
+    /// </summary>
+    /// <param name="panel">Owning panel used only to ensure a valid serialized context exists.</param>
+    /// <param name="target">Target container that receives the slider.</param>
+    /// <param name="parentProperty">Serialized parent property that owns the relative field.</param>
+    /// <param name="relativePropertyName">Relative float field name under the parent property.</param>
+    /// <param name="label">Display label used by the slider.</param>
+    /// <param name="lowValue">Minimum slider value.</param>
+    /// <param name="highValue">Maximum slider value.</param>
+    /// <param name="tooltip">Tooltip text shown by the slider.</param>
+    private static void AddFloatSliderField(EnemyBrainPresetsPanel panel,
+                                            VisualElement target,
+                                            SerializedProperty parentProperty,
+                                            string relativePropertyName,
+                                            string label,
+                                            float lowValue,
+                                            float highValue,
+                                            string tooltip)
+    {
+        if (panel == null)
+            return;
+
+        if (target == null)
+            return;
+
+        if (parentProperty == null)
+            return;
+
+        SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
+
+        if (property == null)
+            return;
+
+        Slider slider = new Slider(label, lowValue, highValue);
+        slider.showInputField = true;
+        slider.tooltip = tooltip;
+        slider.BindProperty(property);
+        slider.RegisterValueChangedCallback(evt =>
+        {
+            EnemyManagementDraftSession.MarkDirty();
+        });
+        target.Add(slider);
+    }
+
+    /// <summary>
     /// Creates one toggle-bound foldout used by damage subsections.
     /// </summary>
     /// <param name="toggleProperty">Boolean property that drives the foldout state.</param>
@@ -378,6 +424,41 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Builds the tactical navigation subsection content.
+    /// </summary>
+    /// <param name="panel">Owning panel that provides serialized context.</param>
+    /// <returns>Returns the tactical navigation subsection content.</returns>
+    private static VisualElement BuildTacticalNavigationSubSection(EnemyBrainPresetsPanel panel)
+    {
+        SerializedProperty tacticalProperty = panel.PresetSerializedObject.FindProperty("tacticalNavigation");
+        VisualElement container = CreateBrainSubSectionContainer("Tactical Navigation");
+
+        AddPropertyField(panel, container, tacticalProperty, "candidateBudget", "Candidate Budget", "Candidate budget used before LOD clamps the tactical scorer.");
+        AddFloatSliderField(panel, container, tacticalProperty, "navigationInfluence", "Navigation Influence", 0f, 1f, "Weight applied to shared flow-field directions when direct movement is blocked or tactically worse.");
+        AddFloatSliderField(panel, container, tacticalProperty, "predictionHorizonSeconds", "Prediction Horizon Seconds", 0f, 2f, "Seconds used to predict player and neighbor positions while scoring movement candidates.");
+        AddFloatSliderField(panel, container, tacticalProperty, "sidePassPreference", "Side-Pass Preference", 0f, 1f, "Weight for trajectories that approach the player and pass beside them instead of only chasing the current position.");
+        AddFloatSliderField(panel, container, tacticalProperty, "crowdLanePreference", "Crowd Lane Preference", 0f, 1f, "Weight for deterministic crowd lanes that reduce enemy-to-enemy indecision and pileups.");
+        AddFloatSliderField(panel, container, tacticalProperty, "wallTangentPreference", "Wall Tangent Preference", 0f, 1f, "Weight for wall-tangent candidates when movement is blocked or stuck recovery is active.");
+        AddFloatSliderField(panel, container, tacticalProperty, "oscillationDamping", "Oscillation Damping", 0f, 1f, "Penalty applied to candidates that reverse the last committed movement direction.");
+        AddFloatSliderField(panel, container, tacticalProperty, "stuckRecoverySeconds", "Stuck Recovery Seconds", 0.05f, 2f, "Seconds of poor displacement before tangent and flow-field alternatives receive stronger weight.");
+
+        HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        warningBox.style.marginTop = 4f;
+        container.Add(warningBox);
+        RefreshTacticalNavigationWarning(tacticalProperty, warningBox);
+
+        if (panel.PresetSerializedObject != null)
+        {
+            container.TrackSerializedObjectValue(panel.PresetSerializedObject, changedObject =>
+            {
+                RefreshTacticalNavigationWarning(tacticalProperty, warningBox);
+            });
+        }
+
+        return container;
+    }
+
+    /// <summary>
     /// Builds the damage subsection content.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context.</param>
@@ -427,6 +508,65 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
         AddPropertyField(panel, container, healthStatisticsProperty, "maxHealth", "Max Health", "Maximum and initial health assigned to this enemy when spawned from pool.");
         AddPropertyField(panel, container, healthStatisticsProperty, "maxShield", "Max Shield", "Maximum shield reserve assigned to this enemy at spawn. Shield absorbs incoming damage before health.");
         return container;
+    }
+
+    /// <summary>
+    /// Refreshes tactical navigation warnings without mutating authored values.
+    /// </summary>
+    /// <param name="tacticalProperty">Serialized tactical navigation settings property.</param>
+    /// <param name="warningBox">Help box receiving warning text.</param>
+    private static void RefreshTacticalNavigationWarning(SerializedProperty tacticalProperty, HelpBox warningBox)
+    {
+        if (warningBox == null)
+            return;
+
+        List<string> warningLines = new List<string>();
+
+        if (tacticalProperty != null)
+        {
+            AddNegativeWarning(tacticalProperty, "navigationInfluence", "Navigation Influence", warningLines);
+            AddNegativeWarning(tacticalProperty, "predictionHorizonSeconds", "Prediction Horizon Seconds", warningLines);
+            AddNegativeWarning(tacticalProperty, "sidePassPreference", "Side-Pass Preference", warningLines);
+            AddNegativeWarning(tacticalProperty, "crowdLanePreference", "Crowd Lane Preference", warningLines);
+            AddNegativeWarning(tacticalProperty, "wallTangentPreference", "Wall Tangent Preference", warningLines);
+            AddNegativeWarning(tacticalProperty, "oscillationDamping", "Oscillation Damping", warningLines);
+
+            SerializedProperty stuckRecoverySecondsProperty = tacticalProperty.FindPropertyRelative("stuckRecoverySeconds");
+
+            if (stuckRecoverySecondsProperty != null && stuckRecoverySecondsProperty.floatValue <= 0f)
+                warningLines.Add("Stuck Recovery Seconds is zero or negative. Wall-stuck recovery will use a runtime minimum.");
+        }
+
+        if (warningLines.Count <= 0)
+        {
+            warningBox.text = string.Empty;
+            warningBox.style.display = DisplayStyle.None;
+            return;
+        }
+
+        warningBox.text = string.Join("\n", warningLines);
+        warningBox.style.display = DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// Adds one warning when a tactical float value is negative.
+    /// </summary>
+    /// <param name="parentProperty">Serialized tactical navigation parent.</param>
+    /// <param name="relativePropertyName">Relative float field name.</param>
+    /// <param name="displayName">Display name used in warning text.</param>
+    /// <param name="warningLines">Mutable warning list.</param>
+    private static void AddNegativeWarning(SerializedProperty parentProperty,
+                                           string relativePropertyName,
+                                           string displayName,
+                                           List<string> warningLines)
+    {
+        if (parentProperty == null || warningLines == null)
+            return;
+
+        SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
+
+        if (property != null && property.floatValue < 0f)
+            warningLines.Add(displayName + " is negative. Runtime bake clamps it to a safe range.");
     }
     #endregion
 

@@ -295,6 +295,175 @@ public sealed class EnemyWandererDvdPayload
 }
 
 /// <summary>
+/// Contains payload values for Acid Wanderer trail emission and damage.
+/// </summary>
+[Serializable]
+public sealed class EnemyWandererAcidPayload
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Seconds that one acid trail segment remains active after being emitted.")]
+    [Range(0.05f, 12f)]
+    [SerializeField] private float trailSegmentLifetimeSeconds = 3f;
+
+    [Tooltip("Minimum planar movement distance required before emitting another acid trail segment.")]
+    [Range(0f, 4f)]
+    [SerializeField] private float trailSpawnDistance = 0.75f;
+
+    [Tooltip("Minimum seconds between emitted acid trail segments.")]
+    [Range(0f, 2f)]
+    [SerializeField] private float trailSpawnIntervalSeconds = 0.18f;
+
+    [Tooltip("Planar overlap radius used by each acid segment when checking the player.")]
+    [Range(0f, 4f)]
+    [SerializeField] private float trailRadius = 0.85f;
+
+    [Tooltip("Maximum active acid trail segments retained by one enemy before the oldest samples are removed.")]
+    [Range(0, 128)]
+    [SerializeField] private int maxActiveSegmentsPerEnemy = 18;
+
+    [Tooltip("Flat shield/health damage applied to the player by one acid tick.")]
+    [Range(0f, 100f)]
+    [SerializeField] private float damagePerTick = 4f;
+
+    [Tooltip("Seconds between damage ticks while the player overlaps an acid segment.")]
+    [Range(0.01f, 4f)]
+    [SerializeField] private float applyIntervalSeconds = 0.55f;
+
+    [Tooltip("Minimum planar movement speed required before this enemy emits acid segments.")]
+    [Range(0f, 8f)]
+    [SerializeField] private float minimumMovementSpeed = 0.1f;
+
+    [Tooltip("Optional one-shot VFX prefab spawned once for each emitted acid trail segment. Leave empty for gameplay-only trails.")]
+    [SerializeField] private GameObject trailSegmentVfxPrefab;
+
+    [Tooltip("When enabled, the trail segment VFX uniform scale is multiplied by the segment diameter.")]
+    [SerializeField] private bool scaleTrailSegmentVfxToRadius = true;
+
+    [Tooltip("Uniform scale multiplier applied to each acid trail segment VFX instance.")]
+    [Range(0.01f, 8f)]
+    [SerializeField] private float trailSegmentVfxScaleMultiplier = 1f;
+
+    [Tooltip("When enabled, runtime enemy wander-target gizmos also draw this enemy's acid trail segments.")]
+    [SerializeField] private bool debugDrawSegments = true;
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public float TrailSegmentLifetimeSeconds
+    {
+        get
+        {
+            return trailSegmentLifetimeSeconds;
+        }
+    }
+
+    public float TrailSpawnDistance
+    {
+        get
+        {
+            return trailSpawnDistance;
+        }
+    }
+
+    public float TrailSpawnIntervalSeconds
+    {
+        get
+        {
+            return trailSpawnIntervalSeconds;
+        }
+    }
+
+    public float TrailRadius
+    {
+        get
+        {
+            return trailRadius;
+        }
+    }
+
+    public int MaxActiveSegmentsPerEnemy
+    {
+        get
+        {
+            return maxActiveSegmentsPerEnemy;
+        }
+    }
+
+    public float DamagePerTick
+    {
+        get
+        {
+            return damagePerTick;
+        }
+    }
+
+    public float ApplyIntervalSeconds
+    {
+        get
+        {
+            return applyIntervalSeconds;
+        }
+    }
+
+    public float MinimumMovementSpeed
+    {
+        get
+        {
+            return minimumMovementSpeed;
+        }
+    }
+
+    public GameObject TrailSegmentVfxPrefab
+    {
+        get
+        {
+            return trailSegmentVfxPrefab;
+        }
+    }
+
+    public bool ScaleTrailSegmentVfxToRadius
+    {
+        get
+        {
+            return scaleTrailSegmentVfxToRadius;
+        }
+    }
+
+    public float TrailSegmentVfxScaleMultiplier
+    {
+        get
+        {
+            return trailSegmentVfxScaleMultiplier;
+        }
+    }
+
+    public bool DebugDrawSegments
+    {
+        get
+        {
+            return debugDrawSegments;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Validation
+    /// <summary>
+    /// Ensures Acid wanderer payload references remain structurally valid without snapping authored settings.
+    /// </summary>
+    public void Validate()
+    {
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
 /// Groups Wanderer mode and mode-specific payloads.
 /// </summary>
 [Serializable]
@@ -311,6 +480,9 @@ public sealed class EnemyWandererModuleData
 
     [Tooltip("Payload used when Wanderer mode is DVD.")]
     [SerializeField] private EnemyWandererDvdPayload dvd = new EnemyWandererDvdPayload();
+
+    [Tooltip("Payload used when Wanderer mode is Acid.")]
+    [SerializeField] private EnemyWandererAcidPayload acid = new EnemyWandererAcidPayload();
     #endregion
 
     #endregion
@@ -339,6 +511,14 @@ public sealed class EnemyWandererModuleData
             return dvd;
         }
     }
+
+    public EnemyWandererAcidPayload Acid
+    {
+        get
+        {
+            return acid;
+        }
+    }
     #endregion
 
     #region Methods
@@ -355,8 +535,12 @@ public sealed class EnemyWandererModuleData
         if (dvd == null)
             dvd = new EnemyWandererDvdPayload();
 
+        if (acid == null)
+            acid = new EnemyWandererAcidPayload();
+
         basic.Validate();
         dvd.Validate();
+        acid.Validate();
     }
     #endregion
 

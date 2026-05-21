@@ -25,6 +25,7 @@ public static class EnemyPatternMovementRuntimeUtility
     public static float ResolveWallClearanceForMovement(in EnemyPatternConfig patternConfig, in EnemyData enemyData)
     {
         if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererBasic &&
+            patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid &&
             patternConfig.MovementKind != EnemyCompiledMovementPatternKind.Coward)
             return 0f;
 

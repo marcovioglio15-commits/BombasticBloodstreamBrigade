@@ -292,6 +292,7 @@ public partial struct EnemyPatternMovementSystem : ISystem
                     break;
 
                 case EnemyCompiledMovementPatternKind.WandererBasic:
+                case EnemyCompiledMovementPatternKind.WandererAcid:
                     desiredVelocity = EnemyPatternWandererUtility.ResolveWandererBasicVelocity(enemyEntity,
                                                                                                in currentEnemyData,
                                                                                                in activePatternConfig,
@@ -363,6 +364,7 @@ public partial struct EnemyPatternMovementSystem : ISystem
 
             if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
                 activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererDvd ||
+                activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                 activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
             {
                 if (!ignoreSteeringAndPriority)
@@ -387,6 +389,7 @@ public partial struct EnemyPatternMovementSystem : ISystem
                         priorityYieldGapNormalized = clearanceYieldGapNormalized;
 
                     if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
+                        activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                         activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
                     {
                         float clearanceBlendScale = EnemyPatternMovementMathUtility.ResolveAggressivenessScale(steeringAggressiveness, 0.78f, 1.25f);
@@ -411,6 +414,7 @@ public partial struct EnemyPatternMovementSystem : ISystem
                 desiredVelocity = float3.zero;
             else if (wallsEnabled &&
                      (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
+                      activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                       activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward))
             {
                 float patternDesiredSpeed = math.length(desiredVelocity);
@@ -552,7 +556,18 @@ public partial struct EnemyPatternMovementSystem : ISystem
                             currentPatternRuntimeState.WanderRetryTimer = math.max(currentPatternRuntimeState.WanderRetryTimer,
                                                                                   activePatternConfig.BasicBlockedPathRetryDelay);
 
+                            if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
+                            {
+                                float recoverySpeed = math.max(desiredSpeed, effectiveMaxSpeed > 0f ? effectiveMaxSpeed : moveSpeed);
+                                EnemyPatternCowardUtility.RegisterWallRecovery(ref currentPatternRuntimeState,
+                                                                               in activePatternConfig,
+                                                                               hitNormal,
+                                                                               currentEnemyRuntimeState.Velocity,
+                                                                               recoverySpeed);
+                            }
+
                             if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
+                                activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                                 activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
                             {
                                 float allowedDisplacementDistance = math.length(allowedDisplacement);
@@ -584,8 +599,19 @@ public partial struct EnemyPatternMovementSystem : ISystem
                             EnemyPatternShortRangeDashUtility.HandleWallHit(in activePatternConfig, ref currentPatternRuntimeState);
                         }
                         else if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
+                                 activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                                  activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
                         {
+                            if (activePatternConfig.MovementKind == EnemyCompiledMovementPatternKind.Coward)
+                            {
+                                float recoverySpeed = math.max(desiredSpeed, effectiveMaxSpeed > 0f ? effectiveMaxSpeed : moveSpeed);
+                                EnemyPatternCowardUtility.RegisterWallRecovery(ref currentPatternRuntimeState,
+                                                                               in activePatternConfig,
+                                                                               clearanceNormal,
+                                                                               currentEnemyRuntimeState.Velocity,
+                                                                               recoverySpeed);
+                            }
+
                             float clearanceCorrectionDistance = math.length(clearanceCorrectionDisplacement);
                             float clearanceCorrectionRatio = math.saturate(clearanceCorrectionDistance / math.max(0.01f, wallCollisionRadius));
 

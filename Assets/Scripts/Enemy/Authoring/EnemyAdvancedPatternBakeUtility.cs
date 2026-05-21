@@ -69,6 +69,7 @@ public static class EnemyAdvancedPatternBakeUtility
                                                ref result.PatternConfig,
                                                ref selectedMovementPriority,
                                                ref result.HasCustomMovement);
+                        TryAssignAcidTrailRuntimeSettings(resolvedPayload, ref result);
                         break;
 
                     case EnemyPatternModuleKind.Shooter:
@@ -109,6 +110,9 @@ public static class EnemyAdvancedPatternBakeUtility
         result.BombardierScaleExplosionVfxToDamageRadius = true;
         result.BombardierExplosionVfxScaleMultiplier = 1f;
         result.HasBombardierRuntimeSettings = false;
+        result.AcidTrailSegmentVfxPrefab = null;
+        result.AcidTrailScaleSegmentVfxToRadius = true;
+        result.AcidTrailSegmentVfxScaleMultiplier = 1f;
         result.DropItemsConfig = EnemyDropItemsBakeUtility.CreateDefaultConfig();
         return result;
     }
@@ -197,6 +201,7 @@ public static class EnemyAdvancedPatternBakeUtility
         EnemyWandererModuleData wanderer = payload.Wanderer;
         EnemyWandererBasicPayload basic = wanderer.Basic;
         EnemyWandererDvdPayload dvd = wanderer.Dvd;
+        EnemyWandererAcidPayload acid = wanderer.Acid;
         EnemyWandererMode resolvedMode = ResolveWandererMode(wanderer.Mode);
 
         if (basic != null)
@@ -227,16 +232,45 @@ public static class EnemyAdvancedPatternBakeUtility
             patternConfig.DvdIgnoreSteeringAndPriority = dvd.IgnoreSteeringAndPriority ? (byte)1 : (byte)0;
         }
 
+        EnemyAcidTrailBakeUtility.ApplyPayload(acid, ref patternConfig);
+
         switch (resolvedMode)
         {
             case EnemyWandererMode.Dvd:
                 patternConfig.MovementKind = EnemyCompiledMovementPatternKind.WandererDvd;
                 return;
 
+            case EnemyWandererMode.Acid:
+                patternConfig.MovementKind = EnemyCompiledMovementPatternKind.WandererAcid;
+                EnemyAcidTrailBakeUtility.Enable(ref patternConfig);
+                return;
+
             default:
                 patternConfig.MovementKind = EnemyCompiledMovementPatternKind.WandererBasic;
                 return;
         }
+    }
+
+    /// <summary>
+    /// Copies Acid Wanderer visual runtime settings into the compiled result when Acid is the selected movement.
+    /// </summary>
+    /// <param name="payload">Resolved module payload that may contain the Acid Wanderer payload.</param>
+    /// <param name="result">Mutable compiled result receiving optional runtime VFX references.</param>
+    internal static void TryAssignAcidTrailRuntimeSettings(EnemyPatternModulePayloadData payload, ref EnemyCompiledPatternBakeResult result)
+    {
+        if (result == null)
+            return;
+
+        if (result.PatternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid)
+            return;
+
+        if (payload == null || payload.Wanderer == null || payload.Wanderer.Acid == null)
+            return;
+
+        EnemyWandererAcidPayload acid = payload.Wanderer.Acid;
+        result.AcidTrailSegmentVfxPrefab = acid.TrailSegmentVfxPrefab;
+        result.AcidTrailScaleSegmentVfxToRadius = acid.ScaleTrailSegmentVfxToRadius;
+        result.AcidTrailSegmentVfxScaleMultiplier = math.max(0.01f, acid.TrailSegmentVfxScaleMultiplier);
     }
 
     internal static void ApplyStationaryPayload(EnemyPatternModulePayloadData payload, ref EnemyPatternConfig patternConfig)
@@ -453,6 +487,7 @@ public static class EnemyAdvancedPatternBakeUtility
         {
             case EnemyWandererMode.Basic:
             case EnemyWandererMode.Dvd:
+            case EnemyWandererMode.Acid:
                 return mode;
 
             default:
@@ -740,6 +775,9 @@ public sealed class EnemyCompiledPatternBakeResult
     public bool BombardierScaleExplosionVfxToDamageRadius;
     public float BombardierExplosionVfxScaleMultiplier;
     public bool HasBombardierRuntimeSettings;
+    public GameObject AcidTrailSegmentVfxPrefab;
+    public bool AcidTrailScaleSegmentVfxToRadius;
+    public float AcidTrailSegmentVfxScaleMultiplier;
     public EnemyDropItemsConfig DropItemsConfig;
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
     public readonly List<EnemyBombardierConfigElement> BombardierConfigs = new List<EnemyBombardierConfigElement>();

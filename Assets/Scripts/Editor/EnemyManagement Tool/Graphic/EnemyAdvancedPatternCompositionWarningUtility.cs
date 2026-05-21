@@ -408,8 +408,14 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
         if (payload == null || payload.Wanderer == null)
             return "Wanderer";
 
-        if (payload.Wanderer.Mode == EnemyWandererMode.Dvd)
-            return "DVD";
+        switch (payload.Wanderer.Mode)
+        {
+            case EnemyWandererMode.Dvd:
+                return "DVD";
+
+            case EnemyWandererMode.Acid:
+                return "Acid Wanderer";
+        }
 
         return "Wanderer";
     }

@@ -14,6 +14,9 @@ public static class EnemyPatternCowardUtility
     private const float PatrolLooseAnchorMultiplier = 1.65f;
     private const float PatrolRetargetRadiusMultiplier = 1.15f;
     private const float ImmediateRetreatAlignmentThreshold = 0.18f;
+    private const float RetargetLockSeconds = 0.16f;
+    private const float WallRecoverySeconds = 0.24f;
+    private const float MinimumRecoverySpeedRatio = 0.55f;
     #endregion
 
     #region Methods
@@ -70,6 +73,8 @@ public static class EnemyPatternCowardUtility
         if (baseSpeed <= DirectionEpsilon)
         {
             ClearTargetState(ref patternRuntimeState);
+            patternRuntimeState.CowardLastResolvedVelocity = float3.zero;
+            patternRuntimeState.CowardHasResolvedVelocity = 0;
             return float3.zero;
         }
 
@@ -78,6 +83,12 @@ public static class EnemyPatternCowardUtility
 
         if (patternRuntimeState.WanderRetryTimer > 0f)
             patternRuntimeState.WanderRetryTimer = math.max(0f, patternRuntimeState.WanderRetryTimer - deltaTime);
+
+        if (patternRuntimeState.CowardRetargetLockTimer > 0f)
+            patternRuntimeState.CowardRetargetLockTimer = math.max(0f, patternRuntimeState.CowardRetargetLockTimer - deltaTime);
+
+        if (patternRuntimeState.CowardRecoveryTimer > 0f)
+            patternRuntimeState.CowardRecoveryTimer = math.max(0f, patternRuntimeState.CowardRecoveryTimer - deltaTime);
 
         float3 toPlayer = playerPosition - enemyPosition;
         toPlayer.y = 0f;
@@ -92,44 +103,86 @@ public static class EnemyPatternCowardUtility
         {
             float retreatSpeed = baseSpeed * ResolveRetreatSpeedMultiplier(in patternConfig, playerDistance);
             retreatSpeed = math.max(0f, retreatSpeed);
-            return ResolveRetreatVelocity(enemyEntity,
-                                          enemyData.PriorityTier,
-                                          enemyData.BodyRadius,
-                                          in patternConfig,
-                                          ref patternRuntimeState,
-                                          enemyPosition,
-                                          playerPosition,
-                                          minimumWallDistance,
-                                          retreatSpeed,
-                                          steeringAggressiveness,
-                                          elapsedTime,
-                                          in physicsWorldSingleton,
-                                          wallsLayerMask,
-                                          wallsEnabled,
-                                          navigationFlowReady,
-                                          in navigationGridState,
-                                          navigationCells,
-                                          in occupancyContext);
+            float3 retreatVelocity = ResolveRetreatVelocity(enemyEntity,
+                                                            enemyData.PriorityTier,
+                                                            enemyData.BodyRadius,
+                                                            in patternConfig,
+                                                            ref patternRuntimeState,
+                                                            enemyPosition,
+                                                            playerPosition,
+                                                            minimumWallDistance,
+                                                            retreatSpeed,
+                                                            steeringAggressiveness,
+                                                            elapsedTime,
+                                                            in physicsWorldSingleton,
+                                                            wallsLayerMask,
+                                                            wallsEnabled,
+                                                            navigationFlowReady,
+                                                            in navigationGridState,
+                                                            navigationCells,
+                                                            in occupancyContext);
+            return StabilizeCowardVelocity(ref patternRuntimeState,
+                                           retreatVelocity,
+                                           retreatSpeed,
+                                           steeringAggressiveness,
+                                           deltaTime);
         }
 
         float patrolRadius = math.max(PatrolMinimumRadius, patternConfig.CowardPatrolRadius);
         RefreshPatrolAnchorIfNeeded(ref patternRuntimeState, enemyPosition, patrolRadius);
         float patrolSpeed = baseSpeed * math.max(0.1f, patternConfig.CowardPatrolSpeedMultiplier);
         patrolSpeed = math.max(0f, patrolSpeed);
-        return ResolvePatrolVelocity(enemyEntity,
-                                     in enemyData,
-                                     in patternConfig,
-                                     ref patternRuntimeState,
-                                     enemyPosition,
-                                     minimumWallDistance,
-                                     patrolRadius,
-                                     patrolSpeed,
-                                     steeringAggressiveness,
-                                     elapsedTime,
-                                     in physicsWorldSingleton,
-                                     wallsLayerMask,
-                                     wallsEnabled,
-                                     in occupancyContext);
+        float3 patrolVelocity = ResolvePatrolVelocity(enemyEntity,
+                                                      in enemyData,
+                                                      in patternConfig,
+                                                      ref patternRuntimeState,
+                                                      enemyPosition,
+                                                      minimumWallDistance,
+                                                      patrolRadius,
+                                                      patrolSpeed,
+                                                      steeringAggressiveness,
+                                                      elapsedTime,
+                                                      in physicsWorldSingleton,
+                                                      wallsLayerMask,
+                                                      wallsEnabled,
+                                                      in occupancyContext);
+        return StabilizeCowardVelocity(ref patternRuntimeState,
+                                       patrolVelocity,
+                                       patrolSpeed,
+                                       steeringAggressiveness,
+                                       deltaTime);
+    }
+
+    /// <summary>
+    /// Primes Coward movement recovery after a wall hit so the next decisions keep sliding out of corners.
+    /// </summary>
+    /// <param name="patternRuntimeState">Mutable pattern runtime state receiving recovery memory.</param>
+    /// <param name="patternConfig">Current compiled Coward pattern config.</param>
+    /// <param name="wallNormal">Normal reported by the wall collision check.</param>
+    /// <param name="currentVelocity">Current velocity after wall response.</param>
+    /// <param name="desiredSpeed">Desired movement speed used to keep recovery motion meaningful.</param>
+    public static void RegisterWallRecovery(ref EnemyPatternRuntimeState patternRuntimeState,
+                                            in EnemyPatternConfig patternConfig,
+                                            float3 wallNormal,
+                                            float3 currentVelocity,
+                                            float desiredSpeed)
+    {
+        patternRuntimeState.WanderHasTarget = 0;
+        patternRuntimeState.WanderWaitTimer = 0f;
+        patternRuntimeState.WanderRetryTimer = math.max(patternRuntimeState.WanderRetryTimer,
+                                                        math.max(0.08f, patternConfig.BasicBlockedPathRetryDelay * 0.75f));
+        patternRuntimeState.CowardRetargetLockTimer = math.max(patternRuntimeState.CowardRetargetLockTimer, RetargetLockSeconds);
+        patternRuntimeState.CowardRecoveryTimer = math.max(patternRuntimeState.CowardRecoveryTimer, WallRecoverySeconds);
+
+        float3 planarCurrentVelocity = new float3(currentVelocity.x, 0f, currentVelocity.z);
+        float3 planarWallNormal = math.normalizesafe(new float3(wallNormal.x, 0f, wallNormal.z), float3.zero);
+        float3 recoveryDirection = math.normalizesafe(planarCurrentVelocity, float3.zero);
+
+        if (math.lengthsq(recoveryDirection) <= DirectionEpsilon)
+            recoveryDirection = math.normalizesafe(new float3(-planarWallNormal.z, 0f, planarWallNormal.x), planarWallNormal);
+
+        patternRuntimeState.CowardLastResolvedVelocity = recoveryDirection * math.max(0f, desiredSpeed) * MinimumRecoverySpeedRatio;
+        patternRuntimeState.CowardHasResolvedVelocity = math.lengthsq(recoveryDirection) > DirectionEpsilon ? (byte)1 : (byte)0;
     }
     #endregion
 
@@ -183,6 +236,7 @@ public static class EnemyPatternCowardUtility
         float currentPlayerDistance = math.length(currentToPlayer);
 
         if (patternRuntimeState.WanderHasTarget != 0 &&
+            patternRuntimeState.CowardRetargetLockTimer <= 0f &&
             targetPlayerDistance <= currentPlayerDistance + math.max(0.45f, patternConfig.BasicMinimumTravelDistance * 0.25f))
         {
             patternRuntimeState.WanderHasTarget = 0;
@@ -343,15 +397,17 @@ public static class EnemyPatternCowardUtility
                 return immediateVelocity;
             }
 
-            patternRuntimeState.WanderHasTarget = 0;
             patternRuntimeState.WanderRetryTimer = math.max(patternRuntimeState.WanderRetryTimer,
                                                             EnemyPatternCowardSharedUtility.ResolveDecisionCooldown(enemyEntity,
-                                                                                                                   0.02f,
-                                                                                                                   0.05f));
+                                                                                                                   0.06f,
+                                                                                                                   0.11f));
+            patternRuntimeState.CowardRetargetLockTimer = math.max(patternRuntimeState.CowardRetargetLockTimer, RetargetLockSeconds);
+            patternRuntimeState.CowardRecoveryTimer = math.max(patternRuntimeState.CowardRecoveryTimer, WallRecoverySeconds * 0.65f);
             return retreatFallbackVelocity;
         }
 
         patternRuntimeState.WanderRetryTimer = math.max(0.02f, patternConfig.BasicBlockedPathRetryDelay * 0.6f);
+        patternRuntimeState.CowardRetargetLockTimer = math.max(patternRuntimeState.CowardRetargetLockTimer, RetargetLockSeconds * 0.75f);
         patternRuntimeState.WanderWaitTimer = math.max(patternRuntimeState.WanderWaitTimer,
                                                        EnemyPatternCowardSharedUtility.ResolveDecisionCooldown(enemyEntity, 0.05f, 0.1f));
         return retreatFallbackVelocity;
@@ -451,6 +507,79 @@ public static class EnemyPatternCowardUtility
             return;
 
         patternRuntimeState.CowardPatrolAnchorPosition = enemyPosition;
+    }
+
+    /// <summary>
+    /// Smooths Coward velocity choices across short target retries so visual facing no longer flips every frame.
+    /// </summary>
+    /// <param name="patternRuntimeState">Mutable Coward runtime state storing the previous accepted velocity.</param>
+    /// <param name="candidateVelocity">Newly resolved velocity candidate.</param>
+    /// <param name="desiredSpeed">Current desired speed used for recovery fallback magnitude.</param>
+    /// <param name="steeringAggressiveness">Resolved steering aggressiveness scalar.</param>
+    /// <param name="deltaTime">Current simulation delta time.</param>
+    /// <returns>Stabilized planar velocity.</returns>
+    private static float3 StabilizeCowardVelocity(ref EnemyPatternRuntimeState patternRuntimeState,
+                                                  float3 candidateVelocity,
+                                                  float desiredSpeed,
+                                                  float steeringAggressiveness,
+                                                  float deltaTime)
+    {
+        float candidateSpeed = math.length(candidateVelocity);
+
+        if (candidateSpeed <= DirectionEpsilon)
+        {
+            if (patternRuntimeState.CowardRecoveryTimer > 0f && patternRuntimeState.CowardHasResolvedVelocity != 0)
+            {
+                float3 recoveryDirection = math.normalizesafe(patternRuntimeState.CowardLastResolvedVelocity, float3.zero);
+
+                if (math.lengthsq(recoveryDirection) > DirectionEpsilon)
+                    return recoveryDirection * math.max(0f, desiredSpeed) * MinimumRecoverySpeedRatio;
+            }
+
+            patternRuntimeState.CowardHasResolvedVelocity = 0;
+            patternRuntimeState.CowardLastResolvedVelocity = float3.zero;
+            return candidateVelocity;
+        }
+
+        float3 candidateDirection = candidateVelocity / candidateSpeed;
+
+        if (patternRuntimeState.CowardHasResolvedVelocity == 0)
+            return CommitCowardVelocity(ref patternRuntimeState, candidateDirection * candidateSpeed);
+
+        float3 lastDirection = math.normalizesafe(patternRuntimeState.CowardLastResolvedVelocity, candidateDirection);
+        float directionDot = math.dot(candidateDirection, lastDirection);
+        bool shouldDampTurn = directionDot < 0.35f ||
+                              patternRuntimeState.CowardRetargetLockTimer > 0f ||
+                              patternRuntimeState.CowardRecoveryTimer > 0f;
+
+        if (!shouldDampTurn)
+            return CommitCowardVelocity(ref patternRuntimeState, candidateVelocity);
+
+        float aggressiveness01 = math.saturate(steeringAggressiveness / 2.5f);
+        float turnBlend = math.saturate(deltaTime * math.lerp(5.25f, 9f, aggressiveness01));
+
+        if (directionDot < -0.12f)
+            turnBlend *= patternRuntimeState.CowardRetargetLockTimer > 0f ? 0.35f : 0.58f;
+
+        if (patternRuntimeState.CowardRecoveryTimer > 0f)
+            turnBlend = math.min(turnBlend, 0.42f);
+
+        float3 resolvedDirection = math.normalizesafe(math.lerp(lastDirection, candidateDirection, turnBlend), candidateDirection);
+        float resolvedSpeed = math.max(candidateSpeed, math.max(0f, desiredSpeed) * MinimumRecoverySpeedRatio);
+        return CommitCowardVelocity(ref patternRuntimeState, resolvedDirection * resolvedSpeed);
+    }
+
+    /// <summary>
+    /// Stores the accepted Coward velocity in runtime memory and returns it for immediate use.
+    /// </summary>
+    /// <param name="patternRuntimeState">Mutable Coward runtime state receiving the velocity memory.</param>
+    /// <param name="resolvedVelocity">Accepted planar velocity.</param>
+    /// <returns>Accepted planar velocity.</returns>
+    private static float3 CommitCowardVelocity(ref EnemyPatternRuntimeState patternRuntimeState, float3 resolvedVelocity)
+    {
+        patternRuntimeState.CowardLastResolvedVelocity = resolvedVelocity;
+        patternRuntimeState.CowardHasResolvedVelocity = 1;
+        return resolvedVelocity;
     }
 
     /// <summary>

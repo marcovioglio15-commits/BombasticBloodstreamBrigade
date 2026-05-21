@@ -91,6 +91,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
                                                                ref result.PatternConfig,
                                                                ref selectedPriority,
                                                                ref hasCustomMovement);
+        EnemyAdvancedPatternBakeUtility.TryAssignAcidTrailRuntimeSettings(resolvedPayload, ref result);
         result.HasCustomMovement = hasCustomMovement;
         return true;
     }

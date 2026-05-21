@@ -99,6 +99,24 @@ public static class EnemyPoolUtility
             if (!entityManager.HasComponent<EnemyPatternRuntimeState>(enemyEntity))
                 entityManager.AddComponentData(enemyEntity, CreateDefaultPatternRuntimeState());
 
+            if (!entityManager.HasComponent<EnemyTacticalNavigationConfig>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, EnemyPatternDefaultsUtility.CreateTacticalNavigationConfig());
+
+            if (!entityManager.HasComponent<EnemyNavigationRuntimeState>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, EnemyPatternDefaultsUtility.CreateNavigationRuntimeState());
+
+            if (!entityManager.HasBuffer<EnemyAcidTrailSegmentElement>(enemyEntity))
+                entityManager.AddBuffer<EnemyAcidTrailSegmentElement>(enemyEntity);
+
+            if (!entityManager.HasBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity))
+                entityManager.AddBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity);
+
+            if (!entityManager.HasBuffer<PlayerPowerUpVfxPrefabBindingElement>(enemyEntity))
+                entityManager.AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(enemyEntity);
+
+            if (!entityManager.HasComponent<PlayerPowerUpVfxCapConfig>(enemyEntity))
+                entityManager.AddComponentData(enemyEntity, CreateDefaultEnemyManagedVfxCapConfig());
+
             if (!entityManager.HasComponent<EnemyShooterControlState>(enemyEntity))
                 entityManager.AddComponentData(enemyEntity, default(EnemyShooterControlState));
 
@@ -388,6 +406,15 @@ public static class EnemyPoolUtility
 
         if (entityManager.HasComponent<EnemyPatternRuntimeState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultPatternRuntimeState());
+
+        if (entityManager.HasComponent<EnemyNavigationRuntimeState>(enemyEntity))
+            entityManager.SetComponentData(enemyEntity, EnemyPatternDefaultsUtility.CreateNavigationRuntimeState());
+
+        if (entityManager.HasBuffer<EnemyAcidTrailSegmentElement>(enemyEntity))
+            entityManager.GetBuffer<EnemyAcidTrailSegmentElement>(enemyEntity).Clear();
+
+        if (entityManager.HasBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity))
+            entityManager.GetBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity).Clear();
 
         if (entityManager.HasComponent<EnemyBossPatternRuntimeState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultBossPatternRuntimeState());
@@ -745,6 +772,22 @@ public static class EnemyPoolUtility
 
         entityManager.SetComponentData(enemyEntity, default(EnemySpawnWarningState));
         entityManager.SetComponentEnabled<EnemySpawnWarningState>(enemyEntity, false);
+    }
+
+    /// <summary>
+    /// Builds fallback caps for pooled enemies that need managed VFX buffers added defensively at runtime.
+    /// </summary>
+    /// <returns>Runtime VFX cap config shared with the managed VFX pool.</returns>
+    private static PlayerPowerUpVfxCapConfig CreateDefaultEnemyManagedVfxCapConfig()
+    {
+        return new PlayerPowerUpVfxCapConfig
+        {
+            MaxSamePrefabPerCell = 10,
+            CellSize = 1.75f,
+            MaxAttachedSamePrefabPerTarget = 1,
+            MaxActiveOneShotVfx = 700,
+            RefreshAttachedLifetimeOnCapHit = 1
+        };
     }
     #endregion
 

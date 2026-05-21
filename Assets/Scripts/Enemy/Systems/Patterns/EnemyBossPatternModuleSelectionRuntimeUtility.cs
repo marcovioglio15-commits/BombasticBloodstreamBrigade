@@ -1032,6 +1032,7 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
         switch (patternConfig.MovementKind)
         {
             case EnemyCompiledMovementPatternKind.WandererBasic:
+            case EnemyCompiledMovementPatternKind.WandererAcid:
             case EnemyCompiledMovementPatternKind.Coward:
                 return patternRuntimeState.WanderHasTarget == 0;
 

@@ -25,13 +25,15 @@ public partial struct EnemySteeringSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         activeEnemiesQuery = SystemAPI.QueryBuilder()
-            .WithAll<EnemyData,
-                     EnemyRuntimeState,
-                     EnemyKnockbackState,
-                     LocalTransform,
-                     EnemyActive,
-                     EnemyElementalRuntimeState,
-                     EnemyShooterControlState>()
+            .WithAll<EnemyData>()
+            .WithAll<EnemyRuntimeState>()
+            .WithAll<EnemyKnockbackState>()
+            .WithAll<LocalTransform>()
+            .WithAll<EnemyActive>()
+            .WithAll<EnemyElementalRuntimeState>()
+            .WithAll<EnemyShooterControlState>()
+            .WithAll<EnemyTacticalNavigationConfig>()
+            .WithAll<EnemyNavigationRuntimeState>()
             .WithNone<EnemyDespawnRequest>()
             .Build();
 
@@ -55,6 +57,12 @@ public partial struct EnemySteeringSystem : ISystem
             return;
 
         float3 playerPosition = SystemAPI.GetComponent<LocalTransform>(playerEntity).Position;
+        float3 playerVelocity = float3.zero;
+
+        if (SystemAPI.HasComponent<PlayerMovementState>(playerEntity))
+            playerVelocity = SystemAPI.GetComponent<PlayerMovementState>(playerEntity).Velocity;
+
+        playerVelocity.y = 0f;
         float enemyTimeScale = 1f;
 
         if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
@@ -71,9 +79,12 @@ public partial struct EnemySteeringSystem : ISystem
         NativeArray<EnemyKnockbackState> enemyKnockbackArray = activeEnemiesQuery.ToComponentDataArray<EnemyKnockbackState>(frameAllocator);
         NativeArray<EnemyElementalRuntimeState> enemyElementalRuntimeArray = activeEnemiesQuery.ToComponentDataArray<EnemyElementalRuntimeState>(frameAllocator);
         NativeArray<EnemyShooterControlState> enemyShooterControlArray = activeEnemiesQuery.ToComponentDataArray<EnemyShooterControlState>(frameAllocator);
+        NativeArray<EnemyTacticalNavigationConfig> tacticalConfigArray = activeEnemiesQuery.ToComponentDataArray<EnemyTacticalNavigationConfig>(frameAllocator);
+        NativeArray<EnemyNavigationRuntimeState> navigationRuntimeArray = activeEnemiesQuery.ToComponentDataArray<EnemyNavigationRuntimeState>(frameAllocator);
 
         NativeArray<float3> positions = CollectionHelper.CreateNativeArray<float3>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
         NativeArray<float2> speedData = CollectionHelper.CreateNativeArray<float2>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        NativeArray<float> separationWeights = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
         NativeArray<float> contactRadii = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
         NativeArray<float> bodyRadii = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
         NativeArray<int> priorityTiers = CollectionHelper.CreateNativeArray<int>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
@@ -116,6 +127,7 @@ public partial struct EnemySteeringSystem : ISystem
 
             float slowMultiplier = math.saturate(1f - elementalSlowPercent * 0.01f);
             speedData[index] = new float2(math.max(0f, enemyData.MoveSpeed) * slowMultiplier, math.max(0f, enemyData.MaxSpeed) * slowMultiplier);
+            separationWeights[index] = math.max(0f, enemyData.SeparationWeight);
             contactRadii[index] = math.max(0f, enemyData.ContactRadius);
             bodyRadii[index] = math.max(0.05f, enemyData.BodyRadius);
             priorityTiers[index] = math.clamp(enemyData.PriorityTier, -128, 128);
@@ -151,6 +163,7 @@ public partial struct EnemySteeringSystem : ISystem
 
                 if (activeMovementKind == EnemyCompiledMovementPatternKind.WandererBasic ||
                     activeMovementKind == EnemyCompiledMovementPatternKind.WandererDvd ||
+                    activeMovementKind == EnemyCompiledMovementPatternKind.WandererAcid ||
                     activeMovementKind == EnemyCompiledMovementPatternKind.Coward)
                 {
                     wandererMovementFlags[index] = 1;
@@ -206,6 +219,9 @@ public partial struct EnemySteeringSystem : ISystem
         NativeArray<float> separationUrgencyResults = default;
         NativeArray<float> priorityYieldUrgencyResults = default;
         NativeArray<float> priorityYieldGapResults = default;
+        NativeArray<float3> navigationVelocityResults = default;
+        NativeArray<float3> tacticalVelocityResults = default;
+        NativeArray<EnemyNavigationRuntimeState> tacticalRuntimeResults = default;
 
         if (evaluatedCount > 0)
         {
@@ -232,6 +248,9 @@ public partial struct EnemySteeringSystem : ISystem
             separationUrgencyResults = CollectionHelper.CreateNativeArray<float>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             priorityYieldUrgencyResults = CollectionHelper.CreateNativeArray<float>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             priorityYieldGapResults = CollectionHelper.CreateNativeArray<float>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+            navigationVelocityResults = CollectionHelper.CreateNativeArray<float3>(evaluatedCount, frameAllocator, NativeArrayOptions.ClearMemory);
+            tacticalVelocityResults = CollectionHelper.CreateNativeArray<float3>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+            tacticalRuntimeResults = CollectionHelper.CreateNativeArray<EnemyNavigationRuntimeState>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
 
             // Approach and separation are independent, so they run in parallel and sync once before integration.
             EnemySteeringUtility.EnemyApproachJob approachJob = new EnemySteeringUtility.EnemyApproachJob
@@ -267,20 +286,79 @@ public partial struct EnemySteeringSystem : ISystem
             JobHandle separationHandle = separationJob.Schedule(evaluatedCount, 64, state.Dependency);
             JobHandle combinedHandle = JobHandle.CombineDependencies(approachHandle, separationHandle);
             combinedHandle.Complete();
+
+            PhysicsWorldSingleton tacticalPhysicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+            int tacticalWallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+            EnemyNavigationGridState tacticalNavigationGridState = default;
+            DynamicBuffer<EnemyNavigationCellElement> tacticalNavigationCells = default;
+            bool tacticalNavigationReady = false;
+
+            if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig tacticalWorldLayersConfig) &&
+                tacticalWorldLayersConfig.WallsLayerMask != 0)
+            {
+                tacticalWallsLayerMask = tacticalWorldLayersConfig.WallsLayerMask;
+            }
+
+            if (tacticalWallsLayerMask != 0 &&
+                SystemAPI.TryGetSingleton<EnemyNavigationGridState>(out tacticalNavigationGridState) &&
+                SystemAPI.TryGetSingletonBuffer<EnemyNavigationCellElement>(out tacticalNavigationCells))
+            {
+                tacticalNavigationReady = tacticalNavigationGridState.FlowReady != 0 && tacticalNavigationCells.Length > 0;
+            }
+
+            if (tacticalNavigationReady)
+            {
+                for (int evaluatedIndex = 0; evaluatedIndex < evaluatedCount; evaluatedIndex++)
+                {
+                    int enemyIndex = evaluatedEnemyIndices[evaluatedIndex];
+                    float navigationDesiredSpeed = speedData[enemyIndex].y > 0f ? speedData[enemyIndex].y : speedData[enemyIndex].x;
+                    float navigationCollisionRadius = math.max(0.01f, bodyRadii[enemyIndex] + enemyDataArray[enemyIndex].MinimumWallDistance);
+
+                    if (EnemyNavigationFlowFieldUtility.TryResolveNavigationVelocity(positions[enemyIndex],
+                                                                                    playerPosition,
+                                                                                    navigationCollisionRadius,
+                                                                                    navigationDesiredSpeed,
+                                                                                    in tacticalPhysicsWorldSingleton,
+                                                                                    tacticalWallsLayerMask,
+                                                                                    in tacticalNavigationGridState,
+                                                                                    tacticalNavigationCells,
+                                                                                    out float3 navigationVelocity))
+                    {
+                        navigationVelocityResults[evaluatedIndex] = navigationVelocity;
+                    }
+                }
+            }
+
+            EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob tacticalJob = new EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob
+            {
+                EvaluatedEnemyIndices = evaluatedEnemyIndices.AsArray(),
+                Positions = positions,
+                SpeedData = speedData,
+                BodyRadii = bodyRadii,
+                SeparationWeights = separationWeights,
+                PriorityTiers = priorityTiers,
+                SteeringAggressiveness = steeringAggressiveness,
+                Velocities = planarVelocities,
+                CellCoordinates = cellCoordinates,
+                CellMap = cellMap,
+                ApproachResults = approachResults,
+                SeparationResults = separationResults,
+                SeparationUrgencyResults = separationUrgencyResults,
+                NavigationVelocityResults = navigationVelocityResults,
+                TacticalConfigs = tacticalConfigArray,
+                RuntimeStates = navigationRuntimeArray,
+                PlayerPosition = playerPosition,
+                PlayerVelocity = playerVelocity,
+                DeltaTime = SystemAPI.Time.DeltaTime * enemyTimeScale,
+                Results = tacticalVelocityResults,
+                RuntimeResults = tacticalRuntimeResults
+            };
+            tacticalJob.Schedule(evaluatedCount, 64).Complete();
         }
 
         float deltaTime = SystemAPI.Time.DeltaTime * enemyTimeScale;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
-        EnemyNavigationGridState navigationGridState = default;
-        DynamicBuffer<EnemyNavigationCellElement> navigationCells = default;
-        bool navigationReady = false;
-
-        if (SystemAPI.TryGetSingleton<EnemyNavigationGridState>(out navigationGridState) &&
-            SystemAPI.TryGetSingletonBuffer<EnemyNavigationCellElement>(out navigationCells))
-        {
-            navigationReady = true;
-        }
 
         if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) && worldLayersConfig.WallsLayerMask != 0)
             wallsLayerMask = worldLayersConfig.WallsLayerMask;
@@ -313,32 +391,8 @@ public partial struct EnemySteeringSystem : ISystem
 
             if (evaluatedIndex >= 0)
             {
-                float separationWeight = math.max(0f, enemyData.SeparationWeight);
-                float3 desiredVelocity = approachResults[evaluatedIndex];
-
-                if (navigationReady && wallsEnabled)
-                {
-                    float navigationDesiredSpeed = velocityMaxSpeed > 0f ? velocityMaxSpeed : math.max(0f, enemyData.MoveSpeed);
-                    float navigationCollisionRadius = math.max(0.01f, enemyData.BodyRadius + math.max(0f, enemyData.MinimumWallDistance));
-
-                    if (EnemyNavigationFlowFieldUtility.TryResolveNavigationVelocity(enemyTransform.Position,
-                                                                                    playerPosition,
-                                                                                    navigationCollisionRadius,
-                                                                                    navigationDesiredSpeed,
-                                                                                    in physicsWorldSingleton,
-                                                                                    wallsLayerMask,
-                                                                                    in navigationGridState,
-                                                                                    navigationCells,
-                                                                                    out float3 navigationVelocity))
-                    {
-                        desiredVelocity = navigationVelocity;
-                    }
-                }
-
-                float urgency = math.saturate(separationUrgencyResults[evaluatedIndex]);
-                float urgencyBoost = math.lerp(1f, EnemySteeringUtility.SeparationUrgencyMaxBoost, urgency);
-                float separationResponseScale = EnemySteeringUtility.ResolveAggressivenessScale(enemySteeringAggressiveness, 0.72f, 1.95f);
-                desiredVelocity += separationResults[evaluatedIndex] * separationWeight * urgencyBoost * separationResponseScale * enemySteeringAggressiveness;
+                float3 desiredVelocity = tacticalVelocityResults[evaluatedIndex];
+                navigationRuntimeArray[enemyIndex] = tacticalRuntimeResults[evaluatedIndex];
                 float priorityYieldUrgency = math.saturate(priorityYieldUrgencyResults[evaluatedIndex]);
                 float priorityYieldGap = math.saturate(priorityYieldGapResults[evaluatedIndex]);
 
@@ -406,6 +460,7 @@ public partial struct EnemySteeringSystem : ISystem
                 if (hitWall)
                 {
                     resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(runtimeState.Velocity, hitNormal);
+                    float3 recoveryHitNormal = hitNormal;
 
                     // If direct motion is blocked, try a short wall-circumnavigation displacement before stopping.
                     if (evaluatedIndex >= 0 &&
@@ -426,7 +481,17 @@ public partial struct EnemySteeringSystem : ISystem
                     {
                         resolvedDisplacement = bypassDisplacement;
                         resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(bypassVelocity, bypassHitNormal);
+                        recoveryHitNormal = math.lengthsq(bypassHitNormal) > EnemySteeringUtility.DirectionEpsilon
+                            ? bypassHitNormal
+                            : hitNormal;
                     }
+
+                    if (evaluatedIndex >= 0)
+                        PrimeNavigationWallRecovery(navigationRuntimeArray,
+                                                    tacticalConfigArray,
+                                                    enemyIndex,
+                                                    recoveryHitNormal,
+                                                    resolvedVelocity);
                 }
             }
 
@@ -472,6 +537,7 @@ public partial struct EnemySteeringSystem : ISystem
         activeEnemiesQuery.CopyFromComponentDataArray(enemyRuntimeArray);
         activeEnemiesQuery.CopyFromComponentDataArray(enemyKnockbackArray);
         activeEnemiesQuery.CopyFromComponentDataArray(enemyTransforms);
+        activeEnemiesQuery.CopyFromComponentDataArray(navigationRuntimeArray);
 
     }
     #endregion
@@ -500,6 +566,52 @@ public partial struct EnemySteeringSystem : ISystem
             return -1;
 
         return bossIndex;
+    }
+
+    /// <summary>
+    /// Primes tactical navigation memory after a wall hit so the next Burst candidate pass favors a stable tangent side.
+    /// </summary>
+    /// <param name="navigationRuntimeArray">Mutable navigation runtime array copied back to enemy components after movement.</param>
+    /// <param name="tacticalConfigArray">Read-only tactical config array used to resolve stuck recovery thresholds.</param>
+    /// <param name="enemyIndex">Active enemy array index that hit the wall.</param>
+    /// <param name="hitNormal">Wall normal used to derive the recovery tangent.</param>
+    /// <param name="resolvedVelocity">Velocity after wall response, used to preserve an already valid bypass direction.</param>
+    private static void PrimeNavigationWallRecovery(NativeArray<EnemyNavigationRuntimeState> navigationRuntimeArray,
+                                                    NativeArray<EnemyTacticalNavigationConfig> tacticalConfigArray,
+                                                    int enemyIndex,
+                                                    float3 hitNormal,
+                                                    float3 resolvedVelocity)
+    {
+        if (!navigationRuntimeArray.IsCreated || !tacticalConfigArray.IsCreated)
+            return;
+
+        if (enemyIndex < 0 || enemyIndex >= navigationRuntimeArray.Length || enemyIndex >= tacticalConfigArray.Length)
+            return;
+
+        float3 planarNormal = math.normalizesafe(new float3(hitNormal.x, 0f, hitNormal.z), float3.zero);
+
+        if (math.lengthsq(planarNormal) <= EnemySteeringUtility.DirectionEpsilon)
+            return;
+
+        EnemyNavigationRuntimeState runtimeState = navigationRuntimeArray[enemyIndex];
+        EnemyTacticalNavigationConfig config = tacticalConfigArray[enemyIndex];
+        sbyte sideSign = runtimeState.LastSideSign != 0 ? runtimeState.LastSideSign : (sbyte)1;
+        float3 tangentDirection = new float3(-planarNormal.z, 0f, planarNormal.x) * sideSign;
+        float3 velocityDirection = math.normalizesafe(new float3(resolvedVelocity.x, 0f, resolvedVelocity.z), float3.zero);
+
+        if (math.lengthsq(velocityDirection) > EnemySteeringUtility.DirectionEpsilon &&
+            math.dot(tangentDirection, velocityDirection) < -0.05f)
+        {
+            tangentDirection = -tangentDirection;
+            sideSign = (sbyte)(-sideSign);
+        }
+
+        runtimeState.LastDesiredDirection = math.normalizesafe(tangentDirection, planarNormal);
+        runtimeState.HadValidDirection = 1;
+        runtimeState.LastSideSign = sideSign;
+        runtimeState.PathCommitTimer = math.max(runtimeState.PathCommitTimer, 0.28f);
+        runtimeState.StuckTimer = math.max(runtimeState.StuckTimer, math.max(0.05f, config.StuckRecoverySeconds));
+        navigationRuntimeArray[enemyIndex] = runtimeState;
     }
     #endregion
 

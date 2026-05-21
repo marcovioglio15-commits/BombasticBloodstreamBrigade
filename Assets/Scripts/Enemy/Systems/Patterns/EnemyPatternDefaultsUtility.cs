@@ -1,4 +1,5 @@
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
@@ -81,7 +82,20 @@ internal static class EnemyPatternDefaultsUtility
             DvdRandomizeInitialDirection = 1,
             DvdFixedInitialDirectionDegrees = 45f,
             DvdCornerNudgeDistance = 0.08f,
-            DvdIgnoreSteeringAndPriority = 0
+            DvdIgnoreSteeringAndPriority = 0,
+            AcidTrailEnabled = 0,
+            AcidTrailSegmentLifetimeSeconds = 3f,
+            AcidTrailSpawnDistance = 0.75f,
+            AcidTrailSpawnIntervalSeconds = 0.18f,
+            AcidTrailRadius = 0.85f,
+            AcidTrailMaxActiveSegments = 18,
+            AcidTrailDamagePerTick = 4f,
+            AcidTrailApplyIntervalSeconds = 0.55f,
+            AcidTrailMinimumMovementSpeed = 0.1f,
+            AcidTrailDebugDrawSegments = 1,
+            AcidTrailVfxPrefabEntity = Entity.Null,
+            AcidTrailScaleVfxToRadius = 1,
+            AcidTrailVfxScaleMultiplier = 1f
         };
     }
 
@@ -109,8 +123,51 @@ internal static class EnemyPatternDefaultsUtility
             WanderInitialized = 0,
             CowardPatrolAnchorPosition = float3.zero,
             CowardPatrolAnchorInitialized = 0,
+            CowardLastResolvedVelocity = float3.zero,
+            CowardRetargetLockTimer = 0f,
+            CowardRecoveryTimer = 0f,
+            CowardHasResolvedVelocity = 0,
             DvdDirection = float3.zero,
-            DvdInitialized = 0
+            DvdInitialized = 0,
+            AcidLastSpawnPosition = float3.zero,
+            AcidSpawnTimer = 0f,
+            AcidInitialized = 0
+        };
+    }
+
+    /// <summary>
+    /// Creates default tactical navigation settings used when brain authoring data is missing.
+    /// </summary>
+    /// <returns>Default tactical navigation config.</returns>
+    public static EnemyTacticalNavigationConfig CreateTacticalNavigationConfig()
+    {
+        return new EnemyTacticalNavigationConfig
+        {
+            CandidateBudget = EnemyTacticalCandidateBudget.Balanced,
+            NavigationInfluence = 0.72f,
+            PredictionHorizonSeconds = 0.42f,
+            SidePassPreference = 0.48f,
+            CrowdLanePreference = 0.58f,
+            WallTangentPreference = 0.64f,
+            OscillationDamping = 0.7f,
+            StuckRecoverySeconds = 0.42f
+        };
+    }
+
+    /// <summary>
+    /// Creates default runtime navigation memory for pooled enemies.
+    /// </summary>
+    /// <returns>Default tactical navigation runtime state.</returns>
+    public static EnemyNavigationRuntimeState CreateNavigationRuntimeState()
+    {
+        return new EnemyNavigationRuntimeState
+        {
+            LastDesiredDirection = float3.zero,
+            LastResolvedPosition = float3.zero,
+            PathCommitTimer = 0f,
+            StuckTimer = 0f,
+            LastSideSign = 0,
+            HadValidDirection = 0
         };
     }
 

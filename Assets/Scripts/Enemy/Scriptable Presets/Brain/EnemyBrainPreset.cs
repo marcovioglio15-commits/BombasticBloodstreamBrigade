@@ -455,6 +455,9 @@ public sealed class EnemyBrainPreset : ScriptableObject
     [Tooltip("Steering settings block.")]
     [SerializeField] private EnemyBrainSteeringSettings steering = new EnemyBrainSteeringSettings();
 
+    [Tooltip("Tactical navigation settings block.")]
+    [SerializeField] private EnemyBrainTacticalNavigationSettings tacticalNavigation = new EnemyBrainTacticalNavigationSettings();
+
     [Tooltip("Damage settings block.")]
     [FormerlySerializedAs("playerContact")]
     [SerializeField] private EnemyBrainDamageSettings damage = new EnemyBrainDamageSettings();
@@ -514,6 +517,14 @@ public sealed class EnemyBrainPreset : ScriptableObject
         }
     }
 
+    public EnemyBrainTacticalNavigationSettings TacticalNavigation
+    {
+        get
+        {
+            return tacticalNavigation;
+        }
+    }
+
     public EnemyBrainDamageSettings Damage
     {
         get
@@ -548,6 +559,9 @@ public sealed class EnemyBrainPreset : ScriptableObject
         if (steering == null)
             steering = new EnemyBrainSteeringSettings();
 
+        if (tacticalNavigation == null)
+            tacticalNavigation = new EnemyBrainTacticalNavigationSettings();
+
         if (damage == null)
             damage = new EnemyBrainDamageSettings();
 
@@ -556,6 +570,7 @@ public sealed class EnemyBrainPreset : ScriptableObject
 
         movement.Validate();
         steering.Validate();
+        tacticalNavigation.Validate();
         damage.Validate();
         healthStatistics.Validate();
     }

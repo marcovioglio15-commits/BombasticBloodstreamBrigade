@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06dc4d4afdfd91e4186770a067a8f030, type: 3}
-  m_Name: PF_EnemySpawner_Testing_Grunts
+  m_Name: PF_EnemySpawner_Testing_BOSS
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
   - waveLabel: PF_EnemySpawner_Grunts
-    previewInScene: 1
+    previewInScene: 0
     startMode: 0
     startDelaySeconds: 0
     spawnDurationSeconds: 1
@@ -43,8 +43,8 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 3, y: 10}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+    - cellCoordinate: {x: 3, y: 9}
+      masterPreset: {fileID: 11400000, guid: a4cf28221b7bd284f94be6c64bef7329, type: 2}
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:

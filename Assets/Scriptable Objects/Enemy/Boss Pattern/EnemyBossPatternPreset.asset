@@ -112,6 +112,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 45
                 cornerNudgeDistance: 0.08
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 8
               releaseDistanceBuffer: 1.5
@@ -398,6 +411,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 0
                 cornerNudgeDistance: 0
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 0
               releaseDistanceBuffer: 0
@@ -648,6 +674,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 0
                 cornerNudgeDistance: 0
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 0
               releaseDistanceBuffer: 0
@@ -936,6 +975,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -1226,6 +1278,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -1539,6 +1604,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -1835,6 +1913,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -2131,6 +2222,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -2386,6 +2490,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -2624,6 +2741,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -2868,6 +2998,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -3132,6 +3275,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 0
                 cornerNudgeDistance: 0
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 0
               releaseDistanceBuffer: 0
@@ -3420,6 +3576,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -3733,6 +3902,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -4029,6 +4211,19 @@ MonoBehaviour:
                   fixedInitialDirectionDegrees: 45
                   cornerNudgeDistance: 0.08
                   ignoreSteeringAndPriority: 0
+                acid:
+                  trailSegmentLifetimeSeconds: 3
+                  trailSpawnDistance: 0.75
+                  trailSpawnIntervalSeconds: 0.18
+                  trailRadius: 0.85
+                  maxActiveSegmentsPerEnemy: 18
+                  damagePerTick: 4
+                  applyIntervalSeconds: 0.55
+                  minimumMovementSpeed: 0.1
+                  trailSegmentVfxPrefab: {fileID: 0}
+                  scaleTrailSegmentVfxToRadius: 1
+                  trailSegmentVfxScaleMultiplier: 1
+                  debugDrawSegments: 1
               coward:
                 detectionRadius: 8
                 releaseDistanceBuffer: 1.5
@@ -4284,6 +4479,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -4522,6 +4730,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -4766,6 +4987,19 @@ MonoBehaviour:
               fixedInitialDirectionDegrees: 0
               cornerNudgeDistance: 0
               ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
           coward:
             detectionRadius: 0
             releaseDistanceBuffer: 0
@@ -4995,6 +5229,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 45
                 cornerNudgeDistance: 0.08
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 8
               releaseDistanceBuffer: 1.5
@@ -5254,6 +5501,19 @@ MonoBehaviour:
                 fixedInitialDirectionDegrees: 45
                 cornerNudgeDistance: 0.08
                 ignoreSteeringAndPriority: 0
+              acid:
+                trailSegmentLifetimeSeconds: 3
+                trailSpawnDistance: 0.75
+                trailSpawnIntervalSeconds: 0.18
+                trailRadius: 0.85
+                maxActiveSegmentsPerEnemy: 18
+                damagePerTick: 4
+                applyIntervalSeconds: 0.55
+                minimumMovementSpeed: 0.1
+                trailSegmentVfxPrefab: {fileID: 0}
+                scaleTrailSegmentVfxToRadius: 1
+                trailSegmentVfxScaleMultiplier: 1
+                debugDrawSegments: 1
             coward:
               detectionRadius: 8
               releaseDistanceBuffer: 1.5

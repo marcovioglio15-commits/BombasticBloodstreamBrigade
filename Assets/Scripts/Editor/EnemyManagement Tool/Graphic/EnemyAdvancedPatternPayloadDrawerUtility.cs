@@ -243,8 +243,9 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         SerializedProperty modeProperty = wandererProperty.FindPropertyRelative("mode");
         SerializedProperty basicProperty = wandererProperty.FindPropertyRelative("basic");
         SerializedProperty dvdProperty = wandererProperty.FindPropertyRelative("dvd");
+        SerializedProperty acidProperty = wandererProperty.FindPropertyRelative("acid");
 
-        if (modeProperty == null || basicProperty == null || dvdProperty == null)
+        if (modeProperty == null || basicProperty == null || dvdProperty == null || acidProperty == null)
         {
             HelpBox missingFieldsBox = new HelpBox("Wanderer payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(missingFieldsBox);
@@ -294,10 +295,48 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         AddFloatSliderField(dvdFoldout, dvdProperty.FindPropertyRelative("cornerNudgeDistance"), "Corner Nudge Distance", 0f, 1f);
         EnemyAdvancedPatternDrawerUtility.AddField(dvdFoldout, dvdProperty.FindPropertyRelative("ignoreSteeringAndPriority"), "Ignore Steering And Priority");
 
-        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(modeProperty, basicFoldout, dvdFoldout);
+        Foldout acidFoldout = CreatePayloadFoldout(acidProperty, "Acid Trail", "WandererAcid");
+        payloadContainer.Add(acidFoldout);
+
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("trailSegmentLifetimeSeconds"), "Segment Lifetime Seconds", 0.05f, 12f);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("trailSpawnDistance"), "Spawn Distance", 0f, 4f);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("trailSpawnIntervalSeconds"), "Spawn Interval Seconds", 0f, 2f);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("trailRadius"), "Trail Radius", 0f, 4f);
+        AddIntSliderField(acidFoldout, acidProperty.FindPropertyRelative("maxActiveSegmentsPerEnemy"), "Max Active Segments", 0, 128);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("damagePerTick"), "Damage Per Tick", 0f, 100f);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("applyIntervalSeconds"), "Apply Interval Seconds", 0.01f, 4f);
+        AddFloatSliderField(acidFoldout, acidProperty.FindPropertyRelative("minimumMovementSpeed"), "Minimum Movement Speed", 0f, 8f);
+
+        SerializedProperty trailSegmentVfxPrefabProperty = acidProperty.FindPropertyRelative("trailSegmentVfxPrefab");
+        EnemyAdvancedPatternDrawerUtility.AddField(acidFoldout, trailSegmentVfxPrefabProperty, "Trail Segment VFX Prefab");
+
+        VisualElement acidVfxOptionsContainer = new VisualElement();
+        acidFoldout.Add(acidVfxOptionsContainer);
+        EnemyAdvancedPatternDrawerUtility.AddField(acidVfxOptionsContainer, acidProperty.FindPropertyRelative("scaleTrailSegmentVfxToRadius"), "Scale VFX To Radius");
+        AddFloatSliderField(acidVfxOptionsContainer, acidProperty.FindPropertyRelative("trailSegmentVfxScaleMultiplier"), "VFX Scale Multiplier", 0.01f, 8f);
+        RefreshAcidVfxOptionsVisibility(trailSegmentVfxPrefabProperty, acidVfxOptionsContainer);
+
+        acidFoldout.TrackPropertyValue(trailSegmentVfxPrefabProperty, changedProperty =>
+        {
+            RefreshAcidVfxOptionsVisibility(changedProperty, acidVfxOptionsContainer);
+        });
+
+        EnemyAdvancedPatternDrawerUtility.AddField(acidFoldout, acidProperty.FindPropertyRelative("debugDrawSegments"), "Debug Draw Segments");
+
+        HelpBox acidWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        acidWarningBox.style.marginTop = 4f;
+        acidFoldout.Add(acidWarningBox);
+        EnemyAdvancedPatternAcidTrailWarningUtility.RefreshAcidTrailWarnings(acidProperty, acidWarningBox);
+
+        acidFoldout.TrackSerializedObjectValue(acidProperty.serializedObject, changedObject =>
+        {
+            EnemyAdvancedPatternAcidTrailWarningUtility.RefreshAcidTrailWarnings(acidProperty, acidWarningBox);
+        });
+
+        EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(modeProperty, basicFoldout, dvdFoldout, acidFoldout);
         payloadContainer.TrackPropertyValue(modeProperty, changedProperty =>
         {
-            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(changedProperty, basicFoldout, dvdFoldout);
+            EnemyAdvancedPatternPayloadVisibilityUtility.UpdateWandererModeVisibility(changedProperty, basicFoldout, dvdFoldout, acidFoldout);
         });
 
         return true;
@@ -632,6 +671,22 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         slider.BindProperty(property);
         parent.Add(slider);
         return true;
+    }
+
+    /// <summary>
+    /// Shows Acid VFX scale options only when a trail segment prefab is assigned.
+    /// </summary>
+    /// <param name="trailSegmentVfxPrefabProperty">Serialized prefab reference controlling visibility.</param>
+    /// <param name="vfxOptionsContainer">Container holding VFX-only options.</param>
+    private static void RefreshAcidVfxOptionsVisibility(SerializedProperty trailSegmentVfxPrefabProperty,
+                                                        VisualElement vfxOptionsContainer)
+    {
+        if (vfxOptionsContainer == null)
+            return;
+
+        bool hasVfxPrefab = trailSegmentVfxPrefabProperty != null &&
+                            trailSegmentVfxPrefabProperty.objectReferenceValue != null;
+        vfxOptionsContainer.style.display = hasVfxPrefab ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     #endregion
