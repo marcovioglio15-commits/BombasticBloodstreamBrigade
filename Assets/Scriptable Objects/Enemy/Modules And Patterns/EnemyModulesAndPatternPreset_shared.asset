@@ -16990,10 +16990,10 @@ MonoBehaviour:
           wanderer:
             mode: 2
             basic:
-              searchRadius: 9
+              searchRadius: 23.27
               minimumTravelDistance: 2
               maximumTravelDistance: 8
-              arrivalTolerance: 0.35
+              arrivalTolerance: 0.05
               waitCooldownSeconds: 0.7
               candidateSampleCount: 9
               useInfiniteDirectionSampling: 1
@@ -17012,7 +17012,7 @@ MonoBehaviour:
               cornerNudgeDistance: 0.08
               ignoreSteeringAndPriority: 0
             acid:
-              trailSegmentLifetimeSeconds: 12
+              trailSegmentLifetimeSeconds: 6
               trailSpawnDistance: 0.75
               trailSpawnIntervalSeconds: 0.18
               trailRadius: 0.5
