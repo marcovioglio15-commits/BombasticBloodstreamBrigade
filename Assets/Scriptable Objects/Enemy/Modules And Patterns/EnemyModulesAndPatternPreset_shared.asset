@@ -16105,7 +16105,7 @@ MonoBehaviour:
             postLaunchStopSeconds: 0.15
             intraBurstDelay: 0.15
             inReachTargetingMode: 1
-            outOfReachTargetingMode: 2
+            outOfReachTargetingMode: 3
             launchPattern: 0
             bombsPerLaunch: 1
             landingSpreadRadius: 1.25
@@ -16118,8 +16118,8 @@ MonoBehaviour:
             apexHeight: 3
             launchHeightOffset: 0.65
             landingHeightOffset: 0
-            damage: 3
-            damageRadius: 1.75
+            damage: 2
+            damageRadius: 2.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
             runtimeBomb:
