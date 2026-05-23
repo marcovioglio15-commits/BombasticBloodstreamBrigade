@@ -585,7 +585,7 @@ MonoBehaviour:
     isEnabled: 1
     timerText: {fileID: 2313405592280617168}
     direction: 1
-    initialSeconds: 300
+    initialSeconds: 450
     hideWhenPlayerMissing: 1
   comboCounterSection:
     isEnabled: 1

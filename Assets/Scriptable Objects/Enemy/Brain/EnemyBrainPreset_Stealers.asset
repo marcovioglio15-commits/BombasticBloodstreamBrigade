@@ -43,7 +43,7 @@ MonoBehaviour:
   damage:
     contactDamageEnabled: 1
     contactRadius: 0.8
-    contactAmountPerTick: 1
+    contactAmountPerTick: 0
     contactTickInterval: 0.75
     areaDamageEnabled: 1
     areaRadius: 0
