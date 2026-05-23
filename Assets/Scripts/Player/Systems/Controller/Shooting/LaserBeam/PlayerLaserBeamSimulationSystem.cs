@@ -28,13 +28,14 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerLaserBeamState>();
+        state.RequireForUpdate<PlayerLaserBeamStormTickPulse>();
         state.RequireForUpdate<PlayerLaserBeamLaneElement>();
         state.RequireForUpdate<PlayerInputState>();
         state.RequireForUpdate<PlayerMovementState>();
         state.RequireForUpdate<PlayerShootingState>();
         state.RequireForUpdate<PlayerRuntimeShootingConfig>();
         state.RequireForUpdate<PlayerRuntimeShootingAppliedElementSlot>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<LocalTransform>();
         state.RequireForUpdate<PhysicsWorldSingleton>();
     }
@@ -69,7 +70,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
         ComponentLookup<PlayerMovementState> movementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true);
         ComponentLookup<PlayerRuntimeShootingConfig> runtimeShootingConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeShootingConfig>(true);
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
@@ -77,21 +78,23 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
-        foreach ((RefRO<LocalTransform> localTransform,
+            foreach ((RefRO<LocalTransform> localTransform,
                   RefRW<PlayerShootingState> shootingState,
                   RefRW<PlayerLaserBeamState> laserBeamState,
+                  DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                   DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                   Entity playerEntity)
                  in SystemAPI.Query<RefRO<LocalTransform>,
                                     RefRW<PlayerShootingState>,
                                     RefRW<PlayerLaserBeamState>,
+                                    DynamicBuffer<PlayerLaserBeamStormTickPulse>,
                                     DynamicBuffer<PlayerLaserBeamLaneElement>>()
                              .WithEntityAccess())
         {
             if (!inputStateLookup.HasComponent(playerEntity) ||
                 !movementStateLookup.HasComponent(playerEntity) ||
                 !runtimeShootingConfigLookup.HasComponent(playerEntity) ||
-                !passiveToolsStateLookup.HasComponent(playerEntity) ||
+                !passiveToolsStateLookup.HasBuffer(playerEntity) ||
                 !appliedElementSlotsLookup.HasBuffer(playerEntity))
             {
                 continue;
@@ -101,7 +104,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             mutableLaserBeamLanes.Clear();
 
             PlayerLaserBeamState currentLaserBeamState = laserBeamState.ValueRO;
-            PlayerPassiveToolsState currentPassiveToolsState = passiveToolsStateLookup[playerEntity];
+            PlayerPassiveToolsState currentPassiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(playerEntity, in passiveToolsStateLookup);
             PlayerLaserBeamStateUtility.UpdateTriggeredActiveLaser(ref currentLaserBeamState, deltaTime);
             bool hasTriggeredActiveLaser = PlayerLaserBeamStateUtility.HasTriggeredActiveLaser(in currentLaserBeamState);
             PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in currentPassiveToolsState,
@@ -115,7 +118,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
             if (!hasLaserBeam)
             {
-                PlayerLaserBeamStateUtility.ResetBeamState(ref currentLaserBeamState);
+                PlayerLaserBeamStateUtility.ResetBeamState(ref currentLaserBeamState, stormTickPulses);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
                 continue;
@@ -124,8 +127,11 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             LaserBeamPassiveConfig laserBeamConfig = effectivePassiveToolsState.LaserBeam;
             PlayerLaserBeamStateUtility.UpdateCooldown(ref currentLaserBeamState, in laserBeamConfig, deltaTime);
             PlayerLaserBeamStateUtility.UpdateChargeImpulse(ref currentLaserBeamState, deltaTime);
-            PlayerLaserBeamStateUtility.AdvanceStormTickPulses(ref currentLaserBeamState, in laserBeamConfig, deltaTime);
-            PlayerLaserBeamStateUtility.UpdateStormBurstTimer(ref currentLaserBeamState, in laserBeamConfig, deltaTime);
+            PlayerLaserBeamStateUtility.AdvanceStormTickPulses(stormTickPulses, in laserBeamConfig, deltaTime);
+            PlayerLaserBeamStateUtility.UpdateStormBurstTimer(ref currentLaserBeamState,
+                                                              in laserBeamConfig,
+                                                              in stormTickPulses,
+                                                              deltaTime);
             bool isShootPressed = currentInputState.Shoot > 0.5f;
             bool hasChargeImpulse = currentLaserBeamState.ChargeImpulseRemainingSeconds > 0f;
             bool isShootingSuppressed = powerUpsStateLookup.HasComponent(playerEntity) &&
@@ -141,7 +147,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 currentLaserBeamState.DamageTickTimer = 0f;
                 currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
                 PlayerLaserBeamStateUtility.ClearStormBurst(ref currentLaserBeamState);
-                PlayerLaserBeamStateUtility.ClearStormTickPulses(ref currentLaserBeamState);
+                PlayerLaserBeamStateUtility.ClearStormTickPulses(stormTickPulses);
 
                 if (isShootingSuppressed)
                     PlayerLaserBeamStateUtility.ClearChargeImpulse(ref currentLaserBeamState);
@@ -158,7 +164,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 currentLaserBeamState.LastResolvedPrimaryLaneCount = 0;
                 currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
                 PlayerLaserBeamStateUtility.ClearStormBurst(ref currentLaserBeamState);
-                PlayerLaserBeamStateUtility.ClearStormTickPulses(ref currentLaserBeamState);
+                PlayerLaserBeamStateUtility.ClearStormTickPulses(stormTickPulses);
                 PlayerLaserBeamStateUtility.ClearChargeImpulse(ref currentLaserBeamState);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
@@ -192,7 +198,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 currentLaserBeamState.DamageTickTimer = math.max(0.0001f, laserBeamConfig.DamageTickIntervalSeconds);
                 currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
                 PlayerLaserBeamStateUtility.ClearStormBurst(ref currentLaserBeamState);
-                PlayerLaserBeamStateUtility.ClearStormTickPulses(ref currentLaserBeamState);
+                PlayerLaserBeamStateUtility.ClearStormTickPulses(stormTickPulses);
                 PlayerLaserBeamStateUtility.ClearChargeImpulse(ref currentLaserBeamState);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
@@ -228,7 +234,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 currentLaserBeamState.LastResolvedPrimaryLaneCount = 0;
                 currentLaserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
                 PlayerLaserBeamStateUtility.ClearStormBurst(ref currentLaserBeamState);
-                PlayerLaserBeamStateUtility.ClearStormTickPulses(ref currentLaserBeamState);
+                PlayerLaserBeamStateUtility.ClearStormTickPulses(stormTickPulses);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
                 continue;

@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public enum PlayerPowerUpCheatCommandType
+public enum PlayerPowerUpCheatCommandType : byte
 {
     None = 0,
     ApplyPresetByIndex = 1
@@ -30,21 +30,14 @@ public struct PlayerPowerUpsState : IComponentData
     public byte PreviousPrimaryPressed;
     public byte PreviousSecondaryPressed;
     public byte PreviousSwapSlotsPressed;
+    public byte HasPendingCheatCommand;
+    public PlayerPowerUpCheatCommandType PendingCheatCommandType;
     public int PrimaryEquipOrder;
     public int SecondaryEquipOrder;
     public int NextEquipOrder;
+    public int PendingCheatPresetIndex;
     public uint LastObservedGlobalKillCount;
     public float3 LastValidMovementDirection;
-}
-
-/// <summary>
-/// Runtime cheat command queue consumed by PlayerPowerUpCheatSystem.
-/// </summary>
-[InternalBufferCapacity(0)]
-public struct PlayerPowerUpCheatCommand : IBufferElementData
-{
-    public PlayerPowerUpCheatCommandType CommandType;
-    public int PresetIndex;
 }
 
 /// <summary>
@@ -171,10 +164,13 @@ public struct PlayerPowerUpTierEntryScalingElement : IBufferElementData
 public struct PlayerMilestonePowerUpSelectionState : IComponentData
 {
     public byte IsSelectionActive;
+    public byte HasPendingCommand;
+    public PlayerMilestoneSelectionCommandType PendingCommandType;
     public int MilestoneLevel;
     public int GamePhaseIndex;
     public int MilestoneIndex;
     public int OfferCount;
+    public int PendingOfferIndex;
 }
 
 /// <summary>
@@ -200,16 +196,6 @@ public enum PlayerMilestoneSelectionCommandType : byte
 }
 
 /// <summary>
-/// One HUD-to-ECS command selecting a rolled power-up option.
-/// </summary>
-[InternalBufferCapacity(0)]
-public struct PlayerMilestonePowerUpSelectionCommand : IBufferElementData
-{
-    public PlayerMilestoneSelectionCommandType CommandType;
-    public int OfferIndex;
-}
-
-/// <summary>
 /// Holds transient state used to restore Time.timeScale smoothly after a milestone selection closes.
 /// </summary>
 public struct PlayerMilestoneTimeScaleResumeState : IComponentData
@@ -224,7 +210,7 @@ public struct PlayerMilestoneTimeScaleResumeState : IComponentData
 /// <summary>
 /// Holds aggregated runtime multipliers from equipped passive tools.
 /// </summary>
-public struct PlayerPassiveToolsState : IComponentData
+public struct PlayerPassiveToolsState
 {
     public float ProjectileSizeMultiplier;
     public float ProjectileDamageMultiplier;
@@ -251,6 +237,17 @@ public struct PlayerPassiveToolsState : IComponentData
     public PassiveBulletTimeConfig BulletTime;
     public byte HasLaserBeam;
     public LaserBeamPassiveConfig LaserBeam;
+    public byte HasOrbitalProjections;
+    public FixedList512Bytes<OrbitalProjectionConfig> OrbitalProjections;
+}
+
+/// <summary>
+/// Stores the single aggregated passive-tools snapshot outside the player chunk payload.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerPassiveToolsStateElement : IBufferElementData
+{
+    public PlayerPassiveToolsState Value;
 }
 
 /// <summary>
@@ -387,10 +384,28 @@ public struct PlayerPassiveBulletTimeState : IComponentData
 /// <summary>
 /// Stores one traveling Laser Beam damage packet with a stable id and current elapsed travel time.
 /// </summary>
-public struct PlayerLaserBeamStormTickPulse
+[InternalBufferCapacity(0)]
+public struct PlayerLaserBeamStormTickPulse : IBufferElementData
 {
     public int PulseId;
     public float CurrentElapsedSeconds;
+}
+
+/// <summary>
+/// Stores the passive hooks needed by a timed active Laser Beam without embedding the full passive runtime state.
+/// </summary>
+public struct PlayerLaserBeamPassiveSnapshot
+{
+    public byte HasLaserBeam;
+    public LaserBeamPassiveConfig LaserBeam;
+    public byte HasPerfectCircle;
+    public PerfectCirclePassiveConfig PerfectCircle;
+    public byte HasShotgun;
+    public ShotgunPowerUpConfig Shotgun;
+    public byte HasBouncingProjectiles;
+    public BouncingProjectilesPassiveConfig BouncingProjectiles;
+    public byte HasSplittingProjectiles;
+    public SplittingProjectilesPassiveConfig SplittingProjectiles;
 }
 
 /// <summary>
@@ -408,12 +423,11 @@ public struct PlayerLaserBeamState : IComponentData
     public float ContinuousDamageAccumulatorSeconds;
     public float StormBurstRemainingSeconds;
     public int NextStormTickPulseId;
-    public FixedList512Bytes<PlayerLaserBeamStormTickPulse> StormTickPulses;
     public float TriggeredActiveRemainingSeconds;
     public ProjectilePenetrationMode TriggeredActivePenetrationMode;
     public int TriggeredActiveMaxPenetrations;
     public PlayerProjectileRequestTemplate TriggeredActiveProjectileTemplate;
-    public PlayerPassiveToolsState TriggeredActivePassiveToolsState;
+    public PlayerLaserBeamPassiveSnapshot TriggeredActivePassiveSnapshot;
     public float ChargeImpulseRemainingSeconds;
     public float ChargeImpulseDamageMultiplier;
     public float ChargeImpulseWidthMultiplier;
@@ -540,16 +554,6 @@ public struct PlayerPowerUpVfxCapConfig : IComponentData
     public int MaxAttachedSamePrefabPerTarget;
     public int MaxActiveOneShotVfx;
     public byte RefreshAttachedLifetimeOnCapHit;
-}
-
-/// <summary>
-/// Pool slot containing one reusable VFX entity instance.
-/// </summary>
-[InternalBufferCapacity(0)]
-public struct PlayerPowerUpVfxPoolElement : IBufferElementData
-{
-    public Entity PrefabEntity;
-    public Entity VfxEntity;
 }
 
 /// <summary>

@@ -8,6 +8,10 @@ using Unity.Physics;
 /// </summary>
 internal static class PlayerLaserBeamStateUtility
 {
+    #region Constants
+    private const int MaximumStormTickPulseCount = 64;
+    #endregion
+
     #region Methods
 
     #region Public Methods
@@ -15,7 +19,9 @@ internal static class PlayerLaserBeamStateUtility
     /// Resets all transient Laser Beam runtime timers and flags to their idle state.
     /// </summary>
     /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
-    public static void ResetBeamState(ref PlayerLaserBeamState laserBeamState)
+    /// <param name="stormTickPulses">Mutable pulse buffer owned by the same player entity.</param>
+    public static void ResetBeamState(ref PlayerLaserBeamState laserBeamState,
+                                      DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses)
     {
         laserBeamState.IsActive = 0;
         laserBeamState.IsOverheated = 0;
@@ -26,7 +32,7 @@ internal static class PlayerLaserBeamStateUtility
         laserBeamState.DamageTickTimer = 0f;
         laserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
         ClearStormBurst(ref laserBeamState);
-        ClearStormTickPulses(ref laserBeamState);
+        ClearStormTickPulses(stormTickPulses);
         laserBeamState.NextStormTickPulseId = 1;
         ClearTriggeredActiveLaser(ref laserBeamState);
         ClearChargeImpulse(ref laserBeamState);
@@ -37,13 +43,15 @@ internal static class PlayerLaserBeamStateUtility
     /// </summary>
     /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
     /// <param name="laserBeamConfig">Runtime Laser Beam config that provides pulse travel and hold timing.</param>
+    /// <param name="stormTickPulses">Pulse buffer used to resolve the current burst lifetime.</param>
     /// <param name="deltaTime">Unused frame delta kept to preserve the shared update-call shape.</param>
     public static void UpdateStormBurstTimer(ref PlayerLaserBeamState laserBeamState,
                                              in LaserBeamPassiveConfig laserBeamConfig,
+                                             in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                              float deltaTime)
     {
         float totalDurationSeconds = ResolveStormTickTotalDurationSeconds(in laserBeamConfig);
-        laserBeamState.StormBurstRemainingSeconds = ResolveCurrentStormBurstRemainingSeconds(in laserBeamState,
+        laserBeamState.StormBurstRemainingSeconds = ResolveCurrentStormBurstRemainingSeconds(in stormTickPulses,
                                                                                              totalDurationSeconds);
     }
 
@@ -59,19 +67,19 @@ internal static class PlayerLaserBeamStateUtility
     /// <summary>
     /// Advances every active traveling damage packet so presentation and hit coverage share the same elapsed pulse time.
     /// </summary>
-    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="stormTickPulses">Mutable pulse buffer owned by the current player.</param>
     /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
     /// <param name="deltaTime">Frame delta used to advance packet travel.</param>
-    public static void AdvanceStormTickPulses(ref PlayerLaserBeamState laserBeamState,
+    public static void AdvanceStormTickPulses(DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                               in LaserBeamPassiveConfig laserBeamConfig,
                                               float deltaTime)
     {
-        if (laserBeamState.StormTickPulses.Length <= 0)
+        if (stormTickPulses.Length <= 0)
             return;
 
         if (math.max(0f, laserBeamConfig.StormTickTravelSpeed) <= 0f)
         {
-            ClearStormTickPulses(ref laserBeamState);
+            ClearStormTickPulses(stormTickPulses);
             return;
         }
 
@@ -80,51 +88,51 @@ internal static class PlayerLaserBeamStateUtility
         if (safeDeltaTime <= 0f)
             return;
 
-        for (int pulseIndex = 0; pulseIndex < laserBeamState.StormTickPulses.Length; pulseIndex++)
+        for (int pulseIndex = 0; pulseIndex < stormTickPulses.Length; pulseIndex++)
         {
-            PlayerLaserBeamStormTickPulse pulse = laserBeamState.StormTickPulses[pulseIndex];
+            PlayerLaserBeamStormTickPulse pulse = stormTickPulses[pulseIndex];
             pulse.CurrentElapsedSeconds += safeDeltaTime;
-            laserBeamState.StormTickPulses[pulseIndex] = pulse;
+            stormTickPulses[pulseIndex] = pulse;
         }
     }
 
     /// <summary>
     /// Removes completed traveling damage packets once their travel and post-travel hold have fully elapsed.
     /// </summary>
-    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="stormTickPulses">Mutable pulse buffer owned by the current player.</param>
     /// <param name="laserBeamConfig">Aggregated Laser Beam passive configuration.</param>
-    public static void RemoveCompletedStormTickPulses(ref PlayerLaserBeamState laserBeamState,
+    public static void RemoveCompletedStormTickPulses(DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                                       in LaserBeamPassiveConfig laserBeamConfig)
     {
-        if (laserBeamState.StormTickPulses.Length <= 0)
+        if (stormTickPulses.Length <= 0)
             return;
 
         float totalDurationSeconds = ResolveStormTickTotalDurationSeconds(in laserBeamConfig);
 
         if (totalDurationSeconds <= 0f)
         {
-            ClearStormTickPulses(ref laserBeamState);
+            ClearStormTickPulses(stormTickPulses);
             return;
         }
 
-        for (int pulseIndex = laserBeamState.StormTickPulses.Length - 1; pulseIndex >= 0; pulseIndex--)
+        for (int pulseIndex = stormTickPulses.Length - 1; pulseIndex >= 0; pulseIndex--)
         {
-            PlayerLaserBeamStormTickPulse pulse = laserBeamState.StormTickPulses[pulseIndex];
+            PlayerLaserBeamStormTickPulse pulse = stormTickPulses[pulseIndex];
 
             if (pulse.CurrentElapsedSeconds < totalDurationSeconds)
                 continue;
 
-            laserBeamState.StormTickPulses.RemoveAt(pulseIndex);
+            stormTickPulses.RemoveAt(pulseIndex);
         }
     }
 
     /// <summary>
-    /// Clears the transient tick-highlight packet queue stored on the Laser Beam runtime state.
+    /// Clears the transient tick-highlight packet queue stored in the player pulse buffer.
     /// </summary>
-    /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
-    public static void ClearStormTickPulses(ref PlayerLaserBeamState laserBeamState)
+    /// <param name="stormTickPulses">Mutable pulse buffer owned by the current player.</param>
+    public static void ClearStormTickPulses(DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses)
     {
-        laserBeamState.StormTickPulses.Clear();
+        stormTickPulses.Clear();
     }
 
     /// <summary>
@@ -168,7 +176,7 @@ internal static class PlayerLaserBeamStateUtility
         laserBeamState.TriggeredActivePenetrationMode = penetrationMode;
         laserBeamState.TriggeredActiveMaxPenetrations = math.max(0, maximumPenetrations);
         laserBeamState.TriggeredActiveProjectileTemplate = projectileTemplate;
-        laserBeamState.TriggeredActivePassiveToolsState = passiveToolsSnapshot;
+        laserBeamState.TriggeredActivePassiveSnapshot = BuildTriggeredPassiveSnapshot(in passiveToolsSnapshot);
         laserBeamState.DamageTickTimer = 0f;
         laserBeamState.ContinuousDamageAccumulatorSeconds = 0f;
     }
@@ -183,16 +191,18 @@ internal static class PlayerLaserBeamStateUtility
         laserBeamState.TriggeredActivePenetrationMode = ProjectilePenetrationMode.None;
         laserBeamState.TriggeredActiveMaxPenetrations = 0;
         laserBeamState.TriggeredActiveProjectileTemplate = default;
-        laserBeamState.TriggeredActivePassiveToolsState = default;
+        laserBeamState.TriggeredActivePassiveSnapshot = default;
     }
 
     /// <summary>
     /// Queues one or more independent traveling damage packets after consuming Laser Beam tick budget.
     /// </summary>
     /// <param name="laserBeamState">Mutable Laser Beam runtime state.</param>
+    /// <param name="stormTickPulses">Mutable pulse buffer owned by the current player.</param>
     /// <param name="laserBeamConfig">Runtime Laser Beam config that provides pulse travel and post-travel hold timing.</param>
     /// <param name="pendingTickCount">Number of damage ticks consumed during the current frame.</param>
     public static void EnqueueStormTickPulses(ref PlayerLaserBeamState laserBeamState,
+                                              DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                               in LaserBeamPassiveConfig laserBeamConfig,
                                               int pendingTickCount)
     {
@@ -206,17 +216,17 @@ internal static class PlayerLaserBeamStateUtility
 
         for (int pulseIndex = 0; pulseIndex < pendingTickCount; pulseIndex++)
         {
-            if (laserBeamState.StormTickPulses.Length >= laserBeamState.StormTickPulses.Capacity)
-                laserBeamState.StormTickPulses.RemoveAt(0);
+            if (stormTickPulses.Length >= MaximumStormTickPulseCount)
+                stormTickPulses.RemoveAt(0);
 
-            laserBeamState.StormTickPulses.Add(new PlayerLaserBeamStormTickPulse
+            stormTickPulses.Add(new PlayerLaserBeamStormTickPulse
             {
                 PulseId = AllocateStormTickPulseId(ref laserBeamState),
                 CurrentElapsedSeconds = 0f
             });
         }
 
-        laserBeamState.StormBurstRemainingSeconds = ResolveCurrentStormBurstRemainingSeconds(in laserBeamState,
+        laserBeamState.StormBurstRemainingSeconds = ResolveCurrentStormBurstRemainingSeconds(in stormTickPulses,
                                                                                              totalDurationSeconds);
     }
 
@@ -269,7 +279,7 @@ internal static class PlayerLaserBeamStateUtility
     public static bool HasTriggeredActiveLaser(in PlayerLaserBeamState laserBeamState)
     {
         return laserBeamState.TriggeredActiveRemainingSeconds > 0f &&
-               laserBeamState.TriggeredActivePassiveToolsState.HasLaserBeam != 0;
+               laserBeamState.TriggeredActivePassiveSnapshot.HasLaserBeam != 0;
     }
 
     /// <summary>
@@ -282,7 +292,7 @@ internal static class PlayerLaserBeamStateUtility
                                                                             in PlayerLaserBeamState laserBeamState)
     {
         if (HasTriggeredActiveLaser(in laserBeamState))
-            return laserBeamState.TriggeredActivePassiveToolsState;
+            return BuildPassiveToolsState(in laserBeamState.TriggeredActivePassiveSnapshot);
 
         return passiveToolsState;
     }
@@ -440,18 +450,18 @@ internal static class PlayerLaserBeamStateUtility
     /// <summary>
     /// Resolves the remaining burst lifetime of the oldest started pulse currently driving the storm visuals.
     /// </summary>
-    /// <param name="laserBeamState">Runtime beam state containing the pulse queue.</param>
+    /// <param name="stormTickPulses">Pulse buffer containing the active storm packets.</param>
     /// <param name="totalDurationSeconds">Total duration of one pulse including travel and hold.</param>
     /// <returns>Remaining burst lifetime in seconds, or 0 when no pulse is currently started.</returns>
-    private static float ResolveCurrentStormBurstRemainingSeconds(in PlayerLaserBeamState laserBeamState,
+    private static float ResolveCurrentStormBurstRemainingSeconds(in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                                                   float totalDurationSeconds)
     {
-        if (laserBeamState.StormTickPulses.Length <= 0 || totalDurationSeconds <= 0f)
+        if (stormTickPulses.Length <= 0 || totalDurationSeconds <= 0f)
             return 0f;
 
-        for (int pulseIndex = 0; pulseIndex < laserBeamState.StormTickPulses.Length; pulseIndex++)
+        for (int pulseIndex = 0; pulseIndex < stormTickPulses.Length; pulseIndex++)
         {
-            PlayerLaserBeamStormTickPulse pulse = laserBeamState.StormTickPulses[pulseIndex];
+            PlayerLaserBeamStormTickPulse pulse = stormTickPulses[pulseIndex];
 
             if (pulse.CurrentElapsedSeconds < 0f || pulse.CurrentElapsedSeconds >= totalDurationSeconds)
                 continue;
@@ -460,6 +470,55 @@ internal static class PlayerLaserBeamStateUtility
         }
 
         return 0f;
+    }
+
+    /// <summary>
+    /// Copies only the passive modules the Laser Beam active needs while it owns a timed snapshot.
+    /// </summary>
+    /// <param name="passiveToolsState">Full passive state resolved when the active was triggered.</param>
+    /// <returns>Compact snapshot stored inside PlayerLaserBeamState.</returns>
+    private static PlayerLaserBeamPassiveSnapshot BuildTriggeredPassiveSnapshot(in PlayerPassiveToolsState passiveToolsState)
+    {
+        return new PlayerLaserBeamPassiveSnapshot
+        {
+            HasLaserBeam = passiveToolsState.HasLaserBeam,
+            LaserBeam = passiveToolsState.LaserBeam,
+            HasPerfectCircle = passiveToolsState.HasPerfectCircle,
+            PerfectCircle = passiveToolsState.PerfectCircle,
+            HasShotgun = passiveToolsState.HasShotgun,
+            Shotgun = passiveToolsState.Shotgun,
+            HasBouncingProjectiles = passiveToolsState.HasBouncingProjectiles,
+            BouncingProjectiles = passiveToolsState.BouncingProjectiles,
+            HasSplittingProjectiles = passiveToolsState.HasSplittingProjectiles,
+            SplittingProjectiles = passiveToolsState.SplittingProjectiles
+        };
+    }
+
+    /// <summary>
+    /// Rehydrates the compact timed Laser Beam snapshot into the passive state shape expected by shared beam code.
+    /// </summary>
+    /// <param name="snapshot">Compact timed active snapshot stored on PlayerLaserBeamState.</param>
+    /// <returns>Passive state containing only the Laser Beam relevant modules.</returns>
+    private static PlayerPassiveToolsState BuildPassiveToolsState(in PlayerLaserBeamPassiveSnapshot snapshot)
+    {
+        return new PlayerPassiveToolsState
+        {
+            ProjectileSizeMultiplier = 1f,
+            ProjectileDamageMultiplier = 1f,
+            ProjectileSpeedMultiplier = 1f,
+            ProjectileLifetimeSecondsMultiplier = 1f,
+            ProjectileLifetimeRangeMultiplier = 1f,
+            HasShotgun = snapshot.HasShotgun,
+            Shotgun = snapshot.Shotgun,
+            HasPerfectCircle = snapshot.HasPerfectCircle,
+            PerfectCircle = snapshot.PerfectCircle,
+            HasBouncingProjectiles = snapshot.HasBouncingProjectiles,
+            BouncingProjectiles = snapshot.BouncingProjectiles,
+            HasSplittingProjectiles = snapshot.HasSplittingProjectiles,
+            SplittingProjectiles = snapshot.SplittingProjectiles,
+            HasLaserBeam = snapshot.HasLaserBeam,
+            LaserBeam = snapshot.LaserBeam
+        };
     }
     #endregion
 

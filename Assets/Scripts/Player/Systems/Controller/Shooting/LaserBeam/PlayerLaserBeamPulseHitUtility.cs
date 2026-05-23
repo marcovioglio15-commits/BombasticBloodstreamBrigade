@@ -81,14 +81,14 @@ internal static class PlayerLaserBeamPulseHitUtility
     /// Removes hit-history entries whose pulse ids are no longer active on the current beam state.
     /// </summary>
     /// <param name="pulseHits">Mutable pulse-hit buffer owned by the player.</param>
-    /// <param name="laserBeamState">Current Laser Beam state containing active storm pulses.</param>
+    /// <param name="stormTickPulses">Current active storm pulses owned by the player.</param>
     public static void RetainActivePulseHits(DynamicBuffer<PlayerLaserBeamPulseHitElement> pulseHits,
-                                             in PlayerLaserBeamState laserBeamState)
+                                             in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses)
     {
         if (pulseHits.Length <= 0)
             return;
 
-        if (laserBeamState.StormTickPulses.Length <= 0)
+        if (stormTickPulses.Length <= 0)
         {
             pulseHits.Clear();
             return;
@@ -96,7 +96,7 @@ internal static class PlayerLaserBeamPulseHitUtility
 
         for (int hitIndex = pulseHits.Length - 1; hitIndex >= 0; hitIndex--)
         {
-            if (HasActivePulseId(pulseHits[hitIndex].PulseId, in laserBeamState))
+            if (HasActivePulseId(pulseHits[hitIndex].PulseId, in stormTickPulses))
                 continue;
 
             pulseHits.RemoveAt(hitIndex);
@@ -182,17 +182,17 @@ internal static class PlayerLaserBeamPulseHitUtility
     /// Checks whether one pulse id is still present in the active pulse list.
     /// </summary>
     /// <param name="pulseId">Pulse id to find.</param>
-    /// <param name="laserBeamState">Current Laser Beam state containing active storm pulses.</param>
+    /// <param name="stormTickPulses">Current active storm pulses owned by the player.</param>
     /// <returns>True when the pulse id is still active.</returns>
     private static bool HasActivePulseId(int pulseId,
-                                         in PlayerLaserBeamState laserBeamState)
+                                         in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses)
     {
         if (pulseId <= 0)
             return false;
 
-        for (int pulseIndex = 0; pulseIndex < laserBeamState.StormTickPulses.Length; pulseIndex++)
+        for (int pulseIndex = 0; pulseIndex < stormTickPulses.Length; pulseIndex++)
         {
-            if (laserBeamState.StormTickPulses[pulseIndex].PulseId == pulseId)
+            if (stormTickPulses[pulseIndex].PulseId == pulseId)
                 return true;
         }
 

@@ -63,10 +63,10 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
                                  .WithAll<PlayerPowerUpCharacterTuningFormulaElement>()
                                  .WithAll<PlayerPowerUpBaseConfigElement>()
                                  .WithAll<PlayerRuntimePowerUpScalingElement>()
-                                 .WithAll<PlayerPowerUpsConfig>()
+                                 .WithAll<PlayerPowerUpsConfigElement>()
                                  .WithAll<PlayerPowerUpUnlockCatalogElement>()
                                  .WithAll<EquippedPassiveToolElement>()
-                                 .WithAll<PlayerPassiveToolsState>()
+                                 .WithAll<PlayerPassiveToolsStateElement>()
                                  .WithAll<PlayerHealth>()
                                  .WithAll<PlayerShield>()
                                  .WithAll<PlayerProgressionConfig>()
@@ -111,10 +111,10 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
         BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(true);
         BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePowerUpScalingElement>(true);
-        ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);

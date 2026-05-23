@@ -33,6 +33,7 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.AreaTickApplyElement,
         PowerUpModuleKind.DeathExplosion,
         PowerUpModuleKind.OrbitalProjectiles,
+        PowerUpModuleKind.OrbitalProjections,
         PowerUpModuleKind.BouncingProjectiles,
         PowerUpModuleKind.ProjectileSplit,
         PowerUpModuleKind.Stackable,
@@ -132,6 +133,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Triggers damage explosion payload.";
             case PowerUpModuleKind.OrbitalProjectiles:
                 return "Overrides projectile trajectories to orbital behavior.";
+            case PowerUpModuleKind.OrbitalProjections:
+                return "Spawns persistent or timed objects orbiting the player with contact damage and interception effects.";
             case PowerUpModuleKind.BouncingProjectiles:
                 return "Adds wall bounce logic to projectiles.";
             case PowerUpModuleKind.ProjectileSplit:
@@ -214,6 +217,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.OrbitalProjectiles:
                 relativePropertyPath = "projectileOrbitOverride";
                 payloadLabel = "Orbital Projectiles Payload";
+                return true;
+            case PowerUpModuleKind.OrbitalProjections:
+                relativePropertyPath = "orbitalProjections";
+                payloadLabel = "Orbital Projections Payload";
                 return true;
             case PowerUpModuleKind.BouncingProjectiles:
                 relativePropertyPath = "projectileBounceOnWalls";

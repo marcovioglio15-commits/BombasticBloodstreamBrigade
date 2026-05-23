@@ -50,8 +50,9 @@ public partial struct PlayerLevelUpSystem : ISystem
         state.RequireForUpdate<PlayerLevel>();
         state.RequireForUpdate<PlayerExperienceCollection>();
         state.RequireForUpdate<PlayerProgressionConfig>();
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
+        state.RequireForUpdate<PlayerPowerUpsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerHealth>();
         state.RequireForUpdate<PlayerShield>();
         state.RequireForUpdate<PlayerRuntimeScalingState>();
@@ -107,8 +108,9 @@ public partial struct PlayerLevelUpSystem : ISystem
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(false);
         ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup = SystemAPI.GetComponentLookup<PlayerBaseHealthStatisticsConfig>(true);
         ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup = SystemAPI.GetComponentLookup<PlayerRuntimeHealthStatisticsConfig>(false);
-        ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false);
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
@@ -403,6 +405,12 @@ public partial struct PlayerLevelUpSystem : ISystem
                     ? equippedPassiveToolsLookup[entity]
                     : default;
                 DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers = milestoneSelectionOffersLookup[entity];
+                PlayerPowerUpsConfig currentPowerUpsConfig = powerUpsConfigLookup.HasBuffer(entity)
+                    ? PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup)
+                    : default;
+                PlayerPowerUpsState currentPowerUpsState = powerUpsStateLookup.HasComponent(entity)
+                    ? powerUpsStateLookup[entity]
+                    : default;
                 PlayerMilestonePowerUpReservationUtility.BuildStolenPowerUpRollReservations(state.EntityManager,
                                                                                             entity,
                                                                                             stolenPowerUpStealerQuery,
@@ -418,6 +426,8 @@ public partial struct PlayerLevelUpSystem : ISystem
                                                                                  tierEntries,
                                                                                  tierEntryScaling,
                                                                                  equippedPassiveTools,
+                                                                                 in currentPowerUpsConfig,
+                                                                                 in currentPowerUpsState,
                                                                                  reservedUnlockCountsByPowerUpId,
                                                                                  reservedPassiveKinds,
                                                                                  selectionOffers,

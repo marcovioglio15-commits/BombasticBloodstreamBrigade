@@ -69,7 +69,7 @@ public partial struct ProjectileSpawnSystem : ISystem
         ExecutePoolExpansionRequests(entityManager, in expansionRequests);
 
         // Refresh lookups after structural changes performed during pool expansion.
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         ComponentLookup<PlayerShootingState> shootingStateLookup = SystemAPI.GetComponentLookup<PlayerShootingState>(false);
         ComponentLookup<LocalTransform> projectileTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(false);
         ComponentLookup<Projectile> projectileLookup = SystemAPI.GetComponentLookup<Projectile>(false);
@@ -195,7 +195,7 @@ public partial struct ProjectileSpawnSystem : ISystem
     private void ProcessShootRequests(ref SystemState state,
                                       EntityManager entityManager,
                                       float elapsedTime,
-                                      in ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup,
+                                      in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
                                       ref ComponentLookup<PlayerShootingState> shootingStateLookup,
                                       ref ComponentLookup<LocalTransform> projectileTransformLookup,
                                       ref ComponentLookup<Projectile> projectileLookup,
@@ -396,12 +396,9 @@ public partial struct ProjectileSpawnSystem : ISystem
         return math.max(MinimumProjectileScale, transformScale);
     }
 
-    private static PlayerPassiveToolsState ResolvePassiveToolsState(Entity shooterEntity, in ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup)
+    private static PlayerPassiveToolsState ResolvePassiveToolsState(Entity shooterEntity, in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup)
     {
-        if (passiveToolsLookup.HasComponent(shooterEntity))
-            return passiveToolsLookup[shooterEntity];
-
-        return default;
+        return PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in passiveToolsLookup);
     }
 
     /// <summary>

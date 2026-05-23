@@ -49,7 +49,7 @@ public partial struct ProjectileSimulationSystem : ISystem
             DeltaTime = SystemAPI.Time.DeltaTime,
             GlobalTime = (float)SystemAPI.Time.ElapsedTime,
             MovementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true),
-            PassiveToolsLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true),
+            PassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true),
             PlayerWorldTransformLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true)
         };
 
@@ -74,7 +74,7 @@ public partial struct ProjectileSimulationSystem : ISystem
         public float DeltaTime;
         public float GlobalTime;
         [ReadOnly] public ComponentLookup<PlayerMovementState> MovementStateLookup;
-        [ReadOnly] public ComponentLookup<PlayerPassiveToolsState> PassiveToolsLookup;
+        [ReadOnly] public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsLookup;
         [ReadOnly] public ComponentLookup<LocalToWorld> PlayerWorldTransformLookup;
         #endregion
 
@@ -123,10 +123,10 @@ public partial struct ProjectileSimulationSystem : ISystem
 
             Entity shooterEntity = owner.ShooterEntity;
 
-            if (!PassiveToolsLookup.HasComponent(shooterEntity))
+            if (!PassiveToolsLookup.HasBuffer(shooterEntity))
                 return false;
 
-            PlayerPassiveToolsState passiveToolsState = PassiveToolsLookup[shooterEntity];
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in PassiveToolsLookup);
 
             if (passiveToolsState.HasPerfectCircle == 0)
                 return false;

@@ -36,7 +36,7 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
     /// <param name="state">DOTS system state used to register required runtime components.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerElementalTrailAttachedVfxState>();
         state.RequireForUpdate<PlayerMovementState>();
         state.RequireForUpdate<LocalTransform>();
@@ -72,22 +72,23 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         CleanupInvalidOwnerInstances(entityManager);
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRO<PlayerMovementState> movementState,
                   RefRO<LocalTransform> playerTransform,
                   RefRW<PlayerElementalTrailAttachedVfxState> trailAttachedVfxState,
                   Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRO<PlayerMovementState>,
                                     RefRO<LocalTransform>,
                                     RefRW<PlayerElementalTrailAttachedVfxState>>()
                              .WithEntityAccess())
         {
             PlayerElementalTrailAttachedVfxState previousTrailState = trailAttachedVfxState.ValueRO;
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
             ReleasePooledTrailEntityIfAny(entityManager, previousTrailState.VfxEntity);
 
             GameObject trailPrefab = ResolveTrailPrefab(entityManager, playerEntity);
-            bool shouldBeActive = passiveToolsState.ValueRO.HasElementalTrail != 0 && trailPrefab != null;
+            bool shouldBeActive = passiveToolsState.HasElementalTrail != 0 && trailPrefab != null;
 
             if (!shouldBeActive)
             {
@@ -104,7 +105,7 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
                 continue;
             }
 
-            ElementalTrailPassiveConfig trailConfig = passiveToolsState.ValueRO.ElementalTrail;
+            ElementalTrailPassiveConfig trailConfig = passiveToolsState.ElementalTrail;
             float radius = math.max(MinimumRadius, trailConfig.TrailRadius);
             float widthMultiplier = math.max(MinimumWidthMultiplier, trailConfig.TrailAttachedVfxScaleMultiplier);
             float desiredTrailWidth = math.max(MinimumTrailWidth, radius * 2f * widthMultiplier);

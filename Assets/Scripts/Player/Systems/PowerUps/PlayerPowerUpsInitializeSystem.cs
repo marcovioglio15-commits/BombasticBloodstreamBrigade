@@ -20,15 +20,16 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingElementalTrailStateQuery;
     private EntityQuery missingElementalTrailAttachedVfxStateQuery;
     private EntityQuery missingBombRequestBufferQuery;
+    private EntityQuery missingOrbitalProjectionRequestBufferQuery;
+    private EntityQuery missingOrbitalProjectionPrefabBindingBufferQuery;
     private EntityQuery missingElementalTrailSegmentBufferQuery;
+    private EntityQuery missingLaserBeamStormTickPulseBufferQuery;
     private EntityQuery missingLaserBeamLaneBufferQuery;
     private EntityQuery missingLaserBeamPulseHitBufferQuery;
     private EntityQuery missingExplosionRequestBufferQuery;
     private EntityQuery missingPowerUpVfxRequestBufferQuery;
-    private EntityQuery missingPowerUpVfxPoolBufferQuery;
     private EntityQuery missingPowerUpVfxPrefabBindingBufferQuery;
     private EntityQuery missingPowerUpVfxCapConfigQuery;
-    private EntityQuery missingPowerUpCheatBufferQuery;
     private EntityQuery missingPowerUpCheatPresetEntryBufferQuery;
     private EntityQuery missingPowerUpCheatPresetPassiveBufferQuery;
     private EntityQuery missingPowerUpUnlockCatalogBufferQuery;
@@ -39,7 +40,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingMilestoneSelectionStateQuery;
     private EntityQuery missingMilestoneTimeScaleResumeStateQuery;
     private EntityQuery missingMilestoneSelectionOfferBufferQuery;
-    private EntityQuery missingMilestoneSelectionCommandBufferQuery;
     #endregion
 
     #region Methods
@@ -52,171 +52,172 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
 
         missingStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpsState>()
             .Build();
 
         missingPassiveToolsStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
-            .WithNone<PlayerPassiveToolsState>()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerPassiveToolsStateElement>()
             .Build();
 
         missingDashQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerDashState>()
             .Build();
 
         missingBulletTimeStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerBulletTimeState>()
             .Build();
 
         missingHealOverTimeStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerHealOverTimeState>()
             .Build();
 
         missingPassiveExplosionStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPassiveExplosionState>()
             .Build();
 
         missingPassiveHealStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPassiveHealState>()
             .Build();
 
         missingPassiveBulletTimeStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPassiveBulletTimeState>()
             .Build();
 
         missingLaserBeamStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerLaserBeamState>()
             .Build();
 
         missingElementalTrailStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerElementalTrailState>()
             .Build();
 
         missingElementalTrailAttachedVfxStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerElementalTrailAttachedVfxState>()
             .Build();
 
         missingBombRequestBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerBombSpawnRequest>()
             .Build();
 
+        missingOrbitalProjectionRequestBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerOrbitalProjectionSpawnRequest>()
+            .Build();
+
+        missingOrbitalProjectionPrefabBindingBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerOrbitalProjectionPrefabElement>()
+            .Build();
+
         missingElementalTrailSegmentBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerElementalTrailSegmentElement>()
             .Build();
 
+        missingLaserBeamStormTickPulseBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerLaserBeamStormTickPulse>()
+            .Build();
+
         missingLaserBeamLaneBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerLaserBeamLaneElement>()
             .Build();
 
         missingLaserBeamPulseHitBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerLaserBeamPulseHitElement>()
             .Build();
 
         missingExplosionRequestBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerExplosionRequest>()
             .Build();
 
         missingPowerUpVfxRequestBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpVfxSpawnRequest>()
             .Build();
 
-        missingPowerUpVfxPoolBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
-            .WithNone<PlayerPowerUpVfxPoolElement>()
-            .Build();
-
         missingPowerUpVfxPrefabBindingBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpVfxPrefabBindingElement>()
             .Build();
 
         missingPowerUpVfxCapConfigQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpVfxCapConfig>()
             .Build();
 
-        missingPowerUpCheatBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
-            .WithNone<PlayerPowerUpCheatCommand>()
-            .Build();
-
         missingPowerUpCheatPresetEntryBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpCheatPresetEntry>()
             .Build();
 
         missingPowerUpCheatPresetPassiveBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpCheatPresetPassiveElement>()
             .Build();
 
         missingPowerUpUnlockCatalogBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpUnlockCatalogElement>()
             .Build();
 
         missingPowerUpCharacterTuningFormulaBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpCharacterTuningFormulaElement>()
             .Build();
 
         missingPowerUpTierDefinitionBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpTierDefinitionElement>()
             .Build();
 
         missingPowerUpTierEntryBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpTierEntryElement>()
             .Build();
 
         missingPowerUpTierEntryScalingBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpTierEntryScalingElement>()
             .Build();
 
         missingMilestoneSelectionStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerMilestonePowerUpSelectionState>()
             .Build();
 
         missingMilestoneTimeScaleResumeStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerMilestoneTimeScaleResumeState>()
             .Build();
 
         missingMilestoneSelectionOfferBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
+            .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerMilestonePowerUpSelectionOfferElement>()
             .Build();
 
-        missingMilestoneSelectionCommandBufferQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfig>()
-            .WithNone<PlayerMilestonePowerUpSelectionCommand>()
-            .Build();
     }
 
     /// <summary>
-    /// Adds missing runtime state/buffers to every entity with PlayerPowerUpsConfig and disables the system once bootstrap completes.
+    /// Adds missing runtime state/buffers to every entity with an external PlayerPowerUpsConfig snapshot and disables the system once bootstrap completes.
     /// </summary>
     /// <param name="state">System state used to query and write ECS runtime data.</param>
 
@@ -240,10 +241,8 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingLaserBeamPulseHitBufferQuery,
             in missingExplosionRequestBufferQuery,
             in missingPowerUpVfxRequestBufferQuery,
-            in missingPowerUpVfxPoolBufferQuery,
             in missingPowerUpVfxPrefabBindingBufferQuery,
             in missingPowerUpVfxCapConfigQuery,
-            in missingPowerUpCheatBufferQuery,
             in missingPowerUpCheatPresetEntryBufferQuery,
             in missingPowerUpCheatPresetPassiveBufferQuery,
             in missingPowerUpUnlockCatalogBufferQuery,
@@ -253,11 +252,19 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingPowerUpTierEntryScalingBufferQuery,
             in missingMilestoneSelectionStateQuery,
             in missingMilestoneTimeScaleResumeStateQuery,
-            in missingMilestoneSelectionOfferBufferQuery,
-            in missingMilestoneSelectionCommandBufferQuery);
+            in missingMilestoneSelectionOfferBufferQuery);
 
-        if (!missingFlags.HasAnyMissing)
+        bool hasMissingOrbitalProjectionRequestBuffer = !missingOrbitalProjectionRequestBufferQuery.IsEmptyIgnoreFilter;
+        bool hasMissingOrbitalProjectionPrefabBindingBuffer = !missingOrbitalProjectionPrefabBindingBufferQuery.IsEmptyIgnoreFilter;
+        bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
+
+        if (!missingFlags.HasAnyMissing &&
+            !hasMissingOrbitalProjectionRequestBuffer &&
+            !hasMissingOrbitalProjectionPrefabBindingBuffer &&
+            !hasMissingLaserBeamStormTickPulseBuffer)
+        {
             return;
+        }
 
         uint currentKillCount = 0u;
 
@@ -267,11 +274,15 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         }
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(true);
 
         if (missingFlags.HasMissingState)
         {
-            PlayerPowerUpsInitializeBootstrapUtility.AddMissingState(ref commandBuffer, in missingStateQuery, currentKillCount);
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingState(ref commandBuffer,
+                                                                     in missingStateQuery,
+                                                                     in powerUpsConfigLookup,
+                                                                     currentKillCount);
         }
 
         if (missingFlags.HasMissingPassiveToolsState)
@@ -329,9 +340,26 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingBombRequestBuffers(ref commandBuffer, in missingBombRequestBufferQuery);
         }
 
+        if (hasMissingOrbitalProjectionRequestBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingOrbitalProjectionRequestBuffers(ref commandBuffer, in missingOrbitalProjectionRequestBufferQuery);
+        }
+
+        if (hasMissingOrbitalProjectionPrefabBindingBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingOrbitalProjectionPrefabBindingBuffers(ref commandBuffer,
+                                                                                                     in missingOrbitalProjectionPrefabBindingBufferQuery);
+        }
+
         if (missingFlags.HasMissingElementalTrailSegmentBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingElementalTrailSegmentBuffers(ref commandBuffer, in missingElementalTrailSegmentBufferQuery);
+        }
+
+        if (hasMissingLaserBeamStormTickPulseBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingLaserBeamStormTickPulseBuffers(ref commandBuffer,
+                                                                                              in missingLaserBeamStormTickPulseBufferQuery);
         }
 
         if (missingFlags.HasMissingLaserBeamLaneBuffer)
@@ -354,11 +382,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxRequestBuffers(ref commandBuffer, in missingPowerUpVfxRequestBufferQuery);
         }
 
-        if (missingFlags.HasMissingPowerUpVfxPoolBuffer)
-        {
-            PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxPoolBuffers(ref commandBuffer, in missingPowerUpVfxPoolBufferQuery);
-        }
-
         if (missingFlags.HasMissingPowerUpVfxPrefabBindingBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxPrefabBindingBuffers(ref commandBuffer, in missingPowerUpVfxPrefabBindingBufferQuery);
@@ -367,11 +390,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingPowerUpVfxCapConfig)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpVfxCapConfig(ref commandBuffer, in missingPowerUpVfxCapConfigQuery);
-        }
-
-        if (missingFlags.HasMissingPowerUpCheatBuffer)
-        {
-            PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpCheatBuffers(ref commandBuffer, in missingPowerUpCheatBufferQuery);
         }
 
         if (missingFlags.HasMissingPowerUpCheatPresetEntryBuffer)
@@ -426,47 +444,8 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingMilestoneSelectionOfferBuffers(ref commandBuffer, in missingMilestoneSelectionOfferBufferQuery);
         }
 
-        if (missingFlags.HasMissingMilestoneSelectionCommandBuffer)
-        {
-            PlayerPowerUpsInitializeBootstrapUtility.AddMissingMilestoneSelectionCommandBuffers(ref commandBuffer, in missingMilestoneSelectionCommandBufferQuery);
-        }
-
         commandBuffer.Playback(state.EntityManager);
         commandBuffer.Dispose();
-
-        PlayerPowerUpsMissingRuntimeFlags remainingMissingFlags = PlayerPowerUpsMissingRuntimeFlags.Create(
-            in missingStateQuery,
-            in missingPassiveToolsStateQuery,
-            in missingDashQuery,
-            in missingBulletTimeStateQuery,
-            in missingHealOverTimeStateQuery,
-            in missingPassiveExplosionStateQuery,
-            in missingPassiveHealStateQuery,
-            in missingPassiveBulletTimeStateQuery,
-            in missingLaserBeamStateQuery,
-            in missingElementalTrailStateQuery,
-            in missingElementalTrailAttachedVfxStateQuery,
-            in missingBombRequestBufferQuery,
-            in missingElementalTrailSegmentBufferQuery,
-            in missingLaserBeamLaneBufferQuery,
-            in missingLaserBeamPulseHitBufferQuery,
-            in missingExplosionRequestBufferQuery,
-            in missingPowerUpVfxRequestBufferQuery,
-            in missingPowerUpVfxPoolBufferQuery,
-            in missingPowerUpVfxPrefabBindingBufferQuery,
-            in missingPowerUpVfxCapConfigQuery,
-            in missingPowerUpCheatBufferQuery,
-            in missingPowerUpCheatPresetEntryBufferQuery,
-            in missingPowerUpCheatPresetPassiveBufferQuery,
-            in missingPowerUpUnlockCatalogBufferQuery,
-            in missingPowerUpCharacterTuningFormulaBufferQuery,
-            in missingPowerUpTierDefinitionBufferQuery,
-            in missingPowerUpTierEntryBufferQuery,
-            in missingPowerUpTierEntryScalingBufferQuery,
-            in missingMilestoneSelectionStateQuery,
-            in missingMilestoneTimeScaleResumeStateQuery,
-            in missingMilestoneSelectionOfferBufferQuery,
-            in missingMilestoneSelectionCommandBufferQuery);
 
     }
     #endregion

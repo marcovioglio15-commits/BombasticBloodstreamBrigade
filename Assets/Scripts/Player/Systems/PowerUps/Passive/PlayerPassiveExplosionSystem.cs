@@ -14,7 +14,7 @@ public partial struct PlayerPassiveExplosionSystem : ISystem
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerPassiveExplosionState>();
         state.RequireForUpdate<PlayerExplosionRequest>();
         state.RequireForUpdate<LocalTransform>();
@@ -26,21 +26,23 @@ public partial struct PlayerPassiveExplosionSystem : ISystem
         bool hasKilledEvents = SystemAPI.TryGetSingletonBuffer<EnemyKilledEventElement>(out DynamicBuffer<EnemyKilledEventElement> killedEventsBuffer);
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(true);
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerPassiveExplosionState> passiveExplosionState,
                   RefRO<LocalTransform> playerTransform,
                   DynamicBuffer<PlayerExplosionRequest> explosionRequests,
                   Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRW<PlayerPassiveExplosionState>,
                                     RefRO<LocalTransform>,
                                     DynamicBuffer<PlayerExplosionRequest>>()
                              .WithEntityAccess())
         {
-            if (passiveToolsState.ValueRO.HasExplosion == 0)
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+
+            if (passiveToolsState.HasExplosion == 0)
                 continue;
 
-            ExplosionPassiveConfig explosionConfig = passiveToolsState.ValueRO.Explosion;
+            ExplosionPassiveConfig explosionConfig = passiveToolsState.Explosion;
 
             if (explosionConfig.Radius <= 0f || explosionConfig.Damage <= 0f)
                 continue;

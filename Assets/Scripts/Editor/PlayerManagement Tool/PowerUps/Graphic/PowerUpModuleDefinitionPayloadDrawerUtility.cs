@@ -73,6 +73,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.OrbitalProjectiles:
                 BuildOrbitalProjectilesPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.OrbitalProjections:
+                PowerUpOrbitalProjectionsPayloadDrawerUtility.BuildPayloadUi(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.LaserBeam:
                 BuildLaserBeamPayloadUi(payloadContainer, payloadProperty);
                 return;
@@ -93,8 +96,12 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="parent">Parent visual element that receives the field.</param>
     /// <param name="property">Serialized property to draw.</param>
     /// <param name="label">Visible label for the created field.</param>
+    /// <param name="allowTokenScaling">True when string token fields should expose Add Scaling.</param>
     /// <returns>Created field root, or null when the input is invalid.</returns>
-    public static VisualElement AddField(VisualElement parent, SerializedProperty property, string label)
+    public static VisualElement AddField(VisualElement parent,
+                                         SerializedProperty property,
+                                         string label,
+                                         bool allowTokenScaling = false)
     {
         if (parent == null)
             return null;
@@ -105,10 +112,15 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty scalingRulesProperty = property.serializedObject != null
             ? property.serializedObject.FindProperty("scalingRules")
             : null;
-        VisualElement field = PlayerScalingFieldElementFactory.CreateField(property, scalingRulesProperty, label);
+        VisualElement field = PlayerScalingFieldElementFactory.CreateField(property,
+                                                                           scalingRulesProperty,
+                                                                           label,
+                                                                           null,
+                                                                           allowTokenScaling);
         parent.Add(field);
         return field;
     }
+
     #endregion
 
     #region Generic Payload
@@ -1184,6 +1196,22 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         {
             refreshAction();
         });
+    }
+
+    /// <summary>
+    /// Tracks one serialized property and invokes a warning refresh callback when it changes.
+    /// </summary>
+    /// <param name="root">Root visual element that owns the binding.</param>
+    /// <param name="property">Property to track.</param>
+    /// <param name="callback">Callback invoked after the property changes.</param>
+    private static void TrackWarningProperty(VisualElement root,
+                                             SerializedProperty property,
+                                             Action<SerializedProperty> callback)
+    {
+        if (root == null || property == null || callback == null)
+            return;
+
+        root.TrackPropertyValue(property, callback);
     }
     #endregion
 

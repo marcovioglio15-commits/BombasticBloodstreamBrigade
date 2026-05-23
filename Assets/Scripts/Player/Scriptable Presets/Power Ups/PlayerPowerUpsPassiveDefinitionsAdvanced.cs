@@ -61,16 +61,11 @@ public sealed class BouncingProjectilesPassiveToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (maxBounces < 0)
-            maxBounces = 0;
-
-        if (minimumSpeedMultiplierAfterBounce < 0f)
-            minimumSpeedMultiplierAfterBounce = 0f;
-
-        if (maximumSpeedMultiplierAfterBounce < minimumSpeedMultiplierAfterBounce)
-            maximumSpeedMultiplierAfterBounce = minimumSpeedMultiplierAfterBounce;
     }
     #endregion
 
@@ -197,23 +192,8 @@ public sealed class SplittingProjectilesPassiveToolData
     #region Validation
     public void Validate()
     {
-        if (splitProjectileCount < 1)
-            splitProjectileCount = 1;
-
         if (customAnglesDegrees == null)
             customAnglesDegrees = new List<float>();
-
-        if (splitDamagePercentFromOriginal < 0f)
-            splitDamagePercentFromOriginal = 0f;
-
-        if (splitSizePercentFromOriginal < 0f)
-            splitSizePercentFromOriginal = 0f;
-
-        if (splitSpeedPercentFromOriginal < 0f)
-            splitSpeedPercentFromOriginal = 0f;
-
-        if (splitLifetimePercentFromOriginal < 0f)
-            splitLifetimePercentFromOriginal = 0f;
     }
     #endregion
 
@@ -335,29 +315,11 @@ public sealed class ExplosionPassiveToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (cooldownSeconds < 0f)
-            cooldownSeconds = 0f;
-
-        if (radius < 0f)
-            radius = 0f;
-
-        if (damage < 0f)
-            damage = 0f;
-
-        if (float.IsNaN(triggerOffset.x) ||
-            float.IsNaN(triggerOffset.y) ||
-            float.IsNaN(triggerOffset.z) ||
-            float.IsInfinity(triggerOffset.x) ||
-            float.IsInfinity(triggerOffset.y) ||
-            float.IsInfinity(triggerOffset.z))
-        {
-            triggerOffset = Vector3.zero;
-        }
-
-        if (vfxScaleMultiplier < 0.01f)
-            vfxScaleMultiplier = 0.01f;
     }
     #endregion
 
@@ -485,37 +447,6 @@ public sealed class ElementalTrailPassiveToolData
             effectData = new ElementalEffectDefinitionData();
 
         effectData.Validate();
-
-        if (trailSegmentLifetimeSeconds < 0.05f)
-            trailSegmentLifetimeSeconds = 0.05f;
-
-        if (trailSpawnDistance < 0f)
-            trailSpawnDistance = 0f;
-
-        if (trailSpawnIntervalSeconds < 0.01f)
-            trailSpawnIntervalSeconds = 0.01f;
-
-        if (trailRadius < 0f)
-            trailRadius = 0f;
-
-        if (maxActiveSegmentsPerPlayer < 1)
-            maxActiveSegmentsPerPlayer = 1;
-
-        if (stacksPerTick < 0f)
-            stacksPerTick = 0f;
-
-        if (applyIntervalSeconds < 0.01f)
-            applyIntervalSeconds = 0.01f;
-
-        if (float.IsNaN(trailAttachedVfxOffset.x) ||
-            float.IsNaN(trailAttachedVfxOffset.y) ||
-            float.IsNaN(trailAttachedVfxOffset.z) ||
-            float.IsInfinity(trailAttachedVfxOffset.x) ||
-            float.IsInfinity(trailAttachedVfxOffset.y) ||
-            float.IsInfinity(trailAttachedVfxOffset.z))
-        {
-            trailAttachedVfxOffset = Vector3.zero;
-        }
 
     }
     #endregion

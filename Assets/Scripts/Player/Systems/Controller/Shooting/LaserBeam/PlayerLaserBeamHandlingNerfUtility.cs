@@ -19,7 +19,7 @@ internal static class PlayerLaserBeamHandlingNerfUtility
     /// <param name="playerEntity">Player entity being evaluated by movement or look systems.</param>
     /// <param name="inputStateLookup">Read-only input lookup used to detect held Shoot input.</param>
     /// <param name="powerUpsStateLookup">Read-only power-up state lookup used to respect shooting suppression.</param>
-    /// <param name="passiveToolsStateLookup">Read-only passive tool state lookup containing the always-on Laser Beam config.</param>
+    /// <param name="passiveToolsStateLookup">Read-only passive tool state buffer lookup containing the always-on Laser Beam config.</param>
     /// <param name="laserBeamStateLookup">Read-only Laser Beam state lookup containing triggered active snapshots and transient flags.</param>
     /// <param name="moveSpeedMultiplier">Resolved movement speed multiplier. Defaults to 1 when no nerf applies.</param>
     /// <param name="rotationSpeedMultiplier">Resolved look rotation speed multiplier. Defaults to 1 when no nerf applies.</param>
@@ -27,7 +27,7 @@ internal static class PlayerLaserBeamHandlingNerfUtility
     public static bool TryResolveFiringHandlingMultipliers(Entity playerEntity,
                                                            in ComponentLookup<PlayerInputState> inputStateLookup,
                                                            in ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
-                                                           in ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup,
+                                                           in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup,
                                                            in ComponentLookup<PlayerLaserBeamState> laserBeamStateLookup,
                                                            out float moveSpeedMultiplier,
                                                            out float rotationSpeedMultiplier)
@@ -35,12 +35,12 @@ internal static class PlayerLaserBeamHandlingNerfUtility
         moveSpeedMultiplier = 1f;
         rotationSpeedMultiplier = 1f;
 
-        if (!passiveToolsStateLookup.HasComponent(playerEntity) ||
+        if (!passiveToolsStateLookup.HasBuffer(playerEntity) ||
             !laserBeamStateLookup.HasComponent(playerEntity))
             return false;
 
         PlayerLaserBeamState laserBeamState = laserBeamStateLookup[playerEntity];
-        PlayerPassiveToolsState passiveToolsState = passiveToolsStateLookup[playerEntity];
+        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(playerEntity, in passiveToolsStateLookup);
         PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
                                                                                                                             in laserBeamState);
 

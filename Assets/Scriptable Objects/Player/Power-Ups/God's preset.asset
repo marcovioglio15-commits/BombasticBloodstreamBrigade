@@ -383,6 +383,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -645,6 +652,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -907,6 +921,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1169,6 +1190,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1431,6 +1459,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1693,6 +1728,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1955,6 +1997,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2217,6 +2266,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2479,6 +2535,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2741,6 +2804,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3003,6 +3073,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3265,6 +3342,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3527,6 +3611,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3789,6 +3880,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4051,6 +4149,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4313,6 +4418,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4575,6 +4687,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4837,6 +4956,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5099,6 +5225,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5361,6 +5494,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5636,6 +5776,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -5898,6 +6045,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6160,6 +6314,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6422,6 +6583,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6685,6 +6853,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6960,6 +7135,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7222,6 +7404,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7484,6 +7673,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7746,6 +7942,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8012,6 +8215,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8278,6 +8488,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8553,6 +8770,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8815,6 +9039,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9077,6 +9308,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9352,6 +9590,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9614,6 +9859,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9876,6 +10128,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10151,6 +10410,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10413,6 +10679,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10675,6 +10948,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10950,6 +11230,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11212,6 +11499,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11474,6 +11768,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11746,6 +12047,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12008,6 +12316,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12271,6 +12586,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12544,6 +12866,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -12804,6 +13133,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -13078,6 +13414,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13340,6 +13683,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13615,6 +13965,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13890,6 +14247,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14153,6 +14517,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14428,6 +14799,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14703,6 +15081,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14978,6 +15363,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -15249,6 +15641,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -15510,6 +15909,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -15781,6 +16187,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16042,6 +16455,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16303,6 +16723,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16574,6 +17001,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16835,6 +17269,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17106,6 +17547,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17367,6 +17815,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17638,6 +18093,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17899,6 +18361,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18170,6 +18639,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18431,6 +18907,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18702,6 +19185,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18963,6 +19453,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19235,6 +19732,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19507,6 +20011,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19778,6 +20289,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -20039,6 +20557,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0

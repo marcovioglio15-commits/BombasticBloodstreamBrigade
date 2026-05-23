@@ -66,13 +66,11 @@ public sealed class PowerUpProjectilePatternConeModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (projectileCount < 1)
-            projectileCount = 1;
-
-        if (coneAngleDegrees < 0f)
-            coneAngleDegrees = 0f;
     }
     #endregion
 
@@ -163,22 +161,11 @@ public sealed class PowerUpProjectileScaleModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (sizeMultiplier < 0.01f)
-            sizeMultiplier = 0.01f;
-
-        if (damageMultiplier < 0f)
-            damageMultiplier = 0f;
-
-        if (speedMultiplier < 0f)
-            speedMultiplier = 0f;
-
-        if (rangeMultiplier < 0f)
-            rangeMultiplier = 0f;
-
-        if (lifetimeMultiplier < 0f)
-            lifetimeMultiplier = 0f;
     }
     #endregion
 
@@ -229,10 +216,11 @@ public sealed class PowerUpProjectilePenetrationModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (maxPenetrations < 0)
-            maxPenetrations = 0;
     }
     #endregion
 
@@ -391,31 +379,10 @@ public sealed class PowerUpProjectileTuningModuleData
     #region Validation
     public void Validate()
     {
-        if (sizeMultiplier < 0.01f)
-            sizeMultiplier = 0.01f;
-
-        if (damageMultiplier < 0f)
-            damageMultiplier = 0f;
-
-        if (speedMultiplier < 0f)
-            speedMultiplier = 0f;
-
-        if (rangeMultiplier < 0f)
-            rangeMultiplier = 0f;
-
-        if (lifetimeMultiplier < 0f)
-            lifetimeMultiplier = 0f;
-
-        if (maxPenetrations < 0)
-            maxPenetrations = 0;
-
         if (elementalEffectData == null)
             elementalEffectData = new ElementalEffectDefinitionData();
 
         elementalEffectData.Validate();
-
-        if (elementalStacksPerHit < 0f)
-            elementalStacksPerHit = 0f;
     }
     #endregion
 

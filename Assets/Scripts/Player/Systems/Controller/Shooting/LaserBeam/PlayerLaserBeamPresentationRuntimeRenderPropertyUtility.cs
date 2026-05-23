@@ -1,3 +1,4 @@
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -340,13 +341,13 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
     /// Resolves the progress and active-state vectors used by the shader to render the currently started tick packets.
     /// </summary>
     /// <param name="laserBeamConfig">Runtime passive config.</param>
-    /// <param name="laserBeamState">Runtime beam state.</param>
+    /// <param name="stormTickPulses">Active storm pulses owned by the player.</param>
     /// <param name="stormTickProgressA">Progress vector of the first four active packets.</param>
     /// <param name="stormTickProgressB">Progress vector of the next four active packets.</param>
     /// <param name="stormTickActiveA">Active-state vector of the first four packets.</param>
     /// <param name="stormTickActiveB">Active-state vector of the next four packets.</param>
     public static void ResolveStormTickPulseVectors(in LaserBeamPassiveConfig laserBeamConfig,
-                                                    in PlayerLaserBeamState laserBeamState,
+                                                    in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                                     out Vector4 stormTickProgressA,
                                                     out Vector4 stormTickProgressB,
                                                     out Vector4 stormTickActiveA,
@@ -366,10 +367,10 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderPropertyUtility
         int renderedPulseCount = 0;
 
         for (int pulseIndex = 0;
-             pulseIndex < laserBeamState.StormTickPulses.Length && renderedPulseCount < 8;
+             pulseIndex < stormTickPulses.Length && renderedPulseCount < 8;
              pulseIndex++)
         {
-            PlayerLaserBeamStormTickPulse pulse = laserBeamState.StormTickPulses[pulseIndex];
+            PlayerLaserBeamStormTickPulse pulse = stormTickPulses[pulseIndex];
 
             if (pulse.CurrentElapsedSeconds < 0f || pulse.CurrentElapsedSeconds >= totalDurationSeconds)
                 continue;

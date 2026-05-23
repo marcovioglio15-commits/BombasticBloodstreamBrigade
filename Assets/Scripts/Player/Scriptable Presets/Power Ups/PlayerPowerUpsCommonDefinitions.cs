@@ -123,14 +123,6 @@ public sealed class PowerUpCommonData
         if (dropPools == null)
             dropPools = new List<string>();
 
-        if (dropTier < 1)
-            dropTier = 1;
-
-        if (dropTier > 5)
-            dropTier = 5;
-
-        if (purchaseCost < 0)
-            purchaseCost = 0;
     }
     #endregion
 
@@ -184,10 +176,11 @@ public sealed class PassiveStatModifier
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (operation == PassiveStatOperation.Multiply && value < 0f)
-            value = 0f;
     }
     #endregion
 

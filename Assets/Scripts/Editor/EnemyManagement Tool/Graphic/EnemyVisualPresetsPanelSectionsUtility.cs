@@ -207,15 +207,11 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
     internal static VisualElement CreateSubSectionContainer(string sectionTitle)
     {
-        VisualElement container = new VisualElement();
-        container.style.marginTop = 4f;
-
-        Label header = new Label(sectionTitle + " Settings");
-        header.style.unityFontStyleAndWeight = FontStyle.Bold;
-        header.style.marginBottom = 4f;
-        ManagementToolCategoryLabelUtility.RegisterColorContextMenu(header, "NashCore.EnemyManagement.Visual.SubSection." + sectionTitle);
-        container.Add(header);
-        return container;
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(sectionTitle,
+                                                                           "NashCore.EnemyManagement.Visual.SubSection." + sectionTitle,
+                                                                           true);
+        foldout.style.marginTop = 4f;
+        return foldout;
     }
 
     internal static void AddPropertyField(EnemyVisualPresetsPanel panel,

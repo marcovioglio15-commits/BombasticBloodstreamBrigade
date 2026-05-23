@@ -236,7 +236,9 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
                                            ref PlayerPassiveToolsState passiveToolsState,
                                            out string applyTarget)
     {
-        PlayerPassiveToolConfig passiveToolConfig = selectedCatalogEntry.PassiveToolConfig;
+        PlayerPassiveToolConfig passiveToolConfig =
+            PlayerOrbitalProjectionCategoryRuntimeUtility.FilterBlockedProjectionCategories(in selectedCatalogEntry.PassiveToolConfig,
+                                                                                            equippedPassiveTools);
         applyTarget = "PassiveBuffer";
 
         if (passiveToolConfig.IsDefined == 0)
@@ -245,7 +247,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
         }
 
-        if (ContainsPassiveToolKind(equippedPassiveTools, passiveToolConfig.ToolKind))
+        if (IsPassiveAlreadyEquipped(in selectedCatalogEntry, in passiveToolConfig, equippedPassiveTools))
         {
             applyTarget = "AlreadyEquipped";
             return false;
@@ -263,6 +265,26 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Resolves whether one catalog passive is already represented by its own id or by an exclusive non-custom passive kind.
+    /// </summary>
+    /// <param name="selectedCatalogEntry">Catalog entry being considered for runtime equip.</param>
+    /// <param name="passiveToolConfig">Runtime passive payload built from the catalog entry.</param>
+    /// <param name="equippedPassiveTools">Current equipped-passive runtime buffer.</param>
+    /// <returns>True when the passive must not be added again.</returns>
+    private static bool IsPassiveAlreadyEquipped(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
+                                                 in PlayerPassiveToolConfig passiveToolConfig,
+                                                 DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+    {
+        if (ContainsPassivePowerUpId(equippedPassiveTools, selectedCatalogEntry.PowerUpId))
+            return true;
+
+        if (passiveToolConfig.ToolKind == PassiveToolKind.Custom)
+            return false;
+
+        return ContainsPassiveToolKind(equippedPassiveTools, passiveToolConfig.ToolKind);
+    }
+
     /// <summary>
     /// Checks whether one passive tool kind is already present in the equipped buffer.
     /// </summary>

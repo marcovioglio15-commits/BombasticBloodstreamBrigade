@@ -95,16 +95,11 @@ public sealed class PowerUpHealMissingHealthModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (healAmount < 0f)
-            healAmount = 0f;
-
-        if (durationSeconds < 0f)
-            durationSeconds = 0f;
-
-        if (tickIntervalSeconds < 0.01f)
-            tickIntervalSeconds = 0.01f;
     }
     #endregion
 
@@ -286,32 +281,11 @@ public sealed class PowerUpTrailSpawnModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (trailSegmentLifetimeSeconds < 0.05f)
-            trailSegmentLifetimeSeconds = 0.05f;
-
-        if (trailSpawnDistance < 0f)
-            trailSpawnDistance = 0f;
-
-        if (trailSpawnIntervalSeconds < 0.01f)
-            trailSpawnIntervalSeconds = 0.01f;
-
-        if (trailRadius < 0f)
-            trailRadius = 0f;
-
-        if (maxActiveSegmentsPerPlayer < 1)
-            maxActiveSegmentsPerPlayer = 1;
-
-        if (float.IsNaN(trailAttachedVfxOffset.x) ||
-            float.IsNaN(trailAttachedVfxOffset.y) ||
-            float.IsNaN(trailAttachedVfxOffset.z) ||
-            float.IsInfinity(trailAttachedVfxOffset.x) ||
-            float.IsInfinity(trailAttachedVfxOffset.y) ||
-            float.IsInfinity(trailAttachedVfxOffset.z))
-        {
-            trailAttachedVfxOffset = Vector3.zero;
-        }
     }
     #endregion
 

@@ -30,7 +30,8 @@ public static class PlayerMilestoneSelectionOutcomeUtility
             MilestoneLevel = 0,
             GamePhaseIndex = -1,
             MilestoneIndex = -1,
-            OfferCount = 0
+            OfferCount = 0,
+            PendingOfferIndex = -1
         };
     }
 

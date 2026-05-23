@@ -25,7 +25,8 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasElementalTrail != 0 ||
                config.HasHeal != 0 ||
                config.HasBulletTime != 0 ||
-               config.HasLaserBeam != 0;
+               config.HasLaserBeam != 0 ||
+               config.HasOrbitalProjections != 0;
     }
 
     public static PassiveToolKind ResolvePassiveToolKind(PlayerPassiveToolConfig config)
@@ -53,6 +54,9 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
 
         if (config.HasLaserBeam != 0)
             return PassiveToolKind.LaserBeam;
+
+        if (config.HasOrbitalProjections != 0)
+            return PassiveToolKind.Custom;
 
         if (config.HasHeal != 0)
             return PassiveToolKind.Custom;

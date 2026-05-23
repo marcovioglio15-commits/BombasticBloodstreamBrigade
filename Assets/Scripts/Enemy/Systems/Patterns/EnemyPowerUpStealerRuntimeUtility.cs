@@ -391,7 +391,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                               ref EnemyPowerUpStealerRuntimeElement runtime,
                                               ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
-        PlayerPowerUpsConfig powerUpsConfig = playerAccess.PowerUpsConfigLookup[playerEntity];
+        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(playerEntity, in playerAccess.PowerUpsConfigLookup);
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
         int slotIndex = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotToSteal(in powerUpsConfig,
@@ -418,7 +418,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;
         powerUpsState.PreviousSecondaryPressed = 0;
-        playerAccess.PowerUpsConfigLookup[playerEntity] = powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
         playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
         runtime.HasStolenPowerUp = 1;
         runtime.StolenKind = PlayerPowerUpUnlockKind.Active;
@@ -485,7 +485,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         int originalUnlockCount = 0;
         equippedPassiveTools.RemoveAt(passiveIndex);
         PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
-        playerAccess.PassiveToolsStateLookup[playerEntity] = passiveToolsState;
+        PlayerPassiveToolsStateBufferUtility.Write(playerAccess.PassiveToolsStateLookup[playerEntity], in passiveToolsState);
 
         if (catalogIndex >= 0)
         {
@@ -585,7 +585,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         if (playerEntity == Entity.Null)
             return false;
 
-        if (!playerAccess.PowerUpsConfigLookup.HasComponent(playerEntity))
+        if (!playerAccess.PowerUpsConfigLookup.HasBuffer(playerEntity))
             return false;
 
         if (!playerAccess.PowerUpsStateLookup.HasComponent(playerEntity))
@@ -594,7 +594,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         if (!playerAccess.EquippedPassiveToolsLookup.HasBuffer(playerEntity))
             return false;
 
-        if (!playerAccess.PassiveToolsStateLookup.HasComponent(playerEntity))
+        if (!playerAccess.PassiveToolsStateLookup.HasBuffer(playerEntity))
             return false;
 
         return playerAccess.UnlockCatalogLookup.HasBuffer(playerEntity);

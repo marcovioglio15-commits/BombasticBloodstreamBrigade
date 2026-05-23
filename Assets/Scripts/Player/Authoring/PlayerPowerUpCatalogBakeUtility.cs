@@ -20,10 +20,12 @@ public static class PlayerPowerUpCatalogBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="equippedPassiveToolsBuffer">Destination ECS buffer.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void PopulateEquippedPassiveToolsBuffer(PlayerAuthoring authoring,
                                                           PlayerPowerUpsPreset preset,
                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer)
+                                                          DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer,
+                                                          Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (preset == null)
             return;
@@ -34,7 +36,8 @@ public static class PlayerPowerUpCatalogBakeUtility
                                                                           preset,
                                                                           resolveDynamicPrefabEntity,
                                                                           equippedPassiveToolConfigs,
-                                                                          equippedPassiveToolIds);
+                                                                          equippedPassiveToolIds,
+                                                                          resolveOrbitalProjectionPrefabBindingIndex);
 
         for (int passiveToolIndex = 0; passiveToolIndex < equippedPassiveToolConfigs.Count; passiveToolIndex++)
         {
@@ -59,6 +62,7 @@ public static class PlayerPowerUpCatalogBakeUtility
     /// <param name="powerUpTierDefinitionsBuffer">Destination tier definition buffer.</param>
     /// <param name="powerUpTierEntriesBuffer">Destination flattened tier entry buffer.</param>
     /// <param name="powerUpTierEntryScalingBuffer">Destination optional tier-entry scaling metadata buffer.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void PopulatePowerUpUnlockTierBuffers(PlayerAuthoring authoring,
                                                         PlayerPowerUpsPreset preset,
                                                         PlayerPowerUpsPreset sourcePreset,
@@ -67,7 +71,8 @@ public static class PlayerPowerUpCatalogBakeUtility
                                                         DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> powerUpCharacterTuningFormulaBuffer,
                                                         DynamicBuffer<PlayerPowerUpTierDefinitionElement> powerUpTierDefinitionsBuffer,
                                                         DynamicBuffer<PlayerPowerUpTierEntryElement> powerUpTierEntriesBuffer,
-                                                        DynamicBuffer<PlayerPowerUpTierEntryScalingElement> powerUpTierEntryScalingBuffer)
+                                                        DynamicBuffer<PlayerPowerUpTierEntryScalingElement> powerUpTierEntryScalingBuffer,
+                                                        Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         powerUpUnlockCatalogBuffer.Clear();
         powerUpTierDefinitionsBuffer.Clear();
@@ -86,6 +91,7 @@ public static class PlayerPowerUpCatalogBakeUtility
                                 activePowerUps,
                                 PlayerPowerUpUnlockKind.Active,
                                 resolveDynamicPrefabEntity,
+                                resolveOrbitalProjectionPrefabBindingIndex,
                                 powerUpCharacterTuningFormulaBuffer,
                                 powerUpUnlockCatalogBuffer,
                                 unlockCatalogIndexByKey);
@@ -94,6 +100,7 @@ public static class PlayerPowerUpCatalogBakeUtility
                                 passivePowerUps,
                                 PlayerPowerUpUnlockKind.Passive,
                                 resolveDynamicPrefabEntity,
+                                resolveOrbitalProjectionPrefabBindingIndex,
                                 powerUpCharacterTuningFormulaBuffer,
                                 powerUpUnlockCatalogBuffer,
                                 unlockCatalogIndexByKey);
@@ -118,10 +125,12 @@ public static class PlayerPowerUpCatalogBakeUtility
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="cheatPresetEntriesBuffer">Destination cheat preset entry buffer.</param>
     /// <param name="cheatPresetPassivesBuffer">Destination flattened passive config buffer.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void PopulatePowerUpCheatPresetBuffers(PlayerAuthoring authoring,
                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
                                                          DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntriesBuffer,
-                                                         DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassivesBuffer)
+                                                         DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassivesBuffer,
+                                                         Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (authoring == null)
             return;
@@ -152,12 +161,14 @@ public static class PlayerPowerUpCatalogBakeUtility
                 isDefined = 1;
                 powerUpsConfigSnapshot = PlayerPowerUpActiveBakeUtility.BuildPowerUpsConfig(authoring,
                                                                                             cheatPreset,
-                                                                                            resolveDynamicPrefabEntity);
+                                                                                            resolveDynamicPrefabEntity,
+                                                                                            resolveOrbitalProjectionPrefabBindingIndex);
                 PlayerPowerUpPassiveBakeUtility.CollectEquippedPassiveToolConfigs(authoring,
                                                                                   cheatPreset,
                                                                                   resolveDynamicPrefabEntity,
                                                                                   collectedPassiveToolConfigs,
-                                                                                  collectedPassivePowerUpIds);
+                                                                                  collectedPassivePowerUpIds,
+                                                                                  resolveOrbitalProjectionPrefabBindingIndex);
 
                 for (int passiveToolIndex = 0; passiveToolIndex < collectedPassiveToolConfigs.Count; passiveToolIndex++)
                 {
@@ -184,11 +195,24 @@ public static class PlayerPowerUpCatalogBakeUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Appends active or passive modular power-ups to the unlock catalog with baked runtime configs.
+    /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="preset">Source power-ups preset.</param>
+    /// <param name="powerUps">Power-up definitions to append.</param>
+    /// <param name="unlockKind">Catalog kind used for the appended entries.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Resolver that stores orbital projection prefabs in a remappable binding table.</param>
+    /// <param name="powerUpCharacterTuningFormulaBuffer">Destination flattened Character Tuning formula buffer.</param>
+    /// <param name="powerUpUnlockCatalogBuffer">Destination unlock catalog buffer.</param>
+    /// <param name="unlockCatalogIndexByKey">Lookup used to avoid duplicate active/passive catalog keys.</param>
     private static void AddUnlockCatalogEntries(PlayerAuthoring authoring,
                                                 PlayerPowerUpsPreset preset,
                                                 IReadOnlyList<ModularPowerUpDefinition> powerUps,
                                                 PlayerPowerUpUnlockKind unlockKind,
                                                 Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex,
                                                 DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> powerUpCharacterTuningFormulaBuffer,
                                                 DynamicBuffer<PlayerPowerUpUnlockCatalogElement> powerUpUnlockCatalogBuffer,
                                                 Dictionary<string, int> unlockCatalogIndexByKey)
@@ -230,12 +254,14 @@ public static class PlayerPowerUpCatalogBakeUtility
                 unlockCatalogEntry.ActiveSlotConfig = PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
                                                                                                                         preset,
                                                                                                                         powerUp,
-                                                                                                                        resolveDynamicPrefabEntity);
+                                                                                                                        resolveDynamicPrefabEntity,
+                                                                                                                        resolveOrbitalProjectionPrefabBindingIndex);
             else
                 unlockCatalogEntry.PassiveToolConfig = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                                                                 preset,
                                                                                                                                 powerUp,
-                                                                                                                                resolveDynamicPrefabEntity);
+                                                                                                                                resolveDynamicPrefabEntity,
+                                                                                                                                resolveOrbitalProjectionPrefabBindingIndex);
 
             int catalogIndex = powerUpUnlockCatalogBuffer.Length;
             powerUpUnlockCatalogBuffer.Add(unlockCatalogEntry);

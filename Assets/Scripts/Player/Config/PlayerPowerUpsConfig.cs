@@ -6,10 +6,19 @@ using Unity.Mathematics;
 /// <summary>
 /// Holds baked runtime configuration for the player's power-up slots.
 /// </summary>
-public struct PlayerPowerUpsConfig : IComponentData
+public struct PlayerPowerUpsConfig
 {
     public PlayerPowerUpSlotConfig PrimarySlot;
     public PlayerPowerUpSlotConfig SecondarySlot;
+}
+
+/// <summary>
+/// Stores the mutable active power-up loadout outside the player chunk payload.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerPowerUpsConfigElement : IBufferElementData
+{
+    public PlayerPowerUpsConfig Value;
 }
 
 /// <summary>
@@ -283,6 +292,7 @@ public struct PlayerPassiveToolConfig
     public byte HasHeal;
     public byte HasBulletTime;
     public byte HasLaserBeam;
+    public byte HasOrbitalProjections;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;
@@ -294,6 +304,44 @@ public struct PlayerPassiveToolConfig
     public PassiveHealConfig Heal;
     public PassiveBulletTimeConfig BulletTime;
     public LaserBeamPassiveConfig LaserBeam;
+    public FixedList512Bytes<OrbitalProjectionConfig> OrbitalProjections;
+}
+
+/// <summary>
+/// Holds baked runtime configuration for one object orbiting around the player.
+/// </summary>
+public struct OrbitalProjectionConfig
+{
+    public int ProjectionIndex;
+    public FixedString64Bytes CategoryId;
+    public Entity PrefabEntity;
+    public int PrefabBindingIndex;
+    public OrbitalProjectionMotionMode MotionMode;
+    public OrbitalProjectionAcquisitionPolicy AcquisitionPolicy;
+    public byte UseCategoryIdAsExclusionFilter;
+    public float ActiveDurationSeconds;
+    public float SpawnAnimationSeconds;
+    public float DespawnAnimationSeconds;
+    public float OrbitDistance;
+    public float HeightOffset;
+    public float AngleOffsetDegrees;
+    public float OrbitSpeedDegreesPerSecond;
+    public byte BounceInsideOrbitCone;
+    public float OrbitConeCenterAngleDegrees;
+    public float OrbitConeAngleDegrees;
+    public OrbitalProjectionFullOrbitConeResponse FullOrbitConeResponse;
+    public float LookFollowDelaySeconds;
+    public float CollisionRadius;
+    public byte DamageEnemies;
+    public float ContactDamage;
+    public float DamageTickIntervalSeconds;
+    public byte BlockEnemyProjectiles;
+    public byte BlockEnemyBombs;
+    public byte HasHealth;
+    public float MaximumHealth;
+    public float EnemyContactHealthDamage;
+    public float ProjectileBlockHealthDamage;
+    public float BombBlockHealthDamage;
 }
 
 /// <summary>

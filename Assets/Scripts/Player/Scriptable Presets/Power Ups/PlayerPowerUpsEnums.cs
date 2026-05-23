@@ -29,7 +29,8 @@ public enum ActiveToolKind
     Shotgun = 4,
     ChargeShot = 5,
     PortableHealthPack = 6,
-    PassiveToggle = 7
+    PassiveToggle = 7,
+    OrbitalProjections = 8
 }
 
 public enum PowerUpResourceType
@@ -79,6 +80,35 @@ public enum ProjectileOrbitPathMode
 {
     Circle = 0,
     GoldenSpiral = 1
+}
+
+/// <summary>
+/// Selects how one orbital projection resolves its desired angle around the player.
+/// </summary>
+public enum OrbitalProjectionMotionMode
+{
+    StaticOffset = 0,
+    IndependentOrbit = 1,
+    FollowPlayerLook = 2
+}
+
+/// <summary>
+/// Selects how a full-circle independent orbital projection reacts to cone-bounce projections on the same orbit ring.
+/// </summary>
+public enum OrbitalProjectionFullOrbitConeResponse
+{
+    IgnoreCones = 0,
+    BounceInComplementaryCone = 1
+}
+
+/// <summary>
+/// Selects how a newly acquired orbital projection module coexists with already active projections.
+/// </summary>
+public enum OrbitalProjectionAcquisitionPolicy
+{
+    Additive = 0,
+    ReplaceMatchingPowerUp = 1,
+    ReplaceAllOrbitalProjections = 2
 }
 
 public enum ElementType

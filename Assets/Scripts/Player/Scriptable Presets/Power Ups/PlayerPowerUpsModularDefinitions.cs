@@ -59,6 +59,10 @@ public sealed class PowerUpModuleData
     [Tooltip("Orbit settings used by OrbitalProjectiles modules.")]
     [SerializeField] private PerfectCirclePassiveToolData projectileOrbitOverride = new PerfectCirclePassiveToolData();
 
+    [Header("Hook - Orbital Projections")]
+    [Tooltip("Object-orbital settings used by OrbitalProjections modules.")]
+    [SerializeField] private PowerUpOrbitalProjectionsModuleData orbitalProjections = new PowerUpOrbitalProjectionsModuleData();
+
     [Header("Hook - Bouncing Projectiles")]
     [Tooltip("Bounce settings used by BouncingProjectiles modules.")]
     [SerializeField] private BouncingProjectilesPassiveToolData projectileBounceOnWalls = new BouncingProjectilesPassiveToolData();
@@ -184,6 +188,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpOrbitalProjectionsModuleData OrbitalProjections
+    {
+        get
+        {
+            return orbitalProjections;
+        }
+    }
+
     public BouncingProjectilesPassiveToolData ProjectileBounceOnWalls
     {
         get
@@ -274,6 +286,9 @@ public sealed class PowerUpModuleData
         if (projectileOrbitOverride == null)
             projectileOrbitOverride = new PerfectCirclePassiveToolData();
 
+        if (orbitalProjections == null)
+            orbitalProjections = new PowerUpOrbitalProjectionsModuleData();
+
         if (projectileBounceOnWalls == null)
             projectileBounceOnWalls = new BouncingProjectilesPassiveToolData();
 
@@ -302,6 +317,7 @@ public sealed class PowerUpModuleData
         healMissingHealth.Validate();
         deathExplosion.Validate();
         projectileOrbitOverride.Validate();
+        orbitalProjections.Validate();
         projectileBounceOnWalls.Validate();
         projectileSplit.Validate();
         laserBeam.Validate();

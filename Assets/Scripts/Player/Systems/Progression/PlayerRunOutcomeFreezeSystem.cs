@@ -36,7 +36,6 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
         ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionLookup = SystemAPI.GetComponentLookup<PlayerMilestonePowerUpSelectionState>(false);
         ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneResumeLookup = SystemAPI.GetComponentLookup<PlayerMilestoneTimeScaleResumeState>(false);
         BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneOfferLookup = SystemAPI.GetBufferLookup<PlayerMilestonePowerUpSelectionOfferElement>(false);
-        BufferLookup<PlayerMilestonePowerUpSelectionCommand> milestoneCommandLookup = SystemAPI.GetBufferLookup<PlayerMilestonePowerUpSelectionCommand>(false);
         bool anyFinalizedRunFound = false;
 
         // Reset all runtime-driven player state exactly once per finalized run.
@@ -69,8 +68,7 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
                 ResetMilestoneRuntimeState(entity,
                                            ref milestoneSelectionLookup,
                                            ref milestoneResumeLookup,
-                                           ref milestoneOfferLookup,
-                                           ref milestoneCommandLookup);
+                                           ref milestoneOfferLookup);
                 runOutcomeState.ValueRW.RuntimeFreezeApplied = 1;
             }
         }
@@ -152,18 +150,16 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
     }
 
     /// <summary>
-    /// Cancels any active milestone selection flow and clears its queued commands and offers.
+    /// Cancels any active milestone selection flow and clears its pending command and offers.
     /// </summary>
     /// <param name="entity">Player entity that owns the milestone runtime state.</param>
     /// <param name="milestoneSelectionLookup">Lookup used to mutate selection state.</param>
     /// <param name="milestoneResumeLookup">Lookup used to mutate time-scale resume state.</param>
     /// <param name="milestoneOfferLookup">Lookup used to clear rolled milestone offers.</param>
-    /// <param name="milestoneCommandLookup">Lookup used to clear queued HUD commands.</param>
     private static void ResetMilestoneRuntimeState(Entity entity,
                                                    ref ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionLookup,
                                                    ref ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneResumeLookup,
-                                                   ref BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneOfferLookup,
-                                                   ref BufferLookup<PlayerMilestonePowerUpSelectionCommand> milestoneCommandLookup)
+                                                   ref BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneOfferLookup)
     {
         if (milestoneSelectionLookup.HasComponent(entity))
             milestoneSelectionLookup[entity] = default;
@@ -173,9 +169,6 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
         if (milestoneOfferLookup.HasBuffer(entity))
             milestoneOfferLookup[entity].Clear();
-
-        if (milestoneCommandLookup.HasBuffer(entity))
-            milestoneCommandLookup[entity].Clear();
     }
     #endregion
 

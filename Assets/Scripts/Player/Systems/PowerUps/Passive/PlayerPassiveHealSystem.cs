@@ -14,7 +14,7 @@ public partial struct PlayerPassiveHealSystem : ISystem
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerPassiveHealState>();
         state.RequireForUpdate<PlayerHealOverTimeState>();
         state.RequireForUpdate<PlayerHealth>();
@@ -25,18 +25,20 @@ public partial struct PlayerPassiveHealSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
         bool hasKilledEvents = SystemAPI.TryGetSingletonBuffer<EnemyKilledEventElement>(out DynamicBuffer<EnemyKilledEventElement> killedEventsBuffer);
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerPassiveHealState> passiveHealState,
                   RefRW<PlayerHealOverTimeState> healOverTimeState,
-                  RefRW<PlayerHealth> playerHealth) in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                  RefRW<PlayerHealth> playerHealth) in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                                                         RefRW<PlayerPassiveHealState>,
                                                                         RefRW<PlayerHealOverTimeState>,
                                                                         RefRW<PlayerHealth>>())
         {
-            if (passiveToolsState.ValueRO.HasHeal == 0)
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+
+            if (passiveToolsState.HasHeal == 0)
                 continue;
 
-            PassiveHealConfig healConfig = passiveToolsState.ValueRO.Heal;
+            PassiveHealConfig healConfig = passiveToolsState.Heal;
             float healAmount = math.max(0f, healConfig.HealAmount);
 
             if (healAmount <= 0f)

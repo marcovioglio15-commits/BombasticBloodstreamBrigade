@@ -18,7 +18,7 @@ public partial struct PlayerPassiveBulletTimeSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerPassiveBulletTimeState>();
         state.RequireForUpdate<PlayerBulletTimeState>();
         state.RequireForUpdate<PlayerHealth>();
@@ -33,19 +33,21 @@ public partial struct PlayerPassiveBulletTimeSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
         bool hasKilledEvents = SystemAPI.TryGetSingletonBuffer<EnemyKilledEventElement>(out DynamicBuffer<EnemyKilledEventElement> killedEventsBuffer);
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerPassiveBulletTimeState> passiveBulletTimeState,
                   RefRW<PlayerBulletTimeState> bulletTimeState,
                   RefRO<PlayerHealth> playerHealth)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRW<PlayerPassiveBulletTimeState>,
                                     RefRW<PlayerBulletTimeState>,
                                     RefRO<PlayerHealth>>())
         {
-            if (passiveToolsState.ValueRO.HasBulletTime == 0)
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+
+            if (passiveToolsState.HasBulletTime == 0)
                 continue;
 
-            PassiveBulletTimeConfig bulletTimeConfig = passiveToolsState.ValueRO.BulletTime;
+            PassiveBulletTimeConfig bulletTimeConfig = passiveToolsState.BulletTime;
             float slowPercent = math.clamp(bulletTimeConfig.EnemySlowPercent, 0f, 100f);
 
             if (slowPercent <= 0f)

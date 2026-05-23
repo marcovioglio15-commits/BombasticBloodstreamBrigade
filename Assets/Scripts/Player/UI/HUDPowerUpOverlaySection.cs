@@ -116,14 +116,15 @@ internal sealed class HUDPowerUpOverlaySection
             return;
 
         if (!entityManager.Exists(playerEntity) ||
-            !entityManager.HasComponent<PlayerPowerUpsConfig>(playerEntity) ||
+            !entityManager.HasBuffer<PlayerPowerUpsConfigElement>(playerEntity) ||
             !entityManager.HasComponent<PlayerPowerUpsState>(playerEntity))
         {
             HandleMissingPlayer();
             return;
         }
 
-        PlayerPowerUpsConfig powerUpsConfig = entityManager.GetComponentData<PlayerPowerUpsConfig>(playerEntity);
+        DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer = entityManager.GetBuffer<PlayerPowerUpsConfigElement>(playerEntity);
+        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
         PlayerPowerUpsState powerUpsState = entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
 
         primarySlot.Update(in powerUpsConfig.PrimarySlot,

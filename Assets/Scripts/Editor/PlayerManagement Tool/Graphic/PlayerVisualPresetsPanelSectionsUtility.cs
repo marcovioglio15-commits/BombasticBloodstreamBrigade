@@ -188,15 +188,11 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
 
     private static VisualElement CreateSubSectionContainer(string sectionTitle)
     {
-        VisualElement container = new VisualElement();
-        container.style.marginTop = 4f;
-
-        Label header = new Label(sectionTitle + " Settings");
-        header.style.unityFontStyleAndWeight = FontStyle.Bold;
-        header.style.marginBottom = 4f;
-        ManagementToolCategoryLabelUtility.RegisterColorContextMenu(header, "NashCore.PlayerManagement.Visual.SubSection." + sectionTitle);
-        container.Add(header);
-        return container;
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(sectionTitle,
+                                                                           "NashCore.PlayerManagement.Visual.SubSection." + sectionTitle,
+                                                                           true);
+        foldout.style.marginTop = 4f;
+        return foldout;
     }
 
     private static void AddPropertyField(PlayerVisualPresetsPanel panel,

@@ -204,44 +204,11 @@ public sealed class BombToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (float.IsNaN(spawnOffset.x) ||
-            float.IsNaN(spawnOffset.y) ||
-            float.IsNaN(spawnOffset.z) ||
-            float.IsInfinity(spawnOffset.x) ||
-            float.IsInfinity(spawnOffset.y) ||
-            float.IsInfinity(spawnOffset.z))
-        {
-            spawnOffset = new Vector3(0f, 0f, 1.2f);
-        }
-
-        if (deploySpeed < 0f)
-            deploySpeed = 0f;
-
-        if (collisionRadius < 0.01f)
-            collisionRadius = 0.01f;
-
-        if (bounceDamping < 0f)
-            bounceDamping = 0f;
-
-        if (bounceDamping > 1f)
-            bounceDamping = 1f;
-
-        if (linearDampingPerSecond < 0f)
-            linearDampingPerSecond = 0f;
-
-        if (fuseSeconds < 0.05f)
-            fuseSeconds = 0.05f;
-
-        if (radius < 0.1f)
-            radius = 0.1f;
-
-        if (damage < 0f)
-            damage = 0f;
-
-        if (vfxScaleMultiplier < 0.01f)
-            vfxScaleMultiplier = 0.01f;
     }
     #endregion
 
@@ -354,22 +321,11 @@ public sealed class DashToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (distance < 0f)
-            distance = 0f;
-
-        if (duration < 0.01f)
-            duration = 0.01f;
-
-        if (speedTransitionInSeconds < 0f)
-            speedTransitionInSeconds = 0f;
-
-        if (speedTransitionOutSeconds < 0f)
-            speedTransitionOutSeconds = 0f;
-
-        if (invulnerabilityExtraTime < 0f)
-            invulnerabilityExtraTime = 0f;
     }
     #endregion
 
@@ -424,19 +380,11 @@ public sealed class BulletTimeToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (duration < 0.05f)
-            duration = 0.05f;
-
-        if (enemySlowPercent < 0f)
-            enemySlowPercent = 0f;
-
-        if (enemySlowPercent > 100f)
-            enemySlowPercent = 100f;
-
-        if (transitionTimeSeconds < 0f)
-            transitionTimeSeconds = 0f;
     }
     #endregion
 
@@ -630,30 +578,6 @@ public sealed class ActiveToolDefinition
             commonData = new PowerUpCommonData();
 
         commonData.Validate();
-
-        if (toolKind == ActiveToolKind.Custom)
-            toolKind = ActiveToolKind.Bomb;
-
-        if (maximumEnergy < 0f)
-            maximumEnergy = 0f;
-
-        if (activationCost < 0f)
-            activationCost = 0f;
-
-        if (maintenanceCostPerSecond < 0f)
-            maintenanceCostPerSecond = 0f;
-
-        if (chargePerTrigger < 0f)
-            chargePerTrigger = 0f;
-
-        if (minimumActivationEnergyPercent < 0f)
-            minimumActivationEnergyPercent = 0f;
-
-        if (minimumActivationEnergyPercent > 100f)
-            minimumActivationEnergyPercent = 100f;
-
-        if (maximumEnergy <= 0f)
-            minimumActivationEnergyPercent = 0f;
 
         if (bombData == null)
             bombData = new BombToolData();

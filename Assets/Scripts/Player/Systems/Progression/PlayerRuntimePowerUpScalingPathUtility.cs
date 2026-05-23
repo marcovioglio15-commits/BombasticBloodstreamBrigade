@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -11,6 +13,8 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     private const string PassiveLaserBeamPayloadPrefix = "laserBeam.";
     private const string HoldChargeChargedLaserBeamPayloadPrefix = "holdCharge.chargedLaserBeam.";
     private const string ElementalAreaTickEffectPrefix = "elementalAreaTick.effectData.";
+    private const string OrbitalProjectionEntryPrefix = "orbitalProjections.projections.Array.data[";
+    private const int MaximumFixedString64Utf8Bytes = 61;
     #endregion
 
     #region Methods
@@ -72,6 +76,35 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case PlayerPowerUpUnlockKind.Passive:
                 ApplyPassiveBooleanValue(payloadPath, resolvedValue, ref passiveToolConfig);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Applies one resolved token Add Scaling value to the runtime config field represented by the provided payload path.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="unlockKind">Active or passive target kind owning the runtime config.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="activeSlotConfig">Mutable active slot config rebuilt from immutable baselines.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config rebuilt from immutable baselines.</param>
+    public static void ApplyTokenValue(string payloadPath,
+                                       PlayerPowerUpUnlockKind unlockKind,
+                                       string resolvedValue,
+                                       ref PlayerPowerUpSlotConfig activeSlotConfig,
+                                       ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath))
+            return;
+
+        switch (unlockKind)
+        {
+            case PlayerPowerUpUnlockKind.Active:
+                ApplyTriggeredProjectilePassiveTokenValue(payloadPath, resolvedValue, ref activeSlotConfig);
+                ApplyEmbeddedTogglePassiveTokenValue(payloadPath, resolvedValue, ref activeSlotConfig);
+                return;
+            case PlayerPowerUpUnlockKind.Passive:
+                ApplyPassiveTokenValue(payloadPath, resolvedValue, ref passiveToolConfig);
                 return;
         }
     }
@@ -291,6 +324,45 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
+    /// Applies one resolved token Add Scaling value to the embedded passive payload owned by an active toggleable power-up.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="activeSlotConfig">Mutable active slot config rebuilt from immutable baselines.</param>
+    private static void ApplyEmbeddedTogglePassiveTokenValue(string payloadPath,
+                                                            string resolvedValue,
+                                                            ref PlayerPowerUpSlotConfig activeSlotConfig)
+    {
+        if (activeSlotConfig.ToolKind != ActiveToolKind.PassiveToggle)
+            return;
+
+        if (activeSlotConfig.TogglePassiveTool.IsDefined == 0)
+            return;
+
+        PlayerPassiveToolConfig togglePassiveTool = activeSlotConfig.TogglePassiveTool;
+        ApplyPassiveTokenValue(payloadPath, resolvedValue, ref togglePassiveTool);
+        activeSlotConfig.TogglePassiveTool = togglePassiveTool;
+    }
+
+    /// <summary>
+    /// Applies one resolved token Add Scaling value to the transient passive snapshot owned by projectile-shooting actives.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="activeSlotConfig">Mutable active slot config rebuilt from immutable baselines.</param>
+    private static void ApplyTriggeredProjectilePassiveTokenValue(string payloadPath,
+                                                                  string resolvedValue,
+                                                                  ref PlayerPowerUpSlotConfig activeSlotConfig)
+    {
+        if (activeSlotConfig.TriggeredProjectilePassiveTool.IsDefined == 0)
+            return;
+
+        PlayerPassiveToolConfig triggeredProjectilePassiveTool = activeSlotConfig.TriggeredProjectilePassiveTool;
+        ApplyPassiveTokenValue(payloadPath, resolvedValue, ref triggeredProjectilePassiveTool);
+        activeSlotConfig.TriggeredProjectilePassiveTool = triggeredProjectilePassiveTool;
+    }
+
+    /// <summary>
     /// Applies one resolved Add Scaling value to a passive-tool runtime config field.
     /// </summary>
     /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
@@ -317,6 +389,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             passiveToolConfig.ElementalTrail.Effect = elementalAreaTickEffect;
             return;
         }
+
+        if (TryApplyOrbitalProjectionValue(payloadPath, resolvedValue, ref passiveToolConfig))
+            return;
 
         switch (payloadPath)
         {
@@ -475,6 +550,20 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 passiveToolConfig.BulletTime.TransitionTimeSeconds = math.max(0f, resolvedValue);
                 return;
         }
+    }
+
+    /// <summary>
+    /// Applies one resolved token Add Scaling value to a passive-tool runtime config field.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config rebuilt from immutable baselines.</param>
+    private static void ApplyPassiveTokenValue(string payloadPath,
+                                               string resolvedValue,
+                                               ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (TryApplyOrbitalProjectionTokenValue(payloadPath, resolvedValue, ref passiveToolConfig))
+            return;
     }
 
     /// <summary>
@@ -847,6 +936,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             return;
         }
 
+        if (TryApplyOrbitalProjectionBooleanValue(payloadPath, resolvedValue, ref passiveToolConfig))
+            return;
+
         switch (payloadPath)
         {
             case "projectileOrbitOverride.spiralClockwise":
@@ -859,6 +951,297 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 passiveToolConfig.Explosion.ScaleVfxToRadius = resolvedValue ? (byte)1 : (byte)0;
                 return;
         }
+    }
+
+    /// <summary>
+    /// Applies one resolved numeric Add Scaling value to an orbital projection payload.
+    /// </summary>
+    /// <param name="payloadPath">Full modular payload path carried by the scaling rule.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config containing projection entries.</param>
+    /// <returns>True when the path matched an orbital projection field and was applied.</returns>
+    private static bool TryApplyOrbitalProjectionValue(string payloadPath,
+                                                       float resolvedValue,
+                                                       ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath))
+            return false;
+
+        switch (payloadPath)
+        {
+            case "orbitalProjections.acquisitionPolicy":
+                ApplyToAllOrbitalProjectionConfigs(payloadPath, resolvedValue, ref passiveToolConfig);
+                return true;
+            case "orbitalProjections.activeDurationSeconds":
+                ApplyToAllOrbitalProjectionConfigs(payloadPath, resolvedValue, ref passiveToolConfig);
+                return true;
+            case "orbitalProjections.spawnAnimationSeconds":
+                ApplyToAllOrbitalProjectionConfigs(payloadPath, resolvedValue, ref passiveToolConfig);
+                return true;
+            case "orbitalProjections.despawnAnimationSeconds":
+                ApplyToAllOrbitalProjectionConfigs(payloadPath, resolvedValue, ref passiveToolConfig);
+                return true;
+        }
+
+        if (!TryResolveOrbitalProjectionEntryPath(payloadPath, out int projectionIndex, out string fieldPath))
+            return false;
+
+        if (projectionIndex < 0 || projectionIndex >= passiveToolConfig.OrbitalProjections.Length)
+            return true;
+
+        OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[projectionIndex];
+
+        switch (fieldPath)
+        {
+            case "motionMode":
+                projectionConfig.MotionMode = PlayerRuntimeScalingEnumUtility.ResolveOrbitalProjectionMotionMode(resolvedValue);
+                break;
+            case "orbitDistance":
+                projectionConfig.OrbitDistance = math.max(0f, resolvedValue);
+                break;
+            case "heightOffset":
+                projectionConfig.HeightOffset = resolvedValue;
+                break;
+            case "angleOffsetDegrees":
+                projectionConfig.AngleOffsetDegrees = resolvedValue;
+                break;
+            case "orbitSpeedDegreesPerSecond":
+                projectionConfig.OrbitSpeedDegreesPerSecond = resolvedValue;
+                break;
+            case "orbitConeCenterAngleDegrees":
+                projectionConfig.OrbitConeCenterAngleDegrees = resolvedValue;
+                break;
+            case "orbitConeAngleDegrees":
+                projectionConfig.OrbitConeAngleDegrees = math.clamp(resolvedValue, 0f, 360f);
+                break;
+            case "fullOrbitConeResponse":
+                projectionConfig.FullOrbitConeResponse = PlayerRuntimeScalingEnumUtility.ResolveOrbitalProjectionFullOrbitConeResponse(resolvedValue);
+                break;
+            case "lookFollowDelaySeconds":
+                projectionConfig.LookFollowDelaySeconds = math.max(0f, resolvedValue);
+                break;
+            case "collisionRadius":
+                projectionConfig.CollisionRadius = math.max(0.01f, resolvedValue);
+                break;
+            case "contactDamage":
+                projectionConfig.ContactDamage = math.max(0f, resolvedValue);
+                break;
+            case "damageTickIntervalSeconds":
+                projectionConfig.DamageTickIntervalSeconds = math.max(0.01f, resolvedValue);
+                break;
+            case "maximumHealth":
+                projectionConfig.MaximumHealth = math.max(0f, resolvedValue);
+                break;
+            case "enemyContactHealthDamage":
+                projectionConfig.EnemyContactHealthDamage = math.max(0f, resolvedValue);
+                break;
+            case "projectileBlockHealthDamage":
+                projectionConfig.ProjectileBlockHealthDamage = math.max(0f, resolvedValue);
+                break;
+            case "bombBlockHealthDamage":
+                projectionConfig.BombBlockHealthDamage = math.max(0f, resolvedValue);
+                break;
+            default:
+                return false;
+        }
+
+        passiveToolConfig.OrbitalProjections[projectionIndex] = projectionConfig;
+        passiveToolConfig.HasOrbitalProjections = passiveToolConfig.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies one resolved token Add Scaling value to an orbital projection payload.
+    /// </summary>
+    /// <param name="payloadPath">Full modular payload path carried by the scaling rule.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config containing projection entries.</param>
+    /// <returns>True when the path matched an orbital projection token field and was applied.</returns>
+    private static bool TryApplyOrbitalProjectionTokenValue(string payloadPath,
+                                                           string resolvedValue,
+                                                           ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (!TryResolveOrbitalProjectionEntryPath(payloadPath, out int projectionIndex, out string fieldPath))
+            return false;
+
+        if (!string.Equals(fieldPath, "categoryId", StringComparison.Ordinal))
+            return false;
+
+        if (projectionIndex < 0 || projectionIndex >= passiveToolConfig.OrbitalProjections.Length)
+            return true;
+
+        if (!TryBuildFixedString64(resolvedValue, out FixedString64Bytes categoryId))
+            return true;
+
+        OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[projectionIndex];
+        projectionConfig.CategoryId = categoryId;
+        passiveToolConfig.OrbitalProjections[projectionIndex] = projectionConfig;
+        passiveToolConfig.HasOrbitalProjections = passiveToolConfig.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies one resolved boolean Add Scaling value to an orbital projection payload.
+    /// </summary>
+    /// <param name="payloadPath">Full modular payload path carried by the scaling rule.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config containing projection entries.</param>
+    /// <returns>True when the path matched an orbital projection boolean field and was applied.</returns>
+    private static bool TryApplyOrbitalProjectionBooleanValue(string payloadPath,
+                                                              bool resolvedValue,
+                                                              ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (string.Equals(payloadPath, "orbitalProjections.useCategoryIdAsExclusionFilter", StringComparison.Ordinal))
+        {
+            ApplyCategoryFilterFlagToAllOrbitalProjectionConfigs(resolvedValue, ref passiveToolConfig);
+            return true;
+        }
+
+        if (!TryResolveOrbitalProjectionEntryPath(payloadPath, out int projectionIndex, out string fieldPath))
+            return false;
+
+        if (projectionIndex < 0 || projectionIndex >= passiveToolConfig.OrbitalProjections.Length)
+            return true;
+
+        OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[projectionIndex];
+        byte value = resolvedValue ? (byte)1 : (byte)0;
+
+        switch (fieldPath)
+        {
+            case "damageEnemies":
+                projectionConfig.DamageEnemies = value;
+                break;
+            case "bounceInsideOrbitCone":
+                projectionConfig.BounceInsideOrbitCone = value;
+                break;
+            case "blockEnemyProjectiles":
+                projectionConfig.BlockEnemyProjectiles = value;
+                break;
+            case "blockEnemyBombs":
+                projectionConfig.BlockEnemyBombs = value;
+                break;
+            case "hasHealth":
+                projectionConfig.HasHealth = value;
+                break;
+            default:
+                return false;
+        }
+
+        passiveToolConfig.OrbitalProjections[projectionIndex] = projectionConfig;
+        passiveToolConfig.HasOrbitalProjections = passiveToolConfig.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
+        return true;
+    }
+
+    /// <summary>
+    /// Applies the module-level category filter flag to every baked projection config.
+    /// </summary>
+    /// <param name="resolvedValue">Formula-resolved filter flag.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config containing projection entries.</param>
+    private static void ApplyCategoryFilterFlagToAllOrbitalProjectionConfigs(bool resolvedValue,
+                                                                             ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        byte filterValue = resolvedValue ? (byte)1 : (byte)0;
+
+        for (int configIndex = 0; configIndex < passiveToolConfig.OrbitalProjections.Length; configIndex++)
+        {
+            OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[configIndex];
+            projectionConfig.UseCategoryIdAsExclusionFilter = filterValue;
+            passiveToolConfig.OrbitalProjections[configIndex] = projectionConfig;
+        }
+
+        passiveToolConfig.HasOrbitalProjections = passiveToolConfig.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
+    }
+
+    /// <summary>
+    /// Applies one module-level value to every projection config in a passive payload.
+    /// </summary>
+    /// <param name="payloadPath">Module-level payload path that should affect each projection entry.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config containing projection entries.</param>
+    private static void ApplyToAllOrbitalProjectionConfigs(string payloadPath,
+                                                           float resolvedValue,
+                                                           ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        for (int configIndex = 0; configIndex < passiveToolConfig.OrbitalProjections.Length; configIndex++)
+        {
+            OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[configIndex];
+
+            switch (payloadPath)
+            {
+                case "orbitalProjections.acquisitionPolicy":
+                    projectionConfig.AcquisitionPolicy = PlayerRuntimeScalingEnumUtility.ResolveOrbitalProjectionAcquisitionPolicy(resolvedValue);
+                    break;
+                case "orbitalProjections.activeDurationSeconds":
+                    projectionConfig.ActiveDurationSeconds = math.max(0f, resolvedValue);
+                    break;
+                case "orbitalProjections.spawnAnimationSeconds":
+                    projectionConfig.SpawnAnimationSeconds = math.max(0f, resolvedValue);
+                    break;
+                case "orbitalProjections.despawnAnimationSeconds":
+                    projectionConfig.DespawnAnimationSeconds = math.max(0f, resolvedValue);
+                    break;
+            }
+
+            passiveToolConfig.OrbitalProjections[configIndex] = projectionConfig;
+        }
+
+        passiveToolConfig.HasOrbitalProjections = passiveToolConfig.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
+    }
+
+    /// <summary>
+    /// Resolves a serialized list entry path for one orbital projection field.
+    /// </summary>
+    /// <param name="payloadPath">Full modular payload path carried by the scaling rule.</param>
+    /// <param name="projectionIndex">Resolved projection list index.</param>
+    /// <param name="fieldPath">Resolved field path inside the projection entry.</param>
+    /// <returns>True when the path points to an orbital projection list entry.</returns>
+    private static bool TryResolveOrbitalProjectionEntryPath(string payloadPath,
+                                                            out int projectionIndex,
+                                                            out string fieldPath)
+    {
+        projectionIndex = -1;
+        fieldPath = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(payloadPath))
+            return false;
+
+        if (!payloadPath.StartsWith(OrbitalProjectionEntryPrefix, StringComparison.Ordinal))
+            return false;
+
+        int indexStart = OrbitalProjectionEntryPrefix.Length;
+        int indexEnd = payloadPath.IndexOf("].", indexStart, StringComparison.Ordinal);
+
+        if (indexEnd < 0)
+            return false;
+
+        string indexText = payloadPath.Substring(indexStart, indexEnd - indexStart);
+
+        if (!int.TryParse(indexText, out projectionIndex))
+            return false;
+
+        fieldPath = payloadPath.Substring(indexEnd + 2);
+        return !string.IsNullOrWhiteSpace(fieldPath);
+    }
+
+    /// <summary>
+    /// Converts one managed token into the FixedString64Bytes storage used by runtime power-up configs.
+    /// </summary>
+    /// <param name="tokenValue">Formula-resolved token text.</param>
+    /// <param name="fixedToken">Fixed token result when the value fits in runtime storage.</param>
+    /// <returns>True when the token can be represented safely in FixedString64Bytes.</returns>
+    private static bool TryBuildFixedString64(string tokenValue,
+                                              out FixedString64Bytes fixedToken)
+    {
+        fixedToken = default;
+        string trimmedToken = string.IsNullOrWhiteSpace(tokenValue)
+            ? string.Empty
+            : tokenValue.Trim();
+
+        if (Encoding.UTF8.GetByteCount(trimmedToken) > MaximumFixedString64Utf8Bytes)
+            return false;
+
+        fixedToken = new FixedString64Bytes(trimmedToken);
+        return true;
     }
     #endregion
 

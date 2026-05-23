@@ -31,8 +31,9 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerLaserBeamState>();
+        state.RequireForUpdate<PlayerLaserBeamStormTickPulse>();
         state.RequireForUpdate<PlayerLaserBeamLaneElement>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerLaserBeamVisualConfig>();
         state.RequireForUpdate<PlayerLaserBeamSourceVariantElement>();
         state.RequireForUpdate<PlayerLaserBeamImpactVariantElement>();
@@ -77,13 +78,15 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         float elapsedTimeSeconds = (float)SystemAPI.Time.ElapsedTime;
         float deltaTimeSeconds = SystemAPI.Time.DeltaTime;
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRO<PlayerLaserBeamState> laserBeamState,
+                  DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                   DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                   RefRO<PlayerLaserBeamVisualConfig> visualConfig,
                   Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRO<PlayerLaserBeamState>,
+                                    DynamicBuffer<PlayerLaserBeamStormTickPulse>,
                                     DynamicBuffer<PlayerLaserBeamLaneElement>,
                                     RefRO<PlayerLaserBeamVisualConfig>>()
                              .WithEntityAccess())
@@ -99,7 +102,8 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
             DynamicBuffer<PlayerLaserBeamSourceVariantElement> sourceVariants = sourceVariantLookup[playerEntity];
             DynamicBuffer<PlayerLaserBeamImpactVariantElement> impactVariants = impactVariantLookup[playerEntity];
             DynamicBuffer<PlayerLaserBeamVisualPresetElement> visualPresetBuffer = visualPresetLookup[playerEntity];
-            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState.ValueRO,
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
                                                                                                                                 in laserBeamState.ValueRO);
             bool shouldRender = effectivePassiveToolsState.HasLaserBeam != 0 &&
                                 laserBeamState.ValueRO.IsActive != 0 &&
@@ -186,6 +190,7 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                                                                                 in visualConfig.ValueRO,
                                                                                 in laserBeamConfig,
                                                                                 in laserBeamState.ValueRO,
+                                                                                in stormTickPulses,
                                                                                 in palette,
                                                                                 bodyMaterial);
             }
@@ -202,6 +207,7 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                                                                                     in visualConfig.ValueRO,
                                                                                     in laserBeamConfig,
                                                                                     in laserBeamState.ValueRO,
+                                                                                    in stormTickPulses,
                                                                                     in palette,
                                                                                     sourceMaterial,
                                                                                     laserBeamConfig.SourceShape,
@@ -211,6 +217,7 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                                                                                     in visualConfig.ValueRO,
                                                                                     in laserBeamConfig,
                                                                                     in laserBeamState.ValueRO,
+                                                                                    in stormTickPulses,
                                                                                     in palette,
                                                                                     terminalCapMaterial,
                                                                                     laserBeamConfig.TerminalCapShape,
@@ -220,6 +227,7 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                                                                                     in visualConfig.ValueRO,
                                                                                     in laserBeamConfig,
                                                                                     in laserBeamState.ValueRO,
+                                                                                    in stormTickPulses,
                                                                                     in palette,
                                                                                     terminalCapMaterial,
                                                                                     laserBeamConfig.TerminalCapShape,

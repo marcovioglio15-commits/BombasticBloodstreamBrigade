@@ -49,6 +49,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     /// <param name="moveInput">Raw movement input used as final fallback for chained Dash modules.</param>
     /// <param name="lastValidMovementDirection">Cached movement direction used as fallback for chained Dash modules.</param>
+    /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
     /// <param name="audioRequests">Optional audio request buffer used when a Game Audio singleton exists.</param>
     /// <param name="canEnqueueAudioRequests">True when audioRequests points to a valid buffer.</param>
     public static void ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
@@ -92,6 +93,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                              ref PlayerBulletTimeState bulletTimeState,
                                              float2 moveInput,
                                              float3 lastValidMovementDirection,
+                                             DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
                                              DynamicBuffer<GameAudioEventRequest> audioRequests,
                                              bool canEnqueueAudioRequests)
     {
@@ -194,6 +196,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                                           in localToWorldLookup,
                                                                           ref laserBeamState,
                                                                           normalizedCharge,
+                                                                          orbitalProjectionRequests,
                                                                           shootRequests);
 
                 PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,

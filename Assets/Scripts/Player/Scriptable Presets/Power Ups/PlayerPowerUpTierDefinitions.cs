@@ -87,8 +87,6 @@ public sealed class PowerUpTierEntryDefinition
         else
             powerUpId = powerUpId.Trim();
 
-        if (selectionWeight < 0f)
-            selectionWeight = 0f;
     }
     #endregion
 

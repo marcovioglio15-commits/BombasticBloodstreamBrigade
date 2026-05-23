@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 /// <summary>
-/// Converts Ctrl+Shift+Number keyboard shortcuts into runtime commands that swap the whole power-up preset.
+/// Converts Ctrl+Shift+Number keyboard shortcuts into pending runtime commands that swap the whole power-up preset.
 /// Number keys map directly to preset indices in the baked cheat snapshot list (0..9).
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
@@ -20,12 +20,12 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
     /// <param name="state">System state used to declare required components.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpCheatCommand>();
+        state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerPowerUpCheatPresetEntry>();
     }
 
     /// <summary>
-    /// Captures Ctrl+Shift+Number keyboard input and enqueues one preset-swap command for the local player entity.
+    /// Captures Ctrl+Shift+Number keyboard input and stores one preset-swap command for the local player entity.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -69,8 +69,8 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
             return;
         }
 
-        foreach ((DynamicBuffer<PlayerPowerUpCheatCommand> cheatCommands,
-                  DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpCheatCommand>,
+        foreach ((RefRW<PlayerPowerUpsState> powerUpsState,
+                  DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries) in SystemAPI.Query<RefRW<PlayerPowerUpsState>,
                                                                                                      DynamicBuffer<PlayerPowerUpCheatPresetEntry>>().WithAll<PlayerControllerConfig>())
         {
             if (cheatPresetEntries.Length <= 0)
@@ -78,7 +78,7 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
                 break;
             }
 
-            AddApplyPresetCommand(cheatCommands, presetIndex);
+            SetApplyPresetCommand(ref powerUpsState.ValueRW, presetIndex);
             break;
         }
     }
@@ -187,17 +187,15 @@ public partial struct PlayerPowerUpCheatInputSystem : ISystem
     }
 
     /// <summary>
-    /// Enqueues one command that requests a complete preset replacement by index.
+    /// Stores one command that requests a complete preset replacement by index.
     /// </summary>
-    /// <param name="cheatCommands">Target runtime cheat command buffer.</param>
+    /// <param name="powerUpsState">Runtime power-up state receiving the pending cheat command.</param>
     /// <param name="presetIndex">Preset index requested by user input.</param>
-    private static void AddApplyPresetCommand(DynamicBuffer<PlayerPowerUpCheatCommand> cheatCommands, int presetIndex)
+    private static void SetApplyPresetCommand(ref PlayerPowerUpsState powerUpsState, int presetIndex)
     {
-        cheatCommands.Add(new PlayerPowerUpCheatCommand
-        {
-            CommandType = PlayerPowerUpCheatCommandType.ApplyPresetByIndex,
-            PresetIndex = presetIndex
-        });
+        powerUpsState.HasPendingCheatCommand = 1;
+        powerUpsState.PendingCheatCommandType = PlayerPowerUpCheatCommandType.ApplyPresetByIndex;
+        powerUpsState.PendingCheatPresetIndex = presetIndex;
     }
     #endregion
 

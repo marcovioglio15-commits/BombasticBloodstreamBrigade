@@ -19,10 +19,12 @@ public static class PlayerPowerUpActiveBakeUtility
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     /// <returns>Primary and secondary active slot config.</returns>
     public static PlayerPowerUpsConfig BuildPowerUpsConfig(PlayerAuthoring authoring,
                                                            PlayerPowerUpsPreset preset,
-                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity)
+                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                           Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (preset == null)
             return default;
@@ -46,11 +48,13 @@ public static class PlayerPowerUpActiveBakeUtility
         PlayerPowerUpSlotConfig primaryCompiledSlot = BuildSlotConfigFromModularPowerUp(authoring,
                                                                                         preset,
                                                                                         primaryPowerUp,
-                                                                                        resolveDynamicPrefabEntity);
+                                                                                        resolveDynamicPrefabEntity,
+                                                                                        resolveOrbitalProjectionPrefabBindingIndex);
         PlayerPowerUpSlotConfig secondaryCompiledSlot = BuildSlotConfigFromModularPowerUp(authoring,
                                                                                           preset,
                                                                                           secondaryPowerUp,
-                                                                                          resolveDynamicPrefabEntity);
+                                                                                          resolveDynamicPrefabEntity,
+                                                                                          resolveOrbitalProjectionPrefabBindingIndex);
 
         return new PlayerPowerUpsConfig
         {
@@ -102,11 +106,13 @@ public static class PlayerPowerUpActiveBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="powerUp">Modular active power-up definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that returns remappable orbital projection prefab binding indices.</param>
     /// <returns>Runtime slot config or default.</returns>
     public static PlayerPowerUpSlotConfig BuildSlotConfigFromModularPowerUp(PlayerAuthoring authoring,
                                                                             PlayerPowerUpsPreset preset,
                                                                             ModularPowerUpDefinition powerUp,
-                                                                            Func<GameObject, Entity> resolveDynamicPrefabEntity)
+                                                                            Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                                            Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (powerUp == null)
             return default;
@@ -203,6 +209,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasExplosionData = false;
         bool hasCharacterTuning = false;
         bool applyCharacterTuningOnActiveTrigger = false;
+        bool hasOrbitalProjections = false;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -386,6 +393,14 @@ public static class PlayerPowerUpActiveBakeUtility
                     bulletTimeTransitionTimeSeconds = math.max(bulletTimeTransitionTimeSeconds,
                                                                math.max(0f, bulletTimeModuleData.TransitionTimeSeconds));
                     break;
+                case PowerUpModuleKind.OrbitalProjections:
+                    PowerUpOrbitalProjectionsModuleData orbitalProjectionsData = payload.OrbitalProjections;
+
+                    if (orbitalProjectionsData == null || orbitalProjectionsData.Projections == null)
+                        break;
+
+                    hasOrbitalProjections = hasOrbitalProjections || orbitalProjectionsData.Projections.Count > 0;
+                    break;
                 case PowerUpModuleKind.Heal:
                     PowerUpHealMissingHealthModuleData healModuleData = payload.HealMissingHealth;
 
@@ -416,7 +431,8 @@ public static class PlayerPowerUpActiveBakeUtility
             togglePassiveTool = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                                          preset,
                                                                                                          powerUp,
-                                                                                                         resolveDynamicPrefabEntity);
+                                                                                                         resolveDynamicPrefabEntity,
+                                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
 
             if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning)
                 return default;
@@ -430,14 +446,18 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasBomb,
                                                                                               hasDash,
                                                                                               hasBulletTime,
-                                                                                              hasHealthPack);
+                                                                                              hasHealthPack,
+                                                                                              hasOrbitalProjections);
 
-            if (resolvedToolKind == ActiveToolKind.ChargeShot || resolvedToolKind == ActiveToolKind.Shotgun)
+            if (resolvedToolKind == ActiveToolKind.ChargeShot ||
+                resolvedToolKind == ActiveToolKind.Shotgun ||
+                hasOrbitalProjections)
             {
                 triggeredProjectilePassiveTool = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                                                            preset,
                                                                                                                            powerUp,
-                                                                                                                           resolveDynamicPrefabEntity);
+                                                                                                                           resolveDynamicPrefabEntity,
+                                                                                                                           resolveOrbitalProjectionPrefabBindingIndex);
             }
         }
 

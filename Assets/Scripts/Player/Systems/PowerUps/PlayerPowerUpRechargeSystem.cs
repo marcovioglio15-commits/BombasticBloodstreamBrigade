@@ -13,7 +13,7 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
     }
 
@@ -28,9 +28,10 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
-        foreach ((RefRO<PlayerPowerUpsConfig> powerUpsConfig,
-                  RefRW<PlayerPowerUpsState> powerUpsState) in SystemAPI.Query<RefRO<PlayerPowerUpsConfig>, RefRW<PlayerPowerUpsState>>())
+        foreach ((DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
+                  RefRW<PlayerPowerUpsState> powerUpsState) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>, RefRW<PlayerPowerUpsState>>())
         {
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
             uint previousKillCount = powerUpsState.ValueRO.LastObservedGlobalKillCount;
             uint killDelta = 0u;
 
@@ -51,13 +52,13 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
             TickCooldown(ref primaryCooldownRemaining, deltaTime);
             TickCooldown(ref secondaryCooldownRemaining, deltaTime);
             RechargeSlot(ref primaryEnergy,
-                         in powerUpsConfig.ValueRO.PrimarySlot,
+                         in powerUpsConfig.PrimarySlot,
                          primaryCooldownRemaining,
                          primaryIsActive,
                          deltaTime,
                          killDelta);
             RechargeSlot(ref secondaryEnergy,
-                         in powerUpsConfig.ValueRO.SecondarySlot,
+                         in powerUpsConfig.SecondarySlot,
                          secondaryCooldownRemaining,
                          secondaryIsActive,
                          deltaTime,
@@ -65,8 +66,8 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
 
             if (canEnqueueAudioRequests)
             {
-                if (DidReachEnergyRequirement(previousPrimaryEnergy, primaryEnergy, in powerUpsConfig.ValueRO.PrimarySlot) ||
-                    DidReachEnergyRequirement(previousSecondaryEnergy, secondaryEnergy, in powerUpsConfig.ValueRO.SecondarySlot))
+                if (DidReachEnergyRequirement(previousPrimaryEnergy, primaryEnergy, in powerUpsConfig.PrimarySlot) ||
+                    DidReachEnergyRequirement(previousSecondaryEnergy, secondaryEnergy, in powerUpsConfig.SecondarySlot))
                 {
                     GameAudioEventRequestUtility.EnqueueGlobal(audioRequests, GameAudioEventId.ActiveEnergyFull);
                 }

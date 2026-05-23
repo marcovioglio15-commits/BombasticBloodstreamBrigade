@@ -72,22 +72,11 @@ public sealed class ProjectileSizePassiveToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (projectileSizeMultiplier < 0.01f)
-            projectileSizeMultiplier = 0.01f;
-
-        if (damageMultiplier < 0f)
-            damageMultiplier = 0f;
-
-        if (speedMultiplier < 0f)
-            speedMultiplier = 0f;
-
-        if (lifetimeSecondsMultiplier < 0f)
-            lifetimeSecondsMultiplier = 0f;
-
-        if (lifetimeRangeMultiplier < 0f)
-            lifetimeRangeMultiplier = 0f;
     }
     #endregion
 
@@ -276,46 +265,11 @@ public sealed class ElementalEffectDefinitionData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (procThresholdStacks < 0.1f)
-            procThresholdStacks = 0.1f;
-
-        if (maximumStacks < 0.1f)
-            maximumStacks = 0.1f;
-
-        if (maximumStacks < procThresholdStacks)
-            maximumStacks = procThresholdStacks;
-
-        if (stackDecayPerSecond < 0f)
-            stackDecayPerSecond = 0f;
-
-        if (dotDamagePerTick < 0f)
-            dotDamagePerTick = 0f;
-
-        if (dotTickInterval < 0.01f)
-            dotTickInterval = 0.01f;
-
-        if (dotDurationSeconds < 0.05f)
-            dotDurationSeconds = 0.05f;
-
-        if (impedimentSlowPercentPerStack < 0f)
-            impedimentSlowPercentPerStack = 0f;
-
-        if (impedimentProcSlowPercent < 0f)
-            impedimentProcSlowPercent = 0f;
-
-        if (impedimentMaxSlowPercent < 0f)
-            impedimentMaxSlowPercent = 0f;
-
-        if (impedimentMaxSlowPercent > 100f)
-            impedimentMaxSlowPercent = 100f;
-
-        if (impedimentProcSlowPercent > impedimentMaxSlowPercent)
-            impedimentProcSlowPercent = impedimentMaxSlowPercent;
-
-        if (impedimentDurationSeconds < 0.05f)
-            impedimentDurationSeconds = 0.05f;
     }
     #endregion
 
@@ -366,8 +320,6 @@ public sealed class ElementalProjectilesPassiveToolData
 
         effectData.Validate();
 
-        if (stacksPerHit < 0f)
-            stacksPerHit = 0f;
     }
     #endregion
 
@@ -566,48 +518,11 @@ public sealed class PerfectCirclePassiveToolData
     #region Methods
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (radialEntrySpeed < 0f)
-            radialEntrySpeed = 0f;
-
-        if (orbitalSpeed < 0f)
-            orbitalSpeed = 0f;
-
-        if (orbitRadiusMin < 0f)
-            orbitRadiusMin = 0f;
-
-        if (orbitRadiusMax < 0f)
-            orbitRadiusMax = 0f;
-
-        if (orbitRadiusMax < orbitRadiusMin)
-            orbitRadiusMax = orbitRadiusMin;
-
-        if (orbitPulseFrequency < 0f)
-            orbitPulseFrequency = 0f;
-
-        orbitEntryRatio = Mathf.Clamp01(orbitEntryRatio);
-
-        if (orbitBlendDuration < 0f)
-            orbitBlendDuration = 0f;
-
-        if (goldenAngleDegrees < 0f)
-            goldenAngleDegrees = Mathf.Abs(goldenAngleDegrees);
-
-        if (spiralStartRadius < 0f)
-            spiralStartRadius = 0f;
-
-        if (spiralMaximumRadius < spiralStartRadius)
-            spiralMaximumRadius = spiralStartRadius;
-
-        if (spiralAngularSpeedDegreesPerSecond < 0f)
-            spiralAngularSpeedDegreesPerSecond = 0f;
-
-        if (spiralGrowthMultiplier < 0f)
-            spiralGrowthMultiplier = 0f;
-
-        if (spiralTurnsBeforeDespawn < 0.1f)
-            spiralTurnsBeforeDespawn = 0.1f;
     }
     #endregion
 

@@ -31,6 +31,7 @@ public static class PlayerPowerUpActivationExecutionUtility
     /// <param name="dashState">Mutable dash state for primary or chained dash execution.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state for timed slow effects.</param>
     /// <param name="bombRequests">Output bomb-spawn request buffer.</param>
+    /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
     /// <param name="shootRequests">Output projectile-spawn request buffer.</param>
     public static void ExecuteTool(in PlayerPowerUpSlotConfig slotConfig,
                                    in LocalTransform localTransform,
@@ -50,10 +51,16 @@ public static class PlayerPowerUpActivationExecutionUtility
                                    ref PlayerDashState dashState,
                                    ref PlayerBulletTimeState bulletTimeState,
                                    DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
+                                   DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
                                    DynamicBuffer<ShootRequest> shootRequests)
     {
         bool executeDashAfterPrimaryTool = slotConfig.ToolKind != ActiveToolKind.Dash &&
                                            PlayerPowerUpDashActivationUtility.HasDashPayload(in slotConfig);
+
+        if (slotConfig.ToolKind != ActiveToolKind.PassiveToggle)
+            EnqueueTriggeredOrbitalProjectionRequest(in slotConfig,
+                                                     playerEntity,
+                                                     orbitalProjectionRequests);
 
         switch (slotConfig.ToolKind)
         {
@@ -89,6 +96,8 @@ public static class PlayerPowerUpActivationExecutionUtility
                 break;
             case ActiveToolKind.PortableHealthPack:
                 break;
+            case ActiveToolKind.OrbitalProjections:
+                break;
             case ActiveToolKind.PassiveToggle:
                 return;
             default:
@@ -123,6 +132,7 @@ public static class PlayerPowerUpActivationExecutionUtility
     /// <param name="localToWorldLookup">LocalToWorld lookup used to resolve projectile spawn positions.</param>
     /// <param name="laserBeamState">Mutable laser-beam state for charged active beams.</param>
     /// <param name="normalizedCharge">Charge amount normalized above the required release threshold.</param>
+    /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
     /// <param name="shootRequests">Output projectile-spawn request buffer.</param>
     public static void ExecuteChargeShot(in PlayerPowerUpSlotConfig slotConfig,
                                          in LocalTransform localTransform,
@@ -136,8 +146,13 @@ public static class PlayerPowerUpActivationExecutionUtility
                                          in ComponentLookup<LocalToWorld> localToWorldLookup,
                                          ref PlayerLaserBeamState laserBeamState,
                                          float normalizedCharge,
+                                         DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
                                          DynamicBuffer<ShootRequest> shootRequests)
     {
+        EnqueueTriggeredOrbitalProjectionRequest(in slotConfig,
+                                                 playerEntity,
+                                                 orbitalProjectionRequests);
+
         float chargeFactor = math.saturate(normalizedCharge);
         float resolvedSizeMultiplier = ResolveChargeScaledMultiplier(slotConfig.ChargeShot.SizeMultiplier, chargeFactor);
         float resolvedDamageMultiplier = ResolveChargeScaledMultiplier(slotConfig.ChargeShot.DamageMultiplier, chargeFactor);
@@ -347,6 +362,34 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                            slotConfig.BulletTime.Duration,
                                                            slotConfig.BulletTime.EnemySlowPercent,
                                                            slotConfig.BulletTime.TransitionTimeSeconds);
+    }
+
+    /// <summary>
+    /// Enqueues timed orbital projection spawn requests embedded in an active power-up's transient passive payload.
+    /// </summary>
+    /// <param name="slotConfig">Active slot configuration being executed.</param>
+    /// <param name="playerEntity">Player entity that will own the spawned projections.</param>
+    /// <param name="orbitalProjectionRequests">Mutable request buffer receiving spawn entries.</param>
+    private static void EnqueueTriggeredOrbitalProjectionRequest(in PlayerPowerUpSlotConfig slotConfig,
+                                                                 Entity playerEntity,
+                                                                 DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests)
+    {
+        PlayerPassiveToolConfig triggeredPassiveTool = slotConfig.TriggeredProjectilePassiveTool;
+
+        if (triggeredPassiveTool.IsDefined == 0 || triggeredPassiveTool.HasOrbitalProjections == 0)
+            return;
+
+        if (triggeredPassiveTool.OrbitalProjections.Length <= 0)
+            return;
+
+        orbitalProjectionRequests.Add(new PlayerOrbitalProjectionSpawnRequest
+        {
+            OwnerEntity = playerEntity,
+            PowerUpId = slotConfig.PowerUpId,
+            Persistent = 0,
+            SourceInstanceId = 0,
+            Projections = triggeredPassiveTool.OrbitalProjections
+        });
     }
 
     private static void ExecuteShotgun(in PlayerPowerUpSlotConfig slotConfig,

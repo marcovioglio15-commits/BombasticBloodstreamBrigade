@@ -235,7 +235,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                         bool hasBomb,
                                                         bool hasDash,
                                                         bool hasBulletTime,
-                                                        bool hasHealthPack)
+                                                        bool hasHealthPack,
+                                                        bool hasOrbitalProjections)
     {
         if (hasHoldCharge)
             return ActiveToolKind.ChargeShot;
@@ -254,6 +255,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
         if (hasHealthPack)
             return ActiveToolKind.PortableHealthPack;
+
+        if (hasOrbitalProjections)
+            return ActiveToolKind.OrbitalProjections;
 
         return ActiveToolKind.Custom;
     }

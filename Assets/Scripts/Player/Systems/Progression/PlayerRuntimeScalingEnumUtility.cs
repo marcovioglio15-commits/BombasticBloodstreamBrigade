@@ -249,6 +249,36 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe OrbitalProjectionMotionMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static OrbitalProjectionMotionMode ResolveOrbitalProjectionMotionMode(float value)
+    {
+        return (OrbitalProjectionMotionMode)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
+    /// Resolves a safe OrbitalProjectionFullOrbitConeResponse from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static OrbitalProjectionFullOrbitConeResponse ResolveOrbitalProjectionFullOrbitConeResponse(float value)
+    {
+        return (OrbitalProjectionFullOrbitConeResponse)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe OrbitalProjectionAcquisitionPolicy from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static OrbitalProjectionAcquisitionPolicy ResolveOrbitalProjectionAcquisitionPolicy(float value)
+    {
+        return (OrbitalProjectionAcquisitionPolicy)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
     /// Resolves a safe LaserBeamBodyProfile from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

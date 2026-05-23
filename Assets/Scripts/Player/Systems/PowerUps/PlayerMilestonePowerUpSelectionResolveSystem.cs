@@ -32,7 +32,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerMilestonePowerUpSelectionCommand>();
         state.RequireForUpdate<PlayerMilestonePowerUpSelectionOfferElement>();
         state.RequireForUpdate<PlayerMilestonePowerUpSelectionState>();
         state.RequireForUpdate<PlayerMilestoneTimeScaleResumeState>();
@@ -46,10 +45,10 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         state.RequireForUpdate<PlayerScalableStatElement>();
         state.RequireForUpdate<PlayerHealth>();
         state.RequireForUpdate<PlayerShield>();
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<EquippedPassiveToolElement>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<LocalTransform>();
         state.RequireForUpdate<PhysicsWorldSingleton>();
     }
@@ -63,7 +62,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
     {
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
         ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneTimeScaleResumeStateLookup = SystemAPI.GetComponentLookup<PlayerMilestoneTimeScaleResumeState>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
         ComponentLookup<PlayerLevel> playerLevelLookup = SystemAPI.GetComponentLookup<PlayerLevel>(false);
@@ -71,7 +70,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         ComponentLookup<PlayerExperienceCollection> playerExperienceCollectionLookup = SystemAPI.GetComponentLookup<PlayerExperienceCollection>(false);
         ComponentLookup<PlayerHealth> playerHealthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> playerShieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
-        ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> powerUpContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
@@ -80,23 +79,21 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach ((DynamicBuffer<PlayerMilestonePowerUpSelectionCommand> selectionCommands,
-                  DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers,
+        foreach ((DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers,
                   DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                   DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
                   DynamicBuffer<PlayerScalableStatElement> scalableStats,
                   DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                   RefRW<PlayerMilestonePowerUpSelectionState> selectionState,
                   Entity entity)
-                 in SystemAPI.Query<DynamicBuffer<PlayerMilestonePowerUpSelectionCommand>,
-                                    DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement>,
                                     DynamicBuffer<PlayerPowerUpUnlockCatalogElement>,
                                     DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement>,
                                     DynamicBuffer<PlayerScalableStatElement>,
                                     DynamicBuffer<PlayerRuntimeGamePhaseElement>,
                                     RefRW<PlayerMilestonePowerUpSelectionState>>().WithEntityAccess())
         {
-            if (!passiveToolsStateLookup.HasComponent(entity) ||
+            if (!passiveToolsStateLookup.HasBuffer(entity) ||
                 !milestoneTimeScaleResumeStateLookup.HasComponent(entity) ||
                 !progressionConfigLookup.HasComponent(entity) ||
                 !playerLevelLookup.HasComponent(entity) ||
@@ -104,12 +101,11 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 !playerExperienceCollectionLookup.HasComponent(entity) ||
                 !playerHealthLookup.HasComponent(entity) ||
                 !playerShieldLookup.HasComponent(entity) ||
-                !powerUpsConfigLookup.HasComponent(entity) ||
+                !powerUpsConfigLookup.HasBuffer(entity) ||
                 !powerUpsStateLookup.HasComponent(entity) ||
                 !equippedPassiveToolsLookup.HasBuffer(entity))
                 continue;
 
-            DynamicBuffer<PlayerMilestonePowerUpSelectionCommand> selectionCommandsBuffer = selectionCommands;
             DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffersBuffer = selectionOffers;
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalogBuffer = unlockCatalog;
             DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer = characterTuningFormulas;
@@ -117,18 +113,22 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhaseBuffer = runtimeGamePhases;
             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer = equippedPassiveToolsLookup[entity];
 
-            if (selectionCommandsBuffer.Length <= 0)
+            PlayerMilestonePowerUpSelectionState selectionStateValue = selectionState.ValueRO;
+
+            if (selectionStateValue.HasPendingCommand == 0)
                 continue;
 
-            if (!TryResolveRequestedCommand(selectionCommandsBuffer, out ResolvedMilestoneSelectionCommand resolvedCommand))
+            if (!TryResolveRequestedCommand(in selectionStateValue, out ResolvedMilestoneSelectionCommand resolvedCommand))
             {
-                selectionCommandsBuffer.Clear();
+                ClearPendingCommand(ref selectionStateValue);
+                selectionState.ValueRW = selectionStateValue;
                 continue;
             }
 
-            selectionCommandsBuffer.Clear();
+            ClearPendingCommand(ref selectionStateValue);
+            selectionState.ValueRW = selectionStateValue;
 
-            if (selectionState.ValueRO.IsSelectionActive == 0)
+            if (selectionStateValue.IsSelectionActive == 0)
             {
                 Debug.LogWarning(string.Format(CultureInfo.InvariantCulture,
                                                "[PlayerMilestonePowerUpSelectionResolveSystem] Ignored stale selection command on entity {0}: no active milestone selection.",
@@ -136,12 +136,11 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 continue;
             }
 
-            PlayerMilestonePowerUpSelectionState selectionStateValue = selectionState.ValueRO;
             PlayerMilestoneTimeScaleResumeState milestoneTimeScaleResumeStateValue = milestoneTimeScaleResumeStateLookup[entity];
             PlayerProgressionConfig progressionConfigValue = progressionConfigLookup[entity];
             PlayerLevel playerLevelValue = playerLevelLookup[entity];
             PlayerExperienceCollection playerExperienceCollectionValue = playerExperienceCollectionLookup[entity];
-            PlayerPowerUpsConfig powerUpsConfigValue = powerUpsConfigLookup[entity];
+            PlayerPowerUpsConfig powerUpsConfigValue = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
             PlayerPowerUpsState powerUpsStateValue = powerUpsStateLookup[entity];
             PlayerExperience playerExperienceValue = playerExperienceLookup[entity];
             PlayerHealth playerHealthValue = playerHealthLookup[entity];
@@ -212,7 +211,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 continue;
             }
 
-            PlayerPassiveToolsState passiveToolsState = passiveToolsStateLookup[entity];
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup);
             PlayerPowerUpUnlockCatalogElement selectedCatalogEntry = unlockCatalogBuffer[selectedCatalogIndex];
             int maximumUnlockCount = math.max(1, selectedCatalogEntry.MaximumUnlockCount);
 
@@ -271,9 +270,9 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                                                                               unlockCatalogBuffer,
                                                                               elapsedTime);
 
-            powerUpsConfigLookup[entity] = powerUpsConfigValue;
+            PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigLookup[entity], in powerUpsConfigValue);
             powerUpsStateLookup[entity] = powerUpsStateValue;
-            passiveToolsStateLookup[entity] = passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateLookup[entity], in passiveToolsState);
             playerExperienceLookup[entity] = playerExperienceValue;
             playerLevelLookup[entity] = playerLevelValue;
             playerExperienceCollectionLookup[entity] = playerExperienceCollectionValue;
@@ -305,42 +304,52 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
 
     #region Commands
     /// <summary>
-    /// Resolves the first actionable milestone-selection command from the queue.
+    /// Resolves the actionable milestone-selection command stored on the selection state.
     /// </summary>
-    /// <param name="selectionCommands">Queued HUD selection commands.</param>
+    /// <param name="selectionState">Selection state carrying one pending HUD command.</param>
     /// <param name="resolvedCommand">Resolved command payload when found.</param>
     /// <returns>True when one actionable command exists; otherwise false.</returns>
-    private static bool TryResolveRequestedCommand(DynamicBuffer<PlayerMilestonePowerUpSelectionCommand> selectionCommands,
+    private static bool TryResolveRequestedCommand(in PlayerMilestonePowerUpSelectionState selectionState,
                                                    out ResolvedMilestoneSelectionCommand resolvedCommand)
     {
         resolvedCommand = default;
 
-        for (int commandIndex = 0; commandIndex < selectionCommands.Length; commandIndex++)
-        {
-            PlayerMilestonePowerUpSelectionCommand selectionCommand = selectionCommands[commandIndex];
+        if (selectionState.HasPendingCommand == 0)
+            return false;
 
-            if (selectionCommand.CommandType == PlayerMilestoneSelectionCommandType.Skip)
-            {
+        switch (selectionState.PendingCommandType)
+        {
+            case PlayerMilestoneSelectionCommandType.Skip:
                 resolvedCommand = new ResolvedMilestoneSelectionCommand
                 {
                     CommandType = PlayerMilestoneSelectionCommandType.Skip,
                     OfferIndex = -1
                 };
                 return true;
-            }
+            case PlayerMilestoneSelectionCommandType.SelectOffer:
+                if (selectionState.PendingOfferIndex < 0)
+                    return false;
 
-            if (selectionCommand.OfferIndex < 0)
-                continue;
-
-            resolvedCommand = new ResolvedMilestoneSelectionCommand
-            {
-                CommandType = PlayerMilestoneSelectionCommandType.SelectOffer,
-                OfferIndex = selectionCommand.OfferIndex
-            };
-            return true;
+                resolvedCommand = new ResolvedMilestoneSelectionCommand
+                {
+                    CommandType = PlayerMilestoneSelectionCommandType.SelectOffer,
+                    OfferIndex = selectionState.PendingOfferIndex
+                };
+                return true;
+            default:
+                return false;
         }
+    }
 
-        return false;
+    /// <summary>
+    /// Clears the HUD command slot after the resolver has observed it.
+    /// </summary>
+    /// <param name="selectionState">Selection state whose pending command fields are reset.</param>
+    private static void ClearPendingCommand(ref PlayerMilestonePowerUpSelectionState selectionState)
+    {
+        selectionState.HasPendingCommand = 0;
+        selectionState.PendingCommandType = PlayerMilestoneSelectionCommandType.SelectOffer;
+        selectionState.PendingOfferIndex = -1;
     }
 
     /// <summary>

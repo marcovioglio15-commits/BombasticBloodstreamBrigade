@@ -6,10 +6,10 @@ using Unity.Entities;
 internal struct EnemyPowerUpStealerPlayerAccess
 {
     #region Fields
-    public ComponentLookup<PlayerPowerUpsConfig> PowerUpsConfigLookup;
+    public BufferLookup<PlayerPowerUpsConfigElement> PowerUpsConfigLookup;
     public ComponentLookup<PlayerPowerUpsState> PowerUpsStateLookup;
     public BufferLookup<EquippedPassiveToolElement> EquippedPassiveToolsLookup;
-    public ComponentLookup<PlayerPassiveToolsState> PassiveToolsStateLookup;
+    public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsStateLookup;
     public BufferLookup<PlayerPowerUpUnlockCatalogElement> UnlockCatalogLookup;
     public ComponentLookup<PlayerPowerUpContainerInteractionConfig> ContainerConfigLookup;
     #endregion

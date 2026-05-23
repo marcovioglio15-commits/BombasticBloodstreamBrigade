@@ -52,7 +52,7 @@ public partial struct PlayerShootingIntentSystem : ISystem
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(true);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
@@ -332,21 +332,9 @@ public partial struct PlayerShootingIntentSystem : ISystem
     }
 
     private static PlayerPassiveToolsState ResolvePassiveToolsState(Entity shooterEntity,
-                                                                    in ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup)
+                                                                    in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup)
     {
-        if (passiveToolsLookup.HasComponent(shooterEntity))
-            return passiveToolsLookup[shooterEntity];
-
-        return new PlayerPassiveToolsState
-        {
-            ProjectileSizeMultiplier = 1f,
-            ProjectileDamageMultiplier = 1f,
-            ProjectileSpeedMultiplier = 1f,
-            ProjectileLifetimeSecondsMultiplier = 1f,
-            ProjectileLifetimeRangeMultiplier = 1f,
-            HasShotgun = 0,
-            Shotgun = default
-        };
+        return PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in passiveToolsLookup);
     }
 
     #endregion

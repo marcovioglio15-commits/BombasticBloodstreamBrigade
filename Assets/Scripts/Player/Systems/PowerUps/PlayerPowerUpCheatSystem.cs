@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
-/// Consumes runtime cheat commands and replaces the player's whole power-up loadout with a baked preset snapshot.
+/// Consumes pending runtime cheat commands and replaces the player's whole power-up loadout with a baked preset snapshot.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpsInitializeSystem))]
@@ -18,60 +18,52 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <param name="state">System state used to declare update requirements.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpCheatCommand>();
         state.RequireForUpdate<PlayerPowerUpCheatPresetEntry>();
         state.RequireForUpdate<PlayerPowerUpCheatPresetPassiveElement>();
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<EquippedPassiveToolElement>();
     }
 
     /// <summary>
-    /// Applies queued cheat commands for each player, replacing runtime config and passives when a preset swap is requested.
+    /// Applies pending cheat commands for each player, replacing runtime config and passives when a preset swap is requested.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        foreach ((DynamicBuffer<PlayerPowerUpCheatCommand> cheatCommands,
-                  DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
+        foreach ((DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
                   DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
-                  RefRW<PlayerPowerUpsConfig> powerUpsConfig,
+                  DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState,
                   DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
-                  RefRW<PlayerPassiveToolsState> passiveToolsState) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpCheatCommand>,
-                                                                                       DynamicBuffer<PlayerPowerUpCheatPresetEntry>,
+                  DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpCheatPresetEntry>,
                                                                                        DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement>,
-                                                                                       RefRW<PlayerPowerUpsConfig>,
+                                                                                       DynamicBuffer<PlayerPowerUpsConfigElement>,
                                                                                        RefRW<PlayerPowerUpsState>,
                                                                                        DynamicBuffer<EquippedPassiveToolElement>,
-                                                                                       RefRW<PlayerPassiveToolsState>>())
+                                                                                       DynamicBuffer<PlayerPassiveToolsStateElement>>())
         {
-            int commandCount = cheatCommands.Length;
-
-            if (commandCount <= 0)
+            if (!TryConsumePendingCommand(ref powerUpsState.ValueRW,
+                                          out PlayerPowerUpCheatCommandType commandType,
+                                          out int presetIndex))
                 continue;
 
-            bool passivesChanged = false;
-
-            for (int commandIndex = 0; commandIndex < commandCount; commandIndex++)
-            {
-                PlayerPowerUpCheatCommand cheatCommand = cheatCommands[commandIndex];
-                bool changed = ProcessCheatCommand(in cheatCommand,
-                                                   cheatPresetEntries,
-                                                   cheatPresetPassives,
-                                                   ref powerUpsConfig.ValueRW,
-                                                   ref powerUpsState.ValueRW,
-                                                   equippedPassiveTools);
-
-                if (changed)
-                    passivesChanged = true;
-            }
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            bool passivesChanged = ProcessCheatCommand(commandType,
+                                                       presetIndex,
+                                                       cheatPresetEntries,
+                                                       cheatPresetPassives,
+                                                       ref powerUpsConfig,
+                                                       ref powerUpsState.ValueRW,
+                                                       equippedPassiveTools);
 
             if (passivesChanged)
-                passiveToolsState.ValueRW = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
-
-            cheatCommands.Clear();
+            {
+                PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
+                PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+                PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateBuffer, in passiveToolsState);
+            }
         }
     }
     #endregion
@@ -80,24 +72,26 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <summary>
     /// Routes one command to the matching cheat action.
     /// </summary>
-    /// <param name="cheatCommand">Command payload to process.</param>
+    /// <param name="commandType">Pending command kind to process.</param>
+    /// <param name="presetIndex">Pending preset index used by apply-preset commands.</param>
     /// <param name="cheatPresetEntries">Baked preset metadata buffer.</param>
     /// <param name="cheatPresetPassives">Flattened baked passives buffer.</param>
     /// <param name="powerUpsConfig">Runtime power-up config to mutate.</param>
     /// <param name="powerUpsState">Runtime power-up state to reset.</param>
     /// <param name="equippedPassiveTools">Runtime equipped passives buffer to replace.</param>
     /// <returns>True when runtime loadout was changed, otherwise false.</returns>
-    private static bool ProcessCheatCommand(in PlayerPowerUpCheatCommand cheatCommand,
+    private static bool ProcessCheatCommand(PlayerPowerUpCheatCommandType commandType,
+                                            int presetIndex,
                                             DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
                                             DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
                                             ref PlayerPowerUpsConfig powerUpsConfig,
                                             ref PlayerPowerUpsState powerUpsState,
                                             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
     {
-        switch (cheatCommand.CommandType)
+        switch (commandType)
         {
             case PlayerPowerUpCheatCommandType.ApplyPresetByIndex:
-                return TryApplyPresetByIndex(cheatCommand.PresetIndex,
+                return TryApplyPresetByIndex(presetIndex,
                                              cheatPresetEntries,
                                              cheatPresetPassives,
                                              ref powerUpsConfig,
@@ -106,6 +100,29 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
             default:
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Reads and clears the single pending cheat command stored in runtime power-up state.
+    /// </summary>
+    /// <param name="powerUpsState">Runtime power-up state that owns pending cheat input.</param>
+    /// <param name="commandType">Resolved pending command type.</param>
+    /// <param name="presetIndex">Resolved pending preset index.</param>
+    /// <returns>True when a pending command was present.</returns>
+    private static bool TryConsumePendingCommand(ref PlayerPowerUpsState powerUpsState,
+                                                 out PlayerPowerUpCheatCommandType commandType,
+                                                 out int presetIndex)
+    {
+        commandType = powerUpsState.PendingCheatCommandType;
+        presetIndex = powerUpsState.PendingCheatPresetIndex;
+
+        if (powerUpsState.HasPendingCheatCommand == 0)
+            return false;
+
+        powerUpsState.HasPendingCheatCommand = 0;
+        powerUpsState.PendingCheatCommandType = PlayerPowerUpCheatCommandType.None;
+        powerUpsState.PendingCheatPresetIndex = -1;
+        return true;
     }
 
     /// <summary>

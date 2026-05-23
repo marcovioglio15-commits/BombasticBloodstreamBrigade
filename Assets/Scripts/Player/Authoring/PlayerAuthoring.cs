@@ -672,12 +672,24 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         if (powerUpsPreset != null)
         {
             DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> powerUpVfxPrefabBindingsBuffer = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+            DynamicBuffer<PlayerOrbitalProjectionPrefabElement> orbitalProjectionPrefabBindingsBuffer = AddBuffer<PlayerOrbitalProjectionPrefabElement>(entity);
             Func<GameObject, Entity> resolveDynamicPowerUpVfxPrefabEntity = (GameObject prefab) =>
                 ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
+            Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = (GameObject prefab) =>
+                ResolveOrbitalProjectionPrefabBindingIndex(prefab, orbitalProjectionPrefabBindingsBuffer);
             PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpActiveBakeUtility.BuildPowerUpsConfig(authoring,
                                                                                                      powerUpsPreset,
-                                                                                                     resolveDynamicPowerUpVfxPrefabEntity);
-            AddComponent(entity, powerUpsConfig);
+                                                                                                     resolveDynamicPowerUpVfxPrefabEntity,
+                                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
+            DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer = AddBuffer<PlayerPowerUpsConfigElement>(entity);
+            PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
+            AddComponent(entity, new PlayerLaserBeamState
+            {
+                NextStormTickPulseId = 1
+            });
+            AddBuffer<PlayerLaserBeamStormTickPulse>(entity);
+            AddBuffer<PlayerLaserBeamLaneElement>(entity);
+            AddBuffer<PlayerLaserBeamPulseHitElement>(entity);
             AddComponent(entity, new PlayerChargeCharacterTuningState());
             AddBuffer<PlayerChargeCharacterTuningBaseStatElement>(entity);
             PlayerPowerUpVfxCapConfig powerUpVfxCapConfig = PlayerPowerUpBakeSharedUtility.BuildPowerUpVfxCapConfig(authoring);
@@ -709,7 +721,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             PlayerPowerUpCatalogBakeUtility.PopulateEquippedPassiveToolsBuffer(authoring,
                                                                                powerUpsPreset,
                                                                                resolveDynamicPowerUpVfxPrefabEntity,
-                                                                               equippedPassiveToolsBuffer);
+                                                                               equippedPassiveToolsBuffer,
+                                                                               resolveOrbitalProjectionPrefabBindingIndex);
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> powerUpUnlockCatalogBuffer = AddBuffer<PlayerPowerUpUnlockCatalogElement>(entity);
             DynamicBuffer<PlayerPowerUpTierDefinitionElement> powerUpTierDefinitionsBuffer = AddBuffer<PlayerPowerUpTierDefinitionElement>(entity);
             DynamicBuffer<PlayerPowerUpTierEntryElement> powerUpTierEntriesBuffer = AddBuffer<PlayerPowerUpTierEntryElement>(entity);
@@ -724,11 +737,13 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                              characterTuningFormulaBuffer,
                                                                              powerUpTierDefinitionsBuffer,
                                                                              powerUpTierEntriesBuffer,
-                                                                             powerUpTierEntryScalingBuffer);
+                                                                             powerUpTierEntryScalingBuffer,
+                                                                             resolveOrbitalProjectionPrefabBindingIndex);
             PlayerRuntimeScalingBakeUtility.PopulatePowerUpBaseConfigs(authoring,
                                                                        sourcePowerUpsPreset,
                                                                        resolveDynamicPowerUpVfxPrefabEntity,
-                                                                       powerUpBaseConfigBuffer);
+                                                                       powerUpBaseConfigBuffer,
+                                                                       resolveOrbitalProjectionPrefabBindingIndex);
 #if UNITY_EDITOR
             PlayerRuntimeScalingBakeUtility.PopulatePowerUpScalingMetadata(sourcePowerUpsPreset, powerUpScalingBuffer);
 #endif
@@ -737,7 +752,9 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             PlayerPowerUpCatalogBakeUtility.PopulatePowerUpCheatPresetBuffers(authoring,
                                                                               resolveDynamicPowerUpVfxPrefabEntity,
                                                                               cheatPresetEntriesBuffer,
-                                                                              cheatPresetPassivesBuffer);
+                                                                              cheatPresetPassivesBuffer,
+                                                                              resolveOrbitalProjectionPrefabBindingIndex);
+            AddBuffer<PlayerOrbitalProjectionSpawnRequest>(entity);
         }
 
         ShootingSettings shootingSettings = controllerPreset.ShootingSettings;
@@ -907,6 +924,37 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             Prefab = prefab
         });
         return prefabEntity;
+    }
+
+    /// <summary>
+    /// Registers one orbital projection prefab in a remappable player-owned binding table.
+    /// </summary>
+    /// <param name="prefab">Prefab asset referenced by an orbital projection config.</param>
+    /// <param name="bindingsBuffer">Player-owned buffer receiving remappable prefab entities.</param>
+    /// <returns>Stable binding index used by fixed-list projection configs, or -1 when the prefab is missing.</returns>
+    private int ResolveOrbitalProjectionPrefabBindingIndex(GameObject prefab,
+                                                           DynamicBuffer<PlayerOrbitalProjectionPrefabElement> bindingsBuffer)
+    {
+        Entity prefabEntity = ResolveDynamicPrefabEntity(prefab);
+
+        if (prefab == null || prefabEntity == Entity.Null)
+            return -1;
+
+        for (int bindingIndex = 0; bindingIndex < bindingsBuffer.Length; bindingIndex++)
+        {
+            PlayerOrbitalProjectionPrefabElement binding = bindingsBuffer[bindingIndex];
+
+            if (binding.PrefabEntity == prefabEntity)
+                return binding.BindingIndex;
+        }
+
+        int newBindingIndex = bindingsBuffer.Length;
+        bindingsBuffer.Add(new PlayerOrbitalProjectionPrefabElement
+        {
+            BindingIndex = newBindingIndex,
+            PrefabEntity = prefabEntity
+        });
+        return newBindingIndex;
     }
     #endregion
 

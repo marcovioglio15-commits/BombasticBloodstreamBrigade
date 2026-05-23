@@ -22,6 +22,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdAreaTickApplyElement = "Module_AreaTickApplyElement";
     internal const string ModuleIdDeathExplosion = "Module_DeathExplosion";
     internal const string ModuleIdOrbitalProjectiles = "Module_OrbitalProjectiles";
+    internal const string ModuleIdOrbitalProjections = "Module_OrbitalProjections";
     internal const string ModuleIdBouncingProjectiles = "Module_BouncingProjectiles";
     internal const string ModuleIdProjectileSplit = "Module_ProjectileSplit";
     internal const string ModuleIdStackable = "Module_Stackable";
@@ -165,6 +166,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdAreaTickApplyElement, "Area Tick Apply Element", PowerUpModuleKind.AreaTickApplyElement, PowerUpModuleStage.Hook, "Applies elemental stacks in area over time."));
         definitions.Add(CreateModuleDefinition(ModuleIdDeathExplosion, "Death Explosion", PowerUpModuleKind.DeathExplosion, PowerUpModuleStage.Hook, "Triggers explosions from configured events."));
         definitions.Add(CreateModuleDefinition(ModuleIdOrbitalProjectiles, "Orbital Projectiles", PowerUpModuleKind.OrbitalProjectiles, PowerUpModuleStage.Hook, "Overrides projectile trajectory to orbital behavior."));
+        definitions.Add(CreateModuleDefinition(ModuleIdOrbitalProjections, "Orbital Projections", PowerUpModuleKind.OrbitalProjections, PowerUpModuleStage.Hook, "Spawns player-owned orbiting objects with contact damage and interception effects."));
         definitions.Add(CreateModuleDefinition(ModuleIdBouncingProjectiles, "Bouncing Projectiles", PowerUpModuleKind.BouncingProjectiles, PowerUpModuleStage.Hook, "Adds wall bounce behavior to projectiles."));
         definitions.Add(CreateModuleDefinition(ModuleIdProjectileSplit, "Projectile Split", PowerUpModuleKind.ProjectileSplit, PowerUpModuleStage.Hook, "Splits projectiles based on configured trigger mode."));
         definitions.Add(CreateModuleDefinition(ModuleIdStackable, "Stackable", PowerUpModuleKind.Stackable, PowerUpModuleStage.PostExecute, "Allows milestone reacquisition up to a configured total count."));
@@ -380,6 +382,12 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                 break;
             case PowerUpModuleKind.Stackable:
                 payload.Stackable.Configure(2);
+                break;
+            case PowerUpModuleKind.OrbitalProjections:
+                payload.OrbitalProjections.Configure(new List<PowerUpOrbitalProjectionDefinitionData>
+                {
+                    new PowerUpOrbitalProjectionDefinitionData()
+                });
                 break;
             default:
                 break;

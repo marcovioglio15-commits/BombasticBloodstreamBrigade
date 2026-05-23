@@ -24,7 +24,7 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerInputState>();
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerControllerConfig>();
     }
@@ -36,9 +36,9 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         foreach ((RefRO<PlayerInputState> inputState,
-                  RefRW<PlayerPowerUpsConfig> powerUpsConfig,
+                  DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState) in SystemAPI.Query<RefRO<PlayerInputState>,
-                                                                               RefRW<PlayerPowerUpsConfig>,
+                                                                               DynamicBuffer<PlayerPowerUpsConfigElement>,
                                                                                RefRW<PlayerPowerUpsState>>().WithAll<PlayerControllerConfig>())
         {
             bool swapPressed = inputState.ValueRO.SwapPowerUpSlots > InputPressThreshold;
@@ -48,12 +48,15 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
             if (!swapPressedThisFrame)
                 continue;
 
-            if (!CanSwapSlots(in powerUpsConfig.ValueRO))
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+
+            if (!CanSwapSlots(in powerUpsConfig))
                 continue;
 
-            ApplySlotSwap(ref powerUpsConfig.ValueRW,
+            ApplySlotSwap(ref powerUpsConfig,
                           ref powerUpsState.ValueRW,
                           in inputState.ValueRO);
+            PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
         }
     }
     #endregion

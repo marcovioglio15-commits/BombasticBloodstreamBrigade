@@ -12,6 +12,7 @@ public static class RuntimeGizmoDebugState
     private const bool DefaultPlayerPickupRadiusEnabled = false;
     private const bool DefaultPlayerMoveVectorEnabled = false;
     private const bool DefaultPlayerLookDirectionEnabled = false;
+    private const bool DefaultOrbitalProjectionCollisionRadiusEnabled = false;
     private const bool DefaultEnemyBodyRadiusEnabled = false;
     private const bool DefaultEnemyContactRadiusEnabled = false;
     private const bool DefaultEnemyAreaRadiusEnabled = false;
@@ -32,6 +33,7 @@ public static class RuntimeGizmoDebugState
     private static bool playerPickupRadiusEnabled;
     private static bool playerMoveVectorEnabled;
     private static bool playerLookDirectionEnabled;
+    private static bool orbitalProjectionCollisionRadiusEnabled;
     private static bool enemyBodyRadiusEnabled;
     private static bool enemyContactRadiusEnabled;
     private static bool enemyAreaRadiusEnabled;
@@ -115,6 +117,18 @@ public static class RuntimeGizmoDebugState
         set
         {
             SetFlag(ref playerLookDirectionEnabled, value);
+        }
+    }
+
+    public static bool OrbitalProjectionCollisionRadiusEnabled
+    {
+        get
+        {
+            return orbitalProjectionCollisionRadiusEnabled;
+        }
+        set
+        {
+            SetFlag(ref orbitalProjectionCollisionRadiusEnabled, value);
         }
     }
 
@@ -268,7 +282,8 @@ public static class RuntimeGizmoDebugState
         {
             if (playerPickupRadiusEnabled ||
                 playerMoveVectorEnabled ||
-                playerLookDirectionEnabled)
+                playerLookDirectionEnabled ||
+                orbitalProjectionCollisionRadiusEnabled)
             {
                 return true;
             }
@@ -322,6 +337,7 @@ public static class RuntimeGizmoDebugState
         playerPickupRadiusEnabled = DefaultPlayerPickupRadiusEnabled;
         playerMoveVectorEnabled = DefaultPlayerMoveVectorEnabled;
         playerLookDirectionEnabled = DefaultPlayerLookDirectionEnabled;
+        orbitalProjectionCollisionRadiusEnabled = DefaultOrbitalProjectionCollisionRadiusEnabled;
         enemyBodyRadiusEnabled = DefaultEnemyBodyRadiusEnabled;
         enemyContactRadiusEnabled = DefaultEnemyContactRadiusEnabled;
         enemyAreaRadiusEnabled = DefaultEnemyAreaRadiusEnabled;

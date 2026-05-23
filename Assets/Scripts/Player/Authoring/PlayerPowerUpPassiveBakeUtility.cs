@@ -21,11 +21,13 @@ public static class PlayerPowerUpPassiveBakeUtility
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="outputPassiveToolConfigs">Destination list receiving compiled passive configs.</param>
     /// <param name="outputPowerUpIds">Optional destination list receiving the PowerUpId aligned to each compiled passive config.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void CollectEquippedPassiveToolConfigs(PlayerAuthoring authoring,
                                                          PlayerPowerUpsPreset preset,
                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
                                                          List<PlayerPassiveToolConfig> outputPassiveToolConfigs,
-                                                         List<FixedString64Bytes> outputPowerUpIds = null)
+                                                         List<FixedString64Bytes> outputPowerUpIds = null,
+                                                         Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (preset == null || outputPassiveToolConfigs == null)
             return;
@@ -64,7 +66,8 @@ public static class PlayerPowerUpPassiveBakeUtility
                 PlayerPassiveToolConfig passiveToolConfig = BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                                      preset,
                                                                                                      passivePowerUp,
-                                                                                                     resolveDynamicPrefabEntity);
+                                                                                                     resolveDynamicPrefabEntity,
+                                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
                 FixedString64Bytes powerUpId = ResolvePassivePowerUpId(passivePowerUp);
 
                 if (powerUpId.Length <= 0)
@@ -152,11 +155,13 @@ public static class PlayerPowerUpPassiveBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="powerUp">Modular passive power-up definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that returns remappable orbital projection prefab binding indices.</param>
     /// <returns>Runtime passive config or default.</returns>
     public static PlayerPassiveToolConfig BuildPassiveToolConfigFromModularPowerUp(PlayerAuthoring authoring,
                                                                                    PlayerPowerUpsPreset preset,
                                                                                    ModularPowerUpDefinition powerUp,
-                                                                                   Func<GameObject, Entity> resolveDynamicPrefabEntity)
+                                                                                   Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                                                   Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         if (powerUp == null)
             return default;
@@ -208,6 +213,8 @@ public static class PlayerPowerUpPassiveBakeUtility
         float bulletTimeTransitionTimeSeconds = 0f;
         bool hasLaserBeam = false;
         LaserBeamPassiveConfig laserBeamConfig = default;
+        bool hasOrbitalProjections = false;
+        FixedList512Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -315,6 +322,21 @@ public static class PlayerPowerUpPassiveBakeUtility
                     PlayerPowerUpPassiveConfigBuildUtility.AccumulatePerfectCirclePassiveConfig(ref orbitConfig,
                                                                                                 in candidateOrbitConfig,
                                                                                                 ref hasOrbit);
+                    break;
+                case PowerUpModuleKind.OrbitalProjections:
+                    FixedList512Bytes<OrbitalProjectionConfig> candidateProjectionConfigs =
+                        PlayerPowerUpOrbitalProjectionBakeUtility.BuildProjectionConfigs(authoring,
+                                                                                         payload.OrbitalProjections,
+                                                                                         resolveDynamicPrefabEntity,
+                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
+
+                    if (candidateProjectionConfigs.Length <= 0)
+                        break;
+
+                    PlayerPowerUpOrbitalProjectionBakeUtility.AppendProjectionConfigs(authoring,
+                                                                                      ref orbitalProjectionConfigs,
+                                                                                      in candidateProjectionConfigs);
+                    hasOrbitalProjections = orbitalProjectionConfigs.Length > 0;
                     break;
                 case PowerUpModuleKind.BouncingProjectiles:
                     BouncingProjectilesPassiveConfig candidateBounceConfig = PlayerPowerUpPassiveConfigBuildUtility.BuildBouncingProjectilesPassiveConfig(payload.ProjectileBounceOnWalls);
@@ -516,6 +538,7 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasHeal = hasHeal && healAmount > 0f ? (byte)1 : (byte)0,
             HasBulletTime = hasBulletTime && bulletTimeEnemySlowPercent > 0f ? (byte)1 : (byte)0,
             HasLaserBeam = hasLaserBeam ? (byte)1 : (byte)0,
+            HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
             ProjectileSize = new ProjectileSizePassiveConfig
             {
                 SizeMultiplier = math.max(0.01f, projectileSizeMultiplier),
@@ -583,7 +606,8 @@ public static class PlayerPowerUpPassiveBakeUtility
                 EnemySlowPercent = math.clamp(bulletTimeEnemySlowPercent, 0f, 100f),
                 TransitionTimeSeconds = math.max(0f, bulletTimeTransitionTimeSeconds)
             },
-            LaserBeam = laserBeamConfig
+            LaserBeam = laserBeamConfig,
+            OrbitalProjections = orbitalProjectionConfigs
         };
 
         if (!PlayerPowerUpPassiveConfigBuildUtility.HasAnyPayload(config))
@@ -658,6 +682,9 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasExplosion = hasExplosion,
             HasElementalTrail = hasElementalTrail,
             HasHeal = 0,
+            HasBulletTime = 0,
+            HasLaserBeam = 0,
+            HasOrbitalProjections = 0,
             ProjectileSize = PlayerPowerUpPassiveConfigBuildUtility.BuildProjectileSizePassiveConfig(passiveTool.ProjectileSizeData),
             ElementalProjectiles = PlayerPowerUpPassiveConfigBuildUtility.BuildElementalProjectilesPassiveConfig(passiveTool.ElementalProjectilesData),
             PerfectCircle = PlayerPowerUpPassiveConfigBuildUtility.BuildPerfectCirclePassiveConfig(passiveTool.PerfectCircleData),

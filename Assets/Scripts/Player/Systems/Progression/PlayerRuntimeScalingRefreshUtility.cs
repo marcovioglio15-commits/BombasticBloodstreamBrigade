@@ -33,10 +33,10 @@ internal static class PlayerRuntimeScalingRefreshUtility
     /// <param name="runtimeComboPassiveUnlocksLookup">Mutable runtime combo passive-unlock lookup.</param>
     /// <param name="basePowerUpConfigsLookup">Immutable modular power-up baseline lookup.</param>
     /// <param name="powerUpScalingLookup">Runtime power-up scaling metadata lookup.</param>
-    /// <param name="powerUpsConfigLookup">Mutable active-slot config lookup.</param>
+    /// <param name="powerUpsConfigLookup">Mutable external active-slot config snapshot lookup.</param>
     /// <param name="unlockCatalogLookup">Mutable unlock catalog lookup.</param>
     /// <param name="equippedPassiveToolsLookup">Mutable equipped-passive buffer lookup.</param>
-    /// <param name="passiveToolsStateLookup">Mutable aggregated passive-state lookup.</param>
+    /// <param name="passiveToolsStateLookup">Mutable aggregated passive-state snapshot buffer lookup.</param>
     /// <param name="healthLookup">Mutable health component lookup.</param>
     /// <param name="shieldLookup">Mutable shield component lookup.</param>
     /// <param name="progressionConfigLookup">Runtime progression config lookup.</param>
@@ -75,10 +75,10 @@ internal static class PlayerRuntimeScalingRefreshUtility
                                          BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup,
                                          BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup,
                                          BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup,
-                                         ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup,
+                                         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
                                          BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup,
                                          BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup,
-                                         ComponentLookup<PlayerPassiveToolsState> passiveToolsStateLookup,
+                                         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup,
                                          ComponentLookup<PlayerHealth> healthLookup,
                                          ComponentLookup<PlayerShield> shieldLookup,
                                          ComponentLookup<PlayerProgressionConfig> progressionConfigLookup,
@@ -116,10 +116,10 @@ internal static class PlayerRuntimeScalingRefreshUtility
             !characterTuningFormulaLookup.HasBuffer(entity) ||
             !basePowerUpConfigsLookup.HasBuffer(entity) ||
             !powerUpScalingLookup.HasBuffer(entity) ||
-            !powerUpsConfigLookup.HasComponent(entity) ||
+            !powerUpsConfigLookup.HasBuffer(entity) ||
             !unlockCatalogLookup.HasBuffer(entity) ||
             !equippedPassiveToolsLookup.HasBuffer(entity) ||
-            !passiveToolsStateLookup.HasComponent(entity) ||
+            !passiveToolsStateLookup.HasBuffer(entity) ||
             !healthLookup.HasComponent(entity) ||
             !shieldLookup.HasComponent(entity) ||
             !progressionConfigLookup.HasComponent(entity) ||
@@ -159,10 +159,10 @@ internal static class PlayerRuntimeScalingRefreshUtility
         DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas = characterTuningFormulaLookup[entity];
         DynamicBuffer<PlayerPowerUpBaseConfigElement> basePowerUpConfigs = basePowerUpConfigsLookup[entity];
         DynamicBuffer<PlayerRuntimePowerUpScalingElement> powerUpScaling = powerUpScalingLookup[entity];
-        PlayerPowerUpsConfig powerUpsConfig = powerUpsConfigLookup[entity];
+        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[entity];
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup[entity];
-        PlayerPassiveToolsState passiveToolsState = passiveToolsStateLookup[entity];
+        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup);
         PlayerHealth playerHealth = healthLookup[entity];
         PlayerShield playerShield = shieldLookup[entity];
         PlayerProgressionConfig progressionConfig = progressionConfigLookup[entity];
@@ -221,8 +221,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
         runtimeHealthLookup[entity] = runtimeHealth;
         runtimeComboConfigLookup[entity] = runtimeComboConfig;
         comboCounterStateLookup[entity] = comboCounterState;
-        powerUpsConfigLookup[entity] = powerUpsConfig;
-        passiveToolsStateLookup[entity] = passiveToolsState;
+        PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigLookup[entity], in powerUpsConfig);
+        PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateLookup[entity], in passiveToolsState);
         healthLookup[entity] = playerHealth;
         shieldLookup[entity] = playerShield;
         experienceLookup[entity] = playerExperience;

@@ -22,7 +22,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerChargeCharacterTuningState>();
         state.RequireForUpdate<PlayerChargeCharacterTuningBaseStatElement>();
@@ -68,10 +68,11 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerShield>();
         state.RequireForUpdate<LocalTransform>();
         state.RequireForUpdate<PlayerBombSpawnRequest>();
+        state.RequireForUpdate<PlayerOrbitalProjectionSpawnRequest>();
         state.RequireForUpdate<ShootRequest>();
         state.RequireForUpdate<PlayerBulletTimeState>();
         state.RequireForUpdate<PlayerHealOverTimeState>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerLaserBeamState>();
     }
 
@@ -79,7 +80,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
-        ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
         ComponentLookup<PlayerLookState> lookLookup = SystemAPI.GetComponentLookup<PlayerLookState>(true);
@@ -96,7 +97,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(false);
         ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup = SystemAPI.GetComponentLookup<PlayerBaseHealthStatisticsConfig>(true);
         ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup = SystemAPI.GetComponentLookup<PlayerRuntimeHealthStatisticsConfig>(false);
-        ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
@@ -127,11 +128,12 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         ComponentLookup<PlayerComboCounterState> comboCounterStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(false);
         BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(true);
         BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePowerUpScalingElement>(true);
+        BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
         foreach ((RefRO<PlayerInputState> inputState,
-                  RefRW<PlayerPowerUpsConfig> powerUpsConfig,
+                  DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState,
                   RefRW<PlayerDashState> dashState,
                   RefRW<PlayerLaserBeamState> laserBeamState,
@@ -139,7 +141,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                   DynamicBuffer<ShootRequest> shootRequests,
                   Entity entity)
                  in SystemAPI.Query<RefRO<PlayerInputState>,
-                                    RefRW<PlayerPowerUpsConfig>,
+                                    DynamicBuffer<PlayerPowerUpsConfigElement>,
                                     RefRW<PlayerPowerUpsState>,
                                     RefRW<PlayerDashState>,
                                     RefRW<PlayerLaserBeamState>,
@@ -158,7 +160,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!runtimeShootingLookup.HasComponent(entity))
                 continue;
 
-            if (!passiveToolsLookup.HasComponent(entity))
+            if (!passiveToolsLookup.HasBuffer(entity))
                 continue;
 
             if (!transformLookup.HasComponent(entity))
@@ -200,11 +202,15 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!runtimeGamePhasesLookup.HasBuffer(entity))
                 continue;
 
+            if (!orbitalProjectionRequestsLookup.HasBuffer(entity))
+                continue;
+
             PlayerLookState lookState = lookLookup[entity];
             PlayerMovementState movementState = movementLookup[entity];
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
             PlayerRuntimeMovementConfig runtimeMovementConfig = runtimeMovementLookup[entity];
             PlayerRuntimeShootingConfig runtimeShootingConfig = runtimeShootingLookup[entity];
-            PlayerPassiveToolsState passiveToolsState = passiveToolsLookup[entity];
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsLookup);
             LocalTransform localTransform = transformLookup[entity];
             PlayerBulletTimeState bulletTimeState = bulletTimeLookup[entity];
             PlayerHealOverTimeState healOverTimeState = healOverTimeLookup[entity];
@@ -219,6 +225,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas = characterTuningFormulaLookup[entity];
             DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
             DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases = runtimeGamePhasesLookup[entity];
+            DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests = orbitalProjectionRequestsLookup[entity];
             PlayerLaserBeamState mutableLaserBeamState = laserBeamState.ValueRO;
             bool primaryPressed = inputState.ValueRO.PowerUpPrimary > InputPressThreshold;
             bool secondaryPressed = inputState.ValueRO.PowerUpSecondary > InputPressThreshold;
@@ -234,8 +241,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             powerUpsState.ValueRW.PreviousPrimaryPressed = primaryPressed ? (byte)1 : (byte)0;
             powerUpsState.ValueRW.PreviousSecondaryPressed = secondaryPressed ? (byte)1 : (byte)0;
 
-            PlayerPowerUpSlotConfig primarySlotConfig = powerUpsConfig.ValueRO.PrimarySlot;
-            PlayerPowerUpSlotConfig secondarySlotConfig = powerUpsConfig.ValueRO.SecondarySlot;
+            PlayerPowerUpSlotConfig primarySlotConfig = powerUpsConfig.PrimarySlot;
+            PlayerPowerUpSlotConfig secondarySlotConfig = powerUpsConfig.SecondarySlot;
             float primaryEnergy = powerUpsState.ValueRO.PrimaryEnergy;
             float secondaryEnergy = powerUpsState.ValueRO.SecondaryEnergy;
             float primaryCooldownRemaining = powerUpsState.ValueRO.PrimaryCooldownRemaining;
@@ -364,6 +371,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref bulletTimeState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
+                                                                orbitalProjectionRequests,
                                                                 shootRequests,
                                                                 audioRequests,
                                                                 canEnqueueAudioRequests,
@@ -486,6 +494,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref bulletTimeState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
+                                                                orbitalProjectionRequests,
                                                                 shootRequests,
                                                                 audioRequests,
                                                                 canEnqueueAudioRequests,
@@ -680,7 +689,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     /// <param name="runtimeGamePhasesLookup">Mutable runtime-phase buffer lookup.</param>
     /// <param name="basePowerUpConfigsLookup">Immutable modular power-up baseline lookup.</param>
     /// <param name="powerUpScalingLookup">Runtime power-up scaling metadata lookup.</param>
-    /// <param name="powerUpsConfigLookup">Mutable power-up slot config lookup.</param>
+    /// <param name="powerUpsConfigLookup">Mutable external power-up slot config snapshot lookup.</param>
     /// <param name="unlockCatalogLookup">Mutable unlock catalog lookup.</param>
     /// <param name="equippedPassiveToolsLookup">Mutable equipped-passive buffer lookup.</param>
     /// <param name="passiveToolsLookup">Mutable passive aggregate lookup.</param>
@@ -728,10 +737,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                   BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup,
                                                   BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup,
                                                   BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup,
-                                                  ComponentLookup<PlayerPowerUpsConfig> powerUpsConfigLookup,
+                                                  BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
                                                   BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup,
                                                   BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup,
-                                                  ComponentLookup<PlayerPassiveToolsState> passiveToolsLookup,
+                                                  BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
                                                   ComponentLookup<PlayerHealth> healthLookup,
                                                   ComponentLookup<PlayerShield> shieldLookup,
                                                   ComponentLookup<PlayerProgressionConfig> progressionConfigLookup,
@@ -790,10 +799,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                              runtimeScalingStateLookup,
                                                              false);
 
-        if (!powerUpsConfigLookup.HasComponent(entity))
+        if (!powerUpsConfigLookup.HasBuffer(entity))
             return;
 
-        PlayerPowerUpsConfig powerUpsConfig = powerUpsConfigLookup[entity];
+        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
         primarySlotConfig = powerUpsConfig.PrimarySlot;
         secondarySlotConfig = powerUpsConfig.SecondarySlot;
 
@@ -803,8 +812,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         if (runtimeShootingLookup.HasComponent(entity))
             runtimeShootingConfig = runtimeShootingLookup[entity];
 
-        if (passiveToolsLookup.HasComponent(entity))
-            passiveToolsState = passiveToolsLookup[entity];
+        if (passiveToolsLookup.HasBuffer(entity))
+            passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsLookup);
 
         if (experienceLookup.HasComponent(entity))
             playerExperience = experienceLookup[entity];

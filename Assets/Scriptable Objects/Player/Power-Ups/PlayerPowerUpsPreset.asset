@@ -412,6 +412,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -674,6 +681,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -936,6 +950,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1198,6 +1219,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1460,6 +1488,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1722,6 +1757,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -1984,6 +2026,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2246,6 +2295,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2508,6 +2564,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -2770,6 +2833,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3032,6 +3102,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3294,6 +3371,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3556,6 +3640,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -3818,6 +3909,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4080,6 +4178,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4342,6 +4447,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4604,6 +4716,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -4866,6 +4985,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5128,6 +5254,13 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5390,6 +5523,306 @@ MonoBehaviour:
         spiralGrowthMultiplier: 1
         spiralTurnsBeforeDespawn: 1.25
         spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
+      projectileBounceOnWalls:
+        maxBounces: 2
+        speedPercentChangePerBounce: -5
+        minimumSpeedMultiplierAfterBounce: 0.1
+        maximumSpeedMultiplierAfterBounce: 3
+      projectileSplit:
+        triggerMode: 0
+        directionMode: 0
+        splitProjectileCount: 2
+        splitOffsetDegrees: 0
+        customAnglesDegrees:
+        - -20
+        - 20
+        splitDamagePercentFromOriginal: 50
+        splitSizePercentFromOriginal: 75
+        splitSpeedPercentFromOriginal: 85
+        splitLifetimePercentFromOriginal: 65
+      laserBeam:
+        damageMultiplier: 5
+        continuousDamagePerSecondMultiplier: 0.1
+        virtualProjectileSpeedMultiplier: 1
+        damageTickIntervalSeconds: 0.5
+        maximumContinuousActiveSeconds: 2.75
+        cooldownSeconds: 0.15
+        maximumBounceSegments: 2
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
+        visualPresetId: 0
+        bodyProfile: 1
+        sourceShape: 2
+        terminalCapShape: 1
+        bodyWidthMultiplier: 5
+        collisionWidthMultiplier: 1
+        sourceScaleMultiplier: 2
+        terminalCapScaleMultiplier: 2
+        contactFlareScaleMultiplier: 1.2
+        bodyOpacity: 1
+        coreWidthMultiplier: 0.5
+        coreBrightness: 1.52
+        rimBrightness: 1
+        flowScrollSpeed: 14
+        flowPulseFrequency: 6
+        stormTwistSpeed: 14
+        stormTickPostTravelHoldSeconds: 0.25
+        stormIdleIntensity: 0
+        stormBurstIntensity: 1
+        sourceOffset: 0.08
+        sourceDischargeIntensity: 1.2
+        stormShellWidthMultiplier: 1.12
+        stormShellSeparation: 0.05
+        stormRingFrequency: 1
+        stormRingThickness: 0.1
+        stormTickTravelSpeed: 1.5
+        stormTickDamageLengthTolerance: 0.18
+        terminalCapIntensity: 1.12
+        contactFlareIntensity: 1.28
+        wobbleAmplitude: 1
+        bubbleDriftSpeed: 1.4
+      trailSpawn:
+        trailSegmentLifetimeSeconds: 1.5
+        trailSpawnDistance: 0.6
+        trailSpawnIntervalSeconds: 0.1
+        trailRadius: 1.2
+        maxActiveSegmentsPerPlayer: 30
+        trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+      elementalAreaTick:
+        effectData:
+          elementType: 0
+          effectKind: 0
+          procMode: 0
+          reapplyMode: 0
+          procThresholdStacks: 5
+          maximumStacks: 20
+          stackDecayPerSecond: 1
+          consumeStacksOnProc: 0
+          dotDamagePerTick: 4
+          dotTickInterval: 0.5
+          dotDurationSeconds: 2
+          impedimentSlowPercentPerStack: 10
+          impedimentProcSlowPercent: 50
+          impedimentMaxSlowPercent: 100
+          impedimentDurationSeconds: 2
+        stacksPerTick: 1
+        applyIntervalSeconds: 0.2
+      stackable:
+        maxAcquisitions: 2
+  - moduleId: Module_OrbitalProjections
+    displayName: OrbitalProjections
+    moduleKind: 20
+    defaultStage: 7
+    notes: 
+    data:
+      holdCharge:
+        requiredCharge: 500
+        maximumCharge: 500
+        chargeRatePerSecond: 125
+        decayAfterRelease: 0
+        decayAfterReleasePercentPerSecond: 25
+        passiveChargeGainWhileReleased: 0
+        passiveChargeGainPercentPerSecond: 10
+        laserDurationSeconds: 0.45
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        slowPlayerWhileCharging: 0
+        maximumPlayerSlowPercent: 35
+        playerSlowCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      triggerEvent:
+        eventType: 0
+      resourceGate:
+        activationResource: 1
+        maintenanceResource: 1
+        maximumEnergy: 100
+        activationCost: 100
+        maintenanceCostPerSecond: 0
+        isToggleable: 0
+        maintenanceTicksPerSecond: 4
+        minimumActivationEnergyPercent: 0
+        chargeType: 0
+        chargePerTrigger: 100
+        cooldownSeconds: 1
+        allowRechargeDuringToggleStartupLock: 0
+      suppressShooting:
+        suppressBaseShootingWhileActive: 1
+        interruptOtherSlotOnEnter: 0
+        interruptOtherSlotChargingOnly: 1
+      projectilePatternCone:
+        projectileCount: 6
+        coneAngleDegrees: 45
+        laserDurationSeconds: 0.35
+      characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas: []
+      bomb:
+        bombPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 1.2}
+        spawnOffsetOrientation: 0
+        deploySpeed: 4.5
+        velocityDirection: 0
+        collisionRadius: 0.18
+        bounceOnWalls: 1
+        bounceDamping: 0.65
+        linearDampingPerSecond: 1.2
+        fuseSeconds: 1.25
+        radius: 7
+        enableDamagePayload: 1
+        damage: 120
+        affectAllEnemiesInRadius: 1
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      dash:
+        distance: 6
+        directionMode: 0
+        duration: 0.18
+        speedTransitionInSeconds: 0.06
+        speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
+        grantsInvulnerability: 1
+        invulnerabilityExtraTime: 0.1
+      bulletTime:
+        duration: 3
+        enemySlowPercent: 40
+        transitionTimeSeconds: 0.2
+      healMissingHealth:
+        applyMode: 0
+        healAmount: 30
+        durationSeconds: 2
+        tickIntervalSeconds: 0.2
+        stackPolicy: 0
+      deathExplosion:
+        triggerMode: 0
+        cooldownSeconds: 2
+        radius: 4
+        damage: 20
+        affectAllEnemiesInRadius: 1
+        triggerOffset: {x: 0, y: 0, z: 0}
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      projectileOrbitOverride:
+        pathMode: 0
+        radialEntrySpeed: 12
+        orbitalSpeed: 8
+        orbitRadiusMin: 4
+        orbitRadiusMax: 6
+        orbitPulseFrequency: 0.7
+        orbitEntryRatio: 0.9
+        orbitBlendDuration: 0.3
+        heightOffset: 0
+        goldenAngleDegrees: 137.5
+        spiralStartRadius: 2.5
+        spiralMaximumRadius: 8
+        spiralAngularSpeedDegreesPerSecond: 240
+        spiralGrowthMultiplier: 1
+        spiralTurnsBeforeDespawn: 1.25
+        spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections:
+        - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+          displayName: Orbital Projection Shield
+          categoryId: OrbitalProjection
+          motionMode: 1
+          orbitDistance: 3
+          heightOffset: 0.7
+          angleOffsetDegrees: 0
+          orbitSpeedDegreesPerSecond: 30
+          bounceInsideOrbitCone: 0
+          orbitConeCenterAngleDegrees: 0
+          orbitConeAngleDegrees: 90
+          fullOrbitConeResponse: 0
+          lookFollowDelaySeconds: 0
+          collisionRadius: 1
+          damageEnemies: 0
+          contactDamage: 0
+          damageTickIntervalSeconds: 0
+          blockEnemyProjectiles: 1
+          blockEnemyBombs: 1
+          hasHealth: 1
+          maximumHealth: 5
+          enemyContactHealthDamage: 0
+          projectileBlockHealthDamage: 1
+          bombBlockHealthDamage: 1
       projectileBounceOnWalls:
         maxBounces: 2
         speedPercentChangePerBounce: -5
@@ -5665,6 +6098,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -5927,6 +6367,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6189,6 +6636,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6451,6 +6905,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6714,6 +7175,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -6989,6 +7457,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7251,6 +7726,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7513,6 +7995,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -7779,6 +8268,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8045,6 +8541,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8320,6 +8823,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8582,6 +9092,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -8844,6 +9361,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9106,6 +9630,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9369,6 +9900,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9644,6 +10182,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -9906,6 +10451,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10168,6 +10720,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10443,6 +11002,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10705,6 +11271,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -10967,6 +11540,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11242,6 +11822,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11504,6 +12091,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -11766,6 +12360,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12041,6 +12642,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12303,6 +12911,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12565,6 +13180,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -12837,6 +13459,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13099,6 +13728,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13362,6 +13998,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13449,6 +14092,563 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
+    unreplaceable: 0
+  - commonData:
+      powerUpId: ActivePowerUp_OrbitalProjection
+      displayName: Orbital Projections
+      description: 
+      icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
+      dropPools:
+      - Milestone
+      dropTier: 1
+      purchaseCost: 0
+    moduleBindings:
+    - bindingId: f246c556356e4c538aa9114f50cd819f
+      moduleId: Module_OrbitalProjections
+      stage: 7
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0
+          chargedLaserBeam:
+            damageMultiplier: 0
+            continuousDamagePerSecondMultiplier: 0
+            virtualProjectileSpeedMultiplier: 0
+            damageTickIntervalSeconds: 0
+            maximumContinuousActiveSeconds: 0
+            cooldownSeconds: 0
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 0
+            firingRotationSpeedMultiplier: 0
+            visualPresetId: 0
+            bodyProfile: 0
+            sourceShape: 0
+            terminalCapShape: 0
+            bodyWidthMultiplier: 0
+            collisionWidthMultiplier: 0
+            sourceScaleMultiplier: 0
+            terminalCapScaleMultiplier: 0
+            contactFlareScaleMultiplier: 0
+            bodyOpacity: 0
+            coreWidthMultiplier: 0
+            coreBrightness: 0
+            rimBrightness: 0
+            flowScrollSpeed: 0
+            flowPulseFrequency: 0
+            stormTwistSpeed: 0
+            stormTickPostTravelHoldSeconds: 0
+            stormIdleIntensity: 0
+            stormBurstIntensity: 0
+            sourceOffset: 0
+            sourceDischargeIntensity: 0
+            stormShellWidthMultiplier: 0
+            stormShellSeparation: 0
+            stormRingFrequency: 0
+            stormRingThickness: 0
+            stormTickTravelSpeed: 0
+            stormTickDamageLengthTolerance: 0
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
+            wobbleAmplitude: 0
+            bubbleDriftSpeed: 0
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 0
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 0
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0
+          radius: 0
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections:
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield
+            categoryId: Shield
+            motionMode: 1
+            orbitDistance: 3
+            heightOffset: 0.7
+            angleOffsetDegrees: 0
+            orbitSpeedDegreesPerSecond: 30
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 0
+            lookFollowDelaySeconds: 0
+            collisionRadius: 1
+            damageEnemies: 1
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 0
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 0
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 0
+          continuousDamagePerSecondMultiplier: 0
+          virtualProjectileSpeedMultiplier: 0
+          damageTickIntervalSeconds: 0
+          maximumContinuousActiveSeconds: 0
+          cooldownSeconds: 0
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 0
+          terminalCapShape: 0
+          bodyWidthMultiplier: 0
+          collisionWidthMultiplier: 0
+          sourceScaleMultiplier: 0
+          terminalCapScaleMultiplier: 0
+          contactFlareScaleMultiplier: 0
+          bodyOpacity: 0
+          coreWidthMultiplier: 0
+          coreBrightness: 0
+          rimBrightness: 0
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0
+          sourceDischargeIntensity: 0
+          stormShellWidthMultiplier: 0
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0
+          stormTickTravelSpeed: 0
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 0
+          contactFlareIntensity: 0
+          wobbleAmplitude: 0
+          bubbleDriftSpeed: 0
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 0
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0
+            maximumStacks: 0
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0
+            dotDurationSeconds: 0
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0
+          stacksPerTick: 0
+          applyIntervalSeconds: 0
+        stackable:
+          maxAcquisitions: 0
+    - bindingId: 1c0627b9214b4fd2bfa32c20af7d0cdb
+      moduleId: Module_GateResource
+      stage: 2
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0
+          chargedLaserBeam:
+            damageMultiplier: 0
+            continuousDamagePerSecondMultiplier: 0
+            virtualProjectileSpeedMultiplier: 0
+            damageTickIntervalSeconds: 0
+            maximumContinuousActiveSeconds: 0
+            cooldownSeconds: 0
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 0
+            firingRotationSpeedMultiplier: 0
+            visualPresetId: 0
+            bodyProfile: 0
+            sourceShape: 0
+            terminalCapShape: 0
+            bodyWidthMultiplier: 0
+            collisionWidthMultiplier: 0
+            sourceScaleMultiplier: 0
+            terminalCapScaleMultiplier: 0
+            contactFlareScaleMultiplier: 0
+            bodyOpacity: 0
+            coreWidthMultiplier: 0
+            coreBrightness: 0
+            rimBrightness: 0
+            flowScrollSpeed: 0
+            flowPulseFrequency: 0
+            stormTwistSpeed: 0
+            stormTickPostTravelHoldSeconds: 0
+            stormIdleIntensity: 0
+            stormBurstIntensity: 0
+            sourceOffset: 0
+            sourceDischargeIntensity: 0
+            stormShellWidthMultiplier: 0
+            stormShellSeparation: 0
+            stormRingFrequency: 0
+            stormRingThickness: 0
+            stormTickTravelSpeed: 0
+            stormTickDamageLengthTolerance: 0
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
+            wobbleAmplitude: 0
+            bubbleDriftSpeed: 0
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 0
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 0
+          maximumEnergy: 15
+          activationCost: 15
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 100
+          chargeType: 1
+          chargePerTrigger: 1
+          cooldownSeconds: 3
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 0
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0
+          radius: 0
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections:
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield
+            categoryId: Shield
+            motionMode: 1
+            orbitDistance: 3
+            heightOffset: 0.7
+            angleOffsetDegrees: 0
+            orbitSpeedDegreesPerSecond: 30
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 0
+            lookFollowDelaySeconds: 0
+            collisionRadius: 1
+            damageEnemies: 1
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 0
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 0
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 0
+          continuousDamagePerSecondMultiplier: 0
+          virtualProjectileSpeedMultiplier: 0
+          damageTickIntervalSeconds: 0
+          maximumContinuousActiveSeconds: 0
+          cooldownSeconds: 0
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 0
+          terminalCapShape: 0
+          bodyWidthMultiplier: 0
+          collisionWidthMultiplier: 0
+          sourceScaleMultiplier: 0
+          terminalCapScaleMultiplier: 0
+          contactFlareScaleMultiplier: 0
+          bodyOpacity: 0
+          coreWidthMultiplier: 0
+          coreBrightness: 0
+          rimBrightness: 0
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0
+          sourceDischargeIntensity: 0
+          stormShellWidthMultiplier: 0
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0
+          stormTickTravelSpeed: 0
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 0
+          contactFlareIntensity: 0
+          wobbleAmplitude: 0
+          bubbleDriftSpeed: 0
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 0
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0
+            maximumStacks: 0
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0
+            dotDurationSeconds: 0
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0
+          stacksPerTick: 0
+          applyIntervalSeconds: 0
+        stackable:
+          maxAcquisitions: 0
     unreplaceable: 0
   passivePowerUps:
   - commonData:
@@ -13638,6 +14838,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -13900,6 +15107,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14175,6 +15389,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14450,6 +15671,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14713,6 +15941,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -14988,6 +16223,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -15263,6 +16505,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 1
           spiralTurnsBeforeDespawn: 1.25
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 2
           speedPercentChangePerBounce: -5
@@ -15539,6 +16788,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -15813,6 +17069,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16084,6 +17347,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16345,6 +17615,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16616,6 +17893,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -16877,6 +18161,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17138,6 +18429,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17409,6 +18707,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17670,6 +18975,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -17941,6 +19253,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18202,6 +19521,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18473,6 +19799,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -18734,6 +20067,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19005,6 +20345,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19266,6 +20613,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19537,6 +20891,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -19798,6 +21159,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -20069,6 +21437,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -20330,6 +21705,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -20602,6 +21984,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -20874,6 +22263,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -21145,6 +22541,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -21406,6 +22809,13 @@ MonoBehaviour:
           spiralGrowthMultiplier: 0
           spiralTurnsBeforeDespawn: 0.1
           spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
         projectileBounceOnWalls:
           maxBounces: 0
           speedPercentChangePerBounce: 0
@@ -21492,9 +22902,318 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  - commonData:
+      powerUpId: Passive_OrbitalProjections
+      displayName: Orbital Projections
+      description: Orbital Projections
+      icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
+      dropPools:
+      - Milestone
+      dropTier: 1
+      purchaseCost: 0
+    moduleBindings:
+    - bindingId: b677169f13424b73a3036dcd3056af58
+      moduleId: Module_OrbitalProjections
+      stage: 7
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0
+          chargedLaserBeam:
+            damageMultiplier: 0
+            continuousDamagePerSecondMultiplier: 0
+            virtualProjectileSpeedMultiplier: 0
+            damageTickIntervalSeconds: 0
+            maximumContinuousActiveSeconds: 0
+            cooldownSeconds: 0
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 0
+            firingRotationSpeedMultiplier: 0
+            visualPresetId: 0
+            bodyProfile: 0
+            sourceShape: 0
+            terminalCapShape: 0
+            bodyWidthMultiplier: 0
+            collisionWidthMultiplier: 0
+            sourceScaleMultiplier: 0
+            terminalCapScaleMultiplier: 0
+            contactFlareScaleMultiplier: 0
+            bodyOpacity: 0
+            coreWidthMultiplier: 0
+            coreBrightness: 0
+            rimBrightness: 0
+            flowScrollSpeed: 0
+            flowPulseFrequency: 0
+            stormTwistSpeed: 0
+            stormTickPostTravelHoldSeconds: 0
+            stormIdleIntensity: 0
+            stormBurstIntensity: 0
+            sourceOffset: 0
+            sourceDischargeIntensity: 0
+            stormShellWidthMultiplier: 0
+            stormShellSeparation: 0
+            stormRingFrequency: 0
+            stormRingThickness: 0
+            stormTickTravelSpeed: 0
+            stormTickDamageLengthTolerance: 0
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
+            wobbleAmplitude: 0
+            bubbleDriftSpeed: 0
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 0
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 0
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0
+          radius: 0
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0
+          enemySlowPercent: 0
+          transitionTimeSeconds: 0
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0
+          stackPolicy: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections:
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield
+            categoryId: OrbitalProjection
+            motionMode: 1
+            orbitDistance: 3
+            heightOffset: 0
+            angleOffsetDegrees: 0
+            orbitSpeedDegreesPerSecond: 120
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 0
+            lookFollowDelaySeconds: 0
+            collisionRadius: 0.7
+            damageEnemies: 0
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 0
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+          - projectionPrefab: {fileID: 6580205467536590943, guid: 0ff06bb8cf64f1c49b9397624aa28916, type: 3}
+            displayName: Orbital Projection Damage
+            categoryId: 'Orbital Projection Damage '
+            motionMode: 0
+            orbitDistance: 3
+            heightOffset: 0
+            angleOffsetDegrees: 0
+            orbitSpeedDegreesPerSecond: 120
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 0
+            lookFollowDelaySeconds: 0
+            collisionRadius: 0.7
+            damageEnemies: 1
+            contactDamage: 5
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 0
+            blockEnemyBombs: 0
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 0
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 0
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 0
+          continuousDamagePerSecondMultiplier: 0
+          virtualProjectileSpeedMultiplier: 0
+          damageTickIntervalSeconds: 0
+          maximumContinuousActiveSeconds: 0
+          cooldownSeconds: 0
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 0
+          terminalCapShape: 0
+          bodyWidthMultiplier: 0
+          collisionWidthMultiplier: 0
+          sourceScaleMultiplier: 0
+          terminalCapScaleMultiplier: 0
+          contactFlareScaleMultiplier: 0
+          bodyOpacity: 0
+          coreWidthMultiplier: 0
+          coreBrightness: 0
+          rimBrightness: 0
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0
+          sourceDischargeIntensity: 0
+          stormShellWidthMultiplier: 0
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0
+          stormTickTravelSpeed: 0
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 0
+          contactFlareIntensity: 0
+          wobbleAmplitude: 0
+          bubbleDriftSpeed: 0
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 0
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0
+            maximumStacks: 0
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0
+            dotDurationSeconds: 0
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0
+          stacksPerTick: 0
+          applyIntervalSeconds: 0
+        stackable:
+          maxAcquisitions: 0
+    unreplaceable: 0
+  primaryActivePowerUpId: ActivePowerUp_OrbitalProjection
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - Passive_OrbitalProjections
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

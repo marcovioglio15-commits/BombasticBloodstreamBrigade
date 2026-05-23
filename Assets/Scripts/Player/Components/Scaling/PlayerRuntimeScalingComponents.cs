@@ -429,6 +429,7 @@ public struct PlayerRuntimePowerUpScalingElement : IBufferElementData
     public float BaseValue;
     public byte BaseBooleanValue;
     public byte IsInteger;
+    public FixedString64Bytes BaseTokenValue;
     public FixedString512Bytes Formula;
 }
 #endregion

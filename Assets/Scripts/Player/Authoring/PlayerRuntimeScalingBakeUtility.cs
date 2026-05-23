@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -18,6 +19,7 @@ internal static class PlayerRuntimeScalingBakeUtility
     private const string ActivePowerUpsRoot = "activePowerUps.Array.data[";
     private const string PassivePowerUpsRoot = "passivePowerUps.Array.data[";
     private const string ModuleDefinitionsRoot = "moduleDefinitions.Array.data[";
+    private const int MaximumFixedString64Utf8Bytes = 61;
     #endregion
 
     #region Methods
@@ -74,10 +76,12 @@ internal static class PlayerRuntimeScalingBakeUtility
     /// <param name="sourcePreset">Unscaled power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="baseConfigs">Destination immutable base config buffer.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void PopulatePowerUpBaseConfigs(PlayerAuthoring authoring,
                                                   PlayerPowerUpsPreset sourcePreset,
                                                   Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                  DynamicBuffer<PlayerPowerUpBaseConfigElement> baseConfigs)
+                                                  DynamicBuffer<PlayerPowerUpBaseConfigElement> baseConfigs,
+                                                  Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
         baseConfigs.Clear();
 
@@ -91,12 +95,14 @@ internal static class PlayerRuntimeScalingBakeUtility
                                  activePowerUps,
                                  PlayerPowerUpUnlockKind.Active,
                                  resolveDynamicPrefabEntity,
+                                 resolveOrbitalProjectionPrefabBindingIndex,
                                  baseConfigs);
         AppendPowerUpBaseConfigs(authoring,
                                  sourcePreset,
                                  passivePowerUps,
                                  PlayerPowerUpUnlockKind.Passive,
                                  resolveDynamicPrefabEntity,
+                                 resolveOrbitalProjectionPrefabBindingIndex,
                                  baseConfigs);
     }
 
@@ -139,11 +145,22 @@ internal static class PlayerRuntimeScalingBakeUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Appends immutable active or passive base configs used by runtime scaling rebuilds.
+    /// </summary>
+    /// <param name="authoring">Owning player authoring component.</param>
+    /// <param name="sourcePreset">Unscaled power-ups preset used as the baseline.</param>
+    /// <param name="powerUps">Power-up definitions to append.</param>
+    /// <param name="unlockKind">Config kind represented by the power-up list.</param>
+    /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Resolver that stores orbital projection prefabs in a remappable binding table.</param>
+    /// <param name="baseConfigs">Destination immutable base config buffer.</param>
     private static void AppendPowerUpBaseConfigs(PlayerAuthoring authoring,
                                                  PlayerPowerUpsPreset sourcePreset,
                                                  IReadOnlyList<ModularPowerUpDefinition> powerUps,
                                                  PlayerPowerUpUnlockKind unlockKind,
                                                  Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                 Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex,
                                                  DynamicBuffer<PlayerPowerUpBaseConfigElement> baseConfigs)
     {
         if (powerUps == null)
@@ -168,28 +185,65 @@ internal static class PlayerRuntimeScalingBakeUtility
                 element.ActiveSlotConfig = PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
                                                                                                             sourcePreset,
                                                                                                             powerUp,
-                                                                                                            resolveDynamicPrefabEntity);
+                                                                                                            resolveDynamicPrefabEntity,
+                                                                                                            resolveOrbitalProjectionPrefabBindingIndex);
             else
                 element.PassiveToolConfig = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                                                     sourcePreset,
                                                                                                                     powerUp,
-                                                                                                                    resolveDynamicPrefabEntity);
+                                                                                                                    resolveDynamicPrefabEntity,
+                                                                                                                    resolveOrbitalProjectionPrefabBindingIndex);
 
             baseConfigs.Add(element);
         }
     }
 
 #if UNITY_EDITOR
+    /// <summary>
+    /// Resolves numeric, boolean, and enum baseline metadata for Add Scaling fields that do not need token storage.
+    /// </summary>
+    /// <param name="property">Serialized property targeted by Add Scaling.</param>
+    /// <param name="valueType">Runtime formula value type.</param>
+    /// <param name="baseValue">Numeric base value when applicable.</param>
+    /// <param name="baseBooleanValue">Boolean base value when applicable.</param>
+    /// <param name="isInteger">True when numeric values should be rounded before assignment.</param>
+    /// <returns>True when the serialized property can be converted to runtime scaling metadata.</returns>
     internal static bool TryResolveScalingBaseMetadata(SerializedProperty property,
                                                        out byte valueType,
                                                        out float baseValue,
                                                        out byte baseBooleanValue,
                                                        out byte isInteger)
     {
+        return TryResolveScalingBaseMetadata(property,
+                                             out valueType,
+                                             out baseValue,
+                                             out baseBooleanValue,
+                                             out isInteger,
+                                             out FixedString64Bytes unusedBaseTokenValue);
+    }
+
+    /// <summary>
+    /// Resolves baseline metadata for Add Scaling fields, including token-backed string properties.
+    /// </summary>
+    /// <param name="property">Serialized property targeted by Add Scaling.</param>
+    /// <param name="valueType">Runtime formula value type.</param>
+    /// <param name="baseValue">Numeric base value when applicable.</param>
+    /// <param name="baseBooleanValue">Boolean base value when applicable.</param>
+    /// <param name="isInteger">True when numeric values should be rounded before assignment.</param>
+    /// <param name="baseTokenValue">Token base value when applicable.</param>
+    /// <returns>True when the serialized property can be converted to runtime scaling metadata.</returns>
+    internal static bool TryResolveScalingBaseMetadata(SerializedProperty property,
+                                                       out byte valueType,
+                                                       out float baseValue,
+                                                       out byte baseBooleanValue,
+                                                       out byte isInteger,
+                                                       out FixedString64Bytes baseTokenValue)
+    {
         valueType = (byte)PlayerFormulaValueType.Invalid;
         baseValue = 0f;
         baseBooleanValue = 0;
         isInteger = 0;
+        baseTokenValue = default;
 
         if (property == null)
             return false;
@@ -215,6 +269,17 @@ internal static class PlayerRuntimeScalingBakeUtility
                 valueType = (byte)PlayerFormulaValueType.Number;
                 baseValue = property.enumValueIndex;
                 isInteger = 1;
+                return true;
+            case SerializedPropertyType.String:
+                valueType = (byte)PlayerFormulaValueType.Token;
+                string tokenValue = string.IsNullOrWhiteSpace(property.stringValue)
+                    ? string.Empty
+                    : property.stringValue.Trim();
+
+                if (Encoding.UTF8.GetByteCount(tokenValue) > MaximumFixedString64Utf8Bytes)
+                    return false;
+
+                baseTokenValue = new FixedString64Bytes(tokenValue);
                 return true;
             default:
                 return false;
@@ -245,7 +310,8 @@ internal static class PlayerRuntimeScalingBakeUtility
                                            out byte valueType,
                                            out float baseValue,
                                            out byte baseBooleanValue,
-                                           out byte isInteger))
+                                           out byte isInteger,
+                                           out FixedString64Bytes baseTokenValue))
         {
             return false;
         }
@@ -259,6 +325,7 @@ internal static class PlayerRuntimeScalingBakeUtility
             BaseValue = baseValue,
             BaseBooleanValue = baseBooleanValue,
             IsInteger = isInteger,
+            BaseTokenValue = baseTokenValue,
             Formula = new FixedString512Bytes(ResolveStoredFormula(scalingRule.Formula, property, null))
         });
         return true;
@@ -293,7 +360,8 @@ internal static class PlayerRuntimeScalingBakeUtility
                                            out byte valueType,
                                            out float baseValue,
                                            out byte baseBooleanValue,
-                                           out byte isInteger))
+                                           out byte isInteger,
+                                           out FixedString64Bytes baseTokenValue))
         {
             return;
         }
@@ -305,6 +373,7 @@ internal static class PlayerRuntimeScalingBakeUtility
                                           valueType,
                                           baseValue,
                                           baseBooleanValue,
+                                          baseTokenValue,
                                           isInteger != 0,
                                           ResolveStoredFormula(scalingRule.Formula, property, null),
                                           scalingBuffer);
@@ -315,6 +384,7 @@ internal static class PlayerRuntimeScalingBakeUtility
                                           valueType,
                                           baseValue,
                                           baseBooleanValue,
+                                          baseTokenValue,
                                           isInteger != 0,
                                           ResolveStoredFormula(scalingRule.Formula, property, null),
                                           scalingBuffer);
@@ -327,6 +397,7 @@ internal static class PlayerRuntimeScalingBakeUtility
                                                           byte valueType,
                                                           float baseValue,
                                                           byte baseBooleanValue,
+                                                          FixedString64Bytes baseTokenValue,
                                                           bool isInteger,
                                                           string formula,
                                                           DynamicBuffer<PlayerRuntimePowerUpScalingElement> scalingBuffer)
@@ -371,6 +442,7 @@ internal static class PlayerRuntimeScalingBakeUtility
                     ValueType = valueType,
                     BaseValue = baseValue,
                     BaseBooleanValue = baseBooleanValue,
+                    BaseTokenValue = baseTokenValue,
                     IsInteger = isInteger ? (byte)1 : (byte)0,
                     Formula = new FixedString512Bytes(formula)
                 });

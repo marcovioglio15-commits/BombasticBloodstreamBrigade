@@ -298,7 +298,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                  ref playerAccess,
                                                  ref commandBuffer);
 
-        PlayerPowerUpsConfig powerUpsConfig = playerAccess.PowerUpsConfigLookup[playerEntity];
+        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(playerEntity, in playerAccess.PowerUpsConfigLookup);
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
 
         if (PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
@@ -307,7 +307,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                                                    ref powerUpsConfig,
                                                                                    ref powerUpsState))
         {
-            playerAccess.PowerUpsConfigLookup[playerEntity] = powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
             MarkActivePowerUpRecovered(playerEntity,
                                        runtime.PowerUpId,
@@ -336,7 +336,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                                                    ref powerUpsConfig,
                                                                                    ref powerUpsState))
         {
-            playerAccess.PowerUpsConfigLookup[playerEntity] = powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
             MarkActivePowerUpRecovered(playerEntity,
                                        runtime.PowerUpId,
@@ -400,7 +400,8 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                                               elapsedTime);
         }
 
-        playerAccess.PassiveToolsStateLookup[playerEntity] = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+        PlayerPassiveToolsStateBufferUtility.Write(playerAccess.PassiveToolsStateLookup[playerEntity], in passiveToolsState);
         return true;
     }
 

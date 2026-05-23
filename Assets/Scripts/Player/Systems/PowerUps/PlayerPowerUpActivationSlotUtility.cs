@@ -45,6 +45,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         ref PlayerBulletTimeState bulletTimeState,
                                         ref PlayerHealOverTimeState healOverTimeState,
                                         DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
+                                        DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
                                         DynamicBuffer<ShootRequest> shootRequests,
                                         DynamicBuffer<GameAudioEventRequest> audioRequests,
                                         bool canEnqueueAudioRequests,
@@ -102,6 +103,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 ref bulletTimeState,
                                                                                 moveInput,
                                                                                 lastValidMovementDirection,
+                                                                                orbitalProjectionRequests,
                                                                                 audioRequests,
                                                                                 canEnqueueAudioRequests);
             return;
@@ -237,6 +239,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                             ref dashState,
                                                             ref bulletTimeState,
                                                             bombRequests,
+                                                            orbitalProjectionRequests,
                                                             shootRequests);
 
         if (canEnqueueAudioRequests)
@@ -330,6 +333,10 @@ public static class PlayerPowerUpActivationSlotUtility
                     return false;
 
                 return true;
+            case ActiveToolKind.OrbitalProjections:
+                return slotConfig.TriggeredProjectilePassiveTool.IsDefined != 0 &&
+                       slotConfig.TriggeredProjectilePassiveTool.HasOrbitalProjections != 0 &&
+                       slotConfig.TriggeredProjectilePassiveTool.OrbitalProjections.Length > 0;
             case ActiveToolKind.ChargeShot:
                 if (slotConfig.ChargeShot.RequiredCharge <= 0f)
                     return false;

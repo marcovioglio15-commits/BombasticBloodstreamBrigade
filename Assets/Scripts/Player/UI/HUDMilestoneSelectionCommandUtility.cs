@@ -1,7 +1,7 @@
 using Unity.Entities;
 
 /// <summary>
-/// Validates and queues milestone selection commands requested by the HUD.
+/// Validates and stores milestone selection commands requested by the HUD.
 /// </summary>
 public static class HUDMilestoneSelectionCommandUtility
 {
@@ -9,10 +9,10 @@ public static class HUDMilestoneSelectionCommandUtility
 
     #region Public Methods
     /// <summary>
-    /// Queues one milestone command after validating the current runtime state and optional offer index.
+    /// Stores one milestone command after validating the current runtime state and optional offer index.
     /// </summary>
-    /// <param name="entityManager">Entity manager used to read and write milestone selection buffers.</param>
-    /// <param name="playerEntity">Player entity that owns milestone selection state and command buffers.</param>
+    /// <param name="entityManager">Entity manager used to read and write milestone selection state.</param>
+    /// <param name="playerEntity">Player entity that owns milestone selection state.</param>
     /// <param name="commandType">Command kind requested by the HUD.</param>
     /// <param name="offerIndex">Offer index used by selection commands, or -1 for skip.</param>
     /// <returns>True when the command is queued; otherwise false.</returns>
@@ -43,16 +43,10 @@ public static class HUDMilestoneSelectionCommandUtility
                 return false;
         }
 
-        if (!entityManager.HasBuffer<PlayerMilestonePowerUpSelectionCommand>(playerEntity))
-            return false;
-
-        DynamicBuffer<PlayerMilestonePowerUpSelectionCommand> selectionCommandsBuffer = entityManager.GetBuffer<PlayerMilestonePowerUpSelectionCommand>(playerEntity);
-        selectionCommandsBuffer.Clear();
-        selectionCommandsBuffer.Add(new PlayerMilestonePowerUpSelectionCommand
-        {
-            CommandType = commandType,
-            OfferIndex = offerIndex
-        });
+        selectionState.HasPendingCommand = 1;
+        selectionState.PendingCommandType = commandType;
+        selectionState.PendingOfferIndex = offerIndex;
+        entityManager.SetComponentData(playerEntity, selectionState);
         return true;
     }
     #endregion

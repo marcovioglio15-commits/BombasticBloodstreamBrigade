@@ -438,6 +438,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.SpawnObject:
                 case PowerUpModuleKind.DeathExplosion:
                 case PowerUpModuleKind.OrbitalProjectiles:
+                case PowerUpModuleKind.OrbitalProjections:
                 case PowerUpModuleKind.BouncingProjectiles:
                 case PowerUpModuleKind.ProjectileSplit:
                 case PowerUpModuleKind.Dash:
@@ -462,6 +463,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             case PowerUpModuleKind.AreaTickApplyElement:
             case PowerUpModuleKind.DeathExplosion:
             case PowerUpModuleKind.OrbitalProjectiles:
+            case PowerUpModuleKind.OrbitalProjections:
             case PowerUpModuleKind.BouncingProjectiles:
             case PowerUpModuleKind.ProjectileSplit:
             case PowerUpModuleKind.TimeDilationEnemies:
@@ -495,6 +497,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
         bool hasTrail = moduleKinds.Contains(PowerUpModuleKind.SpawnTrailSegment) || moduleKinds.Contains(PowerUpModuleKind.AreaTickApplyElement);
         bool hasOrbit = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjectiles);
+        bool hasOrbitalProjections = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjections);
         bool hasBounce = moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles);
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasIgnoredPassiveOnlyModules = hasTrail || hasOrbit || hasBounce || hasSplit || hasTriggerEvent;
@@ -518,13 +521,16 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (hasHeal)
             executeKindCount += 1;
 
+        if (hasOrbitalProjections)
+            executeKindCount += 1;
+
         if (executeKindCount == 0 && !hasCharacterTuning)
             warningLines.Add("No execute module selected. This active power up compiles as undefined.");
         else if (executeKindCount == 0)
             warningLines.Add("No active execute module selected. Only Character Tuning acquisition effects will apply.");
 
         if (executeKindCount > 1)
-            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal.");
+            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections.");
 
         if (hasDeathExplosion && !hasSpawnObject)
             warningLines.Add("DeathExplosion is ignored unless SpawnObject is also bound.");
@@ -553,6 +559,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasTrail = moduleKinds.Contains(PowerUpModuleKind.SpawnTrailSegment) || moduleKinds.Contains(PowerUpModuleKind.AreaTickApplyElement);
         bool hasExplosion = moduleKinds.Contains(PowerUpModuleKind.DeathExplosion);
         bool hasOrbit = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjectiles);
+        bool hasOrbitalProjections = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjections);
         bool hasBounce = moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles);
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasShotgun = moduleKinds.Contains(PowerUpModuleKind.ProjectilesPatternCone);
@@ -562,7 +569,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
-        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam;
+        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam;
         List<string> ignoredActiveModules = new List<string>();
 
         if (!hasPassiveRuntimeConsumer)
@@ -666,6 +673,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasTrail = moduleKinds.Contains(PowerUpModuleKind.SpawnTrailSegment) || moduleKinds.Contains(PowerUpModuleKind.AreaTickApplyElement);
         bool hasExplosion = moduleKinds.Contains(PowerUpModuleKind.DeathExplosion);
         bool hasOrbit = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjectiles);
+        bool hasOrbitalProjections = moduleKinds.Contains(PowerUpModuleKind.OrbitalProjections);
         bool hasBounce = moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles);
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasShotgun = moduleKinds.Contains(PowerUpModuleKind.ProjectilesPatternCone);
@@ -675,7 +683,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasGateResource = moduleKinds.Contains(PowerUpModuleKind.GateResource);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
-        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam;
+        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam;
 
         if (!hasAnyPassiveRuntimeConsumer)
             warningLines.Add("No passive runtime module found. This passive power up compiles as undefined.");

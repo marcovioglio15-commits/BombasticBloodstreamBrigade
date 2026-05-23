@@ -48,6 +48,9 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         powerUpsState.PreviousPrimaryPressed = 0;
         powerUpsState.PreviousSecondaryPressed = 0;
         powerUpsState.PreviousSwapSlotsPressed = 0;
+        powerUpsState.HasPendingCheatCommand = 0;
+        powerUpsState.PendingCheatCommandType = PlayerPowerUpCheatCommandType.None;
+        powerUpsState.PendingCheatPresetIndex = -1;
         AssignInitialEquipOrders(ref powerUpsState, in powerUpsConfig);
     }
 

@@ -79,7 +79,9 @@ public static class PlayerPassiveToolsAggregationUtility
             HasBulletTime = 0,
             BulletTime = default,
             HasLaserBeam = 0,
-            LaserBeam = default
+            LaserBeam = default,
+            HasOrbitalProjections = 0,
+            OrbitalProjections = default
         };
     }
 
@@ -266,6 +268,8 @@ public static class PlayerPassiveToolsAggregationUtility
             }
         }
 
+        AccumulateOrbitalProjections(ref passiveToolsState, in passiveToolConfig);
+
         if (passiveToolConfig.HasHeal == 0 &&
             passiveToolConfig.HasBulletTime == 0 &&
             passiveToolConfig.HasLaserBeam == 0)
@@ -403,6 +407,31 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.LaserBeam.BodyProfile = passiveToolConfig.LaserBeam.BodyProfile;
         passiveToolsState.LaserBeam.SourceShape = passiveToolConfig.LaserBeam.SourceShape;
         passiveToolsState.LaserBeam.TerminalCapShape = passiveToolConfig.LaserBeam.TerminalCapShape;
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Appends orbital projection configs from one passive payload into the aggregate passive snapshot.
+    /// </summary>
+    /// <param name="passiveToolsState">Aggregate passive state updated in place for systems that consume rebuilt passive snapshots.</param>
+    /// <param name="passiveToolConfig">Passive payload that may contain one or more orbital projection entries.</param>
+    private static void AccumulateOrbitalProjections(ref PlayerPassiveToolsState passiveToolsState,
+                                                     in PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (passiveToolConfig.HasOrbitalProjections == 0 ||
+            passiveToolConfig.OrbitalProjections.Length <= 0)
+            return;
+
+        for (int projectionIndex = 0; projectionIndex < passiveToolConfig.OrbitalProjections.Length; projectionIndex++)
+        {
+            if (passiveToolsState.OrbitalProjections.Length >= passiveToolsState.OrbitalProjections.Capacity)
+                break;
+
+            passiveToolsState.OrbitalProjections.Add(passiveToolConfig.OrbitalProjections[projectionIndex]);
+        }
+
+        passiveToolsState.HasOrbitalProjections = passiveToolsState.OrbitalProjections.Length > 0 ? (byte)1 : (byte)0;
     }
     #endregion
 

@@ -48,6 +48,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private static EntityQuery spawnerQuery;
     private static EntityQuery bombQuery;
     private static EntityQuery projectileQuery;
+    private static EntityQuery orbitalProjectionQuery;
     #endregion
 
     #region Properties
@@ -90,6 +91,10 @@ public static class RuntimeEntityGizmoRenderUtility
                                                                  cachedEntityManager,
                                                                  projectileQuery,
                                                                  playerTransform.Position);
+        RuntimeEntityOrbitalProjectionGizmoUtility.DrawCollisionRadiusGizmos(primitiveDrawer,
+                                                                             cachedEntityManager,
+                                                                             orbitalProjectionQuery,
+                                                                             playerTransform.Position);
         return true;
     }
 
@@ -106,6 +111,7 @@ public static class RuntimeEntityGizmoRenderUtility
         spawnerQuery = default;
         bombQuery = default;
         projectileQuery = default;
+        orbitalProjectionQuery = default;
     }
     #endregion
 
@@ -140,6 +146,8 @@ public static class RuntimeEntityGizmoRenderUtility
                                                                 ComponentType.ReadOnly<ProjectileOwner>(),
                                                                 ComponentType.ReadOnly<LocalTransform>(),
                                                                 ComponentType.ReadOnly<ProjectileActive>());
+        orbitalProjectionQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerOrbitalProjectionInstance>(),
+                                                                       ComponentType.ReadOnly<LocalTransform>());
         return true;
     }
 

@@ -27,10 +27,10 @@ public partial struct EnemyPowerUpStealerModuleActivationSystem : ISystem
         playerQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<PlayerControllerConfig,
                      LocalTransform,
-                     PlayerPowerUpsConfig,
+                     PlayerPowerUpsConfigElement,
                      PlayerPowerUpsState,
                      EquippedPassiveToolElement,
-                     PlayerPassiveToolsState,
+                     PlayerPassiveToolsStateElement,
                      PlayerPowerUpUnlockCatalogElement>()
             .Build(ref state);
 
@@ -52,10 +52,10 @@ public partial struct EnemyPowerUpStealerModuleActivationSystem : ISystem
         LocalTransform playerTransform = SystemAPI.GetComponent<LocalTransform>(playerEntity);
         EnemyPowerUpStealerPlayerAccess playerAccess = new EnemyPowerUpStealerPlayerAccess
         {
-            PowerUpsConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsConfig>(false),
+            PowerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false),
             PowerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false),
             EquippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false),
-            PassiveToolsStateLookup = SystemAPI.GetComponentLookup<PlayerPassiveToolsState>(false),
+            PassiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false),
             UnlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false),
             ContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true)
         };

@@ -1,4 +1,5 @@
 using Unity.Mathematics;
+using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
@@ -21,6 +22,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
     /// <param name="visualConfig">Shared visual config.</param>
     /// <param name="laserBeamConfig">Runtime passive config used for material properties.</param>
     /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="stormTickPulses">Active storm pulses used to drive packet shader vectors.</param>
     /// <param name="palette">Resolved beam palette.</param>
     /// <param name="bodyMaterial">Optional shared body material override.</param>
     public static void ApplyBodyVisual(PlayerLaserBeamManagedBodyVisual visual,
@@ -28,6 +30,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
                                        in PlayerLaserBeamVisualConfig visualConfig,
                                        in LaserBeamPassiveConfig laserBeamConfig,
                                        in PlayerLaserBeamState laserBeamState,
+                                       in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                        in PlayerLaserBeamResolvedPalette palette,
                                        Material bodyMaterial)
     {
@@ -44,7 +47,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
         float maximumWidth = PlayerLaserBeamPresentationRuntimeMeshUtility.ResolveBodyVisualWidth(math.max(laneVisual.StartWidth, laneVisual.EndWidth));
         float stormBurstNormalized = PlayerLaserBeamPresentationRuntimeMeshUtility.ResolveStormBurstNormalized(in laserBeamConfig, in laserBeamState);
         PlayerLaserBeamPresentationRuntimeRenderPropertyUtility.ResolveStormTickPulseVectors(in laserBeamConfig,
-                                                                                             in laserBeamState,
+                                                                                             in stormTickPulses,
                                                                                              out Vector4 stormTickProgressA,
                                                                                              out Vector4 stormTickProgressB,
                                                                                              out Vector4 stormTickActiveA,
@@ -110,6 +113,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
     /// <param name="visualConfig">Shared visual config.</param>
     /// <param name="laserBeamConfig">Runtime passive config used for scale and material properties.</param>
     /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="stormTickPulses">Active storm pulses used to drive packet shader vectors.</param>
     /// <param name="palette">Resolved beam palette.</param>
     /// <param name="materialOverride">Optional shared material override.</param>
     /// <param name="capShape">Shape selector applied to the shader.</param>
@@ -119,6 +123,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
                                            in PlayerLaserBeamVisualConfig visualConfig,
                                            in LaserBeamPassiveConfig laserBeamConfig,
                                            in PlayerLaserBeamState laserBeamState,
+                                           in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                            in PlayerLaserBeamResolvedPalette palette,
                                            Material materialOverride,
                                            LaserBeamCapShape capShape,
@@ -156,6 +161,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
                              in palette,
                              in laserBeamConfig,
                              in laserBeamState,
+                             in stormTickPulses,
                              capShape,
                              width,
                              endpoint.TerminalBlockedByWall != 0,
@@ -194,6 +200,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
     /// <param name="palette">Resolved beam palette.</param>
     /// <param name="laserBeamConfig">Runtime passive config that drives the shader response.</param>
     /// <param name="laserBeamState">Runtime state used to resolve the current storm response.</param>
+    /// <param name="stormTickPulses">Active storm pulses used to drive packet shader vectors.</param>
     /// <param name="capShape">Shape selector applied to the shader.</param>
     /// <param name="width">Beam width at the endpoint.</param>
     /// <param name="terminalBlockedByWall">True when the terminal point is a wall hit.</param>
@@ -202,6 +209,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
                                              in PlayerLaserBeamResolvedPalette palette,
                                              in LaserBeamPassiveConfig laserBeamConfig,
                                              in PlayerLaserBeamState laserBeamState,
+                                             in DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                                              LaserBeamCapShape capShape,
                                              float width,
                                              bool terminalBlockedByWall,
@@ -218,7 +226,7 @@ internal static class PlayerLaserBeamPresentationRuntimeRenderUtility
         float resolvedEndpointWidth = PlayerLaserBeamPresentationRuntimeMeshUtility.ResolveBodyVisualWidth(width);
         float stormBurstNormalized = PlayerLaserBeamPresentationRuntimeMeshUtility.ResolveStormBurstNormalized(in laserBeamConfig, in laserBeamState);
         PlayerLaserBeamPresentationRuntimeRenderPropertyUtility.ResolveStormTickPulseVectors(in laserBeamConfig,
-                                                                                             in laserBeamState,
+                                                                                             in stormTickPulses,
                                                                                              out Vector4 stormTickProgressA,
                                                                                              out Vector4 stormTickProgressB,
                                                                                              out Vector4 stormTickActiveA,

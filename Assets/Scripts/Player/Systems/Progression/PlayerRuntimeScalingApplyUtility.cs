@@ -407,19 +407,37 @@ internal static class PlayerRuntimeScalingApplyUtility
 
             if ((PlayerFormulaValueType)scalingElement.ValueType == PlayerFormulaValueType.Boolean)
             {
-            if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
-                                                                                      scalingElement.BaseBooleanValue != 0,
-                                                                                      variableContext,
-                                                                                      out bool resolvedBoolean))
-            {
-                continue;
-            }
+                if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
+                                                                                          scalingElement.BaseBooleanValue != 0,
+                                                                                          variableContext,
+                                                                                          out bool resolvedBoolean))
+                {
+                    continue;
+                }
 
                 PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue(scalingElement.PayloadPath.ToString(),
                                                                          unlockKind,
                                                                          resolvedBoolean,
                                                                          ref activeSlotConfig,
                                                                          ref passiveToolConfig);
+                continue;
+            }
+
+            if ((PlayerFormulaValueType)scalingElement.ValueType == PlayerFormulaValueType.Token)
+            {
+                if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateTokenValue(scalingElement.Formula.ToString(),
+                                                                                        scalingElement.BaseTokenValue.ToString(),
+                                                                                        variableContext,
+                                                                                        out string resolvedToken))
+                {
+                    continue;
+                }
+
+                PlayerRuntimePowerUpScalingPathUtility.ApplyTokenValue(scalingElement.PayloadPath.ToString(),
+                                                                       unlockKind,
+                                                                       resolvedToken,
+                                                                       ref activeSlotConfig,
+                                                                       ref passiveToolConfig);
                 continue;
             }
 

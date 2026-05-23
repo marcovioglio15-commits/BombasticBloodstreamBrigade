@@ -197,22 +197,17 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     }
 
     /// <summary>
-    /// Creates a subsection content container with a bold local header.
+    /// Creates a subsection content foldout without duplicating nested drawer labels.
     /// </summary>
     /// <param name="sectionTitle">Subsection title shown in the header.</param>
     /// <returns>Returns the ready-to-fill subsection container.</returns>
     private static VisualElement CreateBrainSubSectionContainer(string sectionTitle)
     {
-        VisualElement container = new VisualElement();
-        container.style.marginTop = 4f;
-
-        Label header = new Label(sectionTitle + " Settings");
-        header.style.unityFontStyleAndWeight = FontStyle.Bold;
-        header.style.marginBottom = 4f;
-        ManagementToolCategoryLabelUtility.RegisterColorContextMenu(header, "NashCore.EnemyManagement.Brain.SubSection." + sectionTitle);
-        container.Add(header);
-
-        return container;
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(sectionTitle,
+                                                                           "NashCore.EnemyManagement.Brain.SubSection." + sectionTitle,
+                                                                           true);
+        foldout.style.marginTop = 4f;
+        return foldout;
     }
 
     /// <summary>

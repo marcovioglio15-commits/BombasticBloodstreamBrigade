@@ -16,7 +16,7 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
     #region Lifecycle
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerElementalTrailState>();
         state.RequireForUpdate<PlayerElementalTrailSegmentElement>();
         state.RequireForUpdate<PlayerMovementState>();
@@ -29,13 +29,13 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach ((RefRO<PlayerPassiveToolsState> passiveToolsState,
+        foreach ((DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerElementalTrailState> trailState,
                   RefRO<PlayerMovementState> movementState,
                   RefRO<LocalTransform> playerTransform,
                   DynamicBuffer<PlayerElementalTrailSegmentElement> trailSegments,
                   Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerPassiveToolsState>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRW<PlayerElementalTrailState>,
                                     RefRO<PlayerMovementState>,
                                     RefRO<LocalTransform>,
@@ -43,9 +43,10 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
                              .WithEntityAccess())
         {
             PlayerElementalTrailState currentTrailState = trailState.ValueRO;
+            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
             CompactSegments(entityManager, trailSegments, ref currentTrailState);
 
-            if (passiveToolsState.ValueRO.HasElementalTrail == 0)
+            if (passiveToolsState.HasElementalTrail == 0)
             {
                 currentTrailState.Initialized = 0;
                 currentTrailState.SpawnTimer = 0f;
@@ -53,7 +54,7 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
                 continue;
             }
 
-            ElementalTrailPassiveConfig trailConfig = passiveToolsState.ValueRO.ElementalTrail;
+            ElementalTrailPassiveConfig trailConfig = passiveToolsState.ElementalTrail;
             bool hasValidPayload = trailConfig.TrailRadius > 0f && trailConfig.StacksPerTick > 0f;
 
             if (!hasValidPayload)

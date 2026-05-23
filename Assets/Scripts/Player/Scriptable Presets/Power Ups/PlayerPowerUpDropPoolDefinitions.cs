@@ -65,8 +65,6 @@ public sealed class PowerUpDropPoolTierDefinition
         else
             tierId = tierId.Trim();
 
-        if (selectionPercentage < 0f)
-            selectionPercentage = 0f;
     }
     #endregion
 

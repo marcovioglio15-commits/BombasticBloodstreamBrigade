@@ -23,10 +23,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     public readonly bool HasMissingLaserBeamPulseHitBuffer;
     public readonly bool HasMissingExplosionRequestBuffer;
     public readonly bool HasMissingPowerUpVfxRequestBuffer;
-    public readonly bool HasMissingPowerUpVfxPoolBuffer;
     public readonly bool HasMissingPowerUpVfxPrefabBindingBuffer;
     public readonly bool HasMissingPowerUpVfxCapConfig;
-    public readonly bool HasMissingPowerUpCheatBuffer;
     public readonly bool HasMissingPowerUpCheatPresetEntryBuffer;
     public readonly bool HasMissingPowerUpCheatPresetPassiveBuffer;
     public readonly bool HasMissingPowerUpUnlockCatalogBuffer;
@@ -37,7 +35,6 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     public readonly bool HasMissingMilestoneSelectionState;
     public readonly bool HasMissingMilestoneTimeScaleResumeState;
     public readonly bool HasMissingMilestoneSelectionOfferBuffer;
-    public readonly bool HasMissingMilestoneSelectionCommandBuffer;
     #endregion
 
     #region Properties
@@ -62,10 +59,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
                    HasMissingLaserBeamPulseHitBuffer ||
                    HasMissingExplosionRequestBuffer ||
                    HasMissingPowerUpVfxRequestBuffer ||
-                   HasMissingPowerUpVfxPoolBuffer ||
                    HasMissingPowerUpVfxPrefabBindingBuffer ||
                    HasMissingPowerUpVfxCapConfig ||
-                   HasMissingPowerUpCheatBuffer ||
                    HasMissingPowerUpCheatPresetEntryBuffer ||
                    HasMissingPowerUpCheatPresetPassiveBuffer ||
                    HasMissingPowerUpUnlockCatalogBuffer ||
@@ -75,8 +70,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
                    HasMissingPowerUpTierEntryScalingBuffer ||
                    HasMissingMilestoneSelectionState ||
                    HasMissingMilestoneTimeScaleResumeState ||
-                   HasMissingMilestoneSelectionOfferBuffer ||
-                   HasMissingMilestoneSelectionCommandBuffer;
+                   HasMissingMilestoneSelectionOfferBuffer;
         }
     }
     #endregion
@@ -88,7 +82,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// Creates a new immutable snapshot of missing power-up runtime flags.
     /// </summary>
     /// <param name="hasMissingState">True when PlayerPowerUpsState is missing.</param>
-    /// <param name="hasMissingPassiveToolsState">True when PlayerPassiveToolsState is missing.</param>
+    /// <param name="hasMissingPassiveToolsState">True when the PlayerPassiveToolsStateElement snapshot buffer is missing.</param>
     /// <param name="hasMissingDash">True when PlayerDashState is missing.</param>
     /// <param name="hasMissingBulletTimeState">True when PlayerBulletTimeState is missing.</param>
     /// <param name="hasMissingHealOverTimeState">True when PlayerHealOverTimeState is missing.</param>
@@ -104,10 +98,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="hasMissingLaserBeamPulseHitBuffer">True when PlayerLaserBeamPulseHitElement buffer is missing.</param>
     /// <param name="hasMissingExplosionRequestBuffer">True when PlayerExplosionRequest buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxRequestBuffer">True when PlayerPowerUpVfxSpawnRequest buffer is missing.</param>
-    /// <param name="hasMissingPowerUpVfxPoolBuffer">True when PlayerPowerUpVfxPoolElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxPrefabBindingBuffer">True when PlayerPowerUpVfxPrefabBindingElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxCapConfig">True when PlayerPowerUpVfxCapConfig is missing.</param>
-    /// <param name="hasMissingPowerUpCheatBuffer">True when PlayerPowerUpCheatCommand buffer is missing.</param>
     /// <param name="hasMissingPowerUpCheatPresetEntryBuffer">True when PlayerPowerUpCheatPresetEntry buffer is missing.</param>
     /// <param name="hasMissingPowerUpCheatPresetPassiveBuffer">True when PlayerPowerUpCheatPresetPassiveElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpUnlockCatalogBuffer">True when PlayerPowerUpUnlockCatalogElement buffer is missing.</param>
@@ -118,7 +110,6 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="hasMissingMilestoneSelectionState">True when PlayerMilestonePowerUpSelectionState is missing.</param>
     /// <param name="hasMissingMilestoneTimeScaleResumeState">True when PlayerMilestoneTimeScaleResumeState is missing.</param>
     /// <param name="hasMissingMilestoneSelectionOfferBuffer">True when PlayerMilestonePowerUpSelectionOfferElement buffer is missing.</param>
-    /// <param name="hasMissingMilestoneSelectionCommandBuffer">True when PlayerMilestonePowerUpSelectionCommand buffer is missing.</param>
     /// <returns>A populated immutable snapshot.</returns>
     public PlayerPowerUpsMissingRuntimeFlags(
         bool hasMissingState,
@@ -138,10 +129,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         bool hasMissingLaserBeamPulseHitBuffer,
         bool hasMissingExplosionRequestBuffer,
         bool hasMissingPowerUpVfxRequestBuffer,
-        bool hasMissingPowerUpVfxPoolBuffer,
         bool hasMissingPowerUpVfxPrefabBindingBuffer,
         bool hasMissingPowerUpVfxCapConfig,
-        bool hasMissingPowerUpCheatBuffer,
         bool hasMissingPowerUpCheatPresetEntryBuffer,
         bool hasMissingPowerUpCheatPresetPassiveBuffer,
         bool hasMissingPowerUpUnlockCatalogBuffer,
@@ -151,8 +140,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         bool hasMissingPowerUpTierEntryScalingBuffer,
         bool hasMissingMilestoneSelectionState,
         bool hasMissingMilestoneTimeScaleResumeState,
-        bool hasMissingMilestoneSelectionOfferBuffer,
-        bool hasMissingMilestoneSelectionCommandBuffer)
+        bool hasMissingMilestoneSelectionOfferBuffer)
     {
         HasMissingState = hasMissingState;
         HasMissingPassiveToolsState = hasMissingPassiveToolsState;
@@ -171,10 +159,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         HasMissingLaserBeamPulseHitBuffer = hasMissingLaserBeamPulseHitBuffer;
         HasMissingExplosionRequestBuffer = hasMissingExplosionRequestBuffer;
         HasMissingPowerUpVfxRequestBuffer = hasMissingPowerUpVfxRequestBuffer;
-        HasMissingPowerUpVfxPoolBuffer = hasMissingPowerUpVfxPoolBuffer;
         HasMissingPowerUpVfxPrefabBindingBuffer = hasMissingPowerUpVfxPrefabBindingBuffer;
         HasMissingPowerUpVfxCapConfig = hasMissingPowerUpVfxCapConfig;
-        HasMissingPowerUpCheatBuffer = hasMissingPowerUpCheatBuffer;
         HasMissingPowerUpCheatPresetEntryBuffer = hasMissingPowerUpCheatPresetEntryBuffer;
         HasMissingPowerUpCheatPresetPassiveBuffer = hasMissingPowerUpCheatPresetPassiveBuffer;
         HasMissingPowerUpUnlockCatalogBuffer = hasMissingPowerUpUnlockCatalogBuffer;
@@ -185,7 +171,6 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         HasMissingMilestoneSelectionState = hasMissingMilestoneSelectionState;
         HasMissingMilestoneTimeScaleResumeState = hasMissingMilestoneTimeScaleResumeState;
         HasMissingMilestoneSelectionOfferBuffer = hasMissingMilestoneSelectionOfferBuffer;
-        HasMissingMilestoneSelectionCommandBuffer = hasMissingMilestoneSelectionCommandBuffer;
     }
     #endregion
 
@@ -194,7 +179,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// Evaluates all runtime bootstrap queries and returns a snapshot of missing data.
     /// </summary>
     /// <param name="missingStateQuery">Query for entities missing PlayerPowerUpsState.</param>
-    /// <param name="missingPassiveToolsStateQuery">Query for entities missing PlayerPassiveToolsState.</param>
+    /// <param name="missingPassiveToolsStateQuery">Query for entities missing the PlayerPassiveToolsStateElement snapshot buffer.</param>
     /// <param name="missingDashQuery">Query for entities missing PlayerDashState.</param>
     /// <param name="missingBulletTimeStateQuery">Query for entities missing PlayerBulletTimeState.</param>
     /// <param name="missingHealOverTimeStateQuery">Query for entities missing PlayerHealOverTimeState.</param>
@@ -210,10 +195,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="missingLaserBeamPulseHitBufferQuery">Query for entities missing PlayerLaserBeamPulseHitElement buffer.</param>
     /// <param name="missingExplosionRequestBufferQuery">Query for entities missing PlayerExplosionRequest buffer.</param>
     /// <param name="missingPowerUpVfxRequestBufferQuery">Query for entities missing PlayerPowerUpVfxSpawnRequest buffer.</param>
-    /// <param name="missingPowerUpVfxPoolBufferQuery">Query for entities missing PlayerPowerUpVfxPoolElement buffer.</param>
     /// <param name="missingPowerUpVfxPrefabBindingBufferQuery">Query for entities missing PlayerPowerUpVfxPrefabBindingElement buffer.</param>
     /// <param name="missingPowerUpVfxCapConfigQuery">Query for entities missing PlayerPowerUpVfxCapConfig.</param>
-    /// <param name="missingPowerUpCheatBufferQuery">Query for entities missing PlayerPowerUpCheatCommand buffer.</param>
     /// <param name="missingPowerUpCheatPresetEntryBufferQuery">Query for entities missing PlayerPowerUpCheatPresetEntry buffer.</param>
     /// <param name="missingPowerUpCheatPresetPassiveBufferQuery">Query for entities missing PlayerPowerUpCheatPresetPassiveElement buffer.</param>
     /// <param name="missingPowerUpUnlockCatalogBufferQuery">Query for entities missing PlayerPowerUpUnlockCatalogElement buffer.</param>
@@ -224,7 +207,6 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="missingMilestoneSelectionStateQuery">Query for entities missing PlayerMilestonePowerUpSelectionState.</param>
     /// <param name="missingMilestoneTimeScaleResumeStateQuery">Query for entities missing PlayerMilestoneTimeScaleResumeState.</param>
     /// <param name="missingMilestoneSelectionOfferBufferQuery">Query for entities missing PlayerMilestonePowerUpSelectionOfferElement buffer.</param>
-    /// <param name="missingMilestoneSelectionCommandBufferQuery">Query for entities missing PlayerMilestonePowerUpSelectionCommand buffer.</param>
     /// <returns>A snapshot of all missing-runtime flags.</returns>
     public static PlayerPowerUpsMissingRuntimeFlags Create(
         in EntityQuery missingStateQuery,
@@ -244,10 +226,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         in EntityQuery missingLaserBeamPulseHitBufferQuery,
         in EntityQuery missingExplosionRequestBufferQuery,
         in EntityQuery missingPowerUpVfxRequestBufferQuery,
-        in EntityQuery missingPowerUpVfxPoolBufferQuery,
         in EntityQuery missingPowerUpVfxPrefabBindingBufferQuery,
         in EntityQuery missingPowerUpVfxCapConfigQuery,
-        in EntityQuery missingPowerUpCheatBufferQuery,
         in EntityQuery missingPowerUpCheatPresetEntryBufferQuery,
         in EntityQuery missingPowerUpCheatPresetPassiveBufferQuery,
         in EntityQuery missingPowerUpUnlockCatalogBufferQuery,
@@ -257,8 +237,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         in EntityQuery missingPowerUpTierEntryScalingBufferQuery,
         in EntityQuery missingMilestoneSelectionStateQuery,
         in EntityQuery missingMilestoneTimeScaleResumeStateQuery,
-        in EntityQuery missingMilestoneSelectionOfferBufferQuery,
-        in EntityQuery missingMilestoneSelectionCommandBufferQuery)
+        in EntityQuery missingMilestoneSelectionOfferBufferQuery)
     {
         return new PlayerPowerUpsMissingRuntimeFlags(
             !missingStateQuery.IsEmptyIgnoreFilter,
@@ -278,10 +257,8 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
             !missingLaserBeamPulseHitBufferQuery.IsEmptyIgnoreFilter,
             !missingExplosionRequestBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxRequestBufferQuery.IsEmptyIgnoreFilter,
-            !missingPowerUpVfxPoolBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxPrefabBindingBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxCapConfigQuery.IsEmptyIgnoreFilter,
-            !missingPowerUpCheatBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpCheatPresetEntryBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpCheatPresetPassiveBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpUnlockCatalogBufferQuery.IsEmptyIgnoreFilter,
@@ -291,8 +268,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
             !missingPowerUpTierEntryScalingBufferQuery.IsEmptyIgnoreFilter,
             !missingMilestoneSelectionStateQuery.IsEmptyIgnoreFilter,
             !missingMilestoneTimeScaleResumeStateQuery.IsEmptyIgnoreFilter,
-            !missingMilestoneSelectionOfferBufferQuery.IsEmptyIgnoreFilter,
-            !missingMilestoneSelectionCommandBufferQuery.IsEmptyIgnoreFilter);
+            !missingMilestoneSelectionOfferBufferQuery.IsEmptyIgnoreFilter);
     }
     #endregion
 

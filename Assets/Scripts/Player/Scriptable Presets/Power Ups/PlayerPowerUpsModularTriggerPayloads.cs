@@ -272,23 +272,11 @@ public sealed class PowerUpHoldChargeModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps reference payloads allocated without snapping designer-authored numeric values.
+    /// </summary>
     public void Validate()
     {
-        if (requiredCharge < 0f)
-            requiredCharge = 0f;
-
-        if (maximumCharge < requiredCharge)
-            maximumCharge = requiredCharge;
-
-        if (chargeRatePerSecond < 0f)
-            chargeRatePerSecond = 0f;
-
-        if (decayAfterReleasePercentPerSecond < 0f)
-            decayAfterReleasePercentPerSecond = 0f;
-
-        if (passiveChargeGainPercentPerSecond < 0f)
-            passiveChargeGainPercentPerSecond = 0f;
-
         if (chargedLaserBeam == null)
             chargedLaserBeam = new PowerUpLaserBeamModuleData();
 
@@ -566,37 +554,11 @@ public sealed class PowerUpResourceGateModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (maximumEnergy < 0f)
-            maximumEnergy = 0f;
-
-        if (activationCost < 0f)
-            activationCost = 0f;
-
-        if (maintenanceCostPerSecond < 0f)
-            maintenanceCostPerSecond = 0f;
-
-        if (maintenanceTicksPerSecond < 0f)
-            maintenanceTicksPerSecond = 0f;
-
-        if (minimumActivationEnergyPercent < 0f)
-            minimumActivationEnergyPercent = 0f;
-
-        if (minimumActivationEnergyPercent > 100f)
-            minimumActivationEnergyPercent = 100f;
-
-        if (maximumEnergy <= 0f)
-            minimumActivationEnergyPercent = 0f;
-
-        if (chargePerTrigger < 0f)
-            chargePerTrigger = 0f;
-
-        if (cooldownSeconds < 0f)
-            cooldownSeconds = 0f;
-
-        if (isToggleable && maintenanceTicksPerSecond < 0.01f)
-            maintenanceTicksPerSecond = 0.01f;
     }
     #endregion
 
@@ -635,10 +597,11 @@ public sealed class PowerUpCooldownGateModuleData
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// </summary>
     public void Validate()
     {
-        if (cooldownSeconds < 0f)
-            cooldownSeconds = 0f;
     }
     #endregion
 

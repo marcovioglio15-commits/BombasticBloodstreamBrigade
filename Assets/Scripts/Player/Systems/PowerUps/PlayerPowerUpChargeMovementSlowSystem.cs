@@ -20,7 +20,7 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerMovementModifiers>();
     }
@@ -33,16 +33,17 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        foreach ((RefRO<PlayerPowerUpsConfig> powerUpsConfig,
+        foreach ((DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRO<PlayerPowerUpsState> powerUpsState,
-                  RefRW<PlayerMovementModifiers> movementModifiers) in SystemAPI.Query<RefRO<PlayerPowerUpsConfig>,
+                  RefRW<PlayerMovementModifiers> movementModifiers) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>,
                                                                                        RefRO<PlayerPowerUpsState>,
                                                                                        RefRW<PlayerMovementModifiers>>())
         {
-            float primarySlowPercent = ResolveSlotSlowPercent(in powerUpsConfig.ValueRO.PrimarySlot,
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            float primarySlowPercent = ResolveSlotSlowPercent(in powerUpsConfig.PrimarySlot,
                                                               powerUpsState.ValueRO.PrimaryCharge,
                                                               powerUpsState.ValueRO.PrimaryIsCharging);
-            float secondarySlowPercent = ResolveSlotSlowPercent(in powerUpsConfig.ValueRO.SecondarySlot,
+            float secondarySlowPercent = ResolveSlotSlowPercent(in powerUpsConfig.SecondarySlot,
                                                                 powerUpsState.ValueRO.SecondaryCharge,
                                                                 powerUpsState.ValueRO.SecondaryIsCharging);
             float slowPercent = math.max(primarySlowPercent, secondarySlowPercent);

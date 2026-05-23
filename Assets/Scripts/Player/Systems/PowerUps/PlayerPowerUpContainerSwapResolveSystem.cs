@@ -23,7 +23,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
     {
         state.RequireForUpdate<PlayerPowerUpContainerSwapCommand>();
         state.RequireForUpdate<PlayerDroppedPowerUpContainerContent>();
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
     }
 
@@ -42,11 +42,11 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         foreach ((DynamicBuffer<PlayerPowerUpContainerSwapCommand> swapCommands,
-                  RefRW<PlayerPowerUpsConfig> powerUpsConfig,
+                  DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState,
                   Entity playerEntity)
                  in SystemAPI.Query<DynamicBuffer<PlayerPowerUpContainerSwapCommand>,
-                                    RefRW<PlayerPowerUpsConfig>,
+                                    DynamicBuffer<PlayerPowerUpsConfigElement>,
                                     RefRW<PlayerPowerUpsState>>().WithEntityAccess())
         {
             if (swapCommands.Length <= 0)
@@ -65,6 +65,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 : default;
             float interactionLockDuration = PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(in interactionConfig,
                                                                                                                             scalableStats);
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
 
             for (int commandIndex = 0; commandIndex < swapCommands.Length; commandIndex++)
             {
@@ -80,10 +81,12 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 if (!PlayerPowerUpLoadoutRuntimeUtility.TrySwapStoredPowerUpWithSlot(ref storedPowerUp,
                                                                                      swapCommand.TargetSlotIndex,
                                                                                      storedStateMode,
-                                                                                     ref powerUpsConfig.ValueRW,
+                                                                                     ref powerUpsConfig,
                                                                                      ref powerUpsState.ValueRW,
                                                                                      out bool storedPowerUpConsumed))
                     continue;
+
+                PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
 
                 if (storedPowerUpConsumed)
                 {

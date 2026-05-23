@@ -629,14 +629,10 @@ public sealed class PlayerProgressionPresetsPanel
 
     internal VisualElement CreateSectionContainer(string sectionTitle)
     {
-        VisualElement container = new VisualElement();
+        Foldout container = ManagementToolFoldoutStateUtility.CreateFoldout(sectionTitle,
+                                                                            "NashCore.PlayerManagement.Progression.Section." + sectionTitle,
+                                                                            true);
         container.style.marginTop = 8f;
-
-        Label header = new Label(sectionTitle);
-        header.style.unityFontStyleAndWeight = FontStyle.Bold;
-        header.style.marginBottom = 4f;
-        ManagementToolCategoryLabelUtility.RegisterColorContextMenu(header, "NashCore.PlayerManagement.Progression.Section." + sectionTitle);
-        container.Add(header);
 
         if (sectionContentRoot != null)
             sectionContentRoot.Add(container);

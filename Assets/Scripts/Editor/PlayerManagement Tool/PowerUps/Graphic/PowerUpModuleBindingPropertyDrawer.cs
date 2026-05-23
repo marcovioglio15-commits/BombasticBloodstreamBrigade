@@ -11,26 +11,6 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
     private const string ActivePowerUpsRoot = "activePowerUps.Array.data[";
     private const string ModuleBindingsPath = ".moduleBindings.Array.data[";
 
-    private static readonly string[] spawnObjectPayloadPropertyNames =
-    {
-        "bombPrefab",
-        "spawnOffset",
-        "spawnOffsetOrientation",
-        "deploySpeed",
-        "velocityDirection",
-        "collisionRadius",
-        "bounceOnWalls",
-        "bounceDamping",
-        "linearDampingPerSecond",
-        "fuseSeconds",
-        "radius",
-        "enableDamagePayload",
-        "damage",
-        "affectAllEnemiesInRadius",
-        "explosionVfxPrefab",
-        "scaleVfxToRadius",
-        "vfxScaleMultiplier"
-    };
     #endregion
 
     #region Methods
@@ -90,7 +70,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                          overridePayloadProperty,
                          modulePopup,
                          moduleKindInfoBox,
-                         overrideContainer);
+                         overrideContainer,
+                         false);
 
         modulePopup.RegisterValueChangedCallback(evt =>
         {
@@ -108,7 +89,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              overridePayloadProperty,
                              modulePopup,
                              moduleKindInfoBox,
-                             overrideContainer);
+                             overrideContainer,
+                             useOverrideProperty.boolValue);
         });
 
         root.TrackPropertyValue(moduleIdProperty, changedProperty =>
@@ -121,7 +103,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              overridePayloadProperty,
                              modulePopup,
                              moduleKindInfoBox,
-                             overrideContainer);
+                             overrideContainer,
+                             useOverrideProperty != null && useOverrideProperty.boolValue);
         });
 
         root.TrackPropertyValue(useOverrideProperty, changedProperty =>
@@ -134,7 +117,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              overridePayloadProperty,
                              modulePopup,
                              moduleKindInfoBox,
-                             overrideContainer);
+                             overrideContainer,
+                             changedProperty.boolValue);
         });
 
         return root;
@@ -146,9 +130,10 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                          SerializedProperty stageProperty,
                                          SerializedProperty useOverrideProperty,
                                          SerializedProperty overridePayloadProperty,
-                                         PopupField<string> modulePopup,
-                                         HelpBox moduleKindInfoBox,
-                                         VisualElement overrideContainer)
+	                                         PopupField<string> modulePopup,
+	                                         HelpBox moduleKindInfoBox,
+	                                         VisualElement overrideContainer,
+	                                         bool seedOverridePayload)
     {
         string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
         List<string> options = BuildModuleIdOptions(serializedObject);
@@ -189,8 +174,18 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         UpdateModuleInfoBox(moduleKindInfoBox, moduleResolved, moduleKind, moduleDisplayName);
 
-        if (moduleResolved && useOverrideProperty != null && useOverrideProperty.boolValue)
-            EnsureOverridePayloadInheritedReferences(overridePayloadProperty, moduleDefaultPayloadProperty, moduleKind);
+        if (moduleResolved &&
+            seedOverridePayload &&
+            useOverrideProperty != null &&
+            useOverrideProperty.boolValue)
+        {
+            PowerUpModuleBindingOverridePayloadSeedUtility.SeedOverridePayload(serializedObject,
+                                                                               bindingProperty,
+                                                                               resolvedModuleId,
+                                                                               moduleKind,
+                                                                               overridePayloadProperty,
+                                                                               moduleDefaultPayloadProperty);
+        }
 
         RebuildOverrideContainer(overrideContainer,
                                  useOverrideProperty,
@@ -511,161 +506,6 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
             return moduleDefaultPayloadProperty;
 
         return overridePayloadProperty;
-    }
-
-    /// <summary>
-    /// Copies required SpawnObject object references from the selected module default into a newly enabled override payload.
-    /// </summary>
-    /// <param name="overridePayloadProperty">Override payload serialized root.</param>
-    /// <param name="moduleDefaultPayloadProperty">Selected module default payload serialized root.</param>
-    /// <param name="moduleKind">Resolved module kind for the selected binding.</param>
-    private static void EnsureOverridePayloadInheritedReferences(SerializedProperty overridePayloadProperty,
-                                                                 SerializedProperty moduleDefaultPayloadProperty,
-                                                                 PowerUpModuleKind moduleKind)
-    {
-        if (moduleKind != PowerUpModuleKind.SpawnObject)
-            return;
-
-        if (overridePayloadProperty == null || moduleDefaultPayloadProperty == null)
-            return;
-
-        SerializedProperty overrideBombProperty = overridePayloadProperty.FindPropertyRelative("bomb");
-        SerializedProperty defaultBombProperty = moduleDefaultPayloadProperty.FindPropertyRelative("bomb");
-
-        if (overrideBombProperty == null || defaultBombProperty == null)
-            return;
-
-        bool changed = CopySpawnObjectPayloadIfPrefabMissing(overrideBombProperty, defaultBombProperty);
-
-        if (!changed)
-        {
-            changed = CopyMissingObjectReference(overrideBombProperty, defaultBombProperty, "bombPrefab") || changed;
-            bool copiedExplosionVfxPrefab = CopyMissingObjectReference(overrideBombProperty, defaultBombProperty, "explosionVfxPrefab");
-
-            if (copiedExplosionVfxPrefab)
-            {
-                CopyPropertyValue(overrideBombProperty, defaultBombProperty, "scaleVfxToRadius");
-                CopyPropertyValue(overrideBombProperty, defaultBombProperty, "vfxScaleMultiplier");
-            }
-
-            changed = copiedExplosionVfxPrefab || changed;
-        }
-
-        if (!changed)
-            return;
-
-        overridePayloadProperty.serializedObject.ApplyModifiedProperties();
-    }
-
-    /// <summary>
-    /// Initializes an empty SpawnObject override from the selected module default before designers edit individual values.
-    /// </summary>
-    /// <param name="targetRootProperty">Override Bomb payload root that receives module-default values.</param>
-    /// <param name="sourceRootProperty">Module-default Bomb payload root that provides values.</param>
-    /// <returns>True when the full SpawnObject payload was copied.</returns>
-    private static bool CopySpawnObjectPayloadIfPrefabMissing(SerializedProperty targetRootProperty,
-                                                              SerializedProperty sourceRootProperty)
-    {
-        if (targetRootProperty == null || sourceRootProperty == null)
-            return false;
-
-        SerializedProperty targetPrefabProperty = targetRootProperty.FindPropertyRelative("bombPrefab");
-        SerializedProperty sourcePrefabProperty = sourceRootProperty.FindPropertyRelative("bombPrefab");
-
-        if (HasObjectReference(targetPrefabProperty) || !HasObjectReference(sourcePrefabProperty))
-            return false;
-
-        CopyPayloadProperties(targetRootProperty, sourceRootProperty, spawnObjectPayloadPropertyNames);
-        return true;
-    }
-
-    /// <summary>
-    /// Copies a known set of serialized payload fields between matching roots.
-    /// </summary>
-    /// <param name="targetRootProperty">Payload root that receives values.</param>
-    /// <param name="sourceRootProperty">Payload root that provides values.</param>
-    /// <param name="relativePaths">Relative serialized property paths to copy.</param>
-    private static void CopyPayloadProperties(SerializedProperty targetRootProperty,
-                                              SerializedProperty sourceRootProperty,
-                                              IReadOnlyList<string> relativePaths)
-    {
-        if (relativePaths == null)
-            return;
-
-        for (int pathIndex = 0; pathIndex < relativePaths.Count; pathIndex++)
-            CopyPropertyValue(targetRootProperty, sourceRootProperty, relativePaths[pathIndex]);
-    }
-
-    /// <summary>
-    /// Copies one object reference only when the target override reference is empty.
-    /// </summary>
-    /// <param name="targetRootProperty">Override payload root that receives the reference.</param>
-    /// <param name="sourceRootProperty">Module-default payload root that provides the reference.</param>
-    /// <param name="relativePath">Relative serialized object-reference path to copy.</param>
-    /// <returns>True when a reference was copied.</returns>
-    private static bool CopyMissingObjectReference(SerializedProperty targetRootProperty,
-                                                   SerializedProperty sourceRootProperty,
-                                                   string relativePath)
-    {
-        if (targetRootProperty == null || sourceRootProperty == null || string.IsNullOrWhiteSpace(relativePath))
-            return false;
-
-        SerializedProperty targetProperty = targetRootProperty.FindPropertyRelative(relativePath);
-        SerializedProperty sourceProperty = sourceRootProperty.FindPropertyRelative(relativePath);
-
-        if (targetProperty == null || sourceProperty == null)
-            return false;
-
-        if (targetProperty.propertyType != SerializedPropertyType.ObjectReference ||
-            sourceProperty.propertyType != SerializedPropertyType.ObjectReference)
-        {
-            return false;
-        }
-
-        if (targetProperty.objectReferenceValue != null || sourceProperty.objectReferenceValue == null)
-            return false;
-
-        targetProperty.objectReferenceValue = sourceProperty.objectReferenceValue;
-        return true;
-    }
-
-    /// <summary>
-    /// Copies one primitive serialized value between matching payload roots.
-    /// </summary>
-    /// <param name="targetRootProperty">Override payload root that receives the value.</param>
-    /// <param name="sourceRootProperty">Module-default payload root that provides the value.</param>
-    /// <param name="relativePath">Relative serialized property path to copy.</param>
-    private static void CopyPropertyValue(SerializedProperty targetRootProperty,
-                                          SerializedProperty sourceRootProperty,
-                                          string relativePath)
-    {
-        if (targetRootProperty == null || sourceRootProperty == null || string.IsNullOrWhiteSpace(relativePath))
-            return;
-
-        SerializedProperty targetProperty = targetRootProperty.FindPropertyRelative(relativePath);
-        SerializedProperty sourceProperty = sourceRootProperty.FindPropertyRelative(relativePath);
-
-        if (targetProperty == null || sourceProperty == null || targetProperty.propertyType != sourceProperty.propertyType)
-            return;
-
-        switch (targetProperty.propertyType)
-        {
-            case SerializedPropertyType.Boolean:
-                targetProperty.boolValue = sourceProperty.boolValue;
-                break;
-            case SerializedPropertyType.Enum:
-                targetProperty.enumValueIndex = sourceProperty.enumValueIndex;
-                break;
-            case SerializedPropertyType.Float:
-                targetProperty.floatValue = sourceProperty.floatValue;
-                break;
-            case SerializedPropertyType.ObjectReference:
-                targetProperty.objectReferenceValue = sourceProperty.objectReferenceValue;
-                break;
-            case SerializedPropertyType.Vector3:
-                targetProperty.vector3Value = sourceProperty.vector3Value;
-                break;
-        }
     }
 
     /// <summary>

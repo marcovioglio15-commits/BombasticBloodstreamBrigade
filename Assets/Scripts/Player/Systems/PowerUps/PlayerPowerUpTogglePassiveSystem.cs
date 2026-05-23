@@ -19,9 +19,9 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerPowerUpsConfig>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
-        state.RequireForUpdate<PlayerPassiveToolsState>();
+        state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerBulletTimeState>();
         state.RequireForUpdate<EquippedPassiveToolElement>();
     }
@@ -36,19 +36,20 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
 
-        foreach ((RefRO<PlayerPowerUpsConfig> powerUpsConfig,
+        foreach ((DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState,
                   DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
-                  RefRW<PlayerPassiveToolsState> passiveToolsState,
+                  DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerBulletTimeState> bulletTimeState,
                   Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerPowerUpsConfig>,
+                 in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>,
                                     RefRW<PlayerPowerUpsState>,
                                     DynamicBuffer<EquippedPassiveToolElement>,
-                                    RefRW<PlayerPassiveToolsState>,
+                                    DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRW<PlayerBulletTimeState>>()
                              .WithEntityAccess())
         {
+            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
             PlayerPassiveToolsState aggregatedPassiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
             PlayerBulletTimeState currentBulletTimeState = bulletTimeState.ValueRO;
             byte isShootingSuppressed = powerUpsState.ValueRO.IsShootingSuppressed;
@@ -67,7 +68,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             float toggleBulletTimeSlowPercent = 0f;
             float toggleBulletTimeTransitionTimeSeconds = 0f;
 
-            ProcessTogglePassiveSlot(in powerUpsConfig.ValueRO.PrimarySlot,
+            ProcessTogglePassiveSlot(in powerUpsConfig.PrimarySlot,
                                      deltaTime,
                                      playerEntity,
                                      ref primaryEnergy,
@@ -84,7 +85,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
                                      ref toggleBulletTimeTransitionTimeSeconds);
-            ProcessTogglePassiveSlot(in powerUpsConfig.ValueRO.SecondarySlot,
+            ProcessTogglePassiveSlot(in powerUpsConfig.SecondarySlot,
                                      deltaTime,
                                      playerEntity,
                                      ref secondaryEnergy,
@@ -117,7 +118,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             powerUpsState.ValueRW.PrimaryMaintenanceTickTimer = primaryMaintenanceTickTimer;
             powerUpsState.ValueRW.SecondaryMaintenanceTickTimer = secondaryMaintenanceTickTimer;
             powerUpsState.ValueRW.IsShootingSuppressed = isShootingSuppressed;
-            passiveToolsState.ValueRW = aggregatedPassiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateBuffer, in aggregatedPassiveToolsState);
 
             if (toggleBulletTimeSlowPercent <= 0f && currentBulletTimeState.ToggleSlowPercent > 0f)
                 toggleBulletTimeTransitionTimeSeconds = math.max(toggleBulletTimeTransitionTimeSeconds,

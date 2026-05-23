@@ -15,6 +15,7 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
     private const string DefaultToggleBindingDisplay = "Ctrl+Shift+G";
     private const string UnsupportedCheckmarkGlyph = "\u2713";
     private const string FallbackCheckmarkGlyph = "V";
+    private const string OrbitalProjectionCollisionRadiusTogglePath = "PlayerSection/OrbitalProjectionCollisionRadiusRow/Toggle";
     #endregion
 
     #region Fields
@@ -40,6 +41,9 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
 
     [Tooltip("Toggle used to show or hide the player look direction gizmo.")]
     [SerializeField] private Toggle playerLookDirectionToggle;
+
+    [Tooltip("Toggle used to show or hide orbital projection collision radius gizmos.")]
+    [SerializeField] private Toggle orbitalProjectionCollisionRadiusToggle;
 
     [Header("Enemy Toggles")]
     [Tooltip("Toggle used to show or hide enemy body radius gizmos.")]
@@ -133,10 +137,14 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
     #region Initialization
     private void InitializeToggles()
     {
+        ResolvePrefabToggleReferences();
         BindToggle(showLabelsToggle, RuntimeGizmoDebugState.ShowLabels, HandleShowLabelsChanged);
         BindToggle(playerPickupRadiusToggle, RuntimeGizmoDebugState.PlayerPickupRadiusEnabled, HandlePlayerPickupRadiusChanged);
         BindToggle(playerMoveVectorToggle, RuntimeGizmoDebugState.PlayerMoveVectorEnabled, HandlePlayerMoveVectorChanged);
         BindToggle(playerLookDirectionToggle, RuntimeGizmoDebugState.PlayerLookDirectionEnabled, HandlePlayerLookDirectionChanged);
+        BindToggle(orbitalProjectionCollisionRadiusToggle,
+                   RuntimeGizmoDebugState.OrbitalProjectionCollisionRadiusEnabled,
+                   HandleOrbitalProjectionCollisionRadiusChanged);
         BindToggle(enemyBodyRadiusToggle, RuntimeGizmoDebugState.EnemyBodyRadiusEnabled, HandleEnemyBodyRadiusChanged);
         BindToggle(enemyContactRadiusToggle, RuntimeGizmoDebugState.EnemyContactRadiusEnabled, HandleEnemyContactRadiusChanged);
         BindToggle(enemyAreaRadiusToggle, RuntimeGizmoDebugState.EnemyAreaRadiusEnabled, HandleEnemyAreaRadiusChanged);
@@ -149,6 +157,22 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
         BindToggle(projectileImpactRadiusToggle, RuntimeGizmoDebugState.ProjectileImpactRadiusEnabled, HandleProjectileImpactRadiusChanged);
         BindToggle(projectileVelocityToggle, RuntimeGizmoDebugState.ProjectileVelocityEnabled, HandleProjectileVelocityChanged);
         BindToggle(projectileRemainingRangeToggle, RuntimeGizmoDebugState.ProjectileRemainingRangeEnabled, HandleProjectileRemainingRangeChanged);
+    }
+
+    /// <summary>
+    /// Resolves prefab children added after existing scene controller bindings without creating runtime UI.
+    /// </summary>
+    private void ResolvePrefabToggleReferences()
+    {
+        if (orbitalProjectionCollisionRadiusToggle != null || panelRoot == null)
+            return;
+
+        Transform orbitalProjectionToggleTransform = panelRoot.transform.Find(OrbitalProjectionCollisionRadiusTogglePath);
+
+        if (orbitalProjectionToggleTransform == null)
+            return;
+
+        orbitalProjectionCollisionRadiusToggle = orbitalProjectionToggleTransform.GetComponent<Toggle>();
     }
 
     /// <summary>
@@ -283,6 +307,7 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
         SetToggleValue(playerPickupRadiusToggle, RuntimeGizmoDebugState.PlayerPickupRadiusEnabled);
         SetToggleValue(playerMoveVectorToggle, RuntimeGizmoDebugState.PlayerMoveVectorEnabled);
         SetToggleValue(playerLookDirectionToggle, RuntimeGizmoDebugState.PlayerLookDirectionEnabled);
+        SetToggleValue(orbitalProjectionCollisionRadiusToggle, RuntimeGizmoDebugState.OrbitalProjectionCollisionRadiusEnabled);
         SetToggleValue(enemyBodyRadiusToggle, RuntimeGizmoDebugState.EnemyBodyRadiusEnabled);
         SetToggleValue(enemyContactRadiusToggle, RuntimeGizmoDebugState.EnemyContactRadiusEnabled);
         SetToggleValue(enemyAreaRadiusToggle, RuntimeGizmoDebugState.EnemyAreaRadiusEnabled);
@@ -335,6 +360,15 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
     private static void HandlePlayerLookDirectionChanged(bool isEnabled)
     {
         RuntimeGizmoDebugState.PlayerLookDirectionEnabled = isEnabled;
+    }
+
+    /// <summary>
+    /// Propagates the orbital projection collision-radius toggle to the shared runtime gizmo debug state.
+    /// </summary>
+    /// <param name="isEnabled">Current UI toggle value.</param>
+    private static void HandleOrbitalProjectionCollisionRadiusChanged(bool isEnabled)
+    {
+        RuntimeGizmoDebugState.OrbitalProjectionCollisionRadiusEnabled = isEnabled;
     }
 
     private static void HandleEnemyBodyRadiusChanged(bool isEnabled)

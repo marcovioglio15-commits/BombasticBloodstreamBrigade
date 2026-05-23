@@ -179,13 +179,10 @@ public sealed class PowerUpStackableModuleData
 
     #region Validation
     /// <summary>
-    /// Clamps the total acquisition cap to a meaningful stackable range.
-    /// none.
+    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
     /// </summary>
     public void Validate()
     {
-        if (maxAcquisitions < 2)
-            maxAcquisitions = 2;
     }
     #endregion
 

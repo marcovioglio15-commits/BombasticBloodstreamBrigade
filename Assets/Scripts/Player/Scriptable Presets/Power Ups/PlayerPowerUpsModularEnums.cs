@@ -34,7 +34,8 @@ public enum PowerUpModuleKind
     BouncingProjectiles = 16,
     ProjectileSplit = 17,
     Stackable = 18,
-    LaserBeam = 19
+    LaserBeam = 19,
+    OrbitalProjections = 20
 }
 
 public enum PowerUpTriggerEventType
@@ -87,6 +88,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.AreaTickApplyElement:
             case PowerUpModuleKind.DeathExplosion:
             case PowerUpModuleKind.OrbitalProjectiles:
+            case PowerUpModuleKind.OrbitalProjections:
             case PowerUpModuleKind.BouncingProjectiles:
             case PowerUpModuleKind.ProjectileSplit:
             case PowerUpModuleKind.LaserBeam:

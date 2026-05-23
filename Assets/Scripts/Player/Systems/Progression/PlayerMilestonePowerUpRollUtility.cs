@@ -56,6 +56,8 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="tierEntries">Flattened tier-entry buffer.</param>
     /// <param name="tierEntryScaling">Optional runtime scaling metadata for tier-entry weights.</param>
     /// <param name="equippedPassiveTools">Current equipped passive-tools buffer used to exclude incompatible passive offers.</param>
+    /// <param name="powerUpsConfig">Current active slot config used to detect active toggle orbital categories.</param>
+    /// <param name="powerUpsState">Current active slot state used to detect active toggle orbital categories.</param>
     /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <param name="reservedPassiveKinds">Passive tool kinds temporarily reserved by Stealer enemies.</param>
     /// <param name="selectionOffers">Selection-offers destination buffer.</param>
@@ -71,6 +73,8 @@ public static class PlayerMilestonePowerUpRollUtility
                                                  DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
                                                  DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
                                                  DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                 in PlayerPowerUpsConfig powerUpsConfig,
+                                                 in PlayerPowerUpsState powerUpsState,
                                                  IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
                                                  HashSet<PassiveToolKind> reservedPassiveKinds,
                                                  DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers,
@@ -105,6 +109,9 @@ public static class PlayerMilestonePowerUpRollUtility
         PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
         HashSet<int> rolledCatalogIndices = new HashSet<int>();
         HashSet<PassiveToolKind> blockedPassiveKinds = BuildBlockedPassiveKinds(equippedPassiveTools);
+        HashSet<string> blockedOrbitalProjectionCategoryIds = BuildBlockedOrbitalProjectionCategoryIds(equippedPassiveTools,
+                                                                                                        in powerUpsConfig,
+                                                                                                        in powerUpsState);
         MergeBlockedPassiveKinds(blockedPassiveKinds, reservedPassiveKinds);
 
         for (int rollIndex = 0; rollIndex < milestoneBlob.PowerUpUnlocks.Length; rollIndex++)
@@ -119,6 +126,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                        tierEntryScaling,
                                        rolledCatalogIndices,
                                        blockedPassiveKinds,
+                                       blockedOrbitalProjectionCategoryIds,
                                        reservedUnlockCountsByPowerUpId,
                                        out int rolledCatalogIndex,
                                        out string selectedDropPoolId,
@@ -140,6 +148,9 @@ public static class PlayerMilestonePowerUpRollUtility
 
             if (unlockEntry.UnlockKind == PlayerPowerUpUnlockKind.Passive && unlockEntry.PassiveToolConfig.IsDefined != 0)
                 blockedPassiveKinds.Add(unlockEntry.PassiveToolConfig.ToolKind);
+
+            PlayerOrbitalProjectionCategoryRuntimeUtility.AddCatalogEntryCategories(in unlockEntry,
+                                                                                    blockedOrbitalProjectionCategoryIds);
 
             selectionOffers.Add(new PlayerMilestonePowerUpSelectionOfferElement
             {
@@ -168,10 +179,13 @@ public static class PlayerMilestonePowerUpRollUtility
             return false;
 
         selectionState.IsSelectionActive = 1;
+        selectionState.HasPendingCommand = 0;
+        selectionState.PendingCommandType = PlayerMilestoneSelectionCommandType.SelectOffer;
         selectionState.MilestoneLevel = milestoneLevel;
         selectionState.GamePhaseIndex = activeGamePhaseIndex;
         selectionState.MilestoneIndex = milestoneIndex;
         selectionState.OfferCount = rolledOfferCount;
+        selectionState.PendingOfferIndex = -1;
         return true;
     }
     #endregion
@@ -188,6 +202,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="tierEntryScaling">Optional runtime scaling metadata for tier-entry weights.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in this milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds already equipped or already rolled during this selection.</param>
+    /// <param name="blockedOrbitalProjectionCategoryIds">Orbital projection categories already present or already rolled during this selection.</param>
     /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <param name="rolledCatalogIndex">Resolved rolled catalog index when successful.</param>
     /// <param name="selectedTierId">Tier ID selected for the current roll.</param>
@@ -202,6 +217,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                               DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
                                               HashSet<int> rolledCatalogIndices,
                                               HashSet<PassiveToolKind> blockedPassiveKinds,
+                                              HashSet<string> blockedOrbitalProjectionCategoryIds,
                                               IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
                                               out int rolledCatalogIndex,
                                               out string selectedDropPoolId,
@@ -238,6 +254,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                      unlockCatalog,
                                      rolledCatalogIndices,
                                      blockedPassiveKinds,
+                                     blockedOrbitalProjectionCategoryIds,
                                      reservedUnlockCountsByPowerUpId))
                 continue;
 
@@ -265,6 +282,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                       unlockCatalog,
                                       rolledCatalogIndices,
                                       blockedPassiveKinds,
+                                      blockedOrbitalProjectionCategoryIds,
                                       reservedUnlockCountsByPowerUpId,
                                       out rolledCatalogIndex,
                                       out selectedEntryWeight);
@@ -310,6 +328,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalog">Unlock catalog buffer.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in current milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
+    /// <param name="blockedOrbitalProjectionCategoryIds">Orbital projection categories already present or already rolled during this selection.</param>
     /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <returns>True when at least one rollable candidate is available; otherwise false.</returns>
     private static bool HasAnyRollableEntry(in PlayerPowerUpTierDefinitionElement tierDefinition,
@@ -319,6 +338,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                             HashSet<int> rolledCatalogIndices,
                                             HashSet<PassiveToolKind> blockedPassiveKinds,
+                                            HashSet<string> blockedOrbitalProjectionCategoryIds,
                                             IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId)
     {
         int startIndex = mathMax(0, tierDefinition.EntryStartIndex);
@@ -351,6 +371,10 @@ public static class PlayerMilestonePowerUpRollUtility
             if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds, effectiveCurrentUnlockCount))
                 continue;
 
+            if (PlayerOrbitalProjectionCategoryRuntimeUtility.IsCatalogEntryFullyBlocked(in unlockEntry,
+                                                                                         blockedOrbitalProjectionCategoryIds))
+                continue;
+
             return true;
         }
 
@@ -367,6 +391,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="unlockCatalog">Unlock catalog buffer.</param>
     /// <param name="rolledCatalogIndices">Catalog indices already rolled in current milestone selection.</param>
     /// <param name="blockedPassiveKinds">Passive kinds that cannot be offered for this milestone selection.</param>
+    /// <param name="blockedOrbitalProjectionCategoryIds">Orbital projection categories already present or already rolled during this selection.</param>
     /// <param name="reservedUnlockCountsByPowerUpId">Power-up ids temporarily reserved by Stealer enemies, with their effective unlock count.</param>
     /// <param name="catalogIndex">Resolved catalog index when successful.</param>
     /// <param name="entryWeight">Weight of the selected power-up entry.</param>
@@ -378,6 +403,7 @@ public static class PlayerMilestonePowerUpRollUtility
                                                DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                HashSet<int> rolledCatalogIndices,
                                                HashSet<PassiveToolKind> blockedPassiveKinds,
+                                               HashSet<string> blockedOrbitalProjectionCategoryIds,
                                                IReadOnlyDictionary<string, int> reservedUnlockCountsByPowerUpId,
                                                out int catalogIndex,
                                                out float entryWeight)
@@ -416,6 +442,10 @@ public static class PlayerMilestonePowerUpRollUtility
                 continue;
 
             if (IsPassiveOfferBlocked(in unlockEntry, blockedPassiveKinds, effectiveCurrentUnlockCount))
+                continue;
+
+            if (PlayerOrbitalProjectionCategoryRuntimeUtility.IsCatalogEntryFullyBlocked(in unlockEntry,
+                                                                                         blockedOrbitalProjectionCategoryIds))
                 continue;
 
             AddOrAccumulateCandidateWeight(candidateCatalogIndices,
@@ -488,6 +518,26 @@ public static class PlayerMilestonePowerUpRollUtility
         }
 
         return blockedPassiveKinds;
+    }
+
+    /// <summary>
+    /// Builds the orbital projection category exclusion set from currently present player-owned sources.
+    /// </summary>
+    /// <param name="equippedPassiveTools">Equipped passive buffer to scan.</param>
+    /// <param name="powerUpsConfig">Active slot config that may contain active toggle orbital payloads.</param>
+    /// <param name="powerUpsState">Active slot state used to detect currently active toggle payloads.</param>
+    /// <returns>Category ids that should block offers with no new filtered projections.</returns>
+    private static HashSet<string> BuildBlockedOrbitalProjectionCategoryIds(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                                            in PlayerPowerUpsConfig powerUpsConfig,
+                                                                            in PlayerPowerUpsState powerUpsState)
+    {
+        HashSet<string> blockedCategoryIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        PlayerOrbitalProjectionCategoryRuntimeUtility.AddEquippedPassiveCategories(equippedPassiveTools,
+                                                                                   blockedCategoryIds);
+        PlayerOrbitalProjectionCategoryRuntimeUtility.AddActiveToggleCategories(in powerUpsConfig,
+                                                                                in powerUpsState,
+                                                                                blockedCategoryIds);
+        return blockedCategoryIds;
     }
 
     /// <summary>
