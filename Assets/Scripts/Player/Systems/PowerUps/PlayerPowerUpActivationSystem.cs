@@ -126,7 +126,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerRuntimeComboPassiveUnlockElement> runtimeComboPassiveUnlocksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboPassiveUnlockElement>(false);
         BufferLookup<PlayerRuntimeComboCounterScalingElement> comboScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboCounterScalingElement>(true);
         ComponentLookup<PlayerComboCounterState> comboCounterStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(false);
-        BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(true);
+        BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(false);
         BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePowerUpScalingElement>(true);
         BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
@@ -207,10 +207,13 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
 
             PlayerLookState lookState = lookLookup[entity];
             PlayerMovementState movementState = movementLookup[entity];
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
             PlayerRuntimeMovementConfig runtimeMovementConfig = runtimeMovementLookup[entity];
             PlayerRuntimeShootingConfig runtimeShootingConfig = runtimeShootingLookup[entity];
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsLookup);
+            DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = passiveToolsLookup[entity];
+            ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
             LocalTransform localTransform = transformLookup[entity];
             PlayerBulletTimeState bulletTimeState = bulletTimeLookup[entity];
             PlayerHealOverTimeState healOverTimeState = healOverTimeLookup[entity];
@@ -802,7 +805,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         if (!powerUpsConfigLookup.HasBuffer(entity))
             return;
 
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
+        PlayerPowerUpsConfig powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Read(entity,
+                                               in powerUpsConfigLookup,
+                                               out powerUpsConfig);
         primarySlotConfig = powerUpsConfig.PrimarySlot;
         secondarySlotConfig = powerUpsConfig.SecondarySlot;
 
@@ -811,9 +817,6 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
 
         if (runtimeShootingLookup.HasComponent(entity))
             runtimeShootingConfig = runtimeShootingLookup[entity];
-
-        if (passiveToolsLookup.HasBuffer(entity))
-            passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsLookup);
 
         if (experienceLookup.HasComponent(entity))
             playerExperience = experienceLookup[entity];

@@ -758,7 +758,6 @@ public sealed class PlayerPowerUpsPresetsPanel
 
     /// <summary>
     /// Refreshes the left preset list and dependent panels after the current batch of serialized mutations settles.
-    /// none
     /// </summary>
     private void RefreshPresetSerializedChangeDependents()
     {
@@ -767,8 +766,26 @@ public sealed class PlayerPowerUpsPresetsPanel
         if (selectedPreset == null)
             return;
 
-        RefreshPresetList();
+        if (activeSection == SectionType.Metadata || !RefreshSelectedPresetListItem())
+            RefreshPresetList();
+
         PlayerManagementSelectionContext.NotifyPowerUpsPresetContentChanged();
+    }
+
+    /// <summary>
+    /// Rebinds the visible preset-list rows without rebuilding the whole filtered collection after non-metadata edits.
+    /// </summary>
+    /// <returns>True when the selected preset is still present in the current filtered list.</returns>
+    private bool RefreshSelectedPresetListItem()
+    {
+        if (listView == null || selectedPreset == null)
+            return false;
+
+        if (!filteredPresets.Contains(selectedPreset))
+            return false;
+
+        listView.RefreshItems();
+        return true;
     }
 
     /// <summary>

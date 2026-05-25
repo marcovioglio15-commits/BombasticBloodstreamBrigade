@@ -137,9 +137,13 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                              .WithEntityAccess())
         {
             PlayerLaserBeamState currentLaserBeamState = laserBeamState.ValueRO;
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
-            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
-                                                                                                                                in currentLaserBeamState);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
+            PlayerPassiveToolsState effectivePassiveToolsState;
+            PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
+                                                                          in currentLaserBeamState,
+                                                                          out effectivePassiveToolsState);
             bool hasTriggeredActiveLaser = PlayerLaserBeamStateUtility.HasTriggeredActiveLaser(in currentLaserBeamState);
 
             if (currentLaserBeamState.IsActive == 0)
@@ -397,9 +401,13 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                                     DynamicBuffer<PlayerLaserBeamPulseHitElement>>())
         {
             PlayerLaserBeamState currentLaserBeamState = laserBeamState.ValueRO;
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
-            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
-                                                                                                                                in currentLaserBeamState);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
+            PlayerPassiveToolsState effectivePassiveToolsState;
+            PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
+                                                                          in currentLaserBeamState,
+                                                                          out effectivePassiveToolsState);
 
             if (currentLaserBeamState.IsActive == 0 &&
                 currentLaserBeamState.IsTickReady == 0 &&

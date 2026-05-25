@@ -694,7 +694,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             return;
         }
 
-        HelpBox infoBox = new HelpBox("Stackable controls how many times the same power-up can be acquired from milestones. Pair it with Character Tuning so repeated pickups have a meaningful acquisition effect.", HelpBoxMessageType.Info);
+        HelpBox infoBox = new HelpBox("Stackable controls how many times the same power-up can be acquired from milestones. Pair it with Character Tuning or Orbital Projections so repeated pickups have a meaningful acquisition effect.", HelpBoxMessageType.Info);
         payloadContainer.Add(infoBox);
         AddField(payloadContainer, maxAcquisitionsProperty, "Max Acquisitions");
     }

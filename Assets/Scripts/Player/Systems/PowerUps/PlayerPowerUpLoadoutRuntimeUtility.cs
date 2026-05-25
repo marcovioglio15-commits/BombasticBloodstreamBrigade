@@ -176,10 +176,35 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                            ref PlayerPowerUpsState powerUpsState,
                                            out PlayerStoredActivePowerUpData removedPowerUp)
     {
-        removedPowerUp = CaptureStoredPowerUp(targetSlotIndex,
-                                              PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown,
-                                              in powerUpsConfig,
-                                              in powerUpsState);
+        removedPowerUp = default;
+        return TryRemoveActiveSlot(targetSlotIndex,
+                                   ref powerUpsConfig.PrimarySlot,
+                                   ref powerUpsConfig.SecondarySlot,
+                                   ref powerUpsState,
+                                   ref removedPowerUp);
+    }
+
+    /// <summary>
+    /// Removes one active slot from direct slot payloads and captures its state for delayed restoration.
+    /// </summary>
+    /// <param name="targetSlotIndex">Slot index to remove. 0 is primary and 1 is secondary.</param>
+    /// <param name="primarySlotConfig">Mutable primary active slot payload.</param>
+    /// <param name="secondarySlotConfig">Mutable secondary active slot payload.</param>
+    /// <param name="powerUpsState">Runtime slot state to mutate.</param>
+    /// <param name="removedPowerUp">Captured active-slot payload ready for restoration or dropped-container storage.</param>
+    /// <returns>True when a defined active slot was removed; otherwise false.</returns>
+    public static bool TryRemoveActiveSlot(int targetSlotIndex,
+                                           ref PlayerPowerUpSlotConfig primarySlotConfig,
+                                           ref PlayerPowerUpSlotConfig secondarySlotConfig,
+                                           ref PlayerPowerUpsState powerUpsState,
+                                           ref PlayerStoredActivePowerUpData removedPowerUp)
+    {
+        CaptureStoredPowerUp(targetSlotIndex,
+                             PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown,
+                             in primarySlotConfig,
+                             in secondarySlotConfig,
+                             in powerUpsState,
+                             ref removedPowerUp);
 
         if (removedPowerUp.SlotConfig.IsDefined == 0)
             return false;
@@ -187,13 +212,13 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         switch (targetSlotIndex)
         {
             case 0:
-                powerUpsConfig.PrimarySlot = default;
+                primarySlotConfig = default;
                 ResetPrimaryRuntimeState(ref powerUpsState, default);
                 powerUpsState.PrimaryEquipOrder = 0;
                 return true;
 
             case 1:
-                powerUpsConfig.SecondarySlot = default;
+                secondarySlotConfig = default;
                 ResetSecondaryRuntimeState(ref powerUpsState, default);
                 powerUpsState.SecondaryEquipOrder = 0;
                 return true;
@@ -239,30 +264,57 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                            ref PlayerPowerUpsConfig powerUpsConfig,
                                                            ref PlayerPowerUpsState powerUpsState)
     {
+        return TryRestoreStoredPowerUpToVacantSlot(in storedPowerUp,
+                                                   targetSlotIndex,
+                                                   restoredEquipOrder,
+                                                   ref powerUpsConfig.PrimarySlot,
+                                                   ref powerUpsConfig.SecondarySlot,
+                                                   ref powerUpsState);
+    }
+
+    /// <summary>
+    /// Restores one stored active power-up into direct slot payloads when the requested destination slot is still vacant.
+    /// </summary>
+    /// <param name="storedPowerUp">Stored active payload to restore.</param>
+    /// <param name="targetSlotIndex">Slot index to restore into. 0 is primary and 1 is secondary.</param>
+    /// <param name="restoredEquipOrder">Original positive equip-order marker to preserve, or 0 to assign a new order.</param>
+    /// <param name="primarySlotConfig">Mutable primary active slot payload.</param>
+    /// <param name="secondarySlotConfig">Mutable secondary active slot payload.</param>
+    /// <param name="powerUpsState">Runtime slot state to mutate.</param>
+    /// <returns>True when the stored power-up was restored directly; otherwise false.</returns>
+    public static bool TryRestoreStoredPowerUpToVacantSlot(in PlayerStoredActivePowerUpData storedPowerUp,
+                                                           int targetSlotIndex,
+                                                           int restoredEquipOrder,
+                                                           ref PlayerPowerUpSlotConfig primarySlotConfig,
+                                                           ref PlayerPowerUpSlotConfig secondarySlotConfig,
+                                                           ref PlayerPowerUpsState powerUpsState)
+    {
         if (storedPowerUp.SlotConfig.IsDefined == 0)
             return false;
 
         switch (targetSlotIndex)
         {
             case 0:
-                if (powerUpsConfig.PrimarySlot.IsDefined != 0)
+                if (primarySlotConfig.IsDefined != 0)
                     return false;
 
                 ApplyStoredPowerUpToSlot(in storedPowerUp,
                                          targetSlotIndex,
                                          restoredEquipOrder,
-                                         ref powerUpsConfig,
+                                         ref primarySlotConfig,
+                                         ref secondarySlotConfig,
                                          ref powerUpsState);
                 return true;
 
             case 1:
-                if (powerUpsConfig.SecondarySlot.IsDefined != 0)
+                if (secondarySlotConfig.IsDefined != 0)
                     return false;
 
                 ApplyStoredPowerUpToSlot(in storedPowerUp,
                                          targetSlotIndex,
                                          restoredEquipOrder,
-                                         ref powerUpsConfig,
+                                         ref primarySlotConfig,
+                                         ref secondarySlotConfig,
                                          ref powerUpsState);
                 return true;
 
@@ -372,21 +424,73 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                                       in PlayerPowerUpsConfig powerUpsConfig,
                                                                       in PlayerPowerUpsState powerUpsState)
     {
-        PlayerPowerUpSlotConfig slotConfig = slotIndex == 0
-            ? powerUpsConfig.PrimarySlot
-            : slotIndex == 1
-                ? powerUpsConfig.SecondarySlot
-                : default;
+        PlayerStoredActivePowerUpData storedPowerUp = default;
+        CaptureStoredPowerUp(slotIndex,
+                             storedStateMode,
+                             in powerUpsConfig.PrimarySlot,
+                             in powerUpsConfig.SecondarySlot,
+                             in powerUpsState,
+                             ref storedPowerUp);
+        return storedPowerUp;
+    }
 
+    /// <summary>
+    /// Captures one runtime active slot from direct slot payloads into an existing stored-data target.
+    /// </summary>
+    /// <param name="slotIndex">Slot index to snapshot. 0 is primary and 1 is secondary.</param>
+    /// <param name="storedStateMode">Storage policy applied while building the snapshot.</param>
+    /// <param name="primarySlotConfig">Current primary active slot payload.</param>
+    /// <param name="secondarySlotConfig">Current secondary active slot payload.</param>
+    /// <param name="powerUpsState">Runtime slot state inspected for energy and cooldown values.</param>
+    /// <param name="storedPowerUp">Stored slot snapshot target reused by callers that already own storage.</param>
+    private static void CaptureStoredPowerUp(int slotIndex,
+                                             PlayerPowerUpContainerStoredStateMode storedStateMode,
+                                             in PlayerPowerUpSlotConfig primarySlotConfig,
+                                             in PlayerPowerUpSlotConfig secondarySlotConfig,
+                                             in PlayerPowerUpsState powerUpsState,
+                                             ref PlayerStoredActivePowerUpData storedPowerUp)
+    {
+        storedPowerUp = default;
+
+        switch (slotIndex)
+        {
+            case 0:
+                WriteStoredPowerUpSnapshot(in primarySlotConfig,
+                                           powerUpsState.PrimaryEnergy,
+                                           powerUpsState.PrimaryCooldownRemaining,
+                                           storedStateMode,
+                                           ref storedPowerUp);
+                return;
+
+            case 1:
+                WriteStoredPowerUpSnapshot(in secondarySlotConfig,
+                                           powerUpsState.SecondaryEnergy,
+                                           powerUpsState.SecondaryCooldownRemaining,
+                                           storedStateMode,
+                                           ref storedPowerUp);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Writes one active slot and its persisted runtime resources into stored active data.
+    /// </summary>
+    /// <param name="slotConfig">Slot payload to store.</param>
+    /// <param name="currentEnergy">Current energy value owned by the slot.</param>
+    /// <param name="currentCooldownRemaining">Current cooldown value owned by the slot.</param>
+    /// <param name="storedStateMode">Storage policy applied while building the snapshot.</param>
+    /// <param name="storedPowerUp">Stored slot snapshot receiving the payload.</param>
+    private static void WriteStoredPowerUpSnapshot(in PlayerPowerUpSlotConfig slotConfig,
+                                                   float currentEnergy,
+                                                   float currentCooldownRemaining,
+                                                   PlayerPowerUpContainerStoredStateMode storedStateMode,
+                                                   ref PlayerStoredActivePowerUpData storedPowerUp)
+    {
         if (slotConfig.IsDefined == 0)
-            return default;
+            return;
 
-        float storedEnergy = slotIndex == 0
-            ? powerUpsState.PrimaryEnergy
-            : powerUpsState.SecondaryEnergy;
-        float storedCooldownRemaining = slotIndex == 0
-            ? powerUpsState.PrimaryCooldownRemaining
-            : powerUpsState.SecondaryCooldownRemaining;
+        float storedEnergy = currentEnergy;
+        float storedCooldownRemaining = currentCooldownRemaining;
 
         if (storedStateMode == PlayerPowerUpContainerStoredStateMode.ResetEnergyAndCooldown)
         {
@@ -394,12 +498,9 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
             storedCooldownRemaining = 0f;
         }
 
-        return new PlayerStoredActivePowerUpData
-        {
-            SlotConfig = slotConfig,
-            StoredEnergy = math.clamp(storedEnergy, 0f, math.max(0f, slotConfig.MaximumEnergy)),
-            StoredCooldownRemaining = math.clamp(storedCooldownRemaining, 0f, math.max(0f, slotConfig.CooldownSeconds))
-        };
+        storedPowerUp.SlotConfig = slotConfig;
+        storedPowerUp.StoredEnergy = math.clamp(storedEnergy, 0f, math.max(0f, slotConfig.MaximumEnergy));
+        storedPowerUp.StoredCooldownRemaining = math.clamp(storedCooldownRemaining, 0f, math.max(0f, slotConfig.CooldownSeconds));
     }
 
     /// <summary>
@@ -416,10 +517,34 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                  ref PlayerPowerUpsConfig powerUpsConfig,
                                                  ref PlayerPowerUpsState powerUpsState)
     {
+        ApplyStoredPowerUpToSlot(in storedPowerUp,
+                                 targetSlotIndex,
+                                 restoredEquipOrder,
+                                 ref powerUpsConfig.PrimarySlot,
+                                 ref powerUpsConfig.SecondarySlot,
+                                 ref powerUpsState);
+    }
+
+    /// <summary>
+    /// Applies one stored payload into direct slot fields while resetting non-persisted transient state.
+    /// </summary>
+    /// <param name="storedPowerUp">Stored payload restored from a dropped container.</param>
+    /// <param name="targetSlotIndex">Slot index receiving the payload. 0 is primary and 1 is secondary.</param>
+    /// <param name="restoredEquipOrder">Original positive equip-order marker to preserve, or 0 to assign a new order.</param>
+    /// <param name="primarySlotConfig">Mutable primary active slot payload.</param>
+    /// <param name="secondarySlotConfig">Mutable secondary active slot payload.</param>
+    /// <param name="powerUpsState">Runtime slot state to mutate.</param>
+    private static void ApplyStoredPowerUpToSlot(in PlayerStoredActivePowerUpData storedPowerUp,
+                                                 int targetSlotIndex,
+                                                 int restoredEquipOrder,
+                                                 ref PlayerPowerUpSlotConfig primarySlotConfig,
+                                                 ref PlayerPowerUpSlotConfig secondarySlotConfig,
+                                                 ref PlayerPowerUpsState powerUpsState)
+    {
         switch (targetSlotIndex)
         {
             case 0:
-                powerUpsConfig.PrimarySlot = storedPowerUp.SlotConfig;
+                primarySlotConfig = storedPowerUp.SlotConfig;
                 powerUpsState.PrimaryEnergy = math.clamp(storedPowerUp.StoredEnergy, 0f, math.max(0f, storedPowerUp.SlotConfig.MaximumEnergy));
                 powerUpsState.PrimaryCooldownRemaining = math.clamp(storedPowerUp.StoredCooldownRemaining, 0f, math.max(0f, storedPowerUp.SlotConfig.CooldownSeconds));
                 powerUpsState.PrimaryCharge = 0f;
@@ -429,7 +554,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 powerUpsState.PrimaryEquipOrder = ResolveRestoredEquipOrder(ref powerUpsState, restoredEquipOrder);
                 return;
             case 1:
-                powerUpsConfig.SecondarySlot = storedPowerUp.SlotConfig;
+                secondarySlotConfig = storedPowerUp.SlotConfig;
                 powerUpsState.SecondaryEnergy = math.clamp(storedPowerUp.StoredEnergy, 0f, math.max(0f, storedPowerUp.SlotConfig.MaximumEnergy));
                 powerUpsState.SecondaryCooldownRemaining = math.clamp(storedPowerUp.StoredCooldownRemaining, 0f, math.max(0f, storedPowerUp.SlotConfig.CooldownSeconds));
                 powerUpsState.SecondaryCharge = 0f;

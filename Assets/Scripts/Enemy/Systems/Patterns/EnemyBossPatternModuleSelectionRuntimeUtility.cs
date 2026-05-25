@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -708,20 +707,18 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                                                    DynamicBuffer<EnemyPowerUpStealerConfigElement> stealerConfigs,
                                                    DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime)
     {
-        NativeList<EnemyPowerUpStealerRuntimeElement> preservedStolenRuntime = new NativeList<EnemyPowerUpStealerRuntimeElement>(Allocator.Temp);
+        int preservedStolenRuntimeCount = CountStolenPowerUpStealerRuntime(stealerRuntime);
+        int stagingStartIndex = stealerRuntime.Length;
 
-        for (int runtimeIndex = 0; runtimeIndex < stealerRuntime.Length; runtimeIndex++)
+        if (preservedStolenRuntimeCount > 0)
         {
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[runtimeIndex];
-
-            if (runtime.HasStolenPowerUp == 0)
-                continue;
-
-            preservedStolenRuntime.Add(runtime);
+            stealerRuntime.ResizeUninitialized(stagingStartIndex + preservedStolenRuntimeCount);
+            StageStolenPowerUpStealerRuntime(stealerRuntime,
+                                             stagingStartIndex);
         }
 
         stealerConfigs.Clear();
-        stealerRuntime.Clear();
+        int selectedConfigCount = 0;
 
         if (hasWeaponConfig)
         {
@@ -733,14 +730,141 @@ internal static class EnemyBossPatternModuleSelectionRuntimeUtility
                     continue;
 
                 stealerConfigs.Add(bossStealerConfigs[sourceIndex].StealerConfig);
-                stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+                selectedConfigCount += 1;
             }
         }
 
-        for (int runtimeIndex = 0; runtimeIndex < preservedStolenRuntime.Length; runtimeIndex++)
-            stealerRuntime.Add(preservedStolenRuntime[runtimeIndex]);
+        int finalRuntimeCount = selectedConfigCount + preservedStolenRuntimeCount;
 
-        preservedStolenRuntime.Dispose();
+        if (stealerRuntime.Length < finalRuntimeCount)
+            stealerRuntime.ResizeUninitialized(finalRuntimeCount);
+
+        MoveStagedPowerUpStealerRuntime(stealerRuntime,
+                                        stagingStartIndex,
+                                        selectedConfigCount,
+                                        preservedStolenRuntimeCount);
+
+        for (int runtimeIndex = 0; runtimeIndex < selectedConfigCount; runtimeIndex++)
+        {
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(runtimeIndex);
+            EnemyPowerUpStealerRuntimeDefaultsUtility.InitializeDefault(ref runtime);
+        }
+
+        stealerRuntime.ResizeUninitialized(finalRuntimeCount);
+    }
+
+    /// <summary>
+    /// Counts stolen payloads that must survive a boss module-selection rebuild.
+    /// </summary>
+    /// <param name="stealerRuntime">Runtime Stealer buffer scanned for held stolen payloads.</param>
+    /// <returns>Number of runtime entries currently holding stolen power-ups.</returns>
+    private static int CountStolenPowerUpStealerRuntime(DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime)
+    {
+        int stolenRuntimeCount = 0;
+
+        for (int runtimeIndex = 0; runtimeIndex < stealerRuntime.Length; runtimeIndex++)
+        {
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(runtimeIndex);
+
+            if (runtime.HasStolenPowerUp == 0)
+                continue;
+
+            stolenRuntimeCount += 1;
+        }
+
+        return stolenRuntimeCount;
+    }
+
+    /// <summary>
+    /// Copies stolen Stealer runtime entries into temporary tail space inside the same dynamic buffer.
+    /// </summary>
+    /// <param name="stealerRuntime">Runtime Stealer buffer with enough tail capacity for staged entries.</param>
+    /// <param name="stagingStartIndex">First tail index reserved for staged stolen payloads.</param>
+    private static void StageStolenPowerUpStealerRuntime(DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
+                                                         int stagingStartIndex)
+    {
+        int stagedRuntimeCount = 0;
+
+        for (int runtimeIndex = 0; runtimeIndex < stagingStartIndex; runtimeIndex++)
+        {
+            ref EnemyPowerUpStealerRuntimeElement sourceRuntime = ref stealerRuntime.ElementAt(runtimeIndex);
+
+            if (sourceRuntime.HasStolenPowerUp == 0)
+                continue;
+
+            ref EnemyPowerUpStealerRuntimeElement targetRuntime = ref stealerRuntime.ElementAt(stagingStartIndex + stagedRuntimeCount);
+            CopyPowerUpStealerRuntime(ref sourceRuntime,
+                                      ref targetRuntime);
+            stagedRuntimeCount += 1;
+        }
+    }
+
+    /// <summary>
+    /// Moves staged stolen payloads after the freshly selected non-stolen Stealer runtime entries.
+    /// </summary>
+    /// <param name="stealerRuntime">Runtime Stealer buffer containing staged stolen payloads.</param>
+    /// <param name="stagingStartIndex">First tail index used by staged stolen payloads.</param>
+    /// <param name="selectedConfigCount">Number of active configs selected by the boss module candidate.</param>
+    /// <param name="preservedStolenRuntimeCount">Number of staged stolen payloads to move.</param>
+    private static void MoveStagedPowerUpStealerRuntime(DynamicBuffer<EnemyPowerUpStealerRuntimeElement> stealerRuntime,
+                                                        int stagingStartIndex,
+                                                        int selectedConfigCount,
+                                                        int preservedStolenRuntimeCount)
+    {
+        if (preservedStolenRuntimeCount <= 0)
+            return;
+
+        if (selectedConfigCount > stagingStartIndex)
+        {
+            for (int runtimeIndex = preservedStolenRuntimeCount - 1; runtimeIndex >= 0; runtimeIndex--)
+            {
+                ref EnemyPowerUpStealerRuntimeElement sourceRuntime = ref stealerRuntime.ElementAt(stagingStartIndex + runtimeIndex);
+                ref EnemyPowerUpStealerRuntimeElement targetRuntime = ref stealerRuntime.ElementAt(selectedConfigCount + runtimeIndex);
+                CopyPowerUpStealerRuntime(ref sourceRuntime,
+                                          ref targetRuntime);
+            }
+
+            return;
+        }
+
+        for (int runtimeIndex = 0; runtimeIndex < preservedStolenRuntimeCount; runtimeIndex++)
+        {
+            ref EnemyPowerUpStealerRuntimeElement sourceRuntime = ref stealerRuntime.ElementAt(stagingStartIndex + runtimeIndex);
+            ref EnemyPowerUpStealerRuntimeElement targetRuntime = ref stealerRuntime.ElementAt(selectedConfigCount + runtimeIndex);
+            CopyPowerUpStealerRuntime(ref sourceRuntime,
+                                      ref targetRuntime);
+        }
+    }
+
+    /// <summary>
+    /// Copies one Stealer runtime entry field-by-field to avoid passing the large element by value.
+    /// </summary>
+    /// <param name="sourceRuntime">Runtime entry supplying the payload and recovery metadata.</param>
+    /// <param name="targetRuntime">Runtime entry receiving the copied payload and recovery metadata.</param>
+    private static void CopyPowerUpStealerRuntime(ref EnemyPowerUpStealerRuntimeElement sourceRuntime,
+                                                  ref EnemyPowerUpStealerRuntimeElement targetRuntime)
+    {
+        targetRuntime.HasTriggeredOnce = sourceRuntime.HasTriggeredOnce;
+        targetRuntime.HasStolenPowerUp = sourceRuntime.HasStolenPowerUp;
+        targetRuntime.StolenKind = sourceRuntime.StolenKind;
+        targetRuntime.PowerUpId = sourceRuntime.PowerUpId;
+        targetRuntime.StoredActivePowerUp = sourceRuntime.StoredActivePowerUp;
+        targetRuntime.StoredPassiveTool = sourceRuntime.StoredPassiveTool;
+        targetRuntime.OriginalActiveSlotIndex = sourceRuntime.OriginalActiveSlotIndex;
+        targetRuntime.OriginalActiveEquipOrder = sourceRuntime.OriginalActiveEquipOrder;
+        targetRuntime.OriginalPassiveCatalogIndex = sourceRuntime.OriginalPassiveCatalogIndex;
+        targetRuntime.OriginalPassiveBufferIndex = sourceRuntime.OriginalPassiveBufferIndex;
+        targetRuntime.OriginalPassiveUnlockCount = sourceRuntime.OriginalPassiveUnlockCount;
+        targetRuntime.PlayerEntity = sourceRuntime.PlayerEntity;
+        targetRuntime.UseDamageRecovery = sourceRuntime.UseDamageRecovery;
+        targetRuntime.DamageRecoveryPercent = sourceRuntime.DamageRecoveryPercent;
+        targetRuntime.UseTimedDamageRecovery = sourceRuntime.UseTimedDamageRecovery;
+        targetRuntime.TimedDamageRecoveryPercent = sourceRuntime.TimedDamageRecoveryPercent;
+        targetRuntime.TimedDamageRecoverySeconds = sourceRuntime.TimedDamageRecoverySeconds;
+        targetRuntime.HealthAtSteal = sourceRuntime.HealthAtSteal;
+        targetRuntime.LastObservedHealth = sourceRuntime.LastObservedHealth;
+        targetRuntime.RecoveryWindowElapsedSeconds = sourceRuntime.RecoveryWindowElapsedSeconds;
+        targetRuntime.RecoveryWindowAccumulatedPercent = sourceRuntime.RecoveryWindowAccumulatedPercent;
     }
 
     /// <summary>

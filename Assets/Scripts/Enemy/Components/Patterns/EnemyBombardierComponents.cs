@@ -42,6 +42,7 @@ public struct EnemyBombardierConfigElement : IBufferElementData
     public float DamageRadius;
     public float ImpactExplosionDelaySeconds;
     public float BombScaleMultiplier;
+    public byte PreventMidAirInterception;
     public byte EnableLandingWarning;
     public float WarningLeadTimeSeconds;
     public float WarningRadiusScale;
@@ -87,6 +88,7 @@ public struct EnemyBombardierLaunchRequest : IBufferElementData
     public float DamageRadius;
     public float ImpactExplosionDelaySeconds;
     public float BombScaleMultiplier;
+    public byte PreventMidAirInterception;
     public byte EnableLandingWarning;
     public float WarningLeadTimeSeconds;
     public float WarningRadius;
@@ -127,7 +129,9 @@ public struct EnemyBombardierBomb : IComponentData
     public float ExplosionDelayElapsedSeconds;
     public float Damage;
     public float DamageRadius;
+    public float CollisionRadius;
     public byte ScaleExplosionVfxToDamageRadius;
+    public byte PreventMidAirInterception;
     public float ExplosionVfxScaleMultiplier;
     public byte HasImpacted;
     public byte HasExploded;

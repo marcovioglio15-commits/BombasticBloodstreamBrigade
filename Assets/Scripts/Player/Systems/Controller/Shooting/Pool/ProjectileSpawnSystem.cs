@@ -234,7 +234,10 @@ public partial struct ProjectileSpawnSystem : ISystem
                 continue;
             }
 
-            PlayerPassiveToolsState passiveToolsState = ResolvePassiveToolsState(shooterEntity, in passiveToolsLookup);
+            PlayerPassiveToolsState passiveToolsState;
+            ResolvePassiveToolsState(shooterEntity,
+                                     in passiveToolsLookup,
+                                     out passiveToolsState);
             int requestsCount = shooterShootRequests.Length;
             int spawnedProjectileCount = 0;
 
@@ -396,9 +399,13 @@ public partial struct ProjectileSpawnSystem : ISystem
         return math.max(MinimumProjectileScale, transformScale);
     }
 
-    private static PlayerPassiveToolsState ResolvePassiveToolsState(Entity shooterEntity, in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup)
+    private static void ResolvePassiveToolsState(Entity shooterEntity,
+                                                 in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
+                                                 out PlayerPassiveToolsState passiveToolsState)
     {
-        return PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in passiveToolsLookup);
+        PlayerPassiveToolsStateBufferUtility.Read(shooterEntity,
+                                                  in passiveToolsLookup,
+                                                  out passiveToolsState);
     }
 
     /// <summary>

@@ -265,8 +265,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                        float resolvedRangeMultiplier,
                                                        float resolvedLifetimeMultiplier)
     {
-        PlayerPassiveToolsState chargedLaserPassiveToolsState =
-            PlayerPassiveToolsAggregationUtility.CreateStandaloneLaserBeamState(in slotConfig.ChargeShot.ChargedLaserBeam);
+        PlayerPassiveToolsState chargedLaserPassiveToolsState;
+        PlayerPassiveToolsAggregationUtility.CreateStandaloneLaserBeamState(in slotConfig.ChargeShot.ChargedLaserBeam,
+                                                                            out chargedLaserPassiveToolsState);
 
         ResolvePenetrationSettings(in runtimeShootingConfig.Values,
                                    slotConfig.ChargeShot.PenetrationMode,

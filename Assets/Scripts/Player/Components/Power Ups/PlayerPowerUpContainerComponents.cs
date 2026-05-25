@@ -30,12 +30,24 @@ public struct PlayerStoredActivePowerUpData
 }
 
 /// <summary>
-/// Marks one dropped world entity and stores the active power-up currently available inside it.
-/// none.
+/// Marks one dropped world entity and stores the small runtime state for the active power-up currently available inside it.
+/// The large slot payload is stored in PlayerDroppedPowerUpContainerSlotElement to avoid by-value ECB calls with oversized structs.
 /// </summary>
 public struct PlayerDroppedPowerUpContainerContent : IComponentData
 {
-    public PlayerStoredActivePowerUpData StoredPowerUp;
+    public float StoredEnergy;
+    public float StoredCooldownRemaining;
+    public byte HasStoredPowerUp;
+}
+
+/// <summary>
+/// Stores the large active-slot payload for one dropped power-up container outside the component payload.
+/// none.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerDroppedPowerUpContainerSlotElement : IBufferElementData
+{
+    public PlayerPowerUpSlotConfig SlotConfig;
 }
 
 /// <summary>

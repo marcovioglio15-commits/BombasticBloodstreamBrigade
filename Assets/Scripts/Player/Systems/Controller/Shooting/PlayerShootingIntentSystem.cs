@@ -80,7 +80,10 @@ public partial struct PlayerShootingIntentSystem : ISystem
             // if shooting is disabled in the config, skip processing shooting logic for this player
             PlayerRuntimeShootingConfig shootingConfig = runtimeShootingConfig.ValueRO;
             ShootingValuesBlob values = shootingConfig.Values;
-            PlayerPassiveToolsState passiveToolsState = ResolvePassiveToolsState(entity, in passiveToolsLookup);
+            PlayerPassiveToolsState passiveToolsState;
+            ResolvePassiveToolsState(entity,
+                                     in passiveToolsLookup,
+                                     out passiveToolsState);
             ElementalEffectConfig unusedElementalEffect = default;
             bool isShootingSuppressed = false;
 
@@ -331,10 +334,13 @@ public partial struct PlayerShootingIntentSystem : ISystem
         shootingState.VisualShootingActive = inputRequestsShootingVisual || pulseStillActive ? (byte)1 : (byte)0;
     }
 
-    private static PlayerPassiveToolsState ResolvePassiveToolsState(Entity shooterEntity,
-                                                                    in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup)
+    private static void ResolvePassiveToolsState(Entity shooterEntity,
+                                                 in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
+                                                 out PlayerPassiveToolsState passiveToolsState)
     {
-        return PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in passiveToolsLookup);
+        PlayerPassiveToolsStateBufferUtility.Read(shooterEntity,
+                                                  in passiveToolsLookup,
+                                                  out passiveToolsState);
     }
 
     #endregion

@@ -26,6 +26,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     public readonly bool HasMissingPowerUpVfxPrefabBindingBuffer;
     public readonly bool HasMissingPowerUpVfxCapConfig;
     public readonly bool HasMissingPowerUpCheatPresetEntryBuffer;
+    public readonly bool HasMissingPowerUpCheatPresetSlotBuffer;
     public readonly bool HasMissingPowerUpCheatPresetPassiveBuffer;
     public readonly bool HasMissingPowerUpUnlockCatalogBuffer;
     public readonly bool HasMissingPowerUpCharacterTuningFormulaBuffer;
@@ -62,6 +63,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
                    HasMissingPowerUpVfxPrefabBindingBuffer ||
                    HasMissingPowerUpVfxCapConfig ||
                    HasMissingPowerUpCheatPresetEntryBuffer ||
+                   HasMissingPowerUpCheatPresetSlotBuffer ||
                    HasMissingPowerUpCheatPresetPassiveBuffer ||
                    HasMissingPowerUpUnlockCatalogBuffer ||
                    HasMissingPowerUpCharacterTuningFormulaBuffer ||
@@ -101,6 +103,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="hasMissingPowerUpVfxPrefabBindingBuffer">True when PlayerPowerUpVfxPrefabBindingElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpVfxCapConfig">True when PlayerPowerUpVfxCapConfig is missing.</param>
     /// <param name="hasMissingPowerUpCheatPresetEntryBuffer">True when PlayerPowerUpCheatPresetEntry buffer is missing.</param>
+    /// <param name="hasMissingPowerUpCheatPresetSlotBuffer">True when PlayerPowerUpCheatPresetSlotElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpCheatPresetPassiveBuffer">True when PlayerPowerUpCheatPresetPassiveElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpUnlockCatalogBuffer">True when PlayerPowerUpUnlockCatalogElement buffer is missing.</param>
     /// <param name="hasMissingPowerUpCharacterTuningFormulaBuffer">True when PlayerPowerUpCharacterTuningFormulaElement buffer is missing.</param>
@@ -132,6 +135,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         bool hasMissingPowerUpVfxPrefabBindingBuffer,
         bool hasMissingPowerUpVfxCapConfig,
         bool hasMissingPowerUpCheatPresetEntryBuffer,
+        bool hasMissingPowerUpCheatPresetSlotBuffer,
         bool hasMissingPowerUpCheatPresetPassiveBuffer,
         bool hasMissingPowerUpUnlockCatalogBuffer,
         bool hasMissingPowerUpCharacterTuningFormulaBuffer,
@@ -162,6 +166,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         HasMissingPowerUpVfxPrefabBindingBuffer = hasMissingPowerUpVfxPrefabBindingBuffer;
         HasMissingPowerUpVfxCapConfig = hasMissingPowerUpVfxCapConfig;
         HasMissingPowerUpCheatPresetEntryBuffer = hasMissingPowerUpCheatPresetEntryBuffer;
+        HasMissingPowerUpCheatPresetSlotBuffer = hasMissingPowerUpCheatPresetSlotBuffer;
         HasMissingPowerUpCheatPresetPassiveBuffer = hasMissingPowerUpCheatPresetPassiveBuffer;
         HasMissingPowerUpUnlockCatalogBuffer = hasMissingPowerUpUnlockCatalogBuffer;
         HasMissingPowerUpCharacterTuningFormulaBuffer = hasMissingPowerUpCharacterTuningFormulaBuffer;
@@ -198,6 +203,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
     /// <param name="missingPowerUpVfxPrefabBindingBufferQuery">Query for entities missing PlayerPowerUpVfxPrefabBindingElement buffer.</param>
     /// <param name="missingPowerUpVfxCapConfigQuery">Query for entities missing PlayerPowerUpVfxCapConfig.</param>
     /// <param name="missingPowerUpCheatPresetEntryBufferQuery">Query for entities missing PlayerPowerUpCheatPresetEntry buffer.</param>
+    /// <param name="missingPowerUpCheatPresetSlotBufferQuery">Query for entities missing PlayerPowerUpCheatPresetSlotElement buffer.</param>
     /// <param name="missingPowerUpCheatPresetPassiveBufferQuery">Query for entities missing PlayerPowerUpCheatPresetPassiveElement buffer.</param>
     /// <param name="missingPowerUpUnlockCatalogBufferQuery">Query for entities missing PlayerPowerUpUnlockCatalogElement buffer.</param>
     /// <param name="missingPowerUpCharacterTuningFormulaBufferQuery">Query for entities missing PlayerPowerUpCharacterTuningFormulaElement buffer.</param>
@@ -229,6 +235,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
         in EntityQuery missingPowerUpVfxPrefabBindingBufferQuery,
         in EntityQuery missingPowerUpVfxCapConfigQuery,
         in EntityQuery missingPowerUpCheatPresetEntryBufferQuery,
+        in EntityQuery missingPowerUpCheatPresetSlotBufferQuery,
         in EntityQuery missingPowerUpCheatPresetPassiveBufferQuery,
         in EntityQuery missingPowerUpUnlockCatalogBufferQuery,
         in EntityQuery missingPowerUpCharacterTuningFormulaBufferQuery,
@@ -260,6 +267,7 @@ internal readonly struct PlayerPowerUpsMissingRuntimeFlags
             !missingPowerUpVfxPrefabBindingBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpVfxCapConfigQuery.IsEmptyIgnoreFilter,
             !missingPowerUpCheatPresetEntryBufferQuery.IsEmptyIgnoreFilter,
+            !missingPowerUpCheatPresetSlotBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpCheatPresetPassiveBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpUnlockCatalogBufferQuery.IsEmptyIgnoreFilter,
             !missingPowerUpCharacterTuningFormulaBufferQuery.IsEmptyIgnoreFilter,

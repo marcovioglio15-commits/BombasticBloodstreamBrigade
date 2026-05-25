@@ -16,12 +16,26 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     /// <param name="position">World position.</param>
     /// <param name="rotation">World rotation.</param>
     /// <param name="uniformScale">Uniform local scale.</param>
+    /// <param name="particleSimulationSpeedMultiplier">Multiplier applied to authored particle simulation speeds.</param>
+    /// <param name="forceLooping">True when particle systems should loop for the request lifetime.</param>
+    /// <param name="hasColorOverride">True when matching particle systems should use request colors.</param>
+    /// <param name="colorOverride">Primary linear color override applied to matching particle systems.</param>
+    /// <param name="secondaryColorOverride">Secondary linear color override used for randomized debris palettes.</param>
+    /// <param name="colorOverrideCount">Number of valid request colors, clamped by the caller-side palette producer.</param>
+    /// <param name="colorOverrideChildName">Optional child object name used to limit the color override.</param>
     /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to preserve authored scaling.</param>
     /// <param name="trailRendererTimeOverrideSeconds">Positive trail history time override, or zero to preserve authored retention.</param>
     public static void ApplyTransform(PlayerPowerUpManagedVfxInstance instance,
                                       float3 position,
                                       quaternion rotation,
                                       float uniformScale,
+                                      float particleSimulationSpeedMultiplier,
+                                      bool forceLooping,
+                                      bool hasColorOverride,
+                                      float4 colorOverride,
+                                      float4 secondaryColorOverride,
+                                      byte colorOverrideCount,
+                                      string colorOverrideChildName,
                                       float trailRendererWidthOverride,
                                       float trailRendererTimeOverrideSeconds)
     {
@@ -29,6 +43,14 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
         instanceTransform.position = ToVector3(position);
         instanceTransform.rotation = ToQuaternion(rotation);
         ApplyParticleSystemScaling(instance);
+        ApplyParticleSystemRuntimeSettings(instance,
+                                           particleSimulationSpeedMultiplier,
+                                           forceLooping,
+                                           hasColorOverride,
+                                           colorOverride,
+                                           secondaryColorOverride,
+                                           colorOverrideCount,
+                                           colorOverrideChildName);
         instanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
         ApplyTrailRendererSettings(instance,
                                    uniformScale,
@@ -45,6 +67,21 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
                                      float3 position)
     {
         instance.InstanceTransform.position = ToVector3(position);
+    }
+
+    /// <summary>
+    /// Applies a position and rotation update to one managed VFX root without touching playback state.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance whose transform is being updated.</param>
+    /// <param name="position">World position.</param>
+    /// <param name="rotation">World rotation.</param>
+    public static void ApplyPositionAndRotation(PlayerPowerUpManagedVfxInstance instance,
+                                                float3 position,
+                                                quaternion rotation)
+    {
+        Transform instanceTransform = instance.InstanceTransform;
+        instanceTransform.position = ToVector3(position);
+        instanceTransform.rotation = ToQuaternion(rotation);
     }
 
     /// <summary>
@@ -70,6 +107,87 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
 
             mainModule.scalingMode = ParticleSystemScalingMode.Hierarchy;
         }
+    }
+
+    /// <summary>
+    /// Applies per-request particle timing, looping and optional start-color overrides without clearing playback.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance whose particle systems are being prepared.</param>
+    /// <param name="simulationSpeedMultiplier">Multiplier applied to cached authored simulation speeds. Values at or below zero resolve to 1.</param>
+    /// <param name="forceLooping">True when particle systems should loop for the request lifetime.</param>
+    /// <param name="hasColorOverride">True when matching particle systems should use request colors.</param>
+    /// <param name="colorOverride">Primary linear color override applied to matching particle systems.</param>
+    /// <param name="secondaryColorOverride">Secondary linear color override used for randomized debris palettes.</param>
+    /// <param name="colorOverrideCount">Number of valid request colors, with values below two treated as a single color.</param>
+    /// <param name="colorOverrideChildName">Optional child object name used to limit the color override.</param>
+    public static void ApplyParticleSystemRuntimeSettings(PlayerPowerUpManagedVfxInstance instance,
+                                                          float simulationSpeedMultiplier,
+                                                          bool forceLooping,
+                                                          bool hasColorOverride,
+                                                          float4 colorOverride,
+                                                          float4 secondaryColorOverride,
+                                                          byte colorOverrideCount,
+                                                          string colorOverrideChildName)
+    {
+        if (instance.ParticleSystems == null)
+            return;
+
+        float sanitizedSimulationSpeedMultiplier = simulationSpeedMultiplier > 0f ? simulationSpeedMultiplier : 1f;
+        ParticleSystem.MinMaxGradient colorOverrideGradient = ResolveColorOverrideGradient(colorOverride,
+                                                                                           secondaryColorOverride,
+                                                                                           colorOverrideCount);
+
+        for (int particleIndex = 0; particleIndex < instance.ParticleSystems.Length; particleIndex++)
+        {
+            ParticleSystem particleSystem = instance.ParticleSystems[particleIndex];
+
+            if (particleSystem == null)
+                continue;
+
+            ParticleSystem.MainModule mainModule = particleSystem.main;
+            bool applyColorOverride = ShouldApplyColorOverride(particleSystem, hasColorOverride, colorOverrideChildName);
+            mainModule.simulationSpeed = ResolveParticleBaseSimulationSpeed(instance, particleIndex, mainModule) * sanitizedSimulationSpeedMultiplier;
+            mainModule.loop = forceLooping || ResolveParticleBaseLooping(instance, particleIndex, mainModule);
+            mainModule.startColor = applyColorOverride
+                ? colorOverrideGradient
+                : ResolveParticleBaseStartColor(instance, particleIndex, mainModule);
+            ApplyParticleColorOverLifetime(instance,
+                                           particleIndex,
+                                           particleSystem,
+                                           applyColorOverride);
+        }
+    }
+
+    /// <summary>
+    /// Applies or restores Color over Lifetime settings so overridden debris colors are not remapped by the prefab gradient.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance whose cached color-over-lifetime data is used.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached arrays.</param>
+    /// <param name="particleSystem">Particle system receiving runtime settings.</param>
+    /// <param name="applyColorOverride">True when this particle system is using request color overrides.</param>
+    private static void ApplyParticleColorOverLifetime(PlayerPowerUpManagedVfxInstance instance,
+                                                       int particleIndex,
+                                                       ParticleSystem particleSystem,
+                                                       bool applyColorOverride)
+    {
+        ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particleSystem.colorOverLifetime;
+
+        if (applyColorOverride)
+        {
+            colorOverLifetime.enabled = false;
+            return;
+        }
+
+        colorOverLifetime.enabled = ResolveParticleBaseColorOverLifetimeEnabled(instance,
+                                                                                particleIndex,
+                                                                                colorOverLifetime);
+
+        if (!colorOverLifetime.enabled)
+            return;
+
+        colorOverLifetime.color = ResolveParticleBaseColorOverLifetimeColor(instance,
+                                                                            particleIndex,
+                                                                            colorOverLifetime);
     }
 
     /// <summary>
@@ -226,6 +344,168 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
         }
 
         return Mathf.Max(0.0001f, instance.TrailRendererBaseWidths[trailIndex]);
+    }
+
+    /// <summary>
+    /// Resolves cached authored particle simulation speed for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached particle timing values.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="mainModule">Current particle main module used as fallback.</param>
+    /// <returns>Positive authored simulation speed.</returns>
+    private static float ResolveParticleBaseSimulationSpeed(PlayerPowerUpManagedVfxInstance instance,
+                                                            int particleIndex,
+                                                            ParticleSystem.MainModule mainModule)
+    {
+        if (instance.ParticleSystemBaseSimulationSpeeds == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseSimulationSpeeds.Length)
+        {
+            return Mathf.Max(0.0001f, mainModule.simulationSpeed);
+        }
+
+        return Mathf.Max(0.0001f, instance.ParticleSystemBaseSimulationSpeeds[particleIndex]);
+    }
+
+    /// <summary>
+    /// Resolves cached authored particle looping state for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached looping flags.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="mainModule">Current particle main module used as fallback.</param>
+    /// <returns>Authored loop flag.</returns>
+    private static bool ResolveParticleBaseLooping(PlayerPowerUpManagedVfxInstance instance,
+                                                   int particleIndex,
+                                                   ParticleSystem.MainModule mainModule)
+    {
+        if (instance.ParticleSystemBaseLooping == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseLooping.Length)
+        {
+            return mainModule.loop;
+        }
+
+        return instance.ParticleSystemBaseLooping[particleIndex];
+    }
+
+    /// <summary>
+    /// Resolves cached authored particle start color for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached start colors.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="mainModule">Current particle main module used as fallback.</param>
+    /// <returns>Authored start color gradient.</returns>
+    private static ParticleSystem.MinMaxGradient ResolveParticleBaseStartColor(PlayerPowerUpManagedVfxInstance instance,
+                                                                               int particleIndex,
+                                                                               ParticleSystem.MainModule mainModule)
+    {
+        if (instance.ParticleSystemBaseStartColors == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseStartColors.Length)
+        {
+            return mainModule.startColor;
+        }
+
+        return instance.ParticleSystemBaseStartColors[particleIndex];
+    }
+
+    /// <summary>
+    /// Resolves cached authored Color over Lifetime enabled state for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached color-over-lifetime states.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="colorOverLifetime">Current color-over-lifetime module used as fallback.</param>
+    /// <returns>Authored enabled state.</returns>
+    private static bool ResolveParticleBaseColorOverLifetimeEnabled(PlayerPowerUpManagedVfxInstance instance,
+                                                                    int particleIndex,
+                                                                    ParticleSystem.ColorOverLifetimeModule colorOverLifetime)
+    {
+        if (instance.ParticleSystemBaseColorOverLifetimeEnabled == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseColorOverLifetimeEnabled.Length)
+        {
+            return colorOverLifetime.enabled;
+        }
+
+        return instance.ParticleSystemBaseColorOverLifetimeEnabled[particleIndex];
+    }
+
+    /// <summary>
+    /// Resolves cached authored Color over Lifetime gradient for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached color-over-lifetime gradients.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="colorOverLifetime">Current color-over-lifetime module used as fallback.</param>
+    /// <returns>Authored color-over-lifetime gradient.</returns>
+    private static ParticleSystem.MinMaxGradient ResolveParticleBaseColorOverLifetimeColor(PlayerPowerUpManagedVfxInstance instance,
+                                                                                           int particleIndex,
+                                                                                           ParticleSystem.ColorOverLifetimeModule colorOverLifetime)
+    {
+        if (instance.ParticleSystemBaseColorOverLifetimeColors == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseColorOverLifetimeColors.Length)
+        {
+            return colorOverLifetime.color;
+        }
+
+        return instance.ParticleSystemBaseColorOverLifetimeColors[particleIndex];
+    }
+
+    /// <summary>
+    /// Builds the particle-system start color override used by single-color and two-color debris requests.
+    /// </summary>
+    /// <param name="primaryColor">Primary linear request color.</param>
+    /// <param name="secondaryColor">Secondary linear request color used when at least two colors are valid.</param>
+    /// <param name="colorCount">Number of valid request colors.</param>
+    /// <returns>Particle gradient that randomizes between two colors when a palette is available.</returns>
+    private static ParticleSystem.MinMaxGradient ResolveColorOverrideGradient(float4 primaryColor,
+                                                                              float4 secondaryColor,
+                                                                              byte colorCount)
+    {
+        Color managedPrimaryColor = new Color(primaryColor.x,
+                                              primaryColor.y,
+                                              primaryColor.z,
+                                              primaryColor.w);
+
+        if (colorCount < 2)
+            return new ParticleSystem.MinMaxGradient(managedPrimaryColor);
+
+        Color managedSecondaryColor = new Color(secondaryColor.x,
+                                                secondaryColor.y,
+                                                secondaryColor.z,
+                                                secondaryColor.w);
+
+        return new ParticleSystem.MinMaxGradient(managedPrimaryColor, managedSecondaryColor);
+    }
+
+    /// <summary>
+    /// Resolves whether a color override should affect one particle system.
+    /// </summary>
+    /// <param name="particleSystem">Particle system being inspected.</param>
+    /// <param name="hasColorOverride">True when the request carries a color override.</param>
+    /// <param name="colorOverrideChildName">Optional child object name used as a filter.</param>
+    /// <returns>True when the particle start color should be overridden.</returns>
+    private static bool ShouldApplyColorOverride(ParticleSystem particleSystem,
+                                                 bool hasColorOverride,
+                                                 string colorOverrideChildName)
+    {
+        if (!hasColorOverride)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(colorOverrideChildName))
+            return true;
+
+        Transform particleTransform = particleSystem.transform;
+
+        while (particleTransform != null)
+        {
+            if (string.Equals(particleTransform.name, colorOverrideChildName, System.StringComparison.Ordinal))
+                return true;
+
+            particleTransform = particleTransform.parent;
+        }
+
+        return false;
     }
 
     /// <summary>

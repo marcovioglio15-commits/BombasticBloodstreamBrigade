@@ -19,6 +19,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultHitVfxScaleMultiplier = 1f;
     private const float DefaultSpawnVfxLifetimeSeconds = 0.5f;
     private const float DefaultSpawnVfxScaleMultiplier = 1f;
+    private const float DefaultDeathVfxLifetimeSeconds = 0.75f;
+    private const float DefaultDeathVfxScaleMultiplier = 1f;
     private static readonly Color DefaultDamageFlashColor = new Color(1f, 0.15f, 0.15f, 1f);
     private static readonly Color DefaultOutlineColor = Color.black;
     private const float DefaultDamageFlashDurationSeconds = 0.06f;
@@ -693,6 +695,97 @@ public sealed class EnemyAuthoring : MonoBehaviour
                 return DefaultSpawnVfxScaleMultiplier;
 
             return settings.SpawnVfxScaleMultiplier;
+        }
+    }
+
+    public GameObject DeathVfxPrefab
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return null;
+
+            return settings.DeathVfxPrefab;
+        }
+    }
+
+    public float DeathVfxLifetimeSeconds
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return DefaultDeathVfxLifetimeSeconds;
+
+            return settings.DeathVfxLifetimeSeconds;
+        }
+    }
+
+    public Vector3 DeathVfxSpawnOffset
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return Vector3.zero;
+
+            return settings.DeathVfxSpawnOffset;
+        }
+    }
+
+    public float DeathVfxScaleMultiplier
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return DefaultDeathVfxScaleMultiplier;
+
+            return settings.DeathVfxScaleMultiplier;
+        }
+    }
+
+    public bool UseEnemyBaseColorForDeathDebris
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return true;
+
+            return settings.UseEnemyBaseColorForDeathDebris;
+        }
+    }
+
+    public Color DeathDebrisFallbackColor
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return Color.white;
+
+            return settings.DeathDebrisFallbackColor;
+        }
+    }
+
+    public string DeathDebrisParticleChildName
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return "VFX_Debris";
+
+            return settings.DeathDebrisParticleChildName;
         }
     }
 

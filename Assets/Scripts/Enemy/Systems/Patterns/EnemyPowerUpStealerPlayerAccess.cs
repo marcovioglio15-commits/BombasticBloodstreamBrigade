@@ -10,6 +10,7 @@ internal struct EnemyPowerUpStealerPlayerAccess
     public ComponentLookup<PlayerPowerUpsState> PowerUpsStateLookup;
     public BufferLookup<EquippedPassiveToolElement> EquippedPassiveToolsLookup;
     public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsStateLookup;
+    public BufferLookup<PlayerOrbitalProjectionLostElement> OrbitalProjectionLostLookup;
     public BufferLookup<PlayerPowerUpUnlockCatalogElement> UnlockCatalogLookup;
     public ComponentLookup<PlayerPowerUpContainerInteractionConfig> ContainerConfigLookup;
     #endregion

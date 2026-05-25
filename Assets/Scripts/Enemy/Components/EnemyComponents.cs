@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -154,6 +155,23 @@ public struct EnemySpawnVfxConfig : IComponentData
     public float3 SpawnOffset;
     public float LifetimeSeconds;
     public float ScaleMultiplier;
+}
+
+/// <summary>
+/// Stores optional one-shot VFX settings used when an enemy dies.
+/// </summary>
+public struct EnemyDeathVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> Prefab;
+    public float3 SpawnOffset;
+    public float LifetimeSeconds;
+    public float ScaleMultiplier;
+    public byte HasDebrisColorOverride;
+    public float4 DebrisColor;
+    public float4 SecondaryDebrisColor;
+    public byte DebrisColorCount;
+    public FixedString64Bytes DebrisParticleChildName;
 }
 
 /// <summary>

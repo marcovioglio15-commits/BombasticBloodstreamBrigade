@@ -67,12 +67,14 @@ public partial struct PlayerPowerUpContainerProximitySystem : ISystem
                 float3 playerPosition = playerTransform.ValueRO.Position;
 
                 foreach ((RefRO<PlayerDroppedPowerUpContainerContent> droppedContainerContent,
+                          DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement> containerSlotBuffer,
                           RefRO<LocalTransform> containerTransform,
                           Entity containerEntity)
                          in SystemAPI.Query<RefRO<PlayerDroppedPowerUpContainerContent>,
+                                            DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement>,
                                             RefRO<LocalTransform>>().WithEntityAccess())
                 {
-                    if (droppedContainerContent.ValueRO.StoredPowerUp.SlotConfig.IsDefined == 0)
+                    if (!PlayerDroppedPowerUpContainerPayloadUtility.HasValidPayload(in droppedContainerContent.ValueRO, containerSlotBuffer))
                         continue;
 
                     if (containerEntity == lockedContainerEntity)

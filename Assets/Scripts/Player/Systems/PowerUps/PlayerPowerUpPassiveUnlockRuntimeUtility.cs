@@ -31,7 +31,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
         for (int candidateIndex = 0; candidateIndex < unlockCatalog.Length; candidateIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[candidateIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(candidateIndex);
 
             if (catalogEntry.UnlockKind != PlayerPowerUpUnlockKind.Passive)
             {
@@ -127,7 +127,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
         }
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
         if (catalogEntry.UnlockKind != PlayerPowerUpUnlockKind.Passive)
         {
@@ -158,19 +158,55 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
         }
         else
         {
-            applyTarget = "PassiveStacked";
+            equippedOnGrant = TryStackOrbitalProjectionTool(in catalogEntry,
+                                                            equippedPassiveTools,
+                                                            ref passiveToolsState,
+                                                            out applyTarget);
+
+            if (!equippedOnGrant)
+                applyTarget = "PassiveStacked";
         }
 
         catalogEntry.CurrentUnlockCount = math.min(maximumUnlockCount, catalogEntry.CurrentUnlockCount + 1);
         catalogEntry.IsUnlocked = 1;
         catalogEntry.PendingInitialCharacterTuningApply = 0;
-        unlockCatalog[catalogIndex] = catalogEntry;
 
         if (acquisitionTime >= 0f)
             PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(catalogIndex,
                                                                               unlockCatalog,
                                                                               acquisitionTime);
 
+        return true;
+    }
+
+    /// <summary>
+    /// Adds an orbital-only passive entry for repeated Stackable acquisitions so projection acquisition policies remain source-aware.
+    /// </summary>
+    /// <param name="selectedCatalogEntry">Passive catalog entry being acquired again.</param>
+    /// <param name="equippedPassiveTools">Runtime equipped-passive tool buffer receiving the orbital-only source.</param>
+    /// <param name="passiveToolsState">Aggregated passive runtime state rebuilt after the source is added.</param>
+    /// <param name="applyTarget">Debug label describing the stacked orbital result.</param>
+    /// <returns>True when an orbital projection source was added for this stacked acquisition.</returns>
+    public static bool TryStackOrbitalProjectionTool(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
+                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                     ref PlayerPassiveToolsState passiveToolsState,
+                                                     out string applyTarget)
+    {
+        applyTarget = "NoOrbitalProjectionStack";
+
+        if (!equippedPassiveTools.IsCreated)
+            return false;
+
+        if (!TryCreateOrbitalProjectionOnlyTool(in selectedCatalogEntry.PassiveToolConfig,
+                                                out PlayerPassiveToolConfig orbitalOnlyTool))
+            return false;
+
+        AddEquippedPassiveTool(equippedPassiveTools,
+                               selectedCatalogEntry.PowerUpId,
+                               in orbitalOnlyTool);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
+        applyTarget = "PassiveOrbitalProjectionStacked";
         return true;
     }
 
@@ -192,7 +228,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
         }
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
         if (catalogEntry.UnlockKind != PlayerPowerUpUnlockKind.Passive || catalogEntry.CurrentUnlockCount <= 0)
         {
@@ -207,8 +243,6 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             catalogEntry.PendingInitialCharacterTuningApply = 0;
         }
 
-        unlockCatalog[catalogIndex] = catalogEntry;
-
         if (catalogEntry.CurrentUnlockCount > 0 || grant.EquippedOnGrant == 0)
         {
             return true;
@@ -219,7 +253,8 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return true;
         }
 
-        passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
         return true;
     }
 
@@ -236,9 +271,10 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
                                            ref PlayerPassiveToolsState passiveToolsState,
                                            out string applyTarget)
     {
-        PlayerPassiveToolConfig passiveToolConfig =
-            PlayerOrbitalProjectionCategoryRuntimeUtility.FilterBlockedProjectionCategories(in selectedCatalogEntry.PassiveToolConfig,
-                                                                                            equippedPassiveTools);
+        PlayerPassiveToolConfig passiveToolConfig;
+        PlayerOrbitalProjectionCategoryRuntimeUtility.FilterBlockedProjectionCategories(in selectedCatalogEntry.PassiveToolConfig,
+                                                                                       equippedPassiveTools,
+                                                                                       out passiveToolConfig);
         applyTarget = "PassiveBuffer";
 
         if (passiveToolConfig.IsDefined == 0)
@@ -253,12 +289,11 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
         }
 
-        equippedPassiveTools.Add(new EquippedPassiveToolElement
-        {
-            PowerUpId = selectedCatalogEntry.PowerUpId,
-            Tool = passiveToolConfig
-        });
-        passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+        AddEquippedPassiveTool(equippedPassiveTools,
+                               selectedCatalogEntry.PowerUpId,
+                               in passiveToolConfig);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
         applyTarget = "PassiveAdded";
         return true;
     }
@@ -283,6 +318,34 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
 
         return ContainsPassiveToolKind(equippedPassiveTools, passiveToolConfig.ToolKind);
+    }
+
+    /// <summary>
+    /// Builds a passive payload that carries only orbital projection configs from a stackable passive acquisition.
+    /// </summary>
+    /// <param name="sourceTool">Source passive payload stored in the unlock catalog.</param>
+    /// <param name="orbitalOnlyTool">Orbital-only passive tool when the source has projection entries.</param>
+    /// <returns>True when an orbital-only tool was created.</returns>
+    private static bool TryCreateOrbitalProjectionOnlyTool(in PlayerPassiveToolConfig sourceTool,
+                                                           out PlayerPassiveToolConfig orbitalOnlyTool)
+    {
+        orbitalOnlyTool = default;
+
+        if (sourceTool.IsDefined == 0 ||
+            sourceTool.HasOrbitalProjections == 0 ||
+            sourceTool.OrbitalProjections.Length <= 0)
+        {
+            return false;
+        }
+
+        orbitalOnlyTool = new PlayerPassiveToolConfig
+        {
+            IsDefined = 1,
+            ToolKind = PassiveToolKind.Custom,
+            HasOrbitalProjections = 1,
+            OrbitalProjections = sourceTool.OrbitalProjections
+        };
+        return true;
     }
 
     /// <summary>
@@ -341,11 +404,10 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
             return false;
         }
 
-        equippedPassiveTools.Add(new EquippedPassiveToolElement
-        {
-            PowerUpId = selectedCatalogEntry.PowerUpId,
-            Tool = default
-        });
+        PlayerPassiveToolConfig passiveToolConfig = default;
+        AddEquippedPassiveTool(equippedPassiveTools,
+                               selectedCatalogEntry.PowerUpId,
+                               in passiveToolConfig);
         applyTarget = "PassiveOwnershipMarker";
         return true;
     }
@@ -393,7 +455,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
 
         if (grant.CatalogIndex >= 0 && grant.CatalogIndex < unlockCatalog.Length)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[grant.CatalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(grant.CatalogIndex);
 
             if (catalogEntry.UnlockKind == PlayerPowerUpUnlockKind.Passive && catalogEntry.PowerUpId == grant.PowerUpId)
             {
@@ -403,6 +465,23 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
         }
 
         return TryFindPassiveCatalogIndex(grant.PowerUpId, unlockCatalog, out catalogIndex);
+    }
+
+    /// <summary>
+    /// Appends one equipped passive entry without passing the large buffer element payload by value.
+    /// </summary>
+    /// <param name="equippedPassiveTools">Mutable equipped-passive buffer receiving the entry.</param>
+    /// <param name="powerUpId">Power-up id stored on the equipped entry.</param>
+    /// <param name="passiveToolConfig">Passive tool payload copied into the new buffer slot.</param>
+    private static void AddEquippedPassiveTool(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                               FixedString64Bytes powerUpId,
+                                               in PlayerPassiveToolConfig passiveToolConfig)
+    {
+        int passiveIndex = equippedPassiveTools.Length;
+        equippedPassiveTools.ResizeUninitialized(passiveIndex + 1);
+        ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+        equippedPassiveTool.PowerUpId = powerUpId;
+        equippedPassiveTool.Tool = passiveToolConfig;
     }
 
     /// <summary>

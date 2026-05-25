@@ -33,7 +33,9 @@ public partial struct PlayerPassiveHealSystem : ISystem
                                                                         RefRW<PlayerHealOverTimeState>,
                                                                         RefRW<PlayerHealth>>())
         {
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
 
             if (passiveToolsState.HasHeal == 0)
                 continue;

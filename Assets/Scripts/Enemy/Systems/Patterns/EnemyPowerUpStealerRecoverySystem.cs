@@ -37,6 +37,7 @@ public partial struct EnemyPowerUpStealerRecoverySystem : ISystem
             PowerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false),
             EquippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false),
             PassiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false),
+            OrbitalProjectionLostLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(false),
             UnlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false),
             ContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true)
         };

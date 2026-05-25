@@ -31,7 +31,9 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
         foreach ((DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>, RefRW<PlayerPowerUpsState>>())
         {
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
             uint previousKillCount = powerUpsState.ValueRO.LastObservedGlobalKillCount;
             uint killDelta = 0u;
 

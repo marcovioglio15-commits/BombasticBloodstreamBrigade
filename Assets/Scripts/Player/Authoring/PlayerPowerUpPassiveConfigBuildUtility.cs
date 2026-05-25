@@ -13,7 +13,12 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
     #region Methods
 
     #region Public Methods
-    public static bool HasAnyPayload(PlayerPassiveToolConfig config)
+    /// <summary>
+    /// Checks whether a passive config contains at least one runtime payload block.
+    /// </summary>
+    /// <param name="config">Passive config inspected by reference to avoid copying orbital projection payloads.</param>
+    /// <returns>True when any passive payload flag is enabled.</returns>
+    public static bool HasAnyPayload(in PlayerPassiveToolConfig config)
     {
         return config.HasProjectileSize != 0 ||
                config.HasShotgun != 0 ||
@@ -29,7 +34,12 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasOrbitalProjections != 0;
     }
 
-    public static PassiveToolKind ResolvePassiveToolKind(PlayerPassiveToolConfig config)
+    /// <summary>
+    /// Resolves the representative passive kind used by systems that need a single category for a multi-payload config.
+    /// </summary>
+    /// <param name="config">Passive config inspected by reference to avoid copying orbital projection payloads.</param>
+    /// <returns>Representative passive tool kind for the authored payload mix.</returns>
+    public static PassiveToolKind ResolvePassiveToolKind(in PlayerPassiveToolConfig config)
     {
         if (config.HasElementalTrail != 0)
             return PassiveToolKind.ElementalTrail;

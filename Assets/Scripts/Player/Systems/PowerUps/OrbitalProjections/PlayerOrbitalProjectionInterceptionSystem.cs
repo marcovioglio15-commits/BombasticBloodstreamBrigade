@@ -13,6 +13,7 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
 {
     #region Constants
     private const float BaseProjectileHitRadius = 0.05f;
+    private const float BaseBombHitRadius = 0.18f;
     #endregion
 
     #region Methods
@@ -36,7 +37,12 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
         ComponentLookup<PlayerControllerConfig> playerControllerLookup = SystemAPI.GetComponentLookup<PlayerControllerConfig>(true);
+        ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         BufferLookup<ProjectilePoolElement> projectilePoolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
+        BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(false);
+        DynamicBuffer<GameAudioEventRequest> audioRequests = default;
+        bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
         foreach ((RefRW<PlayerOrbitalProjectionInstance> projection,
                   RefRO<LocalTransform> projectionTransform)
@@ -79,7 +85,8 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                                       ref projectilePoolLookup);
                     ApplyProjectionHealthCost(ref instance,
                                               projectionTransform.ValueRO.Position,
-                                              instance.Config.ProjectileBlockHealthDamage);
+                                              instance.Config.ProjectileBlockHealthDamage,
+                                              ref lostProjectionLookup);
 
                     if (instance.Phase == PlayerOrbitalProjectionPhase.Despawning)
                         break;
@@ -98,18 +105,28 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                     if (bomb.ValueRO.HasExploded != 0)
                         continue;
 
+                    if (bomb.ValueRO.PreventMidAirInterception != 0)
+                        continue;
+
                     if (!IsOverlapping(projectionTransform.ValueRO.Position,
                                        instance.Config.CollisionRadius,
                                        bombTransform.ValueRO.Position,
-                                       math.max(0f, bomb.ValueRO.DamageRadius)))
+                                       ResolveBombHitRadius(in bomb.ValueRO, in bombTransform.ValueRO)))
                     {
                         continue;
                     }
 
+                    EnemyBombardierExplosionFeedbackUtility.EnqueueExplosionFeedback(in bomb.ValueRO,
+                                                                                     bombTransform.ValueRO.Position,
+                                                                                     in localTransformLookup,
+                                                                                     ref vfxRequestLookup,
+                                                                                     canEnqueueAudioRequests,
+                                                                                     audioRequests);
                     commandBuffer.DestroyEntity(bombEntity);
                     ApplyProjectionHealthCost(ref instance,
                                               projectionTransform.ValueRO.Position,
-                                              instance.Config.BombBlockHealthDamage);
+                                              instance.Config.BombBlockHealthDamage,
+                                              ref lostProjectionLookup);
 
                     if (instance.Phase == PlayerOrbitalProjectionPhase.Despawning)
                         break;
@@ -153,14 +170,30 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
 
     #region Shared Helpers
     /// <summary>
+    /// Resolves the physical Bombardier bomb body radius used for orbital interception.
+    /// </summary>
+    /// <param name="bomb">Bombardier bomb state carrying an authored collision radius when available.</param>
+    /// <param name="bombTransform">Current bomb transform used as compatibility fallback.</param>
+    /// <returns>Positive radius for body-level interception.</returns>
+    private static float ResolveBombHitRadius(in EnemyBombardierBomb bomb, in LocalTransform bombTransform)
+    {
+        if (bomb.CollisionRadius > 0f)
+            return bomb.CollisionRadius;
+
+        return BaseBombHitRadius * math.max(0.01f, bombTransform.Scale);
+    }
+
+    /// <summary>
     /// Applies optional health loss to the projection after an interception.
     /// </summary>
     /// <param name="instance">Projection instance updated in place.</param>
     /// <param name="currentPosition">Current projection position used when despawn starts.</param>
     /// <param name="healthDamage">Health cost applied to the projection.</param>
+    /// <param name="lostProjectionLookup">Writable owner lookup used to store permanent loss markers.</param>
     private static void ApplyProjectionHealthCost(ref PlayerOrbitalProjectionInstance instance,
                                                   float3 currentPosition,
-                                                  float healthDamage)
+                                                  float healthDamage,
+                                                  ref BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup)
     {
         if (instance.Config.HasHealth == 0 || healthDamage <= 0f)
             return;
@@ -173,6 +206,8 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
         instance.Phase = PlayerOrbitalProjectionPhase.Despawning;
         instance.PhaseElapsedSeconds = 0f;
         instance.DespawnStartPosition = currentPosition;
+        PlayerOrbitalProjectionLossRuntimeUtility.TryRecordPermanentLoss(ref lostProjectionLookup,
+                                                                         in instance);
     }
 
     /// <summary>

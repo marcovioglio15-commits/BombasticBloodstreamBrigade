@@ -78,10 +78,12 @@ public partial struct EnemyBombardierBombSystem : ISystem
                 bombTransform.ValueRW.Position = bombState.LandingPosition;
                 bombTransform.ValueRW.Scale = HiddenBombScale;
 
-                if (canEnqueueAudioRequests)
-                    GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.ExplosionBomb, bombState.LandingPosition);
-
-                EnqueueExplosionVfxRequest(in bombState, in localTransformLookup, ref vfxRequestLookup);
+                EnemyBombardierExplosionFeedbackUtility.EnqueueExplosionFeedback(in bombState,
+                                                                                 bombState.LandingPosition,
+                                                                                 in localTransformLookup,
+                                                                                 ref vfxRequestLookup,
+                                                                                 canEnqueueAudioRequests,
+                                                                                 audioRequests);
 
                 if (ShouldDamagePlayer(in playerSnapshot, in bombState))
                 {
@@ -106,59 +108,6 @@ public partial struct EnemyBombardierBombSystem : ISystem
 
         commandBuffer.Playback(entityManager);
         commandBuffer.Dispose();
-    }
-    #endregion
-
-    #region VFX
-    /// <summary>
-    /// Queues the optional one-shot explosion VFX through the shared managed VFX pool.
-    /// </summary>
-    /// <param name="bombState">Bomb state carrying the resolved VFX prefab and explosion radius.</param>
-    /// <param name="localTransformLookup">Read-only transform lookup used to keep floor-level VFX above the owner plane.</param>
-    /// <param name="vfxRequestLookup">Writable VFX request buffers keyed by Bombardier owner entity.</param>
-    private static void EnqueueExplosionVfxRequest(in EnemyBombardierBomb bombState,
-                                                   in ComponentLookup<LocalTransform> localTransformLookup,
-                                                   ref BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup)
-    {
-        if (bombState.OwnerEntity == Entity.Null)
-            return;
-
-        if (bombState.ExplosionVfxPrefabEntity == Entity.Null)
-            return;
-
-        if (!vfxRequestLookup.HasBuffer(bombState.OwnerEntity))
-            return;
-
-        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = vfxRequestLookup[bombState.OwnerEntity];
-        float scaleMultiplier = math.max(0.01f, bombState.ExplosionVfxScaleMultiplier);
-
-        if (bombState.ScaleExplosionVfxToDamageRadius != 0)
-            scaleMultiplier *= math.max(0.1f, bombState.DamageRadius);
-
-        float3 explosionVfxPosition = bombState.LandingPosition;
-
-        if (localTransformLookup.HasComponent(bombState.OwnerEntity))
-        {
-            float ownerFloorReferenceY = localTransformLookup[bombState.OwnerEntity].Position.y;
-
-            if (explosionVfxPosition.y < ownerFloorReferenceY)
-                explosionVfxPosition.y = ownerFloorReferenceY;
-        }
-
-        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
-        {
-            PrefabEntity = bombState.ExplosionVfxPrefabEntity,
-            SourcePrefab = bombState.ExplosionVfxPrefab,
-            Position = explosionVfxPosition,
-            Rotation = quaternion.identity,
-            UniformScale = scaleMultiplier,
-            LifetimeSeconds = 2f,
-            FollowTargetEntity = Entity.Null,
-            FollowPositionOffset = float3.zero,
-            FollowValidationEntity = Entity.Null,
-            FollowValidationSpawnVersion = 0u,
-            Velocity = float3.zero
-        });
     }
     #endregion
 

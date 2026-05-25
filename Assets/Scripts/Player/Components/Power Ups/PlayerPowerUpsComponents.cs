@@ -47,9 +47,20 @@ public struct PlayerPowerUpsState : IComponentData
 public struct PlayerPowerUpCheatPresetEntry : IBufferElementData
 {
     public byte IsDefined;
+    public int SlotStartIndex;
+    public int SlotCount;
     public int PassiveStartIndex;
     public int PassiveCount;
-    public PlayerPowerUpsConfig PowerUpsConfig;
+}
+
+/// <summary>
+/// Flattened active-slot payloads referenced by PlayerPowerUpCheatPresetEntry.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerPowerUpCheatPresetSlotElement : IBufferElementData
+{
+    public byte SlotIndex;
+    public PlayerPowerUpSlotConfig Slot;
 }
 
 /// <summary>
@@ -238,7 +249,7 @@ public struct PlayerPassiveToolsState
     public byte HasLaserBeam;
     public LaserBeamPassiveConfig LaserBeam;
     public byte HasOrbitalProjections;
-    public FixedList512Bytes<OrbitalProjectionConfig> OrbitalProjections;
+    public FixedList4096Bytes<OrbitalProjectionConfig> OrbitalProjections;
 }
 
 /// <summary>
@@ -534,6 +545,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public float3 Position;
     public quaternion Rotation;
     public float UniformScale;
+    public float ParticleSimulationSpeedMultiplier;
     public float TrailRendererWidthOverride;
     public float TrailRendererTimeOverrideSeconds;
     public float LifetimeSeconds;
@@ -542,6 +554,73 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public Entity FollowValidationEntity;
     public uint FollowValidationSpawnVersion;
     public float3 Velocity;
+    public int RefreshKey;
+    public byte ForceLooping;
+    public byte HasColorOverride;
+    public float4 ColorOverride;
+    public float4 SecondaryColorOverride;
+    public byte ColorOverrideCount;
+    public FixedString64Bytes ColorOverrideChildName;
+    public byte FollowMuzzlePose;
+}
+
+/// <summary>
+/// Selects when the player level-up VFX should be spawned by progression runtime.
+/// </summary>
+public enum PlayerLevelUpVfxTriggerMode : byte
+{
+    EveryLevelUp = 0,
+    MilestonePowerUpsOnly = 1
+}
+
+/// <summary>
+/// Selects how charge-shot VFX playback should cover the charge window.
+/// </summary>
+public enum PlayerChargeShotVfxPlaybackMode : byte
+{
+    PlayOnceTimedWithChargeCompletion = 0,
+    LoopWhileCharging = 1,
+    StretchSinglePlaybackToCharge = 2
+}
+
+/// <summary>
+/// Runtime VFX settings spawned when player level progression advances.
+/// </summary>
+public struct PlayerLevelUpVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float LifetimeSeconds;
+    public PlayerLevelUpVfxTriggerMode TriggerMode;
+}
+
+/// <summary>
+/// Runtime VFX settings spawned while a Charge Shot active tool is charging.
+/// </summary>
+public struct PlayerChargeShotVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float LifetimeSeconds;
+    public PlayerChargeShotVfxPlaybackMode PlaybackMode;
+    public byte AppliesToAllHoldChargePowerUps;
+}
+
+/// <summary>
+/// Tracks charge-shot VFX playback edges so one-shot modes do not restart every frame.
+/// </summary>
+public struct PlayerChargeShotVfxRuntimeState : IComponentData
+{
+    public byte PrimaryWasCharging;
+    public byte SecondaryWasCharging;
+    public byte PrimaryTimedVfxSpawned;
+    public byte SecondaryTimedVfxSpawned;
+    public byte PrimaryStretchVfxSpawned;
+    public byte SecondaryStretchVfxSpawned;
 }
 
 /// <summary>

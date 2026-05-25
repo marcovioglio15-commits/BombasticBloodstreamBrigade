@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 /// <summary>
@@ -135,7 +137,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         BufferLookup<PlayerRuntimeComboCounterScalingElement> comboScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboCounterScalingElement>(true);
         ComponentLookup<PlayerComboCounterState> comboCounterStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(false);
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
-        BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(true);
+        BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(false);
         BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePowerUpScalingElement>(true);
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         BufferLookup<PlayerPowerUpTierDefinitionElement> tierDefinitionsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpTierDefinitionElement>(true);
@@ -143,6 +145,9 @@ public partial struct PlayerLevelUpSystem : ISystem
         BufferLookup<PlayerPowerUpTierEntryScalingElement> tierEntryScalingLookup = SystemAPI.GetBufferLookup<PlayerPowerUpTierEntryScalingElement>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneTimeScaleResumeStateLookup = SystemAPI.GetComponentLookup<PlayerMilestoneTimeScaleResumeState>(false);
+        ComponentLookup<PlayerLevelUpVfxConfig> levelUpVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerLevelUpVfxConfig>(true);
+        ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
@@ -405,9 +410,12 @@ public partial struct PlayerLevelUpSystem : ISystem
                     ? equippedPassiveToolsLookup[entity]
                     : default;
                 DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers = milestoneSelectionOffersLookup[entity];
-                PlayerPowerUpsConfig currentPowerUpsConfig = powerUpsConfigLookup.HasBuffer(entity)
-                    ? PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup)
-                    : default;
+                PlayerPowerUpsConfig currentPowerUpsConfig = default;
+
+                if (powerUpsConfigLookup.HasBuffer(entity))
+                    PlayerPowerUpsConfigBufferUtility.Read(entity,
+                                                           in powerUpsConfigLookup,
+                                                           out currentPowerUpsConfig);
                 PlayerPowerUpsState currentPowerUpsState = powerUpsStateLookup.HasComponent(entity)
                     ? powerUpsStateLookup[entity]
                     : default;
@@ -483,6 +491,13 @@ public partial struct PlayerLevelUpSystem : ISystem
                 GameAudioEventRequestUtility.EnqueueGlobal(audioRequests, levelAudioEventId);
             }
 
+            QueueLevelUpVfx(entity,
+                            gainedLevelsCount,
+                            reachedMilestone,
+                            in levelUpVfxConfigLookup,
+                            in localTransformLookup,
+                            powerUpVfxRequestsLookup);
+
             string previousPhaseID = PlayerProgressionPhaseUtility.ResolvePhaseID(progressionConfig.ValueRO, startingGamePhaseIndex);
             string activePhaseID = PlayerProgressionPhaseUtility.ResolvePhaseID(progressionConfig.ValueRO, activeGamePhaseIndex);
             string phaseTransition = startingGamePhaseIndex != activeGamePhaseIndex
@@ -501,6 +516,68 @@ public partial struct PlayerLevelUpSystem : ISystem
                                     requiredExperienceForNextLevel,
                                     milestoneState,
                                     selectionState));
+        }
+    }
+    #endregion
+
+    #region Level-Up VFX
+    /// <summary>
+    /// Queues managed visual feedback for player level-up events after progression state has advanced.
+    /// </summary>
+    /// <param name="playerEntity">Player entity that leveled up.</param>
+    /// <param name="gainedLevelsCount">Number of levels gained during the current progression update.</param>
+    /// <param name="reachedMilestone">True when at least one consumed level-up threshold was a milestone.</param>
+    /// <param name="levelUpVfxConfigLookup">Lookup containing optional visual-preset level-up VFX config.</param>
+    /// <param name="localTransformLookup">Lookup used to seed the initial VFX world position.</param>
+    /// <param name="powerUpVfxRequestsLookup">Writable request buffer lookup consumed by the managed VFX pool.</param>
+    private static void QueueLevelUpVfx(Entity playerEntity,
+                                        int gainedLevelsCount,
+                                        bool reachedMilestone,
+                                        in ComponentLookup<PlayerLevelUpVfxConfig> levelUpVfxConfigLookup,
+                                        in ComponentLookup<LocalTransform> localTransformLookup,
+                                        BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestsLookup)
+    {
+        if (gainedLevelsCount <= 0)
+            return;
+
+        if (!levelUpVfxConfigLookup.HasComponent(playerEntity))
+            return;
+
+        if (!powerUpVfxRequestsLookup.HasBuffer(playerEntity))
+            return;
+
+        PlayerLevelUpVfxConfig config = levelUpVfxConfigLookup[playerEntity];
+
+        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
+            return;
+
+        if (config.TriggerMode == PlayerLevelUpVfxTriggerMode.MilestonePowerUpsOnly && !reachedMilestone)
+            return;
+
+        int spawnCount = config.TriggerMode == PlayerLevelUpVfxTriggerMode.EveryLevelUp
+            ? math.max(1, gainedLevelsCount)
+            : 1;
+        float3 playerPosition = localTransformLookup.HasComponent(playerEntity)
+            ? localTransformLookup[playerEntity].Position
+            : float3.zero;
+        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestsLookup[playerEntity];
+
+        for (int spawnIndex = 0; spawnIndex < spawnCount; spawnIndex++)
+        {
+            vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
+            {
+                PrefabEntity = config.PrefabEntity,
+                SourcePrefab = config.SourcePrefab,
+                Position = playerPosition + config.SpawnOffset,
+                Rotation = quaternion.identity,
+                UniformScale = math.max(0.01f, config.UniformScale),
+                LifetimeSeconds = math.max(0.05f, config.LifetimeSeconds),
+                FollowTargetEntity = playerEntity,
+                FollowPositionOffset = config.SpawnOffset,
+                FollowValidationEntity = Entity.Null,
+                FollowValidationSpawnVersion = 0u,
+                Velocity = float3.zero
+            });
         }
     }
     #endregion

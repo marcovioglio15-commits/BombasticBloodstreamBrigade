@@ -13,12 +13,13 @@ public struct PlayerPowerUpsConfig
 }
 
 /// <summary>
-/// Stores the mutable active power-up loadout outside the player chunk payload.
+/// Stores one mutable active power-up slot outside the player chunk payload.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerPowerUpsConfigElement : IBufferElementData
 {
-    public PlayerPowerUpsConfig Value;
+    public byte SlotIndex;
+    public PlayerPowerUpSlotConfig Slot;
 }
 
 /// <summary>
@@ -304,7 +305,7 @@ public struct PlayerPassiveToolConfig
     public PassiveHealConfig Heal;
     public PassiveBulletTimeConfig BulletTime;
     public LaserBeamPassiveConfig LaserBeam;
-    public FixedList512Bytes<OrbitalProjectionConfig> OrbitalProjections;
+    public FixedList4096Bytes<OrbitalProjectionConfig> OrbitalProjections;
 }
 
 /// <summary>

@@ -56,6 +56,8 @@ public partial struct EnemyKilledEventsSystem : ISystem
         BufferLookup<EnemyExtraComboPointsModuleElement> extraComboPointsModuleLookup = SystemAPI.GetBufferLookup<EnemyExtraComboPointsModuleElement>(true);
         BufferLookup<EnemyExtraComboPointsConditionElement> extraComboPointsConditionLookup = SystemAPI.GetBufferLookup<EnemyExtraComboPointsConditionElement>(true);
         BufferLookup<EnemyDropItemsModuleSelectionElement> dropItemsSelectionModuleLookup = SystemAPI.GetBufferLookup<EnemyDropItemsModuleSelectionElement>(true);
+        ComponentLookup<EnemyDeathVfxConfig> deathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyDeathVfxConfig>(true);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
 
         foreach ((RefRO<EnemyDespawnRequest> despawnRequest,
                   RefRO<EnemyData> enemyData,
@@ -85,6 +87,10 @@ public partial struct EnemyKilledEventsSystem : ISystem
                 Position = killedEventPosition,
                 ComboPointMultiplier = comboPointMultiplier
             });
+            QueueDeathVfx(enemyEntity,
+                          killedEventPosition,
+                          in deathVfxConfigLookup,
+                          vfxRequestLookup);
         }
     }
 
@@ -100,6 +106,56 @@ public partial struct EnemyKilledEventsSystem : ISystem
         float verticalOffset = math.max(0.05f, math.max(0f, bodyRadius) * 0.35f);
         resolvedPosition.y += verticalOffset;
         return resolvedPosition;
+    }
+
+    /// <summary>
+    /// Queues the optional enemy-authored death VFX before pooled despawn clears runtime buffers.
+    /// </summary>
+    /// <param name="enemyEntity">Killed enemy entity that owns the managed VFX request buffer.</param>
+    /// <param name="killedEventPosition">Resolved death position shared with gameplay kill events.</param>
+    /// <param name="deathVfxConfigLookup">Lookup containing optional death VFX configs.</param>
+    /// <param name="vfxRequestLookup">Writable managed VFX request buffers.</param>
+    private static void QueueDeathVfx(Entity enemyEntity,
+                                      float3 killedEventPosition,
+                                      in ComponentLookup<EnemyDeathVfxConfig> deathVfxConfigLookup,
+                                      BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup)
+    {
+        if (!deathVfxConfigLookup.HasComponent(enemyEntity))
+            return;
+
+        if (!vfxRequestLookup.HasBuffer(enemyEntity))
+            return;
+
+        EnemyDeathVfxConfig config = deathVfxConfigLookup[enemyEntity];
+
+        if (config.PrefabEntity == Entity.Null && config.Prefab.Value == null)
+            return;
+
+        float3 spawnPosition = killedEventPosition + config.SpawnOffset;
+
+        if (!math.all(math.isfinite(spawnPosition)))
+            return;
+
+        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = vfxRequestLookup[enemyEntity];
+        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
+        {
+            PrefabEntity = config.PrefabEntity,
+            SourcePrefab = config.Prefab,
+            Position = spawnPosition,
+            Rotation = quaternion.identity,
+            UniformScale = math.max(0.01f, config.ScaleMultiplier),
+            LifetimeSeconds = math.max(0.05f, config.LifetimeSeconds),
+            FollowTargetEntity = Entity.Null,
+            FollowPositionOffset = float3.zero,
+            FollowValidationEntity = Entity.Null,
+            FollowValidationSpawnVersion = 0u,
+            Velocity = float3.zero,
+            HasColorOverride = config.HasDebrisColorOverride,
+            ColorOverride = config.DebrisColor,
+            SecondaryColorOverride = config.SecondaryDebrisColor,
+            ColorOverrideCount = config.DebrisColorCount,
+            ColorOverrideChildName = config.DebrisParticleChildName
+        });
     }
 
     /// <summary>

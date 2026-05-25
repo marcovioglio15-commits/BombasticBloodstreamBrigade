@@ -26,12 +26,12 @@ public static class PlayerPowerUpOrbitalProjectionBakeUtility
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Resolver that stores prefab entities in a remappable player-owned binding table.</param>
     /// <returns>Fixed-list projection config used by runtime spawn systems.</returns>
-    public static FixedList512Bytes<OrbitalProjectionConfig> BuildProjectionConfigs(PlayerAuthoring authoring,
-                                                                                    PowerUpOrbitalProjectionsModuleData moduleData,
-                                                                                    Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                                                    Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
+    public static FixedList4096Bytes<OrbitalProjectionConfig> BuildProjectionConfigs(PlayerAuthoring authoring,
+                                                                                     PowerUpOrbitalProjectionsModuleData moduleData,
+                                                                                     Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                                                     Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
-        FixedList512Bytes<OrbitalProjectionConfig> configs = default;
+        FixedList4096Bytes<OrbitalProjectionConfig> configs = default;
 
         if (moduleData == null)
             return configs;
@@ -78,8 +78,8 @@ public static class PlayerPowerUpOrbitalProjectionBakeUtility
     /// <param name="targetConfigs">Destination fixed-list receiving appended entries.</param>
     /// <param name="sourceConfigs">Source fixed-list produced from one module payload.</param>
     public static void AppendProjectionConfigs(PlayerAuthoring authoring,
-                                               ref FixedList512Bytes<OrbitalProjectionConfig> targetConfigs,
-                                               in FixedList512Bytes<OrbitalProjectionConfig> sourceConfigs)
+                                               ref FixedList4096Bytes<OrbitalProjectionConfig> targetConfigs,
+                                               in FixedList4096Bytes<OrbitalProjectionConfig> sourceConfigs)
     {
         for (int configIndex = 0; configIndex < sourceConfigs.Length; configIndex++)
         {

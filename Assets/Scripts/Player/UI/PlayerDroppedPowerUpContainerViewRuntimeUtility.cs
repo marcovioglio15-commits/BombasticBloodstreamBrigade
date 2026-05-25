@@ -365,14 +365,7 @@ public static class PlayerDroppedPowerUpContainerViewRuntimeUtility
     /// <returns>True when the container is still alive; otherwise false.</returns>
     private static bool IsContainerEntityAlive(EntityManager entityManager, Entity containerEntity)
     {
-        if (containerEntity == Entity.Null || !entityManager.Exists(containerEntity))
-            return false;
-
-        if (!entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity))
-            return false;
-
-        PlayerDroppedPowerUpContainerContent containerContent = entityManager.GetComponentData<PlayerDroppedPowerUpContainerContent>(containerEntity);
-        return containerContent.StoredPowerUp.SlotConfig.IsDefined != 0;
+        return PlayerDroppedPowerUpContainerPayloadUtility.IsContainerUsable(entityManager, containerEntity);
     }
 
     /// <summary>

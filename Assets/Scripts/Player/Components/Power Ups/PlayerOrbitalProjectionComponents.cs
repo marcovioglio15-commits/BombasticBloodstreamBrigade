@@ -22,7 +22,7 @@ public struct PlayerOrbitalProjectionSpawnRequest : IBufferElementData
     public FixedString64Bytes PowerUpId;
     public byte Persistent;
     public int SourceInstanceId;
-    public FixedList512Bytes<OrbitalProjectionConfig> Projections;
+    public FixedList4096Bytes<OrbitalProjectionConfig> Projections;
 }
 
 /// <summary>
@@ -33,6 +33,17 @@ public struct PlayerOrbitalProjectionPrefabElement : IBufferElementData
 {
     public int BindingIndex;
     public Entity PrefabEntity;
+}
+
+/// <summary>
+/// Permanent runtime loss marker for persistent health-based orbital projections.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerOrbitalProjectionLostElement : IBufferElementData
+{
+    public FixedString64Bytes PowerUpId;
+    public int ProjectionIndex;
+    public int SourceInstanceId;
 }
 
 /// <summary>

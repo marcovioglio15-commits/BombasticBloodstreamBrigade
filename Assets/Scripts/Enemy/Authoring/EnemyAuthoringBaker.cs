@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -156,7 +158,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         for (int stealerIndex = 0; stealerIndex < compiledPattern.PowerUpStealerConfigs.Count; stealerIndex++)
         {
             stealerConfigs.Add(compiledPattern.PowerUpStealerConfigs[stealerIndex]);
-            stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+            int runtimeIndex = stealerRuntime.Length;
+            stealerRuntime.ResizeUninitialized(runtimeIndex + 1);
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(runtimeIndex);
+            EnemyPowerUpStealerRuntimeDefaultsUtility.InitializeDefault(ref runtime);
         }
 
         AddComponent(entity, new EnemyPowerUpStealerVisualState
@@ -240,6 +245,27 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                shouldBakeManagedVfxRuntime,
                                spawnVfxPrefabEntity,
                                authoring.SpawnVfxPrefab);
+
+        Entity deathVfxPrefabEntity = ResolveDeathVfxPrefabEntity(authoring);
+        Vector3 deathVfxSpawnOffset = authoring.DeathVfxSpawnOffset;
+        EnemyDeathDebrisColorPalette deathDebrisPalette = EnemyVisualColorSamplingUtility.ResolveDeathDebrisPalette(authoring);
+        AddComponent(entity, new EnemyDeathVfxConfig
+        {
+            PrefabEntity = deathVfxPrefabEntity,
+            Prefab = deathVfxPrefabEntity != Entity.Null ? authoring.DeathVfxPrefab : null,
+            SpawnOffset = new float3(deathVfxSpawnOffset.x, deathVfxSpawnOffset.y, deathVfxSpawnOffset.z),
+            LifetimeSeconds = math.max(0.05f, authoring.DeathVfxLifetimeSeconds),
+            ScaleMultiplier = math.max(0.01f, authoring.DeathVfxScaleMultiplier),
+            HasDebrisColorOverride = deathVfxPrefabEntity != Entity.Null ? (byte)1 : (byte)0,
+            DebrisColor = deathDebrisPalette.PrimaryColor,
+            SecondaryDebrisColor = deathDebrisPalette.SecondaryColor,
+            DebrisColorCount = deathDebrisPalette.ColorCount,
+            DebrisParticleChildName = NormalizeFixedString64(authoring.DeathDebrisParticleChildName)
+        });
+        TryBakeDeathVfxRuntime(managedVfxPrefabBindings,
+                               shouldBakeManagedVfxRuntime,
+                               deathVfxPrefabEntity,
+                               authoring.DeathVfxPrefab);
 
         AddComponent(entity, BuildProjectileOffscreenWarningConfig(authoring));
         TryBakeProjectileOffscreenWarningManagedConfig(authoring, entity);
@@ -382,7 +408,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                                          EnemyCompiledPatternBakeResult compiledPattern,
                                                          in EnemyPatternConfig patternConfig)
     {
-        if (authoring != null && authoring.SpawnVfxPrefab != null)
+        if (authoring != null && (authoring.SpawnVfxPrefab != null || authoring.DeathVfxPrefab != null))
             return true;
 
         if (compiledPattern == null)
@@ -1399,6 +1425,19 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
+    /// Resolves the optional Death VFX prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
+    private Entity ResolveDeathVfxPrefabEntity(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return Entity.Null;
+
+        return ResolveRuntimeVfxPrefabEntity(authoring, authoring.DeathVfxPrefab, "enemy death VFX");
+    }
+
+    /// <summary>
     /// Resolves a runtime VFX prefab into an ECS prefab entity while emitting a context-specific bake warning.
     /// </summary>
     /// <param name="authoring">Source enemy authoring component used for warning context.</param>
@@ -1553,6 +1592,24 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
+    /// Adds Death VFX prefab bindings to the shared enemy managed VFX runtime.
+    /// </summary>
+    /// <param name="prefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
+    /// <param name="prefabEntity">Resolved death VFX prefab entity.</param>
+    /// <param name="sourcePrefab">Source prefab asset stored for managed runtime instantiation.</param>
+    private static void TryBakeDeathVfxRuntime(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                               bool canBakeManagedVfx,
+                                               Entity prefabEntity,
+                                               GameObject sourcePrefab)
+    {
+        if (!canBakeManagedVfx)
+            return;
+
+        AppendManagedVfxPrefabBinding(prefabBindings, prefabEntity, sourcePrefab);
+    }
+
+    /// <summary>
     /// Adds one managed VFX prefab binding when an equivalent binding does not already exist.
     /// </summary>
     /// <param name="prefabBindings">Shared managed VFX prefab binding buffer.</param>
@@ -1594,6 +1651,24 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             MaxActiveOneShotVfx = 700,
             RefreshAttachedLifetimeOnCapHit = 1
         };
+    }
+
+    /// <summary>
+    /// Converts a designer-authored string into a FixedString64Bytes value used by managed VFX color filtering.
+    /// </summary>
+    /// <param name="value">Source string from the visual preset.</param>
+    /// <returns>Trimmed fixed string, or empty when no child-name filter is configured.</returns>
+    private static FixedString64Bytes NormalizeFixedString64(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return default;
+
+        string trimmedValue = value.Trim();
+
+        if (Encoding.UTF8.GetByteCount(trimmedValue) > 61)
+            return default;
+
+        return new FixedString64Bytes(trimmedValue);
     }
 
     private Entity RegisterStatusBarsViewEntity(EnemyWorldSpaceStatusBarsView statusBarsView)
@@ -1638,7 +1713,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             renderTargets.Add(new DamageFlashRenderTargetElement
             {
                 Value = renderEntity,
-                BaseColor = ResolveRendererBaseColor(renderer)
+                BaseColor = EnemyVisualColorSamplingUtility.ResolveRendererBaseColor(renderer)
             });
         }
 
@@ -1650,41 +1725,6 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             Value = rootEntity,
             BaseColor = new float4(1f, 1f, 1f, 1f)
         });
-    }
-
-    /// <summary>
-    /// Resolves the first valid base color exposed by one authored renderer.
-    /// </summary>
-    /// <param name="renderer">Renderer inspected for compatible material color properties.</param>
-    /// <returns>Resolved base color or white when the renderer has no supported color property.</returns>
-    private static float4 ResolveRendererBaseColor(Renderer renderer)
-    {
-        if (renderer == null)
-            return new float4(1f, 1f, 1f, 1f);
-
-        Material[] sharedMaterials = renderer.sharedMaterials;
-
-        for (int materialIndex = 0; materialIndex < sharedMaterials.Length; materialIndex++)
-        {
-            Material sharedMaterial = sharedMaterials[materialIndex];
-
-            if (sharedMaterial == null)
-                continue;
-
-            if (sharedMaterial.HasProperty("_BaseColor"))
-            {
-                Color baseColor = sharedMaterial.GetColor("_BaseColor");
-                return new float4(baseColor.r, baseColor.g, baseColor.b, baseColor.a);
-            }
-
-            if (sharedMaterial.HasProperty("_Color"))
-            {
-                Color baseColor = sharedMaterial.GetColor("_Color");
-                return new float4(baseColor.r, baseColor.g, baseColor.b, baseColor.a);
-            }
-        }
-
-        return new float4(1f, 1f, 1f, 1f);
     }
     #endregion
 

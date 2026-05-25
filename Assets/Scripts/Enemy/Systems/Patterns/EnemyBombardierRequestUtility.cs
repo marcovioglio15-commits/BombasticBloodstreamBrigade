@@ -472,6 +472,7 @@ internal static class EnemyBombardierRequestUtility
             DamageRadius = damageRadius,
             ImpactExplosionDelaySeconds = math.max(0f, bombardierConfig.ImpactExplosionDelaySeconds),
             BombScaleMultiplier = math.max(0.01f, bombardierConfig.BombScaleMultiplier),
+            PreventMidAirInterception = bombardierConfig.PreventMidAirInterception,
             EnableLandingWarning = bombardierConfig.EnableLandingWarning,
             WarningLeadTimeSeconds = math.max(0f, bombardierConfig.WarningLeadTimeSeconds),
             WarningRadius = damageRadius * math.max(0f, bombardierConfig.WarningRadiusScale),

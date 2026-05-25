@@ -40,7 +40,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         for (int stealerIndex = 0; stealerIndex < stealerRuntime.Length; stealerIndex++)
         {
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[stealerIndex];
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(stealerIndex);
 
             if (runtime.HasStolenPowerUp == 0)
                 continue;
@@ -53,11 +53,9 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                    elapsedTime,
                                    ref playerAccess,
                                    ref commandBuffer))
-            {
                 continue;
-            }
 
-            stealerRuntime[stealerIndex] = EnemyPowerUpStealerRuntimeDefaultsUtility.CreateCleared(in runtime);
+            EnemyPowerUpStealerRuntimeDefaultsUtility.ClearAfterRecovery(ref runtime);
             recoveredAny = true;
         }
 
@@ -98,7 +96,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         for (int stealerIndex = 0; stealerIndex < stealerRuntime.Length; stealerIndex++)
         {
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[stealerIndex];
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(stealerIndex);
 
             if (runtime.HasStolenPowerUp == 0)
                 continue;
@@ -106,10 +104,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
             bool shouldRecover = UpdateDamageRecoveryMetrics(ref runtime, in enemyHealth, deltaTime);
 
             if (!shouldRecover)
-            {
-                stealerRuntime[stealerIndex] = runtime;
                 continue;
-            }
 
             if (!TryRecoverRuntime(in runtime,
                                    dropPosition,
@@ -119,12 +114,9 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                    elapsedTime,
                                    ref playerAccess,
                                    ref commandBuffer))
-            {
-                stealerRuntime[stealerIndex] = runtime;
                 continue;
-            }
 
-            stealerRuntime[stealerIndex] = EnemyPowerUpStealerRuntimeDefaultsUtility.CreateCleared(in runtime);
+            EnemyPowerUpStealerRuntimeDefaultsUtility.ClearAfterRecovery(ref runtime);
             recoveredAny = true;
         }
 
@@ -298,16 +290,24 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
                                                  ref playerAccess,
                                                  ref commandBuffer);
 
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(playerEntity, in playerAccess.PowerUpsConfigLookup);
+        PlayerPowerUpSlotConfig primarySlotConfig;
+        PlayerPowerUpSlotConfig secondarySlotConfig;
+        PlayerPowerUpsConfigBufferUtility.ReadSlots(playerEntity,
+                                                    in playerAccess.PowerUpsConfigLookup,
+                                                    out primarySlotConfig,
+                                                    out secondarySlotConfig);
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
 
         if (PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    runtime.OriginalActiveSlotIndex,
                                                                                    runtime.OriginalActiveEquipOrder,
-                                                                                   ref powerUpsConfig,
+                                                                                   ref primarySlotConfig,
+                                                                                   ref secondarySlotConfig,
                                                                                    ref powerUpsState))
         {
-            PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
+            PlayerPowerUpsConfigBufferUtility.WriteSlots(playerAccess.PowerUpsConfigLookup[playerEntity],
+                                                         in primarySlotConfig,
+                                                         in secondarySlotConfig);
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
             MarkActivePowerUpRecovered(playerEntity,
                                        runtime.PowerUpId,
@@ -328,15 +328,19 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
         if (PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    0,
                                                                                    runtime.OriginalActiveEquipOrder,
-                                                                                   ref powerUpsConfig,
+                                                                                   ref primarySlotConfig,
+                                                                                   ref secondarySlotConfig,
                                                                                    ref powerUpsState) ||
             PlayerPowerUpLoadoutRuntimeUtility.TryRestoreStoredPowerUpToVacantSlot(in runtime.StoredActivePowerUp,
                                                                                    1,
                                                                                    runtime.OriginalActiveEquipOrder,
-                                                                                   ref powerUpsConfig,
+                                                                                   ref primarySlotConfig,
+                                                                                   ref secondarySlotConfig,
                                                                                    ref powerUpsState))
         {
-            PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
+            PlayerPowerUpsConfigBufferUtility.WriteSlots(playerAccess.PowerUpsConfigLookup[playerEntity],
+                                                         in primarySlotConfig,
+                                                         in secondarySlotConfig);
             playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
             MarkActivePowerUpRecovered(playerEntity,
                                        runtime.PowerUpId,
@@ -366,17 +370,17 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
 
-        if (runtime.OriginalPassiveBufferIndex >= 0 &&
-            !EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(runtime.PowerUpId, equippedPassiveTools) &&
-            runtime.PowerUpId.Length > 0)
+        if (ShouldRestorePassiveBufferEntry(in runtime))
         {
-            InsertPassiveAtRestoredIndex(equippedPassiveTools,
-                                         runtime.OriginalPassiveBufferIndex,
-                                         new EquippedPassiveToolElement
-                                         {
-                                             PowerUpId = runtime.PowerUpId,
-                                             Tool = runtime.StoredPassiveTool
-                                         });
+            int restoredPassiveIndex = InsertPassiveAtRestoredIndex(equippedPassiveTools,
+                                                                    runtime.OriginalPassiveBufferIndex,
+                                                                    runtime.PowerUpId,
+                                                                    in runtime.StoredPassiveTool);
+            RestoreLostProjectionSourceIds(playerEntity,
+                                           runtime.PowerUpId,
+                                           runtime.OriginalPassiveBufferIndex,
+                                           restoredPassiveIndex,
+                                           ref playerAccess);
         }
 
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
@@ -389,20 +393,34 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         if (catalogIndex >= 0)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
             catalogEntry.CurrentUnlockCount = math.max(catalogEntry.CurrentUnlockCount,
                                                        math.max(1, runtime.OriginalPassiveUnlockCount));
             catalogEntry.IsUnlocked = 1;
             catalogEntry.PendingInitialCharacterTuningApply = 0;
-            unlockCatalog[catalogIndex] = catalogEntry;
             PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(catalogIndex,
                                                                               unlockCatalog,
                                                                               elapsedTime);
         }
 
-        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
-        PlayerPassiveToolsStateBufferUtility.Write(playerAccess.PassiveToolsStateLookup[playerEntity], in passiveToolsState);
+        DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = playerAccess.PassiveToolsStateLookup[playerEntity];
+        ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
         return true;
+    }
+
+    /// <summary>
+    /// Resolves whether the stolen passive payload represented an equipped buffer entry that must be reinserted.
+    /// </summary>
+    /// <param name="runtime">Stealer runtime holding the passive payload.</param>
+    /// <returns>True when the stolen passive was removed from the equipped-passive buffer.</returns>
+    private static bool ShouldRestorePassiveBufferEntry(in EnemyPowerUpStealerRuntimeElement runtime)
+    {
+        if (runtime.OriginalPassiveBufferIndex < 0)
+            return false;
+
+        return runtime.PowerUpId.Length > 0;
     }
 
     /// <summary>
@@ -432,23 +450,56 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Mutable passive buffer receiving the restored entry.</param>
     /// <param name="restoredIndex">Original passive buffer index captured when the Stealer removed the entry.</param>
-    /// <param name="restoredPassive">Passive entry to restore.</param>
-    private static void InsertPassiveAtRestoredIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
-                                                     int restoredIndex,
-                                                     EquippedPassiveToolElement restoredPassive)
+    /// <param name="powerUpId">Power-up id restored into the passive buffer.</param>
+    /// <param name="passiveToolConfig">Passive tool payload restored into the passive buffer.</param>
+    /// <returns>Actual passive buffer index used for reinsertion.</returns>
+    private static int InsertPassiveAtRestoredIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                    int restoredIndex,
+                                                    FixedString64Bytes powerUpId,
+                                                    in PlayerPassiveToolConfig passiveToolConfig)
     {
         int insertionIndex = restoredIndex >= 0
             ? math.min(restoredIndex, equippedPassiveTools.Length)
             : equippedPassiveTools.Length;
-        equippedPassiveTools.Add(restoredPassive);
+        int appendedIndex = equippedPassiveTools.Length;
+        equippedPassiveTools.ResizeUninitialized(appendedIndex + 1);
 
         // Shift the newly appended entry into its original acquisition slot.
-        for (int passiveIndex = equippedPassiveTools.Length - 1; passiveIndex > insertionIndex; passiveIndex--)
+        for (int passiveIndex = appendedIndex; passiveIndex > insertionIndex; passiveIndex--)
         {
-            equippedPassiveTools[passiveIndex] = equippedPassiveTools[passiveIndex - 1];
+            ref EquippedPassiveToolElement targetPassive = ref equippedPassiveTools.ElementAt(passiveIndex);
+            ref EquippedPassiveToolElement sourcePassive = ref equippedPassiveTools.ElementAt(passiveIndex - 1);
+            targetPassive = sourcePassive;
         }
 
-        equippedPassiveTools[insertionIndex] = restoredPassive;
+        ref EquippedPassiveToolElement restoredPassive = ref equippedPassiveTools.ElementAt(insertionIndex);
+        restoredPassive.PowerUpId = powerUpId;
+        restoredPassive.Tool = passiveToolConfig;
+        return insertionIndex;
+    }
+
+    /// <summary>
+    /// Rebinds permanent orbital-loss source ids after a stolen passive is restored.
+    /// </summary>
+    /// <param name="playerEntity">Player entity receiving the passive.</param>
+    /// <param name="powerUpId">Restored passive power-up id.</param>
+    /// <param name="originalIndex">Original passive buffer index captured at steal time.</param>
+    /// <param name="restoredIndex">Actual passive buffer index after reinsertion.</param>
+    /// <param name="playerAccess">Mutable player passive accessors.</param>
+    private static void RestoreLostProjectionSourceIds(Entity playerEntity,
+                                                       FixedString64Bytes powerUpId,
+                                                       int originalIndex,
+                                                       int restoredIndex,
+                                                       ref EnemyPowerUpStealerPlayerAccess playerAccess)
+    {
+        if (!playerAccess.OrbitalProjectionLostLookup.HasBuffer(playerEntity))
+            return;
+
+        DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections = playerAccess.OrbitalProjectionLostLookup[playerEntity];
+        PlayerOrbitalProjectionLossRuntimeUtility.ShiftAfterPassiveRestore(lostProjections,
+                                                                           powerUpId,
+                                                                           originalIndex,
+                                                                           restoredIndex);
     }
 
     /// <summary>

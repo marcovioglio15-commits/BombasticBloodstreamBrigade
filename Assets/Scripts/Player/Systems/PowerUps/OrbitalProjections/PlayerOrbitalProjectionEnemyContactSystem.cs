@@ -33,6 +33,7 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
         float deltaTime = math.max(0f, SystemAPI.Time.DeltaTime);
         EntityManager entityManager = state.EntityManager;
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
+        BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(false);
 
         foreach ((RefRW<PlayerOrbitalProjectionInstance> projection,
                   RefRO<LocalTransform> projectionTransform,
@@ -87,7 +88,8 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
 
                 ApplyProjectionHealthCost(ref instance,
                                           projectionTransform.ValueRO.Position,
-                                          instance.Config.EnemyContactHealthDamage);
+                                          instance.Config.EnemyContactHealthDamage,
+                                          ref lostProjectionLookup);
 
                 if (instance.Phase == PlayerOrbitalProjectionPhase.Despawning)
                     break;
@@ -155,9 +157,11 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
     /// <param name="instance">Projection instance updated in place.</param>
     /// <param name="currentPosition">Current projection position used when despawn starts.</param>
     /// <param name="healthDamage">Health cost applied to the projection.</param>
+    /// <param name="lostProjectionLookup">Writable owner lookup used to store permanent loss markers.</param>
     private static void ApplyProjectionHealthCost(ref PlayerOrbitalProjectionInstance instance,
                                                   float3 currentPosition,
-                                                  float healthDamage)
+                                                  float healthDamage,
+                                                  ref BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup)
     {
         if (instance.Config.HasHealth == 0 || healthDamage <= 0f)
             return;
@@ -170,6 +174,8 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
         instance.Phase = PlayerOrbitalProjectionPhase.Despawning;
         instance.PhaseElapsedSeconds = 0f;
         instance.DespawnStartPosition = currentPosition;
+        PlayerOrbitalProjectionLossRuntimeUtility.TryRecordPermanentLoss(ref lostProjectionLookup,
+                                                                         in instance);
     }
     #endregion
 

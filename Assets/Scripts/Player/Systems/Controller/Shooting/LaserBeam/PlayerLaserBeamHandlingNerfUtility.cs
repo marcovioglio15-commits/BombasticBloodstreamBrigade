@@ -40,9 +40,14 @@ internal static class PlayerLaserBeamHandlingNerfUtility
             return false;
 
         PlayerLaserBeamState laserBeamState = laserBeamStateLookup[playerEntity];
-        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(playerEntity, in passiveToolsStateLookup);
-        PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
-                                                                                                                            in laserBeamState);
+        PlayerPassiveToolsState passiveToolsState;
+        PlayerPassiveToolsStateBufferUtility.Read(playerEntity,
+                                                  in passiveToolsStateLookup,
+                                                  out passiveToolsState);
+        PlayerPassiveToolsState effectivePassiveToolsState;
+        PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
+                                                                      in laserBeamState,
+                                                                      out effectivePassiveToolsState);
 
         if (effectivePassiveToolsState.HasLaserBeam == 0)
             return false;

@@ -43,7 +43,9 @@ public partial struct PlayerElementalTrailSpawnSystem : ISystem
                              .WithEntityAccess())
         {
             PlayerElementalTrailState currentTrailState = trailState.ValueRO;
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
             CompactSegments(entityManager, trailSegments, ref currentTrailState);
 
             if (passiveToolsState.HasElementalTrail == 0)

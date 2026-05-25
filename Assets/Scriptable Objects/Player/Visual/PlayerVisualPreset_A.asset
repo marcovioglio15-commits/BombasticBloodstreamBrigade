@@ -100,3 +100,13 @@ MonoBehaviour:
       flowColor: {r: 0.754717, g: 0.05033183, b: 0.010679938, a: 1}
       stormColor: {r: 0.07662869, g: 0.463585, b: 0.7735849, a: 1}
       contactColor: {r: 0.75294125, g: 0.050980397, b: 0.011764707, a: 1}
+  levelUpVfxPrefab: {fileID: 2247918788865528309, guid: 6297c49cc3c95e1438b0ad41f18e1beb, type: 3}
+  levelUpVfxSpawnOffset: {x: 0, y: -0.5, z: 0}
+  levelUpVfxScaleMultiplier: 1
+  levelUpVfxTriggerMode: 0
+  chargeShotVfxPrefab: {fileID: 3217864258068119640, guid: f92ce35d32609f74c90bd48ce9d100db, type: 3}
+  chargeShotVfxSpawnOffset: {x: 0, y: 0.2, z: -0.1}
+  chargeShotVfxScaleMultiplier: 1
+  chargeShotVfxPlaybackMode: 1
+  chargeShotVfxAppliesToAllHoldChargePowerUps: 1
+  scalingRules: []

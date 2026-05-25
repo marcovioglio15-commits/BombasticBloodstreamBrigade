@@ -63,11 +63,13 @@ public static class PlayerPowerUpPassiveBakeUtility
                 if (passivePowerUp == null)
                     continue;
 
-                PlayerPassiveToolConfig passiveToolConfig = BuildPassiveToolConfigFromModularPowerUp(authoring,
-                                                                                                     preset,
-                                                                                                     passivePowerUp,
-                                                                                                     resolveDynamicPrefabEntity,
-                                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPassiveToolConfig passiveToolConfig;
+                BuildPassiveToolConfigFromModularPowerUp(authoring,
+                                                         preset,
+                                                         passivePowerUp,
+                                                         resolveDynamicPrefabEntity,
+                                                         out passiveToolConfig,
+                                                         resolveOrbitalProjectionPrefabBindingIndex);
                 FixedString64Bytes powerUpId = ResolvePassivePowerUpId(passivePowerUp);
 
                 if (powerUpId.Length <= 0)
@@ -104,7 +106,11 @@ public static class PlayerPowerUpPassiveBakeUtility
             if (passiveTool == null)
                 continue;
 
-            PlayerPassiveToolConfig passiveToolConfig = BuildPassiveToolConfig(authoring, passiveTool, resolveDynamicPrefabEntity);
+            PlayerPassiveToolConfig passiveToolConfig;
+            BuildPassiveToolConfig(authoring,
+                                   passiveTool,
+                                   resolveDynamicPrefabEntity,
+                                   out passiveToolConfig);
 
             if (passiveToolConfig.IsDefined == 0)
                 continue;
@@ -155,16 +161,19 @@ public static class PlayerPowerUpPassiveBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="powerUp">Modular passive power-up definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="passiveToolConfig">Runtime passive config or default.</param>
     /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that returns remappable orbital projection prefab binding indices.</param>
-    /// <returns>Runtime passive config or default.</returns>
-    public static PlayerPassiveToolConfig BuildPassiveToolConfigFromModularPowerUp(PlayerAuthoring authoring,
-                                                                                   PlayerPowerUpsPreset preset,
-                                                                                   ModularPowerUpDefinition powerUp,
-                                                                                   Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                                                   Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
+    public static void BuildPassiveToolConfigFromModularPowerUp(PlayerAuthoring authoring,
+                                                                PlayerPowerUpsPreset preset,
+                                                                ModularPowerUpDefinition powerUp,
+                                                                Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                                out PlayerPassiveToolConfig passiveToolConfig,
+                                                                Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
+        passiveToolConfig = default;
+
         if (powerUp == null)
-            return default;
+            return;
 
         bool hasTriggerEvent = false;
         PowerUpTriggerEventType triggerEventType = PowerUpTriggerEventType.OnEnemyKilled;
@@ -214,11 +223,11 @@ public static class PlayerPowerUpPassiveBakeUtility
         bool hasLaserBeam = false;
         LaserBeamPassiveConfig laserBeamConfig = default;
         bool hasOrbitalProjections = false;
-        FixedList512Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
+        FixedList4096Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
-            return default;
+            return;
 
         for (int index = 0; index < moduleBindings.Count; index++)
         {
@@ -324,7 +333,7 @@ public static class PlayerPowerUpPassiveBakeUtility
                                                                                                 ref hasOrbit);
                     break;
                 case PowerUpModuleKind.OrbitalProjections:
-                    FixedList512Bytes<OrbitalProjectionConfig> candidateProjectionConfigs =
+                    FixedList4096Bytes<OrbitalProjectionConfig> candidateProjectionConfigs =
                         PlayerPowerUpOrbitalProjectionBakeUtility.BuildProjectionConfigs(authoring,
                                                                                          payload.OrbitalProjections,
                                                                                          resolveDynamicPrefabEntity,
@@ -610,12 +619,12 @@ public static class PlayerPowerUpPassiveBakeUtility
             OrbitalProjections = orbitalProjectionConfigs
         };
 
-        if (!PlayerPowerUpPassiveConfigBuildUtility.HasAnyPayload(config))
-            return default;
+        if (!PlayerPowerUpPassiveConfigBuildUtility.HasAnyPayload(in config))
+            return;
 
         config.IsDefined = 1;
-        config.ToolKind = PlayerPowerUpPassiveConfigBuildUtility.ResolvePassiveToolKind(config);
-        return config;
+        config.ToolKind = PlayerPowerUpPassiveConfigBuildUtility.ResolvePassiveToolKind(in config);
+        passiveToolConfig = config;
     }
 
     /// <summary>
@@ -624,13 +633,16 @@ public static class PlayerPowerUpPassiveBakeUtility
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="passiveTool">Legacy passive tool definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
-    /// <returns>Runtime passive config or default.</returns>
-    public static PlayerPassiveToolConfig BuildPassiveToolConfig(PlayerAuthoring authoring,
-                                                                 PassiveToolDefinition passiveTool,
-                                                                 Func<GameObject, Entity> resolveDynamicPrefabEntity)
+    /// <param name="passiveToolConfig">Runtime passive config or default.</param>
+    public static void BuildPassiveToolConfig(PlayerAuthoring authoring,
+                                              PassiveToolDefinition passiveTool,
+                                              Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                              out PlayerPassiveToolConfig passiveToolConfig)
     {
+        passiveToolConfig = default;
+
         if (passiveTool == null)
-            return default;
+            return;
 
         PassiveToolKind toolKind = passiveTool.ToolKind == PassiveToolKind.Custom
             ? PassiveToolKind.ProjectileSize
@@ -669,7 +681,7 @@ public static class PlayerPowerUpPassiveBakeUtility
                 break;
         }
 
-        return new PlayerPassiveToolConfig
+        passiveToolConfig = new PlayerPassiveToolConfig
         {
             IsDefined = 1,
             ToolKind = toolKind,

@@ -27,7 +27,10 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
 
         for (int index = 0; index < entities.Length; index++)
         {
-            PlayerPowerUpsConfig config = PlayerPowerUpsConfigBufferUtility.Read(entities[index], in powerUpsConfigLookup);
+            PlayerPowerUpsConfig config;
+            PlayerPowerUpsConfigBufferUtility.Read(entities[index],
+                                                   in powerUpsConfigLookup,
+                                                   out config);
             PlayerPowerUpsState initialState = PlayerPowerUpLoadoutRuntimeUtility.CreateInitialState(in config, currentKillCount);
             commandBuffer.AddComponent(entities[index], initialState);
         }
@@ -52,9 +55,11 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
         for (int index = 0; index < entities.Length; index++)
         {
             Entity entity = entities[index];
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(entity, in equippedPassiveToolsLookup);
             DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = commandBuffer.AddBuffer<PlayerPassiveToolsStateElement>(entity);
-            PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateBuffer, in passiveToolsState);
+            ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
+            PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(entity,
+                                                                          in equippedPassiveToolsLookup,
+                                                                          ref passiveToolsState);
         }
 
         entities.Dispose();
@@ -300,6 +305,17 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     }
 
     /// <summary>
+    /// Adds PlayerOrbitalProjectionLostElement buffers to entities missing them.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingOrbitalProjectionLostBufferQuery">Query selecting entities without PlayerOrbitalProjectionLostElement buffer.</param>
+    public static void AddMissingOrbitalProjectionLostBuffers(ref EntityCommandBuffer commandBuffer,
+                                                              in EntityQuery missingOrbitalProjectionLostBufferQuery)
+    {
+        AddBufferForEntities<PlayerOrbitalProjectionLostElement>(ref commandBuffer, in missingOrbitalProjectionLostBufferQuery);
+    }
+
+    /// <summary>
     /// Adds PlayerElementalTrailSegmentElement buffers to entities missing them.
     /// </summary>
     /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
@@ -384,6 +400,18 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
         in EntityQuery missingPowerUpCheatPresetEntryBufferQuery)
     {
         AddBufferForEntities<PlayerPowerUpCheatPresetEntry>(ref commandBuffer, in missingPowerUpCheatPresetEntryBufferQuery);
+    }
+
+    /// <summary>
+    /// Adds PlayerPowerUpCheatPresetSlotElement buffers to entities missing them.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingPowerUpCheatPresetSlotBufferQuery">Query selecting entities without PlayerPowerUpCheatPresetSlotElement buffer.</param>
+    public static void AddMissingPowerUpCheatPresetSlotBuffers(
+        ref EntityCommandBuffer commandBuffer,
+        in EntityQuery missingPowerUpCheatPresetSlotBufferQuery)
+    {
+        AddBufferForEntities<PlayerPowerUpCheatPresetSlotElement>(ref commandBuffer, in missingPowerUpCheatPresetSlotBufferQuery);
     }
 
     /// <summary>

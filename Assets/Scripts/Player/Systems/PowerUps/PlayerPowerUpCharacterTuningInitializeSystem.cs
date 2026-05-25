@@ -64,7 +64,7 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
 
             for (int catalogIndex = 0; catalogIndex < unlockCatalogBuffer.Length; catalogIndex++)
             {
-                PlayerPowerUpUnlockCatalogElement unlockCatalogEntry = unlockCatalogBuffer[catalogIndex];
+                ref PlayerPowerUpUnlockCatalogElement unlockCatalogEntry = ref unlockCatalogBuffer.ElementAt(catalogIndex);
 
                 if (unlockCatalogEntry.PendingInitialCharacterTuningApply == 0)
                     continue;
@@ -80,7 +80,6 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
                                                                                    ref playerExperienceCollection,
                                                                                    out int _);
                 unlockCatalogEntry.PendingInitialCharacterTuningApply = 0;
-                unlockCatalogBuffer[catalogIndex] = unlockCatalogEntry;
             }
 
             if (!anyPending)

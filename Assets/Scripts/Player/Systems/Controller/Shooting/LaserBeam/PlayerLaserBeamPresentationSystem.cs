@@ -102,9 +102,13 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
             DynamicBuffer<PlayerLaserBeamSourceVariantElement> sourceVariants = sourceVariantLookup[playerEntity];
             DynamicBuffer<PlayerLaserBeamImpactVariantElement> impactVariants = impactVariantLookup[playerEntity];
             DynamicBuffer<PlayerLaserBeamVisualPresetElement> visualPresetBuffer = visualPresetLookup[playerEntity];
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
-            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
-                                                                                                                                in laserBeamState.ValueRO);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
+            PlayerPassiveToolsState effectivePassiveToolsState;
+            PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in passiveToolsState,
+                                                                          in laserBeamState.ValueRO,
+                                                                          out effectivePassiveToolsState);
             bool shouldRender = effectivePassiveToolsState.HasLaserBeam != 0 &&
                                 laserBeamState.ValueRO.IsActive != 0 &&
                                 laserBeamLanes.Length > 0;

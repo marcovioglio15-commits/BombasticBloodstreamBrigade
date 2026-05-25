@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -36,6 +37,7 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         container.Add(BuildEnemyPrefabFoldout(panel, prefabsProperty));
         container.Add(BuildHitVfxFoldout(panel, prefabsProperty));
         container.Add(BuildSpawnVfxFoldout(panel, prefabsProperty));
+        container.Add(BuildDeathVfxFoldout(panel, prefabsProperty));
         container.Add(BuildPaintMetadataFoldout(panel, prefabsProperty));
         return container;
     }
@@ -126,6 +128,38 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     }
 
     /// <summary>
+    /// Builds death VFX controls and hides dependent settings until a VFX prefab is assigned.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <returns>Foldout containing death VFX controls.</returns>
+    private static Foldout BuildDeathVfxFoldout(EnemyVisualPresetsPanel panel, SerializedProperty prefabsProperty)
+    {
+        return BuildOptionalVfxFoldout(panel,
+                                       prefabsProperty,
+                                       "Death VFX",
+                                       "DeathVfx",
+                                       "Optional one-shot visual feedback spawned when this enemy dies.",
+                                       "deathVfxPrefab",
+                                       "Death VFX Prefab",
+                                       "Optional one-shot VFX prefab spawned when this enemy dies.",
+                                       "Assign a Death VFX prefab to enable spawn offset, lifetime, scale, and debris color controls.",
+                                       string.Empty,
+                                       string.Empty,
+                                       string.Empty,
+                                       "deathVfxSpawnOffset",
+                                       "Death VFX Spawn Offset",
+                                       "World-space offset added to the enemy death position before spawning the optional death VFX.",
+                                       "deathVfxLifetimeSeconds",
+                                       "Death VFX Lifetime Seconds",
+                                       "Lifetime in seconds assigned to each spawned death VFX instance.",
+                                       "deathVfxScaleMultiplier",
+                                       "Death VFX Scale Multiplier",
+                                       "Uniform scale multiplier applied to each optional death VFX instance.",
+                                       BuildDeathVfxExtraControls);
+    }
+
+    /// <summary>
     /// Builds metadata controls used by wave painting and editor previews.
     /// </summary>
     /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
@@ -193,7 +227,8 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
                                                    string lifetimeTooltip,
                                                    string scalePropertyName,
                                                    string scaleLabel,
-                                                   string scaleTooltip)
+                                                   string scaleTooltip,
+                                                   Action<EnemyVisualPresetsPanel, VisualElement, SerializedProperty> extraDetailsBuilder = null)
     {
         Foldout foldout = CreatePrefabFoldout(prefabsProperty, foldoutTitle, stateSuffix, foldoutTooltip);
         SerializedProperty vfxPrefabProperty = prefabsProperty.FindPropertyRelative(prefabPropertyName);
@@ -236,6 +271,9 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
                                                                 scalePropertyName,
                                                                 scaleLabel,
                                                                 scaleTooltip);
+        if (extraDetailsBuilder != null)
+            extraDetailsBuilder(panel, detailsContainer, prefabsProperty);
+
         detailsContainer.Add(warningsContainer);
         RefreshOptionalVfxDetailsVisibility(vfxPrefabProperty,
                                             missingPrefabBox,
@@ -265,6 +303,93 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
                                         scalePropertyName,
                                         scaleLabel);
         return foldout;
+    }
+
+    /// <summary>
+    /// Adds Death VFX debris palette controls with fallback color shown only when renderer color extraction is disabled.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="detailsContainer">Container receiving additional Death VFX controls.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    private static void BuildDeathVfxExtraControls(EnemyVisualPresetsPanel panel,
+                                                   VisualElement detailsContainer,
+                                                   SerializedProperty prefabsProperty)
+    {
+        SerializedProperty useEnemyBaseColorProperty = prefabsProperty.FindPropertyRelative("useEnemyBaseColorForDeathDebris");
+        SerializedProperty childNameProperty = prefabsProperty.FindPropertyRelative("deathDebrisParticleChildName");
+        VisualElement fallbackColorContainer = new VisualElement();
+
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                detailsContainer,
+                                                                prefabsProperty,
+                                                                "useEnemyBaseColorForDeathDebris",
+                                                                "Use Enemy Visual Palette For Death Debris",
+                                                                "When enabled, death debris particles use a compact palette sampled from this enemy prefab's visible body renderers at bake time.");
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                fallbackColorContainer,
+                                                                prefabsProperty,
+                                                                "deathDebrisFallbackColor",
+                                                                "Death Debris Fallback Color",
+                                                                "Fallback debris particle color used when visual palette extraction is disabled or no usable enemy body color can be sampled.");
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                detailsContainer,
+                                                                prefabsProperty,
+                                                                "deathDebrisParticleChildName",
+                                                                "Death Debris Particle Child Name",
+                                                                "Particle-system child object name that receives the death debris color override.");
+        detailsContainer.Add(fallbackColorContainer);
+        RefreshDeathDebrisFallbackVisibility(useEnemyBaseColorProperty, fallbackColorContainer);
+
+        if (useEnemyBaseColorProperty != null)
+        {
+            detailsContainer.TrackPropertyValue(useEnemyBaseColorProperty, changedProperty =>
+            {
+                RefreshDeathDebrisFallbackVisibility(changedProperty, fallbackColorContainer);
+            });
+        }
+
+        if (childNameProperty == null)
+            return;
+
+        HelpBox childNameWarning = new HelpBox("Death Debris Particle Child Name is longer than the runtime FixedString64 limit and will be ignored at bake time.", HelpBoxMessageType.Warning);
+        detailsContainer.Add(childNameWarning);
+        RefreshDeathDebrisChildNameWarning(childNameProperty, childNameWarning);
+        detailsContainer.TrackPropertyValue(childNameProperty, changedProperty =>
+        {
+            RefreshDeathDebrisChildNameWarning(changedProperty, childNameWarning);
+        });
+    }
+
+    /// <summary>
+    /// Shows fallback color only when renderer-derived debris color is disabled.
+    /// </summary>
+    /// <param name="useEnemyBaseColorProperty">Boolean property controlling renderer-derived debris colors.</param>
+    /// <param name="fallbackColorContainer">Container holding fallback color controls.</param>
+    private static void RefreshDeathDebrisFallbackVisibility(SerializedProperty useEnemyBaseColorProperty,
+                                                             VisualElement fallbackColorContainer)
+    {
+        if (fallbackColorContainer == null)
+            return;
+
+        bool usesEnemyBaseColor = useEnemyBaseColorProperty != null && useEnemyBaseColorProperty.boolValue;
+        fallbackColorContainer.style.display = usesEnemyBaseColor ? DisplayStyle.None : DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// Shows a warning when the debris child-name filter cannot fit into runtime FixedString64 storage.
+    /// </summary>
+    /// <param name="childNameProperty">String property containing the target child object name.</param>
+    /// <param name="warningBox">Warning box to show or hide.</param>
+    private static void RefreshDeathDebrisChildNameWarning(SerializedProperty childNameProperty,
+                                                           HelpBox warningBox)
+    {
+        if (warningBox == null)
+            return;
+
+        bool isTooLong = childNameProperty != null &&
+                         !string.IsNullOrWhiteSpace(childNameProperty.stringValue) &&
+                         System.Text.Encoding.UTF8.GetByteCount(childNameProperty.stringValue.Trim()) > 61;
+        warningBox.style.display = isTooLong ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     /// <summary>
@@ -571,7 +696,7 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         if (panel == null || panel.PresetSerializedObject == null)
             return;
 
-        Object targetObject = panel.PresetSerializedObject.targetObject;
+        UnityEngine.Object targetObject = panel.PresetSerializedObject.targetObject;
 
         if (targetObject != null)
             EditorUtility.SetDirty(targetObject);

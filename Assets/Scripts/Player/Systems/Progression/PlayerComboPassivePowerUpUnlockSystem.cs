@@ -69,8 +69,9 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
             DynamicBuffer<PlayerComboPassivePowerUpGrantElement> passiveGrants = passiveGrantsLookup[entity];
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[entity];
             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup[entity];
+            DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = passiveToolsStateLookup[entity];
             PlayerComboCounterState mutableComboState = comboCounterState.ValueRO;
-            PlayerPassiveToolsState mutablePassiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup);
+            ref PlayerPassiveToolsState mutablePassiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
             int activeRankIndex = ResolvePassiveGrantActiveRankIndex(mutableComboState.CurrentValue,
                                                                      PlayerComboCounterRuntimeUtility.ResolveActiveRankIndex(mutableComboState.CurrentValue,
                                                                                                                             in runtimeConfig.ValueRO,
@@ -96,7 +97,6 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
             mutableComboState.ActivePassiveUnlockRankIndex = activeRankIndex;
             mutableComboState.PassiveUnlockSignature = desiredSignature;
             comboCounterState.ValueRW = mutableComboState;
-            PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateLookup[entity], in mutablePassiveToolsState);
         }
     }
     #endregion

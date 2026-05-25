@@ -124,7 +124,9 @@ internal sealed class HUDPowerUpOverlaySection
         }
 
         DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer = entityManager.GetBuffer<PlayerPowerUpsConfigElement>(playerEntity);
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+        PlayerPowerUpsConfig powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                               out powerUpsConfig);
         PlayerPowerUpsState powerUpsState = entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
 
         primarySlot.Update(in powerUpsConfig.PrimarySlot,

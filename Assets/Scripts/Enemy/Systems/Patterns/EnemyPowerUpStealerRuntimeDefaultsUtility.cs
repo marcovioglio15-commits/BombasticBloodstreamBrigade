@@ -9,47 +9,43 @@ internal static class EnemyPowerUpStealerRuntimeDefaultsUtility
 
     #region Public Methods
     /// <summary>
-    /// Creates a clean Power-Up Stealer runtime entry for a newly baked, pooled, or activated module.
+    /// Initializes a clean Power-Up Stealer runtime entry for a newly baked, pooled, or activated module.
     /// </summary>
-    /// <returns>Default runtime entry with no stolen payload and no recovery metrics.</returns>
-    public static EnemyPowerUpStealerRuntimeElement CreateDefault()
+    /// <param name="runtime">Runtime entry receiving the default no-payload state.</param>
+    public static void InitializeDefault(ref EnemyPowerUpStealerRuntimeElement runtime)
     {
-        return new EnemyPowerUpStealerRuntimeElement
-        {
-            HasTriggeredOnce = 0,
-            HasStolenPowerUp = 0,
-            StolenKind = PlayerPowerUpUnlockKind.Active,
-            PowerUpId = default,
-            StoredActivePowerUp = default,
-            StoredPassiveTool = default,
-            OriginalActiveSlotIndex = -1,
-            OriginalActiveEquipOrder = 0,
-            OriginalPassiveCatalogIndex = -1,
-            OriginalPassiveBufferIndex = -1,
-            OriginalPassiveUnlockCount = 0,
-            PlayerEntity = Entity.Null,
-            UseDamageRecovery = 0,
-            DamageRecoveryPercent = 0f,
-            UseTimedDamageRecovery = 0,
-            TimedDamageRecoveryPercent = 0f,
-            TimedDamageRecoverySeconds = 0f,
-            HealthAtSteal = 0f,
-            LastObservedHealth = 0f,
-            RecoveryWindowElapsedSeconds = 0f,
-            RecoveryWindowAccumulatedPercent = 0f
-        };
+        runtime.HasTriggeredOnce = 0;
+        runtime.HasStolenPowerUp = 0;
+        runtime.StolenKind = PlayerPowerUpUnlockKind.Active;
+        runtime.PowerUpId = default;
+        runtime.StoredActivePowerUp = default;
+        runtime.StoredPassiveTool = default;
+        runtime.OriginalActiveSlotIndex = -1;
+        runtime.OriginalActiveEquipOrder = 0;
+        runtime.OriginalPassiveCatalogIndex = -1;
+        runtime.OriginalPassiveBufferIndex = -1;
+        runtime.OriginalPassiveUnlockCount = 0;
+        runtime.PlayerEntity = Entity.Null;
+        runtime.UseDamageRecovery = 0;
+        runtime.DamageRecoveryPercent = 0f;
+        runtime.UseTimedDamageRecovery = 0;
+        runtime.TimedDamageRecoveryPercent = 0f;
+        runtime.TimedDamageRecoverySeconds = 0f;
+        runtime.HealthAtSteal = 0f;
+        runtime.LastObservedHealth = 0f;
+        runtime.RecoveryWindowElapsedSeconds = 0f;
+        runtime.RecoveryWindowAccumulatedPercent = 0f;
     }
 
     /// <summary>
     /// Clears a runtime entry after recovery while preserving one-shot trigger history for the same module activation.
     /// </summary>
     /// <param name="runtime">Runtime entry that just returned its stolen payload.</param>
-    /// <returns>Cleared runtime entry ready to ignore held-payload checks.</returns>
-    public static EnemyPowerUpStealerRuntimeElement CreateCleared(in EnemyPowerUpStealerRuntimeElement runtime)
+    public static void ClearAfterRecovery(ref EnemyPowerUpStealerRuntimeElement runtime)
     {
-        EnemyPowerUpStealerRuntimeElement clearedRuntime = CreateDefault();
-        clearedRuntime.HasTriggeredOnce = runtime.HasTriggeredOnce;
-        return clearedRuntime;
+        byte hasTriggeredOnce = runtime.HasTriggeredOnce;
+        InitializeDefault(ref runtime);
+        runtime.HasTriggeredOnce = hasTriggeredOnce;
     }
     #endregion
 

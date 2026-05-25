@@ -23434,7 +23434,7 @@ MonoBehaviour:
             categoryId: 'OrbitalShield '
             motionMode: 1
             orbitDistance: 3
-            heightOffset: 1.5
+            heightOffset: 1
             angleOffsetDegrees: 0
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
@@ -23812,9 +23812,10 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveChargeShot
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - Passive_OrbitalShield
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

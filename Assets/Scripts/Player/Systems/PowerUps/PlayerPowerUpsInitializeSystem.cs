@@ -22,6 +22,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingBombRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionPrefabBindingBufferQuery;
+    private EntityQuery missingOrbitalProjectionLostBufferQuery;
     private EntityQuery missingElementalTrailSegmentBufferQuery;
     private EntityQuery missingLaserBeamStormTickPulseBufferQuery;
     private EntityQuery missingLaserBeamLaneBufferQuery;
@@ -31,6 +32,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingPowerUpVfxPrefabBindingBufferQuery;
     private EntityQuery missingPowerUpVfxCapConfigQuery;
     private EntityQuery missingPowerUpCheatPresetEntryBufferQuery;
+    private EntityQuery missingPowerUpCheatPresetSlotBufferQuery;
     private EntityQuery missingPowerUpCheatPresetPassiveBufferQuery;
     private EntityQuery missingPowerUpUnlockCatalogBufferQuery;
     private EntityQuery missingPowerUpCharacterTuningFormulaBufferQuery;
@@ -124,6 +126,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             .WithNone<PlayerOrbitalProjectionPrefabElement>()
             .Build();
 
+        missingOrbitalProjectionLostBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerOrbitalProjectionLostElement>()
+            .Build();
+
         missingElementalTrailSegmentBufferQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerElementalTrailSegmentElement>()
@@ -167,6 +174,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingPowerUpCheatPresetEntryBufferQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpCheatPresetEntry>()
+            .Build();
+
+        missingPowerUpCheatPresetSlotBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerPowerUpCheatPresetSlotElement>()
             .Build();
 
         missingPowerUpCheatPresetPassiveBufferQuery = SystemAPI.QueryBuilder()
@@ -244,6 +256,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingPowerUpVfxPrefabBindingBufferQuery,
             in missingPowerUpVfxCapConfigQuery,
             in missingPowerUpCheatPresetEntryBufferQuery,
+            in missingPowerUpCheatPresetSlotBufferQuery,
             in missingPowerUpCheatPresetPassiveBufferQuery,
             in missingPowerUpUnlockCatalogBufferQuery,
             in missingPowerUpCharacterTuningFormulaBufferQuery,
@@ -256,11 +269,13 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
 
         bool hasMissingOrbitalProjectionRequestBuffer = !missingOrbitalProjectionRequestBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingOrbitalProjectionPrefabBindingBuffer = !missingOrbitalProjectionPrefabBindingBufferQuery.IsEmptyIgnoreFilter;
+        bool hasMissingOrbitalProjectionLostBuffer = !missingOrbitalProjectionLostBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
 
         if (!missingFlags.HasAnyMissing &&
             !hasMissingOrbitalProjectionRequestBuffer &&
             !hasMissingOrbitalProjectionPrefabBindingBuffer &&
+            !hasMissingOrbitalProjectionLostBuffer &&
             !hasMissingLaserBeamStormTickPulseBuffer)
         {
             return;
@@ -275,7 +290,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
-        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(true);
+        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
 
         if (missingFlags.HasMissingState)
         {
@@ -351,6 +366,12 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
                                                                                                      in missingOrbitalProjectionPrefabBindingBufferQuery);
         }
 
+        if (hasMissingOrbitalProjectionLostBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingOrbitalProjectionLostBuffers(ref commandBuffer,
+                                                                                           in missingOrbitalProjectionLostBufferQuery);
+        }
+
         if (missingFlags.HasMissingElementalTrailSegmentBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingElementalTrailSegmentBuffers(ref commandBuffer, in missingElementalTrailSegmentBufferQuery);
@@ -395,6 +416,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingPowerUpCheatPresetEntryBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpCheatPresetEntryBuffers(ref commandBuffer, in missingPowerUpCheatPresetEntryBufferQuery);
+        }
+
+        if (missingFlags.HasMissingPowerUpCheatPresetSlotBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpCheatPresetSlotBuffers(ref commandBuffer, in missingPowerUpCheatPresetSlotBufferQuery);
         }
 
         if (missingFlags.HasMissingPowerUpCheatPresetPassiveBuffer)

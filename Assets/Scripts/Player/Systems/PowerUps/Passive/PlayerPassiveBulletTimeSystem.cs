@@ -42,7 +42,9 @@ public partial struct PlayerPassiveBulletTimeSystem : ISystem
                                     RefRW<PlayerBulletTimeState>,
                                     RefRO<PlayerHealth>>())
         {
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
 
             if (passiveToolsState.HasBulletTime == 0)
                 continue;

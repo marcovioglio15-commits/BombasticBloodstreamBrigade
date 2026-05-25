@@ -47,6 +47,7 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         ComponentLookup<LocalTransform> ownerTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerLookState> lookStateLookup = SystemAPI.GetComponentLookup<PlayerLookState>(true);
+        BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(false);
         NativeArray<Entity> projectionEntities = projectionQuery.ToEntityArray(Allocator.Temp);
         NativeArray<PlayerOrbitalProjectionInstance> projectionInstances = projectionQuery.ToComponentDataArray<PlayerOrbitalProjectionInstance>(Allocator.Temp);
 
@@ -70,7 +71,11 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
                 : default;
 
             if (instance.CurrentHealth <= 0f && instance.Phase != PlayerOrbitalProjectionPhase.Despawning)
+            {
+                PlayerOrbitalProjectionLossRuntimeUtility.TryRecordPermanentLoss(ref lostProjectionLookup,
+                                                                                 in instance);
                 BeginDespawn(ref instance, transform.ValueRO.Position);
+            }
 
             TickMotion(ref instance,
                        projectionEntity,
