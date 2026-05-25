@@ -409,10 +409,13 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                                      "Controls whether Charge Shot VFX plays once near completion, loops while charging, or stretches one playback over the whole charge.",
                                                                      "chargeShotVfxSpawnOffset",
                                                                      "Charge Shot VFX Offset",
-                                                                     "Local-space offset applied to Charge Shot VFX relative to the player entity position.",
+                                                                     "Local-space offset applied to Charge Shot VFX relative to the current weapon muzzle pose.",
                                                                      "chargeShotVfxScaleMultiplier",
                                                                      "Charge Shot VFX Scale",
-                                                                     "Uniform scale multiplier applied to the Charge Shot VFX instance.");
+                                                                     "Uniform scale multiplier applied to the Charge Shot VFX instance.",
+                                                                     "chargeShotVfxAppliesToAllHoldChargePowerUps",
+                                                                     "Show For All Hold-Charge Power-Ups",
+                                                                     "When enabled, the same charge VFX also appears while any active power-up built from a hold-charge module is charging.");
 
         container.Add(powerUpsVfxFoldout);
         container.Add(levelUpVfxFoldout);
@@ -514,7 +517,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                          string offsetTooltip,
                                                          string scalePropertyName,
                                                          string scaleLabel,
-                                                         string scaleTooltip)
+                                                         string scaleTooltip,
+                                                         string extraTogglePropertyName = null,
+                                                         string extraToggleLabel = null,
+                                                         string extraToggleTooltip = null)
     {
         Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(title,
                                                                           "NashCore.PlayerManagement.Visual.VFX." + stateSuffix,
@@ -524,6 +530,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         SerializedProperty modeProperty = presetSerializedObject.FindProperty(modePropertyName);
         SerializedProperty offsetProperty = presetSerializedObject.FindProperty(offsetPropertyName);
         SerializedProperty scaleProperty = presetSerializedObject.FindProperty(scalePropertyName);
+        SerializedProperty extraToggleProperty = !string.IsNullOrWhiteSpace(extraTogglePropertyName)
+            ? presetSerializedObject.FindProperty(extraTogglePropertyName)
+            : null;
         HelpBox missingPrefabBox = new HelpBox(missingPrefabMessage, HelpBoxMessageType.Info);
         VisualElement detailsContainer = new VisualElement();
         VisualElement warningsContainer = new VisualElement();
@@ -554,6 +563,13 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                  scalingRulesProperty,
                                  scaleLabel,
                                  scaleTooltip);
+
+        AddScalablePropertyField(panel,
+                                 detailsContainer,
+                                 extraToggleProperty,
+                                 scalingRulesProperty,
+                                 extraToggleLabel,
+                                 extraToggleTooltip);
         detailsContainer.Add(warningsContainer);
 
         RefreshOptionalPlayerVfxVisibility(prefabProperty,

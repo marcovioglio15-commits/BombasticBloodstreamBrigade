@@ -70,6 +70,21 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     }
 
     /// <summary>
+    /// Applies a position and rotation update to one managed VFX root without touching playback state.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance whose transform is being updated.</param>
+    /// <param name="position">World position.</param>
+    /// <param name="rotation">World rotation.</param>
+    public static void ApplyPositionAndRotation(PlayerPowerUpManagedVfxInstance instance,
+                                                float3 position,
+                                                quaternion rotation)
+    {
+        Transform instanceTransform = instance.InstanceTransform;
+        instanceTransform.position = ToVector3(position);
+        instanceTransform.rotation = ToQuaternion(rotation);
+    }
+
+    /// <summary>
     /// Forces managed particle systems to honor the root transform scale applied by gameplay VFX requests.
     /// </summary>
     /// <param name="instance">Managed VFX instance whose particle systems are being prepared.</param>
@@ -130,12 +145,49 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
                 continue;
 
             ParticleSystem.MainModule mainModule = particleSystem.main;
+            bool applyColorOverride = ShouldApplyColorOverride(particleSystem, hasColorOverride, colorOverrideChildName);
             mainModule.simulationSpeed = ResolveParticleBaseSimulationSpeed(instance, particleIndex, mainModule) * sanitizedSimulationSpeedMultiplier;
             mainModule.loop = forceLooping || ResolveParticleBaseLooping(instance, particleIndex, mainModule);
-            mainModule.startColor = ShouldApplyColorOverride(particleSystem, hasColorOverride, colorOverrideChildName)
+            mainModule.startColor = applyColorOverride
                 ? colorOverrideGradient
                 : ResolveParticleBaseStartColor(instance, particleIndex, mainModule);
+            ApplyParticleColorOverLifetime(instance,
+                                           particleIndex,
+                                           particleSystem,
+                                           applyColorOverride);
         }
+    }
+
+    /// <summary>
+    /// Applies or restores Color over Lifetime settings so overridden debris colors are not remapped by the prefab gradient.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance whose cached color-over-lifetime data is used.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached arrays.</param>
+    /// <param name="particleSystem">Particle system receiving runtime settings.</param>
+    /// <param name="applyColorOverride">True when this particle system is using request color overrides.</param>
+    private static void ApplyParticleColorOverLifetime(PlayerPowerUpManagedVfxInstance instance,
+                                                       int particleIndex,
+                                                       ParticleSystem particleSystem,
+                                                       bool applyColorOverride)
+    {
+        ParticleSystem.ColorOverLifetimeModule colorOverLifetime = particleSystem.colorOverLifetime;
+
+        if (applyColorOverride)
+        {
+            colorOverLifetime.enabled = false;
+            return;
+        }
+
+        colorOverLifetime.enabled = ResolveParticleBaseColorOverLifetimeEnabled(instance,
+                                                                                particleIndex,
+                                                                                colorOverLifetime);
+
+        if (!colorOverLifetime.enabled)
+            return;
+
+        colorOverLifetime.color = ResolveParticleBaseColorOverLifetimeColor(instance,
+                                                                            particleIndex,
+                                                                            colorOverLifetime);
     }
 
     /// <summary>
@@ -355,6 +407,48 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
         }
 
         return instance.ParticleSystemBaseStartColors[particleIndex];
+    }
+
+    /// <summary>
+    /// Resolves cached authored Color over Lifetime enabled state for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached color-over-lifetime states.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="colorOverLifetime">Current color-over-lifetime module used as fallback.</param>
+    /// <returns>Authored enabled state.</returns>
+    private static bool ResolveParticleBaseColorOverLifetimeEnabled(PlayerPowerUpManagedVfxInstance instance,
+                                                                    int particleIndex,
+                                                                    ParticleSystem.ColorOverLifetimeModule colorOverLifetime)
+    {
+        if (instance.ParticleSystemBaseColorOverLifetimeEnabled == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseColorOverLifetimeEnabled.Length)
+        {
+            return colorOverLifetime.enabled;
+        }
+
+        return instance.ParticleSystemBaseColorOverLifetimeEnabled[particleIndex];
+    }
+
+    /// <summary>
+    /// Resolves cached authored Color over Lifetime gradient for one particle system.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance that owns cached color-over-lifetime gradients.</param>
+    /// <param name="particleIndex">Particle-system index inside the cached array.</param>
+    /// <param name="colorOverLifetime">Current color-over-lifetime module used as fallback.</param>
+    /// <returns>Authored color-over-lifetime gradient.</returns>
+    private static ParticleSystem.MinMaxGradient ResolveParticleBaseColorOverLifetimeColor(PlayerPowerUpManagedVfxInstance instance,
+                                                                                           int particleIndex,
+                                                                                           ParticleSystem.ColorOverLifetimeModule colorOverLifetime)
+    {
+        if (instance.ParticleSystemBaseColorOverLifetimeColors == null ||
+            particleIndex < 0 ||
+            particleIndex >= instance.ParticleSystemBaseColorOverLifetimeColors.Length)
+        {
+            return colorOverLifetime.color;
+        }
+
+        return instance.ParticleSystemBaseColorOverLifetimeColors[particleIndex];
     }
 
     /// <summary>

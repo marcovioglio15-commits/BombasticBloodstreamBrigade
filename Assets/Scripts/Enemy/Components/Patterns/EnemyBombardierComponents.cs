@@ -127,6 +127,7 @@ public struct EnemyBombardierBomb : IComponentData
     public float ExplosionDelayElapsedSeconds;
     public float Damage;
     public float DamageRadius;
+    public float CollisionRadius;
     public byte ScaleExplosionVfxToDamageRadius;
     public float ExplosionVfxScaleMultiplier;
     public byte HasImpacted;

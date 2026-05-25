@@ -38,9 +38,11 @@ public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
         EntityManager entityManager = state.EntityManager;
 
         foreach ((RefRO<PlayerDroppedPowerUpContainerContent> droppedContainerContent,
+                  DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement> containerSlotBuffer,
                   RefRO<LocalTransform> containerTransform,
                   Entity containerEntity)
                  in SystemAPI.Query<RefRO<PlayerDroppedPowerUpContainerContent>,
+                                    DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement>,
                                     RefRO<LocalTransform>>()
                              .WithEntityAccess())
         {
@@ -54,7 +56,9 @@ public partial struct PlayerDroppedPowerUpContainerIconSyncSystem : ISystem
             PlayerDroppedPowerUpContainerViewRuntimeUtility.SyncViewPose(containerView,
                                                                         in containerTransform.ValueRO);
 
-            string powerUpId = droppedContainerContent.ValueRO.StoredPowerUp.SlotConfig.PowerUpId.ToString();
+            if (!PlayerDroppedPowerUpContainerPayloadUtility.HasValidPayload(in droppedContainerContent.ValueRO, containerSlotBuffer) ||
+                !PlayerDroppedPowerUpContainerPayloadUtility.TryResolvePowerUpId(containerSlotBuffer, out string powerUpId))
+                powerUpId = string.Empty;
 
             if (!PlayerPowerUpPresentationRuntime.TryResolveIcon(powerUpId, out UnityEngine.Sprite icon))
                 icon = null;

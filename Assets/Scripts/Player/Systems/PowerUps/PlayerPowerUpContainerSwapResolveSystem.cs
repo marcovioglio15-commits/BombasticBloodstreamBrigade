@@ -36,6 +36,7 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         ComponentLookup<PlayerDroppedPowerUpContainerContent> droppedContainerContentLookup = SystemAPI.GetComponentLookup<PlayerDroppedPowerUpContainerContent>(false);
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> interactionConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionLock>(false);
+        BufferLookup<PlayerDroppedPowerUpContainerSlotElement> droppedContainerSlotLookup = SystemAPI.GetBufferLookup<PlayerDroppedPowerUpContainerSlotElement>(false);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -76,8 +77,17 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 if (!droppedContainerContentLookup.HasComponent(swapCommand.ContainerEntity))
                     continue;
 
+                if (!droppedContainerSlotLookup.HasBuffer(swapCommand.ContainerEntity))
+                    continue;
+
                 PlayerDroppedPowerUpContainerContent containerContent = droppedContainerContentLookup[swapCommand.ContainerEntity];
-                PlayerStoredActivePowerUpData storedPowerUp = containerContent.StoredPowerUp;
+                DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement> containerSlotBuffer = droppedContainerSlotLookup[swapCommand.ContainerEntity];
+
+                if (!PlayerDroppedPowerUpContainerPayloadUtility.TryReadStoredPowerUp(in containerContent,
+                                                                                      containerSlotBuffer,
+                                                                                      out PlayerStoredActivePowerUpData storedPowerUp))
+                    continue;
+
                 FixedString64Bytes acquiredPowerUpId = storedPowerUp.SlotConfig.PowerUpId;
 
                 if (!PlayerPowerUpLoadoutRuntimeUtility.TrySwapStoredPowerUpWithSlot(ref storedPowerUp,
@@ -97,8 +107,10 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 }
                 else
                 {
-                    containerContent.StoredPowerUp = storedPowerUp;
-                    droppedContainerContentLookup[swapCommand.ContainerEntity] = containerContent;
+                    PlayerDroppedPowerUpContainerPayloadUtility.WriteStoredPowerUp(swapCommand.ContainerEntity,
+                                                                                   in storedPowerUp,
+                                                                                   ref droppedContainerContentLookup,
+                                                                                   ref droppedContainerSlotLookup);
                 }
 
                 if (unlockCatalogLookup.HasBuffer(playerEntity))

@@ -561,6 +561,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public float4 SecondaryColorOverride;
     public byte ColorOverrideCount;
     public FixedString64Bytes ColorOverrideChildName;
+    public byte FollowMuzzlePose;
 }
 
 /// <summary>
@@ -606,6 +607,7 @@ public struct PlayerChargeShotVfxConfig : IComponentData
     public float UniformScale;
     public float LifetimeSeconds;
     public PlayerChargeShotVfxPlaybackMode PlaybackMode;
+    public byte AppliesToAllHoldChargePowerUps;
 }
 
 /// <summary>

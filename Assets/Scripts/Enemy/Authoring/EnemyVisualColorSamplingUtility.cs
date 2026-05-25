@@ -9,6 +9,8 @@ public static class EnemyVisualColorSamplingUtility
 {
     #region Constants
     private const int MaximumTextureSamples = 256;
+    private const int MaximumPaletteBuckets = 12;
+    private const float VisibleAlphaThreshold = 0.01f;
     private const float DistinctColorDistanceThreshold = 0.08f;
     private const byte SingleColorCount = 1;
     private const byte PaletteColorCount = 2;
@@ -74,9 +76,9 @@ public static class EnemyVisualColorSamplingUtility
         if (renderers == null || renderers.Length <= 0)
             return false;
 
-        float4 primaryColor = float4.zero;
-        float4 secondaryColor = float4.zero;
-        int colorCount = 0;
+        float4[] paletteColors = new float4[MaximumPaletteBuckets];
+        int[] paletteWeights = new int[MaximumPaletteBuckets];
+        int bucketCount = 0;
 
         // Sample only enemy body renderers so status bars, warnings and VFX helpers do not pollute debris colors.
         for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
@@ -86,60 +88,178 @@ public static class EnemyVisualColorSamplingUtility
             if (!ShouldSampleRendererForDeathDebris(renderer))
                 continue;
 
-            if (!TryResolveRendererColor(renderer, out float4 rendererColor))
+            if (!TryAppendRendererColors(renderer,
+                                         paletteColors,
+                                         paletteWeights,
+                                         ref bucketCount))
                 continue;
-
-            if (!math.all(math.isfinite(rendererColor)) || rendererColor.w <= 0.01f)
-                continue;
-
-            if (TryAppendDistinctColor(ref primaryColor, ref secondaryColor, ref colorCount, rendererColor))
-            {
-                if (colorCount >= PaletteColorCount)
-                    break;
-            }
         }
 
-        if (colorCount <= 0)
+        if (bucketCount <= 0)
             return false;
 
-        if (colorCount == 1)
-            secondaryColor = primaryColor;
+        ResolveDominantPalette(paletteColors,
+                               paletteWeights,
+                               bucketCount,
+                               out float4 primaryColor,
+                               out float4 secondaryColor,
+                               out byte colorCount);
 
         palette = new EnemyDeathDebrisColorPalette
         {
             PrimaryColor = primaryColor,
             SecondaryColor = secondaryColor,
-            ColorCount = colorCount > 1 ? PaletteColorCount : SingleColorCount
+            ColorCount = colorCount
         };
         return true;
     }
 
     /// <summary>
-    /// Appends one renderer color when it is visually distinct from colors already in the palette.
+    /// Appends one color sample into the compact dominant-color accumulator.
     /// </summary>
-    /// <param name="primaryColor">First palette color.</param>
-    /// <param name="secondaryColor">Second palette color.</param>
-    /// <param name="colorCount">Current number of accepted colors.</param>
+    /// <param name="paletteColors">Mutable palette color buckets.</param>
+    /// <param name="paletteWeights">Mutable palette sample weights matching paletteColors.</param>
+    /// <param name="bucketCount">Current number of active buckets.</param>
     /// <param name="candidateColor">Candidate color sampled from a renderer.</param>
-    /// <returns>True when the candidate changed the palette.</returns>
-    private static bool TryAppendDistinctColor(ref float4 primaryColor,
-                                               ref float4 secondaryColor,
-                                               ref int colorCount,
-                                               float4 candidateColor)
+    /// <param name="sampleWeight">Sample weight contributed by this color.</param>
+    internal static void AppendPaletteSample(float4[] paletteColors,
+                                             int[] paletteWeights,
+                                             ref int bucketCount,
+                                             float4 candidateColor,
+                                             int sampleWeight)
     {
-        if (colorCount <= 0)
+        if (!IsVisibleFiniteColor(candidateColor))
+            return;
+
+        int resolvedWeight = math.max(1, sampleWeight);
+        int existingBucketIndex = FindMatchingPaletteBucket(paletteColors,
+                                                            bucketCount,
+                                                            candidateColor);
+
+        if (existingBucketIndex >= 0)
         {
-            primaryColor = candidateColor;
-            colorCount = 1;
-            return true;
+            int previousWeight = math.max(1, paletteWeights[existingBucketIndex]);
+            int nextWeight = previousWeight + resolvedWeight;
+            paletteColors[existingBucketIndex] = (paletteColors[existingBucketIndex] * previousWeight + candidateColor * resolvedWeight) / nextWeight;
+            paletteWeights[existingBucketIndex] = nextWeight;
+            return;
         }
 
-        if (ColorDistance(primaryColor, candidateColor) < DistinctColorDistanceThreshold)
-            return false;
+        if (bucketCount < MaximumPaletteBuckets)
+        {
+            paletteColors[bucketCount] = candidateColor;
+            paletteWeights[bucketCount] = resolvedWeight;
+            bucketCount++;
+            return;
+        }
 
-        secondaryColor = candidateColor;
-        colorCount = 2;
-        return true;
+        int weakestBucketIndex = ResolveWeakestPaletteBucket(paletteWeights, bucketCount);
+
+        if (weakestBucketIndex < 0 || paletteWeights[weakestBucketIndex] >= resolvedWeight)
+            return;
+
+        paletteColors[weakestBucketIndex] = candidateColor;
+        paletteWeights[weakestBucketIndex] = resolvedWeight;
+    }
+
+    /// <summary>
+    /// Selects the two most represented colors from the compact palette accumulator.
+    /// </summary>
+    /// <param name="paletteColors">Palette color buckets populated during renderer sampling.</param>
+    /// <param name="paletteWeights">Palette sample weights matching paletteColors.</param>
+    /// <param name="bucketCount">Number of valid palette buckets.</param>
+    /// <param name="primaryColor">Most represented color.</param>
+    /// <param name="secondaryColor">Second represented color, or primary when only one exists.</param>
+    /// <param name="colorCount">Number of valid output colors.</param>
+    private static void ResolveDominantPalette(float4[] paletteColors,
+                                               int[] paletteWeights,
+                                               int bucketCount,
+                                               out float4 primaryColor,
+                                               out float4 secondaryColor,
+                                               out byte colorCount)
+    {
+        int primaryIndex = ResolveStrongestPaletteBucket(paletteWeights, bucketCount, -1);
+        int secondaryIndex = ResolveStrongestPaletteBucket(paletteWeights, bucketCount, primaryIndex);
+
+        primaryColor = primaryIndex >= 0 ? paletteColors[primaryIndex] : new float4(1f, 1f, 1f, 1f);
+        secondaryColor = secondaryIndex >= 0 ? paletteColors[secondaryIndex] : primaryColor;
+        colorCount = secondaryIndex >= 0 ? PaletteColorCount : SingleColorCount;
+    }
+
+    /// <summary>
+    /// Finds an existing palette bucket close enough to merge with a new color sample.
+    /// </summary>
+    /// <param name="paletteColors">Current palette color buckets.</param>
+    /// <param name="bucketCount">Number of active buckets.</param>
+    /// <param name="candidateColor">Candidate color to match.</param>
+    /// <returns>Matching bucket index, or -1 when the candidate is distinct.</returns>
+    private static int FindMatchingPaletteBucket(float4[] paletteColors,
+                                                 int bucketCount,
+                                                 float4 candidateColor)
+    {
+        for (int bucketIndex = 0; bucketIndex < bucketCount; bucketIndex++)
+        {
+            if (ColorDistance(paletteColors[bucketIndex], candidateColor) >= DistinctColorDistanceThreshold)
+                continue;
+
+            return bucketIndex;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Finds the strongest palette bucket while optionally excluding one bucket index.
+    /// </summary>
+    /// <param name="paletteWeights">Palette weights to inspect.</param>
+    /// <param name="bucketCount">Number of active buckets.</param>
+    /// <param name="excludedIndex">Bucket index that must not be returned.</param>
+    /// <returns>Strongest bucket index, or -1 when no valid bucket exists.</returns>
+    private static int ResolveStrongestPaletteBucket(int[] paletteWeights, int bucketCount, int excludedIndex)
+    {
+        int strongestIndex = -1;
+        int strongestWeight = 0;
+
+        for (int bucketIndex = 0; bucketIndex < bucketCount; bucketIndex++)
+        {
+            if (bucketIndex == excludedIndex)
+                continue;
+
+            int bucketWeight = paletteWeights[bucketIndex];
+
+            if (bucketWeight <= strongestWeight)
+                continue;
+
+            strongestIndex = bucketIndex;
+            strongestWeight = bucketWeight;
+        }
+
+        return strongestIndex;
+    }
+
+    /// <summary>
+    /// Finds the weakest palette bucket to replace when the compact accumulator is full.
+    /// </summary>
+    /// <param name="paletteWeights">Palette weights to inspect.</param>
+    /// <param name="bucketCount">Number of active buckets.</param>
+    /// <returns>Weakest bucket index, or -1 when no valid bucket exists.</returns>
+    private static int ResolveWeakestPaletteBucket(int[] paletteWeights, int bucketCount)
+    {
+        int weakestIndex = -1;
+        int weakestWeight = int.MaxValue;
+
+        for (int bucketIndex = 0; bucketIndex < bucketCount; bucketIndex++)
+        {
+            int bucketWeight = paletteWeights[bucketIndex];
+
+            if (bucketWeight >= weakestWeight)
+                continue;
+
+            weakestIndex = bucketIndex;
+            weakestWeight = bucketWeight;
+        }
+
+        return weakestIndex;
     }
 
     /// <summary>
@@ -161,6 +281,48 @@ public static class EnemyVisualColorSamplingUtility
     #endregion
 
     #region Renderer Sampling
+    /// <summary>
+    /// Appends all useful body colors exposed by one renderer into the dominant-color accumulator.
+    /// </summary>
+    /// <param name="renderer">Renderer inspected for visual color data.</param>
+    /// <param name="paletteColors">Mutable palette color buckets.</param>
+    /// <param name="paletteWeights">Mutable palette sample weights matching paletteColors.</param>
+    /// <param name="bucketCount">Current number of active palette buckets.</param>
+    /// <returns>True when the renderer contributed at least one color sample.</returns>
+    private static bool TryAppendRendererColors(Renderer renderer,
+                                                float4[] paletteColors,
+                                                int[] paletteWeights,
+                                                ref int bucketCount)
+    {
+        SpriteRenderer spriteRenderer = renderer as SpriteRenderer;
+
+        if (spriteRenderer != null)
+        {
+            AppendPaletteSample(paletteColors,
+                                paletteWeights,
+                                ref bucketCount,
+                                ToFloat4(spriteRenderer.color),
+                                1);
+            return true;
+        }
+
+        if (EnemyVisualMeshColorSamplingUtility.TryAppendMeshVisualColors(renderer,
+                                                                          paletteColors,
+                                                                          paletteWeights,
+                                                                          ref bucketCount))
+            return true;
+
+        if (!TryResolveRendererColor(renderer, out float4 rendererColor))
+            return false;
+
+        AppendPaletteSample(paletteColors,
+                            paletteWeights,
+                            ref bucketCount,
+                            rendererColor,
+                            1);
+        return true;
+    }
+
     /// <summary>
     /// Resolves one renderer color from SpriteRenderer tint, material textures, or material color properties.
     /// </summary>
@@ -236,6 +398,12 @@ public static class EnemyVisualColorSamplingUtility
         if (renderer == null)
             return false;
 
+        if (!renderer.enabled)
+            return false;
+
+        if (!renderer.gameObject.activeSelf)
+            return false;
+
         if (renderer is ParticleSystemRenderer || renderer is TrailRenderer || renderer is LineRenderer)
             return false;
 
@@ -279,9 +447,12 @@ public static class EnemyVisualColorSamplingUtility
     /// <param name="material">Material inspected for supported tint properties.</param>
     /// <param name="color">Resolved tint when a supported property exists.</param>
     /// <returns>True when a supported tint property exists.</returns>
-    private static bool TryResolveMaterialTint(Material material, out Color color)
+    internal static bool TryResolveMaterialTint(Material material, out Color color)
     {
         color = Color.white;
+
+        if (material == null)
+            return false;
 
         if (material.HasProperty(BaseColorPropertyId))
         {
@@ -305,21 +476,29 @@ public static class EnemyVisualColorSamplingUtility
     }
 
     /// <summary>
-    /// Resolves the average visible color of a readable material base texture.
+    /// Resolves the average visible color of a material base texture without requiring readable import settings.
     /// </summary>
     /// <param name="material">Material inspected for supported texture properties.</param>
     /// <param name="color">Average texture color when a readable texture is available.</param>
-    /// <returns>True when a readable texture was sampled.</returns>
+    /// <returns>True when a texture was sampled.</returns>
     private static bool TryResolveMaterialTextureAverage(Material material, out Color color)
     {
         color = Color.white;
         Texture texture = ResolveMaterialTexture(material);
-        Texture2D texture2D = texture as Texture2D;
 
-        if (texture2D == null || !texture2D.isReadable)
+        if (!EnemyVisualReadableTextureUtility.TryResolveReadableTexture(texture,
+                                                                         out Texture2D readableTexture,
+                                                                         out bool ownsReadableTexture))
             return false;
 
-        return TryAverageReadableTexture(texture2D, out color);
+        try
+        {
+            return TryAverageReadableTexture(readableTexture, out color);
+        }
+        finally
+        {
+            EnemyVisualReadableTextureUtility.ReleaseReadableTexture(readableTexture, ownsReadableTexture);
+        }
     }
 
     /// <summary>
@@ -327,7 +506,7 @@ public static class EnemyVisualColorSamplingUtility
     /// </summary>
     /// <param name="material">Material inspected for supported texture properties.</param>
     /// <returns>Texture assigned to the material, or null when none exists.</returns>
-    private static Texture ResolveMaterialTexture(Material material)
+    internal static Texture ResolveMaterialTexture(Material material)
     {
         if (material.HasProperty(BaseMapPropertyId))
             return material.GetTexture(BaseMapPropertyId);
@@ -391,7 +570,7 @@ public static class EnemyVisualColorSamplingUtility
     /// <param name="left">First color.</param>
     /// <param name="right">Second color.</param>
     /// <returns>Component-wise color product.</returns>
-    private static Color Multiply(Color left, Color right)
+    internal static Color Multiply(Color left, Color right)
     {
         return new Color(left.r * right.r,
                          left.g * right.g,
@@ -404,9 +583,19 @@ public static class EnemyVisualColorSamplingUtility
     /// </summary>
     /// <param name="color">Managed color value.</param>
     /// <returns>Float4 color with matching components.</returns>
-    private static float4 ToFloat4(Color color)
+    internal static float4 ToFloat4(Color color)
     {
         return new float4(color.r, color.g, color.b, color.a);
+    }
+
+    /// <summary>
+    /// Checks whether one sampled color is finite and visible enough to affect the debris palette.
+    /// </summary>
+    /// <param name="color">Candidate color sample.</param>
+    /// <returns>True when the sample is finite and visible.</returns>
+    private static bool IsVisibleFiniteColor(float4 color)
+    {
+        return math.all(math.isfinite(color)) && color.w > VisibleAlphaThreshold;
     }
 
     /// <summary>

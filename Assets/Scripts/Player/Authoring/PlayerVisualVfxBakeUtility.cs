@@ -76,7 +76,8 @@ public static class PlayerVisualVfxBakeUtility
             SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
             UniformScale = math.max(MinimumScale, visualPreset.ChargeShotVfxScaleMultiplier),
             LifetimeSeconds = ManagedVfxPrefabLifetimeUtility.ResolvePrefabLifetimeSeconds(prefab, DefaultChargeShotVfxLifetimeSeconds),
-            PlaybackMode = ResolveChargeShotPlaybackMode(visualPreset.ChargeShotVfxPlaybackMode)
+            PlaybackMode = ResolveChargeShotPlaybackMode(visualPreset.ChargeShotVfxPlaybackMode),
+            AppliesToAllHoldChargePowerUps = visualPreset.ChargeShotVfxAppliesToAllHoldChargePowerUps ? (byte)1 : (byte)0
         };
         return true;
     }

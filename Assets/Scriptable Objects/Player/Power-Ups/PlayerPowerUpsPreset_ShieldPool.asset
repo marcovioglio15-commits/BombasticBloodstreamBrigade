@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10910fec561694a45ad2b09a5ad9bbba, type: 3}
-  m_Name: PlayerPowerUpsPreset
+  m_Name: PlayerPowerUpsPreset_ShieldPool
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPowerUpsPreset
-  presetId: 780bde0072904df3a87793ed6799b56e
-  presetName: PlayerPowerUpsPreset
+  presetId: c802aa62d0bf4531a56d907b3c6ab522
+  presetName: PlayerPowerUpsPreset_ShieldPool
   description: 
   version: 1.0.0
   scalingRules:
@@ -24541,7 +24541,7 @@ MonoBehaviour:
             categoryId: 'OrbitalShield '
             motionMode: 1
             orbitDistance: 3
-            heightOffset: 1
+            heightOffset: 1.5
             angleOffsetDegrees: 0
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0

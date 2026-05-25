@@ -72,8 +72,14 @@ internal static class PlayerPowerUpContainerSpawnUtility
         commandBuffer.SetComponent(containerEntity, containerTransform);
         commandBuffer.AddComponent(containerEntity, new PlayerDroppedPowerUpContainerContent
         {
-            StoredPowerUp = storedPowerUp
+            StoredEnergy = storedPowerUp.StoredEnergy,
+            StoredCooldownRemaining = storedPowerUp.StoredCooldownRemaining,
+            HasStoredPowerUp = 1
         });
+        DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement> slotBuffer = commandBuffer.AddBuffer<PlayerDroppedPowerUpContainerSlotElement>(containerEntity);
+        slotBuffer.ResizeUninitialized(1);
+        ref PlayerDroppedPowerUpContainerSlotElement slotElement = ref slotBuffer.ElementAt(0);
+        slotElement.SlotConfig = storedPowerUp.SlotConfig;
         return true;
     }
     #endregion

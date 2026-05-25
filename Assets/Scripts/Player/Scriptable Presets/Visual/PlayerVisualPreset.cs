@@ -172,6 +172,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Controls whether Charge Shot VFX plays once near completion, loops while charging, or stretches one playback over the whole charge.")]
     [SerializeField] private PlayerChargeShotVfxPlaybackMode chargeShotVfxPlaybackMode = PlayerChargeShotVfxPlaybackMode.PlayOnceTimedWithChargeCompletion;
 
+    [Tooltip("When enabled, Charge Shot VFX is also displayed while any active power-up built from a hold-charge module is charging.")]
+    [SerializeField] private bool chargeShotVfxAppliesToAllHoldChargePowerUps;
+
     [Header("Scaling")]
     [Tooltip("Add Scaling rules applied to supported visual preset fields at bake time without mutating this asset.")]
     [SerializeField] private List<PlayerStatScalingRule> scalingRules = new List<PlayerStatScalingRule>();
@@ -409,6 +412,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return chargeShotVfxPlaybackMode;
+        }
+    }
+
+    public bool ChargeShotVfxAppliesToAllHoldChargePowerUps
+    {
+        get
+        {
+            return chargeShotVfxAppliesToAllHoldChargePowerUps;
         }
     }
 

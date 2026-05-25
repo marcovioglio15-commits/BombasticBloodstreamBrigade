@@ -13,6 +13,7 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
 {
     #region Constants
     private const float BaseProjectileHitRadius = 0.05f;
+    private const float BaseBombHitRadius = 0.18f;
     #endregion
 
     #region Methods
@@ -101,7 +102,7 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                     if (!IsOverlapping(projectionTransform.ValueRO.Position,
                                        instance.Config.CollisionRadius,
                                        bombTransform.ValueRO.Position,
-                                       math.max(0f, bomb.ValueRO.DamageRadius)))
+                                       ResolveBombHitRadius(in bomb.ValueRO, in bombTransform.ValueRO)))
                     {
                         continue;
                     }
@@ -152,6 +153,20 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
     #endregion
 
     #region Shared Helpers
+    /// <summary>
+    /// Resolves the physical Bombardier bomb body radius used for orbital interception.
+    /// </summary>
+    /// <param name="bomb">Bombardier bomb state carrying an authored collision radius when available.</param>
+    /// <param name="bombTransform">Current bomb transform used as compatibility fallback.</param>
+    /// <returns>Positive radius for body-level interception.</returns>
+    private static float ResolveBombHitRadius(in EnemyBombardierBomb bomb, in LocalTransform bombTransform)
+    {
+        if (bomb.CollisionRadius > 0f)
+            return bomb.CollisionRadius;
+
+        return BaseBombHitRadius * math.max(0.01f, bombTransform.Scale);
+    }
+
     /// <summary>
     /// Applies optional health loss to the projection after an interception.
     /// </summary>

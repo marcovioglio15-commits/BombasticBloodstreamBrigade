@@ -581,6 +581,17 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             RemainingSeconds = 0f,
             AppliedBlend = 0f
         });
+        Vector3 authoringPosition = authoring.transform.position;
+        Quaternion authoringRotation = authoring.transform.rotation;
+        AddComponent(entity, new PlayerAnimatedMuzzleWorldPose
+        {
+            Position = new float3(authoringPosition.x, authoringPosition.y, authoringPosition.z),
+            Rotation = new quaternion(authoringRotation.x, authoringRotation.y, authoringRotation.z, authoringRotation.w),
+            LocalPosition = float3.zero,
+            ForwardShotOffset = 0f,
+            MinimumPlanarDistanceFromPlayer = 0f,
+            IsValid = 0
+        });
         AddComponent(entity, PlayerLaserBeamVisualBakeUtility.BuildConfig(authoring));
         DynamicBuffer<PlayerLaserBeamSourceVariantElement> laserBeamSourceVariantBuffer = AddBuffer<PlayerLaserBeamSourceVariantElement>(entity);
         DynamicBuffer<PlayerLaserBeamImpactVariantElement> laserBeamImpactVariantBuffer = AddBuffer<PlayerLaserBeamImpactVariantElement>(entity);

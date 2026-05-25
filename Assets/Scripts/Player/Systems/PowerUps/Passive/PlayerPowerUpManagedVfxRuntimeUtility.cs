@@ -35,7 +35,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
 
-            if (!IsInstanceUsable(instance))
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
             {
                 RemoveActiveInstanceAt(instanceIndex);
                 continue;
@@ -87,10 +87,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     public static void DestroyAll()
     {
         for (int activeIndex = 0; activeIndex < activeInstances.Count; activeIndex++)
-            DestroyInstance(activeInstances[activeIndex]);
+            PlayerPowerUpManagedVfxInstanceUtility.DestroyInstance(activeInstances[activeIndex]);
 
         for (int pooledIndex = 0; pooledIndex < pooledInstances.Count; pooledIndex++)
-            DestroyInstance(pooledInstances[pooledIndex]);
+            PlayerPowerUpManagedVfxInstanceUtility.DestroyInstance(pooledInstances[pooledIndex]);
 
         activeInstances.Clear();
         pooledInstances.Clear();
@@ -187,7 +187,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             PlayerPowerUpManagedVfxInstance pooledInstance = pooledInstances[instanceIndex];
 
-            if (!IsInstanceUsable(pooledInstance))
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(pooledInstance))
             {
                 RemovePooledInstanceAt(instanceIndex);
                 continue;
@@ -200,147 +200,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             return pooledInstance;
         }
 
-        return CreateInstance(sourcePrefab);
-    }
-
-    /// <summary>
-    /// Instantiates one managed VFX object and caches presentation components used during reuse.
-    /// </summary>
-    /// <param name="sourcePrefab">Source prefab asset requested by gameplay.</param>
-    /// <returns>Created managed VFX instance, or null when the prefab cannot be instantiated.</returns>
-    private static PlayerPowerUpManagedVfxInstance CreateInstance(GameObject sourcePrefab)
-    {
-        if (sourcePrefab == null)
-            return null;
-
-        GameObject instanceObject = Object.Instantiate(sourcePrefab);
-
-        if (instanceObject == null)
-            return null;
-
-        ParticleSystem[] particleSystems = instanceObject.GetComponentsInChildren<ParticleSystem>(true);
-        TrailRenderer[] trailRenderers = instanceObject.GetComponentsInChildren<TrailRenderer>(true);
-
-        instanceObject.name = string.Format("{0}_PowerUpVfx", sourcePrefab.name);
-        return new PlayerPowerUpManagedVfxInstance
-        {
-            SourcePrefab = sourcePrefab,
-            InstanceObject = instanceObject,
-            InstanceTransform = instanceObject.transform,
-            RootBaseLocalScale = instanceObject.transform.localScale,
-            ParticleSystems = particleSystems,
-            TrailRenderers = trailRenderers,
-            ParticleSystemBaseSimulationSpeeds = BuildParticleSystemBaseSimulationSpeeds(particleSystems),
-            ParticleSystemBaseLooping = BuildParticleSystemBaseLooping(particleSystems),
-            ParticleSystemBaseStartColors = BuildParticleSystemBaseStartColors(particleSystems),
-            TrailRendererBaseWidths = BuildTrailRendererBaseWidths(trailRenderers),
-            TrailRendererBaseTimes = BuildTrailRendererBaseTimes(trailRenderers)
-        };
-    }
-
-    /// <summary>
-    /// Caches authored particle simulation speeds so pooled VFX can restore timing after charge-shot stretch requests.
-    /// </summary>
-    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
-    /// <returns>Simulation speeds matching the particle-system array order.</returns>
-    private static float[] BuildParticleSystemBaseSimulationSpeeds(ParticleSystem[] particleSystems)
-    {
-        if (particleSystems == null || particleSystems.Length <= 0)
-            return null;
-
-        float[] baseSimulationSpeeds = new float[particleSystems.Length];
-
-        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
-        {
-            ParticleSystem particleSystem = particleSystems[particleIndex];
-            baseSimulationSpeeds[particleIndex] = particleSystem != null ? particleSystem.main.simulationSpeed : 1f;
-        }
-
-        return baseSimulationSpeeds;
-    }
-
-    /// <summary>
-    /// Caches authored particle loop flags so forced-loop VFX requests do not leak into pooled reuse.
-    /// </summary>
-    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
-    /// <returns>Loop flags matching the particle-system array order.</returns>
-    private static bool[] BuildParticleSystemBaseLooping(ParticleSystem[] particleSystems)
-    {
-        if (particleSystems == null || particleSystems.Length <= 0)
-            return null;
-
-        bool[] baseLooping = new bool[particleSystems.Length];
-
-        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
-        {
-            ParticleSystem particleSystem = particleSystems[particleIndex];
-            baseLooping[particleIndex] = particleSystem != null && particleSystem.main.loop;
-        }
-
-        return baseLooping;
-    }
-
-    /// <summary>
-    /// Caches authored particle start colors so color override requests can be reset during pooled reuse.
-    /// </summary>
-    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
-    /// <returns>Start colors matching the particle-system array order.</returns>
-    private static ParticleSystem.MinMaxGradient[] BuildParticleSystemBaseStartColors(ParticleSystem[] particleSystems)
-    {
-        if (particleSystems == null || particleSystems.Length <= 0)
-            return null;
-
-        ParticleSystem.MinMaxGradient[] baseStartColors = new ParticleSystem.MinMaxGradient[particleSystems.Length];
-
-        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
-        {
-            ParticleSystem particleSystem = particleSystems[particleIndex];
-            baseStartColors[particleIndex] = particleSystem != null ? particleSystem.main.startColor : new ParticleSystem.MinMaxGradient(Color.white);
-        }
-
-        return baseStartColors;
-    }
-
-    /// <summary>
-    /// Caches authored trail widths so pooled VFX can be rescaled from stable prefab values.
-    /// </summary>
-    /// <param name="trailRenderers">Trail renderers collected from the spawned VFX instance.</param>
-    /// <returns>Width multipliers matching the renderer array order.</returns>
-    private static float[] BuildTrailRendererBaseWidths(TrailRenderer[] trailRenderers)
-    {
-        if (trailRenderers == null || trailRenderers.Length <= 0)
-            return null;
-
-        float[] baseWidths = new float[trailRenderers.Length];
-
-        for (int trailIndex = 0; trailIndex < trailRenderers.Length; trailIndex++)
-        {
-            TrailRenderer trailRenderer = trailRenderers[trailIndex];
-            baseWidths[trailIndex] = trailRenderer != null ? trailRenderer.widthMultiplier : 1f;
-        }
-
-        return baseWidths;
-    }
-
-    /// <summary>
-    /// Caches authored trail retention times so pooled VFX can restore source prefab history settings.
-    /// </summary>
-    /// <param name="trailRenderers">Trail renderers collected from the spawned VFX instance.</param>
-    /// <returns>Retention times matching the renderer array order.</returns>
-    private static float[] BuildTrailRendererBaseTimes(TrailRenderer[] trailRenderers)
-    {
-        if (trailRenderers == null || trailRenderers.Length <= 0)
-            return null;
-
-        float[] baseTimes = new float[trailRenderers.Length];
-
-        for (int trailIndex = 0; trailIndex < trailRenderers.Length; trailIndex++)
-        {
-            TrailRenderer trailRenderer = trailRenderers[trailIndex];
-            baseTimes[trailIndex] = trailRenderer != null ? trailRenderer.time : 0f;
-        }
-
-        return baseTimes;
+        return PlayerPowerUpManagedVfxInstanceUtility.CreateInstance(sourcePrefab);
     }
 
     /// <summary>
@@ -362,6 +222,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.HasFollowTarget = request.FollowTargetEntity != Entity.Null;
         instance.HasVelocity = !instance.HasFollowTarget && math.lengthsq(request.Velocity) > VelocityEpsilonSquared;
         instance.Position = request.Position;
+        instance.Rotation = request.Rotation;
+        instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
 
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTransform(instance,
                                                                   request.Position,
@@ -399,12 +261,24 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         if (instance.HasFollowTarget)
         {
             float3 targetPosition;
+            quaternion targetRotation;
 
-            if (!TryResolveFollowPosition(entityManager, instance, out targetPosition))
+            if (!TryResolveFollowPose(entityManager, instance, out targetPosition, out targetRotation))
                 return false;
 
-            instance.Position = targetPosition + instance.FollowPositionOffset;
-            PlayerPowerUpManagedVfxPresentationUtility.ApplyPosition(instance, instance.Position);
+            if (instance.FollowMuzzlePose)
+            {
+                instance.Position = targetPosition + math.rotate(targetRotation, instance.FollowPositionOffset);
+                instance.Rotation = targetRotation;
+                PlayerPowerUpManagedVfxPresentationUtility.ApplyPositionAndRotation(instance,
+                                                                                    instance.Position,
+                                                                                    instance.Rotation);
+            }
+            else
+            {
+                instance.Position = targetPosition + instance.FollowPositionOffset;
+                PlayerPowerUpManagedVfxPresentationUtility.ApplyPosition(instance, instance.Position);
+            }
         }
         else if (instance.HasVelocity)
         {
@@ -417,17 +291,20 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     }
 
     /// <summary>
-    /// Resolves and validates the current world position for a follow-target VFX instance.
+    /// Resolves and validates the current world pose for a follow-target VFX instance.
     /// </summary>
     /// <param name="entityManager">Entity manager used to inspect target entities.</param>
     /// <param name="instance">Managed VFX instance containing follow metadata.</param>
-    /// <param name="targetPosition">Current target position when the method succeeds.</param>
-    /// <returns>True when the target is alive and has a readable transform.</returns>
-    private static bool TryResolveFollowPosition(EntityManager entityManager,
-                                                 PlayerPowerUpManagedVfxInstance instance,
-                                                 out float3 targetPosition)
+    /// <param name="targetPosition">Current target or muzzle position when the method succeeds.</param>
+    /// <param name="targetRotation">Current target or muzzle rotation when the method succeeds.</param>
+    /// <returns>True when the target is alive and has a readable pose.</returns>
+    private static bool TryResolveFollowPose(EntityManager entityManager,
+                                             PlayerPowerUpManagedVfxInstance instance,
+                                             out float3 targetPosition,
+                                             out quaternion targetRotation)
     {
         targetPosition = float3.zero;
+        targetRotation = quaternion.identity;
 
         if (!IsEntityUsable(entityManager, instance.FollowTargetEntity))
             return false;
@@ -435,10 +312,17 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         if (!IsValidationTargetAlive(entityManager, instance))
             return false;
 
+        if (instance.FollowMuzzlePose && TryResolveMuzzlePose(entityManager,
+                                                              instance.FollowTargetEntity,
+                                                              out targetPosition,
+                                                              out targetRotation))
+            return true;
+
         if (entityManager.HasComponent<LocalToWorld>(instance.FollowTargetEntity))
         {
             LocalToWorld localToWorld = entityManager.GetComponentData<LocalToWorld>(instance.FollowTargetEntity);
-            targetPosition = localToWorld.Position;
+            targetPosition = localToWorld.Value.c3.xyz;
+            targetRotation = quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz);
             return true;
         }
 
@@ -446,7 +330,63 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(instance.FollowTargetEntity);
             targetPosition = localTransform.Position;
+            targetRotation = localTransform.Rotation;
             return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves the latest baked weapon muzzle pose for a player-following managed VFX, with animated pose used only as fallback.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect player and muzzle entities.</param>
+    /// <param name="playerEntity">Player entity followed by the managed VFX.</param>
+    /// <param name="position">Resolved muzzle position.</param>
+    /// <param name="rotation">Resolved muzzle rotation.</param>
+    /// <returns>True when a readable baked or fallback animated muzzle pose exists.</returns>
+    private static bool TryResolveMuzzlePose(EntityManager entityManager,
+                                             Entity playerEntity,
+                                             out float3 position,
+                                             out quaternion rotation)
+    {
+        position = float3.zero;
+        rotation = quaternion.identity;
+
+        if (entityManager.HasComponent<ShooterMuzzleAnchor>(playerEntity))
+        {
+            Entity muzzleEntity = entityManager.GetComponentData<ShooterMuzzleAnchor>(playerEntity).AnchorEntity;
+
+            if (IsEntityUsable(entityManager, muzzleEntity))
+            {
+                if (entityManager.HasComponent<LocalToWorld>(muzzleEntity))
+                {
+                    LocalToWorld localToWorld = entityManager.GetComponentData<LocalToWorld>(muzzleEntity);
+                    position = localToWorld.Value.c3.xyz;
+                    rotation = quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz);
+                    return true;
+                }
+
+                if (entityManager.HasComponent<LocalTransform>(muzzleEntity))
+                {
+                    LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(muzzleEntity);
+                    position = localTransform.Position;
+                    rotation = localTransform.Rotation;
+                    return true;
+                }
+            }
+        }
+
+        if (entityManager.HasComponent<PlayerAnimatedMuzzleWorldPose>(playerEntity))
+        {
+            PlayerAnimatedMuzzleWorldPose muzzlePose = entityManager.GetComponentData<PlayerAnimatedMuzzleWorldPose>(playerEntity);
+
+            if (muzzlePose.IsValid != 0)
+            {
+                position = muzzlePose.Position;
+                rotation = muzzlePose.Rotation;
+                return true;
+            }
         }
 
         return false;
@@ -505,7 +445,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
 
-            if (!IsInstanceUsable(instance))
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
                 continue;
 
             if (!instance.HasFollowTarget)
@@ -547,7 +487,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
 
-            if (!IsInstanceUsable(instance))
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
                 continue;
 
             if (instance.HasFollowTarget)
@@ -590,7 +530,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         {
             PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
 
-            if (!IsInstanceUsable(instance))
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
                 continue;
 
             if (instance.RefreshKey != request.RefreshKey)
@@ -629,6 +569,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.Velocity = request.Velocity;
         instance.HasFollowTarget = request.FollowTargetEntity != Entity.Null;
         instance.HasVelocity = !instance.HasFollowTarget && math.lengthsq(request.Velocity) > VelocityEpsilonSquared;
+        instance.Position = request.Position;
+        instance.Rotation = request.Rotation;
+        instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
 
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTrailRendererSettings(instance,
                                                                                math.max(MinimumScale, request.UniformScale),
@@ -692,7 +635,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     /// <param name="instance">Managed VFX instance being released.</param>
     private static void ReleaseInstance(PlayerPowerUpManagedVfxInstance instance)
     {
-        if (!IsInstanceUsable(instance))
+        if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
             return;
 
         PlayerPowerUpManagedVfxPresentationUtility.StopVisualPlayback(instance);
@@ -700,51 +643,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         if (instance.InstanceObject.activeSelf)
             instance.InstanceObject.SetActive(false);
 
-        ResetRuntimeState(instance);
+        PlayerPowerUpManagedVfxInstanceUtility.ResetRuntimeState(instance);
         pooledInstances.Add(instance);
     }
 
-    /// <summary>
-    /// Clears runtime-only metadata before a managed VFX instance is pooled.
-    /// </summary>
-    /// <param name="instance">Managed VFX instance being reset.</param>
-    private static void ResetRuntimeState(PlayerPowerUpManagedVfxInstance instance)
-    {
-        instance.PrefabEntity = Entity.Null;
-        instance.RefreshKey = 0;
-        instance.RemainingSeconds = 0f;
-        instance.FollowTargetEntity = Entity.Null;
-        instance.FollowPositionOffset = float3.zero;
-        instance.FollowValidationEntity = Entity.Null;
-        instance.FollowValidationSpawnVersion = 0u;
-        instance.Velocity = float3.zero;
-        instance.Position = float3.zero;
-        instance.HasFollowTarget = false;
-        instance.HasVelocity = false;
-    }
-
-    /// <summary>
-    /// Destroys one managed VFX GameObject and clears cached component references.
-    /// </summary>
-    /// <param name="instance">Managed VFX instance being destroyed.</param>
-    private static void DestroyInstance(PlayerPowerUpManagedVfxInstance instance)
-    {
-        if (instance == null)
-            return;
-
-        if (instance.InstanceObject != null)
-            Object.Destroy(instance.InstanceObject);
-
-        instance.SourcePrefab = null;
-        instance.InstanceObject = null;
-        instance.InstanceTransform = null;
-        instance.ParticleSystems = null;
-        instance.TrailRenderers = null;
-        instance.ParticleSystemBaseSimulationSpeeds = null;
-        instance.ParticleSystemBaseLooping = null;
-        instance.ParticleSystemBaseStartColors = null;
-        ResetRuntimeState(instance);
-    }
     #endregion
 
     #region Collection Helpers
@@ -772,25 +674,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #endregion
 
     #region Validation
-    /// <summary>
-    /// Checks whether a managed VFX instance still has a live GameObject and transform.
-    /// </summary>
-    /// <param name="instance">Managed VFX instance to validate.</param>
-    /// <returns>True when the instance can be updated or pooled.</returns>
-    private static bool IsInstanceUsable(PlayerPowerUpManagedVfxInstance instance)
-    {
-        if (instance == null)
-            return false;
-
-        if (instance.InstanceObject == null)
-            return false;
-
-        if (instance.InstanceTransform == null)
-            return false;
-
-        return true;
-    }
-
     /// <summary>
     /// Checks whether an entity can safely be inspected through EntityManager.
     /// </summary>

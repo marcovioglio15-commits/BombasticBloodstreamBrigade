@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -7,11 +8,13 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpActivationSystem))]
+[UpdateAfter(typeof(PlayerMuzzlePoseSyncSystem))]
 public partial struct PlayerChargeShotVfxSystem : ISystem
 {
     #region Constants
     private const float MinimumLifetimeSeconds = 0.05f;
     private const float LoopRefreshLifetimeSeconds = 0.18f;
+    private static readonly FixedString64Bytes DefaultChargeShotPowerUpId = new FixedString64Bytes("ActiveChargeShot");
     #endregion
 
     #region Methods
@@ -36,6 +39,11 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        ComponentLookup<PlayerAnimatedMuzzleWorldPose> animatedMuzzlePoseLookup = SystemAPI.GetComponentLookup<PlayerAnimatedMuzzleWorldPose>(true);
+        ComponentLookup<ShooterMuzzleAnchor> shooterMuzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
+        ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+
         foreach ((RefRO<PlayerChargeShotVfxConfig> chargeShotVfxConfig,
                   RefRW<PlayerChargeShotVfxRuntimeState> chargeShotVfxState,
                   DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
@@ -60,6 +68,14 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                                                    out powerUpsConfig);
             PlayerPowerUpsState powerUpsStateValue = powerUpsState.ValueRO;
             PlayerChargeShotVfxRuntimeState runtimeState = chargeShotVfxState.ValueRO;
+            ResolveChargeVfxPose(playerEntity,
+                                 in localTransform.ValueRO,
+                                 in animatedMuzzlePoseLookup,
+                                 in shooterMuzzleLookup,
+                                 in localToWorldLookup,
+                                 in localTransformLookup,
+                                 out float3 spawnReferencePosition,
+                                 out quaternion spawnReferenceRotation);
 
             ProcessSlot(playerEntity,
                         0,
@@ -67,7 +83,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                         in powerUpsConfig.PrimarySlot,
                         powerUpsStateValue.PrimaryIsCharging,
                         powerUpsStateValue.PrimaryCharge,
-                        localTransform.ValueRO.Position,
+                        spawnReferencePosition,
+                        spawnReferenceRotation,
                         vfxRequests,
                         ref runtimeState.PrimaryWasCharging,
                         ref runtimeState.PrimaryTimedVfxSpawned,
@@ -78,7 +95,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                         in powerUpsConfig.SecondarySlot,
                         powerUpsStateValue.SecondaryIsCharging,
                         powerUpsStateValue.SecondaryCharge,
-                        localTransform.ValueRO.Position,
+                        spawnReferencePosition,
+                        spawnReferenceRotation,
                         vfxRequests,
                         ref runtimeState.SecondaryWasCharging,
                         ref runtimeState.SecondaryTimedVfxSpawned,
@@ -99,7 +117,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
     /// <param name="slotConfig">Active slot config being inspected.</param>
     /// <param name="isCharging">Current runtime charging flag for the slot.</param>
     /// <param name="currentCharge">Current accumulated charge value for the slot.</param>
-    /// <param name="playerPosition">Current player world position.</param>
+    /// <param name="spawnReferencePosition">Current muzzle or player fallback world position.</param>
+    /// <param name="spawnReferenceRotation">Current muzzle or player fallback world rotation.</param>
     /// <param name="vfxRequests">Managed VFX request buffer receiving queued effects.</param>
     /// <param name="wasCharging">Previous-frame charging flag for this slot.</param>
     /// <param name="timedVfxSpawned">One-shot guard for timed-completion playback.</param>
@@ -110,13 +129,14 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                                     in PlayerPowerUpSlotConfig slotConfig,
                                     byte isCharging,
                                     float currentCharge,
-                                    float3 playerPosition,
+                                    float3 spawnReferencePosition,
+                                    quaternion spawnReferenceRotation,
                                     DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests,
                                     ref byte wasCharging,
                                     ref byte timedVfxSpawned,
                                     ref byte stretchVfxSpawned)
     {
-        if (slotConfig.IsDefined == 0 || slotConfig.ToolKind != ActiveToolKind.ChargeShot)
+        if (!CanDisplayForSlot(in vfxConfig, in slotConfig))
         {
             ResetSlotState(ref wasCharging, ref timedVfxSpawned, ref stretchVfxSpawned);
             return;
@@ -138,7 +158,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                 EnqueueChargeShotVfx(playerEntity,
                                      slotIndex,
                                      in vfxConfig,
-                                     playerPosition,
+                                     spawnReferencePosition,
+                                     spawnReferenceRotation,
                                      LoopRefreshLifetimeSeconds,
                                      1f,
                                      true,
@@ -151,7 +172,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                     EnqueueChargeShotVfx(playerEntity,
                                          slotIndex,
                                          in vfxConfig,
-                                         playerPosition,
+                                         spawnReferencePosition,
+                                         spawnReferenceRotation,
                                          math.max(MinimumLifetimeSeconds, fullChargeSeconds),
                                          ResolveStretchSimulationMultiplier(vfxConfig.LifetimeSeconds, fullChargeSeconds),
                                          false,
@@ -167,7 +189,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
                     EnqueueChargeShotVfx(playerEntity,
                                          slotIndex,
                                          in vfxConfig,
-                                         playerPosition,
+                                         spawnReferencePosition,
+                                         spawnReferenceRotation,
                                          vfxConfig.LifetimeSeconds,
                                          1f,
                                          false,
@@ -180,6 +203,24 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
         }
 
         wasCharging = 1;
+    }
+
+    /// <summary>
+    /// Resolves whether the visual-preset charge VFX should be shown for one charging active slot.
+    /// </summary>
+    /// <param name="vfxConfig">Visual-preset charge VFX config.</param>
+    /// <param name="slotConfig">Active slot config being inspected.</param>
+    /// <returns>True when this slot is allowed to display the charge VFX.</returns>
+    private static bool CanDisplayForSlot(in PlayerChargeShotVfxConfig vfxConfig,
+                                          in PlayerPowerUpSlotConfig slotConfig)
+    {
+        if (slotConfig.IsDefined == 0 || slotConfig.ToolKind != ActiveToolKind.ChargeShot)
+            return false;
+
+        if (vfxConfig.AppliesToAllHoldChargePowerUps != 0)
+            return true;
+
+        return slotConfig.PowerUpId == DefaultChargeShotPowerUpId;
     }
 
     /// <summary>
@@ -205,7 +246,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
     /// <param name="playerEntity">Player entity followed by the VFX.</param>
     /// <param name="slotIndex">Slot index used for optional keyed refresh.</param>
     /// <param name="vfxConfig">Visual-preset VFX configuration.</param>
-    /// <param name="playerPosition">Current player world position.</param>
+    /// <param name="spawnReferencePosition">Current muzzle or player fallback world position.</param>
+    /// <param name="spawnReferenceRotation">Current muzzle or player fallback world rotation.</param>
     /// <param name="lifetimeSeconds">Request lifetime used by the managed VFX pool.</param>
     /// <param name="simulationSpeedMultiplier">Particle simulation speed multiplier for stretched playback.</param>
     /// <param name="forceLooping">True when particle systems should loop for this request.</param>
@@ -214,7 +256,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
     private static void EnqueueChargeShotVfx(Entity playerEntity,
                                              int slotIndex,
                                              in PlayerChargeShotVfxConfig vfxConfig,
-                                             float3 playerPosition,
+                                             float3 spawnReferencePosition,
+                                             quaternion spawnReferenceRotation,
                                              float lifetimeSeconds,
                                              float simulationSpeedMultiplier,
                                              bool forceLooping,
@@ -225,8 +268,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
         {
             PrefabEntity = vfxConfig.PrefabEntity,
             SourcePrefab = vfxConfig.SourcePrefab,
-            Position = playerPosition + vfxConfig.SpawnOffset,
-            Rotation = quaternion.identity,
+            Position = spawnReferencePosition + math.rotate(spawnReferenceRotation, vfxConfig.SpawnOffset),
+            Rotation = spawnReferenceRotation,
             UniformScale = math.max(0.01f, vfxConfig.UniformScale),
             ParticleSimulationSpeedMultiplier = math.max(0.01f, simulationSpeedMultiplier),
             LifetimeSeconds = math.max(MinimumLifetimeSeconds, lifetimeSeconds),
@@ -236,7 +279,8 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
             FollowValidationSpawnVersion = 0u,
             Velocity = float3.zero,
             RefreshKey = useRefreshKey ? ResolveRefreshKey(playerEntity, slotIndex) : 0,
-            ForceLooping = forceLooping ? (byte)1 : (byte)0
+            ForceLooping = forceLooping ? (byte)1 : (byte)0,
+            FollowMuzzlePose = 1
         });
     }
 
@@ -250,6 +294,65 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
     {
         int refreshKey = 1000003 + playerEntity.Index * 397 + playerEntity.Version * 31 + slotIndex;
         return refreshKey != 0 ? refreshKey : 1000003 + slotIndex;
+    }
+    #endregion
+
+    #region Pose
+    /// <summary>
+    /// Resolves the current baked shooter muzzle pose used for spawning the charge VFX, falling back to animated pose and then player transform.
+    /// </summary>
+    /// <param name="playerEntity">Player entity owning the charge VFX.</param>
+    /// <param name="playerTransform">Current player transform used as the final fallback pose.</param>
+    /// <param name="animatedMuzzlePoseLookup">Lookup for the managed visual muzzle pose bridge used only when no baked anchor exists.</param>
+    /// <param name="shooterMuzzleLookup">Lookup for baked weapon muzzle anchors shared with projectile spawning.</param>
+    /// <param name="localToWorldLookup">Lookup for current world transforms.</param>
+    /// <param name="localTransformLookup">Lookup for local transform fallback data.</param>
+    /// <param name="position">Resolved muzzle or player world position.</param>
+    /// <param name="rotation">Resolved muzzle or player world rotation.</param>
+    private static void ResolveChargeVfxPose(Entity playerEntity,
+                                             in LocalTransform playerTransform,
+                                             in ComponentLookup<PlayerAnimatedMuzzleWorldPose> animatedMuzzlePoseLookup,
+                                             in ComponentLookup<ShooterMuzzleAnchor> shooterMuzzleLookup,
+                                             in ComponentLookup<LocalToWorld> localToWorldLookup,
+                                             in ComponentLookup<LocalTransform> localTransformLookup,
+                                             out float3 position,
+                                             out quaternion rotation)
+    {
+        if (shooterMuzzleLookup.HasComponent(playerEntity))
+        {
+            Entity muzzleEntity = shooterMuzzleLookup[playerEntity].AnchorEntity;
+
+            if (localToWorldLookup.HasComponent(muzzleEntity))
+            {
+                LocalToWorld localToWorld = localToWorldLookup[muzzleEntity];
+                position = localToWorld.Value.c3.xyz;
+                rotation = quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz);
+                return;
+            }
+
+            if (localTransformLookup.HasComponent(muzzleEntity))
+            {
+                LocalTransform muzzleTransform = localTransformLookup[muzzleEntity];
+                position = muzzleTransform.Position;
+                rotation = muzzleTransform.Rotation;
+                return;
+            }
+        }
+
+        if (animatedMuzzlePoseLookup.HasComponent(playerEntity))
+        {
+            PlayerAnimatedMuzzleWorldPose muzzlePose = animatedMuzzlePoseLookup[playerEntity];
+
+            if (muzzlePose.IsValid != 0)
+            {
+                position = muzzlePose.Position;
+                rotation = muzzlePose.Rotation;
+                return;
+            }
+        }
+
+        position = playerTransform.Position;
+        rotation = playerTransform.Rotation;
     }
     #endregion
 

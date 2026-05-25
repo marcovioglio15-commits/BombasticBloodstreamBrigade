@@ -370,9 +370,7 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
 
-        if (runtime.OriginalPassiveBufferIndex >= 0 &&
-            !EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(runtime.PowerUpId, equippedPassiveTools) &&
-            runtime.PowerUpId.Length > 0)
+        if (ShouldRestorePassiveBufferEntry(in runtime))
         {
             InsertPassiveAtRestoredIndex(equippedPassiveTools,
                                          runtime.OriginalPassiveBufferIndex,
@@ -405,6 +403,19 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
         PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
                                                                       ref passiveToolsState);
         return true;
+    }
+
+    /// <summary>
+    /// Resolves whether the stolen passive payload represented an equipped buffer entry that must be reinserted.
+    /// </summary>
+    /// <param name="runtime">Stealer runtime holding the passive payload.</param>
+    /// <returns>True when the stolen passive was removed from the equipped-passive buffer.</returns>
+    private static bool ShouldRestorePassiveBufferEntry(in EnemyPowerUpStealerRuntimeElement runtime)
+    {
+        if (runtime.OriginalPassiveBufferIndex < 0)
+            return false;
+
+        return runtime.PowerUpId.Length > 0;
     }
 
     /// <summary>

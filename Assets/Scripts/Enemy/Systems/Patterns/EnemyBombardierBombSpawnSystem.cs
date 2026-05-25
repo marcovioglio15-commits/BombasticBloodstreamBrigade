@@ -17,6 +17,7 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
     private const float MinimumFlightDurationSeconds = 0.05f;
     private const float MinimumGravity = 0.01f;
     private const float MinimumBombScale = 0.0001f;
+    private const float BaseBombCollisionRadius = 0.18f;
     #endregion
 
     #region Methods
@@ -113,11 +114,15 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
             ExplosionDelayElapsedSeconds = 0f,
             Damage = math.max(0f, request.Damage),
             DamageRadius = math.max(0f, request.DamageRadius),
+            CollisionRadius = ResolveBombCollisionRadius(request.BombScaleMultiplier),
             ScaleExplosionVfxToDamageRadius = bombPrefab.ScaleExplosionVfxToDamageRadius,
             ExplosionVfxScaleMultiplier = math.max(0.01f, bombPrefab.ExplosionVfxScaleMultiplier),
             HasImpacted = 0,
             HasExploded = 0,
-            WarningFadeOutEndTime = elapsedTime + trajectory.FlightDurationSeconds + math.max(0f, request.WarningFadeOutSeconds)
+            WarningFadeOutEndTime = elapsedTime +
+                                    trajectory.FlightDurationSeconds +
+                                    math.max(0f, request.ImpactExplosionDelaySeconds) +
+                                    math.max(0f, request.WarningFadeOutSeconds)
         };
 
         if (entityManager.HasComponent<LocalTransform>(prefabEntity))
@@ -208,6 +213,16 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
     #endregion
 
     #region Trajectory
+    /// <summary>
+    /// Resolves the physical bomb interception radius from the authored visual scale.
+    /// </summary>
+    /// <param name="bombScaleMultiplier">Authored uniform bomb scale multiplier.</param>
+    /// <returns>Positive bomb body radius used by orbital projection interception.</returns>
+    private static float ResolveBombCollisionRadius(float bombScaleMultiplier)
+    {
+        return BaseBombCollisionRadius * math.max(0.01f, bombScaleMultiplier);
+    }
+
     /// <summary>
     /// Solves initial velocity, gravity and duration for one Bombardier trajectory request.
     /// </summary>

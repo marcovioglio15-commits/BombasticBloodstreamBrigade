@@ -453,11 +453,9 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <param name="containerEntity">Dropped container currently shown by the overlay.</param>
     private void UpdateOverlayContent(Entity containerEntity)
     {
-        if (!entityManager.Exists(containerEntity) || !entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity))
+        if (!PlayerDroppedPowerUpContainerPayloadUtility.TryResolvePowerUpId(entityManager, containerEntity, out string powerUpId))
             return;
 
-        PlayerDroppedPowerUpContainerContent containerContent = entityManager.GetComponentData<PlayerDroppedPowerUpContainerContent>(containerEntity);
-        string powerUpId = containerContent.StoredPowerUp.SlotConfig.PowerUpId.ToString();
         string title = PlayerPowerUpPresentationRuntime.ResolveDisplayName(powerUpId, powerUpId);
         string description = string.Empty;
 
@@ -665,14 +663,7 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// <returns>True when the container can still be interacted with; otherwise false.</returns>
     private bool IsContainerUsable(Entity containerEntity)
     {
-        if (containerEntity == Entity.Null || !entityManager.Exists(containerEntity))
-            return false;
-
-        if (!entityManager.HasComponent<PlayerDroppedPowerUpContainerContent>(containerEntity))
-            return false;
-
-        PlayerDroppedPowerUpContainerContent containerContent = entityManager.GetComponentData<PlayerDroppedPowerUpContainerContent>(containerEntity);
-        return containerContent.StoredPowerUp.SlotConfig.IsDefined != 0;
+        return PlayerDroppedPowerUpContainerPayloadUtility.IsContainerUsable(entityManager, containerEntity);
     }
 
     /// <summary>

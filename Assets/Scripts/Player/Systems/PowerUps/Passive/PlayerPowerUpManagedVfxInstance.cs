@@ -17,6 +17,8 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public float[] ParticleSystemBaseSimulationSpeeds;
     public bool[] ParticleSystemBaseLooping;
     public ParticleSystem.MinMaxGradient[] ParticleSystemBaseStartColors;
+    public bool[] ParticleSystemBaseColorOverLifetimeEnabled;
+    public ParticleSystem.MinMaxGradient[] ParticleSystemBaseColorOverLifetimeColors;
     public float[] TrailRendererBaseWidths;
     public float[] TrailRendererBaseTimes;
     public Entity PrefabEntity;
@@ -28,7 +30,9 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public uint FollowValidationSpawnVersion;
     public float3 Velocity;
     public float3 Position;
+    public quaternion Rotation;
     public bool HasFollowTarget;
     public bool HasVelocity;
+    public bool FollowMuzzlePose;
     #endregion
 }
