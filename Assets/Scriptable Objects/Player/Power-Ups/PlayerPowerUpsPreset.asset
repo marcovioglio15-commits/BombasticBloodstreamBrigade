@@ -5941,7 +5941,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: Active_Shotgun
       displayName: Shotgun!
-      description: Fires a cone spread of projectiles.
+      description: Fires a cone spread of projectiles with the same properties of
+        the base weapon.
       icon: {fileID: 21300000, guid: a7690da87adf5cf41a658e2a35bcfe59, type: 3}
       dropPools:
       - Milestone
@@ -6887,7 +6888,7 @@ MonoBehaviour:
           scaleVfxToRadius: 1
           vfxScaleMultiplier: 1
         dash:
-          distance: 3
+          distance: 2
           directionMode: 3
           duration: 0.2
           speedTransitionInSeconds: 0.06
@@ -7300,7 +7301,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: ActiveChargeShot
       displayName: Charge Shot
-      description: Builds and releases a charged empowered shot.
+      description: Allows to freely fire charged empowered shots with the same properties
+        of the base weapon.
       icon: {fileID: 21300000, guid: bd1a9df158626b746933d61fd6845978, type: 3}
       dropPools:
       - Milestone
@@ -10025,7 +10027,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: ActiveGigaBomb
       displayName: Giga Bomb
-      description: Deploys a high-damage area bomb.
+      description: Deploys a high-damage bomb that covers a wide area.
       icon: {fileID: 21300000, guid: 59397376f02040a489e6bbe91154ba70, type: 3}
       dropPools:
       - Milestone
@@ -10845,7 +10847,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: ActiveBasicDash
       displayName: Basic Dash
-      description: Quick reposition dash with optional i-frames.
+      description: Repositions quickly by dashing in the direction of movement, allowing
+        to avoid damage.
       icon: {fileID: 21300000, guid: d85ac5183a685094f8e9b517d3ac719c, type: 3}
       dropPools:
       - Milestone
@@ -11665,7 +11668,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: ActivePortableHealthPack
       displayName: Portable Health Pack
-      description: Instant heal with an energy cost.
+      description: Instantly recovers a small portion of Health.
       icon: {fileID: 21300000, guid: 0a1ad6fe770c83245bbca4b35e85af23, type: 3}
       dropPools:
       - Milestone
@@ -12485,7 +12488,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: ActiveBulletTime
       displayName: Bullet Time
-      description: Slows enemies for a tactical time window.
+      description: Slows all enemies and their projectiles while active.
       icon: {fileID: 21300000, guid: 6590c898a53490d4e9d34c8f9b70bcec, type: 3}
       dropPools:
       - Milestone
@@ -13305,7 +13308,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: Active_DamageBoost
       displayName: Damage Boost
-      description: Increases Damage while active.
+      description: Increases the Damage parameter while active.
       icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
       dropPools: []
       dropTier: 1
@@ -14120,1125 +14123,12 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  - commonData:
-      powerUpId: ActivePowerUp_OrbitalProjection
-      displayName: Orbital Projections
-      description: 
-      icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
-      dropPools:
-      - Milestone
-      dropTier: 1
-      purchaseCost: 0
-    moduleBindings:
-    - bindingId: f246c556356e4c538aa9114f50cd819f
-      moduleId: Module_OrbitalProjections
-      stage: 7
-      isEnabled: 1
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 0
-          maximumCharge: 0
-          chargeRatePerSecond: 0
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 0
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 0
-          laserDurationSeconds: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0
-          chargedLaserBeam:
-            damageMultiplier: 0
-            continuousDamagePerSecondMultiplier: 0
-            virtualProjectileSpeedMultiplier: 0
-            damageTickIntervalSeconds: 0
-            maximumContinuousActiveSeconds: 0
-            cooldownSeconds: 0
-            maximumBounceSegments: 0
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 0
-            firingRotationSpeedMultiplier: 0
-            visualPresetId: 0
-            bodyProfile: 0
-            sourceShape: 0
-            terminalCapShape: 0
-            bodyWidthMultiplier: 0
-            collisionWidthMultiplier: 0
-            sourceScaleMultiplier: 0
-            terminalCapScaleMultiplier: 0
-            contactFlareScaleMultiplier: 0
-            bodyOpacity: 0
-            coreWidthMultiplier: 0
-            coreBrightness: 0
-            rimBrightness: 0
-            flowScrollSpeed: 0
-            flowPulseFrequency: 0
-            stormTwistSpeed: 0
-            stormTickPostTravelHoldSeconds: 0
-            stormIdleIntensity: 0
-            stormBurstIntensity: 0
-            sourceOffset: 0
-            sourceDischargeIntensity: 0
-            stormShellWidthMultiplier: 0
-            stormShellSeparation: 0
-            stormRingFrequency: 0
-            stormRingThickness: 0
-            stormTickTravelSpeed: 0
-            stormTickDamageLengthTolerance: 0
-            terminalCapIntensity: 0
-            contactFlareIntensity: 0
-            wobbleAmplitude: 0
-            bubbleDriftSpeed: 0
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 0
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        resourceGate:
-          activationResource: 0
-          maintenanceResource: 0
-          maximumEnergy: 0
-          activationCost: 0
-          maintenanceCostPerSecond: 0
-          isToggleable: 0
-          maintenanceTicksPerSecond: 0
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 0
-          cooldownSeconds: 0
-          allowRechargeDuringToggleStartupLock: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas: []
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 0
-          directionMode: 0
-          duration: 0
-          speedTransitionInSeconds: 0
-          speedTransitionOutSeconds: 0
-          wallBounceIntensity: 0
-          grantsInvulnerability: 0
-          invulnerabilityExtraTime: 0
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          transitionTimeSeconds: 0
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 5
-          spawnAnimationSeconds: 0.25
-          despawnAnimationSeconds: 0.2
-          projections:
-          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
-            displayName: Orbital Projection Shield
-            categoryId: Shield
-            motionMode: 1
-            orbitDistance: 2
-            heightOffset: 0
-            angleOffsetDegrees: 0
-            orbitSpeedDegreesPerSecond: 120
-            bounceInsideOrbitCone: 1
-            orbitConeCenterAngleDegrees: 0
-            orbitConeAngleDegrees: 90
-            fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0
-            collisionRadius: 1
-            damageEnemies: 0
-            contactDamage: 1
-            damageTickIntervalSeconds: 1
-            blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
-            hasHealth: 0
-            maximumHealth: 5
-            enemyContactHealthDamage: 0
-            projectileBlockHealthDamage: 1
-            bombBlockHealthDamage: 1
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    - bindingId: 1c0627b9214b4fd2bfa32c20af7d0cdb
-      moduleId: Module_GateResource
-      stage: 2
-      isEnabled: 1
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 0
-          maximumCharge: 0
-          chargeRatePerSecond: 0
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 0
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 0
-          laserDurationSeconds: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0
-          chargedLaserBeam:
-            damageMultiplier: 0
-            continuousDamagePerSecondMultiplier: 0
-            virtualProjectileSpeedMultiplier: 0
-            damageTickIntervalSeconds: 0
-            maximumContinuousActiveSeconds: 0
-            cooldownSeconds: 0
-            maximumBounceSegments: 0
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 0
-            firingRotationSpeedMultiplier: 0
-            visualPresetId: 0
-            bodyProfile: 0
-            sourceShape: 0
-            terminalCapShape: 0
-            bodyWidthMultiplier: 0
-            collisionWidthMultiplier: 0
-            sourceScaleMultiplier: 0
-            terminalCapScaleMultiplier: 0
-            contactFlareScaleMultiplier: 0
-            bodyOpacity: 0
-            coreWidthMultiplier: 0
-            coreBrightness: 0
-            rimBrightness: 0
-            flowScrollSpeed: 0
-            flowPulseFrequency: 0
-            stormTwistSpeed: 0
-            stormTickPostTravelHoldSeconds: 0
-            stormIdleIntensity: 0
-            stormBurstIntensity: 0
-            sourceOffset: 0
-            sourceDischargeIntensity: 0
-            stormShellWidthMultiplier: 0
-            stormShellSeparation: 0
-            stormRingFrequency: 0
-            stormRingThickness: 0
-            stormTickTravelSpeed: 0
-            stormTickDamageLengthTolerance: 0
-            terminalCapIntensity: 0
-            contactFlareIntensity: 0
-            wobbleAmplitude: 0
-            bubbleDriftSpeed: 0
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 0
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        resourceGate:
-          activationResource: 1
-          maintenanceResource: 0
-          maximumEnergy: 15
-          activationCost: 15
-          maintenanceCostPerSecond: 0
-          isToggleable: 0
-          maintenanceTicksPerSecond: 4
-          minimumActivationEnergyPercent: 100
-          chargeType: 1
-          chargePerTrigger: 1
-          cooldownSeconds: 3
-          allowRechargeDuringToggleStartupLock: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas: []
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 0
-          directionMode: 0
-          duration: 0
-          speedTransitionInSeconds: 0
-          speedTransitionOutSeconds: 0
-          wallBounceIntensity: 0
-          grantsInvulnerability: 0
-          invulnerabilityExtraTime: 0
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          transitionTimeSeconds: 0
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 5
-          spawnAnimationSeconds: 0.25
-          despawnAnimationSeconds: 0.2
-          projections:
-          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
-            displayName: Orbital Projection Shield
-            categoryId: Shield
-            motionMode: 1
-            orbitDistance: 3
-            heightOffset: 0.7
-            angleOffsetDegrees: 0
-            orbitSpeedDegreesPerSecond: 30
-            bounceInsideOrbitCone: 0
-            orbitConeCenterAngleDegrees: 0
-            orbitConeAngleDegrees: 90
-            fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0
-            collisionRadius: 1
-            damageEnemies: 1
-            contactDamage: 1
-            damageTickIntervalSeconds: 1
-            blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
-            hasHealth: 0
-            maximumHealth: 5
-            enemyContactHealthDamage: 0
-            projectileBlockHealthDamage: 1
-            bombBlockHealthDamage: 1
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    unreplaceable: 0
-  - commonData:
-      powerUpId: ActivePowerUp_OrbitalProjectionToggleable
-      displayName: OrbitalProjectionToggleable
-      description: 
-      icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
-      dropPools:
-      - Milestone
-      dropTier: 1
-      purchaseCost: 0
-    moduleBindings:
-    - bindingId: f246c556356e4c538aa9114f50cd819f
-      moduleId: Module_OrbitalProjections
-      stage: 7
-      isEnabled: 1
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 0
-          maximumCharge: 0
-          chargeRatePerSecond: 0
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 0
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 0
-          laserDurationSeconds: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0
-          chargedLaserBeam:
-            damageMultiplier: 0
-            continuousDamagePerSecondMultiplier: 0
-            virtualProjectileSpeedMultiplier: 0
-            damageTickIntervalSeconds: 0
-            maximumContinuousActiveSeconds: 0
-            cooldownSeconds: 0
-            maximumBounceSegments: 0
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 0
-            firingRotationSpeedMultiplier: 0
-            visualPresetId: 0
-            bodyProfile: 0
-            sourceShape: 0
-            terminalCapShape: 0
-            bodyWidthMultiplier: 0
-            collisionWidthMultiplier: 0
-            sourceScaleMultiplier: 0
-            terminalCapScaleMultiplier: 0
-            contactFlareScaleMultiplier: 0
-            bodyOpacity: 0
-            coreWidthMultiplier: 0
-            coreBrightness: 0
-            rimBrightness: 0
-            flowScrollSpeed: 0
-            flowPulseFrequency: 0
-            stormTwistSpeed: 0
-            stormTickPostTravelHoldSeconds: 0
-            stormIdleIntensity: 0
-            stormBurstIntensity: 0
-            sourceOffset: 0
-            sourceDischargeIntensity: 0
-            stormShellWidthMultiplier: 0
-            stormShellSeparation: 0
-            stormRingFrequency: 0
-            stormRingThickness: 0
-            stormTickTravelSpeed: 0
-            stormTickDamageLengthTolerance: 0
-            terminalCapIntensity: 0
-            contactFlareIntensity: 0
-            wobbleAmplitude: 0
-            bubbleDriftSpeed: 0
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 0
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        resourceGate:
-          activationResource: 0
-          maintenanceResource: 0
-          maximumEnergy: 0
-          activationCost: 0
-          maintenanceCostPerSecond: 0
-          isToggleable: 0
-          maintenanceTicksPerSecond: 0
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 0
-          cooldownSeconds: 0
-          allowRechargeDuringToggleStartupLock: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas: []
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 0
-          directionMode: 0
-          duration: 0
-          speedTransitionInSeconds: 0
-          speedTransitionOutSeconds: 0
-          wallBounceIntensity: 0
-          grantsInvulnerability: 0
-          invulnerabilityExtraTime: 0
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          transitionTimeSeconds: 0
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 5
-          spawnAnimationSeconds: 0.25
-          despawnAnimationSeconds: 0.2
-          projections:
-          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
-            displayName: Orbital Projection Shield
-            categoryId: Shield
-            motionMode: 1
-            orbitDistance: 2
-            heightOffset: 0
-            angleOffsetDegrees: 0
-            orbitSpeedDegreesPerSecond: 120
-            bounceInsideOrbitCone: 1
-            orbitConeCenterAngleDegrees: 0
-            orbitConeAngleDegrees: 90
-            fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0
-            collisionRadius: 0.5
-            damageEnemies: 0
-            contactDamage: 1
-            damageTickIntervalSeconds: 1
-            blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
-            hasHealth: 0
-            maximumHealth: 5
-            enemyContactHealthDamage: 0
-            projectileBlockHealthDamage: 1
-            bombBlockHealthDamage: 1
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    - bindingId: 1c0627b9214b4fd2bfa32c20af7d0cdb
-      moduleId: Module_GateResource
-      stage: 2
-      isEnabled: 1
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 0
-          maximumCharge: 0
-          chargeRatePerSecond: 0
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 0
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 0
-          laserDurationSeconds: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0
-          chargedLaserBeam:
-            damageMultiplier: 0
-            continuousDamagePerSecondMultiplier: 0
-            virtualProjectileSpeedMultiplier: 0
-            damageTickIntervalSeconds: 0
-            maximumContinuousActiveSeconds: 0
-            cooldownSeconds: 0
-            maximumBounceSegments: 0
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 0
-            firingRotationSpeedMultiplier: 0
-            visualPresetId: 0
-            bodyProfile: 0
-            sourceShape: 0
-            terminalCapShape: 0
-            bodyWidthMultiplier: 0
-            collisionWidthMultiplier: 0
-            sourceScaleMultiplier: 0
-            terminalCapScaleMultiplier: 0
-            contactFlareScaleMultiplier: 0
-            bodyOpacity: 0
-            coreWidthMultiplier: 0
-            coreBrightness: 0
-            rimBrightness: 0
-            flowScrollSpeed: 0
-            flowPulseFrequency: 0
-            stormTwistSpeed: 0
-            stormTickPostTravelHoldSeconds: 0
-            stormIdleIntensity: 0
-            stormBurstIntensity: 0
-            sourceOffset: 0
-            sourceDischargeIntensity: 0
-            stormShellWidthMultiplier: 0
-            stormShellSeparation: 0
-            stormRingFrequency: 0
-            stormRingThickness: 0
-            stormTickTravelSpeed: 0
-            stormTickDamageLengthTolerance: 0
-            terminalCapIntensity: 0
-            contactFlareIntensity: 0
-            wobbleAmplitude: 0
-            bubbleDriftSpeed: 0
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 0
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        resourceGate:
-          activationResource: 1
-          maintenanceResource: 1
-          maximumEnergy: 100
-          activationCost: 10
-          maintenanceCostPerSecond: 5
-          isToggleable: 1
-          maintenanceTicksPerSecond: 3
-          minimumActivationEnergyPercent: 50
-          chargeType: 1
-          chargePerTrigger: 1
-          cooldownSeconds: 3
-          allowRechargeDuringToggleStartupLock: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas: []
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 0
-          directionMode: 0
-          duration: 0
-          speedTransitionInSeconds: 0
-          speedTransitionOutSeconds: 0
-          wallBounceIntensity: 0
-          grantsInvulnerability: 0
-          invulnerabilityExtraTime: 0
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          transitionTimeSeconds: 0
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 5
-          spawnAnimationSeconds: 0.25
-          despawnAnimationSeconds: 0.2
-          projections:
-          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
-            displayName: Orbital Projection Shield
-            categoryId: Shield
-            motionMode: 1
-            orbitDistance: 3
-            heightOffset: 0.7
-            angleOffsetDegrees: 0
-            orbitSpeedDegreesPerSecond: 30
-            bounceInsideOrbitCone: 0
-            orbitConeCenterAngleDegrees: 0
-            orbitConeAngleDegrees: 90
-            fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0
-            collisionRadius: 1
-            damageEnemies: 1
-            contactDamage: 1
-            damageTickIntervalSeconds: 1
-            blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
-            hasHealth: 0
-            maximumHealth: 5
-            enemyContactHealthDamage: 0
-            projectileBlockHealthDamage: 1
-            bombBlockHealthDamage: 1
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    unreplaceable: 0
   passivePowerUps:
   - commonData:
       powerUpId: PassiveElementalTrail
       displayName: Elemental Trail
-      description: Leaves an elemental trail that applies area stacks.
+      description: Leaves a trail that applies damage over time to all enemies that
+        tread on it.
       icon: {fileID: 21300000, guid: 59397376f02040a489e6bbe91154ba70, type: 3}
       dropPools:
       - Milestone
@@ -15788,8 +14678,8 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: PassiveEnemiesExplodeOnDeath
-      displayName: Enemies Explode On Death
-      description: Killed enemies explode and damage nearby targets.
+      displayName: Explosive Charges
+      description: Enemies killed create a small explosion that damage nearby targets.
       icon: {fileID: 21300000, guid: bd1a9df158626b746933d61fd6845978, type: 3}
       dropPools:
       - Milestone
@@ -16071,7 +14961,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: PassiveOrbitalProjectiles
       displayName: Orbital Projectiles
-      description: Projectiles switch to an orbital movement pattern.
+      description: Projectiles move in an orbital pattern that widens as they travel.
       icon: {fileID: 21300000, guid: a7690da87adf5cf41a658e2a35bcfe59, type: 3}
       dropPools:
       - Milestone
@@ -16623,7 +15513,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: PassiveBouncingProjectiles
       displayName: Bouncing Projectiles
-      description: Projectiles bounce on walls.
+      description: The base weapon bounces off walls up to two times.
       icon: {fileID: 21300000, guid: a7690da87adf5cf41a658e2a35bcfe59, type: 3}
       dropPools:
       - Milestone
@@ -16905,7 +15795,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: PassiveSplittingProjectiles
       displayName: Splitting Projectiles
-      description: Projectiles split when they expire.
+      description: Projectiles split into four smaller ones when they expire.
       icon: {fileID: 21300000, guid: 6eed8978203147046a1a99d7aad979d8, type: 3}
       dropPools:
       - Milestone
@@ -17187,7 +16077,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: Passive_MegaProjectiles
       displayName: Mega Projectiles
-      description: 'THAT''S RIGHT!! NOW''S YOUR CHANCE TO BE A [[BIG SHOT]]'
+      description: Projectiles increase in size and Damage, at the cost of Fire Rate
+        and speed.
       icon: {fileID: 21300000, guid: f8c397c483a89d94483673c54272ba2b, type: 3}
       dropPools: []
       dropTier: 1
@@ -17468,7 +16359,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: Passive_MicroProjectiles
       displayName: Micro Projectiles
-      description: Size doesn't matter, it's the fire rate that is important.
+      description: Projectiles increase in speed and Fire Rate, at the cost of Damage
+        and size.
       icon: {fileID: 21300000, guid: ffcc72bbb2321fa47bd5cfbc44c0a586, type: 3}
       dropPools: []
       dropTier: 1
@@ -17748,7 +16640,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_HealthIncrease
-      displayName: Health Increase
+      displayName: Max Health Up
       description: Increase your maximum Health.
       icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
       dropPools: []
@@ -18295,7 +17187,8 @@ MonoBehaviour:
   - commonData:
       powerUpId: Passive_AdditionalBarrel
       displayName: Additional Barrel
-      description: Add a Barrel to your weapon.
+      description: Add a Barrel to the base weapon, shooting an additional projectile
+        in a conic pattern.
       icon: {fileID: 21300000, guid: 6eed8978203147046a1a99d7aad979d8, type: 3}
       dropPools: []
       dropTier: 1
@@ -19108,7 +18001,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_DamageIncrease
-      displayName: Damage Increase
+      displayName: Damage Up
       description: Increase your Damage parameter.
       icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
       dropPools: []
@@ -19654,7 +18547,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_FireRate
-      displayName: Fire Rate Increase
+      displayName: Fire Rate Up
       description: Increase your Fire Rate.
       icon: {fileID: 21300000, guid: 7e750fd851942a34583ffeadd6caf82a, type: 3}
       dropPools: []
@@ -20200,7 +19093,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_Range
-      displayName: Range Increase
+      displayName: Range Up
       description: Increase your Range.
       icon: {fileID: 21300000, guid: 7e750fd851942a34583ffeadd6caf82a, type: 3}
       dropPools: []
@@ -20746,7 +19639,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_GatheringRadius
-      displayName: Gathering Radius Increase
+      displayName: Gathering Radius Up
       description: Increase your Gathering Radius.
       icon: {fileID: 21300000, guid: 33199e81afc49f449851a960a8ddd4f4, type: 3}
       dropPools: []
@@ -21292,7 +20185,7 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_MovementSpeed
-      displayName: Movement Speed Increase
+      displayName: Movement Speed Up
       description: Increase your Movement Speed.
       icon: {fileID: 21300000, guid: 74030686af064b24290d328e5beec01c, type: 3}
       dropPools: []
@@ -21838,8 +20731,8 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_Shield
-      displayName: Shield Increase
-      description: Increase your Shield parameter.
+      displayName: Max Shield Up
+      description: Increase your maximum Shield.
       icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
       dropPools: []
       dropTier: 1
@@ -22384,8 +21277,8 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_ElementalBullets_Fire
-      displayName: Elemental Bullets Fire
-      description: Elemental Bullets Fire
+      displayName: Fire Bullets
+      description: Base weapon applies a damage over time effect on enemies.
       icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
       dropPools:
       - Milestone
@@ -22663,8 +21556,8 @@ MonoBehaviour:
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_ElementalBullets_Ice
-      displayName: Elemental Bullets Ice
-      description: Elemental Bullets Ice
+      displayName: Ice Bullets
+      description: Base weapon applies a stacking slow effect on enemies.
       icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
       dropPools:
       - Milestone
@@ -22943,7 +21836,7 @@ MonoBehaviour:
   - commonData:
       powerUpId: Passive_LaserBeam
       displayName: Laser Beam
-      description: IL LAZERONE
+      description: Replaces the base weapon with a continuous laser stream.
       icon: {fileID: 21300000, guid: 283ddc3a73b4fc649a727c325fc6787e, type: 3}
       dropPools:
       - Milestone
