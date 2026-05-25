@@ -24555,7 +24555,7 @@ MonoBehaviour:
             damageTickIntervalSeconds: 1
             blockEnemyProjectiles: 1
             blockEnemyBombs: 1
-            hasHealth: 1
+            hasHealth: 0
             maximumHealth: 1
             enemyContactHealthDamage: 1
             projectileBlockHealthDamage: 1
