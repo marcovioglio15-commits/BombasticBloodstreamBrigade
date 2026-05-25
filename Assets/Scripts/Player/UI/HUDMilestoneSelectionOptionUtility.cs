@@ -10,7 +10,13 @@ using UnityEngine.UI;
 public static class HUDMilestoneSelectionOptionUtility
 {
     #region Fields
+    /// <summary>
+    /// Default LevelUpTitle template used when the authored text is empty.
+    /// </summary>
+    public const string DefaultHeaderTextTemplate = " LEVEL [CurrentPlayerLevel] - CHOOSE 1";
+
     private const string PowerUpListRootName = "PowerUpList";
+    private const string CurrentPlayerLevelToken = "[CurrentPlayerLevel]";
     #endregion
 
     #region Methods
@@ -151,15 +157,18 @@ public static class HUDMilestoneSelectionOptionUtility
         }
     }
 
+    /// <summary>
     /// Applies current ECS offer data to every discovered card view.
     /// </summary>
     /// <param name="optionViews">Auto-discovered card views under the panel hierarchy.</param>
     /// <param name="selectionOffers">Current buffer of rolled milestone offers.</param>
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
+    /// <param name="hideOptionTitleNumbers">True to omit generated numeric prefixes from card titles.</param>
 
     public static void RenderOptionViews(IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews,
                                          DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers,
-                                         int activeOfferCount)
+                                         int activeOfferCount,
+                                         bool hideOptionTitleNumbers)
     {
         if (optionViews == null)
             return;
@@ -175,18 +184,21 @@ public static class HUDMilestoneSelectionOptionUtility
             }
 
             PlayerMilestonePowerUpSelectionOfferElement offer = selectionOffers[optionIndex];
-            SetOptionViewOffer(optionView, optionIndex, in offer);
+            SetOptionViewOffer(optionView, optionIndex, hideOptionTitleNumbers, in offer);
         }
     }
 
+    /// <summary>
     /// Applies one rolled milestone offer to a card view resolved from the panel prefab.
     /// </summary>
     /// <param name="optionView">Card view receiving the offer data.</param>
     /// <param name="optionIndex">Display order index used for numbering.</param>
+    /// <param name="hideOptionTitleNumbers">True to omit generated numeric prefixes from the title.</param>
     /// <param name="offer">Rolled milestone offer bound to the card.</param>
 
     public static void SetOptionViewOffer(MilestonePowerUpSelectionOptionView optionView,
                                           int optionIndex,
+                                          bool hideOptionTitleNumbers,
                                           in PlayerMilestonePowerUpSelectionOfferElement offer)
     {
         if (optionView == null)
@@ -199,7 +211,7 @@ public static class HUDMilestoneSelectionOptionUtility
 
         optionView.SetInteractable(true);
         optionView.SetSelected(false);
-        SetText(optionView.NameText, BuildDisplayName(optionIndex, in offer));
+        SetText(optionView.NameText, BuildDisplayName(optionIndex, hideOptionTitleNumbers, in offer));
         SetText(optionView.TypeText, ResolveUnlockKindLabel(offer.UnlockKind));
         SetIcon(optionView.IconImage, offer.PowerUpId.ToString());
 
@@ -239,6 +251,7 @@ public static class HUDMilestoneSelectionOptionUtility
         SetIcon(optionView.IconImage, string.Empty);
     }
 
+    /// <summary>
     /// Updates the selected highlight state for all discovered card views.
     /// </summary>
     /// <param name="optionViews">Resolved card views currently owned by the milestone panel.</param>
@@ -342,14 +355,21 @@ public static class HUDMilestoneSelectionOptionUtility
 
     #region Formatting
     /// <summary>
-    /// Builds the milestone panel header shown while the selection is active.
+    /// Builds the milestone panel header from the designer-authored text template.
     /// </summary>
-    /// <param name="milestoneLevel">Milestone level that triggered the current selection panel.</param>
-    /// <param name="offerCount">Number of rolled offers currently shown to the player.</param>
+    /// <param name="headerTemplate">Template read from the LevelUpTitle text object.</param>
+    /// <param name="currentPlayerLevel">Current player level used to replace the supported token.</param>
     /// <returns>Formatted header string for the milestone selection panel.</returns>
-    public static string BuildHeaderText(int milestoneLevel, int offerCount)
+    public static string BuildHeaderText(string headerTemplate, int currentPlayerLevel)
     {
-        return string.Format("Milestone Lv {0} - Choose 1 of {1} Power-Ups", milestoneLevel, offerCount);
+        string resolvedTemplate = string.IsNullOrWhiteSpace(headerTemplate)
+            ? DefaultHeaderTextTemplate
+            : headerTemplate;
+
+        if (!resolvedTemplate.Contains(CurrentPlayerLevelToken))
+            return resolvedTemplate;
+
+        return resolvedTemplate.Replace(CurrentPlayerLevelToken, currentPlayerLevel.ToString());
     }
 
     /// <summary>
@@ -373,17 +393,23 @@ public static class HUDMilestoneSelectionOptionUtility
     }
 
     /// <summary>
-    /// Builds the numbered title shown for one offer inside the milestone selection UI.
+    /// Builds the title shown for one offer inside the milestone selection UI.
     /// </summary>
     /// <param name="optionIndex">Display order index used for numbering.</param>
+    /// <param name="hideOptionTitleNumbers">True to omit generated numeric prefixes from the title.</param>
     /// <param name="offer">Rolled milestone offer bound to the UI slot.</param>
     /// <returns>Formatted display title for the option.</returns>
-    private static string BuildDisplayName(int optionIndex, in PlayerMilestonePowerUpSelectionOfferElement offer)
+    private static string BuildDisplayName(int optionIndex,
+                                           bool hideOptionTitleNumbers,
+                                           in PlayerMilestonePowerUpSelectionOfferElement offer)
     {
         string displayName = offer.DisplayName.ToString();
 
         if (string.IsNullOrWhiteSpace(displayName))
             displayName = offer.PowerUpId.ToString();
+
+        if (hideOptionTitleNumbers)
+            return displayName;
 
         return string.Format("{0}. {1}", optionIndex + 1, displayName);
     }

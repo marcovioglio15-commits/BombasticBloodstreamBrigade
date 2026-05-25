@@ -288,6 +288,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}
@@ -549,6 +550,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}
@@ -810,6 +812,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}
@@ -1145,6 +1148,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -1446,6 +1450,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -1770,6 +1775,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -2077,6 +2083,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -2384,6 +2391,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -2614,6 +2622,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -2863,6 +2872,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -3118,6 +3128,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -3393,6 +3404,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}
@@ -3728,6 +3740,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -4052,6 +4065,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -4359,6 +4373,7 @@ MonoBehaviour:
                 damageRadius: 1.75
                 impactExplosionDelaySeconds: 0
                 bombScaleMultiplier: 1
+                preventMidAirInterception: 1
                 runtimeBomb:
                   bombPrefab: {fileID: 0}
                   explosionVfxPrefab: {fileID: 0}
@@ -4589,6 +4604,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -4838,6 +4854,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -5093,6 +5110,7 @@ MonoBehaviour:
             damageRadius: 1.75
             impactExplosionDelaySeconds: 0
             bombScaleMultiplier: 1
+            preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 0}
               explosionVfxPrefab: {fileID: 0}
@@ -5369,6 +5387,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}
@@ -5639,6 +5658,7 @@ MonoBehaviour:
               damageRadius: 1.75
               impactExplosionDelaySeconds: 0
               bombScaleMultiplier: 1
+              preventMidAirInterception: 1
               runtimeBomb:
                 bombPrefab: {fileID: 0}
                 explosionVfxPrefab: {fileID: 0}

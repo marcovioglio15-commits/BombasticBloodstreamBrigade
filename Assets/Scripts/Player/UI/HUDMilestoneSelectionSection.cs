@@ -23,8 +23,11 @@ public sealed class HUDMilestoneSelectionSection
     [Tooltip("Root panel shown while a milestone power-up selection is active.")]
     [SerializeField] private GameObject panelRoot;
 
-    [Tooltip("Header text updated with the milestone level and current offer count.")]
+    [Tooltip("Header text used as a designer-authored template. The [CurrentPlayerLevel] token is replaced at runtime.")]
     [SerializeField] private TMP_Text headerText;
+
+    [Tooltip("When enabled, milestone option titles are shown without the generated numeric prefix.")]
+    [SerializeField] private bool hideOptionTitleNumbers = true;
 
     [Tooltip("Optional skip button that closes the milestone selection without taking an unlock.")]
     [SerializeField] private Button skipButton;
@@ -58,6 +61,9 @@ public sealed class HUDMilestoneSelectionSection
     private Button registeredSkipButton;
     private UnityAction registeredSkipAction;
     private GameObject discoveredPanelRoot;
+    private TMP_Text cachedHeaderText;
+    private string headerTextTemplate;
+    private string renderedHeaderText;
     private InputAction navigateAction;
     private InputAction submitAction;
     private InputAction cancelAction;
@@ -70,6 +76,7 @@ public sealed class HUDMilestoneSelectionSection
     private bool interactionLocked;
     private bool navigationInputReleased = true;
     private int activeOfferCount;
+    private int renderedHeaderPlayerLevel = int.MinValue;
     private int selectedOfferIndex = -1;
     private float nextAllowedNavigateUnscaledTime;
     #endregion
@@ -86,6 +93,7 @@ public sealed class HUDMilestoneSelectionSection
         RefreshDiscoveredOptionViews();
         RegisterSkipButton();
         RefreshInputActions();
+        CacheHeaderTextTemplate();
         HidePanel();
     }
 
@@ -348,12 +356,14 @@ public sealed class HUDMilestoneSelectionSection
         if (panelRoot != null && !panelRoot.activeSelf)
             panelRoot.SetActive(true);
 
-        if (headerText != null)
-            headerText.text = HUDMilestoneSelectionOptionUtility.BuildHeaderText(selectionState.MilestoneLevel, activeOfferCount);
+        UpdateHeaderText(ResolveCurrentPlayerLevel(selectionState.MilestoneLevel));
 
         ApplyPanelVisibleState(true);
         HUDMilestoneSelectionOptionUtility.SetSkipButtonVisible(skipButton, true, !interactionLocked);
-        HUDMilestoneSelectionOptionUtility.RenderOptionViews(discoveredOptionViews, selectionOffers, activeOfferCount);
+        HUDMilestoneSelectionOptionUtility.RenderOptionViews(discoveredOptionViews,
+                                                             selectionOffers,
+                                                             activeOfferCount,
+                                                             hideOptionTitleNumbers);
         HUDMilestoneSelectionOptionUtility.SetOptionInputsInteractable(discoveredOptionViews, skipButton, !interactionLocked);
         HUDMilestoneSelectionOptionUtility.ApplySelectionVisuals(discoveredOptionViews, selectedOfferIndex, activeOfferCount);
     }
@@ -374,7 +384,65 @@ public sealed class HUDMilestoneSelectionSection
         activeOfferCount = 0;
         selectedOfferIndex = -1;
         navigationInputReleased = true;
+        renderedHeaderPlayerLevel = int.MinValue;
+        renderedHeaderText = null;
         nextAllowedNavigateUnscaledTime = 0f;
+    }
+
+    /// <summary>
+    /// Caches the designer-authored LevelUpTitle text so runtime token replacement does not overwrite the template.
+    /// </summary>
+    private void CacheHeaderTextTemplate()
+    {
+        if (ReferenceEquals(cachedHeaderText, headerText) && !string.IsNullOrWhiteSpace(headerTextTemplate))
+            return;
+
+        cachedHeaderText = headerText;
+        headerTextTemplate = headerText != null
+            ? headerText.text
+            : HUDMilestoneSelectionOptionUtility.DefaultHeaderTextTemplate;
+
+        if (string.IsNullOrWhiteSpace(headerTextTemplate))
+            headerTextTemplate = HUDMilestoneSelectionOptionUtility.DefaultHeaderTextTemplate;
+
+        renderedHeaderPlayerLevel = int.MinValue;
+        renderedHeaderText = null;
+    }
+
+    /// <summary>
+    /// Updates the LevelUpTitle text with the current player level while preserving the cached designer template.
+    /// </summary>
+    /// <param name="currentPlayerLevel">Current player level used to replace the supported token.</param>
+    private void UpdateHeaderText(int currentPlayerLevel)
+    {
+        CacheHeaderTextTemplate();
+
+        if (headerText == null)
+            return;
+
+        if (renderedHeaderPlayerLevel == currentPlayerLevel && headerText.text == renderedHeaderText)
+            return;
+
+        renderedHeaderPlayerLevel = currentPlayerLevel;
+        renderedHeaderText = HUDMilestoneSelectionOptionUtility.BuildHeaderText(headerTextTemplate, currentPlayerLevel);
+        headerText.text = renderedHeaderText;
+    }
+
+    /// <summary>
+    /// Resolves the current player level from ECS, using the milestone level only as a defensive fallback.
+    /// </summary>
+    /// <param name="fallbackPlayerLevel">Milestone level used when the player level component is unavailable.</param>
+    /// <returns>Current player level clamped to a display-safe value.</returns>
+    private int ResolveCurrentPlayerLevel(int fallbackPlayerLevel)
+    {
+        if (!hasRuntimeContext)
+            return Mathf.Max(0, fallbackPlayerLevel);
+
+        if (!entityManager.HasComponent<PlayerLevel>(playerEntity))
+            return Mathf.Max(0, fallbackPlayerLevel);
+
+        PlayerLevel playerLevel = entityManager.GetComponentData<PlayerLevel>(playerEntity);
+        return Mathf.Max(0, playerLevel.Current);
     }
 
     /// <summary>

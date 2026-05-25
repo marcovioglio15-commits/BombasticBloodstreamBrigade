@@ -21,6 +21,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
         VisualElement root = new VisualElement();
         SerializedProperty panelRootProperty = property.FindPropertyRelative("panelRoot");
         SerializedProperty headerTextProperty = property.FindPropertyRelative("headerText");
+        SerializedProperty hideOptionTitleNumbersProperty = property.FindPropertyRelative("hideOptionTitleNumbers");
         SerializedProperty skipButtonProperty = property.FindPropertyRelative("skipButton");
         SerializedProperty autoDiscoverOptionViewsProperty = property.FindPropertyRelative("autoDiscoverOptionViewsFromPanelRoot");
         SerializedProperty navigationInputDeadzoneProperty = property.FindPropertyRelative("navigationInputDeadzone");
@@ -33,6 +34,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
 
         if (!AreRequiredPropertiesValid(panelRootProperty,
                                         headerTextProperty,
+                                        hideOptionTitleNumbersProperty,
                                         skipButtonProperty,
                                         autoDiscoverOptionViewsProperty,
                                         navigationInputDeadzoneProperty,
@@ -48,7 +50,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
             return root;
         }
 
-        HelpBox bindingInfoBox = new HelpBox("Scene binding for the card-based milestone menu: assign Panel Root to the PowerUpsPanel instance, Header Text to LevelUpTitle, and Skip Button to SkipButton. Offer cards are auto-discovered under PowerUpList from the existing PowerUp prefab.", HelpBoxMessageType.Info);
+        HelpBox bindingInfoBox = new HelpBox("Scene binding for the card-based milestone menu: assign Panel Root to the PowerUpsPanel instance, Header Text to LevelUpTitle, and Skip Button to SkipButton. LevelUpTitle is used as a template; write [CurrentPlayerLevel] where the runtime level should appear. Offer cards are auto-discovered under PowerUpList from the existing PowerUp prefab.", HelpBoxMessageType.Info);
         root.Add(bindingInfoBox);
 
         PropertyField panelRootField = CreateBoundField(panelRootProperty, "Panel Root");
@@ -66,6 +68,14 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
 
         HelpBox autoDiscoveryWarningBox = new HelpBox("Auto Discover Option Views should stay enabled for the current milestone menu. Disable it only if you intentionally want the fallback auto-pick flow with no offer cards.", HelpBoxMessageType.Warning);
         root.Add(autoDiscoveryWarningBox);
+
+        Foldout presentationFoldout = new Foldout
+        {
+            text = "Presentation Settings",
+            value = true
+        };
+        presentationFoldout.Add(CreateBoundField(hideOptionTitleNumbersProperty, "Hide Option Title Numbers"));
+        root.Add(presentationFoldout);
 
         Foldout navigationFoldout = new Foldout
         {
@@ -110,6 +120,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="panelRootProperty">Serialized panel root property.</param>
     /// <param name="headerTextProperty">Serialized header text property.</param>
+    /// <param name="hideOptionTitleNumbersProperty">Serialized option-title numbering toggle property.</param>
     /// <param name="skipButtonProperty">Serialized skip button property.</param>
     /// <param name="autoDiscoverOptionViewsProperty">Serialized auto-discovery toggle property.</param>
     /// <param name="navigationInputDeadzoneProperty">Serialized navigation deadzone property.</param>
@@ -122,6 +133,7 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// <returns>True when every required serialized field exists; otherwise false.</returns>
     private static bool AreRequiredPropertiesValid(SerializedProperty panelRootProperty,
                                                    SerializedProperty headerTextProperty,
+                                                   SerializedProperty hideOptionTitleNumbersProperty,
                                                    SerializedProperty skipButtonProperty,
                                                    SerializedProperty autoDiscoverOptionViewsProperty,
                                                    SerializedProperty navigationInputDeadzoneProperty,
@@ -133,6 +145,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
                                                    SerializedProperty lockButtonsAfterSelectionClickProperty)
     {
         if (panelRootProperty == null || headerTextProperty == null || skipButtonProperty == null)
+            return false;
+
+        if (hideOptionTitleNumbersProperty == null)
             return false;
 
         if (autoDiscoverOptionViewsProperty == null)
