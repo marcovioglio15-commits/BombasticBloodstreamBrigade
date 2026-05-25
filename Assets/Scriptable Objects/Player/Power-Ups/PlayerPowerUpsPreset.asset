@@ -172,67 +172,67 @@ MonoBehaviour:
     entries:
     - entryKind: 0
       powerUpId: ActiveBasicDash
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: ActivePortableHealthPack
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_HealthIncrease
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: Active_Shotgun
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: Active_DamageBoost
-      selectionWeight: 1
+      selectionWeight: 4
     - entryKind: 1
       powerUpId: Passive_MovementSpeed
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_GatheringRadius
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: PassiveBouncingProjectiles
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: ActiveGigaLaser
-      selectionWeight: 1
+      selectionWeight: 4
     - entryKind: 1
       powerUpId: Passive_Shield
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_DamageIncrease
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_MegaProjectiles
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_MicroProjectiles
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: PassiveOrbitalProjectiles
-      selectionWeight: 1
+      selectionWeight: 4
     - entryKind: 1
       powerUpId: Passive_ElementalBullets_Fire
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_FireRate
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_Range
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_OrbitalShield
-      selectionWeight: 80
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_OrbitalSpear
-      selectionWeight: 1
+      selectionWeight: 4
     - entryKind: 1
       powerUpId: Passive_OrbitalWings
-      selectionWeight: 1
+      selectionWeight: 5
     - entryKind: 1
       powerUpId: Passive_RearShield
-      selectionWeight: 1
+      selectionWeight: 4
   - tierId: Milestone_Tier4-5
     entries:
     - entryKind: 0
@@ -22855,7 +22855,7 @@ MonoBehaviour:
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
             blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
+            blockEnemyBombs: 0
             hasHealth: 0
             maximumHealth: 1
             enemyContactHealthDamage: 1
@@ -23447,7 +23447,7 @@ MonoBehaviour:
             contactDamage: 5
             damageTickIntervalSeconds: 1
             blockEnemyProjectiles: 1
-            blockEnemyBombs: 1
+            blockEnemyBombs: 0
             hasHealth: 0
             maximumHealth: 1
             enemyContactHealthDamage: 1
@@ -23812,10 +23812,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveChargeShot
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - Passive_OrbitalShield
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
