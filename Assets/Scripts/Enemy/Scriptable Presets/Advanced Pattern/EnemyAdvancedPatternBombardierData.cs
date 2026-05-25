@@ -282,6 +282,9 @@ public sealed class EnemyBombardierModuleData
     [Tooltip("Uniform scale multiplier applied to each spawned bomb visual.")]
     [SerializeField] private float bombScaleMultiplier = 1f;
 
+    [Tooltip("When enabled, player orbital projection bomb blockers ignore this bomb while it is flying, so the authored impact and explosion feedback always resolve.")]
+    [SerializeField] private bool preventMidAirInterception = true;
+
     [Header("Runtime")]
     [Tooltip("Runtime bomb prefab payload used by this module.")]
     [SerializeField] private EnemyBombardierRuntimeBombPayload runtimeBomb = new EnemyBombardierRuntimeBombPayload();
@@ -498,6 +501,14 @@ public sealed class EnemyBombardierModuleData
         get
         {
             return bombScaleMultiplier;
+        }
+    }
+
+    public bool PreventMidAirInterception
+    {
+        get
+        {
+            return preventMidAirInterception;
         }
     }
 

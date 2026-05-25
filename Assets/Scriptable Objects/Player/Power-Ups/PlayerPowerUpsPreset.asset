@@ -24555,7 +24555,7 @@ MonoBehaviour:
             damageTickIntervalSeconds: 1
             blockEnemyProjectiles: 1
             blockEnemyBombs: 1
-            hasHealth: 0
+            hasHealth: 1
             maximumHealth: 1
             enemyContactHealthDamage: 1
             projectileBlockHealthDamage: 1
@@ -24919,7 +24919,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveChargeShot
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
   - Passive_OrbitalShield

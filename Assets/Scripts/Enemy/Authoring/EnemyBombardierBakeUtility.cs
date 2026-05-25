@@ -70,6 +70,7 @@ internal static class EnemyBombardierBakeUtility
             DamageRadius = math.max(0f, bombardierData.DamageRadius),
             ImpactExplosionDelaySeconds = math.max(0f, bombardierData.ImpactExplosionDelaySeconds),
             BombScaleMultiplier = math.max(0.01f, bombardierData.BombScaleMultiplier),
+            PreventMidAirInterception = bombardierData.PreventMidAirInterception ? (byte)1 : (byte)0,
             EnableLandingWarning = warning != null && warning.EnableLandingWarning ? (byte)1 : (byte)0,
             WarningLeadTimeSeconds = warning != null ? math.max(0f, warning.WarningLeadTimeSeconds) : 0f,
             WarningRadiusScale = warning != null ? math.max(0f, warning.WarningRadiusScale) : 0f,

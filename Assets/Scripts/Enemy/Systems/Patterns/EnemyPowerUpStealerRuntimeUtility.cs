@@ -461,10 +461,14 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     {
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = playerAccess.EquippedPassiveToolsLookup[playerEntity];
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
+        DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections = playerAccess.OrbitalProjectionLostLookup.HasBuffer(playerEntity)
+            ? playerAccess.OrbitalProjectionLostLookup[playerEntity]
+            : default;
 
         int passiveIndex = equippedPassiveTools.Length > 0
             ? EnemyPowerUpStealerSelectionUtility.ResolvePassiveIndexToSteal(equippedPassiveTools,
                                                                              unlockCatalog,
+                                                                             lostProjections,
                                                                              config.AcquisitionStealCooldownSeconds,
                                                                              elapsedTime,
                                                                              enemyEntity,
@@ -489,6 +493,9 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         int catalogIndex = FindCatalogIndex(stolenPowerUpId, PlayerPowerUpUnlockKind.Passive, unlockCatalog);
         int originalUnlockCount = 0;
         runtime.StoredPassiveTool = stolenPassive.Tool;
+        PlayerOrbitalProjectionLossRuntimeUtility.ShiftAfterPassiveRemoval(lostProjections,
+                                                                           stolenPowerUpId,
+                                                                           passiveIndex);
         equippedPassiveTools.RemoveAt(passiveIndex);
         DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = playerAccess.PassiveToolsStateLookup[playerEntity];
         ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
@@ -636,28 +643,6 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         return -1;
     }
 
-    /// <summary>
-    /// Checks whether an equipped passive buffer already contains a given power-up id.
-    /// </summary>
-    /// <param name="powerUpId">Power-up id to test.</param>
-    /// <param name="equippedPassiveTools">Equipped passive buffer to scan.</param>
-    /// <returns>True when the passive is already equipped.</returns>
-    internal static bool ContainsPassivePowerUp(FixedString64Bytes powerUpId,
-                                                DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
-    {
-        if (powerUpId.Length <= 0)
-            return false;
-
-        for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
-        {
-            if (equippedPassiveTools[passiveIndex].PowerUpId != powerUpId)
-                continue;
-
-            return true;
-        }
-
-        return false;
-    }
     #endregion
 
     #region Visuals

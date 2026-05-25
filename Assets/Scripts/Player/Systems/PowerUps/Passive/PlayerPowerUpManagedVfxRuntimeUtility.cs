@@ -363,7 +363,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                 {
                     LocalToWorld localToWorld = entityManager.GetComponentData<LocalToWorld>(muzzleEntity);
                     position = localToWorld.Value.c3.xyz;
-                    rotation = quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz);
+                    rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz));
                     return true;
                 }
 
@@ -371,7 +371,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                 {
                     LocalTransform localTransform = entityManager.GetComponentData<LocalTransform>(muzzleEntity);
                     position = localTransform.Position;
-                    rotation = localTransform.Rotation;
+                    rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(localTransform.Rotation);
                     return true;
                 }
             }
@@ -384,7 +384,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             if (muzzlePose.IsValid != 0)
             {
                 position = muzzlePose.Position;
-                rotation = muzzlePose.Rotation;
+                rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(muzzlePose.Rotation);
                 return true;
             }
         }

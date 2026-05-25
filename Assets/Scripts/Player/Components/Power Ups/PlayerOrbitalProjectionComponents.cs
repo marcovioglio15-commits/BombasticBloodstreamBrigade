@@ -36,6 +36,17 @@ public struct PlayerOrbitalProjectionPrefabElement : IBufferElementData
 }
 
 /// <summary>
+/// Permanent runtime loss marker for persistent health-based orbital projections.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerOrbitalProjectionLostElement : IBufferElementData
+{
+    public FixedString64Bytes PowerUpId;
+    public int ProjectionIndex;
+    public int SourceInstanceId;
+}
+
+/// <summary>
 /// Runtime state stored on one orbital projection entity.
 /// </summary>
 public struct PlayerOrbitalProjectionInstance : IComponentData

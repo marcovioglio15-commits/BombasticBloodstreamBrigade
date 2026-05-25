@@ -173,6 +173,7 @@ internal static class EnemyBombardierPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(damageFoldout, bombardierProperty.FindPropertyRelative("damageRadius"), "Damage Radius");
         EnemyAdvancedPatternDrawerUtility.AddField(damageFoldout, bombardierProperty.FindPropertyRelative("impactExplosionDelaySeconds"), "Impact Explosion Delay Seconds");
         EnemyAdvancedPatternDrawerUtility.AddField(damageFoldout, bombardierProperty.FindPropertyRelative("bombScaleMultiplier"), "Bomb Scale Multiplier");
+        EnemyAdvancedPatternDrawerUtility.AddField(damageFoldout, bombardierProperty.FindPropertyRelative("preventMidAirInterception"), "Prevent Mid-Air Interception");
     }
 
     /// <summary>

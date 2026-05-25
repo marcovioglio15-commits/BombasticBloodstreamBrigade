@@ -183,6 +183,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned for eligible entries.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
@@ -192,6 +193,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// <returns>Selected passive buffer index, or -1 when no valid passive can be stolen.</returns>
     public static int ResolvePassiveIndexToSteal(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                  DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                 DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                  float acquisitionStealCooldownSeconds,
                                                  float elapsedTime,
                                                  Entity enemyEntity,
@@ -204,12 +206,14 @@ internal static class EnemyPowerUpStealerSelectionUtility
             case EnemyPowerUpStealSelectionMode.LastObtained:
                 return ResolveLastEligiblePassiveIndex(equippedPassiveTools,
                                                        unlockCatalog,
+                                                       lostProjections,
                                                        acquisitionStealCooldownSeconds,
                                                        elapsedTime);
 
             case EnemyPowerUpStealSelectionMode.Random:
                 return ResolveRandomEligiblePassiveIndex(equippedPassiveTools,
                                                          unlockCatalog,
+                                                         lostProjections,
                                                          acquisitionStealCooldownSeconds,
                                                          elapsedTime,
                                                          enemyEntity,
@@ -219,6 +223,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
             default:
                 return ResolveFirstEligiblePassiveIndex(equippedPassiveTools,
                                                         unlockCatalog,
+                                                        lostProjections,
                                                         acquisitionStealCooldownSeconds,
                                                         elapsedTime);
         }
@@ -275,11 +280,13 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned from front to back.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>First eligible passive index, or -1 when none exists.</returns>
     private static int ResolveFirstEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                        DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                         float acquisitionStealCooldownSeconds,
                                                         float elapsedTime)
     {
@@ -288,7 +295,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
             ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
             if (!IsPassiveEligibleForSteal(in passiveTool,
+                                           passiveIndex,
                                            unlockCatalog,
+                                           lostProjections,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
                 continue;
@@ -333,11 +342,13 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned from back to front.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Last eligible passive index, or -1 when none exists.</returns>
     private static int ResolveLastEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                        DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                       DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                        float acquisitionStealCooldownSeconds,
                                                        float elapsedTime)
     {
@@ -346,7 +357,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
             ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
             if (!IsPassiveEligibleForSteal(in passiveTool,
+                                           passiveIndex,
                                            unlockCatalog,
+                                           lostProjections,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
                 continue;
@@ -391,6 +404,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer scanned for eligible entries.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
@@ -399,6 +413,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// <returns>Random eligible passive index, or -1 when none exists.</returns>
     private static int ResolveRandomEligiblePassiveIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                          DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                         DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                          float acquisitionStealCooldownSeconds,
                                                          float elapsedTime,
                                                          Entity enemyEntity,
@@ -407,6 +422,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     {
         int eligibleCount = CountEligiblePassives(equippedPassiveTools,
                                                   unlockCatalog,
+                                                  lostProjections,
                                                   acquisitionStealCooldownSeconds,
                                                   elapsedTime);
 
@@ -422,7 +438,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
             ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
             if (!IsPassiveEligibleForSteal(in passiveTool,
+                                           passiveIndex,
                                            unlockCatalog,
+                                           lostProjections,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
                 continue;
@@ -491,11 +509,13 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// </summary>
     /// <param name="equippedPassiveTools">Equipped passive buffer to scan.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>Number of eligible passive entries.</returns>
     private static int CountEligiblePassives(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                              DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                             DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                              float acquisitionStealCooldownSeconds,
                                              float elapsedTime)
     {
@@ -506,7 +526,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
             ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
             if (!IsPassiveEligibleForSteal(in passiveTool,
+                                           passiveIndex,
                                            unlockCatalog,
+                                           lostProjections,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
                 continue;
@@ -552,16 +574,25 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// Checks whether a passive entry has a stable PowerUpId, including catalog-driven passives without a runtime tool.
     /// </summary>
     /// <param name="passive">Passive entry being inspected.</param>
+    /// <param name="sourceInstanceId">Passive buffer index used as persistent orbital source identity.</param>
     /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="lostProjections">Player-owned permanent loss markers used to ignore depleted orbital-only passives.</param>
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>True when the passive can be identified, stolen, and restored.</returns>
     private static bool IsPassiveEligibleForSteal(in EquippedPassiveToolElement passive,
+                                                  int sourceInstanceId,
                                                   DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                  DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                   float acquisitionStealCooldownSeconds,
                                                   float elapsedTime)
     {
         if (passive.PowerUpId.Length <= 0)
+            return false;
+
+        if (!PlayerOrbitalProjectionLossRuntimeUtility.CanStealPassive(in passive,
+                                                                       sourceInstanceId,
+                                                                       lostProjections))
             return false;
 
         return !PlayerPowerUpStealCooldownRuntimeUtility.IsPowerUpProtectedFromSteal(passive.PowerUpId,
@@ -598,7 +629,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
                                                                                  elapsedTime))
             return false;
 
-        return !EnemyPowerUpStealerRuntimeUtility.ContainsPassivePowerUp(catalogEntry.PowerUpId, equippedPassiveTools);
+        return !EnemyPowerUpStealerPassiveLookupUtility.ContainsPassivePowerUp(catalogEntry.PowerUpId, equippedPassiveTools);
     }
     #endregion
 

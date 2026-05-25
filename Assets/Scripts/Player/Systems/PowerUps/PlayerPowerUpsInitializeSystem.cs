@@ -22,6 +22,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingBombRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionPrefabBindingBufferQuery;
+    private EntityQuery missingOrbitalProjectionLostBufferQuery;
     private EntityQuery missingElementalTrailSegmentBufferQuery;
     private EntityQuery missingLaserBeamStormTickPulseBufferQuery;
     private EntityQuery missingLaserBeamLaneBufferQuery;
@@ -123,6 +124,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingOrbitalProjectionPrefabBindingBufferQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerOrbitalProjectionPrefabElement>()
+            .Build();
+
+        missingOrbitalProjectionLostBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerOrbitalProjectionLostElement>()
             .Build();
 
         missingElementalTrailSegmentBufferQuery = SystemAPI.QueryBuilder()
@@ -263,11 +269,13 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
 
         bool hasMissingOrbitalProjectionRequestBuffer = !missingOrbitalProjectionRequestBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingOrbitalProjectionPrefabBindingBuffer = !missingOrbitalProjectionPrefabBindingBufferQuery.IsEmptyIgnoreFilter;
+        bool hasMissingOrbitalProjectionLostBuffer = !missingOrbitalProjectionLostBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
 
         if (!missingFlags.HasAnyMissing &&
             !hasMissingOrbitalProjectionRequestBuffer &&
             !hasMissingOrbitalProjectionPrefabBindingBuffer &&
+            !hasMissingOrbitalProjectionLostBuffer &&
             !hasMissingLaserBeamStormTickPulseBuffer)
         {
             return;
@@ -356,6 +364,12 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingOrbitalProjectionPrefabBindingBuffers(ref commandBuffer,
                                                                                                      in missingOrbitalProjectionPrefabBindingBufferQuery);
+        }
+
+        if (hasMissingOrbitalProjectionLostBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingOrbitalProjectionLostBuffers(ref commandBuffer,
+                                                                                           in missingOrbitalProjectionLostBufferQuery);
         }
 
         if (missingFlags.HasMissingElementalTrailSegmentBuffer)

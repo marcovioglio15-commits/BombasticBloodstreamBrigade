@@ -116,6 +116,7 @@ public partial struct EnemyBombardierBombSpawnSystem : ISystem
             DamageRadius = math.max(0f, request.DamageRadius),
             CollisionRadius = ResolveBombCollisionRadius(request.BombScaleMultiplier),
             ScaleExplosionVfxToDamageRadius = bombPrefab.ScaleExplosionVfxToDamageRadius,
+            PreventMidAirInterception = request.PreventMidAirInterception,
             ExplosionVfxScaleMultiplier = math.max(0.01f, bombPrefab.ExplosionVfxScaleMultiplier),
             HasImpacted = 0,
             HasExploded = 0,

@@ -718,6 +718,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                     ref hasPowerUpVfxRuntime,
                                     ref powerUpVfxPrefabBindingsBuffer);
             DynamicBuffer<PlayerOrbitalProjectionPrefabElement> orbitalProjectionPrefabBindingsBuffer = AddBuffer<PlayerOrbitalProjectionPrefabElement>(entity);
+            AddBuffer<PlayerOrbitalProjectionLostElement>(entity);
             Func<GameObject, Entity> resolveDynamicPowerUpVfxPrefabEntity = (GameObject prefab) =>
                 ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
             Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = (GameObject prefab) =>

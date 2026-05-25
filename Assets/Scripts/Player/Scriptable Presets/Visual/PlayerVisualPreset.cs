@@ -163,7 +163,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Optional VFX prefab displayed while a Charge Shot active tool is charging.")]
     [SerializeField] private GameObject chargeShotVfxPrefab;
 
-    [Tooltip("Local-space offset applied to Charge Shot VFX relative to the player entity position.")]
+    [Tooltip("Yaw-relative offset applied to Charge Shot VFX from the muzzle pose. Positive Y always moves upward in world space.")]
     [SerializeField] private Vector3 chargeShotVfxSpawnOffset = Vector3.zero;
 
     [Tooltip("Uniform scale multiplier applied to the Charge Shot VFX instance.")]

@@ -105,8 +105,8 @@ MonoBehaviour:
   levelUpVfxScaleMultiplier: 1
   levelUpVfxTriggerMode: 0
   chargeShotVfxPrefab: {fileID: 3217864258068119640, guid: f92ce35d32609f74c90bd48ce9d100db, type: 3}
-  chargeShotVfxSpawnOffset: {x: 0, y: 0, z: 0}
+  chargeShotVfxSpawnOffset: {x: 0, y: 0.2, z: -0.1}
   chargeShotVfxScaleMultiplier: 1
   chargeShotVfxPlaybackMode: 1
-  chargeShotVfxAppliesToAllHoldChargePowerUps: 0
+  chargeShotVfxAppliesToAllHoldChargePowerUps: 1
   scalingRules: []

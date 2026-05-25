@@ -372,10 +372,15 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
 
         if (ShouldRestorePassiveBufferEntry(in runtime))
         {
-            InsertPassiveAtRestoredIndex(equippedPassiveTools,
-                                         runtime.OriginalPassiveBufferIndex,
-                                         runtime.PowerUpId,
-                                         in runtime.StoredPassiveTool);
+            int restoredPassiveIndex = InsertPassiveAtRestoredIndex(equippedPassiveTools,
+                                                                    runtime.OriginalPassiveBufferIndex,
+                                                                    runtime.PowerUpId,
+                                                                    in runtime.StoredPassiveTool);
+            RestoreLostProjectionSourceIds(playerEntity,
+                                           runtime.PowerUpId,
+                                           runtime.OriginalPassiveBufferIndex,
+                                           restoredPassiveIndex,
+                                           ref playerAccess);
         }
 
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
@@ -447,10 +452,11 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
     /// <param name="restoredIndex">Original passive buffer index captured when the Stealer removed the entry.</param>
     /// <param name="powerUpId">Power-up id restored into the passive buffer.</param>
     /// <param name="passiveToolConfig">Passive tool payload restored into the passive buffer.</param>
-    private static void InsertPassiveAtRestoredIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
-                                                     int restoredIndex,
-                                                     FixedString64Bytes powerUpId,
-                                                     in PlayerPassiveToolConfig passiveToolConfig)
+    /// <returns>Actual passive buffer index used for reinsertion.</returns>
+    private static int InsertPassiveAtRestoredIndex(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                    int restoredIndex,
+                                                    FixedString64Bytes powerUpId,
+                                                    in PlayerPassiveToolConfig passiveToolConfig)
     {
         int insertionIndex = restoredIndex >= 0
             ? math.min(restoredIndex, equippedPassiveTools.Length)
@@ -469,6 +475,31 @@ internal static class EnemyPowerUpStealerRecoveryRuntimeUtility
         ref EquippedPassiveToolElement restoredPassive = ref equippedPassiveTools.ElementAt(insertionIndex);
         restoredPassive.PowerUpId = powerUpId;
         restoredPassive.Tool = passiveToolConfig;
+        return insertionIndex;
+    }
+
+    /// <summary>
+    /// Rebinds permanent orbital-loss source ids after a stolen passive is restored.
+    /// </summary>
+    /// <param name="playerEntity">Player entity receiving the passive.</param>
+    /// <param name="powerUpId">Restored passive power-up id.</param>
+    /// <param name="originalIndex">Original passive buffer index captured at steal time.</param>
+    /// <param name="restoredIndex">Actual passive buffer index after reinsertion.</param>
+    /// <param name="playerAccess">Mutable player passive accessors.</param>
+    private static void RestoreLostProjectionSourceIds(Entity playerEntity,
+                                                       FixedString64Bytes powerUpId,
+                                                       int originalIndex,
+                                                       int restoredIndex,
+                                                       ref EnemyPowerUpStealerPlayerAccess playerAccess)
+    {
+        if (!playerAccess.OrbitalProjectionLostLookup.HasBuffer(playerEntity))
+            return;
+
+        DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections = playerAccess.OrbitalProjectionLostLookup[playerEntity];
+        PlayerOrbitalProjectionLossRuntimeUtility.ShiftAfterPassiveRestore(lostProjections,
+                                                                           powerUpId,
+                                                                           originalIndex,
+                                                                           restoredIndex);
     }
 
     /// <summary>

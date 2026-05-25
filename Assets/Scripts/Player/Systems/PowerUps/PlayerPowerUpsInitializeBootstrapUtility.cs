@@ -305,6 +305,17 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     }
 
     /// <summary>
+    /// Adds PlayerOrbitalProjectionLostElement buffers to entities missing them.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingOrbitalProjectionLostBufferQuery">Query selecting entities without PlayerOrbitalProjectionLostElement buffer.</param>
+    public static void AddMissingOrbitalProjectionLostBuffers(ref EntityCommandBuffer commandBuffer,
+                                                              in EntityQuery missingOrbitalProjectionLostBufferQuery)
+    {
+        AddBufferForEntities<PlayerOrbitalProjectionLostElement>(ref commandBuffer, in missingOrbitalProjectionLostBufferQuery);
+    }
+
+    /// <summary>
     /// Adds PlayerElementalTrailSegmentElement buffers to entities missing them.
     /// </summary>
     /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>

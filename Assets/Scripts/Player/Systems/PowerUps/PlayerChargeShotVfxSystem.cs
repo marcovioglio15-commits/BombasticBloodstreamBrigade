@@ -326,7 +326,7 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
             {
                 LocalToWorld localToWorld = localToWorldLookup[muzzleEntity];
                 position = localToWorld.Value.c3.xyz;
-                rotation = quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz);
+                rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(quaternion.LookRotationSafe(localToWorld.Value.c2.xyz, localToWorld.Value.c1.xyz));
                 return;
             }
 
@@ -334,7 +334,7 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
             {
                 LocalTransform muzzleTransform = localTransformLookup[muzzleEntity];
                 position = muzzleTransform.Position;
-                rotation = muzzleTransform.Rotation;
+                rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(muzzleTransform.Rotation);
                 return;
             }
         }
@@ -346,13 +346,13 @@ public partial struct PlayerChargeShotVfxSystem : ISystem
             if (muzzlePose.IsValid != 0)
             {
                 position = muzzlePose.Position;
-                rotation = muzzlePose.Rotation;
+                rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(muzzlePose.Rotation);
                 return;
             }
         }
 
         position = playerTransform.Position;
-        rotation = playerTransform.Rotation;
+        rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(playerTransform.Rotation);
     }
     #endregion
 
