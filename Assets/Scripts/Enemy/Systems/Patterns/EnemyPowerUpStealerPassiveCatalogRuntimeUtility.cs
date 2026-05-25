@@ -45,14 +45,13 @@ internal static class EnemyPowerUpStealerPassiveCatalogRuntimeUtility
         if (catalogIndex < 0)
             return false;
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         int originalUnlockCount = math.max(1, catalogEntry.CurrentUnlockCount);
 
         // Clear catalog ownership so runtime-scoped Character Tuning and milestone duplicate rules see the stolen state.
         catalogEntry.CurrentUnlockCount = 0;
         catalogEntry.IsUnlocked = 0;
         catalogEntry.PendingInitialCharacterTuningApply = 0;
-        unlockCatalog[catalogIndex] = catalogEntry;
 
         StoreCatalogOnlyPassivePayload(playerEntity,
                                        catalogIndex,

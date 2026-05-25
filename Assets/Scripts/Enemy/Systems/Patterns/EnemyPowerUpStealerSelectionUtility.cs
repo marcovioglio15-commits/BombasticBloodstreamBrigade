@@ -32,11 +32,48 @@ internal static class EnemyPowerUpStealerSelectionUtility
                                                int stealerIndex,
                                                EnemyPowerUpStealSelectionMode selectionMode)
     {
-        bool hasPrimary = IsActiveSlotEligibleForSteal(in powerUpsConfig.PrimarySlot,
+        return ResolveActiveSlotToSteal(in powerUpsConfig.PrimarySlot,
+                                        in powerUpsConfig.SecondarySlot,
+                                        in powerUpsState,
+                                        unlockCatalog,
+                                        acquisitionStealCooldownSeconds,
+                                        elapsedTime,
+                                        enemyEntity,
+                                        in enemyRuntimeState,
+                                        stealerIndex,
+                                        selectionMode);
+    }
+
+    /// <summary>
+    /// Resolves the active slot selected for stealing from direct slot payloads.
+    /// </summary>
+    /// <param name="primarySlotConfig">Current primary active slot payload.</param>
+    /// <param name="secondarySlotConfig">Current secondary active slot payload.</param>
+    /// <param name="powerUpsState">Current player active runtime state containing equip-order markers.</param>
+    /// <param name="unlockCatalog">Player unlock catalog used to ignore protected recent acquisitions.</param>
+    /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
+    /// <param name="elapsedTime">Current gameplay elapsed time.</param>
+    /// <param name="enemyEntity">Enemy entity used by deterministic random selection.</param>
+    /// <param name="enemyRuntimeState">Enemy runtime state used to vary deterministic random selection by activation time.</param>
+    /// <param name="stealerIndex">Stealer module index used to decorrelate sibling modules.</param>
+    /// <param name="selectionMode">Within-category selection mode configured by the module.</param>
+    /// <returns>0 for primary, 1 for secondary, or -1 when no active slot exists.</returns>
+    public static int ResolveActiveSlotToSteal(in PlayerPowerUpSlotConfig primarySlotConfig,
+                                               in PlayerPowerUpSlotConfig secondarySlotConfig,
+                                               in PlayerPowerUpsState powerUpsState,
+                                               DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                               float acquisitionStealCooldownSeconds,
+                                               float elapsedTime,
+                                               Entity enemyEntity,
+                                               in EnemyRuntimeState enemyRuntimeState,
+                                               int stealerIndex,
+                                               EnemyPowerUpStealSelectionMode selectionMode)
+    {
+        bool hasPrimary = IsActiveSlotEligibleForSteal(in primarySlotConfig,
                                                        unlockCatalog,
                                                        acquisitionStealCooldownSeconds,
                                                        elapsedTime);
-        bool hasSecondary = IsActiveSlotEligibleForSteal(in powerUpsConfig.SecondarySlot,
+        bool hasSecondary = IsActiveSlotEligibleForSteal(in secondarySlotConfig,
                                                          unlockCatalog,
                                                          acquisitionStealCooldownSeconds,
                                                          elapsedTime);
@@ -248,7 +285,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
     {
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+            ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+
+            if (!IsPassiveEligibleForSteal(in passiveTool,
                                            unlockCatalog,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
@@ -275,7 +314,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     {
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
                                                        equippedPassiveTools,
@@ -304,7 +343,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
     {
         for (int passiveIndex = equippedPassiveTools.Length - 1; passiveIndex >= 0; passiveIndex--)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+            ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+
+            if (!IsPassiveEligibleForSteal(in passiveTool,
                                            unlockCatalog,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
@@ -331,7 +372,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     {
         for (int catalogIndex = unlockCatalog.Length - 1; catalogIndex >= 0; catalogIndex--)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
                                                        equippedPassiveTools,
@@ -378,7 +419,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
 
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+            ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+
+            if (!IsPassiveEligibleForSteal(in passiveTool,
                                            unlockCatalog,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
@@ -426,7 +469,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
                                                        equippedPassiveTools,
@@ -460,7 +503,9 @@ internal static class EnemyPowerUpStealerSelectionUtility
 
         for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
         {
-            if (!IsPassiveEligibleForSteal(equippedPassiveTools[passiveIndex],
+            ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+
+            if (!IsPassiveEligibleForSteal(in passiveTool,
                                            unlockCatalog,
                                            acquisitionStealCooldownSeconds,
                                            elapsedTime))
@@ -489,7 +534,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveCatalogEntryEligibleForSteal(in catalogEntry,
                                                        equippedPassiveTools,
@@ -511,7 +556,7 @@ internal static class EnemyPowerUpStealerSelectionUtility
     /// <param name="acquisitionStealCooldownSeconds">Cooldown duration applied per recently acquired power-up.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
     /// <returns>True when the passive can be identified, stolen, and restored.</returns>
-    private static bool IsPassiveEligibleForSteal(EquippedPassiveToolElement passive,
+    private static bool IsPassiveEligibleForSteal(in EquippedPassiveToolElement passive,
                                                   DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                   float acquisitionStealCooldownSeconds,
                                                   float elapsedTime)

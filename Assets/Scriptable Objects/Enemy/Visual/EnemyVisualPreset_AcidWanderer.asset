@@ -72,6 +72,13 @@ MonoBehaviour:
     spawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
     spawnVfxLifetimeSeconds: 0.5
     spawnVfxScaleMultiplier: 2
+    deathVfxPrefab: {fileID: 7550252483311059252, guid: e3ad1e727d0729844ab1862e3ddac869, type: 3}
+    deathVfxSpawnOffset: {x: 0, y: 0, z: 0}
+    deathVfxLifetimeSeconds: 0.75
+    deathVfxScaleMultiplier: 1
+    useEnemyBaseColorForDeathDebris: 1
+    deathDebrisFallbackColor: {r: 0.14117648, g: 0.38823533, b: 0.52156866, a: 1}
+    deathDebrisParticleChildName: VFX_Debris
     spawnPaintColor: {r: 0.13953155, g: 0.3884477, b: 0.52201253, a: 1}
   spawnOverrides:
     overrideSpawnOffset: 0

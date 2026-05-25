@@ -382,6 +382,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerControllerPreset sourceControllerPreset = controllerPreset;
         PlayerProgressionPreset progressionPreset = authoring.GetProgressionPreset();
         PlayerPowerUpsPreset powerUpsPreset = authoring.GetPowerUpsPreset();
+        PlayerVisualPreset visualPreset = authoring.MasterPreset != null ? authoring.MasterPreset.VisualPreset : null;
         PlayerProgressionPreset sourceProgressionPreset = progressionPreset;
         PlayerPowerUpsPreset sourcePowerUpsPreset = powerUpsPreset;
         PlayerAnimationBindingsPreset animationBindingsPreset = authoring.MasterPreset != null ? authoring.MasterPreset.AnimationBindingsPreset : null;
@@ -390,10 +391,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerScaledPresetScope scaledPresetScope = PlayerPresetScalingBakeUtility.CreateScope(controllerPreset,
                                                                                                progressionPreset,
                                                                                                powerUpsPreset,
+                                                                                               visualPreset,
                                                                                                animationBindingsPreset);
         controllerPreset = scaledPresetScope.ControllerPreset;
         progressionPreset = scaledPresetScope.ProgressionPreset;
         powerUpsPreset = scaledPresetScope.PowerUpsPreset;
+        visualPreset = scaledPresetScope.VisualPreset;
         animationBindingsPreset = scaledPresetScope.AnimationBindingsPreset;
 
         try
@@ -585,6 +588,34 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerLaserBeamVisualBakeUtility.PopulateSourceVariantBuffer(authoring, laserBeamSourceVariantBuffer);
         PlayerLaserBeamVisualBakeUtility.PopulateImpactVariantBuffer(authoring, laserBeamImpactVariantBuffer);
         PlayerLaserBeamVisualBakeUtility.PopulateVisualPresetBuffer(authoring, laserBeamVisualPresetBuffer);
+        DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> powerUpVfxPrefabBindingsBuffer = default;
+        bool hasPowerUpVfxRuntime = false;
+
+        if (visualPreset != null &&
+            (visualPreset.LevelUpVfxPrefab != null || visualPreset.ChargeShotVfxPrefab != null))
+        {
+            EnsurePowerUpVfxRuntime(authoring,
+                                    entity,
+                                    ref hasPowerUpVfxRuntime,
+                                    ref powerUpVfxPrefabBindingsBuffer);
+            Func<GameObject, Entity> resolveVisualVfxPrefabEntity = (GameObject prefab) =>
+                ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
+
+            if (PlayerVisualVfxBakeUtility.TryBuildLevelUpVfxConfig(visualPreset,
+                                                                     resolveVisualVfxPrefabEntity,
+                                                                     out PlayerLevelUpVfxConfig levelUpVfxConfig))
+            {
+                AddComponent(entity, levelUpVfxConfig);
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildChargeShotVfxConfig(visualPreset,
+                                                                        resolveVisualVfxPrefabEntity,
+                                                                        out PlayerChargeShotVfxConfig chargeShotVfxConfig))
+            {
+                AddComponent(entity, chargeShotVfxConfig);
+                AddComponent(entity, new PlayerChargeShotVfxRuntimeState());
+            }
+        }
 
         if (authoring.SpawnRuntimeVisualBridgeWhenAnimatorMissing &&
             resolvedRuntimeVisualBridgePrefab == null)
@@ -671,18 +702,27 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
         if (powerUpsPreset != null)
         {
-            DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> powerUpVfxPrefabBindingsBuffer = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+            EnsurePowerUpVfxRuntime(authoring,
+                                    entity,
+                                    ref hasPowerUpVfxRuntime,
+                                    ref powerUpVfxPrefabBindingsBuffer);
             DynamicBuffer<PlayerOrbitalProjectionPrefabElement> orbitalProjectionPrefabBindingsBuffer = AddBuffer<PlayerOrbitalProjectionPrefabElement>(entity);
             Func<GameObject, Entity> resolveDynamicPowerUpVfxPrefabEntity = (GameObject prefab) =>
                 ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
             Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = (GameObject prefab) =>
                 ResolveOrbitalProjectionPrefabBindingIndex(prefab, orbitalProjectionPrefabBindingsBuffer);
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpActiveBakeUtility.BuildPowerUpsConfig(authoring,
-                                                                                                     powerUpsPreset,
-                                                                                                     resolveDynamicPowerUpVfxPrefabEntity,
-                                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
+            PlayerPowerUpSlotConfig primaryPowerUpSlotConfig;
+            PlayerPowerUpSlotConfig secondaryPowerUpSlotConfig;
+            PlayerPowerUpActiveBakeUtility.BuildPowerUpSlots(authoring,
+                                                             powerUpsPreset,
+                                                             resolveDynamicPowerUpVfxPrefabEntity,
+                                                             out primaryPowerUpSlotConfig,
+                                                             out secondaryPowerUpSlotConfig,
+                                                             resolveOrbitalProjectionPrefabBindingIndex);
             DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer = AddBuffer<PlayerPowerUpsConfigElement>(entity);
-            PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
+            PlayerPowerUpsConfigBufferUtility.WriteSlots(powerUpsConfigBuffer,
+                                                         in primaryPowerUpSlotConfig,
+                                                         in secondaryPowerUpSlotConfig);
             AddComponent(entity, new PlayerLaserBeamState
             {
                 NextStormTickPulseId = 1
@@ -692,8 +732,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             AddBuffer<PlayerLaserBeamPulseHitElement>(entity);
             AddComponent(entity, new PlayerChargeCharacterTuningState());
             AddBuffer<PlayerChargeCharacterTuningBaseStatElement>(entity);
-            PlayerPowerUpVfxCapConfig powerUpVfxCapConfig = PlayerPowerUpBakeSharedUtility.BuildPowerUpVfxCapConfig(authoring);
-            AddComponent(entity, powerUpVfxCapConfig);
             IReadOnlyList<ElementalVfxByElementData> elementalEnemyVfxAssignments = PlayerAuthoringVisualPresetResolverUtility.ResolveElementalEnemyVfxAssignments(authoring.MasterPreset,
                                                                                                                                                                   powerUpsPreset);
             PlayerElementalVfxConfig elementalVfxConfig = PlayerPowerUpBakeSharedUtility.BuildElementalVfxConfig(authoring,
@@ -748,10 +786,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             PlayerRuntimeScalingBakeUtility.PopulatePowerUpScalingMetadata(sourcePowerUpsPreset, powerUpScalingBuffer);
 #endif
             DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntriesBuffer = AddBuffer<PlayerPowerUpCheatPresetEntry>(entity);
+            DynamicBuffer<PlayerPowerUpCheatPresetSlotElement> cheatPresetSlotsBuffer = AddBuffer<PlayerPowerUpCheatPresetSlotElement>(entity);
             DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassivesBuffer = AddBuffer<PlayerPowerUpCheatPresetPassiveElement>(entity);
             PlayerPowerUpCatalogBakeUtility.PopulatePowerUpCheatPresetBuffers(authoring,
                                                                               resolveDynamicPowerUpVfxPrefabEntity,
                                                                               cheatPresetEntriesBuffer,
+                                                                              cheatPresetSlotsBuffer,
                                                                               cheatPresetPassivesBuffer,
                                                                               resolveOrbitalProjectionPrefabBindingIndex);
             AddBuffer<PlayerOrbitalProjectionSpawnRequest>(entity);
@@ -825,6 +865,27 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
     #endregion
 
     #region Bake Helpers
+    /// <summary>
+    /// Adds shared managed VFX buffers and caps once for visual-preset and power-up runtime VFX requests.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used to resolve VFX cap settings.</param>
+    /// <param name="entity">Player entity receiving the managed VFX runtime buffers.</param>
+    /// <param name="hasRuntime">Mutable guard that prevents duplicate buffer and component additions.</param>
+    /// <param name="prefabBindingsBuffer">Binding buffer returned for prefab registration.</param>
+    private void EnsurePowerUpVfxRuntime(PlayerAuthoring authoring,
+                                         Entity entity,
+                                         ref bool hasRuntime,
+                                         ref DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindingsBuffer)
+    {
+        if (hasRuntime)
+            return;
+
+        AddBuffer<PlayerPowerUpVfxSpawnRequest>(entity);
+        prefabBindingsBuffer = AddBuffer<PlayerPowerUpVfxPrefabBindingElement>(entity);
+        AddComponent(entity, PlayerPowerUpBakeSharedUtility.BuildPowerUpVfxCapConfig(authoring));
+        hasRuntime = true;
+    }
+
     /// <summary>
     /// Declares preset dependencies consumed by this baker so editing preset assets triggers a player rebake.
     /// </summary>

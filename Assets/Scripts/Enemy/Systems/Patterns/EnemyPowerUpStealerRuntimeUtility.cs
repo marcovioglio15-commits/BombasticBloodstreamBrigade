@@ -56,7 +56,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         for (int stealerIndex = 0; stealerIndex < stealerCount; stealerIndex++)
         {
             EnemyPowerUpStealerConfigElement config = stealerConfigs[stealerIndex];
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[stealerIndex];
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(stealerIndex);
 
             if (!CanEvaluateTrigger(in config, in runtime, triggerMode))
                 continue;
@@ -70,10 +70,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                          playerPosition))
             {
                 if (consumeModuleActivationAttempt)
-                {
                     runtime.HasTriggeredOnce = 1;
-                    stealerRuntime[stealerIndex] = runtime;
-                }
 
                 continue;
             }
@@ -98,8 +95,6 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                 InitializeRecoveryTracking(in config, in enemyHealth, ref runtime);
                 ApplyVisualState(enemyEntity, in runtime, ref visualStateLookup);
             }
-
-            stealerRuntime[stealerIndex] = runtime;
 
             if (stolen)
             {
@@ -130,13 +125,12 @@ internal static class EnemyPowerUpStealerRuntimeUtility
             if (!ShouldConsumeModuleActivationAttempt(in config, triggerMode))
                 continue;
 
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[stealerIndex];
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(stealerIndex);
 
             if (runtime.HasTriggeredOnce != 0)
                 continue;
 
             runtime.HasTriggeredOnce = 1;
-            stealerRuntime[stealerIndex] = runtime;
         }
     }
 
@@ -167,7 +161,9 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     {
         for (int runtimeIndex = 0; runtimeIndex < stealerRuntime.Length; runtimeIndex++)
         {
-            if (stealerRuntime[runtimeIndex].HasStolenPowerUp == 0)
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(runtimeIndex);
+
+            if (runtime.HasStolenPowerUp == 0)
                 continue;
 
             return true;
@@ -391,10 +387,16 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                               ref EnemyPowerUpStealerRuntimeElement runtime,
                                               ref EnemyPowerUpStealerPlayerAccess playerAccess)
     {
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(playerEntity, in playerAccess.PowerUpsConfigLookup);
+        PlayerPowerUpSlotConfig primarySlotConfig;
+        PlayerPowerUpSlotConfig secondarySlotConfig;
+        PlayerPowerUpsConfigBufferUtility.ReadSlots(playerEntity,
+                                                    in playerAccess.PowerUpsConfigLookup,
+                                                    out primarySlotConfig,
+                                                    out secondarySlotConfig);
         PlayerPowerUpsState powerUpsState = playerAccess.PowerUpsStateLookup[playerEntity];
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = playerAccess.UnlockCatalogLookup[playerEntity];
-        int slotIndex = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotToSteal(in powerUpsConfig,
+        int slotIndex = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotToSteal(in primarySlotConfig,
+                                                                                     in secondarySlotConfig,
                                                                                      in powerUpsState,
                                                                                      unlockCatalog,
                                                                                      config.AcquisitionStealCooldownSeconds,
@@ -410,20 +412,22 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         int originalEquipOrder = EnemyPowerUpStealerSelectionUtility.ResolveActiveSlotEquipOrder(slotIndex, in powerUpsState);
 
         if (!PlayerPowerUpLoadoutRuntimeUtility.TryRemoveActiveSlot(slotIndex,
-                                                                    ref powerUpsConfig,
+                                                                    ref primarySlotConfig,
+                                                                    ref secondarySlotConfig,
                                                                     ref powerUpsState,
-                                                                    out PlayerStoredActivePowerUpData storedPowerUp))
+                                                                    ref runtime.StoredActivePowerUp))
             return false;
 
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;
         powerUpsState.PreviousSecondaryPressed = 0;
-        PlayerPowerUpsConfigBufferUtility.Write(playerAccess.PowerUpsConfigLookup[playerEntity], in powerUpsConfig);
+        PlayerPowerUpsConfigBufferUtility.WriteSlots(playerAccess.PowerUpsConfigLookup[playerEntity],
+                                                     in primarySlotConfig,
+                                                     in secondarySlotConfig);
         playerAccess.PowerUpsStateLookup[playerEntity] = powerUpsState;
         runtime.HasStolenPowerUp = 1;
         runtime.StolenKind = PlayerPowerUpUnlockKind.Active;
-        runtime.PowerUpId = storedPowerUp.SlotConfig.PowerUpId;
-        runtime.StoredActivePowerUp = storedPowerUp;
+        runtime.PowerUpId = runtime.StoredActivePowerUp.SlotConfig.PowerUpId;
         runtime.StoredPassiveTool = default;
         runtime.OriginalActiveSlotIndex = slotIndex;
         runtime.OriginalActiveEquipOrder = originalEquipOrder;
@@ -480,28 +484,30 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                                                                                      ref runtime,
                                                                                                      ref playerAccess);
 
-        EquippedPassiveToolElement stolenPassive = equippedPassiveTools[passiveIndex];
-        int catalogIndex = FindCatalogIndex(stolenPassive.PowerUpId, PlayerPowerUpUnlockKind.Passive, unlockCatalog);
+        ref EquippedPassiveToolElement stolenPassive = ref equippedPassiveTools.ElementAt(passiveIndex);
+        FixedString64Bytes stolenPowerUpId = stolenPassive.PowerUpId;
+        int catalogIndex = FindCatalogIndex(stolenPowerUpId, PlayerPowerUpUnlockKind.Passive, unlockCatalog);
         int originalUnlockCount = 0;
+        runtime.StoredPassiveTool = stolenPassive.Tool;
         equippedPassiveTools.RemoveAt(passiveIndex);
-        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
-        PlayerPassiveToolsStateBufferUtility.Write(playerAccess.PassiveToolsStateLookup[playerEntity], in passiveToolsState);
+        DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = playerAccess.PassiveToolsStateLookup[playerEntity];
+        ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
 
         if (catalogIndex >= 0)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
             originalUnlockCount = math.max(0, catalogEntry.CurrentUnlockCount);
             catalogEntry.CurrentUnlockCount = 0;
             catalogEntry.IsUnlocked = 0;
             catalogEntry.PendingInitialCharacterTuningApply = 0;
-            unlockCatalog[catalogIndex] = catalogEntry;
         }
 
         runtime.HasStolenPowerUp = 1;
         runtime.StolenKind = PlayerPowerUpUnlockKind.Passive;
-        runtime.PowerUpId = stolenPassive.PowerUpId;
+        runtime.PowerUpId = stolenPowerUpId;
         runtime.StoredActivePowerUp = default;
-        runtime.StoredPassiveTool = stolenPassive.Tool;
         runtime.OriginalActiveSlotIndex = -1;
         runtime.OriginalActiveEquipOrder = 0;
         runtime.OriginalPassiveCatalogIndex = catalogIndex;
@@ -616,7 +622,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (catalogEntry.UnlockKind != unlockKind)
                 continue;

@@ -691,7 +691,9 @@ public sealed class HUDPowerUpContainerInteractionSection
             return false;
 
         DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer = entityManager.GetBuffer<PlayerPowerUpsConfigElement>(currentPlayerEntity);
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+        PlayerPowerUpsConfig powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                               out powerUpsConfig);
 
         if (powerUpsConfig.PrimarySlot.IsDefined == 0)
         {

@@ -144,7 +144,7 @@ public static class PlayerMilestonePowerUpRollUtility
             }
 
             rolledCatalogIndices.Add(rolledCatalogIndex);
-            PlayerPowerUpUnlockCatalogElement unlockEntry = unlockCatalog[rolledCatalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement unlockEntry = ref unlockCatalog.ElementAt(rolledCatalogIndex);
 
             if (unlockEntry.UnlockKind == PlayerPowerUpUnlockKind.Passive && unlockEntry.PassiveToolConfig.IsDefined != 0)
                 blockedPassiveKinds.Add(unlockEntry.PassiveToolConfig.ToolKind);
@@ -362,7 +362,7 @@ public static class PlayerMilestonePowerUpRollUtility
             if (rolledCatalogIndices.Contains(catalogIndex))
                 continue;
 
-            PlayerPowerUpUnlockCatalogElement unlockEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement unlockEntry = ref unlockCatalog.ElementAt(catalogIndex);
             int effectiveCurrentUnlockCount = ResolveEffectiveCurrentUnlockCount(in unlockEntry, reservedUnlockCountsByPowerUpId);
 
             if (!HasRemainingUnlocks(in unlockEntry, effectiveCurrentUnlockCount))
@@ -435,7 +435,7 @@ public static class PlayerMilestonePowerUpRollUtility
             if (rolledCatalogIndices.Contains(candidateCatalogIndex))
                 continue;
 
-            PlayerPowerUpUnlockCatalogElement unlockEntry = unlockCatalog[candidateCatalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement unlockEntry = ref unlockCatalog.ElementAt(candidateCatalogIndex);
             int effectiveCurrentUnlockCount = ResolveEffectiveCurrentUnlockCount(in unlockEntry, reservedUnlockCountsByPowerUpId);
 
             if (!HasRemainingUnlocks(in unlockEntry, effectiveCurrentUnlockCount))

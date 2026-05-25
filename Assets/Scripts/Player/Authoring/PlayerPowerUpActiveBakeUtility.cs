@@ -14,27 +14,38 @@ public static class PlayerPowerUpActiveBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the runtime active loadout config from one power-ups preset.
+    /// Builds the runtime active loadout slots from one power-ups preset without materializing the large two-slot wrapper.
     /// </summary>
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="primarySlotConfig">Primary active slot config.</param>
+    /// <param name="secondarySlotConfig">Secondary active slot config.</param>
     /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
-    /// <returns>Primary and secondary active slot config.</returns>
-    public static PlayerPowerUpsConfig BuildPowerUpsConfig(PlayerAuthoring authoring,
-                                                           PlayerPowerUpsPreset preset,
-                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                           Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
+    public static void BuildPowerUpSlots(PlayerAuthoring authoring,
+                                         PlayerPowerUpsPreset preset,
+                                         Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                         out PlayerPowerUpSlotConfig primarySlotConfig,
+                                         out PlayerPowerUpSlotConfig secondarySlotConfig,
+                                         Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
+        primarySlotConfig = default;
+        secondarySlotConfig = default;
+
         if (preset == null)
-            return default;
+            return;
 
         IReadOnlyList<ModularPowerUpDefinition> activePowerUps = preset.ActivePowerUps;
 
         if (activePowerUps == null || activePowerUps.Count <= 0)
-            return BuildLegacyLoadoutPowerUpsConfig(authoring,
-                                                    preset,
-                                                    resolveDynamicPrefabEntity);
+        {
+            BuildLegacyLoadoutPowerUpSlots(authoring,
+                                           preset,
+                                           resolveDynamicPrefabEntity,
+                                           out primarySlotConfig,
+                                           out secondarySlotConfig);
+            return;
+        }
 
         ModularPowerUpDefinition primaryPowerUp = PlayerPowerUpBakeSharedUtility.ResolveLoadoutActivePowerUp(preset,
                                                                                                               preset.PrimaryActivePowerUpId,
@@ -45,43 +56,44 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                                                 1,
                                                                                                                 false);
 
-        PlayerPowerUpSlotConfig primaryCompiledSlot = BuildSlotConfigFromModularPowerUp(authoring,
-                                                                                        preset,
-                                                                                        primaryPowerUp,
-                                                                                        resolveDynamicPrefabEntity,
-                                                                                        resolveOrbitalProjectionPrefabBindingIndex);
-        PlayerPowerUpSlotConfig secondaryCompiledSlot = BuildSlotConfigFromModularPowerUp(authoring,
-                                                                                          preset,
-                                                                                          secondaryPowerUp,
-                                                                                          resolveDynamicPrefabEntity,
-                                                                                          resolveOrbitalProjectionPrefabBindingIndex);
-
-        return new PlayerPowerUpsConfig
-        {
-            PrimarySlot = primaryCompiledSlot,
-            SecondarySlot = secondaryCompiledSlot
-        };
+        BuildSlotConfigFromModularPowerUp(authoring,
+                                          preset,
+                                          primaryPowerUp,
+                                          resolveDynamicPrefabEntity,
+                                          out primarySlotConfig,
+                                          resolveOrbitalProjectionPrefabBindingIndex);
+        BuildSlotConfigFromModularPowerUp(authoring,
+                                          preset,
+                                          secondaryPowerUp,
+                                          resolveDynamicPrefabEntity,
+                                          out secondarySlotConfig,
+                                          resolveOrbitalProjectionPrefabBindingIndex);
     }
 
     /// <summary>
-    /// Builds the runtime active loadout config from legacy active tool definitions only.
-    /// Used as fallback when modular active power-ups are missing entirely.
+    /// Builds legacy active loadout slots when a preset has no modular active power-up definitions.
     /// </summary>
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
-    /// <returns>Primary and secondary legacy slot config.</returns>
-    public static PlayerPowerUpsConfig BuildLegacyLoadoutPowerUpsConfig(PlayerAuthoring authoring,
-                                                                        PlayerPowerUpsPreset preset,
-                                                                        Func<GameObject, Entity> resolveDynamicPrefabEntity)
+    /// <param name="primarySlotConfig">Primary legacy slot config.</param>
+    /// <param name="secondarySlotConfig">Secondary legacy slot config.</param>
+    public static void BuildLegacyLoadoutPowerUpSlots(PlayerAuthoring authoring,
+                                                      PlayerPowerUpsPreset preset,
+                                                      Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                      out PlayerPowerUpSlotConfig primarySlotConfig,
+                                                      out PlayerPowerUpSlotConfig secondarySlotConfig)
     {
+        primarySlotConfig = default;
+        secondarySlotConfig = default;
+
         if (preset == null)
-            return default;
+            return;
 
         IReadOnlyList<ActiveToolDefinition> activeTools = preset.ActiveTools;
 
         if (activeTools == null || activeTools.Count <= 0)
-            return default;
+            return;
 
         int secondaryFallbackIndex = activeTools.Count > 1 ? 1 : 0;
         ActiveToolDefinition primaryTool = PlayerPowerUpBakeSharedUtility.ResolveLoadoutTool(preset, preset.PrimaryActiveToolId, 0);
@@ -92,11 +104,14 @@ public static class PlayerPowerUpActiveBakeUtility
         if (activeTools.Count > 1 && ReferenceEquals(primaryTool, secondaryTool))
             secondaryTool = PlayerPowerUpBakeSharedUtility.ResolveLoadoutTool(preset, string.Empty, 1);
 
-        return new PlayerPowerUpsConfig
-        {
-            PrimarySlot = BuildSlotConfig(authoring, primaryTool, resolveDynamicPrefabEntity),
-            SecondarySlot = BuildSlotConfig(authoring, secondaryTool, resolveDynamicPrefabEntity)
-        };
+        BuildSlotConfig(authoring,
+                        primaryTool,
+                        resolveDynamicPrefabEntity,
+                        out primarySlotConfig);
+        BuildSlotConfig(authoring,
+                        secondaryTool,
+                        resolveDynamicPrefabEntity,
+                        out secondarySlotConfig);
     }
 
     /// <summary>
@@ -106,16 +121,19 @@ public static class PlayerPowerUpActiveBakeUtility
     /// <param name="preset">Source power-ups preset.</param>
     /// <param name="powerUp">Modular active power-up definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
+    /// <param name="slotConfig">Runtime slot config or default.</param>
     /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that returns remappable orbital projection prefab binding indices.</param>
-    /// <returns>Runtime slot config or default.</returns>
-    public static PlayerPowerUpSlotConfig BuildSlotConfigFromModularPowerUp(PlayerAuthoring authoring,
-                                                                            PlayerPowerUpsPreset preset,
-                                                                            ModularPowerUpDefinition powerUp,
-                                                                            Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                                            Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
+    public static void BuildSlotConfigFromModularPowerUp(PlayerAuthoring authoring,
+                                                         PlayerPowerUpsPreset preset,
+                                                         ModularPowerUpDefinition powerUp,
+                                                         Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                         out PlayerPowerUpSlotConfig slotConfig,
+                                                         Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
+        slotConfig = default;
+
         if (powerUp == null)
-            return default;
+            return;
 
         bool hasGateResource = false;
         PowerUpResourceType activationResource = PowerUpResourceType.None;
@@ -213,7 +231,7 @@ public static class PlayerPowerUpActiveBakeUtility
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
-            return default;
+            return;
 
         for (int index = 0; index < moduleBindings.Count; index++)
         {
@@ -428,14 +446,15 @@ public static class PlayerPowerUpActiveBakeUtility
 
         if (isToggleable)
         {
-            togglePassiveTool = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
-                                                                                                         preset,
-                                                                                                         powerUp,
-                                                                                                         resolveDynamicPrefabEntity,
-                                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
+            PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
+                                                                                     preset,
+                                                                                     powerUp,
+                                                                                     resolveDynamicPrefabEntity,
+                                                                                     out togglePassiveTool,
+                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
 
             if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning)
-                return default;
+                return;
 
             resolvedToolKind = ActiveToolKind.PassiveToggle;
         }
@@ -453,16 +472,17 @@ public static class PlayerPowerUpActiveBakeUtility
                 resolvedToolKind == ActiveToolKind.Shotgun ||
                 hasOrbitalProjections)
             {
-                triggeredProjectilePassiveTool = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
-                                                                                                                           preset,
-                                                                                                                           powerUp,
-                                                                                                                           resolveDynamicPrefabEntity,
-                                                                                                                           resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
+                                                                                         preset,
+                                                                                         powerUp,
+                                                                                         resolveDynamicPrefabEntity,
+                                                                                         out triggeredProjectilePassiveTool,
+                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
             }
         }
 
         if (resolvedToolKind == ActiveToolKind.Custom)
-            return default;
+            return;
 
         Entity bombPrefabEntity = Entity.Null;
         Entity bombExplosionVfxPrefabEntity = Entity.Null;
@@ -505,90 +525,91 @@ public static class PlayerPowerUpActiveBakeUtility
             bombAffectAll = 0;
         }
 
-        return PlayerPowerUpActiveSlotSynthesisUtility.BuildModularSlotConfig(powerUp,
-                                                                              activationResource,
-                                                                              maintenanceResource,
-                                                                              chargeType,
-                                                                              isToggleable,
-                                                                              maximumEnergy,
-                                                                              activationCost,
-                                                                              maintenanceCostPerSecond,
-                                                                              maintenanceTicksPerSecond,
-                                                                              chargePerTrigger,
-                                                                              cooldownSeconds,
-                                                                              allowRechargeDuringToggleStartupLock,
-                                                                              minimumActivationEnergyPercent,
-                                                                              suppressBaseShootingWhileActive,
-                                                                              interruptOtherSlotOnEnter,
-                                                                              interruptOtherSlotChargingOnly,
-                                                                              bombPrefabEntity,
-                                                                              bombSpawnOffset,
-                                                                              bombSpawnOffsetOrientation,
-                                                                              bombDeploySpeed,
-                                                                              bombVelocityDirection,
-                                                                              bombCollisionRadius,
-                                                                              bombBounceOnWalls,
-                                                                              bombBounceDamping,
-                                                                              bombLinearDampingPerSecond,
-                                                                              bombFuseSeconds,
-                                                                              bombEnableDamagePayload,
-                                                                              bombRadius,
-                                                                              bombDamage,
-                                                                              bombAffectAll,
-                                                                              bombExplosionVfxPrefabEntity,
-                                                                              bombScaleVfxToRadius,
-                                                                              bombVfxScaleMultiplier,
-                                                                              dashDistance,
-                                                                              dashDirectionMode,
-                                                                              dashDuration,
-                                                                              dashSpeedTransitionInSeconds,
-                                                                              dashSpeedTransitionOutSeconds,
-                                                                              dashWallBounceIntensity,
-                                                                              dashGrantsInvulnerability,
-                                                                              dashInvulnerabilityExtraTime,
-                                                                              bulletTimeDuration,
-                                                                              bulletTimeEnemySlowPercent,
-                                                                              bulletTimeTransitionTimeSeconds,
-                                                                              hasTriggerPress,
-                                                                              hasTriggerRelease,
-                                                                              hasHoldCharge,
-                                                                              holdChargeRequired,
-                                                                              holdChargeMaximum,
-                                                                              holdChargeRatePerSecond,
-                                                                              decayAfterRelease,
-                                                                              decayAfterReleasePercentPerSecond,
-                                                                              passiveChargeGainWhileReleased,
-                                                                              passiveChargeGainPercentPerSecond,
-                                                                              useChargedLaserBeam,
-                                                                              chargedLaserDurationSeconds,
-                                                                              in chargedLaserBeamConfig,
-                                                                              slowPlayerWhileCharging,
-                                                                              maximumPlayerSlowPercent,
-                                                                              in playerSlowCurveSamples,
-                                                                              suppressBaseShootingWhileCharging,
-                                                                              shotgunProjectileCount,
-                                                                              shotgunConeAngleDegrees,
-                                                                              shotgunLaserDurationSeconds,
-                                                                              chargeShotLaserDurationSeconds,
-                                                                              projectileSizeMultiplier,
-                                                                              projectileDamageMultiplier,
-                                                                              projectileSpeedMultiplier,
-                                                                              projectileRangeMultiplier,
-                                                                              projectileLifetimeMultiplier,
-                                                                              projectilePenetrationMode,
-                                                                              projectileMaxPenetrations,
-                                                                              hasProjectileElementalPayload,
-                                                                              projectileElementalEffect,
-                                                                              projectileElementalStacksPerHit,
-                                                                              hasHealthPackOverTime,
-                                                                              healthPackHealAmount,
-                                                                              healthPackDurationSeconds,
-                                                                              healthPackTickIntervalSeconds,
-                                                                              healthPackStackPolicy,
-                                                                              applyCharacterTuningOnActiveTrigger,
-                                                                              in triggeredProjectilePassiveTool,
-                                                                              in togglePassiveTool,
-                                                                              resolvedToolKind);
+        PlayerPowerUpActiveSlotSynthesisUtility.BuildModularSlotConfig(powerUp,
+                                                                       activationResource,
+                                                                       maintenanceResource,
+                                                                       chargeType,
+                                                                       isToggleable,
+                                                                       maximumEnergy,
+                                                                       activationCost,
+                                                                       maintenanceCostPerSecond,
+                                                                       maintenanceTicksPerSecond,
+                                                                       chargePerTrigger,
+                                                                       cooldownSeconds,
+                                                                       allowRechargeDuringToggleStartupLock,
+                                                                       minimumActivationEnergyPercent,
+                                                                       suppressBaseShootingWhileActive,
+                                                                       interruptOtherSlotOnEnter,
+                                                                       interruptOtherSlotChargingOnly,
+                                                                       bombPrefabEntity,
+                                                                       bombSpawnOffset,
+                                                                       bombSpawnOffsetOrientation,
+                                                                       bombDeploySpeed,
+                                                                       bombVelocityDirection,
+                                                                       bombCollisionRadius,
+                                                                       bombBounceOnWalls,
+                                                                       bombBounceDamping,
+                                                                       bombLinearDampingPerSecond,
+                                                                       bombFuseSeconds,
+                                                                       bombEnableDamagePayload,
+                                                                       bombRadius,
+                                                                       bombDamage,
+                                                                       bombAffectAll,
+                                                                       bombExplosionVfxPrefabEntity,
+                                                                       bombScaleVfxToRadius,
+                                                                       bombVfxScaleMultiplier,
+                                                                       dashDistance,
+                                                                       dashDirectionMode,
+                                                                       dashDuration,
+                                                                       dashSpeedTransitionInSeconds,
+                                                                       dashSpeedTransitionOutSeconds,
+                                                                       dashWallBounceIntensity,
+                                                                       dashGrantsInvulnerability,
+                                                                       dashInvulnerabilityExtraTime,
+                                                                       bulletTimeDuration,
+                                                                       bulletTimeEnemySlowPercent,
+                                                                       bulletTimeTransitionTimeSeconds,
+                                                                       hasTriggerPress,
+                                                                       hasTriggerRelease,
+                                                                       hasHoldCharge,
+                                                                       holdChargeRequired,
+                                                                       holdChargeMaximum,
+                                                                       holdChargeRatePerSecond,
+                                                                       decayAfterRelease,
+                                                                       decayAfterReleasePercentPerSecond,
+                                                                       passiveChargeGainWhileReleased,
+                                                                       passiveChargeGainPercentPerSecond,
+                                                                       useChargedLaserBeam,
+                                                                       chargedLaserDurationSeconds,
+                                                                       in chargedLaserBeamConfig,
+                                                                       slowPlayerWhileCharging,
+                                                                       maximumPlayerSlowPercent,
+                                                                       in playerSlowCurveSamples,
+                                                                       suppressBaseShootingWhileCharging,
+                                                                       shotgunProjectileCount,
+                                                                       shotgunConeAngleDegrees,
+                                                                       shotgunLaserDurationSeconds,
+                                                                       chargeShotLaserDurationSeconds,
+                                                                       projectileSizeMultiplier,
+                                                                       projectileDamageMultiplier,
+                                                                       projectileSpeedMultiplier,
+                                                                       projectileRangeMultiplier,
+                                                                       projectileLifetimeMultiplier,
+                                                                       projectilePenetrationMode,
+                                                                       projectileMaxPenetrations,
+                                                                       hasProjectileElementalPayload,
+                                                                       projectileElementalEffect,
+                                                                       projectileElementalStacksPerHit,
+                                                                       hasHealthPackOverTime,
+                                                                       healthPackHealAmount,
+                                                                       healthPackDurationSeconds,
+                                                                       healthPackTickIntervalSeconds,
+                                                                       healthPackStackPolicy,
+                                                                       applyCharacterTuningOnActiveTrigger,
+                                                                       in triggeredProjectilePassiveTool,
+                                                                       in togglePassiveTool,
+                                                                       resolvedToolKind,
+                                                                       out slotConfig);
     }
 
     /// <summary>
@@ -611,13 +632,16 @@ public static class PlayerPowerUpActiveBakeUtility
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="activeTool">Legacy active tool definition.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
-    /// <returns>Runtime slot config or default.</returns>
-    public static PlayerPowerUpSlotConfig BuildSlotConfig(PlayerAuthoring authoring,
-                                                          ActiveToolDefinition activeTool,
-                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity)
+    /// <param name="slotConfig">Runtime slot config or default.</param>
+    public static void BuildSlotConfig(PlayerAuthoring authoring,
+                                       ActiveToolDefinition activeTool,
+                                       Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                       out PlayerPowerUpSlotConfig slotConfig)
     {
+        slotConfig = default;
+
         if (activeTool == null)
-            return default;
+            return;
 
         BombToolData bombData = activeTool.BombData;
         DashToolData dashData = activeTool.DashData;
@@ -647,7 +671,7 @@ public static class PlayerPowerUpActiveBakeUtility
 
         ActiveToolKind toolKind = activeTool.ToolKind == ActiveToolKind.Custom ? ActiveToolKind.Bomb : activeTool.ToolKind;
 
-        return new PlayerPowerUpSlotConfig
+        slotConfig = new PlayerPowerUpSlotConfig
         {
             IsDefined = 1,
             PowerUpId = ResolveLegacyPowerUpId(activeTool),

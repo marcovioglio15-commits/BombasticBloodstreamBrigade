@@ -344,6 +344,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         List<string> unsupportedModuleKinds = new List<string>();
         bool hasToggleableGate = false;
         bool hasCharacterTuning = false;
+        bool hasOrbitalProjections = false;
         bool hasStackable = false;
 
         for (int bindingIndex = 0; bindingIndex < moduleBindingsProperty.arraySize; bindingIndex++)
@@ -377,6 +378,9 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             if (moduleEntry.ModuleKind == PowerUpModuleKind.CharacterTuning)
                 hasCharacterTuning = true;
 
+            if (moduleEntry.ModuleKind == PowerUpModuleKind.OrbitalProjections)
+                hasOrbitalProjections = true;
+
             if (moduleEntry.ModuleKind == PowerUpModuleKind.Stackable)
                 hasStackable = true;
 
@@ -403,8 +407,8 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             warningLines.Add(unsupportedPrefix + string.Join(", ", unsupportedModuleKinds));
         }
 
-        if (hasStackable && !hasCharacterTuning)
-            warningLines.Add("Stackable requires Character Tuning. Repeated milestone acquisitions would otherwise have no acquisition effect.");
+        if (hasStackable && !hasCharacterTuning && !hasOrbitalProjections)
+            warningLines.Add("Stackable requires Character Tuning or Orbital Projections. Repeated milestone acquisitions would otherwise have no acquisition effect.");
 
         string contextWarning = isActiveSection
             ? BuildActiveCoverageWarning(moduleKinds, hasToggleableGate)

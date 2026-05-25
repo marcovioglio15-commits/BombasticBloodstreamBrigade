@@ -129,7 +129,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                BuildDamageFeedbackSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.PowerUpVfx,
-                               "Power-Ups VFX",
+                               "VFX",
                                BuildPowerUpVfxSubSection(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
@@ -220,6 +220,23 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                 changedCallback();
         });
         target.Add(propertyField);
+    }
+
+    private static void AddScalablePropertyField(PlayerVisualPresetsPanel panel,
+                                                 VisualElement target,
+                                                 SerializedProperty property,
+                                                 SerializedProperty scalingRulesProperty,
+                                                 string label,
+                                                 string tooltip)
+    {
+        if (panel == null || target == null || property == null)
+            return;
+
+        VisualElement field = PlayerScalingFieldElementFactory.CreateField(property,
+                                                                           scalingRulesProperty,
+                                                                           label);
+        field.tooltip = tooltip;
+        target.Add(field);
     }
 
     private static void AddVisualSubSectionTab(PlayerVisualPresetsPanel panel,
@@ -350,18 +367,64 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
 
     private static VisualElement BuildPowerUpVfxSubSection(PlayerVisualPresetsPanel panel)
     {
-        VisualElement container = CreateSubSectionContainer("Power-Ups VFX");
+        VisualElement container = CreateSubSectionContainer("VFX");
         SerializedObject presetSerializedObject = panel.PresetSerializedObject;
+        SerializedProperty scalingRulesProperty = presetSerializedObject.FindProperty("scalingRules");
         SerializedProperty elementalEnemyVfxByElementProperty = presetSerializedObject.FindProperty("elementalEnemyVfxByElement");
         SerializedProperty laserBeamProperty = presetSerializedObject.FindProperty("laserBeam");
+        Foldout powerUpsVfxFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Power-Ups VFX",
+                                                                                     "NashCore.PlayerManagement.Visual.VFX.PowerUps",
+                                                                                     true);
+        Foldout levelUpVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                  presetSerializedObject,
+                                                                  scalingRulesProperty,
+                                                                  "Level-Up VFX",
+                                                                  "LevelUp",
+                                                                  "Optional one-shot VFX spawned on the player when a level-up is registered.",
+                                                                  "levelUpVfxPrefab",
+                                                                  "Level-Up VFX Prefab",
+                                                                  "Optional one-shot VFX prefab spawned on the player when a level-up is registered.",
+                                                                  "Assign a Level-Up VFX prefab to enable trigger mode, offset, and scale controls.",
+                                                                  "levelUpVfxTriggerMode",
+                                                                  "Level-Up Trigger Mode",
+                                                                  "Controls whether Level-Up VFX appears on every level-up or only milestone power-up levels.",
+                                                                  "levelUpVfxSpawnOffset",
+                                                                  "Level-Up VFX Offset",
+                                                                  "Local-space offset applied to Level-Up VFX relative to the player entity position.",
+                                                                  "levelUpVfxScaleMultiplier",
+                                                                  "Level-Up VFX Scale",
+                                                                  "Uniform scale multiplier applied to the Level-Up VFX instance.");
+        Foldout chargeShotVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                     presetSerializedObject,
+                                                                     scalingRulesProperty,
+                                                                     "Charge Shot VFX",
+                                                                     "ChargeShot",
+                                                                     "Optional VFX displayed while a Charge Shot active tool is charging.",
+                                                                     "chargeShotVfxPrefab",
+                                                                     "Charge Shot VFX Prefab",
+                                                                     "Optional VFX prefab displayed while a Charge Shot active tool is charging.",
+                                                                     "Assign a Charge Shot VFX prefab to enable playback mode, offset, and scale controls.",
+                                                                     "chargeShotVfxPlaybackMode",
+                                                                     "Charge Shot Playback Mode",
+                                                                     "Controls whether Charge Shot VFX plays once near completion, loops while charging, or stretches one playback over the whole charge.",
+                                                                     "chargeShotVfxSpawnOffset",
+                                                                     "Charge Shot VFX Offset",
+                                                                     "Local-space offset applied to Charge Shot VFX relative to the player entity position.",
+                                                                     "chargeShotVfxScaleMultiplier",
+                                                                     "Charge Shot VFX Scale",
+                                                                     "Uniform scale multiplier applied to the Charge Shot VFX instance.");
+
+        container.Add(powerUpsVfxFoldout);
+        container.Add(levelUpVfxFoldout);
+        container.Add(chargeShotVfxFoldout);
 
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("elementalTrailAttachedVfxPrefab"),
                          "Elemental Trail Attached VFX Prefab",
                          "Optional attached VFX prefab activated while Elemental Trail passive is enabled.");
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("elementalTrailAttachedVfxScaleMultiplier"),
                          "Elemental Trail Attached VFX Scale Multiplier",
                          "Scale multiplier applied to the attached Elemental Trail VFX instance.");
@@ -372,7 +435,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
             elementalEnemyVfxHeader.style.unityFontStyleAndWeight = FontStyle.Bold;
             elementalEnemyVfxHeader.style.marginTop = 6f;
             elementalEnemyVfxHeader.style.marginBottom = 2f;
-            container.Add(elementalEnemyVfxHeader);
+            powerUpsVfxFoldout.Add(elementalEnemyVfxHeader);
 
             PropertyField elementalEnemyVfxField = new PropertyField(elementalEnemyVfxByElementProperty, "Per Element Assignments");
             elementalEnemyVfxField.BindProperty(elementalEnemyVfxByElementProperty);
@@ -382,31 +445,31 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                 PlayerManagementDraftSession.MarkDirty();
                 panel.RefreshPresetList();
             });
-            container.Add(elementalEnemyVfxField);
+            powerUpsVfxFoldout.Add(elementalEnemyVfxField);
         }
 
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("maxIdenticalOneShotVfxPerCell"),
                          "Max Identical One-Shot VFX Per Cell",
                          "Maximum number of identical one-shot VFX allowed in the same spatial cell. Set 0 to disable this cap.");
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("oneShotVfxCellSize"),
                          "One-Shot VFX Cell Size",
                          "Cell size in meters used by the one-shot VFX per-cell cap.");
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("maxAttachedElementalVfxPerTarget"),
                          "Max Attached Elemental VFX Per Target",
                          "Maximum number of identical attached elemental VFX allowed on the same target. Set 0 to disable this cap.");
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("maxActiveOneShotPowerUpVfx"),
                          "Max Active One-Shot Power-Up VFX",
                          "Maximum number of active one-shot power-up VFX managed by one player. Set 0 to disable this cap.");
         AddPropertyField(panel,
-                         container,
+                         powerUpsVfxFoldout,
                          presetSerializedObject.FindProperty("refreshAttachedElementalVfxLifetimeOnCapHit"),
                          "Refresh Attached Elemental VFX Lifetime On Cap Hit",
                          "When enabled, hitting the attached-target cap refreshes lifetime of the existing VFX.");
@@ -417,7 +480,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
             laserBeamHeader.style.unityFontStyleAndWeight = FontStyle.Bold;
             laserBeamHeader.style.marginTop = 6f;
             laserBeamHeader.style.marginBottom = 2f;
-            container.Add(laserBeamHeader);
+            powerUpsVfxFoldout.Add(laserBeamHeader);
 
             PropertyField laserBeamField = new PropertyField(laserBeamProperty, "Shared Visual Settings");
             laserBeamField.BindProperty(laserBeamProperty);
@@ -427,10 +490,259 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                 PlayerManagementDraftSession.MarkDirty();
                 panel.RefreshPresetList();
             });
-            container.Add(laserBeamField);
+            powerUpsVfxFoldout.Add(laserBeamField);
         }
 
         return container;
+    }
+
+    private static Foldout BuildOptionalPlayerVfxFoldout(PlayerVisualPresetsPanel panel,
+                                                         SerializedObject presetSerializedObject,
+                                                         SerializedProperty scalingRulesProperty,
+                                                         string title,
+                                                         string stateSuffix,
+                                                         string tooltip,
+                                                         string prefabPropertyName,
+                                                         string prefabLabel,
+                                                         string prefabTooltip,
+                                                         string missingPrefabMessage,
+                                                         string modePropertyName,
+                                                         string modeLabel,
+                                                         string modeTooltip,
+                                                         string offsetPropertyName,
+                                                         string offsetLabel,
+                                                         string offsetTooltip,
+                                                         string scalePropertyName,
+                                                         string scaleLabel,
+                                                         string scaleTooltip)
+    {
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(title,
+                                                                          "NashCore.PlayerManagement.Visual.VFX." + stateSuffix,
+                                                                          true);
+        foldout.tooltip = tooltip;
+        SerializedProperty prefabProperty = presetSerializedObject.FindProperty(prefabPropertyName);
+        SerializedProperty modeProperty = presetSerializedObject.FindProperty(modePropertyName);
+        SerializedProperty offsetProperty = presetSerializedObject.FindProperty(offsetPropertyName);
+        SerializedProperty scaleProperty = presetSerializedObject.FindProperty(scalePropertyName);
+        HelpBox missingPrefabBox = new HelpBox(missingPrefabMessage, HelpBoxMessageType.Info);
+        VisualElement detailsContainer = new VisualElement();
+        VisualElement warningsContainer = new VisualElement();
+
+        AddPropertyField(panel,
+                         foldout,
+                         prefabProperty,
+                         prefabLabel,
+                         prefabTooltip);
+        foldout.Add(missingPrefabBox);
+        foldout.Add(detailsContainer);
+
+        AddScalablePropertyField(panel,
+                                 detailsContainer,
+                                 modeProperty,
+                                 scalingRulesProperty,
+                                 modeLabel,
+                                 modeTooltip);
+        AddScalablePropertyField(panel,
+                                 detailsContainer,
+                                 offsetProperty,
+                                 scalingRulesProperty,
+                                 offsetLabel,
+                                 offsetTooltip);
+        AddScalablePropertyField(panel,
+                                 detailsContainer,
+                                 scaleProperty,
+                                 scalingRulesProperty,
+                                 scaleLabel,
+                                 scaleTooltip);
+        detailsContainer.Add(warningsContainer);
+
+        RefreshOptionalPlayerVfxVisibility(prefabProperty,
+                                           missingPrefabBox,
+                                           detailsContainer,
+                                           warningsContainer,
+                                           modeProperty,
+                                           offsetProperty,
+                                           offsetLabel,
+                                           scaleProperty,
+                                           scaleLabel);
+
+        if (prefabProperty != null)
+        {
+            foldout.TrackPropertyValue(prefabProperty, changedProperty =>
+            {
+                RefreshOptionalPlayerVfxVisibility(changedProperty,
+                                                   missingPrefabBox,
+                                                   detailsContainer,
+                                                   warningsContainer,
+                                                   modeProperty,
+                                                   offsetProperty,
+                                                   offsetLabel,
+                                                   scaleProperty,
+                                                   scaleLabel);
+            });
+        }
+
+        TrackOptionalPlayerVfxWarningField(foldout,
+                                           modeProperty,
+                                           modeProperty,
+                                           prefabProperty,
+                                           warningsContainer,
+                                           offsetProperty,
+                                           offsetLabel,
+                                           scaleProperty,
+                                           scaleLabel);
+        TrackOptionalPlayerVfxWarningField(foldout,
+                                           offsetProperty,
+                                           modeProperty,
+                                           prefabProperty,
+                                           warningsContainer,
+                                           offsetProperty,
+                                           offsetLabel,
+                                           scaleProperty,
+                                           scaleLabel);
+        TrackOptionalPlayerVfxWarningField(foldout,
+                                           scaleProperty,
+                                           modeProperty,
+                                           prefabProperty,
+                                           warningsContainer,
+                                           offsetProperty,
+                                           offsetLabel,
+                                           scaleProperty,
+                                           scaleLabel);
+        return foldout;
+    }
+
+    private static void TrackOptionalPlayerVfxWarningField(VisualElement root,
+                                                           SerializedProperty trackedProperty,
+                                                           SerializedProperty modeProperty,
+                                                           SerializedProperty prefabProperty,
+                                                           VisualElement warningsContainer,
+                                                           SerializedProperty offsetProperty,
+                                                           string offsetLabel,
+                                                           SerializedProperty scaleProperty,
+                                                           string scaleLabel)
+    {
+        if (root == null || trackedProperty == null)
+            return;
+
+        root.TrackPropertyValue(trackedProperty, changedProperty =>
+        {
+            RefreshOptionalPlayerVfxWarnings(prefabProperty != null && prefabProperty.objectReferenceValue != null,
+                                             warningsContainer,
+                                             modeProperty,
+                                             offsetProperty,
+                                             offsetLabel,
+                                             scaleProperty,
+                                             scaleLabel);
+        });
+    }
+
+    private static void RefreshOptionalPlayerVfxVisibility(SerializedProperty prefabProperty,
+                                                           HelpBox missingPrefabBox,
+                                                           VisualElement detailsContainer,
+                                                           VisualElement warningsContainer,
+                                                           SerializedProperty modeProperty,
+                                                           SerializedProperty offsetProperty,
+                                                           string offsetLabel,
+                                                           SerializedProperty scaleProperty,
+                                                           string scaleLabel)
+    {
+        bool hasPrefab = prefabProperty != null && prefabProperty.objectReferenceValue != null;
+
+        if (missingPrefabBox != null)
+            missingPrefabBox.style.display = hasPrefab ? DisplayStyle.None : DisplayStyle.Flex;
+
+        if (detailsContainer != null)
+            detailsContainer.style.display = hasPrefab ? DisplayStyle.Flex : DisplayStyle.None;
+
+        RefreshOptionalPlayerVfxWarnings(hasPrefab,
+                                         warningsContainer,
+                                         modeProperty,
+                                         offsetProperty,
+                                         offsetLabel,
+                                         scaleProperty,
+                                         scaleLabel);
+    }
+
+    private static void RefreshOptionalPlayerVfxWarnings(bool hasPrefab,
+                                                        VisualElement warningsContainer,
+                                                        SerializedProperty modeProperty,
+                                                        SerializedProperty offsetProperty,
+                                                        string offsetLabel,
+                                                        SerializedProperty scaleProperty,
+                                                        string scaleLabel)
+    {
+        if (warningsContainer == null)
+            return;
+
+        warningsContainer.Clear();
+
+        if (!hasPrefab)
+            return;
+
+        AddInvalidEnumWarning(warningsContainer,
+                              modeProperty,
+                              modeProperty != null ? modeProperty.displayName + " uses an unsupported enum value." : "VFX mode uses an unsupported enum value.");
+        AddInvalidVector3Warning(warningsContainer,
+                                 offsetProperty,
+                                 offsetLabel + " contains invalid numeric values.");
+        AddNonPositiveFloatWarning(warningsContainer,
+                                   scaleProperty,
+                                   scaleLabel + " should be greater than zero.");
+    }
+
+    private static void AddInvalidEnumWarning(VisualElement container,
+                                              SerializedProperty property,
+                                              string message)
+    {
+        if (container == null || property == null)
+            return;
+
+        if (property.propertyType != SerializedPropertyType.Enum)
+            return;
+
+        if (property.enumValueIndex >= 0 && property.enumValueIndex < property.enumDisplayNames.Length)
+            return;
+
+        container.Add(new HelpBox(message, HelpBoxMessageType.Warning));
+    }
+
+    private static void AddInvalidVector3Warning(VisualElement container,
+                                                 SerializedProperty property,
+                                                 string message)
+    {
+        if (container == null || property == null)
+            return;
+
+        Vector3 value = property.vector3Value;
+
+        if (!float.IsNaN(value.x) &&
+            !float.IsInfinity(value.x) &&
+            !float.IsNaN(value.y) &&
+            !float.IsInfinity(value.y) &&
+            !float.IsNaN(value.z) &&
+            !float.IsInfinity(value.z))
+        {
+            return;
+        }
+
+        container.Add(new HelpBox(message, HelpBoxMessageType.Warning));
+    }
+
+    private static void AddNonPositiveFloatWarning(VisualElement container,
+                                                   SerializedProperty property,
+                                                   string message)
+    {
+        if (container == null || property == null)
+            return;
+
+        if (property.propertyType != SerializedPropertyType.Float)
+            return;
+
+        if (property.floatValue > 0f)
+            return;
+
+        container.Add(new HelpBox(message, HelpBoxMessageType.Warning));
     }
 
     /// <summary>

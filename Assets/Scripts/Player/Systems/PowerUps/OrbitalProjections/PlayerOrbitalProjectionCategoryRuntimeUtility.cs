@@ -125,16 +125,21 @@ public static class PlayerOrbitalProjectionCategoryRuntimeUtility
     /// </summary>
     /// <param name="passiveToolConfig">Passive tool config being granted.</param>
     /// <param name="equippedPassiveTools">Equipped passive tools already owned by the player.</param>
-    /// <returns>Filtered passive config that keeps only projections capable of adding a new category.</returns>
-    public static PlayerPassiveToolConfig FilterBlockedProjectionCategories(in PlayerPassiveToolConfig passiveToolConfig,
-                                                                            DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools)
+    /// <param name="filteredConfig">Filtered passive config that keeps only projections capable of adding a new category.</param>
+    public static void FilterBlockedProjectionCategories(in PlayerPassiveToolConfig passiveToolConfig,
+                                                         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                         out PlayerPassiveToolConfig filteredConfig)
     {
+        filteredConfig = passiveToolConfig;
+
         if (passiveToolConfig.IsDefined == 0 || passiveToolConfig.HasOrbitalProjections == 0)
-            return passiveToolConfig;
+            return;
 
         HashSet<string> blockedCategoryIds = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
         AddEquippedPassiveCategories(equippedPassiveTools, blockedCategoryIds);
-        return FilterBlockedProjectionCategories(in passiveToolConfig, blockedCategoryIds);
+        FilterBlockedProjectionCategories(in passiveToolConfig,
+                                          blockedCategoryIds,
+                                          out filteredConfig);
     }
 
     /// <summary>
@@ -142,19 +147,21 @@ public static class PlayerOrbitalProjectionCategoryRuntimeUtility
     /// </summary>
     /// <param name="passiveToolConfig">Passive tool config being granted.</param>
     /// <param name="blockedCategoryIds">Category ids already present or already kept by this filter pass.</param>
-    /// <returns>Filtered passive config that keeps only projections capable of adding a new category.</returns>
-    public static PlayerPassiveToolConfig FilterBlockedProjectionCategories(in PlayerPassiveToolConfig passiveToolConfig,
-                                                                            HashSet<string> blockedCategoryIds)
+    /// <param name="filteredConfig">Filtered passive config that keeps only projections capable of adding a new category.</param>
+    public static void FilterBlockedProjectionCategories(in PlayerPassiveToolConfig passiveToolConfig,
+                                                         HashSet<string> blockedCategoryIds,
+                                                         out PlayerPassiveToolConfig filteredConfig)
     {
+        filteredConfig = passiveToolConfig;
+
         if (passiveToolConfig.IsDefined == 0 ||
             passiveToolConfig.HasOrbitalProjections == 0 ||
             blockedCategoryIds == null)
         {
-            return passiveToolConfig;
+            return;
         }
 
-        PlayerPassiveToolConfig filteredConfig = passiveToolConfig;
-        FixedList512Bytes<OrbitalProjectionConfig> filteredProjections = default;
+        FixedList4096Bytes<OrbitalProjectionConfig> filteredProjections = default;
 
         for (int projectionIndex = 0; projectionIndex < passiveToolConfig.OrbitalProjections.Length; projectionIndex++)
         {
@@ -175,7 +182,6 @@ public static class PlayerOrbitalProjectionCategoryRuntimeUtility
 
         filteredConfig.OrbitalProjections = filteredProjections;
         filteredConfig.HasOrbitalProjections = filteredProjections.Length > 0 ? (byte)1 : (byte)0;
-        return filteredConfig;
     }
     #endregion
 

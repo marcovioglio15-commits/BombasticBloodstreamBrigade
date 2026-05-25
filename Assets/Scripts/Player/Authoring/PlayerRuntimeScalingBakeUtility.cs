@@ -173,28 +173,29 @@ internal static class PlayerRuntimeScalingBakeUtility
             if (powerUp == null || powerUp.CommonData == null || string.IsNullOrWhiteSpace(powerUp.CommonData.PowerUpId))
                 continue;
 
-            PlayerPowerUpBaseConfigElement element = new PlayerPowerUpBaseConfigElement
-            {
-                PowerUpId = new FixedString64Bytes(powerUp.CommonData.PowerUpId.Trim()),
-                UnlockKind = unlockKind,
-                ActiveSlotConfig = default,
-                PassiveToolConfig = default
-            };
+            int configIndex = baseConfigs.Length;
+            baseConfigs.ResizeUninitialized(configIndex + 1);
+            ref PlayerPowerUpBaseConfigElement element = ref baseConfigs.ElementAt(configIndex);
+
+            element.PowerUpId = new FixedString64Bytes(powerUp.CommonData.PowerUpId.Trim());
+            element.UnlockKind = unlockKind;
+            element.ActiveSlotConfig = default;
+            element.PassiveToolConfig = default;
 
             if (unlockKind == PlayerPowerUpUnlockKind.Active)
-                element.ActiveSlotConfig = PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
-                                                                                                            sourcePreset,
-                                                                                                            powerUp,
-                                                                                                            resolveDynamicPrefabEntity,
-                                                                                                            resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
+                                                                                 sourcePreset,
+                                                                                 powerUp,
+                                                                                 resolveDynamicPrefabEntity,
+                                                                                 out element.ActiveSlotConfig,
+                                                                                 resolveOrbitalProjectionPrefabBindingIndex);
             else
-                element.PassiveToolConfig = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
-                                                                                                                    sourcePreset,
-                                                                                                                    powerUp,
-                                                                                                                    resolveDynamicPrefabEntity,
-                                                                                                                    resolveOrbitalProjectionPrefabBindingIndex);
-
-            baseConfigs.Add(element);
+                PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
+                                                                                         sourcePreset,
+                                                                                         powerUp,
+                                                                                         resolveDynamicPrefabEntity,
+                                                                                         out element.PassiveToolConfig,
+                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
         }
     }
 

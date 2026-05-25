@@ -107,17 +107,17 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     private static GameObject ResolveSourcePrefab(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
                                                   in PlayerPowerUpVfxSpawnRequest request)
     {
-        if (request.PrefabEntity == Entity.Null)
-            return null;
-
-        for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
+        if (request.PrefabEntity != Entity.Null)
         {
-            PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
+            for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
+            {
+                PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
 
-            if (binding.PrefabEntity != request.PrefabEntity)
-                continue;
+                if (binding.PrefabEntity != request.PrefabEntity)
+                    continue;
 
-            return binding.Prefab.Value;
+                return binding.Prefab.Value;
+            }
         }
 
         return request.SourcePrefab.Value;
@@ -135,6 +135,12 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                           out bool refreshedExistingInstance)
     {
         refreshedExistingInstance = false;
+
+        if (request.RefreshKey != 0 && TryRefreshKeyedInstance(in request))
+        {
+            refreshedExistingInstance = true;
+            return false;
+        }
 
         if (capConfig.MaxActiveOneShotVfx > 0 && activeInstances.Count >= capConfig.MaxActiveOneShotVfx)
             return false;
@@ -159,6 +165,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         if (request.FollowTargetEntity == Entity.Null && capConfig.MaxSamePrefabPerCell > 0)
         {
             int areaCount = CountAreaInstances(request.PrefabEntity,
+                                               request.SourcePrefab.Value,
                                                request.Position,
                                                math.max(MinimumCellSize, capConfig.CellSize));
 
@@ -223,9 +230,75 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             RootBaseLocalScale = instanceObject.transform.localScale,
             ParticleSystems = particleSystems,
             TrailRenderers = trailRenderers,
+            ParticleSystemBaseSimulationSpeeds = BuildParticleSystemBaseSimulationSpeeds(particleSystems),
+            ParticleSystemBaseLooping = BuildParticleSystemBaseLooping(particleSystems),
+            ParticleSystemBaseStartColors = BuildParticleSystemBaseStartColors(particleSystems),
             TrailRendererBaseWidths = BuildTrailRendererBaseWidths(trailRenderers),
             TrailRendererBaseTimes = BuildTrailRendererBaseTimes(trailRenderers)
         };
+    }
+
+    /// <summary>
+    /// Caches authored particle simulation speeds so pooled VFX can restore timing after charge-shot stretch requests.
+    /// </summary>
+    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
+    /// <returns>Simulation speeds matching the particle-system array order.</returns>
+    private static float[] BuildParticleSystemBaseSimulationSpeeds(ParticleSystem[] particleSystems)
+    {
+        if (particleSystems == null || particleSystems.Length <= 0)
+            return null;
+
+        float[] baseSimulationSpeeds = new float[particleSystems.Length];
+
+        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
+        {
+            ParticleSystem particleSystem = particleSystems[particleIndex];
+            baseSimulationSpeeds[particleIndex] = particleSystem != null ? particleSystem.main.simulationSpeed : 1f;
+        }
+
+        return baseSimulationSpeeds;
+    }
+
+    /// <summary>
+    /// Caches authored particle loop flags so forced-loop VFX requests do not leak into pooled reuse.
+    /// </summary>
+    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
+    /// <returns>Loop flags matching the particle-system array order.</returns>
+    private static bool[] BuildParticleSystemBaseLooping(ParticleSystem[] particleSystems)
+    {
+        if (particleSystems == null || particleSystems.Length <= 0)
+            return null;
+
+        bool[] baseLooping = new bool[particleSystems.Length];
+
+        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
+        {
+            ParticleSystem particleSystem = particleSystems[particleIndex];
+            baseLooping[particleIndex] = particleSystem != null && particleSystem.main.loop;
+        }
+
+        return baseLooping;
+    }
+
+    /// <summary>
+    /// Caches authored particle start colors so color override requests can be reset during pooled reuse.
+    /// </summary>
+    /// <param name="particleSystems">Particle systems collected from the spawned VFX instance.</param>
+    /// <returns>Start colors matching the particle-system array order.</returns>
+    private static ParticleSystem.MinMaxGradient[] BuildParticleSystemBaseStartColors(ParticleSystem[] particleSystems)
+    {
+        if (particleSystems == null || particleSystems.Length <= 0)
+            return null;
+
+        ParticleSystem.MinMaxGradient[] baseStartColors = new ParticleSystem.MinMaxGradient[particleSystems.Length];
+
+        for (int particleIndex = 0; particleIndex < particleSystems.Length; particleIndex++)
+        {
+            ParticleSystem particleSystem = particleSystems[particleIndex];
+            baseStartColors[particleIndex] = particleSystem != null ? particleSystem.main.startColor : new ParticleSystem.MinMaxGradient(Color.white);
+        }
+
+        return baseStartColors;
     }
 
     /// <summary>
@@ -279,6 +352,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                           in PlayerPowerUpVfxSpawnRequest request)
     {
         instance.PrefabEntity = request.PrefabEntity;
+        instance.RefreshKey = request.RefreshKey;
         instance.RemainingSeconds = math.max(MinimumLifetimeSeconds, request.LifetimeSeconds);
         instance.FollowTargetEntity = request.FollowTargetEntity;
         instance.FollowPositionOffset = request.FollowPositionOffset;
@@ -293,6 +367,13 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                                                   request.Position,
                                                                   request.Rotation,
                                                                   math.max(MinimumScale, request.UniformScale),
+                                                                  request.ParticleSimulationSpeedMultiplier,
+                                                                  request.ForceLooping != 0,
+                                                                  request.HasColorOverride != 0,
+                                                                  request.ColorOverride,
+                                                                  request.SecondaryColorOverride,
+                                                                  request.ColorOverrideCount,
+                                                                  request.ColorOverrideChildName.ToString(),
                                                                   request.TrailRendererWidthOverride,
                                                                   request.TrailRendererTimeOverrideSeconds);
 
@@ -430,7 +511,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             if (!instance.HasFollowTarget)
                 continue;
 
-            if (instance.PrefabEntity != request.PrefabEntity)
+            if (!MatchesRequestedPrefab(instance, in request))
                 continue;
 
             if (instance.FollowValidationEntity != request.FollowValidationEntity)
@@ -454,6 +535,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     /// <param name="cellSize">Sanitized cap cell size.</param>
     /// <returns>Number of active matching one-shot instances in the same cell.</returns>
     private static int CountAreaInstances(Entity prefabEntity,
+                                          GameObject sourcePrefab,
                                           float3 position,
                                           float cellSize)
     {
@@ -471,7 +553,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             if (instance.HasFollowTarget)
                 continue;
 
-            if (instance.PrefabEntity != prefabEntity)
+            if (!MatchesRequestedPrefab(instance, prefabEntity, sourcePrefab))
                 continue;
 
             int instanceCellX = (int)math.floor(instance.Position.x / cellSize);
@@ -494,15 +576,101 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     private static void RefreshAttachedInstance(PlayerPowerUpManagedVfxInstance instance,
                                                 in PlayerPowerUpVfxSpawnRequest request)
     {
+        RefreshInstance(instance, in request);
+    }
+
+    /// <summary>
+    /// Refreshes an existing keyed VFX instance when gameplay wants one continuous effect instead of repeated spawns.
+    /// </summary>
+    /// <param name="request">Request carrying the refresh key and updated presentation settings.</param>
+    /// <returns>True when a matching active instance was found and refreshed.</returns>
+    private static bool TryRefreshKeyedInstance(in PlayerPowerUpVfxSpawnRequest request)
+    {
+        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
+        {
+            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
+
+            if (!IsInstanceUsable(instance))
+                continue;
+
+            if (instance.RefreshKey != request.RefreshKey)
+                continue;
+
+            if (!MatchesRequestedPrefab(instance, in request))
+                continue;
+
+            if (instance.FollowTargetEntity != request.FollowTargetEntity)
+                continue;
+
+            RefreshInstance(instance, in request);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Applies non-restarting presentation updates and lifetime extension to an already active VFX instance.
+    /// </summary>
+    /// <param name="instance">Existing managed VFX instance.</param>
+    /// <param name="request">Request rejected by caps or matched by refresh key.</param>
+    private static void RefreshInstance(PlayerPowerUpManagedVfxInstance instance,
+                                        in PlayerPowerUpVfxSpawnRequest request)
+    {
         float desiredLifetime = math.max(MinimumLifetimeSeconds, request.LifetimeSeconds);
 
         if (desiredLifetime > instance.RemainingSeconds)
             instance.RemainingSeconds = desiredLifetime;
 
+        instance.FollowTargetEntity = request.FollowTargetEntity;
+        instance.FollowPositionOffset = request.FollowPositionOffset;
+        instance.FollowValidationEntity = request.FollowValidationEntity;
+        instance.FollowValidationSpawnVersion = request.FollowValidationSpawnVersion;
+        instance.Velocity = request.Velocity;
+        instance.HasFollowTarget = request.FollowTargetEntity != Entity.Null;
+        instance.HasVelocity = !instance.HasFollowTarget && math.lengthsq(request.Velocity) > VelocityEpsilonSquared;
+
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTrailRendererSettings(instance,
                                                                                math.max(MinimumScale, request.UniformScale),
                                                                                request.TrailRendererWidthOverride,
                                                                                request.TrailRendererTimeOverrideSeconds);
+        PlayerPowerUpManagedVfxPresentationUtility.ApplyParticleSystemRuntimeSettings(instance,
+                                                                                      request.ParticleSimulationSpeedMultiplier,
+                                                                                      request.ForceLooping != 0,
+                                                                                      request.HasColorOverride != 0,
+                                                                                      request.ColorOverride,
+                                                                                      request.SecondaryColorOverride,
+                                                                                      request.ColorOverrideCount,
+                                                                                      request.ColorOverrideChildName.ToString());
+    }
+
+    /// <summary>
+    /// Checks whether a managed instance matches the prefab identity carried by a request.
+    /// </summary>
+    /// <param name="instance">Active managed VFX instance to inspect.</param>
+    /// <param name="request">Spawn request carrying prefab identity.</param>
+    /// <returns>True when the instance and request reference the same prefab.</returns>
+    private static bool MatchesRequestedPrefab(PlayerPowerUpManagedVfxInstance instance,
+                                               in PlayerPowerUpVfxSpawnRequest request)
+    {
+        return MatchesRequestedPrefab(instance, request.PrefabEntity, request.SourcePrefab.Value);
+    }
+
+    /// <summary>
+    /// Checks whether a managed instance matches a prefab entity or direct source prefab identity.
+    /// </summary>
+    /// <param name="instance">Active managed VFX instance to inspect.</param>
+    /// <param name="prefabEntity">Optional baked prefab entity.</param>
+    /// <param name="sourcePrefab">Optional direct source prefab reference.</param>
+    /// <returns>True when the instance and source identify the same prefab.</returns>
+    private static bool MatchesRequestedPrefab(PlayerPowerUpManagedVfxInstance instance,
+                                               Entity prefabEntity,
+                                               GameObject sourcePrefab)
+    {
+        if (prefabEntity != Entity.Null)
+            return instance.PrefabEntity == prefabEntity;
+
+        return sourcePrefab != null && instance.SourcePrefab == sourcePrefab;
     }
     #endregion
 
@@ -543,6 +711,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     private static void ResetRuntimeState(PlayerPowerUpManagedVfxInstance instance)
     {
         instance.PrefabEntity = Entity.Null;
+        instance.RefreshKey = 0;
         instance.RemainingSeconds = 0f;
         instance.FollowTargetEntity = Entity.Null;
         instance.FollowPositionOffset = float3.zero;
@@ -571,6 +740,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.InstanceTransform = null;
         instance.ParticleSystems = null;
         instance.TrailRenderers = null;
+        instance.ParticleSystemBaseSimulationSpeeds = null;
+        instance.ParticleSystemBaseLooping = null;
+        instance.ParticleSystemBaseStartColors = null;
         ResetRuntimeState(instance);
     }
     #endregion

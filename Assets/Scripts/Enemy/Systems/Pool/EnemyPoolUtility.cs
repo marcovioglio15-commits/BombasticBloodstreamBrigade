@@ -632,10 +632,12 @@ public static class EnemyPoolUtility
             stealerCount = entityManager.GetBuffer<EnemyPowerUpStealerConfigElement>(enemyEntity).Length;
 
         stealerRuntime.Clear();
+        stealerRuntime.ResizeUninitialized(stealerCount);
 
         for (int stealerIndex = 0; stealerIndex < stealerCount; stealerIndex++)
         {
-            stealerRuntime.Add(EnemyPowerUpStealerRuntimeDefaultsUtility.CreateDefault());
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(stealerIndex);
+            EnemyPowerUpStealerRuntimeDefaultsUtility.InitializeDefault(ref runtime);
         }
     }
 

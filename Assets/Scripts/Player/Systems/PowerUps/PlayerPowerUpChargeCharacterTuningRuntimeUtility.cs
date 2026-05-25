@@ -67,18 +67,22 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             return false;
         }
 
-        PlayerPowerUpUnlockCatalogElement primaryCatalogEntry = default;
-        PlayerPowerUpUnlockCatalogElement secondaryCatalogEntry = default;
+        int primaryCatalogIndex = -1;
+        int secondaryCatalogIndex = -1;
         bool primaryCanBeApplied = primaryShouldBeActive &&
-                                   TryResolveScopedCatalogEntry(in primarySlotConfig,
+                                   TryResolveScopedCatalogIndex(in primarySlotConfig,
                                                                 unlockCatalog,
-                                                                out primaryCatalogEntry);
+                                                                out primaryCatalogIndex);
         bool secondaryCanBeApplied = secondaryShouldBeActive &&
-                                     TryResolveScopedCatalogEntry(in secondarySlotConfig,
+                                     TryResolveScopedCatalogIndex(in secondarySlotConfig,
                                                                   unlockCatalog,
-                                                                  out secondaryCatalogEntry);
-        uint primaryOwnershipSignature = BuildScopedOwnershipSignature(primaryCanBeApplied, in primaryCatalogEntry);
-        uint secondaryOwnershipSignature = BuildScopedOwnershipSignature(secondaryCanBeApplied, in secondaryCatalogEntry);
+                                                                  out secondaryCatalogIndex);
+        uint primaryOwnershipSignature = BuildScopedOwnershipSignature(primaryCanBeApplied,
+                                                                       unlockCatalog,
+                                                                       primaryCatalogIndex);
+        uint secondaryOwnershipSignature = BuildScopedOwnershipSignature(secondaryCanBeApplied,
+                                                                         unlockCatalog,
+                                                                         secondaryCatalogIndex);
         bool primaryOwnershipChanged = previousPrimaryOwnershipSignature != primaryOwnershipSignature;
         bool secondaryOwnershipChanged = previousSecondaryOwnershipSignature != secondaryOwnershipSignature;
         bool passiveOwnershipChanged = previousPassiveOwnershipSignature != passiveOwnershipSignature;
@@ -93,10 +97,10 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         }
 
         if (primaryCanBeApplied && !primaryWasApplied)
-            CaptureMissingBaseStats(in primaryCatalogEntry, characterTuningFormulas, scalableStats, baseStats);
+            CaptureMissingBaseStats(unlockCatalog, primaryCatalogIndex, characterTuningFormulas, scalableStats, baseStats);
 
         if (secondaryCanBeApplied && !secondaryWasApplied)
-            CaptureMissingBaseStats(in secondaryCatalogEntry, characterTuningFormulas, scalableStats, baseStats);
+            CaptureMissingBaseStats(unlockCatalog, secondaryCatalogIndex, characterTuningFormulas, scalableStats, baseStats);
 
         if (passiveOwnershipSignature != 0u)
             CaptureMissingPassiveBaseStats(unlockCatalog, characterTuningFormulas, scalableStats, baseStats);
@@ -111,7 +115,8 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         if (ApplyOwnedPassiveCharacterTuning(unlockCatalog, characterTuningFormulas, scalableStats))
             anyScalableStatChanged = true;
 
-        if (ApplyScopedCharacterTuning(in primaryCatalogEntry,
+        if (ApplyScopedCharacterTuning(unlockCatalog,
+                                       primaryCatalogIndex,
                                        primaryCanBeApplied,
                                        characterTuningFormulas,
                                        scalableStats))
@@ -119,7 +124,8 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             anyScalableStatChanged = true;
         }
 
-        if (ApplyScopedCharacterTuning(in secondaryCatalogEntry,
+        if (ApplyScopedCharacterTuning(unlockCatalog,
+                                       secondaryCatalogIndex,
                                        secondaryCanBeApplied,
                                        characterTuningFormulas,
                                        scalableStats))
@@ -129,9 +135,9 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
         if (primaryCanBeApplied || secondaryCanBeApplied || passiveOwnershipSignature != 0u)
             PruneUnusedBaseStats(baseStats,
-                                 in primaryCatalogEntry,
+                                 primaryCatalogIndex,
                                  primaryCanBeApplied,
-                                 in secondaryCatalogEntry,
+                                 secondaryCatalogIndex,
                                  secondaryCanBeApplied,
                                  unlockCatalog,
                                  characterTuningFormulas);
@@ -157,13 +163,13 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// </summary>
     /// <param name="slotConfig">Active-slot config inspected by PowerUpId.</param>
     /// <param name="unlockCatalog">Runtime unlock catalog scanned for the matching entry.</param>
-    /// <param name="catalogEntry">Matching runtime-scoped Character Tuning entry when found.</param>
+    /// <param name="catalogIndex">Matching runtime-scoped Character Tuning index when found.</param>
     /// <returns>True when the slot maps to a runtime-scoped Character Tuning entry.</returns>
-    private static bool TryResolveScopedCatalogEntry(in PlayerPowerUpSlotConfig slotConfig,
+    private static bool TryResolveScopedCatalogIndex(in PlayerPowerUpSlotConfig slotConfig,
                                                      DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
-                                                     out PlayerPowerUpUnlockCatalogElement catalogEntry)
+                                                     out int catalogIndex)
     {
-        catalogEntry = default;
+        catalogIndex = -1;
 
         if (slotConfig.IsDefined == 0)
             return false;
@@ -171,9 +177,9 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         if (!unlockCatalog.IsCreated || unlockCatalog.Length <= 0 || slotConfig.PowerUpId.Length <= 0)
             return false;
 
-        for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
+        for (int candidateIndex = 0; candidateIndex < unlockCatalog.Length; candidateIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement candidate = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement candidate = ref unlockCatalog.ElementAt(candidateIndex);
 
             if (candidate.PowerUpId != slotConfig.PowerUpId)
                 continue;
@@ -181,11 +187,35 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             if (!PlayerPowerUpCharacterTuningRuntimeUtility.IsRuntimeScopedCharacterTuning(in candidate))
                 return false;
 
-            catalogEntry = candidate;
+            catalogIndex = candidateIndex;
             return true;
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Captures baseline values for every target stat touched by one runtime-scoped Character Tuning entry.
+    /// </summary>
+    /// <param name="unlockCatalog">Runtime unlock catalog containing the scoped Character Tuning entry.</param>
+    /// <param name="catalogIndex">Catalog index for the scoped Character Tuning entry.</param>
+    /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
+    /// <param name="scalableStats">Current scalable-stat buffer used as snapshot source.</param>
+    /// <param name="baseStats">Snapshot buffer that receives any still-missing target stat values.</param>
+    private static void CaptureMissingBaseStats(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                int catalogIndex,
+                                                DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
+                                                DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                                DynamicBuffer<PlayerChargeCharacterTuningBaseStatElement> baseStats)
+    {
+        if (!unlockCatalog.IsCreated || catalogIndex < 0 || catalogIndex >= unlockCatalog.Length)
+            return;
+
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
+        CaptureMissingBaseStats(in catalogEntry,
+                                characterTuningFormulas,
+                                scalableStats,
+                                baseStats);
     }
 
     /// <summary>
@@ -247,7 +277,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveScopedCharacterTuningOwned(in catalogEntry))
                 continue;
@@ -299,15 +329,16 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// Removes baseline snapshots that are no longer needed by any still-active runtime-scoped Character Tuning overlay.
     /// </summary>
     /// <param name="baseStats">Snapshot buffer pruned in place.</param>
-    /// <param name="primaryCatalogEntry">Primary runtime-scoped Character Tuning entry when active.</param>
+    /// <param name="primaryCatalogIndex">Primary runtime-scoped Character Tuning catalog index when active.</param>
     /// <param name="primaryIsActive">True when the primary runtime-scoped Character Tuning overlay remains active.</param>
-    /// <param name="secondaryCatalogEntry">Secondary runtime-scoped Character Tuning entry when active.</param>
+    /// <param name="secondaryCatalogIndex">Secondary runtime-scoped Character Tuning catalog index when active.</param>
     /// <param name="secondaryIsActive">True when the secondary runtime-scoped Character Tuning overlay remains active.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog used to resolve active indices and passive ownership.</param>
     /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
     private static void PruneUnusedBaseStats(DynamicBuffer<PlayerChargeCharacterTuningBaseStatElement> baseStats,
-                                             in PlayerPowerUpUnlockCatalogElement primaryCatalogEntry,
+                                             int primaryCatalogIndex,
                                              bool primaryIsActive,
-                                             in PlayerPowerUpUnlockCatalogElement secondaryCatalogEntry,
+                                             int secondaryCatalogIndex,
                                              bool secondaryIsActive,
                                              DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                              DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas)
@@ -318,10 +349,16 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             bool statStillNeeded = false;
 
             if (primaryIsActive)
-                statStillNeeded = IsStatTargetedByEntry(statName, in primaryCatalogEntry, characterTuningFormulas);
+                statStillNeeded = IsStatTargetedByCatalogIndex(statName,
+                                                               unlockCatalog,
+                                                               primaryCatalogIndex,
+                                                               characterTuningFormulas);
 
             if (!statStillNeeded && secondaryIsActive)
-                statStillNeeded = IsStatTargetedByEntry(statName, in secondaryCatalogEntry, characterTuningFormulas);
+                statStillNeeded = IsStatTargetedByCatalogIndex(statName,
+                                                               unlockCatalog,
+                                                               secondaryCatalogIndex,
+                                                               characterTuningFormulas);
 
             if (!statStillNeeded)
                 statStillNeeded = IsStatTargetedByOwnedPassiveEntries(statName, unlockCatalog, characterTuningFormulas);
@@ -357,13 +394,20 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// Resolves one stable signature describing the currently applied runtime-scoped active Character Tuning ownership.
     /// </summary>
     /// <param name="canBeApplied">True when the active runtime-scoped Character Tuning is currently active.</param>
-    /// <param name="catalogEntry">Unlock catalog entry backing the active runtime-scoped Character Tuning.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog containing the scoped Character Tuning entry.</param>
+    /// <param name="catalogIndex">Catalog index backing the active runtime-scoped Character Tuning.</param>
     /// <returns>Stable non-zero signature while active, or zero when the scoped Character Tuning is inactive.</returns>
-    private static uint BuildScopedOwnershipSignature(bool canBeApplied, in PlayerPowerUpUnlockCatalogElement catalogEntry)
+    private static uint BuildScopedOwnershipSignature(bool canBeApplied,
+                                                      DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                      int catalogIndex)
     {
         if (!canBeApplied)
             return 0u;
 
+        if (!unlockCatalog.IsCreated || catalogIndex < 0 || catalogIndex >= unlockCatalog.Length)
+            return 0u;
+
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         uint signature = PassiveSignatureSeed;
         FixedString64Bytes powerUpId = catalogEntry.PowerUpId;
 
@@ -389,7 +433,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveScopedCharacterTuningOwned(in catalogEntry))
                 continue;
@@ -423,7 +467,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveScopedCharacterTuningOwned(in catalogEntry))
                 continue;
@@ -450,12 +494,14 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// <summary>
     /// Applies one runtime-scoped active Character Tuning entry as many times as its current unlock count indicates.
     /// </summary>
-    /// <param name="catalogEntry">Runtime-scoped active Character Tuning entry currently applied.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog containing the scoped active Character Tuning entry.</param>
+    /// <param name="catalogIndex">Catalog index for the scoped active Character Tuning entry.</param>
     /// <param name="canBeApplied">True when the runtime-scoped Character Tuning is currently active.</param>
     /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
     /// <param name="scalableStats">Mutable scalable-stat buffer receiving the scoped runtime overlay.</param>
     /// <returns>True when at least one formula changed runtime scalable stats.</returns>
-    private static bool ApplyScopedCharacterTuning(in PlayerPowerUpUnlockCatalogElement catalogEntry,
+    private static bool ApplyScopedCharacterTuning(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                   int catalogIndex,
                                                    bool canBeApplied,
                                                    DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
                                                    DynamicBuffer<PlayerScalableStatElement> scalableStats)
@@ -463,6 +509,10 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         if (!canBeApplied)
             return false;
 
+        if (!unlockCatalog.IsCreated || catalogIndex < 0 || catalogIndex >= unlockCatalog.Length)
+            return false;
+
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         bool anyChanged = false;
         int applicationCount = ResolveScopedApplicationCount(in catalogEntry);
 
@@ -524,7 +574,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (!IsPassiveScopedCharacterTuningOwned(in catalogEntry))
                 continue;
@@ -536,6 +586,26 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Checks whether one stat is targeted by the Character Tuning entry stored at a catalog index.
+    /// </summary>
+    /// <param name="statName">Requested scalable-stat name.</param>
+    /// <param name="unlockCatalog">Runtime unlock catalog containing the candidate entry.</param>
+    /// <param name="catalogIndex">Catalog index to inspect.</param>
+    /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
+    /// <returns>True when the indexed entry targets the stat.</returns>
+    private static bool IsStatTargetedByCatalogIndex(string statName,
+                                                     DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
+                                                     int catalogIndex,
+                                                     DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas)
+    {
+        if (!unlockCatalog.IsCreated || catalogIndex < 0 || catalogIndex >= unlockCatalog.Length)
+            return false;
+
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
+        return IsStatTargetedByEntry(statName, in catalogEntry, characterTuningFormulas);
     }
 
     /// <summary>

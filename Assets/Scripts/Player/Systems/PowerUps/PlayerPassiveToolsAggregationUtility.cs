@@ -14,88 +14,106 @@ public static class PlayerPassiveToolsAggregationUtility
     /// </summary>
     /// <param name="entity">Player entity being aggregated.</param>
     /// <param name="equippedPassiveToolsLookup">Buffer lookup containing equipped passive entries.</param>
-    /// <returns>Aggregated passive runtime state.</returns>
-    public static PlayerPassiveToolsState BuildPassiveToolsState(Entity entity, in BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup)
+    /// <param name="passiveToolsState">Aggregated passive runtime state.</param>
+    public static void BuildPassiveToolsState(Entity entity,
+                                              in BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup,
+                                              out PlayerPassiveToolsState passiveToolsState)
     {
-        PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
+        CreateDefaultState(out passiveToolsState);
 
         if (!equippedPassiveToolsLookup.HasBuffer(entity))
-            return passiveToolsState;
+            return;
 
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer = equippedPassiveToolsLookup[entity];
-        return BuildPassiveToolsState(equippedPassiveToolsBuffer);
+        RebuildPassiveToolsState(equippedPassiveToolsBuffer, ref passiveToolsState);
     }
 
     /// <summary>
     /// Builds aggregated passive state from a direct equipped-passives dynamic buffer.
     /// </summary>
     /// <param name="equippedPassiveToolsBuffer">Runtime equipped passive entries.</param>
-    /// <returns>Aggregated passive runtime state.</returns>
-    public static PlayerPassiveToolsState BuildPassiveToolsState(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer)
+    /// <param name="passiveToolsState">Aggregated passive runtime state.</param>
+    public static void BuildPassiveToolsState(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer,
+                                              out PlayerPassiveToolsState passiveToolsState)
     {
-        PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
+        CreateDefaultState(out passiveToolsState);
+        RebuildPassiveToolsState(equippedPassiveToolsBuffer, ref passiveToolsState);
+    }
+
+    /// <summary>
+    /// Rebuilds aggregated passive state in place so Burst callers do not pass the large state payload by value.
+    /// </summary>
+    /// <param name="entity">Player entity being aggregated.</param>
+    /// <param name="equippedPassiveToolsLookup">Buffer lookup containing equipped passive entries.</param>
+    /// <param name="passiveToolsState">Aggregate snapshot reset and rebuilt in place.</param>
+    public static void RebuildPassiveToolsState(Entity entity,
+                                                in BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup,
+                                                ref PlayerPassiveToolsState passiveToolsState)
+    {
+        ResetToDefault(ref passiveToolsState);
+
+        if (!equippedPassiveToolsLookup.HasBuffer(entity))
+            return;
+
+        DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer = equippedPassiveToolsLookup[entity];
+        RebuildPassiveToolsState(equippedPassiveToolsBuffer, ref passiveToolsState);
+    }
+
+    /// <summary>
+    /// Rebuilds aggregated passive state from a direct equipped-passives buffer without returning the large state payload.
+    /// </summary>
+    /// <param name="equippedPassiveToolsBuffer">Runtime equipped passive entries.</param>
+    /// <param name="passiveToolsState">Aggregate snapshot reset and rebuilt in place.</param>
+    public static void RebuildPassiveToolsState(DynamicBuffer<EquippedPassiveToolElement> equippedPassiveToolsBuffer,
+                                                ref PlayerPassiveToolsState passiveToolsState)
+    {
+        ResetToDefault(ref passiveToolsState);
 
         if (!equippedPassiveToolsBuffer.IsCreated)
-            return passiveToolsState;
+            return;
 
         for (int passiveToolIndex = 0; passiveToolIndex < equippedPassiveToolsBuffer.Length; passiveToolIndex++)
         {
-            EquippedPassiveToolElement equippedPassiveTool = equippedPassiveToolsBuffer[passiveToolIndex];
+            ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveToolsBuffer.ElementAt(passiveToolIndex);
             AccumulatePassiveTool(ref passiveToolsState, in equippedPassiveTool.Tool);
         }
-
-        return passiveToolsState;
     }
 
     /// <summary>
     /// Builds the neutral passive state used when gameplay needs projectile math without equipped passive effects.
     /// </summary>
-    /// <returns>Passive state with projectile multipliers initialized to 1 and all hooks disabled.</returns>
-    public static PlayerPassiveToolsState CreateDefaultState()
+    /// <param name="passiveToolsState">Passive state with projectile multipliers initialized to 1 and all hooks disabled.</param>
+    public static void CreateDefaultState(out PlayerPassiveToolsState passiveToolsState)
     {
-        return new PlayerPassiveToolsState
-        {
-            ProjectileSizeMultiplier = 1f,
-            ProjectileDamageMultiplier = 1f,
-            ProjectileSpeedMultiplier = 1f,
-            ProjectileLifetimeSecondsMultiplier = 1f,
-            ProjectileLifetimeRangeMultiplier = 1f,
-            HasShotgun = 0,
-            Shotgun = default,
-            HasElementalProjectiles = 0,
-            ElementalProjectiles = default,
-            HasPerfectCircle = 0,
-            PerfectCircle = default,
-            HasBouncingProjectiles = 0,
-            BouncingProjectiles = default,
-            HasSplittingProjectiles = 0,
-            SplittingProjectiles = default,
-            HasExplosion = 0,
-            Explosion = default,
-            HasElementalTrail = 0,
-            ElementalTrail = default,
-            HasHeal = 0,
-            Heal = default,
-            HasBulletTime = 0,
-            BulletTime = default,
-            HasLaserBeam = 0,
-            LaserBeam = default,
-            HasOrbitalProjections = 0,
-            OrbitalProjections = default
-        };
+        passiveToolsState = default;
+        ResetToDefault(ref passiveToolsState);
+    }
+
+    /// <summary>
+    /// Resets an aggregate passive snapshot to its neutral multiplier state.
+    /// </summary>
+    /// <param name="passiveToolsState">Aggregate snapshot reset in place.</param>
+    public static void ResetToDefault(ref PlayerPassiveToolsState passiveToolsState)
+    {
+        passiveToolsState = default;
+        passiveToolsState.ProjectileSizeMultiplier = 1f;
+        passiveToolsState.ProjectileDamageMultiplier = 1f;
+        passiveToolsState.ProjectileSpeedMultiplier = 1f;
+        passiveToolsState.ProjectileLifetimeSecondsMultiplier = 1f;
+        passiveToolsState.ProjectileLifetimeRangeMultiplier = 1f;
     }
 
     /// <summary>
     /// Builds a neutral passive snapshot that exposes only one Laser Beam config.
     /// </summary>
     /// <param name="laserBeamConfig">Standalone Laser Beam settings to expose to beam simulation and presentation.</param>
-    /// <returns>Passive state with only HasLaserBeam enabled.</returns>
-    public static PlayerPassiveToolsState CreateStandaloneLaserBeamState(in LaserBeamPassiveConfig laserBeamConfig)
+    /// <param name="passiveToolsState">Passive state with only HasLaserBeam enabled.</param>
+    public static void CreateStandaloneLaserBeamState(in LaserBeamPassiveConfig laserBeamConfig,
+                                                      out PlayerPassiveToolsState passiveToolsState)
     {
-        PlayerPassiveToolsState passiveToolsState = CreateDefaultState();
+        CreateDefaultState(out passiveToolsState);
         passiveToolsState.HasLaserBeam = 1;
         passiveToolsState.LaserBeam = laserBeamConfig;
-        return passiveToolsState;
     }
 
     /// <summary>

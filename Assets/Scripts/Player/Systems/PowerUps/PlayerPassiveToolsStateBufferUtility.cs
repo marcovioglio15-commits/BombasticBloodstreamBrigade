@@ -12,13 +12,28 @@ internal static class PlayerPassiveToolsStateBufferUtility
     /// Resolves the current passive-tools snapshot from one player buffer.
     /// </summary>
     /// <param name="passiveToolsStateBuffer">Buffer owning the external passive-tools snapshot.</param>
-    /// <returns>The stored snapshot, or the default aggregate when the buffer is not initialized yet.</returns>
-    public static PlayerPassiveToolsState Read(DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer)
+    /// <param name="passiveToolsState">Stored snapshot, or the default aggregate when the buffer is not initialized yet.</param>
+    public static void Read(DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
+                            out PlayerPassiveToolsState passiveToolsState)
     {
-        if (passiveToolsStateBuffer.Length <= 0)
-            return PlayerPassiveToolsAggregationUtility.CreateDefaultState();
+        passiveToolsState = default;
+        PlayerPassiveToolsAggregationUtility.ResetToDefault(ref passiveToolsState);
 
-        return passiveToolsStateBuffer[0].Value;
+        if (passiveToolsStateBuffer.Length <= 0)
+            return;
+
+        passiveToolsState = passiveToolsStateBuffer[0].Value;
+    }
+
+    /// <summary>
+    /// Resolves the mutable aggregate snapshot stored in the single-slot passive-tools buffer.
+    /// </summary>
+    /// <param name="passiveToolsStateBuffer">Buffer owning the external passive-tools snapshot.</param>
+    /// <returns>Mutable aggregate state reference initialized to the neutral default when missing.</returns>
+    public static ref PlayerPassiveToolsState GetStateRef(DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer)
+    {
+        EnsureInitialized(passiveToolsStateBuffer);
+        return ref passiveToolsStateBuffer.ElementAt(0).Value;
     }
 
     /// <summary>
@@ -26,14 +41,18 @@ internal static class PlayerPassiveToolsStateBufferUtility
     /// </summary>
     /// <param name="playerEntity">Player entity owning the passive-tools snapshot buffer.</param>
     /// <param name="passiveToolsStateLookup">Lookup used to read player snapshot buffers.</param>
-    /// <returns>The stored snapshot, or the default aggregate when the player has no initialized buffer.</returns>
-    public static PlayerPassiveToolsState Read(Entity playerEntity,
-                                               in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup)
+    /// <param name="passiveToolsState">Stored snapshot, or the default aggregate when the player has no initialized buffer.</param>
+    public static void Read(Entity playerEntity,
+                            in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup,
+                            out PlayerPassiveToolsState passiveToolsState)
     {
-        if (!passiveToolsStateLookup.HasBuffer(playerEntity))
-            return PlayerPassiveToolsAggregationUtility.CreateDefaultState();
+        passiveToolsState = default;
+        PlayerPassiveToolsAggregationUtility.ResetToDefault(ref passiveToolsState);
 
-        return Read(passiveToolsStateLookup[playerEntity]);
+        if (!passiveToolsStateLookup.HasBuffer(playerEntity))
+            return;
+
+        Read(passiveToolsStateLookup[playerEntity], out passiveToolsState);
     }
 
     /// <summary>
@@ -44,18 +63,11 @@ internal static class PlayerPassiveToolsStateBufferUtility
     public static void Write(DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                              in PlayerPassiveToolsState passiveToolsState)
     {
-        PlayerPassiveToolsStateElement stateElement = new PlayerPassiveToolsStateElement
-        {
-            Value = passiveToolsState
-        };
-
         if (passiveToolsStateBuffer.Length <= 0)
-        {
-            passiveToolsStateBuffer.Add(stateElement);
-            return;
-        }
+            passiveToolsStateBuffer.ResizeUninitialized(1);
 
-        passiveToolsStateBuffer[0] = stateElement;
+        ref PlayerPassiveToolsStateElement stateElement = ref passiveToolsStateBuffer.ElementAt(0);
+        stateElement.Value = passiveToolsState;
     }
 
     /// <summary>
@@ -74,6 +86,22 @@ internal static class PlayerPassiveToolsStateBufferUtility
 
         Write(passiveToolsStateLookup[playerEntity], in passiveToolsState);
         return true;
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Ensures the external passive-tools snapshot buffer contains its single aggregate slot.
+    /// </summary>
+    /// <param name="passiveToolsStateBuffer">Buffer that must hold exactly one aggregate snapshot slot.</param>
+    private static void EnsureInitialized(DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer)
+    {
+        if (passiveToolsStateBuffer.Length > 0)
+            return;
+
+        passiveToolsStateBuffer.ResizeUninitialized(1);
+        ref PlayerPassiveToolsStateElement stateElement = ref passiveToolsStateBuffer.ElementAt(0);
+        PlayerPassiveToolsAggregationUtility.ResetToDefault(ref stateElement.Value);
     }
     #endregion
 

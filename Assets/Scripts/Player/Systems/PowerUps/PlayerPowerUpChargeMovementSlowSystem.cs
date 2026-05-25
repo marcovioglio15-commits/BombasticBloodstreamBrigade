@@ -39,7 +39,9 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
                                                                                        RefRO<PlayerPowerUpsState>,
                                                                                        RefRW<PlayerMovementModifiers>>())
         {
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
             float primarySlowPercent = ResolveSlotSlowPercent(in powerUpsConfig.PrimarySlot,
                                                               powerUpsState.ValueRO.PrimaryCharge,
                                                               powerUpsState.ValueRO.PrimaryIsCharging);

@@ -42,12 +42,12 @@ public static class PlayerPowerUpCatalogBakeUtility
         for (int passiveToolIndex = 0; passiveToolIndex < equippedPassiveToolConfigs.Count; passiveToolIndex++)
         {
             PlayerPassiveToolConfig passiveToolConfig = equippedPassiveToolConfigs[passiveToolIndex];
+            int bufferIndex = equippedPassiveToolsBuffer.Length;
+            equippedPassiveToolsBuffer.ResizeUninitialized(bufferIndex + 1);
+            ref EquippedPassiveToolElement equippedElement = ref equippedPassiveToolsBuffer.ElementAt(bufferIndex);
 
-            equippedPassiveToolsBuffer.Add(new EquippedPassiveToolElement
-            {
-                PowerUpId = passiveToolIndex < equippedPassiveToolIds.Count ? equippedPassiveToolIds[passiveToolIndex] : default,
-                Tool = passiveToolConfig
-            });
+            equippedElement.PowerUpId = passiveToolIndex < equippedPassiveToolIds.Count ? equippedPassiveToolIds[passiveToolIndex] : default;
+            equippedElement.Tool = passiveToolConfig;
         }
     }
 
@@ -124,11 +124,13 @@ public static class PlayerPowerUpCatalogBakeUtility
     /// <param name="authoring">Owning player authoring component.</param>
     /// <param name="resolveDynamicPrefabEntity">Prefab-to-entity resolver provided by the baker.</param>
     /// <param name="cheatPresetEntriesBuffer">Destination cheat preset entry buffer.</param>
+    /// <param name="cheatPresetSlotsBuffer">Destination flattened active-slot config buffer.</param>
     /// <param name="cheatPresetPassivesBuffer">Destination flattened passive config buffer.</param>
     /// <param name="resolveOrbitalProjectionPrefabBindingIndex">Optional resolver that stores orbital projection prefabs in a remappable binding table.</param>
     public static void PopulatePowerUpCheatPresetBuffers(PlayerAuthoring authoring,
                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
                                                          DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntriesBuffer,
+                                                         DynamicBuffer<PlayerPowerUpCheatPresetSlotElement> cheatPresetSlotsBuffer,
                                                          DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassivesBuffer,
                                                          Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
     {
@@ -151,18 +153,26 @@ public static class PlayerPowerUpCatalogBakeUtility
         for (int presetIndex = 0; presetIndex < cheatPresets.Count; presetIndex++)
         {
             PlayerPowerUpsPreset cheatPreset = cheatPresets[presetIndex];
+            int slotStartIndex = cheatPresetSlotsBuffer.Length;
+            int slotCount = 0;
             int passiveStartIndex = cheatPresetPassivesBuffer.Length;
             int passiveCount = 0;
             byte isDefined = 0;
-            PlayerPowerUpsConfig powerUpsConfigSnapshot = default;
+            PlayerPowerUpSlotConfig primaryPowerUpSlotConfig = default;
+            PlayerPowerUpSlotConfig secondaryPowerUpSlotConfig = default;
 
             if (cheatPreset != null)
             {
                 isDefined = 1;
-                powerUpsConfigSnapshot = PlayerPowerUpActiveBakeUtility.BuildPowerUpsConfig(authoring,
-                                                                                            cheatPreset,
-                                                                                            resolveDynamicPrefabEntity,
-                                                                                            resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPowerUpActiveBakeUtility.BuildPowerUpSlots(authoring,
+                                                                 cheatPreset,
+                                                                 resolveDynamicPrefabEntity,
+                                                                 out primaryPowerUpSlotConfig,
+                                                                 out secondaryPowerUpSlotConfig,
+                                                                 resolveOrbitalProjectionPrefabBindingIndex);
+                slotCount = PlayerPowerUpCheatPresetSlotBufferUtility.AppendSlots(cheatPresetSlotsBuffer,
+                                                                                  in primaryPowerUpSlotConfig,
+                                                                                  in secondaryPowerUpSlotConfig);
                 PlayerPowerUpPassiveBakeUtility.CollectEquippedPassiveToolConfigs(authoring,
                                                                                   cheatPreset,
                                                                                   resolveDynamicPrefabEntity,
@@ -173,12 +183,12 @@ public static class PlayerPowerUpCatalogBakeUtility
                 for (int passiveToolIndex = 0; passiveToolIndex < collectedPassiveToolConfigs.Count; passiveToolIndex++)
                 {
                     PlayerPassiveToolConfig passiveToolConfig = collectedPassiveToolConfigs[passiveToolIndex];
+                    int bufferIndex = cheatPresetPassivesBuffer.Length;
+                    cheatPresetPassivesBuffer.ResizeUninitialized(bufferIndex + 1);
+                    ref PlayerPowerUpCheatPresetPassiveElement passiveElement = ref cheatPresetPassivesBuffer.ElementAt(bufferIndex);
 
-                    cheatPresetPassivesBuffer.Add(new PlayerPowerUpCheatPresetPassiveElement
-                    {
-                        PowerUpId = passiveToolIndex < collectedPassivePowerUpIds.Count ? collectedPassivePowerUpIds[passiveToolIndex] : default,
-                        Tool = passiveToolConfig
-                    });
+                    passiveElement.PowerUpId = passiveToolIndex < collectedPassivePowerUpIds.Count ? collectedPassivePowerUpIds[passiveToolIndex] : default;
+                    passiveElement.Tool = passiveToolConfig;
                     passiveCount++;
                 }
             }
@@ -186,9 +196,10 @@ public static class PlayerPowerUpCatalogBakeUtility
             cheatPresetEntriesBuffer.Add(new PlayerPowerUpCheatPresetEntry
             {
                 IsDefined = isDefined,
+                SlotStartIndex = slotStartIndex,
+                SlotCount = slotCount,
                 PassiveStartIndex = passiveStartIndex,
-                PassiveCount = passiveCount,
-                PowerUpsConfig = powerUpsConfigSnapshot
+                PassiveCount = passiveCount
             });
         }
     }
@@ -233,38 +244,39 @@ public static class PlayerPowerUpCatalogBakeUtility
             if (unlockCatalogIndexByKey.ContainsKey(catalogKey))
                 continue;
 
-            PlayerPowerUpUnlockCatalogElement unlockCatalogEntry = new PlayerPowerUpUnlockCatalogElement
-            {
-                PowerUpId = new FixedString64Bytes(powerUpId),
-                DisplayName = new FixedString64Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.DisplayName) ? powerUpId : powerUp.CommonData.DisplayName.Trim()),
-                Description = new FixedString128Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.Description) ? string.Empty : powerUp.CommonData.Description.Trim()),
-                UnlockKind = unlockKind,
-                IsUnlocked = 0,
-                PendingInitialCharacterTuningApply = 0,
-                CurrentUnlockCount = 0,
-                MaximumUnlockCount = ResolveMaximumUnlockCount(preset, powerUp),
-                LastAcquiredTime = 0f,
-                CharacterTuningFormulaStartIndex = powerUpCharacterTuningFormulaBuffer.Length,
-                CharacterTuningFormulaCount = AppendCharacterTuningFormulas(preset, powerUp, powerUpCharacterTuningFormulaBuffer),
-                ActiveSlotConfig = default,
-                PassiveToolConfig = default
-            };
+            int catalogIndex = powerUpUnlockCatalogBuffer.Length;
+            powerUpUnlockCatalogBuffer.ResizeUninitialized(catalogIndex + 1);
+            ref PlayerPowerUpUnlockCatalogElement unlockCatalogEntry = ref powerUpUnlockCatalogBuffer.ElementAt(catalogIndex);
+
+            unlockCatalogEntry.PowerUpId = new FixedString64Bytes(powerUpId);
+            unlockCatalogEntry.DisplayName = new FixedString64Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.DisplayName) ? powerUpId : powerUp.CommonData.DisplayName.Trim());
+            unlockCatalogEntry.Description = new FixedString128Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.Description) ? string.Empty : powerUp.CommonData.Description.Trim());
+            unlockCatalogEntry.UnlockKind = unlockKind;
+            unlockCatalogEntry.IsUnlocked = 0;
+            unlockCatalogEntry.PendingInitialCharacterTuningApply = 0;
+            unlockCatalogEntry.CurrentUnlockCount = 0;
+            unlockCatalogEntry.MaximumUnlockCount = ResolveMaximumUnlockCount(preset, powerUp);
+            unlockCatalogEntry.LastAcquiredTime = 0f;
+            unlockCatalogEntry.CharacterTuningFormulaStartIndex = powerUpCharacterTuningFormulaBuffer.Length;
+            unlockCatalogEntry.CharacterTuningFormulaCount = AppendCharacterTuningFormulas(preset, powerUp, powerUpCharacterTuningFormulaBuffer);
+            unlockCatalogEntry.ActiveSlotConfig = default;
+            unlockCatalogEntry.PassiveToolConfig = default;
 
             if (unlockKind == PlayerPowerUpUnlockKind.Active)
-                unlockCatalogEntry.ActiveSlotConfig = PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
-                                                                                                                        preset,
-                                                                                                                        powerUp,
-                                                                                                                        resolveDynamicPrefabEntity,
-                                                                                                                        resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
+                                                                                 preset,
+                                                                                 powerUp,
+                                                                                 resolveDynamicPrefabEntity,
+                                                                                 out unlockCatalogEntry.ActiveSlotConfig,
+                                                                                 resolveOrbitalProjectionPrefabBindingIndex);
             else
-                unlockCatalogEntry.PassiveToolConfig = PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
-                                                                                                                                preset,
-                                                                                                                                powerUp,
-                                                                                                                                resolveDynamicPrefabEntity,
-                                                                                                                                resolveOrbitalProjectionPrefabBindingIndex);
+                PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
+                                                                                         preset,
+                                                                                         powerUp,
+                                                                                         resolveDynamicPrefabEntity,
+                                                                                         out unlockCatalogEntry.PassiveToolConfig,
+                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
 
-            int catalogIndex = powerUpUnlockCatalogBuffer.Length;
-            powerUpUnlockCatalogBuffer.Add(unlockCatalogEntry);
             unlockCatalogIndexByKey.Add(catalogKey, catalogIndex);
         }
     }
@@ -370,9 +382,9 @@ public static class PlayerPowerUpCatalogBakeUtility
                     if (catalogIndex < 0 || catalogIndex >= powerUpUnlockCatalogBuffer.Length)
                         continue;
 
-                    PlayerPowerUpUnlockCatalogElement catalogEntry = powerUpUnlockCatalogBuffer[catalogIndex];
+                    ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref powerUpUnlockCatalogBuffer.ElementAt(catalogIndex);
 
-                    if (!HasRemainingUnlocks(catalogEntry))
+                    if (catalogEntry.CurrentUnlockCount >= math.max(1, catalogEntry.MaximumUnlockCount))
                         continue;
 
                     powerUpTierEntriesBuffer.Add(new PlayerPowerUpTierEntryElement
@@ -409,9 +421,9 @@ public static class PlayerPowerUpCatalogBakeUtility
 
         for (int catalogIndex = 0; catalogIndex < powerUpUnlockCatalogBuffer.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = powerUpUnlockCatalogBuffer[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref powerUpUnlockCatalogBuffer.ElementAt(catalogIndex);
 
-            if (!HasRemainingUnlocks(catalogEntry))
+            if (catalogEntry.CurrentUnlockCount >= math.max(1, catalogEntry.MaximumUnlockCount))
                 continue;
 
             powerUpTierEntriesBuffer.Add(new PlayerPowerUpTierEntryElement
@@ -473,7 +485,7 @@ public static class PlayerPowerUpCatalogBakeUtility
         if (catalogIndex < 0 || catalogIndex >= powerUpUnlockCatalogBuffer.Length)
             return;
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = powerUpUnlockCatalogBuffer[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref powerUpUnlockCatalogBuffer.ElementAt(catalogIndex);
         int maximumUnlockCount = math.max(1, catalogEntry.MaximumUnlockCount);
 
         if (catalogEntry.CurrentUnlockCount >= maximumUnlockCount)
@@ -481,13 +493,62 @@ public static class PlayerPowerUpCatalogBakeUtility
 
         catalogEntry.CurrentUnlockCount = math.min(maximumUnlockCount, catalogEntry.CurrentUnlockCount + 1);
         catalogEntry.IsUnlocked = 1;
-        catalogEntry.PendingInitialCharacterTuningApply = PlayerPowerUpCharacterTuningRuntimeUtility.ShouldApplyOnAcquisition(in catalogEntry) ? (byte)1 : (byte)0;
-        powerUpUnlockCatalogBuffer[catalogIndex] = catalogEntry;
+        catalogEntry.PendingInitialCharacterTuningApply = ShouldApplyCharacterTuningOnAcquisition(catalogEntry.CharacterTuningFormulaCount,
+                                                                                                  catalogEntry.UnlockKind,
+                                                                                                  catalogEntry.ActiveSlotConfig.IsDefined,
+                                                                                                  catalogEntry.ActiveSlotConfig.ToolKind,
+                                                                                                  catalogEntry.ActiveSlotConfig.Toggleable,
+                                                                                                  catalogEntry.ActiveSlotConfig.ApplyCharacterTuningOnActiveTrigger)
+            ? (byte)1
+            : (byte)0;
     }
 
-    private static bool HasRemainingUnlocks(PlayerPowerUpUnlockCatalogElement catalogEntry)
+    /// <summary>
+    /// Resolves permanent Character Tuning application using primitive catalog fields to avoid copying large catalog entries during baking.
+    /// </summary>
+    /// <param name="formulaCount">Number of formulas referenced by the catalog entry.</param>
+    /// <param name="unlockKind">Power-up unlock kind.</param>
+    /// <param name="activeSlotIsDefined">Whether the active slot payload exists.</param>
+    /// <param name="activeToolKind">Active tool kind used by runtime-scoped checks.</param>
+    /// <param name="activeToggleable">Whether the active tool is toggleable.</param>
+    /// <param name="applyCharacterTuningOnActiveTrigger">Whether active Character Tuning is scoped to trigger execution.</param>
+    /// <returns>True when formulas should be applied permanently on acquisition.</returns>
+    private static bool ShouldApplyCharacterTuningOnAcquisition(int formulaCount,
+                                                                PlayerPowerUpUnlockKind unlockKind,
+                                                                byte activeSlotIsDefined,
+                                                                ActiveToolKind activeToolKind,
+                                                                byte activeToggleable,
+                                                                byte applyCharacterTuningOnActiveTrigger)
     {
-        return catalogEntry.CurrentUnlockCount < math.max(1, catalogEntry.MaximumUnlockCount);
+        if (formulaCount <= 0)
+            return false;
+
+        if (unlockKind == PlayerPowerUpUnlockKind.Passive)
+            return false;
+
+        if (unlockKind != PlayerPowerUpUnlockKind.Active)
+            return true;
+
+        if (activeSlotIsDefined == 0)
+            return true;
+
+        if (activeToolKind == ActiveToolKind.ChargeShot)
+            return false;
+
+        if (activeToggleable != 0)
+            return false;
+
+        if (applyCharacterTuningOnActiveTrigger == 0)
+            return true;
+
+        switch (activeToolKind)
+        {
+            case ActiveToolKind.PassiveToggle:
+            case ActiveToolKind.Custom:
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static int ResolveMaximumUnlockCount(PlayerPowerUpsPreset preset, ModularPowerUpDefinition powerUp)

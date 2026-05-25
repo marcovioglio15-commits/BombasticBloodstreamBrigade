@@ -48,7 +48,9 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
             if (!swapPressedThisFrame)
                 continue;
 
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
 
             if (!CanSwapSlots(in powerUpsConfig))
                 continue;

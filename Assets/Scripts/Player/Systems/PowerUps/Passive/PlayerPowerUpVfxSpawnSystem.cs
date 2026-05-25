@@ -6,6 +6,8 @@ using Unity.Entities;
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(PlayerElementalTrailResolveSystem))]
 [UpdateAfter(typeof(PlayerPassiveExplosionResolveSystem))]
+[UpdateAfter(typeof(EnemyKilledEventsSystem))]
+[UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
 public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 {
     #region Methods

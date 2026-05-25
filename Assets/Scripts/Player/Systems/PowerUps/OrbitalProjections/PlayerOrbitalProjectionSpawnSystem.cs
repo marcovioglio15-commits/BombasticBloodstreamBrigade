@@ -46,7 +46,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
-        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(true);
+        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         BufferLookup<PlayerOrbitalProjectionPrefabElement> prefabBindingsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionPrefabElement>(true);
         BufferLookup<PlayerOrbitalProjectionSpawnRequest> spawnRequestLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         NativeArray<Entity> projectionEntities = projectionQuery.ToEntityArray(Allocator.Temp);
@@ -58,7 +58,10 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                              .WithAll<PlayerPowerUpsConfigElement>()
                              .WithEntityAccess())
         {
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(playerEntity, in powerUpsConfigLookup);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(playerEntity,
+                                                   in powerUpsConfigLookup,
+                                                   out powerUpsConfig);
             PlayerPowerUpsState powerUpsState = powerUpsStateLookup.HasComponent(playerEntity)
                 ? powerUpsStateLookup[playerEntity]
                 : default;
@@ -135,7 +138,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         {
             for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
             {
-                EquippedPassiveToolElement passiveTool = equippedPassiveTools[passiveIndex];
+                ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
                 SpawnMissingPersistentConfigs(entityManager,
                                               ref commandBuffer,
                                               in transformLookup,
@@ -146,6 +149,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                               passiveTool.PowerUpId,
                                               passiveIndex,
                                               prefabBindings,
+                                              equippedPassiveTools,
+                                              in powerUpsConfig,
+                                              in powerUpsState,
                                               in passiveTool.Tool);
             }
         }
@@ -161,6 +167,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           powerUpsConfig.PrimarySlot.PowerUpId,
                                           -1,
                                           prefabBindings,
+                                          equippedPassiveTools,
+                                          in powerUpsConfig,
+                                          in powerUpsState,
                                           in powerUpsConfig.PrimarySlot.TogglePassiveTool);
 
         if (powerUpsState.SecondaryIsActive != 0)
@@ -174,6 +183,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           powerUpsConfig.SecondarySlot.PowerUpId,
                                           -2,
                                           prefabBindings,
+                                          equippedPassiveTools,
+                                          in powerUpsConfig,
+                                          in powerUpsState,
                                           in powerUpsConfig.SecondarySlot.TogglePassiveTool);
 
         DespawnStalePersistentInstances(ref commandBuffer,
@@ -199,6 +211,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="powerUpId">Source power-up identifier used for replacement policy.</param>
     /// <param name="sourceInstanceId">Stable source instance id for the current passive or toggle source.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="equippedPassiveTools">Equipped passive tools used to detect later replacing sources.</param>
+    /// <param name="powerUpsConfig">Active slot configuration used to detect replacing toggles.</param>
+    /// <param name="powerUpsState">Active slot state used to detect replacing toggles.</param>
     /// <param name="passiveToolConfig">Passive config containing optional orbital projection entries.</param>
     private static void SpawnMissingPersistentConfigs(EntityManager entityManager,
                                                       ref EntityCommandBuffer commandBuffer,
@@ -210,6 +225,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                       FixedString64Bytes powerUpId,
                                                       int sourceInstanceId,
                                                       DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                                      DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                      in PlayerPowerUpsConfig powerUpsConfig,
+                                                      in PlayerPowerUpsState powerUpsState,
                                                       in PlayerPassiveToolConfig passiveToolConfig)
     {
         if (passiveToolConfig.IsDefined == 0 || passiveToolConfig.HasOrbitalProjections == 0)
@@ -218,6 +236,16 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         for (int configIndex = 0; configIndex < passiveToolConfig.OrbitalProjections.Length; configIndex++)
         {
             OrbitalProjectionConfig projectionConfig = passiveToolConfig.OrbitalProjections[configIndex];
+
+            if (IsPersistentConfigSuperseded(sourceInstanceId,
+                                             powerUpId,
+                                             in projectionConfig,
+                                             equippedPassiveTools,
+                                             in powerUpsConfig,
+                                             in powerUpsState))
+            {
+                continue;
+            }
 
             if (PlayerOrbitalProjectionCategoryRuntimeUtility.ShouldSkipCategorySpawn(in projectionConfig,
                                                                                        projectionInstances,
@@ -317,13 +345,18 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         {
             for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
             {
-                EquippedPassiveToolElement passiveTool = equippedPassiveTools[passiveIndex];
+                ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
                 if (instance.SourceInstanceId == passiveIndex &&
                     passiveTool.PowerUpId == instance.PowerUpId &&
                     ContainsProjection(passiveTool.Tool, instance.ProjectionIndex))
                 {
-                    return true;
+                    return !IsPersistentConfigSuperseded(instance.SourceInstanceId,
+                                                         instance.PowerUpId,
+                                                         in instance.Config,
+                                                         equippedPassiveTools,
+                                                         in powerUpsConfig,
+                                                         in powerUpsState);
                 }
             }
         }
@@ -333,7 +366,12 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
             powerUpsConfig.PrimarySlot.PowerUpId == instance.PowerUpId &&
             ContainsProjection(powerUpsConfig.PrimarySlot.TogglePassiveTool, instance.ProjectionIndex))
         {
-            return true;
+            return !IsPersistentConfigSuperseded(instance.SourceInstanceId,
+                                                 instance.PowerUpId,
+                                                 in instance.Config,
+                                                 equippedPassiveTools,
+                                                 in powerUpsConfig,
+                                                 in powerUpsState);
         }
 
         if (powerUpsState.SecondaryIsActive != 0 &&
@@ -341,7 +379,140 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
             powerUpsConfig.SecondarySlot.PowerUpId == instance.PowerUpId &&
             ContainsProjection(powerUpsConfig.SecondarySlot.TogglePassiveTool, instance.ProjectionIndex))
         {
+            return !IsPersistentConfigSuperseded(instance.SourceInstanceId,
+                                                 instance.PowerUpId,
+                                                 in instance.Config,
+                                                 equippedPassiveTools,
+                                                 in powerUpsConfig,
+                                                 in powerUpsState);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves whether a later persistent source replaces the current projection config before it can spawn or remain active.
+    /// </summary>
+    /// <param name="sourceInstanceId">Source instance id of the projection being evaluated.</param>
+    /// <param name="powerUpId">Power-up id of the projection being evaluated.</param>
+    /// <param name="projectionConfig">Projection config being evaluated.</param>
+    /// <param name="equippedPassiveTools">Equipped passive tools ordered by acquisition.</param>
+    /// <param name="powerUpsConfig">Active slot configuration used for toggle-owned projection sources.</param>
+    /// <param name="powerUpsState">Active slot runtime state used to determine enabled toggles.</param>
+    /// <returns>True when a later ReplaceAll or matching ReplaceMatchingPowerUp source supersedes this projection.</returns>
+    private static bool IsPersistentConfigSuperseded(int sourceInstanceId,
+                                                     FixedString64Bytes powerUpId,
+                                                     in OrbitalProjectionConfig projectionConfig,
+                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                                     in PlayerPowerUpsConfig powerUpsConfig,
+                                                     in PlayerPowerUpsState powerUpsState)
+    {
+        int passiveCount = equippedPassiveTools.IsCreated ? equippedPassiveTools.Length : 0;
+        int sourceOrder = ResolvePersistentSourceOrder(sourceInstanceId, passiveCount);
+
+        if (sourceOrder < 0)
+            return false;
+
+        if (equippedPassiveTools.IsCreated)
+        {
+            for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
+            {
+                if (passiveIndex <= sourceOrder)
+                    continue;
+
+                ref EquippedPassiveToolElement passiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+
+                if (DoesSourceSupersedeProjection(passiveTool.PowerUpId,
+                                                  in passiveTool.Tool,
+                                                  powerUpId,
+                                                  in projectionConfig))
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (powerUpsState.PrimaryIsActive != 0 &&
+            passiveCount > sourceOrder &&
+            DoesSourceSupersedeProjection(powerUpsConfig.PrimarySlot.PowerUpId,
+                                          in powerUpsConfig.PrimarySlot.TogglePassiveTool,
+                                          powerUpId,
+                                          in projectionConfig))
+        {
             return true;
+        }
+
+        if (powerUpsState.SecondaryIsActive != 0 &&
+            passiveCount + 1 > sourceOrder &&
+            DoesSourceSupersedeProjection(powerUpsConfig.SecondarySlot.PowerUpId,
+                                          in powerUpsConfig.SecondarySlot.TogglePassiveTool,
+                                          powerUpId,
+                                          in projectionConfig))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Converts passive and toggle source ids into their deterministic persistent-source order.
+    /// </summary>
+    /// <param name="sourceInstanceId">Runtime source id stored on the projection instance.</param>
+    /// <param name="passiveCount">Number of equipped passive sources currently active.</param>
+    /// <returns>Source order, or -1 when the source id is not persistent.</returns>
+    private static int ResolvePersistentSourceOrder(int sourceInstanceId, int passiveCount)
+    {
+        if (sourceInstanceId >= 0)
+            return sourceInstanceId < passiveCount ? sourceInstanceId : -1;
+
+        switch (sourceInstanceId)
+        {
+            case -1:
+                return passiveCount;
+            case -2:
+                return passiveCount + 1;
+            default:
+                return -1;
+        }
+    }
+
+    /// <summary>
+    /// Checks whether one candidate source owns a replacement policy that supersedes the inspected projection.
+    /// </summary>
+    /// <param name="candidatePowerUpId">Power-up id for the later source.</param>
+    /// <param name="candidateTool">Passive-tool payload for the later source.</param>
+    /// <param name="powerUpId">Power-up id of the inspected projection.</param>
+    /// <param name="projectionConfig">Projection config being inspected.</param>
+    /// <returns>True when the later source replaces all projections or the matching projection from the same PowerUpId.</returns>
+    private static bool DoesSourceSupersedeProjection(FixedString64Bytes candidatePowerUpId,
+                                                      in PlayerPassiveToolConfig candidateTool,
+                                                      FixedString64Bytes powerUpId,
+                                                      in OrbitalProjectionConfig projectionConfig)
+    {
+        if (candidateTool.IsDefined == 0 ||
+            candidateTool.HasOrbitalProjections == 0)
+        {
+            return false;
+        }
+
+        for (int configIndex = 0; configIndex < candidateTool.OrbitalProjections.Length; configIndex++)
+        {
+            OrbitalProjectionConfig candidateProjection = candidateTool.OrbitalProjections[configIndex];
+
+            switch (candidateProjection.AcquisitionPolicy)
+            {
+                case OrbitalProjectionAcquisitionPolicy.ReplaceAllOrbitalProjections:
+                    return true;
+                case OrbitalProjectionAcquisitionPolicy.ReplaceMatchingPowerUp:
+                    if (candidatePowerUpId == powerUpId &&
+                        candidateProjection.ProjectionIndex == projectionConfig.ProjectionIndex)
+                    {
+                        return true;
+                    }
+
+                    break;
+            }
         }
 
         return false;

@@ -14,9 +14,13 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public Vector3 RootBaseLocalScale;
     public ParticleSystem[] ParticleSystems;
     public TrailRenderer[] TrailRenderers;
+    public float[] ParticleSystemBaseSimulationSpeeds;
+    public bool[] ParticleSystemBaseLooping;
+    public ParticleSystem.MinMaxGradient[] ParticleSystemBaseStartColors;
     public float[] TrailRendererBaseWidths;
     public float[] TrailRendererBaseTimes;
     public Entity PrefabEntity;
+    public int RefreshKey;
     public float RemainingSeconds;
     public Entity FollowTargetEntity;
     public float3 FollowPositionOffset;

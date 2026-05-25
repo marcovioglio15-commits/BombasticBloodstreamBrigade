@@ -159,10 +159,14 @@ internal static class PlayerRuntimeScalingRefreshUtility
         DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas = characterTuningFormulaLookup[entity];
         DynamicBuffer<PlayerPowerUpBaseConfigElement> basePowerUpConfigs = basePowerUpConfigsLookup[entity];
         DynamicBuffer<PlayerRuntimePowerUpScalingElement> powerUpScaling = powerUpScalingLookup[entity];
-        PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
+        PlayerPowerUpsConfig powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Read(entity,
+                                               in powerUpsConfigLookup,
+                                               out powerUpsConfig);
         DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[entity];
         DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup[entity];
-        PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup);
+        DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = passiveToolsStateLookup[entity];
+        ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
         PlayerHealth playerHealth = healthLookup[entity];
         PlayerShield playerShield = shieldLookup[entity];
         PlayerProgressionConfig progressionConfig = progressionConfigLookup[entity];
@@ -222,7 +226,6 @@ internal static class PlayerRuntimeScalingRefreshUtility
         runtimeComboConfigLookup[entity] = runtimeComboConfig;
         comboCounterStateLookup[entity] = comboCounterState;
         PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigLookup[entity], in powerUpsConfig);
-        PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateLookup[entity], in passiveToolsState);
         healthLookup[entity] = playerHealth;
         shieldLookup[entity] = playerShield;
         experienceLookup[entity] = playerExperience;

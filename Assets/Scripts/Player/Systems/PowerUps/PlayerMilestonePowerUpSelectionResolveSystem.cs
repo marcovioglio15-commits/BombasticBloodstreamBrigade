@@ -75,6 +75,7 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> powerUpContainerConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
+        BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -140,7 +141,10 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             PlayerProgressionConfig progressionConfigValue = progressionConfigLookup[entity];
             PlayerLevel playerLevelValue = playerLevelLookup[entity];
             PlayerExperienceCollection playerExperienceCollectionValue = playerExperienceCollectionLookup[entity];
-            PlayerPowerUpsConfig powerUpsConfigValue = PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup);
+            PlayerPowerUpsConfig powerUpsConfigValue;
+            PlayerPowerUpsConfigBufferUtility.Read(entity,
+                                                   in powerUpsConfigLookup,
+                                                   out powerUpsConfigValue);
             PlayerPowerUpsState powerUpsStateValue = powerUpsStateLookup[entity];
             PlayerExperience playerExperienceValue = playerExperienceLookup[entity];
             PlayerHealth playerHealthValue = playerHealthLookup[entity];
@@ -211,8 +215,9 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 continue;
             }
 
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup);
-            PlayerPowerUpUnlockCatalogElement selectedCatalogEntry = unlockCatalogBuffer[selectedCatalogIndex];
+            DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer = passiveToolsStateLookup[entity];
+            ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
+            ref PlayerPowerUpUnlockCatalogElement selectedCatalogEntry = ref unlockCatalogBuffer.ElementAt(selectedCatalogIndex);
             int maximumUnlockCount = math.max(1, selectedCatalogEntry.MaximumUnlockCount);
 
             if (selectedCatalogEntry.CurrentUnlockCount >= maximumUnlockCount)
@@ -245,6 +250,16 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                                                     ref commandBuffer,
                                                     out runtimeApplyTarget);
             }
+            else
+            {
+                runtimeApplied = ApplyStackedUnlock(selectedOffer.UnlockKind,
+                                                    in selectedCatalogEntry,
+                                                    equippedPassiveToolsBuffer,
+                                                    ref passiveToolsState,
+                                                    entity,
+                                                    orbitalProjectionRequestsLookup,
+                                                    out runtimeApplyTarget);
+            }
 
             bool characterTuningApplied = false;
             int appliedCharacterTuningCount = 0;
@@ -265,14 +280,12 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             selectedCatalogEntry.CurrentUnlockCount = math.min(maximumUnlockCount, selectedCatalogEntry.CurrentUnlockCount + 1);
             selectedCatalogEntry.IsUnlocked = 1;
             selectedCatalogEntry.PendingInitialCharacterTuningApply = 0;
-            unlockCatalogBuffer[selectedCatalogIndex] = selectedCatalogEntry;
             PlayerPowerUpStealCooldownRuntimeUtility.MarkCatalogEntryAcquired(selectedCatalogIndex,
                                                                               unlockCatalogBuffer,
                                                                               elapsedTime);
 
             PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigLookup[entity], in powerUpsConfigValue);
             powerUpsStateLookup[entity] = powerUpsStateValue;
-            PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateLookup[entity], in passiveToolsState);
             playerExperienceLookup[entity] = playerExperienceValue;
             playerLevelLookup[entity] = playerLevelValue;
             playerExperienceCollectionLookup[entity] = playerExperienceCollectionValue;
@@ -414,6 +427,83 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 applyTarget = "UnknownUnlockKind";
                 return false;
         }
+    }
+
+    /// <summary>
+    /// Applies runtime effects that are meaningful on repeated Stackable acquisitions without re-equipping the base power-up.
+    /// </summary>
+    /// <param name="unlockKind">Selected unlock payload type.</param>
+    /// <param name="selectedCatalogEntry">Selected catalog entry data.</param>
+    /// <param name="equippedPassiveTools">Runtime passive-tools buffer used by passive orbital stacks.</param>
+    /// <param name="passiveToolsState">Aggregated runtime passive state rebuilt when a passive orbital source is added.</param>
+    /// <param name="playerEntity">Player entity receiving the stacked runtime effect.</param>
+    /// <param name="orbitalProjectionRequestsLookup">Writable orbital projection request buffers.</param>
+    /// <param name="applyTarget">Debug-friendly destination where the stacked effect was applied.</param>
+    /// <returns>True when a repeated acquisition produced an orbital runtime effect.</returns>
+    private static bool ApplyStackedUnlock(PlayerPowerUpUnlockKind unlockKind,
+                                           in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
+                                           DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
+                                           ref PlayerPassiveToolsState passiveToolsState,
+                                           Entity playerEntity,
+                                           BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup,
+                                           out string applyTarget)
+    {
+        switch (unlockKind)
+        {
+            case PlayerPowerUpUnlockKind.Active:
+                return TryEnqueueStackedActiveOrbitalProjections(in selectedCatalogEntry,
+                                                                 playerEntity,
+                                                                 orbitalProjectionRequestsLookup,
+                                                                 out applyTarget);
+            case PlayerPowerUpUnlockKind.Passive:
+                return PlayerPowerUpPassiveUnlockRuntimeUtility.TryStackOrbitalProjectionTool(in selectedCatalogEntry,
+                                                                                              equippedPassiveTools,
+                                                                                              ref passiveToolsState,
+                                                                                              out applyTarget);
+            default:
+                applyTarget = "UnknownStackedUnlockKind";
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Enqueues active-tool orbital projections for repeated Stackable acquisitions that cannot equip a second active slot.
+    /// </summary>
+    /// <param name="selectedCatalogEntry">Active catalog entry being acquired again.</param>
+    /// <param name="playerEntity">Player entity that owns the orbital request buffer.</param>
+    /// <param name="orbitalProjectionRequestsLookup">Writable request buffers used by the orbital spawn system.</param>
+    /// <param name="applyTarget">Debug label describing the active stacked result.</param>
+    /// <returns>True when a timed orbital projection request was enqueued.</returns>
+    private static bool TryEnqueueStackedActiveOrbitalProjections(in PlayerPowerUpUnlockCatalogElement selectedCatalogEntry,
+                                                                  Entity playerEntity,
+                                                                  BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup,
+                                                                  out string applyTarget)
+    {
+        applyTarget = "NoActiveOrbitalProjectionStack";
+
+        if (!orbitalProjectionRequestsLookup.HasBuffer(playerEntity))
+            return false;
+
+        PlayerPassiveToolConfig triggeredPassiveTool = selectedCatalogEntry.ActiveSlotConfig.TriggeredProjectilePassiveTool;
+
+        if (triggeredPassiveTool.IsDefined == 0 ||
+            triggeredPassiveTool.HasOrbitalProjections == 0 ||
+            triggeredPassiveTool.OrbitalProjections.Length <= 0)
+        {
+            return false;
+        }
+
+        DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests = orbitalProjectionRequestsLookup[playerEntity];
+        orbitalProjectionRequests.Add(new PlayerOrbitalProjectionSpawnRequest
+        {
+            OwnerEntity = playerEntity,
+            PowerUpId = selectedCatalogEntry.PowerUpId,
+            Persistent = 0,
+            SourceInstanceId = math.max(0, selectedCatalogEntry.CurrentUnlockCount),
+            Projections = triggeredPassiveTool.OrbitalProjections
+        });
+        applyTarget = "ActiveOrbitalProjectionStacked";
+        return true;
     }
     #endregion
 

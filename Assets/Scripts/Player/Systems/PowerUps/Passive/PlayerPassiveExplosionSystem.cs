@@ -37,7 +37,9 @@ public partial struct PlayerPassiveExplosionSystem : ISystem
                                     DynamicBuffer<PlayerExplosionRequest>>()
                              .WithEntityAccess())
         {
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
 
             if (passiveToolsState.HasExplosion == 0)
                 continue;

@@ -145,7 +145,8 @@ internal static class PlayerRuntimeScalingApplyUtility
                                ref runtimeHealth);
         RebuildRuntimeGamePhases(baseGamePhases, runtimeGamePhases, progressionScaling);
         SyncPowerUpConfigs(basePowerUpConfigs, powerUpScaling, ref powerUpsConfig, unlockCatalog, equippedPassiveTools);
-        passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
+        PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                      ref passiveToolsState);
         SyncHealthAndShield(ref playerHealth, ref playerShield, in runtimeHealth);
         SyncProgressionRuntimeState(effectiveScalableStats,
                                     progressionConfig,
@@ -333,28 +334,39 @@ internal static class PlayerRuntimeScalingApplyUtility
 
             for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
             {
-                PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+                ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
-                if (TryFindBaseConfig(basePowerUpConfigs, catalogEntry.PowerUpId, catalogEntry.UnlockKind, out PlayerPowerUpBaseConfigElement baseConfig))
+                if (!TryFindBaseConfigIndex(basePowerUpConfigs,
+                                            catalogEntry.PowerUpId,
+                                            catalogEntry.UnlockKind,
+                                            out int baseConfigIndex))
                 {
-                    catalogEntry.ActiveSlotConfig = baseConfig.ActiveSlotConfig;
-                    catalogEntry.PassiveToolConfig = baseConfig.PassiveToolConfig;
-                    ApplyPowerUpScaling(powerUpScaling,
-                                        catalogEntry.PowerUpId,
-                                        catalogEntry.UnlockKind,
-                                        ref catalogEntry.ActiveSlotConfig,
-                                        ref catalogEntry.PassiveToolConfig);
-                    unlockCatalog[catalogIndex] = catalogEntry;
+                    continue;
                 }
+
+                ref PlayerPowerUpBaseConfigElement baseConfig = ref basePowerUpConfigs.ElementAt(baseConfigIndex);
+                catalogEntry.ActiveSlotConfig = baseConfig.ActiveSlotConfig;
+                catalogEntry.PassiveToolConfig = baseConfig.PassiveToolConfig;
+                ApplyPowerUpScaling(powerUpScaling,
+                                    catalogEntry.PowerUpId,
+                                    catalogEntry.UnlockKind,
+                                    ref catalogEntry.ActiveSlotConfig,
+                                    ref catalogEntry.PassiveToolConfig);
             }
 
             for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
             {
-                EquippedPassiveToolElement equippedPassiveTool = equippedPassiveTools[passiveIndex];
+                ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
 
-                if (!TryFindBaseConfig(basePowerUpConfigs, equippedPassiveTool.PowerUpId, PlayerPowerUpUnlockKind.Passive, out PlayerPowerUpBaseConfigElement baseConfig))
+                if (!TryFindBaseConfigIndex(basePowerUpConfigs,
+                                            equippedPassiveTool.PowerUpId,
+                                            PlayerPowerUpUnlockKind.Passive,
+                                            out int baseConfigIndex))
+                {
                     continue;
+                }
 
+                ref PlayerPowerUpBaseConfigElement baseConfig = ref basePowerUpConfigs.ElementAt(baseConfigIndex);
                 equippedPassiveTool.Tool = baseConfig.PassiveToolConfig;
                 PlayerPowerUpSlotConfig unusedActiveSlot = default;
                 ApplyPowerUpScaling(powerUpScaling,
@@ -362,7 +374,6 @@ internal static class PlayerRuntimeScalingApplyUtility
                                     PlayerPowerUpUnlockKind.Passive,
                                     ref unusedActiveSlot,
                                     ref equippedPassiveTool.Tool);
-                equippedPassiveTools[passiveIndex] = equippedPassiveTool;
             }
         }
     }
@@ -374,9 +385,15 @@ internal static class PlayerRuntimeScalingApplyUtility
         if (slotConfig.IsDefined == 0 || slotConfig.PowerUpId.Length <= 0)
             return;
 
-        if (!TryFindBaseConfig(basePowerUpConfigs, slotConfig.PowerUpId, PlayerPowerUpUnlockKind.Active, out PlayerPowerUpBaseConfigElement baseConfig))
+        if (!TryFindBaseConfigIndex(basePowerUpConfigs,
+                                    slotConfig.PowerUpId,
+                                    PlayerPowerUpUnlockKind.Active,
+                                    out int baseConfigIndex))
+        {
             return;
+        }
 
+        ref PlayerPowerUpBaseConfigElement baseConfig = ref basePowerUpConfigs.ElementAt(baseConfigIndex);
         slotConfig = baseConfig.ActiveSlotConfig;
         PlayerPassiveToolConfig unusedPassiveTool = default;
         ApplyPowerUpScaling(powerUpScaling,
@@ -458,19 +475,19 @@ internal static class PlayerRuntimeScalingApplyUtility
         }
     }
 
-    private static bool TryFindBaseConfig(DynamicBuffer<PlayerPowerUpBaseConfigElement> basePowerUpConfigs,
-                                          FixedString64Bytes powerUpId,
-                                          PlayerPowerUpUnlockKind unlockKind,
-                                          out PlayerPowerUpBaseConfigElement baseConfig)
+    private static bool TryFindBaseConfigIndex(DynamicBuffer<PlayerPowerUpBaseConfigElement> basePowerUpConfigs,
+                                               FixedString64Bytes powerUpId,
+                                               PlayerPowerUpUnlockKind unlockKind,
+                                               out int baseConfigIndex)
     {
-        baseConfig = default;
+        baseConfigIndex = -1;
 
         if (!basePowerUpConfigs.IsCreated || powerUpId.Length <= 0)
             return false;
 
         for (int configIndex = 0; configIndex < basePowerUpConfigs.Length; configIndex++)
         {
-            PlayerPowerUpBaseConfigElement candidate = basePowerUpConfigs[configIndex];
+            ref PlayerPowerUpBaseConfigElement candidate = ref basePowerUpConfigs.ElementAt(configIndex);
 
             if (candidate.UnlockKind != unlockKind)
                 continue;
@@ -478,7 +495,7 @@ internal static class PlayerRuntimeScalingApplyUtility
             if (candidate.PowerUpId != powerUpId)
                 continue;
 
-            baseConfig = candidate;
+            baseConfigIndex = configIndex;
             return true;
         }
 

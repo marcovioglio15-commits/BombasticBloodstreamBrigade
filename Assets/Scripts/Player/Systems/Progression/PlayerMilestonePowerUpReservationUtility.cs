@@ -76,7 +76,7 @@ internal static class PlayerMilestonePowerUpReservationUtility
     {
         for (int runtimeIndex = 0; runtimeIndex < stealerRuntime.Length; runtimeIndex++)
         {
-            EnemyPowerUpStealerRuntimeElement runtime = stealerRuntime[runtimeIndex];
+            ref EnemyPowerUpStealerRuntimeElement runtime = ref stealerRuntime.ElementAt(runtimeIndex);
 
             if (runtime.HasStolenPowerUp == 0)
                 continue;

@@ -296,6 +296,27 @@ public sealed class EnemyVisualPrefabSettings
     [Tooltip("Uniform scale multiplier applied to each optional spawn VFX instance.")]
     [SerializeField] private float spawnVfxScaleMultiplier = 1f;
 
+    [Tooltip("Optional one-shot VFX prefab spawned when this enemy dies.")]
+    [SerializeField] private GameObject deathVfxPrefab;
+
+    [Tooltip("World-space offset added to the enemy death position before spawning the optional death VFX.")]
+    [SerializeField] private Vector3 deathVfxSpawnOffset;
+
+    [Tooltip("Lifetime in seconds assigned to each spawned death VFX instance.")]
+    [SerializeField] private float deathVfxLifetimeSeconds = 0.75f;
+
+    [Tooltip("Uniform scale multiplier applied to each optional death VFX instance.")]
+    [SerializeField] private float deathVfxScaleMultiplier = 1f;
+
+    [Tooltip("When enabled, death debris particles use a compact palette sampled from this enemy prefab's visible body renderers at bake time.")]
+    [SerializeField] private bool useEnemyBaseColorForDeathDebris = true;
+
+    [Tooltip("Fallback debris particle color used when visual palette extraction is disabled or no usable enemy body color can be sampled.")]
+    [SerializeField] private Color deathDebrisFallbackColor = Color.white;
+
+    [Tooltip("Particle-system child object name that receives the death debris color override.")]
+    [SerializeField] private string deathDebrisParticleChildName = "VFX_Debris";
+
     [Tooltip("Color used by the wave painter and scene preview for this enemy type.")]
     [SerializeField] private Color spawnPaintColor = new Color(1f, 0.3f, 0.3f, 1f);
     #endregion
@@ -380,6 +401,62 @@ public sealed class EnemyVisualPrefabSettings
         get
         {
             return spawnVfxScaleMultiplier;
+        }
+    }
+
+    public GameObject DeathVfxPrefab
+    {
+        get
+        {
+            return deathVfxPrefab;
+        }
+    }
+
+    public Vector3 DeathVfxSpawnOffset
+    {
+        get
+        {
+            return deathVfxSpawnOffset;
+        }
+    }
+
+    public float DeathVfxLifetimeSeconds
+    {
+        get
+        {
+            return deathVfxLifetimeSeconds;
+        }
+    }
+
+    public float DeathVfxScaleMultiplier
+    {
+        get
+        {
+            return deathVfxScaleMultiplier;
+        }
+    }
+
+    public bool UseEnemyBaseColorForDeathDebris
+    {
+        get
+        {
+            return useEnemyBaseColorForDeathDebris;
+        }
+    }
+
+    public Color DeathDebrisFallbackColor
+    {
+        get
+        {
+            return deathDebrisFallbackColor;
+        }
+    }
+
+    public string DeathDebrisParticleChildName
+    {
+        get
+        {
+            return deathDebrisParticleChildName;
         }
     }
 

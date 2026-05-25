@@ -84,7 +84,9 @@ public partial struct PlayerElementalTrailAttachedVfxSystem : ISystem
                              .WithEntityAccess())
         {
             PlayerElementalTrailAttachedVfxState previousTrailState = trailAttachedVfxState.ValueRO;
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(passiveToolsStateBuffer,
+                                                      out passiveToolsState);
             ReleasePooledTrailEntityIfAny(entityManager, previousTrailState.VfxEntity);
 
             GameObject trailPrefab = ResolveTrailPrefab(entityManager, playerEntity);

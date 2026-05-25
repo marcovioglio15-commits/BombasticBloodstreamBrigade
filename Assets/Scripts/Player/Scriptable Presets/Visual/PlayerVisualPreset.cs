@@ -120,7 +120,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Maximum overlay strength reached immediately after a valid hit.")]
     [SerializeField] private float damageFlashMaximumBlend = 0.85f;
 
-    [Header("Power-Ups VFX")]
+    [Header("VFX")]
     [Tooltip("Optional attached VFX prefab activated while Elemental Trail passive is enabled.")]
     [SerializeField] private GameObject elementalTrailAttachedVfxPrefab;
 
@@ -147,6 +147,34 @@ public sealed class PlayerVisualPreset : ScriptableObject
 
     [Tooltip("Shared material and palette settings used by the Laser Beam managed visuals.")]
     [SerializeField] private PlayerLaserBeamVisualSettings laserBeam = new PlayerLaserBeamVisualSettings();
+
+    [Tooltip("Optional one-shot VFX prefab spawned on the player when a level-up is registered.")]
+    [SerializeField] private GameObject levelUpVfxPrefab;
+
+    [Tooltip("Local-space offset applied to Level-Up VFX relative to the player entity position.")]
+    [SerializeField] private Vector3 levelUpVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to the Level-Up VFX instance.")]
+    [SerializeField] private float levelUpVfxScaleMultiplier = 1f;
+
+    [Tooltip("Controls whether Level-Up VFX appears on every level-up or only when the level reaches a milestone power-up selection.")]
+    [SerializeField] private PlayerLevelUpVfxTriggerMode levelUpVfxTriggerMode = PlayerLevelUpVfxTriggerMode.EveryLevelUp;
+
+    [Tooltip("Optional VFX prefab displayed while a Charge Shot active tool is charging.")]
+    [SerializeField] private GameObject chargeShotVfxPrefab;
+
+    [Tooltip("Local-space offset applied to Charge Shot VFX relative to the player entity position.")]
+    [SerializeField] private Vector3 chargeShotVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to the Charge Shot VFX instance.")]
+    [SerializeField] private float chargeShotVfxScaleMultiplier = 1f;
+
+    [Tooltip("Controls whether Charge Shot VFX plays once near completion, loops while charging, or stretches one playback over the whole charge.")]
+    [SerializeField] private PlayerChargeShotVfxPlaybackMode chargeShotVfxPlaybackMode = PlayerChargeShotVfxPlaybackMode.PlayOnceTimedWithChargeCompletion;
+
+    [Header("Scaling")]
+    [Tooltip("Add Scaling rules applied to supported visual preset fields at bake time without mutating this asset.")]
+    [SerializeField] private List<PlayerStatScalingRule> scalingRules = new List<PlayerStatScalingRule>();
     #endregion
 
     #endregion
@@ -319,6 +347,78 @@ public sealed class PlayerVisualPreset : ScriptableObject
             return laserBeam;
         }
     }
+
+    public GameObject LevelUpVfxPrefab
+    {
+        get
+        {
+            return levelUpVfxPrefab;
+        }
+    }
+
+    public Vector3 LevelUpVfxSpawnOffset
+    {
+        get
+        {
+            return levelUpVfxSpawnOffset;
+        }
+    }
+
+    public float LevelUpVfxScaleMultiplier
+    {
+        get
+        {
+            return levelUpVfxScaleMultiplier;
+        }
+    }
+
+    public PlayerLevelUpVfxTriggerMode LevelUpVfxTriggerMode
+    {
+        get
+        {
+            return levelUpVfxTriggerMode;
+        }
+    }
+
+    public GameObject ChargeShotVfxPrefab
+    {
+        get
+        {
+            return chargeShotVfxPrefab;
+        }
+    }
+
+    public Vector3 ChargeShotVfxSpawnOffset
+    {
+        get
+        {
+            return chargeShotVfxSpawnOffset;
+        }
+    }
+
+    public float ChargeShotVfxScaleMultiplier
+    {
+        get
+        {
+            return chargeShotVfxScaleMultiplier;
+        }
+    }
+
+    public PlayerChargeShotVfxPlaybackMode ChargeShotVfxPlaybackMode
+    {
+        get
+        {
+            return chargeShotVfxPlaybackMode;
+        }
+    }
+
+    public IReadOnlyList<PlayerStatScalingRule> ScalingRules
+    {
+        get
+        {
+            return scalingRules;
+        }
+    }
     #endregion
 
     #region Methods
@@ -333,6 +433,18 @@ public sealed class PlayerVisualPreset : ScriptableObject
         set
         {
             elementalEnemyVfxByElement = value;
+        }
+    }
+
+    internal List<PlayerStatScalingRule> ScalingRulesMutable
+    {
+        get
+        {
+            return scalingRules;
+        }
+        set
+        {
+            scalingRules = value;
         }
     }
 
@@ -369,9 +481,44 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (laserBeam == null)
             laserBeam = new PlayerLaserBeamVisualSettings();
 
+        if (scalingRules == null)
+            scalingRules = new List<PlayerStatScalingRule>();
+
         outline.Validate();
         laserBeam.Validate();
+        ValidateScalingRules();
         PlayerElementalVfxAssignmentUtility.ValidateAssignments(elementalEnemyVfxByElement);
+    }
+    #endregion
+
+    #region Validation
+    /// <summary>
+    /// Removes empty Add Scaling rows and validates existing rules after inspector edits.
+    /// </summary>
+    private void ValidateScalingRules()
+    {
+        for (int index = 0; index < scalingRules.Count; index++)
+        {
+            PlayerStatScalingRule scalingRule = scalingRules[index];
+
+            if (scalingRule != null)
+                continue;
+
+            scalingRule = new PlayerStatScalingRule();
+            scalingRule.Configure(string.Empty, false, string.Empty);
+            scalingRules[index] = scalingRule;
+        }
+
+        for (int index = scalingRules.Count - 1; index >= 0; index--)
+        {
+            PlayerStatScalingRule scalingRule = scalingRules[index];
+            scalingRule.Validate();
+
+            if (!string.IsNullOrWhiteSpace(scalingRule.StatKey))
+                continue;
+
+            scalingRules.RemoveAt(index);
+        }
     }
     #endregion
 

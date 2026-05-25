@@ -22,7 +22,7 @@ public struct PlayerOrbitalProjectionSpawnRequest : IBufferElementData
     public FixedString64Bytes PowerUpId;
     public byte Persistent;
     public int SourceInstanceId;
-    public FixedList512Bytes<OrbitalProjectionConfig> Projections;
+    public FixedList4096Bytes<OrbitalProjectionConfig> Projections;
 }
 
 /// <summary>

@@ -287,14 +287,19 @@ internal static class PlayerLaserBeamStateUtility
     /// </summary>
     /// <param name="passiveToolsState">Aggregated always-on passive state.</param>
     /// <param name="laserBeamState">Runtime Laser Beam state.</param>
-    /// <returns>Effective passive snapshot for the current frame.</returns>
-    public static PlayerPassiveToolsState ResolveEffectivePassiveToolsState(in PlayerPassiveToolsState passiveToolsState,
-                                                                            in PlayerLaserBeamState laserBeamState)
+    /// <param name="effectivePassiveToolsState">Effective passive snapshot for the current frame.</param>
+    public static void ResolveEffectivePassiveToolsState(in PlayerPassiveToolsState passiveToolsState,
+                                                         in PlayerLaserBeamState laserBeamState,
+                                                         out PlayerPassiveToolsState effectivePassiveToolsState)
     {
         if (HasTriggeredActiveLaser(in laserBeamState))
-            return BuildPassiveToolsState(in laserBeamState.TriggeredActivePassiveSnapshot);
+        {
+            BuildPassiveToolsState(in laserBeamState.TriggeredActivePassiveSnapshot,
+                                   out effectivePassiveToolsState);
+            return;
+        }
 
-        return passiveToolsState;
+        effectivePassiveToolsState = passiveToolsState;
     }
 
     /// <summary>
@@ -498,10 +503,11 @@ internal static class PlayerLaserBeamStateUtility
     /// Rehydrates the compact timed Laser Beam snapshot into the passive state shape expected by shared beam code.
     /// </summary>
     /// <param name="snapshot">Compact timed active snapshot stored on PlayerLaserBeamState.</param>
-    /// <returns>Passive state containing only the Laser Beam relevant modules.</returns>
-    private static PlayerPassiveToolsState BuildPassiveToolsState(in PlayerLaserBeamPassiveSnapshot snapshot)
+    /// <param name="passiveToolsState">Passive state containing only the Laser Beam relevant modules.</param>
+    private static void BuildPassiveToolsState(in PlayerLaserBeamPassiveSnapshot snapshot,
+                                               out PlayerPassiveToolsState passiveToolsState)
     {
-        return new PlayerPassiveToolsState
+        passiveToolsState = new PlayerPassiveToolsState
         {
             ProjectileSizeMultiplier = 1f,
             ProjectileDamageMultiplier = 1f,

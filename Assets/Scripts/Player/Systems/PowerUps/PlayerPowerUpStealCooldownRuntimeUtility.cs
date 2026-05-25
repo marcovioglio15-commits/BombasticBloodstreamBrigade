@@ -28,9 +28,8 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
         if (!unlockCatalog.IsCreated || catalogIndex < 0 || catalogIndex >= unlockCatalog.Length)
             return false;
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         catalogEntry.LastAcquiredTime = math.max(TimestampEpsilon, elapsedTime);
-        unlockCatalog[catalogIndex] = catalogEntry;
         return true;
     }
 
@@ -99,7 +98,7 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
         if (catalogIndex < 0)
             return false;
 
-        PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+        ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         return IsPowerUpProtectedFromSteal(in catalogEntry, cooldownSeconds, elapsedTime);
     }
     #endregion
@@ -121,7 +120,7 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
 
         for (int catalogIndex = 0; catalogIndex < unlockCatalog.Length; catalogIndex++)
         {
-            PlayerPowerUpUnlockCatalogElement catalogEntry = unlockCatalog[catalogIndex];
+            ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
 
             if (catalogEntry.UnlockKind != unlockKind)
                 continue;

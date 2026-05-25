@@ -19,6 +19,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpCheatPresetEntry>();
+        state.RequireForUpdate<PlayerPowerUpCheatPresetSlotElement>();
         state.RequireForUpdate<PlayerPowerUpCheatPresetPassiveElement>();
         state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
@@ -33,11 +34,13 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         foreach ((DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
+                  DynamicBuffer<PlayerPowerUpCheatPresetSlotElement> cheatPresetSlots,
                   DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
                   DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRW<PlayerPowerUpsState> powerUpsState,
                   DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                   DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpCheatPresetEntry>,
+                                                                                       DynamicBuffer<PlayerPowerUpCheatPresetSlotElement>,
                                                                                        DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement>,
                                                                                        DynamicBuffer<PlayerPowerUpsConfigElement>,
                                                                                        RefRW<PlayerPowerUpsState>,
@@ -49,10 +52,13 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
                                           out int presetIndex))
                 continue;
 
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
             bool passivesChanged = ProcessCheatCommand(commandType,
                                                        presetIndex,
                                                        cheatPresetEntries,
+                                                       cheatPresetSlots,
                                                        cheatPresetPassives,
                                                        ref powerUpsConfig,
                                                        ref powerUpsState.ValueRW,
@@ -61,8 +67,9 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
             if (passivesChanged)
             {
                 PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
-                PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsAggregationUtility.BuildPassiveToolsState(equippedPassiveTools);
-                PlayerPassiveToolsStateBufferUtility.Write(passiveToolsStateBuffer, in passiveToolsState);
+                ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
+                PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,
+                                                                              ref passiveToolsState);
             }
         }
     }
@@ -75,6 +82,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <param name="commandType">Pending command kind to process.</param>
     /// <param name="presetIndex">Pending preset index used by apply-preset commands.</param>
     /// <param name="cheatPresetEntries">Baked preset metadata buffer.</param>
+    /// <param name="cheatPresetSlots">Flattened baked active-slot buffer.</param>
     /// <param name="cheatPresetPassives">Flattened baked passives buffer.</param>
     /// <param name="powerUpsConfig">Runtime power-up config to mutate.</param>
     /// <param name="powerUpsState">Runtime power-up state to reset.</param>
@@ -83,6 +91,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     private static bool ProcessCheatCommand(PlayerPowerUpCheatCommandType commandType,
                                             int presetIndex,
                                             DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
+                                            DynamicBuffer<PlayerPowerUpCheatPresetSlotElement> cheatPresetSlots,
                                             DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
                                             ref PlayerPowerUpsConfig powerUpsConfig,
                                             ref PlayerPowerUpsState powerUpsState,
@@ -93,6 +102,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
             case PlayerPowerUpCheatCommandType.ApplyPresetByIndex:
                 return TryApplyPresetByIndex(presetIndex,
                                              cheatPresetEntries,
+                                             cheatPresetSlots,
                                              cheatPresetPassives,
                                              ref powerUpsConfig,
                                              ref powerUpsState,
@@ -130,6 +140,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// </summary>
     /// <param name="presetIndex">Requested snapshot index.</param>
     /// <param name="cheatPresetEntries">Baked preset metadata buffer.</param>
+    /// <param name="cheatPresetSlots">Flattened baked active-slot buffer.</param>
     /// <param name="cheatPresetPassives">Flattened baked passives buffer.</param>
     /// <param name="powerUpsConfig">Runtime power-up config to mutate.</param>
     /// <param name="powerUpsState">Runtime state to reset after replacement.</param>
@@ -137,6 +148,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
     /// <returns>True when the preset was found and applied, otherwise false.</returns>
     private static bool TryApplyPresetByIndex(int presetIndex,
                                               DynamicBuffer<PlayerPowerUpCheatPresetEntry> cheatPresetEntries,
+                                              DynamicBuffer<PlayerPowerUpCheatPresetSlotElement> cheatPresetSlots,
                                               DynamicBuffer<PlayerPowerUpCheatPresetPassiveElement> cheatPresetPassives,
                                               ref PlayerPowerUpsConfig powerUpsConfig,
                                               ref PlayerPowerUpsState powerUpsState,
@@ -153,7 +165,9 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
         if (cheatPresetEntry.IsDefined == 0)
             return false;
 
-        powerUpsConfig = cheatPresetEntry.PowerUpsConfig;
+        PlayerPowerUpCheatPresetSlotBufferUtility.Read(in cheatPresetEntry,
+                                                       cheatPresetSlots,
+                                                       out powerUpsConfig);
         ReplaceEquippedPassivesFromSnapshot(cheatPresetEntry, cheatPresetPassives, equippedPassiveTools);
         PlayerPowerUpLoadoutRuntimeUtility.ResetRuntimeState(ref powerUpsState, in powerUpsConfig);
         return true;
@@ -181,12 +195,11 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
         for (int passiveOffset = 0; passiveOffset < safeCount; passiveOffset++)
         {
             PlayerPowerUpCheatPresetPassiveElement cheatPresetPassive = cheatPresetPassives[safeStartIndex + passiveOffset];
-
-            equippedPassiveTools.Add(new EquippedPassiveToolElement
-            {
-                PowerUpId = cheatPresetPassive.PowerUpId,
-                Tool = cheatPresetPassive.Tool
-            });
+            int passiveIndex = equippedPassiveTools.Length;
+            equippedPassiveTools.ResizeUninitialized(passiveIndex + 1);
+            ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
+            equippedPassiveTool.PowerUpId = cheatPresetPassive.PowerUpId;
+            equippedPassiveTool.Tool = cheatPresetPassive.Tool;
         }
     }
     #endregion

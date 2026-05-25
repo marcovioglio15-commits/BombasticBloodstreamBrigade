@@ -23634,14 +23634,86 @@ MonoBehaviour:
           despawnAnimationSeconds: 0.2
           projections:
           - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
-            displayName: Orbital Projection Shield
+            displayName: Orbital Projection Shield 4
             categoryId: OrbitalProjection
-            motionMode: 1
+            motionMode: 0
             orbitDistance: 2
             heightOffset: 0
-            angleOffsetDegrees: 0
+            angleOffsetDegrees: 45
             orbitSpeedDegreesPerSecond: 120
-            bounceInsideOrbitCone: 1
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 1
+            lookFollowDelaySeconds: 0
+            collisionRadius: 0.7
+            damageEnemies: 0
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 1
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield
+            categoryId: OrbitalProjection
+            motionMode: 0
+            orbitDistance: 2
+            heightOffset: 0
+            angleOffsetDegrees: 180
+            orbitSpeedDegreesPerSecond: 120
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 1
+            lookFollowDelaySeconds: 0
+            collisionRadius: 0.7
+            damageEnemies: 0
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 1
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield 2
+            categoryId: OrbitalProjection
+            motionMode: 0
+            orbitDistance: 2
+            heightOffset: 0
+            angleOffsetDegrees: 135
+            orbitSpeedDegreesPerSecond: 120
+            bounceInsideOrbitCone: 0
+            orbitConeCenterAngleDegrees: 0
+            orbitConeAngleDegrees: 90
+            fullOrbitConeResponse: 1
+            lookFollowDelaySeconds: 0
+            collisionRadius: 0.7
+            damageEnemies: 0
+            contactDamage: 1
+            damageTickIntervalSeconds: 1
+            blockEnemyProjectiles: 1
+            blockEnemyBombs: 1
+            hasHealth: 0
+            maximumHealth: 5
+            enemyContactHealthDamage: 1
+            projectileBlockHealthDamage: 1
+            bombBlockHealthDamage: 1
+          - projectionPrefab: {fileID: 2954602875370412112, guid: 4d9a260ad4152834aa108344063b0c77, type: 3}
+            displayName: Orbital Projection Shield 3
+            categoryId: OrbitalProjection
+            motionMode: 0
+            orbitDistance: 2
+            heightOffset: 0
+            angleOffsetDegrees: 90
+            orbitSpeedDegreesPerSecond: 120
+            bounceInsideOrbitCone: 0
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 1
@@ -23659,17 +23731,17 @@ MonoBehaviour:
             bombBlockHealthDamage: 1
           - projectionPrefab: {fileID: 6580205467536590943, guid: 0ff06bb8cf64f1c49b9397624aa28916, type: 3}
             displayName: Orbital Projection Damage
-            categoryId: 'Orbital Projection Damage '
+            categoryId: OrbitalProjection
             motionMode: 2
-            orbitDistance: 3
+            orbitDistance: 2
             heightOffset: 0
-            angleOffsetDegrees: 0
+            angleOffsetDegrees: 90
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
-            fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0.1
+            fullOrbitConeResponse: 1
+            lookFollowDelaySeconds: 0
             collisionRadius: 0.7
             damageEnemies: 1
             contactDamage: 5
@@ -23677,7 +23749,7 @@ MonoBehaviour:
             blockEnemyProjectiles: 0
             blockEnemyBombs: 0
             hasHealth: 0
-            maximumHealth: 1
+            maximumHealth: 5
             enemyContactHealthDamage: 1
             projectileBlockHealthDamage: 1
             bombBlockHealthDamage: 1
@@ -23767,8 +23839,8 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 0
     unreplaceable: 0
-  primaryActivePowerUpId: ActivePowerUp_OrbitalProjection
-  secondaryActivePowerUpId: ActivePowerUp_OrbitalProjectionToggleable
+  primaryActivePowerUpId: ActiveChargeShot
+  secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
   - Passive_OrbitalProjections
   passiveTools:

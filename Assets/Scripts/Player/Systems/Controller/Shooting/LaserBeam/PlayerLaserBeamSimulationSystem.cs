@@ -104,11 +104,16 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             mutableLaserBeamLanes.Clear();
 
             PlayerLaserBeamState currentLaserBeamState = laserBeamState.ValueRO;
-            PlayerPassiveToolsState currentPassiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(playerEntity, in passiveToolsStateLookup);
+            PlayerPassiveToolsState currentPassiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(playerEntity,
+                                                      in passiveToolsStateLookup,
+                                                      out currentPassiveToolsState);
             PlayerLaserBeamStateUtility.UpdateTriggeredActiveLaser(ref currentLaserBeamState, deltaTime);
             bool hasTriggeredActiveLaser = PlayerLaserBeamStateUtility.HasTriggeredActiveLaser(in currentLaserBeamState);
-            PlayerPassiveToolsState effectivePassiveToolsState = PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in currentPassiveToolsState,
-                                                                                                                                in currentLaserBeamState);
+            PlayerPassiveToolsState effectivePassiveToolsState;
+            PlayerLaserBeamStateUtility.ResolveEffectivePassiveToolsState(in currentPassiveToolsState,
+                                                                          in currentLaserBeamState,
+                                                                          out effectivePassiveToolsState);
             PlayerInputState currentInputState = inputStateLookup[playerEntity];
             PlayerMovementState currentMovementState = movementStateLookup[playerEntity];
             PlayerRuntimeShootingConfig currentRuntimeShootingConfig = runtimeShootingConfigLookup[playerEntity];

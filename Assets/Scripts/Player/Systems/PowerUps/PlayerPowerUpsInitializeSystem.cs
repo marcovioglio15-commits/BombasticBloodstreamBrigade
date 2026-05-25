@@ -31,6 +31,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingPowerUpVfxPrefabBindingBufferQuery;
     private EntityQuery missingPowerUpVfxCapConfigQuery;
     private EntityQuery missingPowerUpCheatPresetEntryBufferQuery;
+    private EntityQuery missingPowerUpCheatPresetSlotBufferQuery;
     private EntityQuery missingPowerUpCheatPresetPassiveBufferQuery;
     private EntityQuery missingPowerUpUnlockCatalogBufferQuery;
     private EntityQuery missingPowerUpCharacterTuningFormulaBufferQuery;
@@ -169,6 +170,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             .WithNone<PlayerPowerUpCheatPresetEntry>()
             .Build();
 
+        missingPowerUpCheatPresetSlotBufferQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerPowerUpCheatPresetSlotElement>()
+            .Build();
+
         missingPowerUpCheatPresetPassiveBufferQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerPowerUpCheatPresetPassiveElement>()
@@ -244,6 +250,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingPowerUpVfxPrefabBindingBufferQuery,
             in missingPowerUpVfxCapConfigQuery,
             in missingPowerUpCheatPresetEntryBufferQuery,
+            in missingPowerUpCheatPresetSlotBufferQuery,
             in missingPowerUpCheatPresetPassiveBufferQuery,
             in missingPowerUpUnlockCatalogBufferQuery,
             in missingPowerUpCharacterTuningFormulaBufferQuery,
@@ -275,7 +282,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
-        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(true);
+        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
 
         if (missingFlags.HasMissingState)
         {
@@ -395,6 +402,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingPowerUpCheatPresetEntryBuffer)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpCheatPresetEntryBuffers(ref commandBuffer, in missingPowerUpCheatPresetEntryBufferQuery);
+        }
+
+        if (missingFlags.HasMissingPowerUpCheatPresetSlotBuffer)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingPowerUpCheatPresetSlotBuffers(ref commandBuffer, in missingPowerUpCheatPresetSlotBufferQuery);
         }
 
         if (missingFlags.HasMissingPowerUpCheatPresetPassiveBuffer)

@@ -65,7 +65,9 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
                 : default;
             float interactionLockDuration = PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(in interactionConfig,
                                                                                                                             scalableStats);
-            PlayerPowerUpsConfig powerUpsConfig = PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
+                                                   out powerUpsConfig);
 
             for (int commandIndex = 0; commandIndex < swapCommands.Length; commandIndex++)
             {

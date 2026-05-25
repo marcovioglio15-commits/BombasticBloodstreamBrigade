@@ -126,7 +126,10 @@ public partial struct ProjectileSimulationSystem : ISystem
             if (!PassiveToolsLookup.HasBuffer(shooterEntity))
                 return false;
 
-            PlayerPassiveToolsState passiveToolsState = PlayerPassiveToolsStateBufferUtility.Read(shooterEntity, in PassiveToolsLookup);
+            PlayerPassiveToolsState passiveToolsState;
+            PlayerPassiveToolsStateBufferUtility.Read(shooterEntity,
+                                                      in PassiveToolsLookup,
+                                                      out passiveToolsState);
 
             if (passiveToolsState.HasPerfectCircle == 0)
                 return false;
