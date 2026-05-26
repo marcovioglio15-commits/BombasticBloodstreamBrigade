@@ -3163,14 +3163,10 @@ MonoBehaviour:
         dropPayloadKind: 0
         experience:
           dropDefinitions:
-          - dropPrefab: {fileID: 6858454939034102764, guid: 03fe33be4f58a114daedf4c2e5b1d2fe, type: 3}
-            experienceAmount: 3
           - dropPrefab: {fileID: 6858454939034102764, guid: 73d41295a6e76694c9da16f94b538973, type: 3}
-            experienceAmount: 6
-          - dropPrefab: {fileID: 6858454939034102764, guid: b4ca66a6a67765143825d976eb834132, type: 3}
-            experienceAmount: 9
-          complessiveExperienceDropMinimum: 9
-          complessiveExperienceDropMaximum: 16
+            experienceAmount: 20
+          complessiveExperienceDropMinimum: 20
+          complessiveExperienceDropMaximum: 20
           dropsDistribution: 0.5
           dropRadius: 0.6
           collectionMovement:
@@ -3458,10 +3454,10 @@ MonoBehaviour:
         recovery:
           dropDefinitions:
           - dropPrefab: {fileID: 6858454939034102764, guid: b1f8b984875b05149a11ac902663992b, type: 3}
-            healthRestoreAmount: 0.1
+            healthRestoreAmount: 0.5
             shieldRestoreAmount: 0
             dropCount: 1
-          dropChancePercent: 100
+          dropChancePercent: 3.5
           dropRadius: 2
           collectionMovement:
             moveSpeed: 12
@@ -4595,6 +4591,270 @@ MonoBehaviour:
       maximumSelectedModules: 1
       modules:
       - moduleId: Module_DropExperience
+        isEnabled: 1
+        selectionWeight: 1
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 1
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 9
+              minimumTravelDistance: 2
+              maximumTravelDistance: 8
+              arrivalTolerance: 0.35
+              waitCooldownSeconds: 0.7
+              candidateSampleCount: 9
+              useInfiniteDirectionSampling: 1
+              infiniteDirectionStepDegrees: 8
+              unexploredDirectionPreference: 0.65
+              towardPlayerPreference: 0.35
+              minimumEnemyClearance: 0.2
+              trajectoryPredictionTime: 0.35
+              freeTrajectoryPreference: 4
+              blockedPathRetryDelay: 0.25
+            dvd:
+              speedMultiplier: 1.05
+              bounceDamping: 1
+              randomizeInitialDirection: 1
+              fixedInitialDirectionDegrees: 45
+              cornerNudgeDistance: 0.08
+              ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
+          coward:
+            detectionRadius: 8
+            releaseDistanceBuffer: 1.5
+            searchRadius: 10
+            minimumRetreatDistance: 2.5
+            maximumRetreatDistance: 8.5
+            arrivalTolerance: 0.35
+            candidateSampleCount: 12
+            useInfiniteDirectionSampling: 1
+            infiniteDirectionStepDegrees: 8
+            minimumEnemyClearance: 0.25
+            trajectoryPredictionTime: 0.35
+            freeTrajectoryPreference: 0.85
+            retreatDirectionPreference: 0.65
+            openSpacePreference: 0.55
+            navigationRetreatPreference: 0.6
+            patrolRadius: 3.5
+            patrolWaitSeconds: 0.55
+            patrolSpeedMultiplier: 0.82
+            retreatSpeedMultiplierFar: 1
+            retreatSpeedMultiplierNear: 1.4
+            blockedPathRetryDelay: 0.2
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0.4
+              moveSpeedMultiplierWhileAiming: 0.1
+            recovery:
+              cooldownSeconds: 1
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 1
+              distanceOffset: 0
+              fixedDistance: 5
+              minimumTravelDistance: 2
+              maximumTravelDistance: 7
+            path:
+              dashDurationSeconds: 0.28
+              lateralAmplitude: 1.2
+              mirrorMode: 2
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 1
+            burstCount: 1
+            aimWindupSeconds: 0.25
+            preFireStopSeconds: 0.25
+            postFireStopSeconds: 0
+            intraBurstDelay: 0.08
+            useMinimumRange: 0
+            minimumRange: 2
+            useMaximumRange: 0
+            maximumRange: 20
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 1
+              spreadAngleDegrees: 0
+              projectileSpeed: 14
+              projectileDamage: 6
+              projectileRange: 28
+              projectileLifetime: 4
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 1
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 24
+              poolExpandBatch: 8
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 5
+                maximumStacks: 20
+                stackDecayPerSecond: 1
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 4
+                dotTickInterval: 0.5
+                dotDurationSeconds: 2
+                impedimentSlowPercentPerStack: 10
+                impedimentProcSlowPercent: 50
+                impedimentMaxSlowPercent: 100
+                impedimentDurationSeconds: 2
+              stacksPerHit: 1
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            preventMidAirInterception: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+              explosionVfxPrefab: {fileID: 0}
+              scaleExplosionVfxToDamageRadius: 1
+              explosionVfxScaleMultiplier: 1
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
+          powerUpStealer:
+            triggerMode: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
+            targetKind: 2
+            selectionMode: 0
+            activeTargetBiasPercent: 50
+            acquisitionStealCooldownSeconds: 3
+            recoverAfterDamageTakenPercent: 0
+            recoveryDamageTakenPercent: 25
+            recoverAfterDamageWindow: 0
+            recoveryDamageWindowPercent: 20
+            recoveryDamageWindowSeconds: 5
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 10
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0.5
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+            extraComboPoints:
+              baseMultiplier: 1
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 4
+              conditions: []
+            recovery:
+              dropDefinitions: []
+              dropChancePercent: 100
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+      - moduleId: Module_DropHealth
         isEnabled: 1
         selectionWeight: 1
         useOverridePayload: 0
@@ -6241,6 +6501,270 @@ MonoBehaviour:
                 collectDistancePerPlayerSpeed: 0.05
                 spawnAnimationMinDuration: 0.08
                 spawnAnimationMaxDuration: 0.16
+      - moduleId: Module_DropHealth
+        isEnabled: 1
+        selectionWeight: 1
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 1
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 9
+              minimumTravelDistance: 2
+              maximumTravelDistance: 8
+              arrivalTolerance: 0.35
+              waitCooldownSeconds: 0.7
+              candidateSampleCount: 9
+              useInfiniteDirectionSampling: 1
+              infiniteDirectionStepDegrees: 8
+              unexploredDirectionPreference: 0.65
+              towardPlayerPreference: 0.35
+              minimumEnemyClearance: 0.2
+              trajectoryPredictionTime: 0.35
+              freeTrajectoryPreference: 4
+              blockedPathRetryDelay: 0.25
+            dvd:
+              speedMultiplier: 1.05
+              bounceDamping: 1
+              randomizeInitialDirection: 1
+              fixedInitialDirectionDegrees: 45
+              cornerNudgeDistance: 0.08
+              ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
+          coward:
+            detectionRadius: 8
+            releaseDistanceBuffer: 1.5
+            searchRadius: 10
+            minimumRetreatDistance: 2.5
+            maximumRetreatDistance: 8.5
+            arrivalTolerance: 0.35
+            candidateSampleCount: 12
+            useInfiniteDirectionSampling: 1
+            infiniteDirectionStepDegrees: 8
+            minimumEnemyClearance: 0.25
+            trajectoryPredictionTime: 0.35
+            freeTrajectoryPreference: 0.85
+            retreatDirectionPreference: 0.65
+            openSpacePreference: 0.55
+            navigationRetreatPreference: 0.6
+            patrolRadius: 3.5
+            patrolWaitSeconds: 0.55
+            patrolSpeedMultiplier: 0.82
+            retreatSpeedMultiplierFar: 1
+            retreatSpeedMultiplierNear: 1.4
+            blockedPathRetryDelay: 0.2
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0.4
+              moveSpeedMultiplierWhileAiming: 0.1
+            recovery:
+              cooldownSeconds: 1
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 1
+              distanceOffset: 0
+              fixedDistance: 5
+              minimumTravelDistance: 2
+              maximumTravelDistance: 7
+            path:
+              dashDurationSeconds: 0.28
+              lateralAmplitude: 1.2
+              mirrorMode: 2
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 1
+            burstCount: 1
+            aimWindupSeconds: 0.25
+            preFireStopSeconds: 0.25
+            postFireStopSeconds: 0
+            intraBurstDelay: 0.08
+            useMinimumRange: 0
+            minimumRange: 2
+            useMaximumRange: 0
+            maximumRange: 20
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 1
+              spreadAngleDegrees: 0
+              projectileSpeed: 14
+              projectileDamage: 6
+              projectileRange: 28
+              projectileLifetime: 4
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 1
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 24
+              poolExpandBatch: 8
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 5
+                maximumStacks: 20
+                stackDecayPerSecond: 1
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 4
+                dotTickInterval: 0.5
+                dotDurationSeconds: 2
+                impedimentSlowPercentPerStack: 10
+                impedimentProcSlowPercent: 50
+                impedimentMaxSlowPercent: 100
+                impedimentDurationSeconds: 2
+              stacksPerHit: 1
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            preventMidAirInterception: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+              explosionVfxPrefab: {fileID: 0}
+              scaleExplosionVfxToDamageRadius: 1
+              explosionVfxScaleMultiplier: 1
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
+          powerUpStealer:
+            triggerMode: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
+            targetKind: 2
+            selectionMode: 0
+            activeTargetBiasPercent: 50
+            acquisitionStealCooldownSeconds: 3
+            recoverAfterDamageTakenPercent: 0
+            recoveryDamageTakenPercent: 25
+            recoverAfterDamageWindow: 0
+            recoveryDamageWindowPercent: 20
+            recoveryDamageWindowSeconds: 5
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 10
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0.5
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+            extraComboPoints:
+              baseMultiplier: 1
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 4
+              conditions: []
+            recovery:
+              dropDefinitions: []
+              dropChancePercent: 100
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
       legacyBinding:
         moduleId: 
         isEnabled: 1
@@ -7361,6 +7885,270 @@ MonoBehaviour:
       maximumSelectedModules: 1
       modules:
       - moduleId: Module_DropExperience
+        isEnabled: 1
+        selectionWeight: 1
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 1
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 9
+              minimumTravelDistance: 2
+              maximumTravelDistance: 8
+              arrivalTolerance: 0.35
+              waitCooldownSeconds: 0.7
+              candidateSampleCount: 9
+              useInfiniteDirectionSampling: 1
+              infiniteDirectionStepDegrees: 8
+              unexploredDirectionPreference: 0.65
+              towardPlayerPreference: 0.35
+              minimumEnemyClearance: 0.2
+              trajectoryPredictionTime: 0.35
+              freeTrajectoryPreference: 4
+              blockedPathRetryDelay: 0.25
+            dvd:
+              speedMultiplier: 1.05
+              bounceDamping: 1
+              randomizeInitialDirection: 1
+              fixedInitialDirectionDegrees: 45
+              cornerNudgeDistance: 0.08
+              ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
+          coward:
+            detectionRadius: 8
+            releaseDistanceBuffer: 1.5
+            searchRadius: 10
+            minimumRetreatDistance: 2.5
+            maximumRetreatDistance: 8.5
+            arrivalTolerance: 0.35
+            candidateSampleCount: 12
+            useInfiniteDirectionSampling: 1
+            infiniteDirectionStepDegrees: 8
+            minimumEnemyClearance: 0.25
+            trajectoryPredictionTime: 0.35
+            freeTrajectoryPreference: 0.85
+            retreatDirectionPreference: 0.65
+            openSpacePreference: 0.55
+            navigationRetreatPreference: 0.6
+            patrolRadius: 3.5
+            patrolWaitSeconds: 0.55
+            patrolSpeedMultiplier: 0.82
+            retreatSpeedMultiplierFar: 1
+            retreatSpeedMultiplierNear: 1.4
+            blockedPathRetryDelay: 0.2
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0.4
+              moveSpeedMultiplierWhileAiming: 0.1
+            recovery:
+              cooldownSeconds: 1
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 1
+              distanceOffset: 0
+              fixedDistance: 5
+              minimumTravelDistance: 2
+              maximumTravelDistance: 7
+            path:
+              dashDurationSeconds: 0.28
+              lateralAmplitude: 1.2
+              mirrorMode: 2
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 1
+            burstCount: 1
+            aimWindupSeconds: 0.25
+            preFireStopSeconds: 0.25
+            postFireStopSeconds: 0
+            intraBurstDelay: 0.08
+            useMinimumRange: 0
+            minimumRange: 2
+            useMaximumRange: 0
+            maximumRange: 20
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 1
+              spreadAngleDegrees: 0
+              projectileSpeed: 14
+              projectileDamage: 6
+              projectileRange: 28
+              projectileLifetime: 4
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 1
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 24
+              poolExpandBatch: 8
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 5
+                maximumStacks: 20
+                stackDecayPerSecond: 1
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 4
+                dotTickInterval: 0.5
+                dotDurationSeconds: 2
+                impedimentSlowPercentPerStack: 10
+                impedimentProcSlowPercent: 50
+                impedimentMaxSlowPercent: 100
+                impedimentDurationSeconds: 2
+              stacksPerHit: 1
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            preventMidAirInterception: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+              explosionVfxPrefab: {fileID: 0}
+              scaleExplosionVfxToDamageRadius: 1
+              explosionVfxScaleMultiplier: 1
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
+          powerUpStealer:
+            triggerMode: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
+            targetKind: 2
+            selectionMode: 0
+            activeTargetBiasPercent: 50
+            acquisitionStealCooldownSeconds: 3
+            recoverAfterDamageTakenPercent: 0
+            recoveryDamageTakenPercent: 25
+            recoverAfterDamageWindow: 0
+            recoveryDamageWindowPercent: 20
+            recoveryDamageWindowSeconds: 5
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 10
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0.5
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+            extraComboPoints:
+              baseMultiplier: 1
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 4
+              conditions: []
+            recovery:
+              dropDefinitions: []
+              dropChancePercent: 100
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+      - moduleId: Module_DropHealth
         isEnabled: 1
         selectionWeight: 1
         useOverridePayload: 0
@@ -8764,7 +9552,7 @@ MonoBehaviour:
       - moduleId: Module_DropExperience
         isEnabled: 1
         selectionWeight: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -8998,15 +9786,17 @@ MonoBehaviour:
           dropItems:
             dropPayloadKind: 0
             experience:
-              dropDefinitions: []
+              dropDefinitions:
+              - dropPrefab: {fileID: 6858454939034102764, guid: 03fe33be4f58a114daedf4c2e5b1d2fe, type: 3}
+                experienceAmount: 10
               complessiveExperienceDropMinimum: 10
-              complessiveExperienceDropMaximum: 0
-              dropsDistribution: 0.5
+              complessiveExperienceDropMaximum: 10
+              dropsDistribution: 1
               dropRadius: 0.6
               collectionMovement:
-                moveSpeed: 8
+                moveSpeed: 12
                 collectDistance: 0.3
-                collectDistancePerPlayerSpeed: 0.05
+                collectDistancePerPlayerSpeed: 0.1
                 spawnAnimationMinDuration: 0.08
                 spawnAnimationMaxDuration: 0.16
             extraComboPoints:
@@ -9015,300 +9805,6 @@ MonoBehaviour:
               minimumFinalMultiplier: 0
               maximumFinalMultiplier: 4
               conditions: []
-            recovery:
-              dropDefinitions: []
-              dropChancePercent: 100
-              dropRadius: 0.6
-              collectionMovement:
-                moveSpeed: 8
-                collectDistance: 0.3
-                collectDistancePerPlayerSpeed: 0.05
-                spawnAnimationMinDuration: 0.08
-                spawnAnimationMaxDuration: 0.16
-      - moduleId: Module_ExtraComboPoints
-        isEnabled: 1
-        selectionWeight: 1
-        useOverridePayload: 1
-        overridePayload:
-          stationary:
-            freezeRotation: 1
-          wanderer:
-            mode: 0
-            basic:
-              searchRadius: 9
-              minimumTravelDistance: 2
-              maximumTravelDistance: 8
-              arrivalTolerance: 0.35
-              waitCooldownSeconds: 0.7
-              candidateSampleCount: 9
-              useInfiniteDirectionSampling: 1
-              infiniteDirectionStepDegrees: 8
-              unexploredDirectionPreference: 0.65
-              towardPlayerPreference: 0.35
-              minimumEnemyClearance: 0.2
-              trajectoryPredictionTime: 0.35
-              freeTrajectoryPreference: 4
-              blockedPathRetryDelay: 0.25
-            dvd:
-              speedMultiplier: 1.05
-              bounceDamping: 1
-              randomizeInitialDirection: 1
-              fixedInitialDirectionDegrees: 45
-              cornerNudgeDistance: 0.08
-              ignoreSteeringAndPriority: 0
-            acid:
-              trailSegmentLifetimeSeconds: 3
-              trailSpawnDistance: 0.75
-              trailSpawnIntervalSeconds: 0.18
-              trailRadius: 0.85
-              maxActiveSegmentsPerEnemy: 18
-              damagePerTick: 4
-              applyIntervalSeconds: 0.55
-              minimumMovementSpeed: 0.1
-              trailSegmentVfxPrefab: {fileID: 0}
-              scaleTrailSegmentVfxToRadius: 1
-              trailSegmentVfxScaleMultiplier: 1
-              debugDrawSegments: 1
-          coward:
-            detectionRadius: 8
-            releaseDistanceBuffer: 1.5
-            searchRadius: 10
-            minimumRetreatDistance: 2.5
-            maximumRetreatDistance: 8.5
-            arrivalTolerance: 0.35
-            candidateSampleCount: 12
-            useInfiniteDirectionSampling: 1
-            infiniteDirectionStepDegrees: 8
-            minimumEnemyClearance: 0.25
-            trajectoryPredictionTime: 0.35
-            freeTrajectoryPreference: 0.85
-            retreatDirectionPreference: 0.65
-            openSpacePreference: 0.55
-            navigationRetreatPreference: 0.6
-            patrolRadius: 3.5
-            patrolWaitSeconds: 0.55
-            patrolSpeedMultiplier: 0.82
-            retreatSpeedMultiplierFar: 1
-            retreatSpeedMultiplierNear: 1.4
-            blockedPathRetryDelay: 0.2
-          shortRangeDash:
-            aim:
-              aimDurationSeconds: 0.4
-              moveSpeedMultiplierWhileAiming: 0.1
-            recovery:
-              cooldownSeconds: 1
-            distance:
-              distanceSource: 0
-              playerDistanceMultiplier: 1
-              distanceOffset: 0
-              fixedDistance: 5
-              minimumTravelDistance: 2
-              maximumTravelDistance: 7
-            path:
-              dashDurationSeconds: 0.28
-              lateralAmplitude: 1.2
-              mirrorMode: 2
-              forwardProgressCurve:
-                serializedVersion: 2
-                m_Curve:
-                - serializedVersion: 3
-                  time: 0
-                  value: 0
-                  inSlope: 0
-                  outSlope: 0
-                  tangentMode: 0
-                  weightedMode: 0
-                  inWeight: 0
-                  outWeight: 0
-                - serializedVersion: 3
-                  time: 1
-                  value: 1
-                  inSlope: 0
-                  outSlope: 0
-                  tangentMode: 0
-                  weightedMode: 0
-                  inWeight: 0
-                  outWeight: 0
-                m_PreInfinity: 2
-                m_PostInfinity: 2
-                m_RotationOrder: 4
-              lateralOffsetCurve:
-                serializedVersion: 2
-                m_Curve:
-                - serializedVersion: 3
-                  time: 0
-                  value: 0
-                  inSlope: 0
-                  outSlope: 0
-                  tangentMode: 0
-                  weightedMode: 0
-                  inWeight: 0
-                  outWeight: 0
-                - serializedVersion: 3
-                  time: 1
-                  value: 0
-                  inSlope: 0
-                  outSlope: 0
-                  tangentMode: 0
-                  weightedMode: 0
-                  inWeight: 0
-                  outWeight: 0
-                m_PreInfinity: 2
-                m_PostInfinity: 2
-                m_RotationOrder: 4
-          shooter:
-            aimPolicy: 0
-            movementPolicy: 0
-            fireInterval: 1
-            burstCount: 1
-            aimWindupSeconds: 0.25
-            preFireStopSeconds: 0.25
-            postFireStopSeconds: 0
-            intraBurstDelay: 0.08
-            useMinimumRange: 0
-            minimumRange: 2
-            useMaximumRange: 0
-            maximumRange: 20
-            projectile:
-              shotPattern: 0
-              projectilesPerShot: 1
-              spreadAngleDegrees: 0
-              projectileSpeed: 14
-              projectileDamage: 6
-              projectileRange: 28
-              projectileLifetime: 4
-              projectileExplosionRadius: 0
-              projectileScaleMultiplier: 1
-              penetrationMode: 0
-              maxPenetrations: 0
-              inheritShooterSpeed: 0
-            runtimeProjectile:
-              projectilePrefab: {fileID: 0}
-              poolInitialCapacity: 24
-              poolExpandBatch: 8
-            elemental:
-              enableElementalDamage: 0
-              effectData:
-                elementType: 0
-                effectKind: 0
-                procMode: 0
-                reapplyMode: 0
-                procThresholdStacks: 5
-                maximumStacks: 20
-                stackDecayPerSecond: 1
-                consumeStacksOnProc: 0
-                dotDamagePerTick: 4
-                dotTickInterval: 0.5
-                dotDurationSeconds: 2
-                impedimentSlowPercentPerStack: 10
-                impedimentProcSlowPercent: 50
-                impedimentMaxSlowPercent: 100
-                impedimentDurationSeconds: 2
-              stacksPerHit: 1
-          bombardier:
-            aimPolicy: 0
-            movementPolicy: 0
-            fireInterval: 2
-            burstCount: 1
-            aimWindupSeconds: 0.45
-            preLaunchStopSeconds: 0.35
-            postLaunchStopSeconds: 0.15
-            intraBurstDelay: 0.15
-            inReachTargetingMode: 1
-            outOfReachTargetingMode: 0
-            launchPattern: 0
-            bombsPerLaunch: 1
-            landingSpreadRadius: 1.25
-            radialPatternRadius: 2
-            randomMinimumDistance: 2
-            randomMaximumDistance: 8
-            trajectoryMode: 0
-            flightDurationSeconds: 1.15
-            gravity: 16
-            apexHeight: 3
-            launchHeightOffset: 0.65
-            landingHeightOffset: 0
-            damage: 12
-            damageRadius: 1.75
-            impactExplosionDelaySeconds: 0
-            bombScaleMultiplier: 1
-            preventMidAirInterception: 1
-            runtimeBomb:
-              bombPrefab: {fileID: 0}
-              explosionVfxPrefab: {fileID: 0}
-              scaleExplosionVfxToDamageRadius: 1
-              explosionVfxScaleMultiplier: 1
-            landingWarning:
-              enableLandingWarning: 1
-              warningLeadTimeSeconds: 0.75
-              warningRadiusScale: 1
-              ringWidth: 0.08
-              heightOffset: 0.04
-              maximumAlpha: 0.85
-              fadeOutSeconds: 0.12
-              color: {r: 1, g: 0.35, b: 0.05, a: 1}
-          powerUpStealer:
-            triggerMode: 1
-            consumeModuleActivationAttemptOnSpawnOnly: 0
-            targetKind: 2
-            selectionMode: 0
-            activeTargetBiasPercent: 50
-            acquisitionStealCooldownSeconds: 3
-            recoverAfterDamageTakenPercent: 0
-            recoveryDamageTakenPercent: 25
-            recoverAfterDamageWindow: 0
-            recoveryDamageWindowPercent: 20
-            recoveryDamageWindowSeconds: 5
-          dropItems:
-            dropPayloadKind: 1
-            experience:
-              dropDefinitions: []
-              complessiveExperienceDropMinimum: 10
-              complessiveExperienceDropMaximum: 0
-              dropsDistribution: 0.5
-              dropRadius: 0.6
-              collectionMovement:
-                moveSpeed: 8
-                collectDistance: 0.3
-                collectDistancePerPlayerSpeed: 0.05
-                spawnAnimationMinDuration: 0.08
-                spawnAnimationMaxDuration: 0.16
-            extraComboPoints:
-              baseMultiplier: 1
-              conditionCombineMode: 0
-              minimumFinalMultiplier: 0
-              maximumFinalMultiplier: 4
-              conditions:
-              - metric: 0
-                minimumValue: 1
-                useMaximumValue: 0
-                maximumValue: 2
-                minimumMultiplier: 1
-                maximumMultiplier: 2
-                normalizedMultiplierCurve:
-                  serializedVersion: 2
-                  m_Curve:
-                  - serializedVersion: 3
-                    time: 0
-                    value: 1
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  - serializedVersion: 3
-                    time: 1
-                    value: 0
-                    inSlope: 0
-                    outSlope: 0
-                    tangentMode: 0
-                    weightedMode: 0
-                    inWeight: 0
-                    outWeight: 0
-                  m_PreInfinity: 2
-                  m_PostInfinity: 2
-                  m_RotationOrder: 4
             recovery:
               dropDefinitions: []
               dropChancePercent: 100
@@ -10443,6 +10939,272 @@ MonoBehaviour:
         isEnabled: 1
         selectionWeight: 1
         useOverridePayload: 1
+        overridePayload:
+          stationary:
+            freezeRotation: 1
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 9
+              minimumTravelDistance: 2
+              maximumTravelDistance: 8
+              arrivalTolerance: 0.35
+              waitCooldownSeconds: 0.7
+              candidateSampleCount: 9
+              useInfiniteDirectionSampling: 1
+              infiniteDirectionStepDegrees: 8
+              unexploredDirectionPreference: 0.65
+              towardPlayerPreference: 0.35
+              minimumEnemyClearance: 0.2
+              trajectoryPredictionTime: 0.35
+              freeTrajectoryPreference: 4
+              blockedPathRetryDelay: 0.25
+            dvd:
+              speedMultiplier: 1.05
+              bounceDamping: 1
+              randomizeInitialDirection: 1
+              fixedInitialDirectionDegrees: 45
+              cornerNudgeDistance: 0.08
+              ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
+          coward:
+            detectionRadius: 8
+            releaseDistanceBuffer: 1.5
+            searchRadius: 10
+            minimumRetreatDistance: 2.5
+            maximumRetreatDistance: 8.5
+            arrivalTolerance: 0.35
+            candidateSampleCount: 12
+            useInfiniteDirectionSampling: 1
+            infiniteDirectionStepDegrees: 8
+            minimumEnemyClearance: 0.25
+            trajectoryPredictionTime: 0.35
+            freeTrajectoryPreference: 0.85
+            retreatDirectionPreference: 0.65
+            openSpacePreference: 0.55
+            navigationRetreatPreference: 0.6
+            patrolRadius: 3.5
+            patrolWaitSeconds: 0.55
+            patrolSpeedMultiplier: 0.82
+            retreatSpeedMultiplierFar: 1
+            retreatSpeedMultiplierNear: 1.4
+            blockedPathRetryDelay: 0.2
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0.4
+              moveSpeedMultiplierWhileAiming: 0.1
+            recovery:
+              cooldownSeconds: 1
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 1
+              distanceOffset: 0
+              fixedDistance: 5
+              minimumTravelDistance: 2
+              maximumTravelDistance: 7
+            path:
+              dashDurationSeconds: 0.28
+              lateralAmplitude: 1.2
+              mirrorMode: 2
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 1
+            burstCount: 1
+            aimWindupSeconds: 0.25
+            preFireStopSeconds: 0.25
+            postFireStopSeconds: 0
+            intraBurstDelay: 0.08
+            useMinimumRange: 0
+            minimumRange: 2
+            useMaximumRange: 0
+            maximumRange: 20
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 1
+              spreadAngleDegrees: 0
+              projectileSpeed: 14
+              projectileDamage: 6
+              projectileRange: 28
+              projectileLifetime: 4
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 1
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 24
+              poolExpandBatch: 8
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 5
+                maximumStacks: 20
+                stackDecayPerSecond: 1
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 4
+                dotTickInterval: 0.5
+                dotDurationSeconds: 2
+                impedimentSlowPercentPerStack: 10
+                impedimentProcSlowPercent: 50
+                impedimentMaxSlowPercent: 100
+                impedimentDurationSeconds: 2
+              stacksPerHit: 1
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            preventMidAirInterception: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+              explosionVfxPrefab: {fileID: 0}
+              scaleExplosionVfxToDamageRadius: 1
+              explosionVfxScaleMultiplier: 1
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
+          powerUpStealer:
+            triggerMode: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
+            targetKind: 2
+            selectionMode: 0
+            activeTargetBiasPercent: 50
+            acquisitionStealCooldownSeconds: 3
+            recoverAfterDamageTakenPercent: 0
+            recoveryDamageTakenPercent: 25
+            recoverAfterDamageWindow: 0
+            recoveryDamageWindowPercent: 20
+            recoveryDamageWindowSeconds: 5
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions:
+              - dropPrefab: {fileID: 6858454939034102764, guid: b4ca66a6a67765143825d976eb834132, type: 3}
+                experienceAmount: 30
+              complessiveExperienceDropMinimum: 30
+              complessiveExperienceDropMaximum: 30
+              dropsDistribution: 1
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 12
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.1
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+            extraComboPoints:
+              baseMultiplier: 1
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 4
+              conditions: []
+            recovery:
+              dropDefinitions: []
+              dropChancePercent: 100
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+      - moduleId: Module_DropHealth
+        isEnabled: 1
+        selectionWeight: 1
+        useOverridePayload: 0
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -13477,6 +14239,270 @@ MonoBehaviour:
                 collectDistancePerPlayerSpeed: 0.05
                 spawnAnimationMinDuration: 0.08
                 spawnAnimationMaxDuration: 0.16
+      - moduleId: Module_DropHealth
+        isEnabled: 1
+        selectionWeight: 1
+        useOverridePayload: 0
+        overridePayload:
+          stationary:
+            freezeRotation: 1
+          wanderer:
+            mode: 0
+            basic:
+              searchRadius: 9
+              minimumTravelDistance: 2
+              maximumTravelDistance: 8
+              arrivalTolerance: 0.35
+              waitCooldownSeconds: 0.7
+              candidateSampleCount: 9
+              useInfiniteDirectionSampling: 1
+              infiniteDirectionStepDegrees: 8
+              unexploredDirectionPreference: 0.65
+              towardPlayerPreference: 0.35
+              minimumEnemyClearance: 0.2
+              trajectoryPredictionTime: 0.35
+              freeTrajectoryPreference: 4
+              blockedPathRetryDelay: 0.25
+            dvd:
+              speedMultiplier: 1.05
+              bounceDamping: 1
+              randomizeInitialDirection: 1
+              fixedInitialDirectionDegrees: 45
+              cornerNudgeDistance: 0.08
+              ignoreSteeringAndPriority: 0
+            acid:
+              trailSegmentLifetimeSeconds: 3
+              trailSpawnDistance: 0.75
+              trailSpawnIntervalSeconds: 0.18
+              trailRadius: 0.85
+              maxActiveSegmentsPerEnemy: 18
+              damagePerTick: 4
+              applyIntervalSeconds: 0.55
+              minimumMovementSpeed: 0.1
+              trailSegmentVfxPrefab: {fileID: 0}
+              scaleTrailSegmentVfxToRadius: 1
+              trailSegmentVfxScaleMultiplier: 1
+              debugDrawSegments: 1
+          coward:
+            detectionRadius: 8
+            releaseDistanceBuffer: 1.5
+            searchRadius: 10
+            minimumRetreatDistance: 2.5
+            maximumRetreatDistance: 8.5
+            arrivalTolerance: 0.35
+            candidateSampleCount: 12
+            useInfiniteDirectionSampling: 1
+            infiniteDirectionStepDegrees: 8
+            minimumEnemyClearance: 0.25
+            trajectoryPredictionTime: 0.35
+            freeTrajectoryPreference: 0.85
+            retreatDirectionPreference: 0.65
+            openSpacePreference: 0.55
+            navigationRetreatPreference: 0.6
+            patrolRadius: 3.5
+            patrolWaitSeconds: 0.55
+            patrolSpeedMultiplier: 0.82
+            retreatSpeedMultiplierFar: 1
+            retreatSpeedMultiplierNear: 1.4
+            blockedPathRetryDelay: 0.2
+          shortRangeDash:
+            aim:
+              aimDurationSeconds: 0.4
+              moveSpeedMultiplierWhileAiming: 0.1
+            recovery:
+              cooldownSeconds: 1
+            distance:
+              distanceSource: 0
+              playerDistanceMultiplier: 1
+              distanceOffset: 0
+              fixedDistance: 5
+              minimumTravelDistance: 2
+              maximumTravelDistance: 7
+            path:
+              dashDurationSeconds: 0.28
+              lateralAmplitude: 1.2
+              mirrorMode: 2
+              forwardProgressCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 1
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+              lateralOffsetCurve:
+                serializedVersion: 2
+                m_Curve:
+                - serializedVersion: 3
+                  time: 0
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                - serializedVersion: 3
+                  time: 1
+                  value: 0
+                  inSlope: 0
+                  outSlope: 0
+                  tangentMode: 0
+                  weightedMode: 0
+                  inWeight: 0
+                  outWeight: 0
+                m_PreInfinity: 2
+                m_PostInfinity: 2
+                m_RotationOrder: 4
+          shooter:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 1
+            burstCount: 1
+            aimWindupSeconds: 0.25
+            preFireStopSeconds: 0.25
+            postFireStopSeconds: 0
+            intraBurstDelay: 0.08
+            useMinimumRange: 0
+            minimumRange: 2
+            useMaximumRange: 0
+            maximumRange: 20
+            projectile:
+              shotPattern: 0
+              projectilesPerShot: 1
+              spreadAngleDegrees: 0
+              projectileSpeed: 14
+              projectileDamage: 6
+              projectileRange: 28
+              projectileLifetime: 4
+              projectileExplosionRadius: 0
+              projectileScaleMultiplier: 1
+              penetrationMode: 0
+              maxPenetrations: 0
+              inheritShooterSpeed: 0
+            runtimeProjectile:
+              projectilePrefab: {fileID: 0}
+              poolInitialCapacity: 24
+              poolExpandBatch: 8
+            elemental:
+              enableElementalDamage: 0
+              effectData:
+                elementType: 0
+                effectKind: 0
+                procMode: 0
+                reapplyMode: 0
+                procThresholdStacks: 5
+                maximumStacks: 20
+                stackDecayPerSecond: 1
+                consumeStacksOnProc: 0
+                dotDamagePerTick: 4
+                dotTickInterval: 0.5
+                dotDurationSeconds: 2
+                impedimentSlowPercentPerStack: 10
+                impedimentProcSlowPercent: 50
+                impedimentMaxSlowPercent: 100
+                impedimentDurationSeconds: 2
+              stacksPerHit: 1
+          bombardier:
+            aimPolicy: 0
+            movementPolicy: 0
+            fireInterval: 2
+            burstCount: 1
+            aimWindupSeconds: 0.45
+            preLaunchStopSeconds: 0.35
+            postLaunchStopSeconds: 0.15
+            intraBurstDelay: 0.15
+            inReachTargetingMode: 1
+            outOfReachTargetingMode: 0
+            launchPattern: 0
+            bombsPerLaunch: 1
+            landingSpreadRadius: 1.25
+            radialPatternRadius: 2
+            randomMinimumDistance: 2
+            randomMaximumDistance: 8
+            trajectoryMode: 0
+            flightDurationSeconds: 1.15
+            gravity: 16
+            apexHeight: 3
+            launchHeightOffset: 0.65
+            landingHeightOffset: 0
+            damage: 12
+            damageRadius: 1.75
+            impactExplosionDelaySeconds: 0
+            bombScaleMultiplier: 1
+            preventMidAirInterception: 1
+            runtimeBomb:
+              bombPrefab: {fileID: 0}
+              explosionVfxPrefab: {fileID: 0}
+              scaleExplosionVfxToDamageRadius: 1
+              explosionVfxScaleMultiplier: 1
+            landingWarning:
+              enableLandingWarning: 1
+              warningLeadTimeSeconds: 0.75
+              warningRadiusScale: 1
+              ringWidth: 0.08
+              heightOffset: 0.04
+              maximumAlpha: 0.85
+              fadeOutSeconds: 0.12
+              color: {r: 1, g: 0.35, b: 0.05, a: 1}
+          powerUpStealer:
+            triggerMode: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
+            targetKind: 2
+            selectionMode: 0
+            activeTargetBiasPercent: 50
+            acquisitionStealCooldownSeconds: 3
+            recoverAfterDamageTakenPercent: 0
+            recoveryDamageTakenPercent: 25
+            recoverAfterDamageWindow: 0
+            recoveryDamageWindowPercent: 20
+            recoveryDamageWindowSeconds: 5
+          dropItems:
+            dropPayloadKind: 0
+            experience:
+              dropDefinitions: []
+              complessiveExperienceDropMinimum: 10
+              complessiveExperienceDropMaximum: 0
+              dropsDistribution: 0.5
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
+            extraComboPoints:
+              baseMultiplier: 1
+              conditionCombineMode: 0
+              minimumFinalMultiplier: 0
+              maximumFinalMultiplier: 4
+              conditions: []
+            recovery:
+              dropDefinitions: []
+              dropChancePercent: 100
+              dropRadius: 0.6
+              collectionMovement:
+                moveSpeed: 8
+                collectDistance: 0.3
+                collectDistancePerPlayerSpeed: 0.05
+                spawnAnimationMinDuration: 0.08
+                spawnAnimationMaxDuration: 0.16
       legacyBinding:
         moduleId: 
         isEnabled: 1
@@ -14599,7 +15625,7 @@ MonoBehaviour:
       - moduleId: Module_DropExperience
         isEnabled: 1
         selectionWeight: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -14833,15 +15859,17 @@ MonoBehaviour:
           dropItems:
             dropPayloadKind: 0
             experience:
-              dropDefinitions: []
-              complessiveExperienceDropMinimum: 10
-              complessiveExperienceDropMaximum: 0
-              dropsDistribution: 0.5
+              dropDefinitions:
+              - dropPrefab: {fileID: 6858454939034102764, guid: b4ca66a6a67765143825d976eb834132, type: 3}
+                experienceAmount: 30
+              complessiveExperienceDropMinimum: 30
+              complessiveExperienceDropMaximum: 30
+              dropsDistribution: 1
               dropRadius: 0.6
               collectionMovement:
-                moveSpeed: 8
+                moveSpeed: 12
                 collectDistance: 0.3
-                collectDistancePerPlayerSpeed: 0.05
+                collectDistancePerPlayerSpeed: 0.1
                 spawnAnimationMinDuration: 0.08
                 spawnAnimationMaxDuration: 0.16
             extraComboPoints:
@@ -16246,7 +17274,7 @@ MonoBehaviour:
       - moduleId: Module_DropExperience
         isEnabled: 1
         selectionWeight: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1
@@ -16480,15 +17508,17 @@ MonoBehaviour:
           dropItems:
             dropPayloadKind: 0
             experience:
-              dropDefinitions: []
-              complessiveExperienceDropMinimum: 10
-              complessiveExperienceDropMaximum: 0
-              dropsDistribution: 0.5
+              dropDefinitions:
+              - dropPrefab: {fileID: 6858454939034102764, guid: b4ca66a6a67765143825d976eb834132, type: 3}
+                experienceAmount: 30
+              complessiveExperienceDropMinimum: 30
+              complessiveExperienceDropMaximum: 30
+              dropsDistribution: 1
               dropRadius: 0.6
               collectionMovement:
-                moveSpeed: 8
+                moveSpeed: 12
                 collectDistance: 0.3
-                collectDistancePerPlayerSpeed: 0.05
+                collectDistancePerPlayerSpeed: 0.1
                 spawnAnimationMinDuration: 0.08
                 spawnAnimationMaxDuration: 0.16
             extraComboPoints:
