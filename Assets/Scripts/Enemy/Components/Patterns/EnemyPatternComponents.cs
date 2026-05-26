@@ -138,6 +138,21 @@ public struct EnemyAcidTrailSegmentElement : IBufferElementData
 }
 
 /// <summary>
+/// Stores one detached acid trail segment that must outlive its dead Acid Wanderer owner until natural expiration.
+/// </summary>
+public struct EnemyDetachedAcidTrailSegment : IComponentData
+{
+    public float3 StartPosition;
+    public float3 EndPosition;
+    public float Radius;
+    public float RemainingLifetime;
+    public float ApplyIntervalSeconds;
+    public float DamagePerTick;
+    public float PlayerDamageCooldown;
+    public byte PlayerOverlapping;
+}
+
+/// <summary>
 /// Stores compact tactical navigation weights baked from the enemy brain preset.
 /// </summary>
 public struct EnemyTacticalNavigationConfig : IComponentData

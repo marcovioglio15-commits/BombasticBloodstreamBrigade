@@ -17053,8 +17053,8 @@ MonoBehaviour:
             mode: 2
             basic:
               searchRadius: 23.27
-              minimumTravelDistance: 2
-              maximumTravelDistance: 8
+              minimumTravelDistance: 3.5
+              maximumTravelDistance: 10
               arrivalTolerance: 0.1
               waitCooldownSeconds: 0.7
               candidateSampleCount: 9

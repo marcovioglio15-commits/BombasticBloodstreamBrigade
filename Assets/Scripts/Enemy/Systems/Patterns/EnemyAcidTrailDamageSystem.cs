@@ -328,10 +328,10 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         /// <returns>True when the player point is inside the Acid section radius.</returns>
         private static bool IsPlayerOverlappingSection(float3 position, in EnemyAcidTrailSegmentElement segment)
         {
-            float radius = math.max(0f, segment.Radius);
-            return ResolvePlanarDistanceSquaredToSegment(position,
-                                                         segment.StartPosition,
-                                                         segment.EndPosition) <= radius * radius;
+            return EnemyAcidTrailGeometryUtility.IsPointOverlappingSection(position,
+                                                                           segment.StartPosition,
+                                                                           segment.EndPosition,
+                                                                           segment.Radius);
         }
 
         /// <summary>
@@ -350,28 +350,6 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
             return math.min(currentIntervalSeconds, safeCandidateIntervalSeconds);
         }
 
-        /// <summary>
-        /// Resolves the squared planar distance between the player point and one emitted acid path section.
-        /// </summary>
-        /// <param name="position">World-space point being tested against the trail section.</param>
-        /// <param name="startPosition">World-space start of the emitted trail section.</param>
-        /// <param name="endPosition">World-space end of the emitted trail section.</param>
-        /// <returns>Squared distance on the XZ plane.</returns>
-        private static float ResolvePlanarDistanceSquaredToSegment(float3 position,
-                                                                   float3 startPosition,
-                                                                   float3 endPosition)
-        {
-            float2 sectionStart = startPosition.xz;
-            float2 sectionDelta = endPosition.xz - sectionStart;
-            float sectionLengthSquared = math.lengthsq(sectionDelta);
-
-            if (sectionLengthSquared <= math.EPSILON)
-                return math.distancesq(position.xz, sectionStart);
-
-            float normalizedProjection = math.saturate(math.dot(position.xz - sectionStart, sectionDelta) / sectionLengthSquared);
-            float2 closestPoint = sectionStart + sectionDelta * normalizedProjection;
-            return math.distancesq(position.xz, closestPoint);
-        }
     }
     #endregion
 

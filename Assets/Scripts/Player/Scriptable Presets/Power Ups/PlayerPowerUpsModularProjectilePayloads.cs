@@ -16,6 +16,12 @@ public sealed class PowerUpProjectilePatternConeModuleData
 
     [Tooltip("Seconds for which a Laser Beam triggered by this active cone pattern remains active.")]
     [SerializeField] private float laserDurationSeconds = 0.35f;
+
+    [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world X axis for projectiles emitted by this module.")]
+    [SerializeField] private bool ignoreInheritedPlayerVelocityX;
+
+    [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world Z axis for projectiles emitted by this module.")]
+    [SerializeField] private bool ignoreInheritedPlayerVelocityZ;
     #endregion
 
     #endregion
@@ -44,6 +50,22 @@ public sealed class PowerUpProjectilePatternConeModuleData
             return laserDurationSeconds;
         }
     }
+
+    public bool IgnoreInheritedPlayerVelocityX
+    {
+        get
+        {
+            return ignoreInheritedPlayerVelocityX;
+        }
+    }
+
+    public bool IgnoreInheritedPlayerVelocityZ
+    {
+        get
+        {
+            return ignoreInheritedPlayerVelocityZ;
+        }
+    }
     #endregion
 
     #region Methods
@@ -53,6 +75,8 @@ public sealed class PowerUpProjectilePatternConeModuleData
     {
         projectileCount = projectileCountValue;
         coneAngleDegrees = coneAngleDegreesValue;
+        ignoreInheritedPlayerVelocityX = false;
+        ignoreInheritedPlayerVelocityZ = false;
     }
 
     public void Configure(int projectileCountValue,
@@ -62,6 +86,8 @@ public sealed class PowerUpProjectilePatternConeModuleData
         projectileCount = projectileCountValue;
         coneAngleDegrees = coneAngleDegreesValue;
         laserDurationSeconds = laserDurationSecondsValue;
+        ignoreInheritedPlayerVelocityX = false;
+        ignoreInheritedPlayerVelocityZ = false;
     }
     #endregion
 

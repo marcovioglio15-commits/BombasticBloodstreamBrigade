@@ -224,6 +224,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.Position = request.Position;
         instance.Rotation = request.Rotation;
         instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
+        instance.DetachWhenFollowTargetInvalid = request.DetachWhenFollowTargetInvalid != 0;
+        instance.KeepAliveWhileFollowTargetValid = request.KeepAliveWhileFollowTargetValid != 0;
 
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTransform(instance,
                                                                   request.Position,
@@ -258,6 +260,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                        PlayerPowerUpManagedVfxInstance instance,
                                        float deltaTime)
     {
+        bool hasValidKeepAliveTarget = false;
+
         if (instance.HasFollowTarget)
         {
             float3 targetPosition;
@@ -279,6 +283,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                 instance.Position = targetPosition + instance.FollowPositionOffset;
                 PlayerPowerUpManagedVfxPresentationUtility.ApplyPosition(instance, instance.Position);
             }
+
+            hasValidKeepAliveTarget = instance.KeepAliveWhileFollowTargetValid && instance.HasFollowTarget;
         }
         else if (instance.HasVelocity)
         {
@@ -286,7 +292,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             PlayerPowerUpManagedVfxPresentationUtility.ApplyPosition(instance, instance.Position);
         }
 
-        instance.RemainingSeconds -= deltaTime;
+        if (!hasValidKeepAliveTarget)
+            instance.RemainingSeconds -= deltaTime;
+
         return instance.RemainingSeconds > 0f;
     }
 
@@ -307,10 +315,16 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         targetRotation = quaternion.identity;
 
         if (!IsEntityUsable(entityManager, instance.FollowTargetEntity))
-            return false;
+            return TryDetachInvalidFollowTarget(instance, out targetPosition, out targetRotation);
 
         if (!IsValidationTargetAlive(entityManager, instance))
-            return false;
+            return TryDetachInvalidFollowTarget(instance, out targetPosition, out targetRotation);
+
+        if (entityManager.HasComponent<ProjectileActive>(instance.FollowTargetEntity) &&
+            !entityManager.IsComponentEnabled<ProjectileActive>(instance.FollowTargetEntity))
+        {
+            return TryDetachInvalidFollowTarget(instance, out targetPosition, out targetRotation);
+        }
 
         if (instance.FollowMuzzlePose && TryResolveMuzzlePose(entityManager,
                                                               instance.FollowTargetEntity,
@@ -334,7 +348,35 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             return true;
         }
 
-        return false;
+        return TryDetachInvalidFollowTarget(instance, out targetPosition, out targetRotation);
+    }
+
+    /// <summary>
+    /// Detaches a follow VFX from its invalid target so trails and particles can expire naturally at their last pose.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance with stale follow metadata.</param>
+    /// <param name="targetPosition">Last known world position reused for the detached frame.</param>
+    /// <param name="targetRotation">Last known world rotation reused for the detached frame.</param>
+    /// <returns>True when the instance can continue as a detached lifetime-only VFX.</returns>
+    private static bool TryDetachInvalidFollowTarget(PlayerPowerUpManagedVfxInstance instance,
+                                                     out float3 targetPosition,
+                                                     out quaternion targetRotation)
+    {
+        targetPosition = instance.Position;
+        targetRotation = instance.Rotation;
+
+        if (!instance.DetachWhenFollowTargetInvalid)
+            return false;
+
+        instance.HasFollowTarget = false;
+        instance.FollowTargetEntity = Entity.Null;
+        instance.FollowPositionOffset = float3.zero;
+        instance.FollowValidationEntity = Entity.Null;
+        instance.FollowValidationSpawnVersion = 0u;
+        instance.FollowMuzzlePose = false;
+        instance.DetachWhenFollowTargetInvalid = false;
+        instance.KeepAliveWhileFollowTargetValid = false;
+        return true;
     }
 
     /// <summary>
@@ -572,6 +614,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.Position = request.Position;
         instance.Rotation = request.Rotation;
         instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
+        instance.DetachWhenFollowTargetInvalid = request.DetachWhenFollowTargetInvalid != 0;
+        instance.KeepAliveWhileFollowTargetValid = request.KeepAliveWhileFollowTargetValid != 0;
 
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTrailRendererSettings(instance,
                                                                                math.max(MinimumScale, request.UniformScale),

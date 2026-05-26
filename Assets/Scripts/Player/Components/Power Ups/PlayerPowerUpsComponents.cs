@@ -556,6 +556,8 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public float3 Velocity;
     public int RefreshKey;
     public byte ForceLooping;
+    public byte DetachWhenFollowTargetInvalid;
+    public byte KeepAliveWhileFollowTargetValid;
     public byte HasColorOverride;
     public float4 ColorOverride;
     public float4 SecondaryColorOverride;

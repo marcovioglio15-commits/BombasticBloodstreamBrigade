@@ -34,5 +34,7 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public bool HasFollowTarget;
     public bool HasVelocity;
     public bool FollowMuzzlePose;
+    public bool DetachWhenFollowTargetInvalid;
+    public bool KeepAliveWhileFollowTargetValid;
     #endregion
 }

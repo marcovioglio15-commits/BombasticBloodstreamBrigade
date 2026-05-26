@@ -145,6 +145,8 @@ public static class PlayerPassiveToolsAggregationUtility
             passiveToolsState.Shotgun.PenetrationMode = (ProjectilePenetrationMode)math.max((int)passiveToolsState.Shotgun.PenetrationMode,
                                                                                              (int)passiveToolConfig.Shotgun.PenetrationMode);
             passiveToolsState.Shotgun.MaxPenetrations += math.max(0, passiveToolConfig.Shotgun.MaxPenetrations);
+            passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityX = passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityX != 0 || passiveToolConfig.Shotgun.IgnoreInheritedPlayerVelocityX != 0 ? (byte)1 : (byte)0;
+            passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityZ = passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityZ != 0 || passiveToolConfig.Shotgun.IgnoreInheritedPlayerVelocityZ != 0 ? (byte)1 : (byte)0;
         }
 
         if (passiveToolConfig.HasElementalProjectiles != 0 && passiveToolConfig.ElementalProjectiles.StacksPerHit > 0f)

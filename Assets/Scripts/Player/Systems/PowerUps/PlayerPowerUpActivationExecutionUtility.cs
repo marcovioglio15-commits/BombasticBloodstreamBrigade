@@ -195,6 +195,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                                              slotConfig.ChargeShot.HasElementalPayload != 0,
                                                                                                                              in slotConfig.ChargeShot.ElementalEffect,
                                                                                                                              slotConfig.ChargeShot.ElementalStacksPerHit);
+            PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref triggeredLaserTemplate,
+                                                                               slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityX,
+                                                                               slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityZ);
 
             PlayerLaserBeamStateUtility.ActivateTriggeredActiveLaser(ref laserBeamState,
                                                                      slotConfig.ChargeShot.LaserDurationSeconds,
@@ -231,6 +234,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                           slotConfig.ChargeShot.HasElementalPayload != 0,
                                                                                                           in slotConfig.ChargeShot.ElementalEffect,
                                                                                                           slotConfig.ChargeShot.ElementalStacksPerHit);
+        PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref template,
+                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityX,
+                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityZ);
 
         PlayerProjectileRequestUtility.AddSpreadRequests(ref shootRequests,
                                                          projectileCount,
@@ -286,6 +292,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                                        slotConfig.ChargeShot.HasElementalPayload != 0,
                                                                                                                        in slotConfig.ChargeShot.ElementalEffect,
                                                                                                                        slotConfig.ChargeShot.ElementalStacksPerHit);
+        PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref chargedLaserTemplate,
+                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityX,
+                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityZ);
 
         PlayerLaserBeamStateUtility.ActivateTriggeredActiveLaser(ref laserBeamState,
                                                                  slotConfig.ChargeShot.ChargedLaserDurationSeconds,
@@ -427,6 +436,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                                              slotConfig.Shotgun.HasElementalPayload != 0,
                                                                                                                              in slotConfig.Shotgun.ElementalEffect,
                                                                                                                              slotConfig.Shotgun.ElementalStacksPerHit);
+            PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref triggeredLaserTemplate,
+                                                                               slotConfig.Shotgun.IgnoreInheritedPlayerVelocityX,
+                                                                               slotConfig.Shotgun.IgnoreInheritedPlayerVelocityZ);
 
             PlayerLaserBeamStateUtility.ActivateTriggeredActiveLaser(ref laserBeamState,
                                                                      slotConfig.Shotgun.LaserDurationSeconds,
@@ -462,6 +474,9 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                           slotConfig.Shotgun.HasElementalPayload != 0,
                                                                                                           in slotConfig.Shotgun.ElementalEffect,
                                                                                                           slotConfig.Shotgun.ElementalStacksPerHit);
+        PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref template,
+                                                                           slotConfig.Shotgun.IgnoreInheritedPlayerVelocityX,
+                                                                           slotConfig.Shotgun.IgnoreInheritedPlayerVelocityZ);
 
         PlayerProjectileRequestUtility.AddSpreadRequests(ref shootRequests,
                                                          projectileCount,
@@ -497,6 +512,8 @@ public static class PlayerPowerUpActivationExecutionUtility
         passiveToolsState.Shotgun.ConeAngleDegrees = math.max(0f, shotgunConfig.ConeAngleDegrees);
         passiveToolsState.Shotgun.PenetrationMode = shotgunConfig.PenetrationMode;
         passiveToolsState.Shotgun.MaxPenetrations = math.max(0, shotgunConfig.MaxPenetrations);
+        passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityX = shotgunConfig.IgnoreInheritedPlayerVelocityX;
+        passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityZ = shotgunConfig.IgnoreInheritedPlayerVelocityZ;
     }
     #endregion
 

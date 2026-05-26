@@ -160,6 +160,30 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Controls whether Level-Up VFX appears on every level-up or only when the level reaches a milestone power-up selection.")]
     [SerializeField] private PlayerLevelUpVfxTriggerMode levelUpVfxTriggerMode = PlayerLevelUpVfxTriggerMode.EveryLevelUp;
 
+    [Tooltip("Optional one-shot VFX prefab spawned on the player when health increases.")]
+    [SerializeField] private GameObject healthIncreaseVfxPrefab;
+
+    [Tooltip("Local-space offset applied to Health Increase VFX relative to the player entity position.")]
+    [SerializeField] private Vector3 healthIncreaseVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to the Health Increase VFX instance.")]
+    [SerializeField] private float healthIncreaseVfxScaleMultiplier = 1f;
+
+    [Tooltip("Controls whether Health Increase VFX appears on every health gain or only when maximum health increases.")]
+    [SerializeField] private PlayerStatIncreaseVfxTriggerMode healthIncreaseVfxTriggerMode = PlayerStatIncreaseVfxTriggerMode.EveryIncrease;
+
+    [Tooltip("Optional one-shot VFX prefab spawned on the player when shield increases.")]
+    [SerializeField] private GameObject shieldIncreaseVfxPrefab;
+
+    [Tooltip("Local-space offset applied to Shield Increase VFX relative to the player entity position.")]
+    [SerializeField] private Vector3 shieldIncreaseVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to the Shield Increase VFX instance.")]
+    [SerializeField] private float shieldIncreaseVfxScaleMultiplier = 1f;
+
+    [Tooltip("Controls whether Shield Increase VFX appears on every shield gain or only when maximum shield increases.")]
+    [SerializeField] private PlayerStatIncreaseVfxTriggerMode shieldIncreaseVfxTriggerMode = PlayerStatIncreaseVfxTriggerMode.EveryIncrease;
+
     [Tooltip("Optional VFX prefab displayed while a Charge Shot active tool is charging.")]
     [SerializeField] private GameObject chargeShotVfxPrefab;
 
@@ -174,6 +198,15 @@ public sealed class PlayerVisualPreset : ScriptableObject
 
     [Tooltip("When enabled, Charge Shot VFX is also displayed while any active power-up built from a hold-charge module is charging.")]
     [SerializeField] private bool chargeShotVfxAppliesToAllHoldChargePowerUps;
+
+    [Tooltip("Optional attached VFX prefab spawned on every player projectile and followed until the projectile despawns.")]
+    [SerializeField] private GameObject playerProjectileVfxPrefab;
+
+    [Tooltip("Local-space offset applied to projectile attached VFX relative to each projectile transform.")]
+    [SerializeField] private Vector3 playerProjectileVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to projectile attached VFX instances.")]
+    [SerializeField] private float playerProjectileVfxScaleMultiplier = 1f;
 
     [Header("Scaling")]
     [Tooltip("Add Scaling rules applied to supported visual preset fields at bake time without mutating this asset.")]
@@ -383,6 +416,70 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public GameObject HealthIncreaseVfxPrefab
+    {
+        get
+        {
+            return healthIncreaseVfxPrefab;
+        }
+    }
+
+    public Vector3 HealthIncreaseVfxSpawnOffset
+    {
+        get
+        {
+            return healthIncreaseVfxSpawnOffset;
+        }
+    }
+
+    public float HealthIncreaseVfxScaleMultiplier
+    {
+        get
+        {
+            return healthIncreaseVfxScaleMultiplier;
+        }
+    }
+
+    public PlayerStatIncreaseVfxTriggerMode HealthIncreaseVfxTriggerMode
+    {
+        get
+        {
+            return healthIncreaseVfxTriggerMode;
+        }
+    }
+
+    public GameObject ShieldIncreaseVfxPrefab
+    {
+        get
+        {
+            return shieldIncreaseVfxPrefab;
+        }
+    }
+
+    public Vector3 ShieldIncreaseVfxSpawnOffset
+    {
+        get
+        {
+            return shieldIncreaseVfxSpawnOffset;
+        }
+    }
+
+    public float ShieldIncreaseVfxScaleMultiplier
+    {
+        get
+        {
+            return shieldIncreaseVfxScaleMultiplier;
+        }
+    }
+
+    public PlayerStatIncreaseVfxTriggerMode ShieldIncreaseVfxTriggerMode
+    {
+        get
+        {
+            return shieldIncreaseVfxTriggerMode;
+        }
+    }
+
     public GameObject ChargeShotVfxPrefab
     {
         get
@@ -420,6 +517,30 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return chargeShotVfxAppliesToAllHoldChargePowerUps;
+        }
+    }
+
+    public GameObject PlayerProjectileVfxPrefab
+    {
+        get
+        {
+            return playerProjectileVfxPrefab;
+        }
+    }
+
+    public Vector3 PlayerProjectileVfxSpawnOffset
+    {
+        get
+        {
+            return playerProjectileVfxSpawnOffset;
+        }
+    }
+
+    public float PlayerProjectileVfxScaleMultiplier
+    {
+        get
+        {
+            return playerProjectileVfxScaleMultiplier;
         }
     }
 

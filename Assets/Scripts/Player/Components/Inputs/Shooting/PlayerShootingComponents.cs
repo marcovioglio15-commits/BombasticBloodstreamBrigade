@@ -68,6 +68,8 @@ public struct ShootRequest : IBufferElementData
     public ProjectileKnockbackDirectionMode KnockbackDirectionMode;
     public ProjectileKnockbackStackingMode KnockbackStackingMode;
     public byte InheritPlayerSpeed;
+    public byte IgnoreInheritedPlayerVelocityX;
+    public byte IgnoreInheritedPlayerVelocityZ;
     public byte IsSplitChild;
     public int OrbitLayerIndex;
     public int OrbitLayerCount;
@@ -100,6 +102,8 @@ public struct Projectile : IComponentData
     public ProjectileKnockbackDirectionMode KnockbackDirectionMode;
     public ProjectileKnockbackStackingMode KnockbackStackingMode;
     public byte InheritPlayerSpeed;
+    public byte IgnoreInheritedPlayerVelocityX;
+    public byte IgnoreInheritedPlayerVelocityZ;
 }
 
 /// <summary>

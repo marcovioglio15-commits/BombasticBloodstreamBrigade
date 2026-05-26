@@ -27,7 +27,7 @@ public static class ProjectileKinematicsUtility
         float3 velocity = projectile.Velocity;
 
         if (projectile.InheritPlayerSpeed != 0)
-            velocity += ResolveInheritedVelocity(owner.ShooterEntity, in movementStateLookup);
+            velocity += ApplyInheritedVelocityAxisMask(ResolveInheritedVelocity(owner.ShooterEntity, in movementStateLookup), in projectile);
 
         return velocity;
     }
@@ -46,7 +46,7 @@ public static class ProjectileKinematicsUtility
         float3 velocity = projectile.Velocity;
 
         if (projectile.InheritPlayerSpeed != 0)
-            velocity += ResolveInheritedVelocity(owner.ShooterEntity, entityManager);
+            velocity += ApplyInheritedVelocityAxisMask(ResolveInheritedVelocity(owner.ShooterEntity, entityManager), in projectile);
 
         return velocity;
     }
@@ -88,6 +88,23 @@ public static class ProjectileKinematicsUtility
             return float3.zero;
 
         return entityManager.GetComponentData<PlayerMovementState>(shooterEntity).Velocity;
+    }
+
+    /// <summary>
+    /// Applies per-projectile inherited velocity axis masks after reading the shooter movement velocity.
+    /// </summary>
+    /// <param name="inheritedVelocity">Full shooter velocity before projectile-specific masking.</param>
+    /// <param name="projectile">Projectile data carrying inherited velocity mask flags.</param>
+    /// <returns>Masked inherited velocity.</returns>
+    public static float3 ApplyInheritedVelocityAxisMask(float3 inheritedVelocity, in Projectile projectile)
+    {
+        if (projectile.IgnoreInheritedPlayerVelocityX != 0)
+            inheritedVelocity.x = 0f;
+
+        if (projectile.IgnoreInheritedPlayerVelocityZ != 0)
+            inheritedVelocity.z = 0f;
+
+        return inheritedVelocity;
     }
     #endregion
 

@@ -150,9 +150,9 @@ public partial struct PlayerShootingIntentSystem : ISystem
             bool automaticWasEnabled = usesAutomaticLatch && shootingState.ValueRO.AutomaticEnabled != 0;
             float shotInterval = 1f / values.RateOfFire;
 
-            // Manual continuous fire must restart from the current frame, otherwise idle time becomes a burst backlog.
+            // Re-anchor manual continuous fire after idle time while preserving active cooldowns across rapid re-presses.
             if (shootingConfig.TriggerMode == ShootingTriggerMode.ManualContinousShot && shootPressedThisFrame)
-                ResetShotSchedule(ref shootingState.ValueRW, elapsedTime);
+                RefreshManualContinuousShotScheduleOnPress(ref shootingState.ValueRW, elapsedTime);
 
             // based on the shooting trigger mode, determine if the player should shoot this frame
             bool shouldShoot = ResolveShootingTrigger(ref shootingState.ValueRW,
@@ -313,6 +313,21 @@ public partial struct PlayerShootingIntentSystem : ISystem
     private static void ResetShotSchedule(ref PlayerShootingState shootingState,
                                           float elapsedTime)
     {
+        shootingState.NextShotTime = elapsedTime;
+    }
+
+    /// <summary>
+    /// Prevents released manual continuous fire from accumulating catch-up shots while keeping a future cooldown intact
+    /// when the player repeatedly presses faster than the configured fire rate.
+    /// </summary>
+    /// <param name="shootingState">Mutable player shooting state that stores the next eligible shot time.</param>
+    /// <param name="elapsedTime">Current world elapsed time used to clear stale idle schedules.</param>
+    private static void RefreshManualContinuousShotScheduleOnPress(ref PlayerShootingState shootingState,
+                                                                   float elapsedTime)
+    {
+        if (shootingState.NextShotTime >= elapsedTime)
+            return;
+
         shootingState.NextShotTime = elapsedTime;
     }
 

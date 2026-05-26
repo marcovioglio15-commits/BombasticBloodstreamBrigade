@@ -104,9 +104,20 @@ MonoBehaviour:
   levelUpVfxSpawnOffset: {x: 0, y: -0.5, z: 0}
   levelUpVfxScaleMultiplier: 1
   levelUpVfxTriggerMode: 0
+  healthIncreaseVfxPrefab: {fileID: 6639131353689249487, guid: 2d4c258ff73598041bfa362b3f171544, type: 3}
+  healthIncreaseVfxSpawnOffset: {x: 0, y: -0.5, z: 0}
+  healthIncreaseVfxScaleMultiplier: 1
+  healthIncreaseVfxTriggerMode: 0
+  shieldIncreaseVfxPrefab: {fileID: 672474950645290884, guid: 926cebe333855e4419f62865c3de81fe, type: 3}
+  shieldIncreaseVfxSpawnOffset: {x: 0, y: -0.5, z: 0}
+  shieldIncreaseVfxScaleMultiplier: 1
+  shieldIncreaseVfxTriggerMode: 0
   chargeShotVfxPrefab: {fileID: 3217864258068119640, guid: f92ce35d32609f74c90bd48ce9d100db, type: 3}
   chargeShotVfxSpawnOffset: {x: 0, y: 0.2, z: -0.1}
   chargeShotVfxScaleMultiplier: 1
   chargeShotVfxPlaybackMode: 1
   chargeShotVfxAppliesToAllHoldChargePowerUps: 1
+  playerProjectileVfxPrefab: {fileID: 3264601393849410126, guid: 4fdbc86243810fa40b6c172f5535dcd8, type: 3}
+  playerProjectileVfxSpawnOffset: {x: 0, y: 0, z: -0.35}
+  playerProjectileVfxScaleMultiplier: 0.35
   scalingRules: []

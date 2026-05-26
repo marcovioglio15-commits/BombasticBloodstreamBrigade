@@ -36,8 +36,14 @@ public static class PowerUpModuleDefinitionVisualizationUtility
         SerializedProperty projectileCountProperty = conePayloadProperty.FindPropertyRelative("projectileCount");
         SerializedProperty coneAngleDegreesProperty = conePayloadProperty.FindPropertyRelative("coneAngleDegrees");
         SerializedProperty laserDurationSecondsProperty = conePayloadProperty.FindPropertyRelative("laserDurationSeconds");
+        SerializedProperty ignoreInheritedPlayerVelocityXProperty = conePayloadProperty.FindPropertyRelative("ignoreInheritedPlayerVelocityX");
+        SerializedProperty ignoreInheritedPlayerVelocityZProperty = conePayloadProperty.FindPropertyRelative("ignoreInheritedPlayerVelocityZ");
 
-        if (projectileCountProperty == null || coneAngleDegreesProperty == null || laserDurationSecondsProperty == null)
+        if (projectileCountProperty == null ||
+            coneAngleDegreesProperty == null ||
+            laserDurationSecondsProperty == null ||
+            ignoreInheritedPlayerVelocityXProperty == null ||
+            ignoreInheritedPlayerVelocityZProperty == null)
         {
             HelpBox errorBox = new HelpBox("Projectile cone payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(errorBox);
@@ -47,6 +53,8 @@ public static class PowerUpModuleDefinitionVisualizationUtility
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, projectileCountProperty, "Projectile Count");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, coneAngleDegreesProperty, "Cone Angle Degrees");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, laserDurationSecondsProperty, "Laser Duration Seconds");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, ignoreInheritedPlayerVelocityXProperty, "Ignore Inherited Velocity X");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, ignoreInheritedPlayerVelocityZProperty, "Ignore Inherited Velocity Z");
 
         Label chartLabel = new Label("Cone Pattern Preview");
         chartLabel.style.unityFontStyleAndWeight = FontStyle.Bold;

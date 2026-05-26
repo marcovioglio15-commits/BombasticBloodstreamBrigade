@@ -134,6 +134,8 @@ public struct ShotgunPowerUpConfig
     public byte HasElementalPayload;
     public ElementalEffectConfig ElementalEffect;
     public float ElementalStacksPerHit;
+    public byte IgnoreInheritedPlayerVelocityX;
+    public byte IgnoreInheritedPlayerVelocityZ;
 }
 
 /// <summary>
@@ -168,6 +170,8 @@ public struct ChargeShotPowerUpConfig
     public byte HasElementalPayload;
     public ElementalEffectConfig ElementalEffect;
     public float ElementalStacksPerHit;
+    public byte IgnoreInheritedPlayerVelocityX;
+    public byte IgnoreInheritedPlayerVelocityZ;
 }
 
 /// <summary>

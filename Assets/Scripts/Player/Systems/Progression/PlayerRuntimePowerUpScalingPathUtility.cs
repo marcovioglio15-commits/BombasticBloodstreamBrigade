@@ -899,6 +899,18 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             case "holdCharge.slowPlayerWhileCharging":
                 activeSlotConfig.ChargeShot.SlowPlayerWhileCharging = resolvedValue ? (byte)1 : (byte)0;
                 return;
+            case "holdCharge.ignoreInheritedPlayerVelocityX":
+                activeSlotConfig.ChargeShot.IgnoreInheritedPlayerVelocityX = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "holdCharge.ignoreInheritedPlayerVelocityZ":
+                activeSlotConfig.ChargeShot.IgnoreInheritedPlayerVelocityZ = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "projectilePatternCone.ignoreInheritedPlayerVelocityX":
+                activeSlotConfig.Shotgun.IgnoreInheritedPlayerVelocityX = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "projectilePatternCone.ignoreInheritedPlayerVelocityZ":
+                activeSlotConfig.Shotgun.IgnoreInheritedPlayerVelocityZ = resolvedValue ? (byte)1 : (byte)0;
+                return;
             case "dash.grantsInvulnerability":
                 activeSlotConfig.Dash.GrantsInvulnerability = resolvedValue ? (byte)1 : (byte)0;
                 return;
@@ -949,6 +961,12 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "deathExplosion.scaleVfxToRadius":
                 passiveToolConfig.Explosion.ScaleVfxToRadius = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "projectilePatternCone.ignoreInheritedPlayerVelocityX":
+                passiveToolConfig.Shotgun.IgnoreInheritedPlayerVelocityX = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "projectilePatternCone.ignoreInheritedPlayerVelocityZ":
+                passiveToolConfig.Shotgun.IgnoreInheritedPlayerVelocityZ = resolvedValue ? (byte)1 : (byte)0;
                 return;
         }
     }

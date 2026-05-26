@@ -172,7 +172,7 @@ public static class EnemyPatternWandererMovementUtility
     }
 
     /// <summary>
-    /// Evaluates whether a candidate destination and its segment are clear enough from neighboring enemies.
+    /// Scores how much free space one candidate destination and its segment keep from neighboring enemies.
     /// </summary>
     /// <param name="enemyEntity">Current enemy entity.</param>
     /// <param name="selfPriorityTier">Current enemy general priority tier.</param>
@@ -184,7 +184,7 @@ public static class EnemyPatternWandererMovementUtility
     /// <param name="occupancyContext">Occupancy context used for neighbor lookup.</param>
     /// <param name="freeTrajectoryScore">Output free-trajectory score.</param>
     /// <param name="freeSpaceScore">Output free-space score.</param>
-    /// <returns>True when candidate and path are valid.</returns>
+    /// <returns>True when the candidate can be scored. Enemy proximity is represented by the output scores instead of hard rejection.</returns>
     public static bool TryEvaluateTrajectoryFreedom(Entity enemyEntity,
                                                     int selfPriorityTier,
                                                     float3 origin,
@@ -255,9 +255,6 @@ public static class EnemyPatternWandererMovementUtility
                     float candidateDistance = math.length(deltaToCandidate);
                     float trajectoryDistance = math.sqrt(DistancePointToSegmentSquaredXZ(predictedOtherPosition, origin, candidate));
 
-                    if (candidateDistance < requiredClearance || trajectoryDistance < requiredClearance)
-                        return false;
-
                     float candidateClearance = candidateDistance - requiredClearance;
                     float trajectoryClearance = trajectoryDistance - requiredClearance;
 
@@ -284,6 +281,55 @@ public static class EnemyPatternWandererMovementUtility
         freeSpaceScore = math.saturate(minimumCandidateClearance / normalization);
         freeTrajectoryScore = math.saturate(minimumTrajectoryScore * 0.8f + averageTrajectoryScore * 0.2f);
         return true;
+    }
+
+    /// <summary>
+    /// Builds a deterministic short-range recovery velocity used when target steering cannot produce a valid move.
+    /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="selfPriorityTier">Current enemy priority tier.</param>
+    /// <param name="enemyPosition">Current enemy position.</param>
+    /// <param name="bodyRadius">Current enemy body radius.</param>
+    /// <param name="minimumEnemyClearance">Extra clearance from neighboring enemies.</param>
+    /// <param name="maxSpeed">Current movement speed cap.</param>
+    /// <param name="steeringAggressiveness">Resolved steering aggressiveness scalar.</param>
+    /// <param name="lastDirectionAngle">Previously selected wander direction in degrees.</param>
+    /// <param name="hasPreviousDirection">True when the last direction can be used to avoid immediate backtracking.</param>
+    /// <param name="occupancyContext">Occupancy context used for neighbor lookup.</param>
+    /// <returns>Planar recovery velocity, or zero when movement is disabled.</returns>
+    public static float3 ResolveRecoveryVelocity(Entity enemyEntity,
+                                                 int selfPriorityTier,
+                                                 float3 enemyPosition,
+                                                 float bodyRadius,
+                                                 float minimumEnemyClearance,
+                                                 float maxSpeed,
+                                                 float steeringAggressiveness,
+                                                 float lastDirectionAngle,
+                                                 bool hasPreviousDirection,
+                                                 in EnemyPatternWandererUtility.OccupancyContext occupancyContext)
+    {
+        float resolvedSpeed = math.max(0f, maxSpeed);
+
+        if (resolvedSpeed <= DirectionEpsilon)
+            return float3.zero;
+
+        float3 clearanceVelocity = ResolveLocalClearanceVelocity(enemyEntity,
+                                                                 selfPriorityTier,
+                                                                 enemyPosition,
+                                                                 bodyRadius,
+                                                                 minimumEnemyClearance,
+                                                                 resolvedSpeed,
+                                                                 steeringAggressiveness,
+                                                                 out float _,
+                                                                 out float _,
+                                                                 in occupancyContext);
+
+        if (math.lengthsq(clearanceVelocity) > DirectionEpsilon)
+            return clearanceVelocity;
+
+        float fallbackAngle = ResolveRecoveryAngle(enemyEntity, lastDirectionAngle, hasPreviousDirection);
+        float3 fallbackDirection = new float3(math.sin(math.radians(fallbackAngle)), 0f, math.cos(math.radians(fallbackAngle)));
+        return fallbackDirection * resolvedSpeed * ResolveAggressivenessScale(steeringAggressiveness, 0.38f, 0.72f);
     }
 
     /// <summary>
@@ -516,6 +562,30 @@ public static class EnemyPatternWandererMovementUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Resolves a deterministic recovery heading that rotates away from the previous target without selecting its exact opposite.
+    /// </summary>
+    /// <param name="enemyEntity">Current enemy entity used as the stable hash source.</param>
+    /// <param name="lastDirectionAngle">Previously selected direction angle in degrees.</param>
+    /// <param name="hasPreviousDirection">True when the previous direction is meaningful.</param>
+    /// <returns>Recovery heading in degrees.</returns>
+    private static float ResolveRecoveryAngle(Entity enemyEntity, float lastDirectionAngle, bool hasPreviousDirection)
+    {
+        uint hash = math.hash(new int4(enemyEntity.Index * 31 + 13,
+                                       enemyEntity.Version * 37 + 17,
+                                       (int)math.round(lastDirectionAngle * 10f),
+                                       hasPreviousDirection ? 1 : 0));
+        float offset = math.lerp(70f, 125f, ResolveHash01(hash));
+
+        if ((hash & 1u) != 0u)
+            offset = -offset;
+
+        if (hasPreviousDirection)
+            return lastDirectionAngle + offset;
+
+        return ResolveHash01(hash) * 360f;
+    }
+
     /// <summary>
     /// Resolves stable deterministic tie-break ordering between two entities.
     /// </summary>

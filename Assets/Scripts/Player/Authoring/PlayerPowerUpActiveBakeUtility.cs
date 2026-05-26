@@ -221,6 +221,8 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasProjectileElementalPayload = false;
         ElementalEffectConfig projectileElementalEffect = default;
         float projectileElementalStacksPerHit = 0f;
+        bool ignoreInheritedPlayerVelocityX = false;
+        bool ignoreInheritedPlayerVelocityZ = false;
         float explosionRadius = 0f;
         float explosionDamage = 0f;
         bool explosionAffectAllEnemies = false;
@@ -287,6 +289,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                  math.max(0f, holdChargeData.PassiveChargeGainPercentPerSecond));
                     chargeShotLaserDurationSeconds = math.max(chargeShotLaserDurationSeconds,
                                                               math.max(0f, holdChargeData.LaserDurationSeconds));
+                    ignoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX || holdChargeData.IgnoreInheritedPlayerVelocityX;
+                    ignoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ || holdChargeData.IgnoreInheritedPlayerVelocityZ;
                     useChargedLaserBeam = useChargedLaserBeam || holdChargeData.UseChargedLaserBeam;
 
                     if (holdChargeData.UseChargedLaserBeam)
@@ -335,6 +339,8 @@ public static class PlayerPowerUpActiveBakeUtility
                     shotgunConeAngleDegrees = math.max(shotgunConeAngleDegrees, math.max(0f, shotgunPatternData.ConeAngleDegrees));
                     shotgunLaserDurationSeconds = math.max(shotgunLaserDurationSeconds,
                                                            math.max(0f, shotgunPatternData.LaserDurationSeconds));
+                    ignoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX || shotgunPatternData.IgnoreInheritedPlayerVelocityX;
+                    ignoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ || shotgunPatternData.IgnoreInheritedPlayerVelocityZ;
                     break;
                 case PowerUpModuleKind.CharacterTuning:
                     bool hasCharacterTuningFormulas = HasCharacterTuningFormulas(payload);
@@ -600,6 +606,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        hasProjectileElementalPayload,
                                                                        projectileElementalEffect,
                                                                        projectileElementalStacksPerHit,
+                                                                       ignoreInheritedPlayerVelocityX,
+                                                                       ignoreInheritedPlayerVelocityZ,
                                                                        hasHealthPackOverTime,
                                                                        healthPackHealAmount,
                                                                        healthPackDurationSeconds,

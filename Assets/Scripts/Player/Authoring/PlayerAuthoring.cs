@@ -603,7 +603,11 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         bool hasPowerUpVfxRuntime = false;
 
         if (visualPreset != null &&
-            (visualPreset.LevelUpVfxPrefab != null || visualPreset.ChargeShotVfxPrefab != null))
+            (visualPreset.LevelUpVfxPrefab != null ||
+             visualPreset.HealthIncreaseVfxPrefab != null ||
+             visualPreset.ShieldIncreaseVfxPrefab != null ||
+             visualPreset.ChargeShotVfxPrefab != null ||
+             visualPreset.PlayerProjectileVfxPrefab != null))
         {
             EnsurePowerUpVfxRuntime(authoring,
                                     entity,
@@ -619,12 +623,40 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                 AddComponent(entity, levelUpVfxConfig);
             }
 
+            bool hasStatIncreaseVfx = false;
+
+            if (PlayerVisualVfxBakeUtility.TryBuildHealthIncreaseVfxConfig(visualPreset,
+                                                                           resolveVisualVfxPrefabEntity,
+                                                                           out PlayerHealthIncreaseVfxConfig healthIncreaseVfxConfig))
+            {
+                AddComponent(entity, healthIncreaseVfxConfig);
+                hasStatIncreaseVfx = true;
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildShieldIncreaseVfxConfig(visualPreset,
+                                                                           resolveVisualVfxPrefabEntity,
+                                                                           out PlayerShieldIncreaseVfxConfig shieldIncreaseVfxConfig))
+            {
+                AddComponent(entity, shieldIncreaseVfxConfig);
+                hasStatIncreaseVfx = true;
+            }
+
+            if (hasStatIncreaseVfx)
+                AddComponent(entity, new PlayerStatIncreaseVfxRuntimeState());
+
             if (PlayerVisualVfxBakeUtility.TryBuildChargeShotVfxConfig(visualPreset,
                                                                         resolveVisualVfxPrefabEntity,
                                                                         out PlayerChargeShotVfxConfig chargeShotVfxConfig))
             {
                 AddComponent(entity, chargeShotVfxConfig);
                 AddComponent(entity, new PlayerChargeShotVfxRuntimeState());
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildProjectileAttachedVfxConfig(visualPreset,
+                                                                               resolveVisualVfxPrefabEntity,
+                                                                               out PlayerProjectileAttachedVfxConfig projectileAttachedVfxConfig))
+            {
+                AddComponent(entity, projectileAttachedVfxConfig);
             }
         }
 

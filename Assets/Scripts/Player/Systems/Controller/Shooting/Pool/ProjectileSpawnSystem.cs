@@ -26,6 +26,8 @@ public partial struct ProjectileSpawnSystem : ISystem
 
     #region Constants
     private const float MinimumProjectileScale = 0.0001f;
+    private const float MinimumVfxScale = 0.01f;
+    private const float MinimumVfxLifetimeSeconds = 0.05f;
     private const float VisualShootingPulseDuration = 0.12f;
     #endregion
 
@@ -83,6 +85,8 @@ public partial struct ProjectileSpawnSystem : ISystem
         ComponentLookup<ProjectileSplitState> splitLookup = SystemAPI.GetComponentLookup<ProjectileSplitState>(false);
         ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(false);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
+        ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileAttachedVfxConfig>(true);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup = SystemAPI.GetBufferLookup<ProjectileHitHistoryElement>(false);
 
         ProcessShootRequests(ref state,
@@ -102,6 +106,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                              ref splitLookup,
                              ref elementalPayloadLookup,
                              ref projectileActiveLookup,
+                             in projectileAttachedVfxConfigLookup,
+                             ref powerUpVfxRequestLookup,
                              ref projectileHitHistoryLookup);
     }
 
@@ -209,6 +215,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       ref ComponentLookup<ProjectileSplitState> splitLookup,
                                       ref ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup,
                                       ref ComponentLookup<ProjectileActive> projectileActiveLookup,
+                                      in ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup,
+                                      ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup,
                                       ref BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup)
     {
         foreach ((DynamicBuffer<ShootRequest> shootRequests,
@@ -288,7 +296,9 @@ public partial struct ProjectileSpawnSystem : ISystem
                     KnockbackDurationSeconds = math.max(0f, request.KnockbackDurationSeconds),
                     KnockbackDirectionMode = request.KnockbackDirectionMode,
                     KnockbackStackingMode = request.KnockbackStackingMode,
-                    InheritPlayerSpeed = request.InheritPlayerSpeed
+                    InheritPlayerSpeed = request.InheritPlayerSpeed,
+                    IgnoreInheritedPlayerVelocityX = request.IgnoreInheritedPlayerVelocityX,
+                    IgnoreInheritedPlayerVelocityZ = request.IgnoreInheritedPlayerVelocityZ
                 };
 
                 projectileLookup[projectileEntity] = projectileData;
@@ -330,6 +340,12 @@ public partial struct ProjectileSpawnSystem : ISystem
                 elementalPayloadLookup[projectileEntity] = elementalPayload;
 
                 projectileActiveLookup.SetComponentEnabled(projectileEntity, true);
+                TryEnqueueProjectileAttachedVfx(shooterEntity,
+                                                projectileEntity,
+                                                in projectileTransform,
+                                                scaleMultiplier,
+                                                in projectileAttachedVfxConfigLookup,
+                                                ref powerUpVfxRequestLookup);
                 spawnedProjectileCount++;
             }
 
@@ -574,6 +590,56 @@ public partial struct ProjectileSpawnSystem : ISystem
 
         return ProjectileElementalPayloadUtility.BuildSingle(in elementalProjectilesConfig.Effect,
                                                              math.max(0f, elementalProjectilesConfig.StacksPerHit));
+    }
+
+    /// <summary>
+    /// Queues an attached managed VFX request for a newly activated projectile when the shooter visual preset provides one.
+    /// </summary>
+    /// <param name="shooterEntity">Player entity that owns the projectile and VFX request buffer.</param>
+    /// <param name="projectileEntity">Projectile entity followed by the VFX until despawn.</param>
+    /// <param name="projectileTransform">Initial projectile transform used for request placement.</param>
+    /// <param name="projectileScaleMultiplier">Projectile size multiplier already applied to the spawned projectile transform.</param>
+    /// <param name="projectileAttachedVfxConfigLookup">Read-only lookup for optional projectile VFX config.</param>
+    /// <param name="powerUpVfxRequestLookup">Writable lookup for player-owned VFX request buffers.</param>
+    private static void TryEnqueueProjectileAttachedVfx(Entity shooterEntity,
+                                                        Entity projectileEntity,
+                                                        in LocalTransform projectileTransform,
+                                                        float projectileScaleMultiplier,
+                                                        in ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup,
+                                                        ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup)
+    {
+        if (!projectileAttachedVfxConfigLookup.HasComponent(shooterEntity))
+            return;
+
+        if (!powerUpVfxRequestLookup.HasBuffer(shooterEntity))
+            return;
+
+        PlayerProjectileAttachedVfxConfig config = projectileAttachedVfxConfigLookup[shooterEntity];
+
+        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
+            return;
+
+        quaternion rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(projectileTransform.Rotation);
+        float resolvedProjectileScaleMultiplier = math.max(MinimumVfxScale, projectileScaleMultiplier);
+        float3 scaledSpawnOffset = config.SpawnOffset * resolvedProjectileScaleMultiplier;
+        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestLookup[shooterEntity];
+        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
+        {
+            PrefabEntity = config.PrefabEntity,
+            SourcePrefab = config.SourcePrefab,
+            Position = projectileTransform.Position + math.rotate(rotation, scaledSpawnOffset),
+            Rotation = rotation,
+            UniformScale = math.max(MinimumVfxScale, config.UniformScale * resolvedProjectileScaleMultiplier),
+            ParticleSimulationSpeedMultiplier = 1f,
+            LifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, config.LifetimeSeconds),
+            FollowTargetEntity = projectileEntity,
+            FollowPositionOffset = scaledSpawnOffset,
+            FollowValidationEntity = Entity.Null,
+            FollowValidationSpawnVersion = 0u,
+            Velocity = float3.zero,
+            KeepAliveWhileFollowTargetValid = 1,
+            FollowMuzzlePose = 1
+        });
     }
 
     #endregion

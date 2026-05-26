@@ -208,6 +208,8 @@ public static class PlayerPowerUpPassiveBakeUtility
         int projectileMaxPenetrations = 0;
         int shotgunProjectileCount = 0;
         float shotgunConeAngleDegrees = 0f;
+        bool ignoreInheritedPlayerVelocityX = false;
+        bool ignoreInheritedPlayerVelocityZ = false;
         bool hasElementalProjectiles = false;
         ElementalEffectConfig elementalProjectilesEffect = default;
         float elementalProjectilesStacksPerHit = 0f;
@@ -397,6 +399,8 @@ public static class PlayerPowerUpPassiveBakeUtility
                     hasShotgunPattern = true;
                     shotgunProjectileCount += math.max(1, shotgunPatternData.ProjectileCount);
                     shotgunConeAngleDegrees = math.max(shotgunConeAngleDegrees, math.max(0f, shotgunPatternData.ConeAngleDegrees));
+                    ignoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX || shotgunPatternData.IgnoreInheritedPlayerVelocityX;
+                    ignoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ || shotgunPatternData.IgnoreInheritedPlayerVelocityZ;
                     break;
                 case PowerUpModuleKind.CharacterTuning:
                 case PowerUpModuleKind.Stackable:
@@ -569,7 +573,9 @@ public static class PlayerPowerUpPassiveBakeUtility
                 MaxPenetrations = math.max(0, projectileMaxPenetrations),
                 HasElementalPayload = hasElementalProjectiles ? (byte)1 : (byte)0,
                 ElementalEffect = elementalProjectilesEffect,
-                ElementalStacksPerHit = math.max(0f, elementalProjectilesStacksPerHit)
+                ElementalStacksPerHit = math.max(0f, elementalProjectilesStacksPerHit),
+                IgnoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX ? (byte)1 : (byte)0,
+                IgnoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ ? (byte)1 : (byte)0
             },
             ElementalProjectiles = new ElementalProjectilesPassiveConfig
             {

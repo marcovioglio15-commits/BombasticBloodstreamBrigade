@@ -87,7 +87,9 @@ public static class ProjectileSplitUtility
                                         splitScaleMultiplier,
                                         in projectileData,
                                         in elementalPayload,
-                                        projectileData.InheritPlayerSpeed);
+                                        projectileData.InheritPlayerSpeed,
+                                        projectileData.IgnoreInheritedPlayerVelocityX,
+                                        projectileData.IgnoreInheritedPlayerVelocityZ);
                 return;
             case ProjectileSplitDirectionMode.CustomAngles:
                 if (splitState.CustomAnglesDegrees.Length <= 0)
@@ -104,7 +106,9 @@ public static class ProjectileSplitUtility
                                             splitScaleMultiplier,
                                             in projectileData,
                                             in elementalPayload,
-                                            projectileData.InheritPlayerSpeed);
+                                            projectileData.InheritPlayerSpeed,
+                                            projectileData.IgnoreInheritedPlayerVelocityX,
+                                            projectileData.IgnoreInheritedPlayerVelocityZ);
                     return;
                 }
 
@@ -120,7 +124,9 @@ public static class ProjectileSplitUtility
                                             splitScaleMultiplier,
                                             in projectileData,
                                             in elementalPayload,
-                                            projectileData.InheritPlayerSpeed);
+                                            projectileData.InheritPlayerSpeed,
+                                            projectileData.IgnoreInheritedPlayerVelocityX,
+                                            projectileData.IgnoreInheritedPlayerVelocityZ);
                 return;
         }
     }
@@ -139,7 +145,9 @@ public static class ProjectileSplitUtility
                                                 float splitScaleMultiplier,
                                                 in Projectile sourceProjectile,
                                                 in ProjectileElementalPayload elementalPayload,
-                                                byte inheritPlayerSpeed)
+                                                byte inheritPlayerSpeed,
+                                                byte ignoreInheritedPlayerVelocityX,
+                                                byte ignoreInheritedPlayerVelocityZ)
     {
         int splitCount = math.max(1, splitState.SplitProjectileCount);
         float stepDegrees = 360f / splitCount;
@@ -161,6 +169,8 @@ public static class ProjectileSplitUtility
                                  in sourceProjectile,
                                  in elementalPayload,
                                  inheritPlayerSpeed,
+                                 ignoreInheritedPlayerVelocityX,
+                                 ignoreInheritedPlayerVelocityZ,
                                  splitIndex,
                                  splitCount);
         }
@@ -178,7 +188,9 @@ public static class ProjectileSplitUtility
                                                     float splitScaleMultiplier,
                                                     in Projectile sourceProjectile,
                                                     in ProjectileElementalPayload elementalPayload,
-                                                    byte inheritPlayerSpeed)
+                                                    byte inheritPlayerSpeed,
+                                                    byte ignoreInheritedPlayerVelocityX,
+                                                    byte ignoreInheritedPlayerVelocityZ)
     {
         float baseAngleDegrees = ResolveDirectionAngleDegrees(baseDirection);
         int splitCount = math.max(1, splitState.CustomAnglesDegrees.Length);
@@ -199,6 +211,8 @@ public static class ProjectileSplitUtility
                                  in sourceProjectile,
                                  in elementalPayload,
                                  inheritPlayerSpeed,
+                                 ignoreInheritedPlayerVelocityX,
+                                 ignoreInheritedPlayerVelocityZ,
                                  splitIndex,
                                  splitCount);
         }
@@ -216,6 +230,8 @@ public static class ProjectileSplitUtility
                                              in Projectile sourceProjectile,
                                              in ProjectileElementalPayload elementalPayload,
                                              byte inheritPlayerSpeed,
+                                             byte ignoreInheritedPlayerVelocityX,
+                                             byte ignoreInheritedPlayerVelocityZ,
                                              int orbitLayerIndex,
                                              int orbitLayerCount)
     {
@@ -238,6 +254,8 @@ public static class ProjectileSplitUtility
             KnockbackDirectionMode = sourceProjectile.KnockbackDirectionMode,
             KnockbackStackingMode = sourceProjectile.KnockbackStackingMode,
             InheritPlayerSpeed = inheritPlayerSpeed,
+            IgnoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX,
+            IgnoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ,
             IsSplitChild = 1,
             OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
             OrbitLayerCount = safeOrbitLayerCount,

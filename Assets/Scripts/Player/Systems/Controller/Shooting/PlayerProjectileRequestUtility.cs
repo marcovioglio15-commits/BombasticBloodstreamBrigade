@@ -121,8 +121,27 @@ public static class PlayerProjectileRequestUtility
             ScaleMultiplier = scale,
             Knockback = values.Knockback,
             InheritPlayerSpeed = runtimeShootingConfig.ProjectilesInheritPlayerSpeed,
+            IgnoreInheritedPlayerVelocityX = passiveToolsState.HasShotgun != 0 ? passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityX : (byte)0,
+            IgnoreInheritedPlayerVelocityZ = passiveToolsState.HasShotgun != 0 ? passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityZ : (byte)0,
             ElementalPayloadOverride = resolvedElementalPayloadOverride
         };
+    }
+
+    /// <summary>
+    /// Applies inherited-player-velocity axis overrides to a projectile request template.
+    /// </summary>
+    /// <param name="template">Mutable projectile request template.</param>
+    /// <param name="ignoreInheritedPlayerVelocityX">True when inherited world X velocity should be ignored.</param>
+    /// <param name="ignoreInheritedPlayerVelocityZ">True when inherited world Z velocity should be ignored.</param>
+    public static void ApplyInheritedVelocityAxisOverrides(ref PlayerProjectileRequestTemplate template,
+                                                           byte ignoreInheritedPlayerVelocityX,
+                                                           byte ignoreInheritedPlayerVelocityZ)
+    {
+        if (ignoreInheritedPlayerVelocityX != 0)
+            template.IgnoreInheritedPlayerVelocityX = 1;
+
+        if (ignoreInheritedPlayerVelocityZ != 0)
+            template.IgnoreInheritedPlayerVelocityZ = 1;
     }
 
     /// <summary>
@@ -249,6 +268,8 @@ public static class PlayerProjectileRequestUtility
             KnockbackDirectionMode = template.Knockback.DirectionMode,
             KnockbackStackingMode = template.Knockback.StackingMode,
             InheritPlayerSpeed = template.InheritPlayerSpeed,
+            IgnoreInheritedPlayerVelocityX = template.IgnoreInheritedPlayerVelocityX,
+            IgnoreInheritedPlayerVelocityZ = template.IgnoreInheritedPlayerVelocityZ,
             IsSplitChild = isSplitChild,
             OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
             OrbitLayerCount = safeOrbitLayerCount,
@@ -289,6 +310,8 @@ public struct PlayerProjectileRequestTemplate
     public float ScaleMultiplier;
     public ProjectileKnockbackSettingsBlob Knockback;
     public byte InheritPlayerSpeed;
+    public byte IgnoreInheritedPlayerVelocityX;
+    public byte IgnoreInheritedPlayerVelocityZ;
     public ProjectileElementalPayload ElementalPayloadOverride;
     #endregion
 }

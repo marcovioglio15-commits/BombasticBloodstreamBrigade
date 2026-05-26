@@ -139,7 +139,7 @@ public partial struct ProjectileSimulationSystem : ISystem
 
             PerfectCirclePassiveConfig perfectCircleConfig = passiveToolsState.PerfectCircle;
             float3 shooterPosition = PlayerWorldTransformLookup[shooterEntity].Position;
-            float3 perfectCircleInheritedVelocity = ResolveFullInheritedVelocity(owner);
+            float3 perfectCircleInheritedVelocity = ResolveInheritedVelocity(in owner, in projectile);
             float3 targetPosition = ProjectilePerfectCircleTrajectoryUtility.ResolveNextPosition(ref perfectCircleState,
                                                                                                 shooterPosition,
                                                                                                 perfectCircleInheritedVelocity,
@@ -192,9 +192,10 @@ public partial struct ProjectileSimulationSystem : ISystem
         /// </summary>
         /// <param name="owner">Projectile owner containing the shooter entity reference.</param>
         /// <returns>Shooter velocity, or zero when the shooter has no movement state.</returns>
-        private float3 ResolveFullInheritedVelocity(in ProjectileOwner owner)
+        private float3 ResolveInheritedVelocity(in ProjectileOwner owner, in Projectile projectile)
         {
-            return ProjectileKinematicsUtility.ResolveInheritedVelocity(owner.ShooterEntity, in MovementStateLookup);
+            return ProjectileKinematicsUtility.ApplyInheritedVelocityAxisMask(ProjectileKinematicsUtility.ResolveInheritedVelocity(owner.ShooterEntity, in MovementStateLookup),
+                                                                             in projectile);
         }
         #endregion
         #endregion

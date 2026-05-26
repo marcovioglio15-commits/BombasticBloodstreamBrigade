@@ -279,6 +279,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -372,6 +374,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -548,6 +552,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -641,6 +647,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -817,6 +825,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -910,6 +920,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -1086,6 +1098,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -1179,6 +1193,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -1355,6 +1371,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -1448,6 +1466,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -1624,6 +1644,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -1717,6 +1739,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -1893,6 +1917,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -1986,6 +2012,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -2162,6 +2190,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -2255,6 +2285,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -2431,6 +2463,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -2524,6 +2558,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -2700,6 +2736,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -2793,6 +2831,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -2969,6 +3009,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -3062,6 +3104,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -3238,6 +3282,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -3331,6 +3377,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -3507,6 +3555,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -3600,6 +3650,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -3776,6 +3828,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -3869,6 +3923,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -4045,6 +4101,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -4138,6 +4196,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -4314,6 +4374,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -4407,6 +4469,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -4583,6 +4647,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -4676,6 +4742,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -4852,6 +4920,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -4945,6 +5015,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -5121,6 +5193,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -5214,6 +5288,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -5390,6 +5466,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -5483,6 +5561,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -5659,6 +5739,8 @@ MonoBehaviour:
         passiveChargeGainWhileReleased: 0
         passiveChargeGainPercentPerSecond: 10
         laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
         useChargedLaserBeam: 0
         chargedLaserDurationSeconds: 0.45
         chargedLaserBeam:
@@ -5752,6 +5834,8 @@ MonoBehaviour:
         projectileCount: 6
         coneAngleDegrees: 45
         laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
       characterTuning:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas: []
@@ -5965,6 +6049,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -6058,6 +6144,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -6234,6 +6322,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -6327,6 +6417,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -6503,6 +6595,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -6596,6 +6690,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 1
           laserDurationSeconds: 1
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -6772,6 +6868,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -6865,6 +6963,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 1
           laserDurationSeconds: 1
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -7041,6 +7141,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -7134,6 +7236,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 1
           laserDurationSeconds: 1
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
@@ -7324,6 +7428,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -7417,6 +7523,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -7593,6 +7701,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.5
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.7
           chargedLaserBeam:
@@ -7686,6 +7796,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -7862,6 +7974,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -7955,6 +8069,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -8131,6 +8247,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -8224,6 +8342,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -8404,6 +8524,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -8497,6 +8619,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -8690,6 +8814,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -8783,6 +8909,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -8959,6 +9087,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.5
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 1
           chargedLaserDurationSeconds: 0.5
           chargedLaserBeam:
@@ -9052,6 +9182,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -9228,6 +9360,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -9321,6 +9455,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -9497,6 +9633,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -9590,6 +9728,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -9766,6 +9906,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -9859,6 +10001,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -10049,6 +10193,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -10142,6 +10288,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -10318,6 +10466,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -10411,6 +10561,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -10587,6 +10739,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -10680,6 +10834,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -10869,6 +11025,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -10962,6 +11120,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -11138,6 +11298,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -11231,6 +11393,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -11407,6 +11571,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -11500,6 +11666,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -11689,6 +11857,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -11782,6 +11952,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -11958,6 +12130,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -12051,6 +12225,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -12227,6 +12403,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -12320,6 +12498,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -12509,6 +12689,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -12602,6 +12784,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -12778,6 +12962,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -12871,6 +13057,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -13047,6 +13235,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -13140,6 +13330,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -13326,6 +13518,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -13419,6 +13613,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -13595,6 +13791,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -13688,6 +13886,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -13864,6 +14064,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -13957,6 +14159,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -14145,6 +14349,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -14220,6 +14426,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -14418,6 +14626,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -14493,6 +14703,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -14702,6 +14914,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -14777,6 +14991,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -14975,6 +15191,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -15050,6 +15268,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -15262,6 +15482,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -15355,6 +15577,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -15531,6 +15755,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -15624,6 +15850,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -15813,6 +16041,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -15906,6 +16136,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -16095,6 +16327,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -16188,6 +16422,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -16364,6 +16600,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -16457,6 +16695,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -16647,6 +16887,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -16740,6 +16982,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -16929,6 +17173,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -17022,6 +17268,8 @@ MonoBehaviour:
           projectileCount: 6
           coneAngleDegrees: 45
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -17208,6 +17456,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -17301,6 +17551,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -17489,6 +17741,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -17582,6 +17836,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -17770,6 +18026,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -17863,6 +18121,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -18038,6 +18298,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -18131,6 +18393,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -18316,6 +18580,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -18409,6 +18675,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -18584,6 +18852,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -18677,6 +18947,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -18852,6 +19124,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -18945,6 +19219,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -19130,6 +19406,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -19223,6 +19501,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -19398,6 +19678,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -19491,6 +19773,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -19676,6 +19960,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -19769,6 +20055,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -19944,6 +20232,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -20037,6 +20327,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -20222,6 +20514,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -20315,6 +20609,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -20490,6 +20786,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -20583,6 +20881,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -20768,6 +21068,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -20861,6 +21163,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -21036,6 +21340,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -21129,6 +21435,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -21314,6 +21622,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -21407,6 +21717,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -21582,6 +21894,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -21675,6 +21989,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -21860,6 +22176,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -21953,6 +22271,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -22128,6 +22448,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -22221,6 +22543,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -22407,6 +22731,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -22500,6 +22826,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -22686,6 +23014,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -22779,6 +23109,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -22965,6 +23297,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -23058,6 +23392,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -23232,6 +23568,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0.45
           chargedLaserBeam:
@@ -23325,6 +23663,8 @@ MonoBehaviour:
           projectileCount: 1
           coneAngleDegrees: 0
           laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -23511,6 +23851,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -23586,6 +23928,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -23795,6 +24139,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -23870,6 +24216,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -24079,6 +24427,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -24154,6 +24504,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -24387,6 +24739,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -24462,6 +24816,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []
@@ -24660,6 +25016,8 @@ MonoBehaviour:
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
           chargedLaserDurationSeconds: 0
           chargedLaserBeam:
@@ -24735,6 +25093,8 @@ MonoBehaviour:
           projectileCount: 0
           coneAngleDegrees: 0
           laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas: []

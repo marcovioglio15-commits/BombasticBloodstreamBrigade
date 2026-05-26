@@ -32,6 +32,12 @@ public sealed class PowerUpHoldChargeModuleData
     [Tooltip("Seconds for which a Laser Beam triggered by this active charge-shot remains active after release.")]
     [SerializeField] private float laserDurationSeconds = 0.45f;
 
+    [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world X axis for charge-shot projectiles emitted by this module.")]
+    [SerializeField] private bool ignoreInheritedPlayerVelocityX;
+
+    [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world Z axis for charge-shot projectiles emitted by this module.")]
+    [SerializeField] private bool ignoreInheritedPlayerVelocityZ;
+
     [Header("Charged Laser Beam")]
     [Tooltip("When enabled, a fully charged release fires a standalone Laser Beam instead of projectile requests. This beam ignores passive tools and other power-up hooks.")]
     [SerializeField] private bool useChargedLaserBeam;
@@ -116,6 +122,22 @@ public sealed class PowerUpHoldChargeModuleData
         get
         {
             return laserDurationSeconds;
+        }
+    }
+
+    public bool IgnoreInheritedPlayerVelocityX
+    {
+        get
+        {
+            return ignoreInheritedPlayerVelocityX;
+        }
+    }
+
+    public bool IgnoreInheritedPlayerVelocityZ
+    {
+        get
+        {
+            return ignoreInheritedPlayerVelocityZ;
         }
     }
 
@@ -262,6 +284,8 @@ public sealed class PowerUpHoldChargeModuleData
         passiveChargeGainWhileReleased = passiveChargeGainWhileReleasedValue;
         passiveChargeGainPercentPerSecond = passiveChargeGainPercentPerSecondValue;
         laserDurationSeconds = laserDurationSecondsValue;
+        ignoreInheritedPlayerVelocityX = false;
+        ignoreInheritedPlayerVelocityZ = false;
         useChargedLaserBeam = useChargedLaserBeamValue;
         chargedLaserDurationSeconds = chargedLaserDurationSecondsValue;
         chargedLaserBeam = chargedLaserBeamValue != null ? chargedLaserBeamValue : new PowerUpLaserBeamModuleData();

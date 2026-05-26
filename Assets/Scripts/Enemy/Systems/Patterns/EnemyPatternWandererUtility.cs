@@ -275,17 +275,27 @@ public static class EnemyPatternWandererUtility
             patternRuntimeState.WanderRetryTimer = 0f;
         }
 
-        if (patternRuntimeState.WanderWaitTimer > 0f)
-        {
-            patternRuntimeState.WanderWaitTimer = math.max(0f, patternRuntimeState.WanderWaitTimer - deltaTime);
-            return float3.zero;
-        }
-
         float resolvedSteeringAggressiveness = EnemyPatternWandererMovementUtility.ResolveSteeringAggressiveness(steeringAggressiveness);
         float bodyRadius = math.max(0.05f, enemyData.BodyRadius);
         float minimumEnemyClearance = math.max(0f, patternConfig.BasicMinimumEnemyClearance);
         float desiredSpeed = maxSpeed > 0f ? math.min(moveSpeed, maxSpeed) : moveSpeed;
         desiredSpeed = math.max(0f, desiredSpeed);
+
+        if (patternRuntimeState.WanderWaitTimer > 0f)
+        {
+            patternRuntimeState.WanderWaitTimer = math.max(0f, patternRuntimeState.WanderWaitTimer - deltaTime);
+            return ResolveRecoveryVelocity(enemyEntity,
+                                           enemyData.PriorityTier,
+                                           enemyPosition,
+                                           bodyRadius,
+                                           minimumEnemyClearance,
+                                           desiredSpeed,
+                                           resolvedSteeringAggressiveness,
+                                           in patternRuntimeState,
+                                           in occupancyContext,
+                                           0.55f,
+                                           false);
+        }
 
         if (patternRuntimeState.WanderRetryTimer > 0f)
             patternRuntimeState.WanderRetryTimer = math.max(0f, patternRuntimeState.WanderRetryTimer - deltaTime);
@@ -300,27 +310,33 @@ public static class EnemyPatternWandererUtility
             {
                 patternRuntimeState.WanderHasTarget = 0;
                 patternRuntimeState.WanderWaitTimer = math.max(0f, patternConfig.BasicWaitCooldownSeconds);
-                return float3.zero;
+                return ResolveRecoveryVelocity(enemyEntity,
+                                               enemyData.PriorityTier,
+                                               enemyPosition,
+                                               bodyRadius,
+                                               minimumEnemyClearance,
+                                               desiredSpeed,
+                                               resolvedSteeringAggressiveness,
+                                               in patternRuntimeState,
+                                               in occupancyContext,
+                                               0.45f,
+                                               false);
             }
 
             if (patternRuntimeState.WanderRetryTimer > 0f)
             {
-                float3 retryClearanceVelocity = ResolveLocalClearanceVelocity(enemyEntity,
-                                                                              enemyData.PriorityTier,
-                                                                              enemyPosition,
-                                                                              bodyRadius,
-                                                                              minimumEnemyClearance,
-                                                                              desiredSpeed,
-                                                                              resolvedSteeringAggressiveness,
-                                                                              out float _,
-                                                                              out float _,
-                                                                              in occupancyContext);
                 float retrySideStepScale = EnemyPatternWandererMovementUtility.ResolveAggressivenessScale(resolvedSteeringAggressiveness, 0.55f, 0.95f);
-
-                if (math.lengthsq(retryClearanceVelocity) > DirectionEpsilon)
-                    return retryClearanceVelocity * retrySideStepScale;
-
-                return float3.zero;
+                return ResolveRecoveryVelocity(enemyEntity,
+                                               enemyData.PriorityTier,
+                                               enemyPosition,
+                                               bodyRadius,
+                                               minimumEnemyClearance,
+                                               desiredSpeed,
+                                               resolvedSteeringAggressiveness,
+                                               in patternRuntimeState,
+                                               in occupancyContext,
+                                               retrySideStepScale,
+                                               true);
             }
 
             float3 targetDirection = toTarget / math.max(distanceToTarget, DirectionEpsilon);
@@ -361,7 +377,18 @@ public static class EnemyPatternWandererUtility
 
                 float yieldRetrySeconds = math.max(0.02f, patternConfig.BasicBlockedPathRetryDelay * 0.45f);
                 patternRuntimeState.WanderRetryTimer = math.max(patternRuntimeState.WanderRetryTimer, yieldRetrySeconds);
-                return float3.zero;
+                patternRuntimeState.WanderHasTarget = 0;
+                return ResolveRecoveryVelocity(enemyEntity,
+                                               enemyData.PriorityTier,
+                                               enemyPosition,
+                                               bodyRadius,
+                                               minimumEnemyClearance,
+                                               desiredSpeed,
+                                               resolvedSteeringAggressiveness,
+                                               in patternRuntimeState,
+                                               in occupancyContext,
+                                               0.72f,
+                                               true);
             }
 
             return desiredVelocity;
@@ -369,22 +396,18 @@ public static class EnemyPatternWandererUtility
 
         if (patternRuntimeState.WanderRetryTimer > 0f)
         {
-            float3 retryClearanceVelocity = ResolveLocalClearanceVelocity(enemyEntity,
-                                                                          enemyData.PriorityTier,
-                                                                          enemyPosition,
-                                                                          bodyRadius,
-                                                                          minimumEnemyClearance,
-                                                                          desiredSpeed,
-                                                                          resolvedSteeringAggressiveness,
-                                                                          out float _,
-                                                                          out float _,
-                                                                          in occupancyContext);
             float retryDriftScale = EnemyPatternWandererMovementUtility.ResolveAggressivenessScale(resolvedSteeringAggressiveness, 0.5f, 0.9f);
-
-            if (math.lengthsq(retryClearanceVelocity) > DirectionEpsilon)
-                return retryClearanceVelocity * retryDriftScale;
-
-            return float3.zero;
+            return ResolveRecoveryVelocity(enemyEntity,
+                                           enemyData.PriorityTier,
+                                           enemyPosition,
+                                           bodyRadius,
+                                           minimumEnemyClearance,
+                                           desiredSpeed,
+                                           resolvedSteeringAggressiveness,
+                                           in patternRuntimeState,
+                                           in occupancyContext,
+                                           retryDriftScale,
+                                           true);
         }
 
         bool pickedDestination = TryPickWanderDestination(enemyEntity,
@@ -422,7 +445,17 @@ public static class EnemyPatternWandererUtility
         }
 
         patternRuntimeState.WanderRetryTimer = math.max(0f, patternConfig.BasicBlockedPathRetryDelay);
-        return float3.zero;
+        return ResolveRecoveryVelocity(enemyEntity,
+                                       enemyData.PriorityTier,
+                                       enemyPosition,
+                                       bodyRadius,
+                                       minimumEnemyClearance,
+                                       desiredSpeed,
+                                       resolvedSteeringAggressiveness,
+                                       in patternRuntimeState,
+                                       in occupancyContext,
+                                       0.65f,
+                                       true);
     }
 
     /// <summary>
@@ -550,24 +583,24 @@ public static class EnemyPatternWandererUtility
                 }
             }
 
-            bool freeTrajectory = EnemyPatternWandererMovementUtility.TryEvaluateTrajectoryFreedom(enemyEntity,
-                                                                                                   selfPriorityTier,
-                                                                                                   enemyPosition,
-                                                                                                   candidate,
-                                                                                                   math.max(0.01f, bodyRadius),
-                                                                                                   minimumEnemyClearance,
-                                                                                                   trajectoryPredictionTime,
-                                                                                                   in occupancyContext,
-                                                                                                   out float freeTrajectoryScore,
-                                                                                                   out float freeSpaceScore);
-
-            if (!freeTrajectory)
+            if (!EnemyPatternWandererMovementUtility.TryEvaluateTrajectoryFreedom(enemyEntity,
+                                                                                 selfPriorityTier,
+                                                                                 enemyPosition,
+                                                                                 candidate,
+                                                                                 math.max(0.01f, bodyRadius),
+                                                                                 minimumEnemyClearance,
+                                                                                 trajectoryPredictionTime,
+                                                                                 in occupancyContext,
+                                                                                 out float freeTrajectoryScore,
+                                                                                 out float freeSpaceScore))
+            {
                 continue;
+            }
 
-            float3 toPlayer = playerPosition - candidate;
+            float3 toPlayer = playerPosition - enemyPosition;
             toPlayer.y = 0f;
-            float playerDistance = math.length(toPlayer);
-            float playerDistanceScore = 1f / (1f + playerDistance);
+            float3 toPlayerDirection = math.normalizesafe(toPlayer, direction);
+            float playerDirectionScore = math.saturate(math.dot(direction, toPlayerDirection) * 0.5f + 0.5f);
             float angleDegrees = math.degrees(math.atan2(direction.x, direction.z));
             float unexploredScore = 1f;
 
@@ -575,14 +608,19 @@ public static class EnemyPatternWandererUtility
             {
                 float deltaDegrees = math.abs(math.degrees(math.atan2(math.sin(math.radians(angleDegrees - lastDirectionAngle)),
                                                                       math.cos(math.radians(angleDegrees - lastDirectionAngle)))));
-                unexploredScore = deltaDegrees / 180f;
+                unexploredScore = ResolveDirectionalNoveltyScore(deltaDegrees);
             }
 
             float safetyScore = math.saturate(freeTrajectoryScore * 0.7f + freeSpaceScore * 0.3f);
-            float safetyWeight = math.max(1f, freeTrajectoryPreference * 10f);
+            float safetyWeight = math.max(1f, freeTrajectoryPreference * 4.5f);
+            float distanceScore = maximumDistance > 0.01f ? math.saturate(targetDistance / maximumDistance) : 0f;
+            uint jitterSeed = math.hash(new int4(enemyEntity.Index, enemyEntity.Version, sampleIndex, 733));
+            float jitterScore = EnemyPatternWandererMovementUtility.ResolveHash01(jitterSeed) * 0.025f;
             float score = safetyWeight * safetyScore +
                           unexploredPreference * unexploredScore +
-                          towardPlayerPreference * playerDistanceScore;
+                          towardPlayerPreference * playerDirectionScore +
+                          distanceScore * 0.18f +
+                          jitterScore;
 
             if (score <= bestScore)
                 continue;
@@ -594,6 +632,73 @@ public static class EnemyPatternWandererUtility
         }
 
         return foundCandidate;
+    }
+
+    /// <summary>
+    /// Resolves an anti-oscillation score for candidate headings relative to the last selected heading.
+    /// </summary>
+    /// <param name="deltaDegrees">Absolute angular delta in degrees.</param>
+    /// <returns>Novelty score that favors meaningful turns without rewarding direct backtracking.</returns>
+    private static float ResolveDirectionalNoveltyScore(float deltaDegrees)
+    {
+        float leaveCurrentLineScore = math.smoothstep(18f, 78f, deltaDegrees);
+        float avoidBacktrackScore = 1f - math.smoothstep(148f, 180f, deltaDegrees);
+        return math.saturate(leaveCurrentLineScore * avoidBacktrackScore);
+    }
+
+    /// <summary>
+    /// Resolves crowd-recovery velocity and applies a local scale used by wait, retry and failed-pick paths.
+    /// </summary>
+    /// <param name="enemyEntity">Current enemy entity.</param>
+    /// <param name="priorityTier">Current enemy priority tier.</param>
+    /// <param name="enemyPosition">Current enemy position.</param>
+    /// <param name="bodyRadius">Current enemy body radius.</param>
+    /// <param name="minimumEnemyClearance">Extra desired clearance from neighboring enemies.</param>
+    /// <param name="desiredSpeed">Current desired movement speed.</param>
+    /// <param name="steeringAggressiveness">Resolved steering aggressiveness scalar.</param>
+    /// <param name="patternRuntimeState">Current wander runtime state used for deterministic recovery heading.</param>
+    /// <param name="occupancyContext">Occupancy context used for neighbor lookup.</param>
+    /// <param name="scale">Additional velocity scale applied by the caller path.</param>
+    /// <param name="allowFallbackHeading">True when deterministic motion is allowed even without immediate overlap pressure.</param>
+    /// <returns>Scaled recovery velocity, or zero when movement is disabled.</returns>
+    private static float3 ResolveRecoveryVelocity(Entity enemyEntity,
+                                                  int priorityTier,
+                                                  float3 enemyPosition,
+                                                  float bodyRadius,
+                                                  float minimumEnemyClearance,
+                                                  float desiredSpeed,
+                                                  float steeringAggressiveness,
+                                                  in EnemyPatternRuntimeState patternRuntimeState,
+                                                  in OccupancyContext occupancyContext,
+                                                  float scale,
+                                                  bool allowFallbackHeading)
+    {
+        if (!allowFallbackHeading)
+        {
+            float3 clearanceVelocity = ResolveLocalClearanceVelocity(enemyEntity,
+                                                                     priorityTier,
+                                                                     enemyPosition,
+                                                                     bodyRadius,
+                                                                     minimumEnemyClearance,
+                                                                     desiredSpeed,
+                                                                     steeringAggressiveness,
+                                                                     out float _,
+                                                                     out float _,
+                                                                     in occupancyContext);
+            return clearanceVelocity * math.max(0f, scale);
+        }
+
+        float3 recoveryVelocity = EnemyPatternWandererMovementUtility.ResolveRecoveryVelocity(enemyEntity,
+                                                                                              priorityTier,
+                                                                                              enemyPosition,
+                                                                                              bodyRadius,
+                                                                                              minimumEnemyClearance,
+                                                                                              desiredSpeed,
+                                                                                              steeringAggressiveness,
+                                                                                              patternRuntimeState.LastWanderDirectionAngle,
+                                                                                              patternRuntimeState.WanderInitialized != 0,
+                                                                                              in occupancyContext);
+        return recoveryVelocity * math.max(0f, scale);
     }
 
     /// <summary>

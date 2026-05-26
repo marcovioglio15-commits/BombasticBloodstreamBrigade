@@ -135,7 +135,8 @@ public partial struct EnemyAcidTrailVfxSpawnSystem : ISystem
             FollowPositionOffset = float3.zero,
             FollowValidationEntity = enemyEntity,
             FollowValidationSpawnVersion = spawnVersion,
-            Velocity = float3.zero
+            Velocity = float3.zero,
+            DetachWhenFollowTargetInvalid = 1
         };
     }
 

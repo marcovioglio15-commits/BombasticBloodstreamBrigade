@@ -416,10 +416,70 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                                      "chargeShotVfxAppliesToAllHoldChargePowerUps",
                                                                      "Show For All Hold-Charge Power-Ups",
                                                                      "When enabled, the same charge VFX also appears while any active power-up built from a hold-charge module is charging.");
+        Foldout healthIncreaseVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                         presetSerializedObject,
+                                                                         scalingRulesProperty,
+                                                                         "Health Increase VFX",
+                                                                         "HealthIncrease",
+                                                                         "Optional one-shot VFX spawned on the player when health increases.",
+                                                                         "healthIncreaseVfxPrefab",
+                                                                         "Health Increase VFX Prefab",
+                                                                         "Optional one-shot VFX prefab spawned on the player when health increases.",
+                                                                         "Assign a Health Increase VFX prefab to enable trigger mode, offset, and scale controls.",
+                                                                         "healthIncreaseVfxTriggerMode",
+                                                                         "Health Increase Trigger Mode",
+                                                                         "Controls whether Health Increase VFX appears on every health gain or only when maximum health increases.",
+                                                                         "healthIncreaseVfxSpawnOffset",
+                                                                         "Health Increase VFX Offset",
+                                                                         "Local-space offset applied to Health Increase VFX relative to the player entity position.",
+                                                                         "healthIncreaseVfxScaleMultiplier",
+                                                                         "Health Increase VFX Scale",
+                                                                         "Uniform scale multiplier applied to the Health Increase VFX instance.");
+        Foldout shieldIncreaseVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                         presetSerializedObject,
+                                                                         scalingRulesProperty,
+                                                                         "Shield Increase VFX",
+                                                                         "ShieldIncrease",
+                                                                         "Optional one-shot VFX spawned on the player when shield increases.",
+                                                                         "shieldIncreaseVfxPrefab",
+                                                                         "Shield Increase VFX Prefab",
+                                                                         "Optional one-shot VFX prefab spawned on the player when shield increases.",
+                                                                         "Assign a Shield Increase VFX prefab to enable trigger mode, offset, and scale controls.",
+                                                                         "shieldIncreaseVfxTriggerMode",
+                                                                         "Shield Increase Trigger Mode",
+                                                                         "Controls whether Shield Increase VFX appears on every shield gain or only when maximum shield increases.",
+                                                                         "shieldIncreaseVfxSpawnOffset",
+                                                                         "Shield Increase VFX Offset",
+                                                                         "Local-space offset applied to Shield Increase VFX relative to the player entity position.",
+                                                                         "shieldIncreaseVfxScaleMultiplier",
+                                                                         "Shield Increase VFX Scale",
+                                                                         "Uniform scale multiplier applied to the Shield Increase VFX instance.");
+        Foldout playerProjectileVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                           presetSerializedObject,
+                                                                           scalingRulesProperty,
+                                                                           "Player Projectile VFX",
+                                                                           "PlayerProjectile",
+                                                                           "Optional attached VFX spawned on player projectiles and followed until projectile despawn.",
+                                                                           "playerProjectileVfxPrefab",
+                                                                           "Player Projectile VFX Prefab",
+                                                                           "Optional attached VFX prefab spawned on every player projectile.",
+                                                                           "Assign a Player Projectile VFX prefab to enable offset and scale controls.",
+                                                                           null,
+                                                                           null,
+                                                                           null,
+                                                                           "playerProjectileVfxSpawnOffset",
+                                                                           "Player Projectile VFX Offset",
+                                                                           "Local-space offset applied to projectile attached VFX relative to each projectile transform.",
+                                                                           "playerProjectileVfxScaleMultiplier",
+                                                                           "Player Projectile VFX Scale",
+                                                                           "Uniform scale multiplier applied to projectile attached VFX instances.");
 
         container.Add(powerUpsVfxFoldout);
         container.Add(levelUpVfxFoldout);
+        container.Add(healthIncreaseVfxFoldout);
+        container.Add(shieldIncreaseVfxFoldout);
         container.Add(chargeShotVfxFoldout);
+        container.Add(playerProjectileVfxFoldout);
 
         AddPropertyField(panel,
                          powerUpsVfxFoldout,
@@ -527,7 +587,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                                           true);
         foldout.tooltip = tooltip;
         SerializedProperty prefabProperty = presetSerializedObject.FindProperty(prefabPropertyName);
-        SerializedProperty modeProperty = presetSerializedObject.FindProperty(modePropertyName);
+        SerializedProperty modeProperty = !string.IsNullOrWhiteSpace(modePropertyName)
+            ? presetSerializedObject.FindProperty(modePropertyName)
+            : null;
         SerializedProperty offsetProperty = presetSerializedObject.FindProperty(offsetPropertyName);
         SerializedProperty scaleProperty = presetSerializedObject.FindProperty(scalePropertyName);
         SerializedProperty extraToggleProperty = !string.IsNullOrWhiteSpace(extraTogglePropertyName)

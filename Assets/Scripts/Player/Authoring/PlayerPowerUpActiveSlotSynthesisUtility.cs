@@ -355,6 +355,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               bool hasProjectileElementalPayload,
                                               ElementalEffectConfig projectileElementalEffect,
                                               float projectileElementalStacksPerHit,
+                                              bool ignoreInheritedPlayerVelocityX,
+                                              bool ignoreInheritedPlayerVelocityZ,
                                               bool hasHealthPackOverTime,
                                               float healthPackHealAmount,
                                               float healthPackDurationSeconds,
@@ -461,7 +463,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 MaxPenetrations = maxPenetrations,
                 HasElementalPayload = hasElementalPayload ? (byte)1 : (byte)0,
                 ElementalEffect = projectileElementalEffect,
-                ElementalStacksPerHit = elementalStacksPerHit
+                ElementalStacksPerHit = elementalStacksPerHit,
+                IgnoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX ? (byte)1 : (byte)0,
+                IgnoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ ? (byte)1 : (byte)0
             },
             ChargeShot = new ChargeShotPowerUpConfig
             {
@@ -489,7 +493,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 MaxPenetrations = maxPenetrations,
                 HasElementalPayload = hasElementalPayload ? (byte)1 : (byte)0,
                 ElementalEffect = projectileElementalEffect,
-                ElementalStacksPerHit = elementalStacksPerHit
+                ElementalStacksPerHit = elementalStacksPerHit,
+                IgnoreInheritedPlayerVelocityX = ignoreInheritedPlayerVelocityX ? (byte)1 : (byte)0,
+                IgnoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ ? (byte)1 : (byte)0
             },
             PortableHealthPack = new PortableHealthPackPowerUpConfig
             {

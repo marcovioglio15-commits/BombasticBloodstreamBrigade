@@ -328,6 +328,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty slowPlayerWhileChargingProperty = holdChargePayloadProperty.FindPropertyRelative("slowPlayerWhileCharging");
         SerializedProperty maximumPlayerSlowPercentProperty = holdChargePayloadProperty.FindPropertyRelative("maximumPlayerSlowPercent");
         SerializedProperty playerSlowCurveProperty = holdChargePayloadProperty.FindPropertyRelative("playerSlowCurve");
+        SerializedProperty ignoreInheritedPlayerVelocityXProperty = holdChargePayloadProperty.FindPropertyRelative("ignoreInheritedPlayerVelocityX");
+        SerializedProperty ignoreInheritedPlayerVelocityZProperty = holdChargePayloadProperty.FindPropertyRelative("ignoreInheritedPlayerVelocityZ");
 
         if (requiredChargeProperty == null ||
             maximumChargeProperty == null ||
@@ -342,7 +344,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             chargedLaserBeamProperty == null ||
             slowPlayerWhileChargingProperty == null ||
             maximumPlayerSlowPercentProperty == null ||
-            playerSlowCurveProperty == null)
+            playerSlowCurveProperty == null ||
+            ignoreInheritedPlayerVelocityXProperty == null ||
+            ignoreInheritedPlayerVelocityZProperty == null)
         {
             HelpBox errorBox = new HelpBox("Hold charge payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(errorBox);
@@ -375,6 +379,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         BuildLaserBeamPayloadUi(chargedLaserContainer,
                                 chargedLaserBeamProperty,
                                 "A fully charged release fires this standalone Laser Beam once. It uses only this Trigger Hold Charge payload and ignores passive tools or other power-up hooks.");
+        AddField(payloadContainer, ignoreInheritedPlayerVelocityXProperty, "Ignore Inherited Velocity X");
+        AddField(payloadContainer, ignoreInheritedPlayerVelocityZProperty, "Ignore Inherited Velocity Z");
 
         AddField(payloadContainer, slowPlayerWhileChargingProperty, "Slow Player While Charging");
 

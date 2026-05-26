@@ -681,7 +681,9 @@ internal static class PlayerLaserBeamDamagePacketHitUtility
             KnockbackDurationSeconds = math.max(0f, projectileTemplate.Knockback.DurationSeconds),
             KnockbackDirectionMode = projectileTemplate.Knockback.DirectionMode,
             KnockbackStackingMode = projectileTemplate.Knockback.StackingMode,
-            InheritPlayerSpeed = projectileTemplate.InheritPlayerSpeed
+            InheritPlayerSpeed = projectileTemplate.InheritPlayerSpeed,
+            IgnoreInheritedPlayerVelocityX = projectileTemplate.IgnoreInheritedPlayerVelocityX,
+            IgnoreInheritedPlayerVelocityZ = projectileTemplate.IgnoreInheritedPlayerVelocityZ
         };
         LocalTransform projectileTransform = LocalTransform.FromPositionRotationScale(hitPoint,
                                                                                      quaternion.identity,

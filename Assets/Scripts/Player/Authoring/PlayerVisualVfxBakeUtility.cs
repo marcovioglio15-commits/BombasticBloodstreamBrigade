@@ -10,7 +10,9 @@ public static class PlayerVisualVfxBakeUtility
 {
     #region Constants
     private const float DefaultLevelUpVfxLifetimeSeconds = 1f;
+    private const float DefaultStatIncreaseVfxLifetimeSeconds = 1f;
     private const float DefaultChargeShotVfxLifetimeSeconds = 1f;
+    private const float DefaultProjectileAttachedVfxLifetimeSeconds = 12f;
     private const float MinimumScale = 0.01f;
     #endregion
 
@@ -81,6 +83,101 @@ public static class PlayerVisualVfxBakeUtility
         };
         return true;
     }
+
+    /// <summary>
+    /// Builds the optional health-increase VFX config from the resolved visual preset.
+    /// </summary>
+    /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <param name="config">Built ECS config when a prefab is assigned.</param>
+    /// <returns>True when the preset contains a Health Increase VFX prefab.</returns>
+    public static bool TryBuildHealthIncreaseVfxConfig(PlayerVisualPreset visualPreset,
+                                                       Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
+                                                       out PlayerHealthIncreaseVfxConfig config)
+    {
+        config = default;
+
+        if (visualPreset == null || visualPreset.HealthIncreaseVfxPrefab == null)
+            return false;
+
+        GameObject prefab = visualPreset.HealthIncreaseVfxPrefab;
+        Entity prefabEntity = resolveDynamicVfxPrefabEntity != null ? resolveDynamicVfxPrefabEntity(prefab) : Entity.Null;
+        Vector3 spawnOffset = visualPreset.HealthIncreaseVfxSpawnOffset;
+
+        config = new PlayerHealthIncreaseVfxConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = prefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(MinimumScale, visualPreset.HealthIncreaseVfxScaleMultiplier),
+            LifetimeSeconds = ManagedVfxPrefabLifetimeUtility.ResolvePrefabLifetimeSeconds(prefab, DefaultStatIncreaseVfxLifetimeSeconds),
+            TriggerMode = ResolveStatIncreaseTriggerMode(visualPreset.HealthIncreaseVfxTriggerMode)
+        };
+        return true;
+    }
+
+    /// <summary>
+    /// Builds the optional shield-increase VFX config from the resolved visual preset.
+    /// </summary>
+    /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <param name="config">Built ECS config when a prefab is assigned.</param>
+    /// <returns>True when the preset contains a Shield Increase VFX prefab.</returns>
+    public static bool TryBuildShieldIncreaseVfxConfig(PlayerVisualPreset visualPreset,
+                                                       Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
+                                                       out PlayerShieldIncreaseVfxConfig config)
+    {
+        config = default;
+
+        if (visualPreset == null || visualPreset.ShieldIncreaseVfxPrefab == null)
+            return false;
+
+        GameObject prefab = visualPreset.ShieldIncreaseVfxPrefab;
+        Entity prefabEntity = resolveDynamicVfxPrefabEntity != null ? resolveDynamicVfxPrefabEntity(prefab) : Entity.Null;
+        Vector3 spawnOffset = visualPreset.ShieldIncreaseVfxSpawnOffset;
+
+        config = new PlayerShieldIncreaseVfxConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = prefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(MinimumScale, visualPreset.ShieldIncreaseVfxScaleMultiplier),
+            LifetimeSeconds = ManagedVfxPrefabLifetimeUtility.ResolvePrefabLifetimeSeconds(prefab, DefaultStatIncreaseVfxLifetimeSeconds),
+            TriggerMode = ResolveStatIncreaseTriggerMode(visualPreset.ShieldIncreaseVfxTriggerMode)
+        };
+        return true;
+    }
+
+    /// <summary>
+    /// Builds the optional projectile-attached VFX config from the resolved visual preset.
+    /// </summary>
+    /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <param name="config">Built ECS config when a prefab is assigned.</param>
+    /// <returns>True when the preset contains a projectile-attached VFX prefab.</returns>
+    public static bool TryBuildProjectileAttachedVfxConfig(PlayerVisualPreset visualPreset,
+                                                           Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
+                                                           out PlayerProjectileAttachedVfxConfig config)
+    {
+        config = default;
+
+        if (visualPreset == null || visualPreset.PlayerProjectileVfxPrefab == null)
+            return false;
+
+        GameObject prefab = visualPreset.PlayerProjectileVfxPrefab;
+        Entity prefabEntity = resolveDynamicVfxPrefabEntity != null ? resolveDynamicVfxPrefabEntity(prefab) : Entity.Null;
+        Vector3 spawnOffset = visualPreset.PlayerProjectileVfxSpawnOffset;
+
+        config = new PlayerProjectileAttachedVfxConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = prefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(MinimumScale, visualPreset.PlayerProjectileVfxScaleMultiplier),
+            LifetimeSeconds = ManagedVfxPrefabLifetimeUtility.ResolvePrefabLifetimeSeconds(prefab, DefaultProjectileAttachedVfxLifetimeSeconds)
+        };
+        return true;
+    }
     #endregion
 
     #region Private Methods
@@ -116,6 +213,23 @@ public static class PlayerVisualVfxBakeUtility
                 return playbackMode;
             default:
                 return PlayerChargeShotVfxPlaybackMode.PlayOnceTimedWithChargeCompletion;
+        }
+    }
+
+    /// <summary>
+    /// Resolves invalid serialized stat-increase VFX trigger values to the every-increase path.
+    /// </summary>
+    /// <param name="triggerMode">Authored trigger mode.</param>
+    /// <returns>Runtime-supported trigger mode.</returns>
+    private static PlayerStatIncreaseVfxTriggerMode ResolveStatIncreaseTriggerMode(PlayerStatIncreaseVfxTriggerMode triggerMode)
+    {
+        switch (triggerMode)
+        {
+            case PlayerStatIncreaseVfxTriggerMode.EveryIncrease:
+            case PlayerStatIncreaseVfxTriggerMode.MaximumValueIncreaseOnly:
+                return triggerMode;
+            default:
+                return PlayerStatIncreaseVfxTriggerMode.EveryIncrease;
         }
     }
     #endregion
