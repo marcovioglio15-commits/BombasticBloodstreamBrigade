@@ -24156,10 +24156,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: ActivePortableHealthPack
-  secondaryActivePowerUpId: ActiveChargeShot
-  equippedPassivePowerUpIds:
-  - Passive_MegaProjectiles
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
