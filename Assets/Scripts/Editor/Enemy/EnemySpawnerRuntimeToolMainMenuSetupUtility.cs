@@ -21,7 +21,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
     /// <summary>
     /// Rebuilds the runtime catalog and installs the main-menu button and panel.
     /// </summary>
-    //[MenuItem(MenuPath)]
+    [MenuItem(MenuPath)]
     public static void ApplyDefaultSetup()
     {
         EnemySpawnerRuntimeCatalog catalog = EnemySpawnerRuntimeCatalogBuildUtility.RebuildCatalogAsset();
@@ -30,6 +30,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
         if (loadedCatalog != null)
             catalog = loadedCatalog;
 
+        EnemySpawnerRuntimeCatalogOwnerSceneImportUtility.ReimportOwnerScenes(catalog);
         Scene scene = EditorSceneManager.OpenScene(MainMenuScenePath, OpenSceneMode.Single);
         MainMenuController menuController = Object.FindFirstObjectByType<MainMenuController>(FindObjectsInactive.Include);
 
@@ -538,6 +539,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
         references.ResetSceneButton = EnemySpawnerRuntimeToolMainMenuReferenceUtility.FindChildComponent<Button>(panelRoot.transform, "ResetSceneButton");
         references.EnableAllButton = EnemySpawnerRuntimeToolMainMenuReferenceUtility.FindChildComponent<Button>(panelRoot.transform, "EnableAllButton");
         references.DisableAllButton = EnemySpawnerRuntimeToolMainMenuReferenceUtility.FindChildComponent<Button>(panelRoot.transform, "DisableAllButton");
+        EnemySpawnerRuntimeToolRowTemplateReferenceUtility.RefreshRowTemplateReferences(references.RowTemplate);
         EnemySpawnerRuntimeToolMainMenuReferenceUtility.AssignFont(panelRoot.transform, fontAsset);
         return references;
     }

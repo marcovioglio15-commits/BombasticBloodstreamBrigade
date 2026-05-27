@@ -4,7 +4,6 @@ using UnityEngine;
 /// <summary>
 /// Stores the authored wave list shared by one or more enemy spawners.
 /// The preset is validated against the owning spawner grid whenever that spawner changes.
-/// None.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyWavePreset", menuName = "Enemy/Enemy Wave Preset")]
 public sealed class EnemyWavePreset : ScriptableObject
@@ -32,9 +31,13 @@ public sealed class EnemyWavePreset : ScriptableObject
     #region Methods
 
     #region Unity Methods
+    /// <summary>
+    /// Restores serialized collections and invalidates editor bake metadata after wave asset edits.
+    /// </summary>
     private void OnValidate()
     {
         EnsureWaveList();
+        EnemySpawnerRuntimeBakeMetadataUtility.ClearRuntimeWavePresetCandidateCache();
     }
     #endregion
 
@@ -55,7 +58,6 @@ public sealed class EnemyWavePreset : ScriptableObject
     #region Helpers
     /// <summary>
     /// Recreates the serialized wave list when Unity deserializes a missing reference as null.
-    /// None.
     /// </summary>
     private void EnsureWaveList()
     {

@@ -62,14 +62,7 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        if (enabledToggle != null)
-            enabledToggle.onValueChanged.AddListener(HandleEnabledChanged);
-
-        if (wavePresetDropdown != null)
-            wavePresetDropdown.onValueChanged.AddListener(HandlePresetChanged);
-
-        if (resetButton != null)
-            resetButton.onClick.AddListener(HandleResetPressed);
+        RegisterControlCallbacks();
     }
 
     /// <summary>
@@ -77,6 +70,7 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
     /// </summary>
     private void OnDestroy()
     {
+        UnregisterControlCallbacks();
         enabledChangedCallback = null;
         presetChangedCallback = null;
         resetCallback = null;
@@ -104,6 +98,7 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
                      Action<EnemySpawnerRuntimeToolRowView, int> newPresetChangedCallback,
                      Action<EnemySpawnerRuntimeToolRowView> newResetCallback)
     {
+        RegisterControlCallbacks();
         spawnerEntry = newSpawnerEntry;
         enabledChangedCallback = newEnabledChangedCallback;
         presetChangedCallback = newPresetChangedCallback;
@@ -117,7 +112,7 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
         HideLegacyLabel(pathLabel);
 
         if (enabledToggle != null)
-            enabledToggle.isOn = isEnabled;
+            enabledToggle.SetIsOnWithoutNotify(isEnabled);
 
         EnemySpawnerRuntimeToolViewportUtility.NormalizeDropdownTemplate(wavePresetDropdown);
         RefreshPresetDropdown(presetOptions, selectedPresetIndex);
@@ -140,6 +135,45 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Registers authored UI control callbacks once the row has valid serialized references.
+    /// </summary>
+    private void RegisterControlCallbacks()
+    {
+        if (enabledToggle != null)
+        {
+            enabledToggle.onValueChanged.RemoveListener(HandleEnabledChanged);
+            enabledToggle.onValueChanged.AddListener(HandleEnabledChanged);
+        }
+
+        if (wavePresetDropdown != null)
+        {
+            wavePresetDropdown.onValueChanged.RemoveListener(HandlePresetChanged);
+            wavePresetDropdown.onValueChanged.AddListener(HandlePresetChanged);
+        }
+
+        if (resetButton != null)
+        {
+            resetButton.onClick.RemoveListener(HandleResetPressed);
+            resetButton.onClick.AddListener(HandleResetPressed);
+        }
+    }
+
+    /// <summary>
+    /// Removes authored UI callbacks before the pooled row is destroyed.
+    /// </summary>
+    private void UnregisterControlCallbacks()
+    {
+        if (enabledToggle != null)
+            enabledToggle.onValueChanged.RemoveListener(HandleEnabledChanged);
+
+        if (wavePresetDropdown != null)
+            wavePresetDropdown.onValueChanged.RemoveListener(HandlePresetChanged);
+
+        if (resetButton != null)
+            resetButton.onClick.RemoveListener(HandleResetPressed);
+    }
+
     /// <summary>
     /// Hides a legacy label so older generated scenes do not keep obsolete table columns in the row layout.
     /// </summary>

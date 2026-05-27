@@ -236,6 +236,9 @@ public sealed class EnemySpawnerRuntimeSpawnerEntry
     #region Fields
 
     #region Serialized Fields
+    [Tooltip("Unity scene or SubScene asset GUID that owns the spawner authoring object and matches the baked ECS identity.")]
+    [SerializeField] private string ownerSceneGuid;
+
     [Tooltip("Stable global object identifier baked onto the spawner entity and used by runtime overrides.")]
     [SerializeField] private string spawnerGuid;
 
@@ -255,6 +258,14 @@ public sealed class EnemySpawnerRuntimeSpawnerEntry
     #endregion
 
     #region Properties
+    public string OwnerSceneGuid
+    {
+        get
+        {
+            return ownerSceneGuid;
+        }
+    }
+
     public string SpawnerGuid
     {
         get
@@ -302,17 +313,20 @@ public sealed class EnemySpawnerRuntimeSpawnerEntry
     /// <summary>
     /// Assigns generated spawner metadata used by the runtime tool and ECS override system.
     /// </summary>
+    /// <param name="newOwnerSceneGuid">Unity scene or SubScene asset GUID that owns the spawner authoring object.</param>
     /// <param name="newSpawnerGuid">Stable global object identifier.</param>
     /// <param name="newSpawnerName">Display name shown in the runtime tool.</param>
     /// <param name="newHierarchyPath">Full scene hierarchy path.</param>
     /// <param name="newDefaultEnabled">Default runtime-enabled state.</param>
     /// <param name="newDefaultWavePresetGuid">Default EnemyWavePreset asset GUID.</param>
-    public void Assign(string newSpawnerGuid,
+    public void Assign(string newOwnerSceneGuid,
+                       string newSpawnerGuid,
                        string newSpawnerName,
                        string newHierarchyPath,
                        bool newDefaultEnabled,
                        string newDefaultWavePresetGuid)
     {
+        ownerSceneGuid = newOwnerSceneGuid;
         spawnerGuid = newSpawnerGuid;
         spawnerName = newSpawnerName;
         hierarchyPath = newHierarchyPath;

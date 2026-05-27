@@ -10,6 +10,13 @@ using UnityEditor;
 /// </summary>
 public static class EnemySpawnerRuntimeBakeMetadataUtility
 {
+    #region Constants
+    private const char SpawnerIdentitySeparator = '|';
+    private const char HierarchySeparator = '/';
+    private const char SiblingIndexOpen = '[';
+    private const char SiblingIndexClose = ']';
+    #endregion
+
     #region Fields
 #if UNITY_EDITOR
     private static readonly List<EnemyWavePreset> cachedRuntimeWavePresets = new List<EnemyWavePreset>();
@@ -89,7 +96,7 @@ public static class EnemySpawnerRuntimeBakeMetadataUtility
     }
 
     /// <summary>
-    /// Resolves a stable global object identifier for the authoring object.
+    /// Resolves a deterministic runtime identifier shared by the catalog builder and the baker.
     /// </summary>
     /// <param name="authoring">Spawner authoring source.</param>
     /// <returns>Stable authoring object identifier used by runtime overrides.</returns>
@@ -99,8 +106,14 @@ public static class EnemySpawnerRuntimeBakeMetadataUtility
             return string.Empty;
 
 #if UNITY_EDITOR
-        GlobalObjectId globalObjectId = GlobalObjectId.GetGlobalObjectIdSlow(authoring);
-        return globalObjectId.ToString();
+        string sceneGuid = ResolveAuthoringSceneGuid(authoring);
+        string hierarchyPath = BuildIndexedHierarchyPath(authoring.transform);
+
+        if (string.IsNullOrWhiteSpace(sceneGuid) || string.IsNullOrWhiteSpace(hierarchyPath))
+            return string.Empty;
+
+        string identitySource = sceneGuid + SpawnerIdentitySeparator + hierarchyPath;
+        return Hash128.Compute(identitySource).ToString();
 #else
         return authoring.name;
 #endif
@@ -163,6 +176,42 @@ public static class EnemySpawnerRuntimeBakeMetadataUtility
             return;
 
         candidatePresets.Add(preset);
+    }
+
+    /// <summary>
+    /// Builds an indexed hierarchy path so duplicated sibling names still resolve to different runtime identities.
+    /// </summary>
+    /// <param name="transform">Authoring transform to describe.</param>
+    /// <returns>Slash-separated hierarchy path with sibling indices.</returns>
+    private static string BuildIndexedHierarchyPath(Transform transform)
+    {
+        if (transform == null)
+            return string.Empty;
+
+        string path = BuildIndexedHierarchySegment(transform);
+        Transform parent = transform.parent;
+
+        // Walk to the scene root so catalog scans and SubScene baking use the same identity source.
+        while (parent != null)
+        {
+            path = BuildIndexedHierarchySegment(parent) + HierarchySeparator + path;
+            parent = parent.parent;
+        }
+
+        return path;
+    }
+
+    /// <summary>
+    /// Builds one hierarchy segment from a transform name and sibling index.
+    /// </summary>
+    /// <param name="transform">Transform represented by this segment.</param>
+    /// <returns>Stable segment text for the current scene hierarchy.</returns>
+    private static string BuildIndexedHierarchySegment(Transform transform)
+    {
+        if (transform == null)
+            return string.Empty;
+
+        return transform.name + SiblingIndexOpen + transform.GetSiblingIndex() + SiblingIndexClose;
     }
     #endregion
 

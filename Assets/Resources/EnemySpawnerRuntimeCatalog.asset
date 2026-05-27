@@ -13,92 +13,85 @@ MonoBehaviour:
   m_Name: EnemySpawnerRuntimeCatalog
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnerRuntimeCatalog
   scenes:
-  - sceneName: SUB_EnemyZone_Main
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting/SUB_EnemyZone_Main.unity
-    sceneGuid: 7dd9022369bc6644e85041d97047103e
+  - sceneName: SCN_PlayerControllerTesting
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity
+    sceneGuid: 99c9720ab356a0642a771bea13969a05
     spawners:
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-157542005
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: adfedbe8b425a6539dfca8ce03e87380
       spawnerName: PF_EnemySpawner_Testing_AcidWanderers
-      hierarchyPath: PF_EnemySpawner_Testing_AcidWanderers
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_AcidWanderers
       defaultEnabled: 0
       defaultWavePresetGuid: 7fdb6c11e4b219c46a717e6356bc6e63
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-654759413
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: ddc4005fd5629cd63652f473ab70576e
       spawnerName: PF_EnemySpawner_Testing_BOSS
-      hierarchyPath: PF_EnemySpawner_Testing_BOSS
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_BOSS
       defaultEnabled: 0
       defaultWavePresetGuid: 4826d72d4b14a294eb52f5ff0aa4984c
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-1004412453
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 5d796adc253e753ac391bbb29a5e1575
       spawnerName: PF_EnemySpawner_Testing_Bombardier
-      hierarchyPath: PF_EnemySpawner_Testing_Bombardier
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Bombardier
       defaultEnabled: 0
       defaultWavePresetGuid: f7adab1593e4c684694aa5fb33dc9f11
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-1856013080
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 58c2cd6ae6aaed57965b60d99048d786
       spawnerName: PF_EnemySpawner_Testing_Cowards
-      hierarchyPath: PF_EnemySpawner_Testing_Cowards
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Cowards
       defaultEnabled: 0
       defaultWavePresetGuid: 45a410f0515124a49af5a8d4ff198eec
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-564012173
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: ad12b767c2080949556ad24a5f1a6862
       spawnerName: PF_EnemySpawner_Testing_DVD
-      hierarchyPath: PF_EnemySpawner_Testing_DVD
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_DVD
       defaultEnabled: 0
       defaultWavePresetGuid: d83ea893f3b670446a6b82587119e832
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-1382853139
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: ae02f44deae4709b830829f0d19ba982
       spawnerName: PF_EnemySpawner_Testing_Grunts
-      hierarchyPath: PF_EnemySpawner_Testing_Grunts
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Grunts
       defaultEnabled: 0
       defaultWavePresetGuid: 4826d72d4b14a294eb52f5ff0aa4984c
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-778039205
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 5717eb91736a73d4e45e81b96faea9b5
       spawnerName: PF_EnemySpawner_Testing_Shooters
-      hierarchyPath: PF_EnemySpawner_Testing_Shooters
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Shooters
       defaultEnabled: 0
       defaultWavePresetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-743946367
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 0be1f4bf7e623373319a31eefa2e0f55
       spawnerName: PF_EnemySpawner_Testing_Stealer
-      hierarchyPath: PF_EnemySpawner_Testing_Stealer
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Stealer
       defaultEnabled: 0
       defaultWavePresetGuid: 9fc1b52c81cf85641bcdc7dfb94f6e9a
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-999813690
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 0337498d86b91d8e3b17d9436cee22e7
       spawnerName: PF_EnemySpawner_Testing_VilDemonio
-      hierarchyPath: PF_EnemySpawner_Testing_VilDemonio
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_VilDemonio
       defaultEnabled: 0
       defaultWavePresetGuid: 67bd4df904839cb4d989f4a55a0eecab
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-2060215879
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 510f9c80fba396e5b924e461ce4987b0
       spawnerName: PF_EnemySpawner_Testing_Wanderers
-      hierarchyPath: PF_EnemySpawner_Testing_Wanderers
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Testing_Wanderers
       defaultEnabled: 0
       defaultWavePresetGuid: d20a60aa22e5f7d48a19138dac9a2d7d
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-1704545416
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: 74e53b24fd5d90c29526ef77c6149322
       spawnerName: PF_EnemySpawner_Wave
-      hierarchyPath: PF_EnemySpawner_Wave
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Wave
       defaultEnabled: 1
       defaultWavePresetGuid: b7a74f7fd87798546abeb0f3dae30f83
-    - spawnerGuid: GlobalObjectId_V1-2-7dd9022369bc6644e85041d97047103e-8575402114385844121-8203827
+    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
+      spawnerGuid: b473ca197e826ee1a6346f5c3668c14c
       spawnerName: PF_EnemySpawner_WaveOnlyCowards
-      hierarchyPath: PF_EnemySpawner_WaveOnlyCowards
+      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_WaveOnlyCowards
       defaultEnabled: 1
-      defaultWavePresetGuid: db86207e9215aea4f917700a8e852c0a
-  - sceneName: SUB_EnemyZone
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_UITesting/SCN_UITesting/SUB_EnemyZone.unity
-    sceneGuid: 9f4536ecac2a32c4db95f84bbe87e48c
-    spawners:
-    - spawnerGuid: GlobalObjectId_V1-2-9f4536ecac2a32c4db95f84bbe87e48c-8575402114385844121-8223665605919680354
-      spawnerName: PF_EnemySpawner_BasicWanderers
-      hierarchyPath: PF_EnemySpawner_BasicWanderers
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
-    - spawnerGuid: GlobalObjectId_V1-2-9f4536ecac2a32c4db95f84bbe87e48c-8575402114385844121-1918204541
-      spawnerName: PF_EnemySpawner_DVDWanderers
-      hierarchyPath: PF_EnemySpawner_DVDWanderers
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
-    - spawnerGuid: GlobalObjectId_V1-2-9f4536ecac2a32c4db95f84bbe87e48c-8575402114385844121-1704545416
-      spawnerName: PF_EnemySpawner_Grunts
-      hierarchyPath: PF_EnemySpawner_Grunts
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
+      defaultWavePresetGuid: 45a410f0515124a49af5a8d4ff198eec
   wavePresetFolders:
-  - folderPath: Assets\Scriptable Objects\Enemy\Wave Preset
-    displayName: Assets\Scriptable Objects\Enemy\Wave Preset
+  - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
+    displayName: Wave Preset
     wavePresets:
     - presetName: PF_EnemySpawner_ShortRangeTest
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_ShortRangeTest.asset

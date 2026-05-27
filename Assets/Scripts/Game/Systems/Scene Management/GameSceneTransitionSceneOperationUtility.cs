@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
+
 /// <summary>
 /// Provides managed Unity scene load and unload steps used by the ECS transition executor.
 /// </summary>
@@ -99,6 +103,11 @@ internal static class GameSceneTransitionSceneOperationUtility
     private static bool TryStartSceneManagerLoad(GameSceneDefinitionElement sceneDefinition,
                                                  ref GameSceneSceneOperationState activeOperation)
     {
+#if UNITY_EDITOR
+        if (Application.isPlaying && TryStartEditorSceneManagerLoad(sceneDefinition, ref activeOperation))
+            return true;
+#endif
+
         if (sceneDefinition.BuildIndex >= 0)
         {
             AsyncOperation sceneManagerOperation = SceneManager.LoadSceneAsync(sceneDefinition.BuildIndex, LoadSceneMode.Additive);
@@ -128,6 +137,43 @@ internal static class GameSceneTransitionSceneOperationUtility
             return false;
         }
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Starts an Editor play-mode scene load by asset path, even when the scene is intentionally absent from Build Settings.
+    /// </summary>
+    /// <param name="sceneDefinition">Target scene definition.</param>
+    /// <param name="activeOperation">Active Unity async operation shared by the transition executor.</param>
+    /// <returns>True when an Editor scene load operation was started.</returns>
+    private static bool TryStartEditorSceneManagerLoad(GameSceneDefinitionElement sceneDefinition,
+                                                       ref GameSceneSceneOperationState activeOperation)
+    {
+        string scenePath = sceneDefinition.ScenePath.ToString();
+
+        if (string.IsNullOrWhiteSpace(scenePath))
+            return false;
+
+        try
+        {
+            LoadSceneParameters loadParameters = new LoadSceneParameters(LoadSceneMode.Additive);
+            AsyncOperation sceneManagerOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scenePath, loadParameters);
+
+            if (sceneManagerOperation == null)
+                return false;
+
+            activeOperation = GameSceneSceneOperationState.FromSceneManager(sceneManagerOperation);
+            return true;
+        }
+        catch (System.Exception exception)
+        {
+            Debug.LogWarning("[GameSceneManager] Editor play-mode scene load failed for " +
+                             sceneDefinition.SceneId.ToString() +
+                             ": " +
+                             exception.Message);
+            return false;
+        }
+    }
+#endif
     #endregion
 
     #region Unload
@@ -275,6 +321,12 @@ internal static class GameSceneTransitionSceneOperationUtility
     /// <returns>True when the Addressables backend should own the scene.</returns>
     private static bool ShouldUseAddressables(GameSceneManagerConfig config, GameSceneDefinitionElement sceneDefinition)
     {
+#if UNITY_EDITOR
+        // Editor play mode must load local scenes so uncommitted SubScene bake changes are visible immediately.
+        if (Application.isPlaying)
+            return false;
+#endif
+
         if (config.LoadBackend != GameSceneLoadBackend.Addressables)
             return false;
 

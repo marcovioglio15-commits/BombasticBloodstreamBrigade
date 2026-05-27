@@ -182,7 +182,7 @@ PrefabInstance:
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
+      objectReference: {fileID: 11400000, guid: 45a410f0515124a49af5a8d4ff198eec, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: waves.Array.size
       value: 1
@@ -6367,7 +6367,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
-      value:
+      value: 
       objectReference: {fileID: 11400000, guid: b7a74f7fd87798546abeb0f3dae30f83, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: spawnerEnabled
@@ -8179,10 +8179,6 @@ PrefabInstance:
     - target: {fileID: 9217395983185399253, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_IsActive
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
-      propertyPath: spawnerEnabled
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9217395983185399253, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: m_StaticEditorFlags

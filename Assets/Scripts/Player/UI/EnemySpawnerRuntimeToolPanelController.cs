@@ -68,11 +68,11 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     private readonly List<EnemySpawnerRuntimeToolRowView> pooledRows = new List<EnemySpawnerRuntimeToolRowView>();
     private readonly Dictionary<string, bool> enabledBySpawnerGuid = new Dictionary<string, bool>();
     private readonly Dictionary<string, string> waveGuidBySpawnerGuid = new Dictionary<string, string>();
-	    private readonly Dictionary<EnemySpawnerRuntimeToolRowView, List<string>> optionGuidsByRow = new Dictionary<EnemySpawnerRuntimeToolRowView, List<string>>();
-	    private int selectedSceneIndex;
-	    private int selectedFolderIndex;
-	    private int visibleRowCount;
-	    private bool suppressCallbacks;
+    private readonly Dictionary<EnemySpawnerRuntimeToolRowView, List<string>> optionGuidsByRow = new Dictionary<EnemySpawnerRuntimeToolRowView, List<string>>();
+    private int selectedSceneIndex;
+    private int selectedFolderIndex;
+    private int visibleRowCount;
+    private bool suppressCallbacks;
     #endregion
 
     #endregion
@@ -136,42 +136,41 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     /// <summary>
     /// Registers callbacks on authored controls.
     /// </summary>
-	    private void RegisterCallbacks()
-	    {
-	        if (sceneDropdown != null)
-	            sceneDropdown.onValueChanged.AddListener(HandleSceneChanged);
-	        if (presetFolderDropdown != null)
-	            presetFolderDropdown.onValueChanged.AddListener(HandleFolderChanged);
-	        if (searchInput != null)
-	            searchInput.onValueChanged.AddListener(HandleSearchChanged);
-	        if (closeButton != null)
-	            closeButton.onClick.AddListener(CloseTool);
-	        if (resetSceneButton != null)
-	            resetSceneButton.onClick.AddListener(ResetSelectedScene);
-	        if (enableAllButton != null)
-	            enableAllButton.onClick.AddListener(EnableAllVisibleSceneSpawners);
-	        if (disableAllButton != null)
-	            disableAllButton.onClick.AddListener(DisableAllVisibleSceneSpawners);
+    private void RegisterCallbacks()
+    {
+        if (sceneDropdown != null)
+            sceneDropdown.onValueChanged.AddListener(HandleSceneChanged);
+        if (presetFolderDropdown != null)
+            presetFolderDropdown.onValueChanged.AddListener(HandleFolderChanged);
+        if (searchInput != null)
+            searchInput.onValueChanged.AddListener(HandleSearchChanged);
+        if (closeButton != null)
+            closeButton.onClick.AddListener(CloseTool);
+        if (resetSceneButton != null)
+            resetSceneButton.onClick.AddListener(ResetSelectedScene);
+        if (enableAllButton != null)
+            enableAllButton.onClick.AddListener(EnableAllVisibleSceneSpawners);
+        if (disableAllButton != null)
+            disableAllButton.onClick.AddListener(DisableAllVisibleSceneSpawners);
     }
 
     /// <summary>
     /// Removes callbacks from authored controls.
     /// </summary>
-	    private void UnregisterCallbacks()
-	    {
-	        if (sceneDropdown != null)
-	            sceneDropdown.onValueChanged.RemoveListener(HandleSceneChanged);
-	        if (presetFolderDropdown != null)
-	            presetFolderDropdown.onValueChanged.RemoveListener(HandleFolderChanged);
-	        if (searchInput != null)
-	            searchInput.onValueChanged.RemoveListener(HandleSearchChanged);
-	        if (closeButton != null)
-	            closeButton.onClick.RemoveListener(CloseTool);
-	        if (resetSceneButton != null)
-	            resetSceneButton.onClick.RemoveListener(ResetSelectedScene);
-	        if (enableAllButton != null)
+    private void UnregisterCallbacks()
+    {
+        if (sceneDropdown != null)
+            sceneDropdown.onValueChanged.RemoveListener(HandleSceneChanged);
+        if (presetFolderDropdown != null)
+            presetFolderDropdown.onValueChanged.RemoveListener(HandleFolderChanged);
+        if (searchInput != null)
+            searchInput.onValueChanged.RemoveListener(HandleSearchChanged);
+        if (closeButton != null)
+            closeButton.onClick.RemoveListener(CloseTool);
+        if (resetSceneButton != null)
+            resetSceneButton.onClick.RemoveListener(ResetSelectedScene);
+        if (enableAllButton != null)
             enableAllButton.onClick.RemoveListener(EnableAllVisibleSceneSpawners);
-
         if (disableAllButton != null)
             disableAllButton.onClick.RemoveListener(DisableAllVisibleSceneSpawners);
     }
@@ -247,11 +246,11 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
             options.Add(new TMP_Dropdown.OptionData(sceneEntry.SceneName + " (" + sceneEntry.Spawners.Count + ")"));
         }
 
-	        sceneDropdown.AddOptions(options);
-	        selectedSceneIndex = Mathf.Clamp(selectedSceneIndex, 0, Mathf.Max(0, sceneEntries.Count - 1));
-	        sceneDropdown.SetValueWithoutNotify(selectedSceneIndex);
-	        sceneDropdown.RefreshShownValue();
-	        sceneDropdown.interactable = sceneEntries.Count > 1;
+        sceneDropdown.AddOptions(options);
+        selectedSceneIndex = Mathf.Clamp(selectedSceneIndex, 0, Mathf.Max(0, sceneEntries.Count - 1));
+        sceneDropdown.SetValueWithoutNotify(selectedSceneIndex);
+        sceneDropdown.RefreshShownValue();
+        sceneDropdown.interactable = sceneEntries.Count > 1;
     }
 
     /// <summary>
@@ -302,9 +301,9 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
                 continue;
 
             EnemySpawnerRuntimeOverrideValue overrideValue;
-            bool hasOverride = EnemySpawnerRuntimeOverrideStore.TryGetOverride(sceneEntry.SceneGuid,
-                                                                               spawnerEntry.SpawnerGuid,
-                                                                               out overrideValue);
+            bool hasOverride = EnemySpawnerRuntimeSceneOverrideUtility.TryGetOverride(sceneEntry,
+                                                                                      spawnerEntry,
+                                                                                      out overrideValue);
             enabledBySpawnerGuid[spawnerEntry.SpawnerGuid] = hasOverride ? overrideValue.Enabled : spawnerEntry.DefaultEnabled;
             waveGuidBySpawnerGuid[spawnerEntry.SpawnerGuid] = hasOverride ? overrideValue.WavePresetGuid : spawnerEntry.DefaultWavePresetGuid;
         }
@@ -327,9 +326,9 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
                               string.Equals(waveGuid, spawnerEntry.DefaultWavePresetGuid, StringComparison.Ordinal);
 
         if (matchesDefault)
-            EnemySpawnerRuntimeOverrideStore.RemoveOverride(sceneEntry.SceneGuid, spawnerEntry.SpawnerGuid);
+            EnemySpawnerRuntimeSceneOverrideUtility.RemoveOverride(sceneEntry, spawnerEntry);
         else
-            EnemySpawnerRuntimeOverrideStore.SetOverride(sceneEntry.SceneGuid, spawnerEntry.SpawnerGuid, isEnabled, waveGuid);
+            EnemySpawnerRuntimeSceneOverrideUtility.SetOverride(sceneEntry, spawnerEntry, isEnabled, waveGuid);
     }
     #endregion
 
@@ -337,12 +336,12 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     /// <summary>
     /// Rebuilds visible spawner rows for the selected scene and search filter.
     /// </summary>
-	    private void RefreshRows()
-	    {
-	        optionGuidsByRow.Clear();
-	        visibleRowCount = 0;
-	
-	        for (int rowIndex = 0; rowIndex < pooledRows.Count; rowIndex++)
+    private void RefreshRows()
+    {
+        optionGuidsByRow.Clear();
+        visibleRowCount = 0;
+
+        for (int rowIndex = 0; rowIndex < pooledRows.Count; rowIndex++)
             pooledRows[rowIndex].gameObject.SetActive(false);
 
         EnemySpawnerRuntimeSceneEntry sceneEntry = GetSelectedScene();
@@ -354,9 +353,9 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
         }
 
         IReadOnlyList<EnemySpawnerRuntimeSpawnerEntry> spawners = sceneEntry.Spawners;
-	        int visibleRowIndex = 0;
-	
-	        for (int spawnerIndex = 0; spawnerIndex < spawners.Count; spawnerIndex++)
+        int visibleRowIndex = 0;
+
+        for (int spawnerIndex = 0; spawnerIndex < spawners.Count; spawnerIndex++)
         {
             EnemySpawnerRuntimeSpawnerEntry spawnerEntry = spawners[spawnerIndex];
 
@@ -364,14 +363,14 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
                 continue;
 
             EnemySpawnerRuntimeToolRowView row = GetOrCreateRow(visibleRowIndex);
-	            BindRow(row, sceneEntry, spawnerEntry);
-	            visibleRowIndex++;
-	        }
-	
-	        visibleRowCount = visibleRowIndex;
-	        EnemySpawnerRuntimeToolLayoutUtility.ForceRebuildRows(rowsContentRoot);
-	        RefreshStatus();
-	    }
+            BindRow(row, sceneEntry, spawnerEntry);
+            visibleRowIndex++;
+        }
+
+        visibleRowCount = visibleRowIndex;
+        EnemySpawnerRuntimeToolLayoutUtility.ForceRebuildRows(rowsContentRoot);
+        RefreshStatus();
+    }
 
     /// <summary>
     /// Returns a pooled row instance, creating one from the template when needed.
@@ -386,13 +385,13 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
             pooledRows.Add(createdRow);
         }
 
-	        EnemySpawnerRuntimeToolRowView row = pooledRows[rowIndex];
-	
-	        if (row.transform.parent != rowsContentRoot)
-	            row.transform.SetParent(rowsContentRoot, false);
-	
-	        row.gameObject.SetActive(true);
-	        return row;
+        EnemySpawnerRuntimeToolRowView row = pooledRows[rowIndex];
+
+        if (row.transform.parent != rowsContentRoot)
+            row.transform.SetParent(rowsContentRoot, false);
+
+        row.gameObject.SetActive(true);
+        return row;
     }
 
     /// <summary>
@@ -414,9 +413,9 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
         string selectedGuid = ResolveWaveGuid(spawnerEntry);
         int selectedIndex = EnemySpawnerRuntimeToolPresetOptionUtility.ResolvePresetOptionIndex(optionGuids, selectedGuid);
         bool isEnabled = ResolveEnabledState(spawnerEntry);
-        bool hasOverride = EnemySpawnerRuntimeOverrideStore.TryGetOverride(sceneEntry.SceneGuid,
-                                                                           spawnerEntry.SpawnerGuid,
-                                                                           out EnemySpawnerRuntimeOverrideValue _);
+        bool hasOverride = EnemySpawnerRuntimeSceneOverrideUtility.TryGetOverride(sceneEntry,
+                                                                                  spawnerEntry,
+                                                                                  out EnemySpawnerRuntimeOverrideValue _);
         optionGuidsByRow[row] = optionGuids;
         row.Bind(spawnerEntry,
                  options,
@@ -520,7 +519,7 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
         if (sceneEntry == null || spawnerEntry == null)
             return;
 
-        EnemySpawnerRuntimeOverrideStore.RemoveOverride(sceneEntry.SceneGuid, spawnerEntry.SpawnerGuid);
+        EnemySpawnerRuntimeSceneOverrideUtility.RemoveOverride(sceneEntry, spawnerEntry);
         RefreshSceneState();
         RefreshRows();
     }
@@ -537,7 +536,7 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
         if (sceneEntry == null)
             return;
 
-        EnemySpawnerRuntimeOverrideStore.ClearSceneOverrides(sceneEntry.SceneGuid);
+        EnemySpawnerRuntimeSceneOverrideUtility.ClearOverridesForScene(sceneEntry);
         RefreshSceneState();
         RefreshRows();
     }
@@ -664,14 +663,14 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     private void RefreshStatus()
     {
         EnemySpawnerRuntimeSceneEntry sceneEntry = GetSelectedScene();
-	        int spawnerCount = sceneEntry != null ? sceneEntry.Spawners.Count : 0;
+        int spawnerCount = sceneEntry != null ? sceneEntry.Spawners.Count : 0;
 
         if (statusLabel != null)
         {
             if (runtimeCatalog == null)
                 statusLabel.text = "Runtime catalog missing.";
-	            else
-	                statusLabel.text = "Overrides: " + EnemySpawnerRuntimeOverrideStore.OverrideCount + " | Rows: " + visibleRowCount + "/" + spawnerCount;
+            else
+                statusLabel.text = "Overrides: " + EnemySpawnerRuntimeOverrideStore.OverrideCount + " | Rows: " + visibleRowCount + "/" + spawnerCount;
         }
 
         if (sceneSummaryLabel != null)

@@ -1,13 +1,16 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 /// <summary>
 /// Applies main-menu spawner overrides to newly loaded enemy spawner entities before pool initialization.
 /// </summary>
 [UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateAfter(typeof(GameSceneManagementSystemGroup))]
 [UpdateBefore(typeof(EnemyExperienceDropPoolInitializeSystem))]
 [UpdateBefore(typeof(EnemyPoolInitializeSystem))]
+[UpdateBefore(typeof(EnemySystemGroup))]
 public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
 {
     #region Fields
@@ -33,10 +36,6 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
             .WithAll<EnemySpawnerWaveEventElement>()
             .WithAll<EnemySpawnerPrefabRequirementElement>()
             .WithAll<EnemySpawnerPrefabPoolMapElement>()
-            .WithAll<EnemySpawnerWavePresetVariantElement>()
-            .WithAll<EnemySpawnerWavePresetVariantDefinitionElement>()
-            .WithAll<EnemySpawnerWavePresetVariantEventElement>()
-            .WithAll<EnemySpawnerWavePresetVariantRequirementElement>()
             .WithOptions(EntityQueryOptions.IncludeDisabledEntities)
             .Build(ref state);
         state.RequireForUpdate(spawnerQuery);
@@ -97,15 +96,76 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
             return;
         }
 
+        bool wavePresetApplied = true;
+
         if (requestedWavePresetGuid.Length > 0)
-            TryApplyWavePresetVariant(entityManager, spawnerEntity, requestedWavePresetGuid);
+            wavePresetApplied = TryApplyWavePresetVariant(entityManager, spawnerEntity, requestedWavePresetGuid);
+
+        if (!wavePresetApplied)
+            LogMissingWavePresetVariant(entityManager, spawnerEntity, in identity, requestedWavePresetGuid);
 
         ApplyEnabledState(entityManager, spawnerEntity, requestedEnabled);
         MarkDisabledSpawnerReady(entityManager, spawnerEntity, requestedEnabled);
         overrideState.AppliedStoreVersion = storeVersion;
-        overrideState.AppliedWavePresetGuid = requestedWavePresetGuid;
+
+        if (wavePresetApplied)
+            overrideState.AppliedWavePresetGuid = requestedWavePresetGuid;
+
         overrideState.AppliedEnabled = requestedEnabled;
         entityManager.SetComponentData(spawnerEntity, overrideState);
+    }
+
+    /// <summary>
+    /// Logs a missing runtime variant so wave-preset dropdown changes do not fail silently.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect baked variant buffers.</param>
+    /// <param name="spawnerEntity">Spawner entity that could not apply the requested preset.</param>
+    /// <param name="identity">Spawner identity that requested the missing variant.</param>
+    /// <param name="requestedWavePresetGuid">Wave preset GUID selected by the runtime tool.</param>
+    private static void LogMissingWavePresetVariant(EntityManager entityManager,
+                                                    Entity spawnerEntity,
+                                                    in EnemySpawnerRuntimeIdentity identity,
+                                                    FixedString64Bytes requestedWavePresetGuid)
+    {
+        Debug.LogWarning("[EnemySpawnerRuntimeOverrideSystem] Spawner '" +
+                         identity.DisplayName.ToString() +
+                         "' requested wave preset '" +
+                         requestedWavePresetGuid.ToString() +
+                         "', but that preset was not baked as a runtime variant. Available variants: " +
+                         BuildAvailableVariantSummary(entityManager, spawnerEntity) +
+                         ". Save the EnemyWavePreset or rebuild the owning SubScene so the runtime spawner tool can apply it.");
+    }
+
+    /// <summary>
+    /// Builds a compact diagnostic list of baked wave-preset variants stored on one spawner.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to read the variant buffer.</param>
+    /// <param name="spawnerEntity">Spawner entity being diagnosed.</param>
+    /// <returns>Comma-separated preset GUID list, or a fallback label when no variants are baked.</returns>
+    private static string BuildAvailableVariantSummary(EntityManager entityManager, Entity spawnerEntity)
+    {
+        if (!entityManager.Exists(spawnerEntity))
+            return "spawner entity no longer exists";
+
+        if (!entityManager.HasBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity))
+            return "no variant buffer";
+
+        DynamicBuffer<EnemySpawnerWavePresetVariantElement> variants = entityManager.GetBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity);
+
+        if (variants.Length <= 0)
+            return "none";
+
+        System.Text.StringBuilder builder = new System.Text.StringBuilder(variants.Length * 36);
+
+        for (int variantIndex = 0; variantIndex < variants.Length; variantIndex++)
+        {
+            if (variantIndex > 0)
+                builder.Append(", ");
+
+            builder.Append(variants[variantIndex].WavePresetGuid.ToString());
+        }
+
+        return builder.ToString();
     }
 
     /// <summary>
@@ -120,19 +180,47 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
     {
         string sceneGuid = identity.SceneGuid.ToString();
         string spawnerGuid = identity.SpawnerGuid.ToString();
+        string spawnerName = identity.DisplayName.ToString();
         EnemySpawnerRuntimeOverrideValue overrideValue;
 
         if (EnemySpawnerRuntimeOverrideStore.TryGetOverride(sceneGuid, spawnerGuid, out overrideValue))
         {
-            requestedEnabled = overrideValue.Enabled ? (byte)1 : (byte)0;
-            requestedWavePresetGuid = string.IsNullOrWhiteSpace(overrideValue.WavePresetGuid)
-                ? identity.DefaultWavePresetGuid
-                : new FixedString64Bytes(overrideValue.WavePresetGuid);
+            ResolveOverrideValue(in identity, overrideValue, out requestedEnabled, out requestedWavePresetGuid);
+            return;
+        }
+
+        if (EnemySpawnerRuntimeOverrideStore.TryGetOverrideBySpawnerGuid(spawnerGuid, out overrideValue))
+        {
+            ResolveOverrideValue(in identity, overrideValue, out requestedEnabled, out requestedWavePresetGuid);
+            return;
+        }
+
+        if (EnemySpawnerRuntimeOverrideStore.TryGetOverrideBySpawnerName(sceneGuid, spawnerName, out overrideValue))
+        {
+            ResolveOverrideValue(in identity, overrideValue, out requestedEnabled, out requestedWavePresetGuid);
             return;
         }
 
         requestedEnabled = identity.DefaultEnabled;
         requestedWavePresetGuid = identity.DefaultWavePresetGuid;
+    }
+
+    /// <summary>
+    /// Converts a managed override-store payload into fixed-string ECS values used by the spawner entity.
+    /// </summary>
+    /// <param name="identity">Spawner identity that provides baked defaults.</param>
+    /// <param name="overrideValue">Managed override payload selected by the runtime tool.</param>
+    /// <param name="requestedEnabled">Resolved enabled state.</param>
+    /// <param name="requestedWavePresetGuid">Resolved wave preset GUID.</param>
+    private static void ResolveOverrideValue(in EnemySpawnerRuntimeIdentity identity,
+                                             EnemySpawnerRuntimeOverrideValue overrideValue,
+                                             out byte requestedEnabled,
+                                             out FixedString64Bytes requestedWavePresetGuid)
+    {
+        requestedEnabled = overrideValue.Enabled ? (byte)1 : (byte)0;
+        requestedWavePresetGuid = string.IsNullOrWhiteSpace(overrideValue.WavePresetGuid)
+            ? identity.DefaultWavePresetGuid
+            : new FixedString64Bytes(overrideValue.WavePresetGuid);
     }
 
     /// <summary>
@@ -189,6 +277,9 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
                                                   Entity spawnerEntity,
                                                   FixedString64Bytes requestedWavePresetGuid)
     {
+        if (!HasRuntimeVariantBuffers(entityManager, spawnerEntity))
+            return false;
+
         DynamicBuffer<EnemySpawnerWavePresetVariantElement> variants = entityManager.GetBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity);
         int variantIndex;
 
@@ -202,6 +293,20 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
         CopyRequirements(entityManager, spawnerEntity, variant);
         ResetSpawnerState(entityManager, spawnerEntity, variant);
         return true;
+    }
+
+    /// <summary>
+    /// Checks whether a loaded spawner entity carries the pre-baked buffers required for wave-preset swaps.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect buffer presence.</param>
+    /// <param name="spawnerEntity">Spawner entity being validated.</param>
+    /// <returns>True when all runtime variant buffers exist on the entity.</returns>
+    private static bool HasRuntimeVariantBuffers(EntityManager entityManager, Entity spawnerEntity)
+    {
+        return entityManager.HasBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity) &&
+               entityManager.HasBuffer<EnemySpawnerWavePresetVariantDefinitionElement>(spawnerEntity) &&
+               entityManager.HasBuffer<EnemySpawnerWavePresetVariantEventElement>(spawnerEntity) &&
+               entityManager.HasBuffer<EnemySpawnerWavePresetVariantRequirementElement>(spawnerEntity);
     }
 
     /// <summary>
