@@ -76,10 +76,10 @@ MonoBehaviour:
     deathVfxSpawnOffset: {x: 0, y: 0, z: 0}
     deathVfxLifetimeSeconds: 0.75
     deathVfxScaleMultiplier: 1
-    useEnemyBaseColorForDeathDebris: 1
-    deathDebrisFallbackColor: {r: 0.5058824, g: 0.003921569, b: 1, a: 1}
+    useEnemyBaseColorForDeathDebris: 0
+    deathDebrisFallbackColor: {r: 0.49019608, g: 0, b: 0.92156863, a: 1}
     deathDebrisParticleChildName: VFX_Debris
-    spawnPaintColor: {r: 0.50711006, g: 0.0047169924, b: 1, a: 1}
+    spawnPaintColor: {r: 0.49019608, g: 0, b: 0.92156863, a: 1}
   spawnOverrides:
     overrideSpawnOffset: 1
     spawnOffset: {x: 0, y: 1, z: 0}
