@@ -17,11 +17,11 @@ MonoBehaviour:
   description: 
   version: 1.0.0
   movement:
-    moveSpeed: 40
-    maxSpeed: 40
+    moveSpeed: 6
+    maxSpeed: 6
     acceleration: 40
     deceleration: 20
-    inactivityTime: 0
+    inactivityTime: 0.1
     rotationSpeedDegreesPerSecond: 0
     priorityTier: 1
     steeringAggressiveness: 1
