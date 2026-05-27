@@ -7296,7 +7296,7 @@ GameObject:
   - component: {fileID: 624074989}
   - component: {fileID: 624074988}
   m_Layer: 0
-  m_Name: SUB_EnemyZone
+  m_Name: SUB_EnemyZone_Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

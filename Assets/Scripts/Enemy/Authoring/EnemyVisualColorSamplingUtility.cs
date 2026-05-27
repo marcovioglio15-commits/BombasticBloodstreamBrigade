@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ public static class EnemyVisualColorSamplingUtility
     private static readonly int TintColorPropertyId = Shader.PropertyToID("_TintColor");
     private static readonly int BaseMapPropertyId = Shader.PropertyToID("_BaseMap");
     private static readonly int MainTexturePropertyId = Shader.PropertyToID("_MainTex");
+    private static readonly Dictionary<int, TextureAverageCacheEntry> textureAverageCacheByInstanceId = new Dictionary<int, TextureAverageCacheEntry>();
     #endregion
 
     #region Methods
@@ -306,21 +308,20 @@ public static class EnemyVisualColorSamplingUtility
             return true;
         }
 
-        if (EnemyVisualMeshColorSamplingUtility.TryAppendMeshVisualColors(renderer,
-                                                                          paletteColors,
-                                                                          paletteWeights,
-                                                                          ref bucketCount))
+        if (TryResolveRendererColor(renderer, out float4 rendererColor))
+        {
+            AppendPaletteSample(paletteColors,
+                                paletteWeights,
+                                ref bucketCount,
+                                rendererColor,
+                                1);
             return true;
+        }
 
-        if (!TryResolveRendererColor(renderer, out float4 rendererColor))
-            return false;
-
-        AppendPaletteSample(paletteColors,
-                            paletteWeights,
-                            ref bucketCount,
-                            rendererColor,
-                            1);
-        return true;
+        return EnemyVisualMeshColorSamplingUtility.TryAppendMeshVisualColors(renderer,
+                                                                             paletteColors,
+                                                                             paletteWeights,
+                                                                             ref bucketCount);
     }
 
     /// <summary>
@@ -486,6 +487,46 @@ public static class EnemyVisualColorSamplingUtility
         color = Color.white;
         Texture texture = ResolveMaterialTexture(material);
 
+        return TryResolveTextureAverage(texture, out color);
+    }
+
+    /// <summary>
+    /// Resolves and caches the average visible color of a texture asset for repeated bake-time material sampling.
+    /// </summary>
+    /// <param name="texture">Texture assigned to the sampled material.</param>
+    /// <param name="color">Average visible color when sampling succeeds.</param>
+    /// <returns>True when a usable average color is available.</returns>
+    private static bool TryResolveTextureAverage(Texture texture, out Color color)
+    {
+        color = Color.white;
+
+        if (texture == null)
+            return false;
+
+        int textureInstanceId = texture.GetInstanceID();
+        TextureAverageCacheEntry cacheEntry;
+
+        if (textureAverageCacheByInstanceId.TryGetValue(textureInstanceId, out cacheEntry))
+        {
+            color = cacheEntry.Color;
+            return cacheEntry.HasColor;
+        }
+
+        bool hasAverageColor = TryResolveReadableTextureAverage(texture, out color);
+        textureAverageCacheByInstanceId[textureInstanceId] = new TextureAverageCacheEntry(hasAverageColor, color);
+        return hasAverageColor;
+    }
+
+    /// <summary>
+    /// Creates or reuses a readable texture copy and samples its average visible color.
+    /// </summary>
+    /// <param name="texture">Texture assigned to the sampled material.</param>
+    /// <param name="color">Average visible color when sampling succeeds.</param>
+    /// <returns>True when the texture was sampled successfully.</returns>
+    private static bool TryResolveReadableTextureAverage(Texture texture, out Color color)
+    {
+        color = Color.white;
+
         if (!EnemyVisualReadableTextureUtility.TryResolveReadableTexture(texture,
                                                                          out Texture2D readableTexture,
                                                                          out bool ownsReadableTexture))
@@ -621,6 +662,34 @@ public static class EnemyVisualColorSamplingUtility
             return false;
 
         return value.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Stores one cached texture average lookup, including failed lookups to avoid repeated decode attempts.
+/// </summary>
+internal readonly struct TextureAverageCacheEntry
+{
+    #region Fields
+    public readonly bool HasColor;
+    public readonly Color Color;
+    #endregion
+
+    #region Methods
+
+    #region Constructors
+    /// <summary>
+    /// Creates a cached texture average result.
+    /// </summary>
+    /// <param name="hasColor">True when the sampled texture produced a visible average color.</param>
+    /// <param name="color">Average color, or white when sampling failed.</param>
+    public TextureAverageCacheEntry(bool hasColor, Color color)
+    {
+        HasColor = hasColor;
+        Color = color;
     }
     #endregion
 

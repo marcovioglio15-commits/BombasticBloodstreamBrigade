@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -28,8 +29,10 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
         List<EnemySpawnerWaveEventElement> stagedWaveEvents = new List<EnemySpawnerWaveEventElement>();
         Dictionary<Entity, int> plannedCountByPrefab = new Dictionary<Entity, int>();
         EnemySpawnWarningConfig spawnerWarningConfig = BuildSpawnerWarningConfig(authoring);
+        bool runtimeEnabledByDefault = authoring.RuntimeEnabledByDefault;
 
         StageWaves(authoring,
+                   authoring.Waves,
                    spawnerWarningConfig,
                    stagedWaveDefinitions,
                    stagedWaveRuntime,
@@ -44,6 +47,24 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             MaximumSpawnDistanceFromCenter = ResolveMaximumSpawnDistanceFromCenter(stagedWaveEvents, authoring.CellSize),
             TotalPlannedEnemyCount = CountTotalPlannedEnemies(plannedCountByPrefab)
         });
+        AddComponent(spawnerEntity, new EnemySpawnerRuntimeIdentity
+        {
+            SceneGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAuthoringSceneGuid(authoring)),
+            SpawnerGuid = new FixedString128Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAuthoringSpawnerGuid(authoring)),
+            DisplayName = new FixedString128Bytes(authoring.name),
+            DefaultWavePresetGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAssetGuid(authoring.WavePreset)),
+            DefaultEnabled = runtimeEnabledByDefault ? (byte)1 : (byte)0
+        });
+        AddComponent(spawnerEntity, new EnemySpawnerRuntimeOverrideState
+        {
+            AppliedStoreVersion = 0u,
+            AppliedWavePresetGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAssetGuid(authoring.WavePreset)),
+            AppliedEnabled = runtimeEnabledByDefault ? (byte)1 : (byte)0
+        });
+
+        if (!runtimeEnabledByDefault)
+            AddComponent<Disabled>(spawnerEntity);
+
         AddComponent(spawnerEntity, spawnerWarningConfig);
         AddComponent(spawnerEntity, new EnemySpawnerState
         {
@@ -58,6 +79,10 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
         DynamicBuffer<EnemySpawnerWaveEventElement> waveEventBuffer = AddBuffer<EnemySpawnerWaveEventElement>(spawnerEntity);
         DynamicBuffer<EnemySpawnerPrefabRequirementElement> prefabRequirementBuffer = AddBuffer<EnemySpawnerPrefabRequirementElement>(spawnerEntity);
         AddBuffer<EnemySpawnerPrefabPoolMapElement>(spawnerEntity);
+        DynamicBuffer<EnemySpawnerWavePresetVariantElement> variantBuffer = AddBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity);
+        DynamicBuffer<EnemySpawnerWavePresetVariantDefinitionElement> variantDefinitionBuffer = AddBuffer<EnemySpawnerWavePresetVariantDefinitionElement>(spawnerEntity);
+        DynamicBuffer<EnemySpawnerWavePresetVariantEventElement> variantEventBuffer = AddBuffer<EnemySpawnerWavePresetVariantEventElement>(spawnerEntity);
+        DynamicBuffer<EnemySpawnerWavePresetVariantRequirementElement> variantRequirementBuffer = AddBuffer<EnemySpawnerWavePresetVariantRequirementElement>(spawnerEntity);
 
         for (int definitionIndex = 0; definitionIndex < stagedWaveDefinitions.Count; definitionIndex++)
             waveDefinitionBuffer.Add(stagedWaveDefinitions[definitionIndex]);
@@ -76,6 +101,13 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
                 TotalPlannedCount = pair.Value
             });
         }
+
+        BakeRuntimeWavePresetVariants(authoring,
+                                      spawnerWarningConfig,
+                                      variantBuffer,
+                                      variantDefinitionBuffer,
+                                      variantEventBuffer,
+                                      variantRequirementBuffer);
     }
     #endregion
 
@@ -84,20 +116,20 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
     /// Stages wave definitions, runtime defaults and exact spawn events from the authored spawner data.
     /// </summary>
     /// <param name="authoring">Spawner authoring source.</param>
+    /// <param name="waves">Wave list being converted for this spawner.</param>
     /// <param name="spawnerWarningConfig">Spawner-level fallback warning config used when enemy visuals do not override warning settings.</param>
     /// <param name="stagedWaveDefinitions">Target wave definition list.</param>
     /// <param name="stagedWaveRuntime">Target wave runtime default list.</param>
     /// <param name="stagedWaveEvents">Target exact spawn event list.</param>
     /// <param name="plannedCountByPrefab">Target prefab usage count map.</param>
     private void StageWaves(EnemySpawnerAuthoring authoring,
+                            List<EnemySpawnWaveAuthoring> waves,
                             EnemySpawnWarningConfig spawnerWarningConfig,
                             List<EnemySpawnerWaveDefinitionElement> stagedWaveDefinitions,
                             List<EnemySpawnerWaveRuntimeElement> stagedWaveRuntime,
                             List<EnemySpawnerWaveEventElement> stagedWaveEvents,
                             Dictionary<Entity, int> plannedCountByPrefab)
     {
-        List<EnemySpawnWaveAuthoring> waves = authoring.Waves;
-
         if (waves == null)
             return;
 
@@ -191,6 +223,132 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             else
                 plannedCountByPrefab[prefabEntity] = enemyCount;
         }
+    }
+
+    /// <summary>
+    /// Bakes every project wave preset as a selectable runtime variant for one spawner.
+    /// </summary>
+    /// <param name="authoring">Spawner authoring source.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config.</param>
+    /// <param name="variantBuffer">Target variant slice table.</param>
+    /// <param name="variantDefinitionBuffer">Target flattened definition storage.</param>
+    /// <param name="variantEventBuffer">Target flattened event storage.</param>
+    /// <param name="variantRequirementBuffer">Target flattened prefab requirement storage.</param>
+    private void BakeRuntimeWavePresetVariants(EnemySpawnerAuthoring authoring,
+                                               EnemySpawnWarningConfig spawnerWarningConfig,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantElement> variantBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantDefinitionElement> variantDefinitionBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantEventElement> variantEventBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantRequirementElement> variantRequirementBuffer)
+    {
+        List<EnemyWavePreset> candidatePresets = EnemySpawnerRuntimeBakeMetadataUtility.CollectRuntimeWavePresetCandidates(authoring.WavePreset);
+
+        for (int presetIndex = 0; presetIndex < candidatePresets.Count; presetIndex++)
+        {
+            EnemyWavePreset preset = candidatePresets[presetIndex];
+
+            if (preset == null)
+                continue;
+
+            DependsOn(preset);
+            StageRuntimeWavePresetVariant(authoring,
+                                          preset,
+                                          spawnerWarningConfig,
+                                          variantBuffer,
+                                          variantDefinitionBuffer,
+                                          variantEventBuffer,
+                                          variantRequirementBuffer);
+        }
+    }
+
+    /// <summary>
+    /// Stages one pre-baked wave-preset variant into flattened runtime override buffers.
+    /// </summary>
+    /// <param name="authoring">Spawner authoring source.</param>
+    /// <param name="preset">EnemyWavePreset being converted for runtime selection.</param>
+    /// <param name="spawnerWarningConfig">Spawner-level fallback warning config.</param>
+    /// <param name="variantBuffer">Target variant slice table.</param>
+    /// <param name="variantDefinitionBuffer">Target flattened definition storage.</param>
+    /// <param name="variantEventBuffer">Target flattened event storage.</param>
+    /// <param name="variantRequirementBuffer">Target flattened prefab requirement storage.</param>
+    private void StageRuntimeWavePresetVariant(EnemySpawnerAuthoring authoring,
+                                               EnemyWavePreset preset,
+                                               EnemySpawnWarningConfig spawnerWarningConfig,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantElement> variantBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantDefinitionElement> variantDefinitionBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantEventElement> variantEventBuffer,
+                                               DynamicBuffer<EnemySpawnerWavePresetVariantRequirementElement> variantRequirementBuffer)
+    {
+        List<EnemySpawnerWaveDefinitionElement> stagedWaveDefinitions = new List<EnemySpawnerWaveDefinitionElement>();
+        List<EnemySpawnerWaveRuntimeElement> stagedWaveRuntime = new List<EnemySpawnerWaveRuntimeElement>();
+        List<EnemySpawnerWaveEventElement> stagedWaveEvents = new List<EnemySpawnerWaveEventElement>();
+        Dictionary<Entity, int> plannedCountByPrefab = new Dictionary<Entity, int>();
+        FixedString64Bytes wavePresetGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAssetGuid(preset));
+        int firstDefinitionIndex = variantDefinitionBuffer.Length;
+        int firstEventIndex = variantEventBuffer.Length;
+        int firstRequirementIndex = variantRequirementBuffer.Length;
+
+        StageWaves(authoring,
+                   preset.Waves,
+                   spawnerWarningConfig,
+                   stagedWaveDefinitions,
+                   stagedWaveRuntime,
+                   stagedWaveEvents,
+                   plannedCountByPrefab);
+
+        // Store wave definitions with event indices relative to this variant slice.
+        for (int definitionIndex = 0; definitionIndex < stagedWaveDefinitions.Count; definitionIndex++)
+        {
+            EnemySpawnerWaveDefinitionElement definition = stagedWaveDefinitions[definitionIndex];
+            variantDefinitionBuffer.Add(new EnemySpawnerWavePresetVariantDefinitionElement
+            {
+                StartMode = definition.StartMode,
+                StartDelaySeconds = definition.StartDelaySeconds,
+                SpawnDurationSeconds = definition.SpawnDurationSeconds,
+                MaximumSpawnWarningLeadTimeSeconds = definition.MaximumSpawnWarningLeadTimeSeconds,
+                FirstEventIndex = definition.FirstEventIndex,
+                EventCount = definition.EventCount
+            });
+        }
+
+        // Store exact events with runtime reservation state reset.
+        for (int eventIndex = 0; eventIndex < stagedWaveEvents.Count; eventIndex++)
+        {
+            EnemySpawnerWaveEventElement waveEvent = stagedWaveEvents[eventIndex];
+            variantEventBuffer.Add(new EnemySpawnerWavePresetVariantEventElement
+            {
+                WaveIndex = waveEvent.WaveIndex,
+                RelativeTime = waveEvent.RelativeTime,
+                LocalSpawnPosition = waveEvent.LocalSpawnPosition,
+                PrefabEntity = waveEvent.PrefabEntity,
+                HasSpawnWarningOverride = waveEvent.HasSpawnWarningOverride,
+                SpawnWarningOverride = waveEvent.SpawnWarningOverride
+            });
+        }
+
+        // Store prefab requirements used by pool initialization after override application.
+        foreach (KeyValuePair<Entity, int> pair in plannedCountByPrefab)
+        {
+            variantRequirementBuffer.Add(new EnemySpawnerWavePresetVariantRequirementElement
+            {
+                WavePresetGuid = wavePresetGuid,
+                PrefabEntity = pair.Key,
+                TotalPlannedCount = pair.Value
+            });
+        }
+
+        variantBuffer.Add(new EnemySpawnerWavePresetVariantElement
+        {
+            WavePresetGuid = wavePresetGuid,
+            FirstDefinitionIndex = firstDefinitionIndex,
+            DefinitionCount = stagedWaveDefinitions.Count,
+            FirstEventIndex = firstEventIndex,
+            EventCount = stagedWaveEvents.Count,
+            FirstRequirementIndex = firstRequirementIndex,
+            RequirementCount = plannedCountByPrefab.Count,
+            MaximumSpawnDistanceFromCenter = ResolveMaximumSpawnDistanceFromCenter(stagedWaveEvents, authoring.CellSize),
+            TotalPlannedEnemyCount = CountTotalPlannedEnemies(plannedCountByPrefab)
+        });
     }
 
     /// <summary>

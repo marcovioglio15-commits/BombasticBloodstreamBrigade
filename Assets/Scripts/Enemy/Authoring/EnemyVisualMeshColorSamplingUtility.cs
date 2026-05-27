@@ -1,3 +1,4 @@
+using System;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -27,20 +28,27 @@ internal static class EnemyVisualMeshColorSamplingUtility
                                                  float4[] paletteColors,
                                                  int[] paletteWeights,
                                                  ref int bucketCount)
-    {
-        if (!TryResolveRendererMesh(renderer, out Mesh mesh))
-            return false;
+	    {
+	        if (!TryResolveRendererMesh(renderer, out Mesh mesh))
+	            return false;
 
-        Mesh.MeshDataArray meshDataArray;
-
-        try
-        {
-            meshDataArray = Mesh.AcquireReadOnlyMeshData(mesh);
-        }
-        catch (UnityException)
-        {
-            return false;
-        }
+	        if (!mesh.isReadable)
+	            return false;
+	
+	        Mesh.MeshDataArray meshDataArray;
+	
+	        try
+	        {
+	            meshDataArray = Mesh.AcquireReadOnlyMeshData(mesh);
+	        }
+	        catch (InvalidOperationException)
+	        {
+	            return false;
+	        }
+	        catch (UnityException)
+	        {
+	            return false;
+	        }
 
         try
         {

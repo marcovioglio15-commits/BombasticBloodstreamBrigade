@@ -1,0 +1,275 @@
+using UnityEditor;
+using UnityEngine;
+
+/// <summary>
+/// Draws reusable inspector sections for EnemySpawnerAuthoring without bloating the main editor class.
+/// </summary>
+public static class EnemySpawnerAuthoringEditorSectionUtility
+{
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Draws runtime activation defaults consumed by the main-menu spawner override flow.
+    /// </summary>
+    /// <param name="spawnerEnabledProperty">Serialized enabled-default property.</param>
+    public static void DrawActivationSection(SerializedProperty spawnerEnabledProperty)
+    {
+        EditorGUILayout.LabelField("Activation", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(spawnerEnabledProperty);
+    }
+
+    /// <summary>
+    /// Draws the grid configuration section.
+    /// </summary>
+    /// <param name="gridSizeXProperty">Serialized grid width property.</param>
+    /// <param name="gridSizeZProperty">Serialized grid depth property.</param>
+    /// <param name="cellSizeProperty">Serialized cell size property.</param>
+    /// <param name="originOffsetProperty">Serialized origin offset property.</param>
+    /// <param name="spawnHeightOffsetProperty">Serialized spawn height offset property.</param>
+    public static void DrawGridSection(SerializedProperty gridSizeXProperty,
+                                       SerializedProperty gridSizeZProperty,
+                                       SerializedProperty cellSizeProperty,
+                                       SerializedProperty originOffsetProperty,
+                                       SerializedProperty spawnHeightOffsetProperty)
+    {
+        EditorGUILayout.LabelField("Grid", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(gridSizeXProperty);
+        EditorGUILayout.PropertyField(gridSizeZProperty);
+        EditorGUILayout.PropertyField(cellSizeProperty);
+        EditorGUILayout.PropertyField(originOffsetProperty);
+        EditorGUILayout.PropertyField(spawnHeightOffsetProperty);
+    }
+
+    /// <summary>
+    /// Draws pool configuration fields.
+    /// </summary>
+    /// <param name="initialPoolCapacityPerPrefabProperty">Serialized initial pool capacity property.</param>
+    /// <param name="expandBatchPerPrefabProperty">Serialized pool expansion batch property.</param>
+    public static void DrawPoolSection(SerializedProperty initialPoolCapacityPerPrefabProperty,
+                                       SerializedProperty expandBatchPerPrefabProperty)
+    {
+        EditorGUILayout.LabelField("Pool", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(initialPoolCapacityPerPrefabProperty);
+        EditorGUILayout.PropertyField(expandBatchPerPrefabProperty);
+    }
+
+    /// <summary>
+    /// Draws lifecycle-related configuration fields.
+    /// </summary>
+    /// <param name="despawnDistanceProperty">Serialized despawn distance property.</param>
+    public static void DrawLifecycleSection(SerializedProperty despawnDistanceProperty)
+    {
+        EditorGUILayout.LabelField("Lifecycle", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(despawnDistanceProperty);
+    }
+
+    /// <summary>
+    /// Draws spawn-warning settings exposed directly on the spawner authoring component.
+    /// </summary>
+    /// <param name="enableSpawnWarningProperty">Serialized spawn-warning toggle property.</param>
+    /// <param name="spawnWarningLeadTimeSecondsProperty">Serialized warning lead-time property.</param>
+    /// <param name="spawnWarningRadiusScaleProperty">Serialized warning radius scale property.</param>
+    /// <param name="spawnWarningRingWidthProperty">Serialized warning ring width property.</param>
+    /// <param name="spawnWarningHeightOffsetProperty">Serialized warning height offset property.</param>
+    /// <param name="spawnWarningMaximumAlphaProperty">Serialized warning opacity property.</param>
+    /// <param name="spawnWarningFadeOutSecondsProperty">Serialized warning fade-out property.</param>
+    /// <param name="spawnWarningColorProperty">Serialized warning color property.</param>
+    public static void DrawSpawnWarningSection(SerializedProperty enableSpawnWarningProperty,
+                                               SerializedProperty spawnWarningLeadTimeSecondsProperty,
+                                               SerializedProperty spawnWarningRadiusScaleProperty,
+                                               SerializedProperty spawnWarningRingWidthProperty,
+                                               SerializedProperty spawnWarningHeightOffsetProperty,
+                                               SerializedProperty spawnWarningMaximumAlphaProperty,
+                                               SerializedProperty spawnWarningFadeOutSecondsProperty,
+                                               SerializedProperty spawnWarningColorProperty)
+    {
+        EditorGUILayout.LabelField("Spawn Warning", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(enableSpawnWarningProperty);
+
+        using (new EditorGUI.DisabledScope(enableSpawnWarningProperty != null && !enableSpawnWarningProperty.boolValue))
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(spawnWarningLeadTimeSecondsProperty);
+            EditorGUILayout.PropertyField(spawnWarningRadiusScaleProperty);
+            EditorGUILayout.PropertyField(spawnWarningRingWidthProperty);
+            EditorGUILayout.PropertyField(spawnWarningHeightOffsetProperty);
+            EditorGUILayout.PropertyField(spawnWarningMaximumAlphaProperty);
+            EditorGUILayout.PropertyField(spawnWarningFadeOutSecondsProperty);
+            EditorGUILayout.PropertyField(spawnWarningColorProperty);
+            EditorGUI.indentLevel--;
+        }
+    }
+
+    /// <summary>
+    /// Draws the selected-cell inspector when a painted cell is currently selected.
+    /// </summary>
+    /// <param name="wavePresetSerializedObject">Serialized object that owns the edited wave preset.</param>
+    /// <param name="cachedWavePreset">Currently assigned wave preset asset.</param>
+    /// <param name="wavesProperty">Serialized wave list property.</param>
+    /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
+    /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
+    public static void DrawSelectedCellSection(SerializedObject wavePresetSerializedObject,
+                                               EnemyWavePreset cachedWavePreset,
+                                               SerializedProperty wavesProperty,
+                                               ref int selectedWaveIndex,
+                                               ref Vector2Int selectedCellCoordinate)
+    {
+        EditorGUILayout.LabelField("Selected Cell", EditorStyles.boldLabel);
+
+        if (wavesProperty == null)
+        {
+            EditorGUILayout.HelpBox("No EnemyWavePreset is assigned.", MessageType.Info);
+            return;
+        }
+
+        if (selectedWaveIndex < 0)
+        {
+            EditorGUILayout.HelpBox("Right click a painted cell in any wave grid to inspect and edit it.", MessageType.Info);
+            return;
+        }
+
+        SerializedProperty cellProperty = EnemySpawnerAuthoringEditorWaveUtility.FindCellProperty(wavesProperty,
+                                                                                                  selectedWaveIndex,
+                                                                                                  selectedCellCoordinate);
+
+        if (cellProperty == null)
+        {
+            EditorGUILayout.HelpBox("The selected cell no longer exists.", MessageType.Info);
+            return;
+        }
+
+        DrawSelectedCellFields(wavePresetSerializedObject,
+                               cachedWavePreset,
+                               wavesProperty,
+                               cellProperty,
+                               ref selectedWaveIndex,
+                               ref selectedCellCoordinate);
+    }
+
+    /// <summary>
+    /// Draws the debug/gizmo configuration fields.
+    /// </summary>
+    /// <param name="drawGridGizmosProperty">Serialized grid gizmo toggle.</param>
+    /// <param name="drawCellCoordinatesProperty">Serialized coordinate label toggle.</param>
+    /// <param name="drawCellCountsProperty">Serialized cell count label toggle.</param>
+    public static void DrawDebugSection(SerializedProperty drawGridGizmosProperty,
+                                        SerializedProperty drawCellCoordinatesProperty,
+                                        SerializedProperty drawCellCountsProperty)
+    {
+        EditorGUILayout.LabelField("Debug", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(drawGridGizmosProperty);
+        EditorGUILayout.PropertyField(drawCellCoordinatesProperty);
+        EditorGUILayout.PropertyField(drawCellCountsProperty);
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Draws editable fields for one selected painted cell.
+    /// </summary>
+    /// <param name="wavePresetSerializedObject">Serialized object that owns the edited wave preset.</param>
+    /// <param name="cachedWavePreset">Currently assigned wave preset asset.</param>
+    /// <param name="wavesProperty">Serialized wave list property.</param>
+    /// <param name="cellProperty">Serialized selected cell property.</param>
+    /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
+    /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
+    private static void DrawSelectedCellFields(SerializedObject wavePresetSerializedObject,
+                                               EnemyWavePreset cachedWavePreset,
+                                               SerializedProperty wavesProperty,
+                                               SerializedProperty cellProperty,
+                                               ref int selectedWaveIndex,
+                                               ref Vector2Int selectedCellCoordinate)
+    {
+        EditorGUILayout.LabelField("Wave Index", selectedWaveIndex.ToString());
+        EditorGUILayout.LabelField("Grid Coordinate", "[" + selectedCellCoordinate.x + "," + selectedCellCoordinate.y + "]");
+        SerializedProperty waveProperty = wavesProperty.GetArrayElementAtIndex(selectedWaveIndex);
+        SerializedProperty defaultDistributionCurveProperty = waveProperty.FindPropertyRelative("defaultDistributionCurve");
+        SerializedProperty useWaveDefaultDistributionProperty = cellProperty.FindPropertyRelative("useWaveDefaultDistribution");
+        SerializedProperty distributionCurveOverrideProperty = cellProperty.FindPropertyRelative("distributionCurveOverride");
+        bool previousUseWaveDefaultDistribution = useWaveDefaultDistributionProperty.boolValue;
+
+        EditorGUILayout.PropertyField(cellProperty.FindPropertyRelative("masterPreset"));
+        EditorGUILayout.PropertyField(cellProperty.FindPropertyRelative("enemyCount"));
+        EditorGUILayout.PropertyField(useWaveDefaultDistributionProperty);
+
+        if (useWaveDefaultDistributionProperty.boolValue)
+            EditorGUILayout.HelpBox("This cell is using the wave default curve. Editing the curve below creates a local override for this cell.", MessageType.None);
+
+        if (previousUseWaveDefaultDistribution && !useWaveDefaultDistributionProperty.boolValue)
+            distributionCurveOverrideProperty.animationCurveValue = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(defaultDistributionCurveProperty.animationCurveValue);
+
+        DrawSelectedCellCurve(defaultDistributionCurveProperty,
+                              useWaveDefaultDistributionProperty,
+                              distributionCurveOverrideProperty);
+        DrawSelectedCellActions(wavePresetSerializedObject,
+                                cachedWavePreset,
+                                wavesProperty,
+                                ref selectedWaveIndex,
+                                ref selectedCellCoordinate);
+    }
+
+    /// <summary>
+    /// Draws and applies the effective distribution curve for one selected cell.
+    /// </summary>
+    /// <param name="defaultDistributionCurveProperty">Wave default curve property.</param>
+    /// <param name="useWaveDefaultDistributionProperty">Cell default-curve toggle property.</param>
+    /// <param name="distributionCurveOverrideProperty">Cell local override curve property.</param>
+    private static void DrawSelectedCellCurve(SerializedProperty defaultDistributionCurveProperty,
+                                              SerializedProperty useWaveDefaultDistributionProperty,
+                                              SerializedProperty distributionCurveOverrideProperty)
+    {
+        AnimationCurve sourceCurve = useWaveDefaultDistributionProperty.boolValue
+            ? defaultDistributionCurveProperty.animationCurveValue
+            : distributionCurveOverrideProperty.animationCurveValue;
+        AnimationCurve editableCurve = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(sourceCurve);
+        EditorGUI.BeginChangeCheck();
+        AnimationCurve editedCurve = EditorGUILayout.CurveField(new GUIContent("Distribution Curve",
+                                                                               "Effective distribution curve used by the selected cell."),
+                                                                editableCurve);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            useWaveDefaultDistributionProperty.boolValue = false;
+            distributionCurveOverrideProperty.animationCurveValue = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(editedCurve);
+        }
+
+        if (useWaveDefaultDistributionProperty.boolValue)
+            return;
+
+        if (GUILayout.Button(new GUIContent("Use Wave Default Again",
+                                            "Discard the local override and return to the current wave default curve.")))
+            useWaveDefaultDistributionProperty.boolValue = true;
+    }
+
+    /// <summary>
+    /// Draws actions that mutate the selected cell.
+    /// </summary>
+    /// <param name="wavePresetSerializedObject">Serialized object that owns the edited wave preset.</param>
+    /// <param name="cachedWavePreset">Currently assigned wave preset asset.</param>
+    /// <param name="wavesProperty">Serialized wave list property.</param>
+    /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
+    /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
+    private static void DrawSelectedCellActions(SerializedObject wavePresetSerializedObject,
+                                                EnemyWavePreset cachedWavePreset,
+                                                SerializedProperty wavesProperty,
+                                                ref int selectedWaveIndex,
+                                                ref Vector2Int selectedCellCoordinate)
+    {
+        if (!GUILayout.Button(new GUIContent("Remove Cell",
+                                             "Delete the currently selected painted cell from the wave.")))
+            return;
+
+        EnemySpawnerAuthoringEditorWaveUtility.RemoveCell(wavePresetSerializedObject,
+                                                          cachedWavePreset,
+                                                          wavesProperty,
+                                                          selectedWaveIndex,
+                                                          selectedCellCoordinate,
+                                                          ref selectedWaveIndex,
+                                                          ref selectedCellCoordinate);
+        GUIUtility.ExitGUI();
+    }
+    #endregion
+
+    #endregion
+}

@@ -16,6 +16,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #region Fields
     private readonly Dictionary<int, bool> waveFoldoutState = new Dictionary<int, bool>();
 
+    private SerializedProperty spawnerEnabledProperty;
     private SerializedProperty gridSizeXProperty;
     private SerializedProperty gridSizeZProperty;
     private SerializedProperty cellSizeProperty;
@@ -63,6 +64,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     /// </summary>
     private void OnEnable()
     {
+        spawnerEnabledProperty = serializedObject.FindProperty("spawnerEnabled");
         gridSizeXProperty = serializedObject.FindProperty("gridSizeX");
         gridSizeZProperty = serializedObject.FindProperty("gridSizeZ");
         cellSizeProperty = serializedObject.FindProperty("cellSize");
@@ -94,22 +96,38 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     /// <summary>
     /// Draws the complete custom inspector layout.
     /// </summary>
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-        DrawGridSection();
-        EditorGUILayout.Space(6f);
-        DrawPoolSection();
-        EditorGUILayout.Space(6f);
-        DrawLifecycleSection();
-        EditorGUILayout.Space(6f);
-        DrawSpawnWarningSection();
-        EditorGUILayout.Space(6f);
-        DrawWavePresetSection();
-        EditorGUILayout.Space(6f);
-        DrawPainterSection();
-        EditorGUILayout.Space(6f);
-        DrawDebugSection();
+	    public override void OnInspectorGUI()
+	    {
+	        serializedObject.Update();
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawActivationSection(spawnerEnabledProperty);
+	        EditorGUILayout.Space(6f);
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawGridSection(gridSizeXProperty,
+	                                                                  gridSizeZProperty,
+	                                                                  cellSizeProperty,
+	                                                                  originOffsetProperty,
+	                                                                  spawnHeightOffsetProperty);
+	        EditorGUILayout.Space(6f);
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawPoolSection(initialPoolCapacityPerPrefabProperty,
+	                                                                  expandBatchPerPrefabProperty);
+	        EditorGUILayout.Space(6f);
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawLifecycleSection(despawnDistanceProperty);
+	        EditorGUILayout.Space(6f);
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawSpawnWarningSection(enableSpawnWarningProperty,
+	                                                                          spawnWarningLeadTimeSecondsProperty,
+	                                                                          spawnWarningRadiusScaleProperty,
+	                                                                          spawnWarningRingWidthProperty,
+	                                                                          spawnWarningHeightOffsetProperty,
+	                                                                          spawnWarningMaximumAlphaProperty,
+	                                                                          spawnWarningFadeOutSecondsProperty,
+	                                                                          spawnWarningColorProperty);
+	        EditorGUILayout.Space(6f);
+	        DrawWavePresetSection();
+	        EditorGUILayout.Space(6f);
+	        DrawPainterSection();
+	        EditorGUILayout.Space(6f);
+	        EnemySpawnerAuthoringEditorSectionUtility.DrawDebugSection(drawGridGizmosProperty,
+	                                                                   drawCellCoordinatesProperty,
+	                                                                   drawCellCountsProperty);
         EditorGUILayout.Space(6f);
         serializedObject.ApplyModifiedProperties();
         RefreshWavePresetBinding();
@@ -159,60 +177,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #endregion
 
     #region Inspector Sections
-    /// <summary>
-    /// Draws the grid configuration section.
-    /// </summary>
-    private void DrawGridSection()
-    {
-        EditorGUILayout.LabelField("Grid", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(gridSizeXProperty);
-        EditorGUILayout.PropertyField(gridSizeZProperty);
-        EditorGUILayout.PropertyField(cellSizeProperty);
-        EditorGUILayout.PropertyField(originOffsetProperty);
-        EditorGUILayout.PropertyField(spawnHeightOffsetProperty);
-    }
-
-    /// <summary>
-    /// Draws pool and lifecycle configuration fields.
-    /// </summary>
-    private void DrawPoolSection()
-    {
-        EditorGUILayout.LabelField("Pool", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(initialPoolCapacityPerPrefabProperty);
-        EditorGUILayout.PropertyField(expandBatchPerPrefabProperty);
-    }
-
-    /// <summary>
-    /// Draws lifecycle-related configuration fields.
-    /// </summary>
-    private void DrawLifecycleSection()
-    {
-        EditorGUILayout.LabelField("Lifecycle", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(despawnDistanceProperty);
-    }
-
-    /// <summary>
-    /// Draws spawn-warning settings exposed directly on the spawner authoring component.
-    /// </summary>
-    private void DrawSpawnWarningSection()
-    {
-        EditorGUILayout.LabelField("Spawn Warning", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(enableSpawnWarningProperty);
-
-        using (new EditorGUI.DisabledScope(enableSpawnWarningProperty != null && !enableSpawnWarningProperty.boolValue))
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(spawnWarningLeadTimeSecondsProperty);
-            EditorGUILayout.PropertyField(spawnWarningRadiusScaleProperty);
-            EditorGUILayout.PropertyField(spawnWarningRingWidthProperty);
-            EditorGUILayout.PropertyField(spawnWarningHeightOffsetProperty);
-            EditorGUILayout.PropertyField(spawnWarningMaximumAlphaProperty);
-            EditorGUILayout.PropertyField(spawnWarningFadeOutSecondsProperty);
-            EditorGUILayout.PropertyField(spawnWarningColorProperty);
-            EditorGUI.indentLevel--;
-        }
-    }
-
     /// <summary>
     /// Draws the wave-preset reference field and helper actions used to create or inspect the assigned preset asset.
     /// </summary>
@@ -295,7 +259,11 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         for (int waveIndex = 0; waveIndex < wavesProperty.arraySize; waveIndex++)
         {
             DrawWaveElement(waveIndex, wavesProperty.GetArrayElementAtIndex(waveIndex));
-            DrawSelectedCellSection();
+	            EnemySpawnerAuthoringEditorSectionUtility.DrawSelectedCellSection(wavePresetSerializedObject,
+	                                                                              cachedWavePreset,
+	                                                                              wavesProperty,
+	                                                                              ref selectedWaveIndex,
+	                                                                              ref selectedCellCoordinate);
         }
 
         EditorGUILayout.Space(6f);
@@ -307,107 +275,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                                                           ref lastPaintedCoordinate);
     }
 
-    /// <summary>
-    /// Draws the selected-cell inspector when a painted cell is currently selected.
-    /// </summary>
-    private void DrawSelectedCellSection()
-    {
-        EditorGUILayout.LabelField("Selected Cell", EditorStyles.boldLabel);
-
-        if (wavesProperty == null)
-        {
-            EditorGUILayout.HelpBox("No EnemyWavePreset is assigned.", MessageType.Info);
-            return;
-        }
-
-        if (selectedWaveIndex < 0)
-        {
-            EditorGUILayout.HelpBox("Right click a painted cell in any wave grid to inspect and edit it.", MessageType.Info);
-            return;
-        }
-
-        SerializedProperty cellProperty = EnemySpawnerAuthoringEditorWaveUtility.FindCellProperty(wavesProperty,
-                                                                                                  selectedWaveIndex,
-                                                                                                  selectedCellCoordinate);
-
-        if (cellProperty == null)
-        {
-            EditorGUILayout.HelpBox("The selected cell no longer exists.", MessageType.Info);
-            return;
-        }
-
-        EditorGUILayout.LabelField("Wave Index", selectedWaveIndex.ToString());
-        EditorGUILayout.LabelField("Grid Coordinate", "[" + selectedCellCoordinate.x + "," + selectedCellCoordinate.y + "]");
-        SerializedProperty waveProperty = wavesProperty.GetArrayElementAtIndex(selectedWaveIndex);
-        SerializedProperty defaultDistributionCurveProperty = waveProperty.FindPropertyRelative("defaultDistributionCurve");
-        SerializedProperty masterPresetProperty = cellProperty.FindPropertyRelative("masterPreset");
-        SerializedProperty enemyCountProperty = cellProperty.FindPropertyRelative("enemyCount");
-        SerializedProperty useWaveDefaultDistributionProperty = cellProperty.FindPropertyRelative("useWaveDefaultDistribution");
-        SerializedProperty distributionCurveOverrideProperty = cellProperty.FindPropertyRelative("distributionCurveOverride");
-        bool previousUseWaveDefaultDistribution = useWaveDefaultDistributionProperty.boolValue;
-
-        EditorGUILayout.PropertyField(masterPresetProperty);
-        EditorGUILayout.PropertyField(enemyCountProperty);
-        EditorGUILayout.PropertyField(useWaveDefaultDistributionProperty);
-
-        if (useWaveDefaultDistributionProperty.boolValue)
-        {
-            EditorGUILayout.HelpBox("This cell is using the wave default curve. Editing the curve below creates a local override for this cell.", MessageType.None);
-        }
-
-        if (previousUseWaveDefaultDistribution && !useWaveDefaultDistributionProperty.boolValue)
-        {
-            distributionCurveOverrideProperty.animationCurveValue = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(defaultDistributionCurveProperty.animationCurveValue);
-        }
-
-        AnimationCurve sourceCurve = useWaveDefaultDistributionProperty.boolValue
-            ? defaultDistributionCurveProperty.animationCurveValue
-            : distributionCurveOverrideProperty.animationCurveValue;
-        AnimationCurve editableCurve = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(sourceCurve);
-        EditorGUI.BeginChangeCheck();
-        AnimationCurve editedCurve = EditorGUILayout.CurveField(new GUIContent("Distribution Curve",
-                                                                               "Effective distribution curve used by the selected cell."),
-                                                                editableCurve);
-
-        if (EditorGUI.EndChangeCheck())
-        {
-            useWaveDefaultDistributionProperty.boolValue = false;
-            distributionCurveOverrideProperty.animationCurveValue = EnemySpawnerAuthoringEditorWaveUtility.CloneAnimationCurve(editedCurve);
-        }
-
-        if (!useWaveDefaultDistributionProperty.boolValue)
-        {
-            if (GUILayout.Button(new GUIContent("Use Wave Default Again",
-                                                "Discard the local override and return to the current wave default curve.")))
-            {
-                useWaveDefaultDistributionProperty.boolValue = true;
-            }
-        }
-
-        if (GUILayout.Button(new GUIContent("Remove Cell",
-                                            "Delete the currently selected painted cell from the wave.")))
-        {
-            EnemySpawnerAuthoringEditorWaveUtility.RemoveCell(wavePresetSerializedObject,
-                                                              cachedWavePreset,
-                                                              wavesProperty,
-                                                              selectedWaveIndex,
-                                                              selectedCellCoordinate,
-                                                              ref selectedWaveIndex,
-                                                              ref selectedCellCoordinate);
-            GUIUtility.ExitGUI();
-        }
-    }
-
-    /// <summary>
-    /// Draws the debug/gizmo configuration fields.
-    /// </summary>
-    private void DrawDebugSection()
-    {
-        EditorGUILayout.LabelField("Debug", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(drawGridGizmosProperty);
-        EditorGUILayout.PropertyField(drawCellCoordinatesProperty);
-        EditorGUILayout.PropertyField(drawCellCountsProperty);
-    }
     #endregion
 
     #region Wave Drawing
@@ -586,7 +453,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
             return;
 
         Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> cellPreviewByCoordinate = EnemySpawnerAuthoringEditorWaveUtility.BuildCellPreviewMap(paintedCellsProperty);
-        SyncGridLabelStyles();
+	        EnemySpawnerAuthoringEditorStyleUtility.SyncGridLabelStyles(ref gridCoordinateLabelStyle,
+	                                                                    ref gridCountLabelStyle,
+	                                                                    gridZoom);
         gridScrollPosition = EditorGUILayout.BeginScrollView(gridScrollPosition, true, true, GUILayout.Height(Mathf.Min(520f, gridSizeZ * (buttonSize + buttonSpacing) + 12f)));
 
         for (int row = gridSizeZ - 1; row >= 0; row--)
@@ -806,71 +675,6 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         EditorGUIUtility.PingObject(newPreset);
     }
 
-    /// <summary>
-    /// Creates one cached label style used by the grid-button overlays.
-    /// </summary>
-    /// <param name="alignment">Text alignment inside the cell overlay rect.</param>
-    /// <param name="fontSize">Overlay font size in points.</param>
-    /// <param name="fontStyle">Overlay font style.</param>
-    /// <param name="textColor">Overlay text color.</param>
-    /// <returns>Configured GUIStyle instance.</returns>
-    private static GUIStyle CreateGridLabelStyle(TextAnchor alignment, int fontSize, FontStyle fontStyle, Color textColor)
-    {
-        GUIStyle baseStyle = EditorStyles.miniLabel;
-
-        if (baseStyle == null)
-            baseStyle = EditorStyles.label;
-
-        if (baseStyle == null && GUI.skin != null)
-            baseStyle = GUI.skin.label;
-
-        GUIStyle style = baseStyle != null
-            ? new GUIStyle(baseStyle)
-            : new GUIStyle();
-        style.alignment = alignment;
-        style.fontSize = fontSize;
-        style.fontStyle = fontStyle;
-        style.normal.textColor = textColor;
-        style.clipping = TextClipping.Clip;
-        return style;
-    }
-
-    /// <summary>
-    /// Lazily creates the grid overlay styles only when the editor skin is fully ready.
-    /// </summary>
-    private void EnsureGridLabelStyles()
-    {
-        if (gridCoordinateLabelStyle == null)
-        {
-            gridCoordinateLabelStyle = CreateGridLabelStyle(TextAnchor.UpperCenter,
-                                                            9,
-                                                            FontStyle.Bold,
-                                                            new Color(0.95f, 0.97f, 1f, 0.98f));
-        }
-
-        if (gridCountLabelStyle == null)
-        {
-            gridCountLabelStyle = CreateGridLabelStyle(TextAnchor.LowerCenter,
-                                                       10,
-                                                       FontStyle.Bold,
-                                                       Color.white);
-        }
-    }
-
-    /// <summary>
-    /// Updates cached grid label styles to stay readable across zoom levels.
-    /// </summary>
-    private void SyncGridLabelStyles()
-    {
-        EnsureGridLabelStyles();
-
-        if (gridCoordinateLabelStyle == null || gridCountLabelStyle == null)
-            return;
-
-        float normalizedZoom = Mathf.InverseLerp(0.45f, 2f, gridZoom);
-        gridCoordinateLabelStyle.fontSize = Mathf.RoundToInt(Mathf.Lerp(6f, 11f, normalizedZoom));
-        gridCountLabelStyle.fontSize = Mathf.RoundToInt(Mathf.Lerp(7f, 12f, normalizedZoom));
-    }
     #endregion
 
     #endregion

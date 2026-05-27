@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Collections;
 using Unity.Mathematics;
 
 #region Enemy Spawner Components
@@ -23,6 +24,28 @@ public struct EnemySpawnerState : IComponentData
     public int AliveCount;
     public byte Initialized;
     public byte StartTimeInitialized;
+}
+
+/// <summary>
+/// Identifies one authored spawner across runtime scene loads and main-menu override edits.
+/// </summary>
+public struct EnemySpawnerRuntimeIdentity : IComponentData
+{
+    public FixedString64Bytes SceneGuid;
+    public FixedString128Bytes SpawnerGuid;
+    public FixedString128Bytes DisplayName;
+    public FixedString64Bytes DefaultWavePresetGuid;
+    public byte DefaultEnabled;
+}
+
+/// <summary>
+/// Stores the last runtime override version applied to one spawner entity.
+/// </summary>
+public struct EnemySpawnerRuntimeOverrideState : IComponentData
+{
+    public uint AppliedStoreVersion;
+    public FixedString64Bytes AppliedWavePresetGuid;
+    public byte AppliedEnabled;
 }
 
 /// <summary>
@@ -101,6 +124,58 @@ public struct EnemySpawnerPrefabPoolMapElement : IBufferElementData
 {
     public Entity PrefabEntity;
     public Entity PoolEntity;
+}
+
+/// <summary>
+/// Describes one pre-baked wave-preset variant available to a runtime-overridable spawner.
+/// </summary>
+public struct EnemySpawnerWavePresetVariantElement : IBufferElementData
+{
+    public FixedString64Bytes WavePresetGuid;
+    public int FirstDefinitionIndex;
+    public int DefinitionCount;
+    public int FirstEventIndex;
+    public int EventCount;
+    public int FirstRequirementIndex;
+    public int RequirementCount;
+    public float MaximumSpawnDistanceFromCenter;
+    public int TotalPlannedEnemyCount;
+}
+
+/// <summary>
+/// Stores immutable wave definitions for all pre-baked preset variants on one spawner.
+/// </summary>
+public struct EnemySpawnerWavePresetVariantDefinitionElement : IBufferElementData
+{
+    public EnemyWaveStartMode StartMode;
+    public float StartDelaySeconds;
+    public float SpawnDurationSeconds;
+    public float MaximumSpawnWarningLeadTimeSeconds;
+    public int FirstEventIndex;
+    public int EventCount;
+}
+
+/// <summary>
+/// Stores exact spawn events for all pre-baked preset variants on one spawner.
+/// </summary>
+public struct EnemySpawnerWavePresetVariantEventElement : IBufferElementData
+{
+    public int WaveIndex;
+    public float RelativeTime;
+    public float3 LocalSpawnPosition;
+    public Entity PrefabEntity;
+    public byte HasSpawnWarningOverride;
+    public EnemySpawnWarningConfig SpawnWarningOverride;
+}
+
+/// <summary>
+/// Stores prefab requirements for all pre-baked preset variants on one spawner.
+/// </summary>
+public struct EnemySpawnerWavePresetVariantRequirementElement : IBufferElementData
+{
+    public FixedString64Bytes WavePresetGuid;
+    public Entity PrefabEntity;
+    public int TotalPlannedCount;
 }
 
 /// <summary>

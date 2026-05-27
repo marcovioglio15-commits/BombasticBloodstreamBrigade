@@ -1,0 +1,272 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Stores one painted spawn cell inside a wave-authored enemy spawner grid.
+/// </summary>
+[Serializable]
+public sealed class EnemySpawnWaveCellAuthoring
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Grid coordinate of the painted spawn cell. X is horizontal, Y is depth on the spawner local XZ plane.")]
+    [SerializeField] private Vector2Int cellCoordinate;
+
+    [Tooltip("Enemy master preset painted on the cell. The visual preset of this master preset resolves the concrete enemy prefab.")]
+    [SerializeField] private EnemyMasterPreset masterPreset;
+
+    [Tooltip("Total amount of enemies of this type emitted by this cell across the wave spawn duration.")]
+    [SerializeField] private int enemyCount = 1;
+
+    [Tooltip("When enabled, this cell uses the default wave distribution curve instead of its local override.")]
+    [SerializeField] private bool useWaveDefaultDistribution = true;
+
+    [Tooltip("Optional per-cell cumulative distribution curve used only when Use Wave Default Distribution is disabled.")]
+    [SerializeField] private AnimationCurve distributionCurveOverride = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public Vector2Int CellCoordinate
+    {
+        get
+        {
+            return cellCoordinate;
+        }
+    }
+
+    public EnemyMasterPreset MasterPreset
+    {
+        get
+        {
+            return masterPreset;
+        }
+    }
+
+    public int EnemyCount
+    {
+        get
+        {
+            return enemyCount;
+        }
+    }
+
+    public bool UseWaveDefaultDistribution
+    {
+        get
+        {
+            return useWaveDefaultDistribution;
+        }
+    }
+
+    public AnimationCurve DistributionCurveOverride
+    {
+        get
+        {
+            return distributionCurveOverride;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Internal Methods
+    /// <summary>
+    /// Updates the authored grid coordinate.
+    /// Used by validation and editor painting tools.
+    /// </summary>
+    /// <param name="value">New grid coordinate.</param>
+    internal void SetCellCoordinate(Vector2Int value)
+    {
+        cellCoordinate = value;
+    }
+
+    /// <summary>
+    /// Updates the authored enemy count.
+    /// Used by validation and dedicated cell editing UI.
+    /// </summary>
+    /// <param name="value">New total enemy count.</param>
+    internal void SetEnemyCount(int value)
+    {
+        enemyCount = value;
+    }
+
+    /// <summary>
+    /// Updates the authored master preset.
+    /// Used by inspector painting tools.
+    /// </summary>
+    /// <param name="value">New master preset assignment.</param>
+    internal void SetMasterPreset(EnemyMasterPreset value)
+    {
+        masterPreset = value;
+    }
+
+    /// <summary>
+    /// Updates the curve-usage mode for the cell.
+    /// Used by inspector cell editing UI.
+    /// </summary>
+    /// <param name="value">New flag controlling default-vs-override curve usage.</param>
+    internal void SetUseWaveDefaultDistribution(bool value)
+    {
+        useWaveDefaultDistribution = value;
+    }
+
+    /// <summary>
+    /// Updates the authored local curve override.
+    /// Used by validation and dedicated cell editing UI.
+    /// </summary>
+    /// <param name="value">New local override curve.</param>
+    internal void SetDistributionCurveOverride(AnimationCurve value)
+    {
+        distributionCurveOverride = value;
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Stores one finite wave authored for the enemy spawner grid.
+/// </summary>
+[Serializable]
+public sealed class EnemySpawnWaveAuthoring
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Optional label used in the inspector to identify this wave.")]
+    [SerializeField] private string waveLabel = "Wave";
+
+    [Tooltip("When enabled, this is the only wave shown in scene previews and gizmos.")]
+    [SerializeField] private bool previewInScene;
+
+    [Tooltip("Reference event used to start the wave delay countdown.")]
+    [SerializeField] private EnemyWaveStartMode startMode = EnemyWaveStartMode.FromSpawnerStart;
+
+    [Tooltip("Delay in seconds applied after the selected start reference before this wave begins.")]
+    [SerializeField] private float startDelaySeconds;
+
+    [Tooltip("Duration in seconds over which all enemies authored in this wave are distributed.")]
+    [SerializeField] private float spawnDurationSeconds = 4f;
+
+    [Tooltip("Default cumulative distribution curve used by cells that do not override it locally.")]
+    [SerializeField] private AnimationCurve defaultDistributionCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
+
+    [Tooltip("Sparse list of painted spawn cells used by this wave.")]
+    [SerializeField] private List<EnemySpawnWaveCellAuthoring> paintedCells = new List<EnemySpawnWaveCellAuthoring>();
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public string WaveLabel
+    {
+        get
+        {
+            return waveLabel;
+        }
+    }
+
+    public bool PreviewInScene
+    {
+        get
+        {
+            return previewInScene;
+        }
+    }
+
+    public EnemyWaveStartMode StartMode
+    {
+        get
+        {
+            return startMode;
+        }
+    }
+
+    public float StartDelaySeconds
+    {
+        get
+        {
+            return startDelaySeconds;
+        }
+    }
+
+    public float SpawnDurationSeconds
+    {
+        get
+        {
+            return spawnDurationSeconds;
+        }
+    }
+
+    public AnimationCurve DefaultDistributionCurve
+    {
+        get
+        {
+            return defaultDistributionCurve;
+        }
+    }
+
+    public List<EnemySpawnWaveCellAuthoring> PaintedCells
+    {
+        get
+        {
+            return paintedCells;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Internal Methods
+    /// <summary>
+    /// Updates the preview flag used by scene gizmos.
+    /// </summary>
+    /// <param name="value">New preview state.</param>
+    internal void SetPreviewInScene(bool value)
+    {
+        previewInScene = value;
+    }
+
+    /// <summary>
+    /// Updates the authored start mode.
+    /// </summary>
+    /// <param name="value">New start mode.</param>
+    internal void SetStartMode(EnemyWaveStartMode value)
+    {
+        startMode = value;
+    }
+
+    /// <summary>
+    /// Updates the authored start delay.
+    /// </summary>
+    /// <param name="value">New delay in seconds.</param>
+    internal void SetStartDelaySeconds(float value)
+    {
+        startDelaySeconds = value;
+    }
+
+    /// <summary>
+    /// Updates the authored spawn duration.
+    /// </summary>
+    /// <param name="value">New duration in seconds.</param>
+    internal void SetSpawnDurationSeconds(float value)
+    {
+        spawnDurationSeconds = value;
+    }
+
+    /// <summary>
+    /// Updates the default wave curve.
+    /// </summary>
+    /// <param name="value">New cumulative distribution curve.</param>
+    internal void SetDefaultDistributionCurve(AnimationCurve value)
+    {
+        defaultDistributionCurve = value;
+    }
+    #endregion
+
+    #endregion
+}

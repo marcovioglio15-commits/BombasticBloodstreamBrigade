@@ -15,8 +15,15 @@ public sealed class MainMenuController : MonoBehaviour
     [Tooltip("Button that starts the gameplay scene.")]
     [SerializeField] private Button playButton;
 
+    [Tooltip("Button that opens the runtime enemy spawner override tool.")]
+    [SerializeField] private Button enemySpawnerToolButton;
+
     [Tooltip("Button that closes the application.")]
     [SerializeField] private Button quitButton;
+
+    [Header("Runtime Tools")]
+    [Tooltip("Runtime enemy spawner override panel opened from the main menu.")]
+    [SerializeField] private EnemySpawnerRuntimeToolPanelController enemySpawnerToolPanel;
 
     [Header("Navigation")]
     [Tooltip("Optional EventSystem override used to select the default menu button.")]
@@ -70,6 +77,9 @@ public sealed class MainMenuController : MonoBehaviour
         if (playButton != null)
             playButton.onClick.AddListener(HandlePlayPressed);
 
+        if (enemySpawnerToolButton != null)
+            enemySpawnerToolButton.onClick.AddListener(HandleEnemySpawnerToolPressed);
+
         if (quitButton != null)
             quitButton.onClick.AddListener(HandleQuitPressed);
     }
@@ -81,6 +91,9 @@ public sealed class MainMenuController : MonoBehaviour
     {
         if (playButton != null)
             playButton.onClick.RemoveListener(HandlePlayPressed);
+
+        if (enemySpawnerToolButton != null)
+            enemySpawnerToolButton.onClick.RemoveListener(HandleEnemySpawnerToolPressed);
 
         if (quitButton != null)
             quitButton.onClick.RemoveListener(HandleQuitPressed);
@@ -99,6 +112,20 @@ public sealed class MainMenuController : MonoBehaviour
             return;
 
         Debug.LogWarning("[MainMenuController] Unable to enqueue gameplay loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
+    }
+
+    /// <summary>
+    /// Opens the runtime enemy spawner override panel from the main menu.
+    /// </summary>
+    private void HandleEnemySpawnerToolPressed()
+    {
+        if (enemySpawnerToolPanel == null)
+        {
+            Debug.LogWarning("[MainMenuController] Enemy spawner runtime tool panel is not assigned.");
+            return;
+        }
+
+        enemySpawnerToolPanel.OpenTool();
     }
 
     /// <summary>

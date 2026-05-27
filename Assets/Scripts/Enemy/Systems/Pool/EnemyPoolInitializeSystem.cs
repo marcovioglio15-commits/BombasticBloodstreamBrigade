@@ -72,10 +72,7 @@ public partial struct EnemyPoolInitializeSystem : ISystem
                         continue;
 
                     if (!entityManager.Exists(requirement.PrefabEntity))
-                    {
-                        allPoolsReady = false;
                         continue;
-                    }
 
                     Entity poolEntity;
                     DynamicBuffer<EnemySpawnerPrefabPoolMapElement> poolMap = entityManager.GetBuffer<EnemySpawnerPrefabPoolMapElement>(spawnerEntity);

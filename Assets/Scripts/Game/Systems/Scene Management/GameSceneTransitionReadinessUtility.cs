@@ -344,6 +344,9 @@ internal static class GameSceneTransitionReadinessUtility
                     if (prefabEntity == Entity.Null)
                         continue;
 
+                    if (!entityManager.Exists(prefabEntity))
+                        continue;
+
                     if (!TryResolveEnemyPool(poolMap, prefabEntity, out Entity poolEntity))
                         return false;
 
