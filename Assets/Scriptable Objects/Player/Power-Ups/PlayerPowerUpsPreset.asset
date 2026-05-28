@@ -22886,7 +22886,7 @@ MonoBehaviour:
             categoryId: 'OrbitalSpear '
             motionMode: 2
             orbitDistance: 2
-            heightOffset: 1.5
+            heightOffset: 1
             angleOffsetDegrees: 0
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
@@ -23174,7 +23174,7 @@ MonoBehaviour:
             categoryId: 'RearShield '
             motionMode: 2
             orbitDistance: 1
-            heightOffset: 1.5
+            heightOffset: 1
             angleOffsetDegrees: 180
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
@@ -23462,7 +23462,7 @@ MonoBehaviour:
             categoryId: 'OrbitalWing '
             motionMode: 2
             orbitDistance: 1.5
-            heightOffset: 1.5
+            heightOffset: 1
             angleOffsetDegrees: 85
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
@@ -23486,7 +23486,7 @@ MonoBehaviour:
             categoryId: 'OrbitalWing '
             motionMode: 2
             orbitDistance: 1.5
-            heightOffset: 1.5
+            heightOffset: 1
             angleOffsetDegrees: -85
             orbitSpeedDegreesPerSecond: 120
             bounceInsideOrbitCone: 0
@@ -24158,7 +24158,11 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - Passive_RearShield
+  - Passive_OrbitalSpear
+  - Passive_OrbitalWings
+  - Passive_OrbitalShield
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
