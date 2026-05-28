@@ -21,7 +21,7 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
     private const int CursorSortingOrder = 32760;
     private const float CursorSpeed = 1500f;
     private const float CursorScrollSpeed = 8f;
-    private const float CursorArmLength = 26f;
+    private const float FallbackCursorSize = 26f;
     private const float CursorThickness = 3f;
     private const float CursorDotSize = 7f;
     #endregion
@@ -30,6 +30,7 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
 
     #region Dependencies
     private readonly Action closeRequested;
+    private readonly EnemySpawnerRuntimeToolCursorStyle cursorStyle;
     #endregion
 
     #region Input Actions
@@ -62,9 +63,11 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
     /// disabled until the cursor is shown, so they never consume input while the tool is closed.
     /// </summary>
     /// <param name="closeRequested">Callback invoked when the player presses the UI cancel button so the owning panel can close.</param>
-    public EnemySpawnerRuntimeToolGamepadNavigationController(Action closeRequested)
+    /// <param name="cursorStyle">Authored cursor style; selects the custom sprite or the generated fallback reticle.</param>
+    public EnemySpawnerRuntimeToolGamepadNavigationController(Action closeRequested, EnemySpawnerRuntimeToolCursorStyle cursorStyle)
     {
         this.closeRequested = closeRequested;
+        this.cursorStyle = cursorStyle;
 
         // Left stick moves the cursor, the south button clicks, the right stick scrolls the spawner list.
         stickAction = new InputAction("EnemySpawnerToolCursorStick", InputActionType.Value, "<Gamepad>/leftStick", expectedControlType : "Vector2");
@@ -132,13 +135,14 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
         bool gamepadPresent = Gamepad.all.Count > 0;
         SetCursorVisible(gamepadPresent);
 
+        // Hide the hardware pointer for gamepad users but keep it UNLOCKED: a locked cursor makes the
+        // InputSystemUIInputModule report pointer hits off-screen, which would silently swallow the virtual clicks.
+        Cursor.visible = !gamepadPresent;
+        Cursor.lockState = CursorLockMode.None;
+
         // Suppress UI navigation in cursor mode so the stick drives only the cursor, never a hidden selection.
         if (eventSystem != null)
             eventSystem.sendNavigationEvents = !gamepadPresent && cachedSendNavigationEvents;
-
-        // Hide the hardware cursor while the software cursor owns input; restore it for mouse users.
-        Cursor.visible = !gamepadPresent;
-        Cursor.lockState = CursorLockMode.None;
 
         // The software cursor selects through pointer events, so drop any stale menu selection it would fight with.
         if (gamepadPresent && eventSystem != null)
@@ -153,8 +157,8 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
         if (eventSystem != null)
             eventSystem.sendNavigationEvents = cachedSendNavigationEvents;
 
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+        // Leave the hardware pointer in the state that matches controller presence (hidden+locked with a gamepad).
+        MenuPointerVisibilityUtility.ApplyForGamepadPresence();
     }
     #endregion
 
@@ -192,6 +196,9 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
         if (cursorRoot != null)
             return;
 
+        // Cursor size falls back to a sensible default when the authored style leaves it unset.
+        float cursorSize = cursorStyle.Size > 0f ? cursorStyle.Size : FallbackCursorSize;
+
         // Dedicated overlay canvas drawn above the menu and with no raycaster so the cursor never blocks clicks.
         cursorRoot = new GameObject(CursorRootName, typeof(Canvas), typeof(CanvasScaler));
         Canvas canvas = cursorRoot.GetComponent<Canvas>();
@@ -202,26 +209,25 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
         scaler.scaleFactor = 1f;
         cursorRoot.SetActive(false);
 
-        // Reticle container that VirtualMouseInput moves to follow the synthesized mouse position.
-        GameObject reticleObject = new GameObject("Reticle", typeof(RectTransform));
-        cursorTransform = reticleObject.GetComponent<RectTransform>();
+        // Container that VirtualMouseInput moves to follow the synthesized mouse position.
+        GameObject cursorObject = new GameObject("Cursor", typeof(RectTransform));
+        cursorTransform = cursorObject.GetComponent<RectTransform>();
         cursorTransform.SetParent(cursorRoot.transform, false);
         cursorTransform.anchorMin = Vector2.zero;
         cursorTransform.anchorMax = Vector2.zero;
         cursorTransform.pivot = new Vector2(0.5f, 0.5f);
-        cursorTransform.sizeDelta = new Vector2(CursorArmLength, CursorArmLength);
+        cursorTransform.sizeDelta = new Vector2(cursorSize, cursorSize);
 
-        // Amber crosshair with a white centre dot used as the VirtualMouseInput graphic.
-        Color armColor = new Color(0.98f, 0.78f, 0.15f, 0.95f);
-        CreateReticleImage("VerticalBar", new Vector2(CursorThickness, CursorArmLength), armColor);
-        CreateReticleImage("HorizontalBar", new Vector2(CursorArmLength, CursorThickness), armColor);
-        Image centerDot = CreateReticleImage("CenterDot", new Vector2(CursorDotSize, CursorDotSize), Color.white);
+        // Use the authored sprite when present, otherwise build the generated crosshair fallback.
+        Image cursorGraphic = cursorStyle.Sprite != null
+            ? BuildCustomCursorGraphic(cursorSize)
+            : BuildFallbackReticleGraphic(cursorSize);
 
         // Feed the gamepad actions into a synthesized Mouse device picked up by the menu InputSystemUIInputModule.
-        virtualMouse = reticleObject.AddComponent<VirtualMouseInput>();
+        virtualMouse = cursorObject.AddComponent<VirtualMouseInput>();
         virtualMouse.cursorMode = VirtualMouseInput.CursorMode.SoftwareCursor;
         virtualMouse.cursorTransform = cursorTransform;
-        virtualMouse.cursorGraphic = centerDot;
+        virtualMouse.cursorGraphic = cursorGraphic;
         virtualMouse.cursorSpeed = CursorSpeed;
         virtualMouse.scrollSpeed = CursorScrollSpeed;
         virtualMouse.stickAction = new InputActionProperty(stickAction);
@@ -230,11 +236,36 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
     }
 
     /// <summary>
-    /// Creates one centered, non-interactive reticle image under the cursor container.
+    /// Builds a single-image cursor from the authored sprite, preserving aspect ratio and applying the style tint.
     /// </summary>
-    /// <param name="imageName">GameObject name assigned to the reticle part.</param>
-    /// <param name="size">Pixel size of the reticle part.</param>
-    /// <param name="color">Fill color of the reticle part.</param>
+    /// <param name="cursorSize">Square size used for the cursor image.</param>
+    /// <returns>Created cursor graphic.</returns>
+    private Image BuildCustomCursorGraphic(float cursorSize)
+    {
+        Image image = CreateReticleImage("Icon", new Vector2(cursorSize, cursorSize), cursorStyle.Tint);
+        image.sprite = cursorStyle.Sprite;
+        image.preserveAspect = true;
+        return image;
+    }
+
+    /// <summary>
+    /// Builds the generated crosshair fallback: two tinted bars plus a white centre dot used as the cursor graphic.
+    /// </summary>
+    /// <param name="cursorSize">Length of the crosshair arms.</param>
+    /// <returns>Centre dot graphic that anchors the cursor.</returns>
+    private Image BuildFallbackReticleGraphic(float cursorSize)
+    {
+        CreateReticleImage("VerticalBar", new Vector2(CursorThickness, cursorSize), cursorStyle.Tint);
+        CreateReticleImage("HorizontalBar", new Vector2(cursorSize, CursorThickness), cursorStyle.Tint);
+        return CreateReticleImage("CenterDot", new Vector2(CursorDotSize, CursorDotSize), Color.white);
+    }
+
+    /// <summary>
+    /// Creates one centered, non-interactive cursor image under the cursor container.
+    /// </summary>
+    /// <param name="imageName">GameObject name assigned to the cursor part.</param>
+    /// <param name="size">Pixel size of the cursor part.</param>
+    /// <param name="color">Fill color of the cursor part.</param>
     /// <returns>Created image component.</returns>
     private Image CreateReticleImage(string imageName, Vector2 size, Color color)
     {

@@ -60,6 +60,16 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
 
     [Tooltip("Button that disables every spawner in the selected scene.")]
     [SerializeField] private Button disableAllButton;
+
+    [Header("Gamepad Navigation")]
+    [Tooltip("Optional custom sprite for the on-screen gamepad cursor shown inside this tool. When empty a generated crosshair reticle is used as a fallback.")]
+    [SerializeField] private Sprite gamepadCursorSprite;
+
+    [Tooltip("Tint multiplied with the gamepad cursor sprite (use white for full-color custom sprites). Also colors the generated fallback crosshair.")]
+    [SerializeField] private Color gamepadCursorTint = new Color(0.98f, 0.78f, 0.15f, 0.95f);
+
+    [Tooltip("On-screen size in pixels of the gamepad cursor (custom sprite or generated fallback).")]
+    [SerializeField] private float gamepadCursorSize = 26f;
     #endregion
 
     #region Runtime
@@ -93,7 +103,8 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        gamepadNavigation = new EnemySpawnerRuntimeToolGamepadNavigationController(CloseTool);
+        gamepadNavigation = new EnemySpawnerRuntimeToolGamepadNavigationController(CloseTool,
+                                                                                  new EnemySpawnerRuntimeToolCursorStyle(gamepadCursorSprite, gamepadCursorTint, gamepadCursorSize));
         EnemySpawnerRuntimeToolViewportUtility.NormalizePanel(rowsContentRoot, rowTemplate, sceneDropdown, presetFolderDropdown);
 
         if (rowTemplate != null)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -32,6 +33,7 @@ public sealed class MainMenuController : MonoBehaviour
 
     #region Runtime
     private MenuSelectionController selectionController;
+    private Selectable selectionBeforeLock;
     private bool navigationLocked;
     #endregion
 
@@ -49,23 +51,26 @@ public sealed class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// Registers menu callbacks and restores menu cursor state.
+    /// Registers menu callbacks and applies the controller-aware menu cursor state.
     /// </summary>
     private void OnEnable()
     {
         RegisterButtons();
         SelectDefaultButton();
         Time.timeScale = 1f;
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
+
+        // Hide and lock the pointer while a controller is connected, even before the spawner tool is opened.
+        InputSystem.onDeviceChange += HandleDeviceChange;
+        MenuPointerVisibilityUtility.ApplyForGamepadPresence();
     }
 
     /// <summary>
-    /// Removes menu callbacks when the controller leaves the active scene.
+    /// Removes menu and device callbacks when the controller leaves the active scene.
     /// </summary>
     private void OnDisable()
     {
         UnregisterButtons();
+        InputSystem.onDeviceChange -= HandleDeviceChange;
     }
     #endregion
 
@@ -109,9 +114,9 @@ public sealed class MainMenuController : MonoBehaviour
 
     #region Public Methods
     /// <summary>
-    /// Locks or unlocks main-menu navigation while a modal runtime overlay owns input. Locking disables the authored
-    /// menu buttons and the selection helper so gamepad and keyboard focus cannot leave the overlay; unlocking restores
-    /// them and reselects the default button.
+    /// Locks or unlocks main-menu navigation while a modal runtime overlay owns input. Locking remembers the focused
+    /// button and disables the authored menu buttons and the selection helper so gamepad and keyboard focus cannot
+    /// leave the overlay; unlocking restores them and reselects the button focused before the overlay opened.
     /// </summary>
     /// <param name="locked">True to suspend menu navigation, false to restore it.</param>
     public void SetNavigationLocked(bool locked)
@@ -120,14 +125,19 @@ public sealed class MainMenuController : MonoBehaviour
             return;
 
         navigationLocked = locked;
+
+        // Remember which button opened the overlay so focus can return to it instead of the first button.
+        if (locked)
+            CaptureSelectionBeforeLock();
+
         SetMenuButtonsInteractable(!locked);
 
         if (selectionController != null)
             selectionController.enabled = !locked;
 
-        // Return focus to a usable menu button once the overlay releases input.
+        // Restore focus to the button selected before the overlay opened once it releases input.
         if (!locked)
-            SelectDefaultButton();
+            RestoreSelectionAfterUnlock();
     }
     #endregion
 
@@ -170,6 +180,34 @@ public sealed class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
+    /// Re-applies the menu cursor state when a gamepad is connected or removed, unless the spawner tool overlay
+    /// currently owns the cursor.
+    /// </summary>
+    /// <param name="device">Device that changed state.</param>
+    /// <param name="change">Kind of change reported by the input system.</param>
+    private void HandleDeviceChange(InputDevice device, InputDeviceChange change)
+    {
+        if (device is not Gamepad)
+            return;
+
+        // The overlay drives the cursor while it is open; only refresh the plain menu state here.
+        if (navigationLocked)
+            return;
+
+        switch (change)
+        {
+            case InputDeviceChange.Added:
+            case InputDeviceChange.Removed:
+            case InputDeviceChange.Reconnected:
+            case InputDeviceChange.Disconnected:
+            case InputDeviceChange.Enabled:
+            case InputDeviceChange.Disabled:
+                MenuPointerVisibilityUtility.ApplyForGamepadPresence();
+                break;
+        }
+    }
+
+    /// <summary>
     /// Requests application shutdown through the shared helper.
     /// </summary>
     private void HandleQuitPressed()
@@ -196,39 +234,85 @@ public sealed class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// Selects the first non-null authored menu button so keyboard and controller navigation work immediately.
+    /// Caches the selectable focused before the overlay opened so focus can return to it on close.
     /// </summary>
-    private void SelectDefaultButton()
+    private void CaptureSelectionBeforeLock()
     {
-        if (selectionController != null && playButton != null)
+        EventSystem resolvedEventSystem = ResolveEventSystem();
+        GameObject selectedObject = resolvedEventSystem != null ? resolvedEventSystem.currentSelectedGameObject : null;
+        selectionBeforeLock = selectedObject != null ? selectedObject.GetComponent<Selectable>() : null;
+    }
+
+    /// <summary>
+    /// Restores focus to the button selected before the overlay opened, falling back to the tool button or default.
+    /// </summary>
+    private void RestoreSelectionAfterUnlock()
+    {
+        Selectable restoreTarget = selectionBeforeLock;
+        selectionBeforeLock = null;
+
+        // Fall back to the tool button (then Play) when the previous selection is gone or no longer usable.
+        if (restoreTarget == null || !restoreTarget.IsInteractable())
+            restoreTarget = enemySpawnerToolButton != null ? enemySpawnerToolButton : playButton;
+
+        if (restoreTarget == null)
         {
-            selectionController.SelectSelectable(playButton, rememberAsDefault : true);
+            SelectDefaultButton();
             return;
         }
 
-        EventSystem resolvedEventSystem = eventSystemOverride != null
-            ? eventSystemOverride
-            : EventSystem.current;
+        if (selectionController != null)
+        {
+            selectionController.SelectSelectable(restoreTarget, rememberAsDefault : true);
+            return;
+        }
+
+        ApplyEventSystemSelection(restoreTarget);
+    }
+
+    /// <summary>
+    /// Selects a sensible default authored button so keyboard and controller navigation work immediately.
+    /// </summary>
+    private void SelectDefaultButton()
+    {
+        Selectable defaultTarget = playButton != null ? playButton : quitButton;
+
+        if (defaultTarget == null)
+            return;
+
+        if (selectionController != null)
+        {
+            selectionController.SelectSelectable(defaultTarget, rememberAsDefault : true);
+            return;
+        }
+
+        ApplyEventSystemSelection(defaultTarget);
+    }
+
+    /// <summary>
+    /// Applies one selection directly through the resolved EventSystem when no selection helper is present.
+    /// </summary>
+    /// <param name="selectable">Selectable that should own UI focus.</param>
+    private void ApplyEventSystemSelection(Selectable selectable)
+    {
+        EventSystem resolvedEventSystem = ResolveEventSystem();
 
         if (resolvedEventSystem == null)
             return;
 
-        if (playButton != null)
-        {
-            Canvas.ForceUpdateCanvases();
-            resolvedEventSystem.SetSelectedGameObject(null);
-            playButton.Select();
-            resolvedEventSystem.SetSelectedGameObject(playButton.gameObject);
-            return;
-        }
+        Canvas.ForceUpdateCanvases();
+        resolvedEventSystem.SetSelectedGameObject(null);
+        selectable.Select();
+        resolvedEventSystem.SetSelectedGameObject(selectable.gameObject);
+    }
 
-        if (quitButton != null)
-        {
-            Canvas.ForceUpdateCanvases();
-            resolvedEventSystem.SetSelectedGameObject(null);
-            quitButton.Select();
-            resolvedEventSystem.SetSelectedGameObject(quitButton.gameObject);
-        }
+    /// <summary>
+    /// Resolves the EventSystem used to drive menu selection.
+    /// </summary>
+    /// <returns>EventSystem override when set, otherwise the active EventSystem.</returns>
+    private EventSystem ResolveEventSystem()
+    {
+        return eventSystemOverride != null ? eventSystemOverride : EventSystem.current;
     }
     #endregion
 
