@@ -21,7 +21,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
     /// <summary>
     /// Rebuilds the runtime catalog and installs the main-menu button and panel.
     /// </summary>
-    [MenuItem(MenuPath)]
+    //[MenuItem(MenuPath)]
     public static void ApplyDefaultSetup()
     {
         EnemySpawnerRuntimeCatalog catalog = EnemySpawnerRuntimeCatalogBuildUtility.RebuildCatalogAsset();

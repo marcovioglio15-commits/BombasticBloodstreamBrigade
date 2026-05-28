@@ -45,6 +45,8 @@ public struct EnemySpawnerRuntimeOverrideState : IComponentData
 {
     public uint AppliedStoreVersion;
     public FixedString64Bytes AppliedWavePresetGuid;
+    public uint FailedStoreVersion;
+    public FixedString64Bytes FailedWavePresetGuid;
     public byte AppliedEnabled;
 }
 

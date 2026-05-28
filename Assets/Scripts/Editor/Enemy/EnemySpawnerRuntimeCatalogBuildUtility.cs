@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public static class EnemySpawnerRuntimeCatalogBuildUtility
 {
     #region Constants
-    public const string CatalogAssetPath = "Assets/Resources/EnemySpawnerRuntimeCatalog.asset";
+    public const string CatalogAssetPath = EnemySpawnerRuntimeCatalog.DefaultAssetPath;
     #endregion
 
     #region Methods
@@ -45,7 +45,10 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
 
     #region Scene Catalog
     /// <summary>
-    /// Builds scene entries by opening project scenes and aggregating direct spawners plus referenced SubScene spawners.
+    /// Builds scene entries by scanning project scenes and aggregating direct spawners plus referenced SubScene spawners.
+    /// Scenes already open in the editor are reused in-place; only freshly opened scenes are explicitly closed after scanning.
+    /// This avoids the "Unloading the last loaded scene is not supported" exception that occurs when the currently-active
+    /// scene is also present in the managed scene list.
     /// </summary>
     /// <returns>Generated scene entries that contain at least one enemy spawner.</returns>
     private static List<EnemySpawnerRuntimeSceneEntry> BuildSceneEntries()
@@ -64,7 +67,10 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
                 if (string.IsNullOrWhiteSpace(scenePath) || !scenePath.EndsWith(".unity"))
                     continue;
 
-                Scene openedScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+                // Reuse the scene if it is already loaded so CloseScene is never called on the last open scene.
+                Scene existingScene = SceneManager.GetSceneByPath(scenePath);
+                bool wasAlreadyOpen = existingScene.IsValid() && existingScene.isLoaded;
+                Scene openedScene = wasAlreadyOpen ? existingScene : EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
                 string sceneGuid = AssetDatabase.AssetPathToGUID(scenePath);
                 bool sceneChanged;
                 List<EnemySpawnerRuntimeSpawnerEntry> spawnerEntries = new List<EnemySpawnerRuntimeSpawnerEntry>();
@@ -95,7 +101,9 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
                     EditorSceneManager.SaveScene(openedScene);
                 }
 
-                EditorSceneManager.CloseScene(openedScene, true);
+                // Only close scenes that this method opened; already-open scenes are restored by RestoreSceneManagerSetup.
+                if (!wasAlreadyOpen)
+                    EditorSceneManager.CloseScene(openedScene, true);
             }
         }
         finally
@@ -258,6 +266,8 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
 
     /// <summary>
     /// Appends spawners from one referenced SubScene asset to the selected parent scene entry.
+    /// SubScene assets that are already open in the editor are reused in-place and never closed by this method;
+    /// cleanup is delegated to <see cref="BuildSceneEntries"/>'s RestoreSceneManagerSetup finally block.
     /// </summary>
     /// <param name="subScene">SubScene component found inside the parent scene.</param>
     /// <param name="spawnerEntries">Target spawner list for the parent scene catalog entry.</param>
@@ -280,7 +290,10 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
         if (!localSubScenePaths.Add(subScenePath))
             return;
 
-        Scene openedSubScene = EditorSceneManager.OpenScene(subScenePath, OpenSceneMode.Additive);
+        // Reuse the sub-scene if already loaded to avoid the "last loaded scene" exception.
+        Scene existingSubScene = SceneManager.GetSceneByPath(subScenePath);
+        bool wasAlreadyOpen = existingSubScene.IsValid() && existingSubScene.isLoaded;
+        Scene openedSubScene = wasAlreadyOpen ? existingSubScene : EditorSceneManager.OpenScene(subScenePath, OpenSceneMode.Additive);
 
         try
         {
@@ -299,7 +312,8 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
         }
         finally
         {
-            EditorSceneManager.CloseScene(openedSubScene, true);
+            if (!wasAlreadyOpen)
+                EditorSceneManager.CloseScene(openedSubScene, true);
         }
     }
 

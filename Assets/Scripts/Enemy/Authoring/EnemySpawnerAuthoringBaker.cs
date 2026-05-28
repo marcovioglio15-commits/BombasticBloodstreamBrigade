@@ -22,6 +22,12 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             return;
 
         DependsOn(authoring.WavePreset);
+#if UNITY_EDITOR
+        EnemySpawnerRuntimeCatalog runtimeCatalog = EnemySpawnerRuntimeBakeMetadataUtility.ResolveRuntimeCatalogAsset();
+
+        if (runtimeCatalog != null)
+            DependsOn(runtimeCatalog);
+#endif
 
         Entity spawnerEntity = GetEntity(TransformUsageFlags.Dynamic);
         List<EnemySpawnerWaveDefinitionElement> stagedWaveDefinitions = new List<EnemySpawnerWaveDefinitionElement>();
@@ -59,6 +65,8 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
         {
             AppliedStoreVersion = 0u,
             AppliedWavePresetGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAssetGuid(authoring.WavePreset)),
+            FailedStoreVersion = 0u,
+            FailedWavePresetGuid = default,
             AppliedEnabled = runtimeEnabledByDefault ? (byte)1 : (byte)0
         });
 

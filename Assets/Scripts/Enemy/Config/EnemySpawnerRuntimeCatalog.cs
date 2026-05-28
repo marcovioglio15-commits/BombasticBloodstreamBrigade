@@ -8,6 +8,10 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemySpawnerRuntimeCatalog", menuName = "Enemy/Spawner Runtime Catalog", order = 31)]
 public sealed class EnemySpawnerRuntimeCatalog : ScriptableObject
 {
+    #region Constants
+    public const string DefaultAssetPath = "Assets/Resources/EnemySpawnerRuntimeCatalog.asset";
+    #endregion
+
     #region Fields
 
     #region Serialized Fields

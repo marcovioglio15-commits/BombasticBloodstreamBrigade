@@ -39,6 +39,7 @@ public static class EnemySpawnerRuntimeBakeMetadataUtility
         AddPresetIfUnique(defaultPreset, candidatePresets, uniquePresets);
 
 #if UNITY_EDITOR
+        AddRuntimeCatalogWavePresetCandidates(candidatePresets, uniquePresets);
         EnsureRuntimeWavePresetCache();
 
         for (int presetIndex = 0; presetIndex < cachedRuntimeWavePresets.Count; presetIndex++)
@@ -129,10 +130,86 @@ public static class EnemySpawnerRuntimeBakeMetadataUtility
         hasCachedRuntimeWavePresets = false;
 #endif
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Resolves the runtime spawner catalog asset that mirrors the dropdown source used by the main-menu tool.
+    /// </summary>
+    /// <returns>Runtime spawner catalog asset, or null when it has not been generated yet.</returns>
+    public static EnemySpawnerRuntimeCatalog ResolveRuntimeCatalogAsset()
+    {
+        return AssetDatabase.LoadAssetAtPath<EnemySpawnerRuntimeCatalog>(EnemySpawnerRuntimeCatalog.DefaultAssetPath);
+    }
+#endif
     #endregion
 
     #region Helpers
 #if UNITY_EDITOR
+    /// <summary>
+    /// Adds catalog-backed wave presets so SubScene baking uses the same selectable set exposed by the runtime tool.
+    /// </summary>
+    /// <param name="candidatePresets">Ordered candidate list receiving catalog presets.</param>
+    /// <param name="uniquePresets">Uniqueness guard shared by all candidate sources.</param>
+    private static void AddRuntimeCatalogWavePresetCandidates(List<EnemyWavePreset> candidatePresets,
+                                                              HashSet<EnemyWavePreset> uniquePresets)
+    {
+        EnemySpawnerRuntimeCatalog catalog = ResolveRuntimeCatalogAsset();
+
+        if (catalog == null)
+            return;
+
+        IReadOnlyList<EnemySpawnerRuntimeWavePresetFolderEntry> folderEntries = catalog.WavePresetFolders;
+
+        for (int folderIndex = 0; folderIndex < folderEntries.Count; folderIndex++)
+            AddRuntimeCatalogFolderWavePresetCandidates(folderEntries[folderIndex], candidatePresets, uniquePresets);
+    }
+
+    /// <summary>
+    /// Adds all valid wave presets from one catalog folder entry.
+    /// </summary>
+    /// <param name="folderEntry">Catalog folder entry to inspect.</param>
+    /// <param name="candidatePresets">Ordered candidate list receiving presets.</param>
+    /// <param name="uniquePresets">Uniqueness guard shared by all candidate sources.</param>
+    private static void AddRuntimeCatalogFolderWavePresetCandidates(EnemySpawnerRuntimeWavePresetFolderEntry folderEntry,
+                                                                    List<EnemyWavePreset> candidatePresets,
+                                                                    HashSet<EnemyWavePreset> uniquePresets)
+    {
+        if (folderEntry == null)
+            return;
+
+        IReadOnlyList<EnemySpawnerRuntimeWavePresetEntry> presetEntries = folderEntry.WavePresets;
+
+        for (int presetIndex = 0; presetIndex < presetEntries.Count; presetIndex++)
+        {
+            EnemySpawnerRuntimeWavePresetEntry presetEntry = presetEntries[presetIndex];
+
+            if (presetEntry == null)
+                continue;
+
+            EnemyWavePreset preset = ResolveCatalogPreset(presetEntry);
+            AddPresetIfUnique(preset, candidatePresets, uniquePresets);
+        }
+    }
+
+    /// <summary>
+    /// Resolves the wave preset referenced by one catalog entry, falling back to its asset path when the object reference is stale.
+    /// </summary>
+    /// <param name="presetEntry">Catalog preset entry to resolve.</param>
+    /// <returns>Resolved EnemyWavePreset asset, or null when unavailable.</returns>
+    private static EnemyWavePreset ResolveCatalogPreset(EnemySpawnerRuntimeWavePresetEntry presetEntry)
+    {
+        if (presetEntry == null)
+            return null;
+
+        if (presetEntry.Preset != null)
+            return presetEntry.Preset;
+
+        if (string.IsNullOrWhiteSpace(presetEntry.AssetPath))
+            return null;
+
+        return AssetDatabase.LoadAssetAtPath<EnemyWavePreset>(presetEntry.AssetPath);
+    }
+
     /// <summary>
     /// Builds the editor wave-preset cache once per domain so each spawner baker does not rescan the AssetDatabase.
     /// </summary>

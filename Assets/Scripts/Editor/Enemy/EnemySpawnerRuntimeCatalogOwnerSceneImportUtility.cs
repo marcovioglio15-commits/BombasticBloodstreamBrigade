@@ -23,7 +23,7 @@ public static class EnemySpawnerRuntimeCatalogOwnerSceneImportUtility
     /// <summary>
     /// Rebuilds the runtime spawner catalog and immediately reimports every owner scene represented by it.
     /// </summary>
-    [MenuItem(RebuildMenuPath)]
+    //[MenuItem(RebuildMenuPath)]
     public static void RebuildCatalogAndReimportOwnerScenes()
     {
         EnemySpawnerRuntimeCatalog catalog = EnemySpawnerRuntimeCatalogBuildUtility.RebuildCatalogAsset();
