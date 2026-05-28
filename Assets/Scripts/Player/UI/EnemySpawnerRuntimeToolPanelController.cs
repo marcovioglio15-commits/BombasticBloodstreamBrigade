@@ -69,12 +69,20 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     private readonly Dictionary<string, bool> enabledBySpawnerGuid = new Dictionary<string, bool>();
     private readonly Dictionary<string, string> waveGuidBySpawnerGuid = new Dictionary<string, string>();
     private readonly Dictionary<EnemySpawnerRuntimeToolRowView, List<string>> optionGuidsByRow = new Dictionary<EnemySpawnerRuntimeToolRowView, List<string>>();
+    private EnemySpawnerRuntimeToolGamepadNavigationController gamepadNavigation;
     private int selectedSceneIndex;
     private int selectedFolderIndex;
     private int visibleRowCount;
     private bool suppressCallbacks;
     #endregion
 
+    #endregion
+
+    #region Events
+    /// <summary>
+    /// Raised after the tool overlay closes so the main menu can restore its suspended navigation.
+    /// </summary>
+    public event Action ToolClosed;
     #endregion
 
     #region Methods
@@ -85,6 +93,7 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
+        gamepadNavigation = new EnemySpawnerRuntimeToolGamepadNavigationController(CloseTool);
         EnemySpawnerRuntimeToolViewportUtility.NormalizePanel(rowsContentRoot, rowTemplate, sceneDropdown, presetFolderDropdown);
 
         if (rowTemplate != null)
@@ -97,11 +106,14 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     }
 
     /// <summary>
-    /// Removes UI callbacks when the panel controller is destroyed.
+    /// Removes UI callbacks and tears down gamepad navigation when the panel controller is destroyed.
     /// </summary>
     private void OnDestroy()
     {
         UnregisterCallbacks();
+
+        if (gamepadNavigation != null)
+            gamepadNavigation.Dispose();
     }
     #endregion
 
@@ -120,15 +132,23 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
         RefreshSceneState();
         RefreshRows();
         RefreshStatus();
+        gamepadNavigation.Activate();
     }
 
     /// <summary>
-    /// Closes the runtime spawner tool panel.
+    /// Closes the runtime spawner tool panel and restores menu pointer and navigation state.
     /// </summary>
     public void CloseTool()
     {
+        gamepadNavigation.Deactivate();
+
         if (panelRoot != null)
             panelRoot.SetActive(false);
+
+        Action toolClosed = ToolClosed;
+
+        if (toolClosed != null)
+            toolClosed.Invoke();
     }
     #endregion
 

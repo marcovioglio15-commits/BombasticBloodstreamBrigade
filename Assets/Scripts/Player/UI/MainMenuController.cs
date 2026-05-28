@@ -32,6 +32,7 @@ public sealed class MainMenuController : MonoBehaviour
 
     #region Runtime
     private MenuSelectionController selectionController;
+    private bool navigationLocked;
     #endregion
 
     #endregion
@@ -82,6 +83,9 @@ public sealed class MainMenuController : MonoBehaviour
 
         if (quitButton != null)
             quitButton.onClick.AddListener(HandleQuitPressed);
+
+        if (enemySpawnerToolPanel != null)
+            enemySpawnerToolPanel.ToolClosed += HandleToolClosed;
     }
 
     /// <summary>
@@ -97,6 +101,33 @@ public sealed class MainMenuController : MonoBehaviour
 
         if (quitButton != null)
             quitButton.onClick.RemoveListener(HandleQuitPressed);
+
+        if (enemySpawnerToolPanel != null)
+            enemySpawnerToolPanel.ToolClosed -= HandleToolClosed;
+    }
+    #endregion
+
+    #region Public Methods
+    /// <summary>
+    /// Locks or unlocks main-menu navigation while a modal runtime overlay owns input. Locking disables the authored
+    /// menu buttons and the selection helper so gamepad and keyboard focus cannot leave the overlay; unlocking restores
+    /// them and reselects the default button.
+    /// </summary>
+    /// <param name="locked">True to suspend menu navigation, false to restore it.</param>
+    public void SetNavigationLocked(bool locked)
+    {
+        if (navigationLocked == locked)
+            return;
+
+        navigationLocked = locked;
+        SetMenuButtonsInteractable(!locked);
+
+        if (selectionController != null)
+            selectionController.enabled = !locked;
+
+        // Return focus to a usable menu button once the overlay releases input.
+        if (!locked)
+            SelectDefaultButton();
     }
     #endregion
 
@@ -125,7 +156,17 @@ public sealed class MainMenuController : MonoBehaviour
             return;
         }
 
+        // Suspend menu navigation before the overlay opens so input cannot leak back to the menu buttons.
+        SetNavigationLocked(true);
         enemySpawnerToolPanel.OpenTool();
+    }
+
+    /// <summary>
+    /// Restores main-menu navigation when the spawner tool overlay reports that it has closed.
+    /// </summary>
+    private void HandleToolClosed()
+    {
+        SetNavigationLocked(false);
     }
 
     /// <summary>
@@ -138,6 +179,22 @@ public sealed class MainMenuController : MonoBehaviour
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Sets the interactable state of every authored menu button so navigation can be suspended in one call.
+    /// </summary>
+    /// <param name="interactable">True to enable the menu buttons, false to disable them.</param>
+    private void SetMenuButtonsInteractable(bool interactable)
+    {
+        if (playButton != null)
+            playButton.interactable = interactable;
+
+        if (enemySpawnerToolButton != null)
+            enemySpawnerToolButton.interactable = interactable;
+
+        if (quitButton != null)
+            quitButton.interactable = interactable;
+    }
+
     /// <summary>
     /// Selects the first non-null authored menu button so keyboard and controller navigation work immediately.
     /// </summary>
