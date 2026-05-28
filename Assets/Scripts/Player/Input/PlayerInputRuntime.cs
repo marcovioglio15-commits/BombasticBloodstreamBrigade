@@ -207,7 +207,7 @@ public static class PlayerInputRuntime
     /// <returns>True when look supports mouse pointer and no controller-like devices are connected.</returns>
     public static bool ShouldUseMousePointerLook()
     {
-        if (lookActionUsesMousePointer == false)
+        if (!lookActionUsesMousePointer)
             return false;
 
         return IsMouseKeyboardOnlyContext();
@@ -217,20 +217,23 @@ public static class PlayerInputRuntime
     /// Reads look input while excluding pointer controls when the action mixes mouse and controller bindings.
     /// </summary>
     /// <param name="lookValue">Resolved look vector.</param>
+    /// <param name="sourceIsAnalog">True when the resolved look value came from an analog stick-like control.</param>
     /// <returns>True when a look vector was resolved from the runtime look action.</returns>
-    public static bool TryReadControllerLookVector(out Vector2 lookValue)
+    public static bool TryReadControllerLookVector(out Vector2 lookValue, out bool sourceIsAnalog)
     {
         lookValue = Vector2.zero;
+        sourceIsAnalog = false;
 
         if (lookAction == null)
             return false;
 
-        if (lookAction.enabled == false)
+        if (!lookAction.enabled)
             return false;
 
-        if (lookActionUsesMousePointer == false)
+        if (!lookActionUsesMousePointer)
         {
             lookValue = lookAction.ReadValue<Vector2>();
+            sourceIsAnalog = PlayerInputControlSourceUtility.IsAnalogVectorSource(lookAction.activeControl);
             return true;
         }
 
@@ -248,7 +251,7 @@ public static class PlayerInputRuntime
             if (IsPointerDevice(control.device))
                 continue;
 
-            if (TryReadLookControlVector2(control, out Vector2 candidateLookValue) == false)
+            if (!TryReadLookControlVector2(control, out Vector2 candidateLookValue))
                 continue;
 
             float candidateMagnitudeSquared = candidateLookValue.sqrMagnitude;
@@ -259,6 +262,7 @@ public static class PlayerInputRuntime
             foundNonPointerControl = true;
             bestMagnitudeSquared = candidateMagnitudeSquared;
             lookValue = candidateLookValue;
+            sourceIsAnalog = PlayerInputControlSourceUtility.IsAnalogVectorSource(control);
         }
 
         if (foundNonPointerControl)
@@ -273,6 +277,7 @@ public static class PlayerInputRuntime
             return false;
 
         lookValue = lookAction.ReadValue<Vector2>();
+        sourceIsAnalog = PlayerInputControlSourceUtility.IsAnalogVectorSource(activeControl);
         return true;
     }
 
@@ -472,31 +477,31 @@ public static class PlayerInputRuntime
         if (PlayerInputRuntime.sourceAsset != sourceAsset)
             return false;
 
-        if (string.Equals(PlayerInputRuntime.moveActionId, moveActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.moveActionId, moveActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.lookActionId, lookActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.lookActionId, lookActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.shootActionId, shootActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.shootActionId, shootActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpPrimaryActionId, powerUpPrimaryActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpPrimaryActionId, powerUpPrimaryActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpSecondaryActionId, powerUpSecondaryActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpSecondaryActionId, powerUpSecondaryActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpSwapSlotsActionId, powerUpSwapSlotsActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpSwapSlotsActionId, powerUpSwapSlotsActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpContainerInteractActionId, powerUpContainerInteractActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpContainerInteractActionId, powerUpContainerInteractActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpContainerReplacePrimaryActionId, powerUpContainerReplacePrimaryActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpContainerReplacePrimaryActionId, powerUpContainerReplacePrimaryActionId))
             return false;
 
-        if (string.Equals(PlayerInputRuntime.powerUpContainerReplaceSecondaryActionId, powerUpContainerReplaceSecondaryActionId) == false)
+        if (!string.Equals(PlayerInputRuntime.powerUpContainerReplaceSecondaryActionId, powerUpContainerReplaceSecondaryActionId))
             return false;
 
         return true;
@@ -507,7 +512,7 @@ public static class PlayerInputRuntime
         if (asset == null)
             return null;
 
-        if (string.IsNullOrWhiteSpace(actionId) == false)
+        if (!string.IsNullOrWhiteSpace(actionId))
         {
             InputAction action = asset.FindAction(actionId, false);
 
@@ -631,7 +636,7 @@ public static class PlayerInputRuntime
 
         string mapName = action.actionMap != null ? action.actionMap.name : "none";
 
-        if (action.enabled == false)
+        if (!action.enabled)
             return string.Format("FOUND (disabled) map '{0}'", mapName);
 
         return string.Format("FOUND (enabled) map '{0}'", mapName);

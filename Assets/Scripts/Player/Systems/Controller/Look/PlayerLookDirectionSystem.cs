@@ -126,14 +126,18 @@ public partial struct PlayerLookDirectionSystem : ISystem
 
             // Retrieve the look input and configuration parameters
             float2 lookInput = inputState.ValueRO.Look;
+            bool usesAnalogLookSource = inputState.ValueRO.LookUsesAnalogSource != 0;
             float deadZone = lookConfig.Values.RotationDeadZone;
             float releaseGraceSeconds = math.max(0f, lookConfig.Values.DigitalReleaseGraceSeconds);
             PlayerControllerMath.GetReferenceBasis(ReferenceFrame.WorldForward, playerForward, new float3(0f, 0f, 1f), false, out float3 forward, out float3 right);
 
             float2 resolvedInput = lookInput;
 
+            if (usesAnalogLookSource)
+                ClearDigitalInputState(ref lookState.ValueRW);
+
             // Check if the input is digital-like (meaning close to digital directions)
-            bool digitalLike = PlayerControllerMath.IsDigitalLike(lookInput, DigitalLikeTolerance);
+            bool digitalLike = !usesAnalogLookSource && PlayerControllerMath.IsDigitalLike(lookInput, DigitalLikeTolerance);
 
             // Snap to digital if input is close to digital
             if (digitalLike)
@@ -192,6 +196,19 @@ public partial struct PlayerLookDirectionSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Clears keyboard/D-pad stabilization state when an analog stick owns look input.
+    /// </summary>
+    /// <param name="lookState">Mutable look state that stores digital input bookkeeping.</param>
+    private static void ClearDigitalInputState(ref PlayerLookState lookState)
+    {
+        lookState.PrevLookMask = 0;
+        lookState.CurrLookMask = 0;
+        lookState.LookPressTimes = float4.zero;
+        lookState.ReleaseHoldMask = 0;
+        lookState.ReleaseHoldUntilTime = 0f;
+    }
+
     /// <summary>
     /// Resolves a planar look direction from the mouse pointer by intersecting a camera ray with the player's Y plane.
     /// </summary>

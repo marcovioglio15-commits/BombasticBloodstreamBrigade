@@ -75,8 +75,12 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             PlayerRuntimeMovementConfig movementConfig = runtimeMovementConfig.ValueRO;
 
             float2 moveInput = inputState.ValueRO.Move;
+            bool usesAnalogMoveSource = inputState.ValueRO.MoveUsesAnalogSource != 0;
             float deadZone = movementConfig.Values.InputDeadZone;
             float releaseGraceSeconds = math.max(0f, movementConfig.Values.DigitalReleaseGraceSeconds);
+
+            if (usesAnalogMoveSource)
+                ClearDigitalInputState(ref movementState.ValueRW);
 
             if (math.lengthsq(moveInput) <= deadZone * deadZone)
             {
@@ -100,7 +104,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
 
             float2 resolvedInput = moveInput;
 
-            bool digitalLike = PlayerControllerMath.IsDigitalLike(moveInput, DigitalLikeTolerance);
+            bool digitalLike = !usesAnalogMoveSource && PlayerControllerMath.IsDigitalLike(moveInput, DigitalLikeTolerance);
 
             if (digitalLike)
                 resolvedInput = ResolveDigitalInput(ref movementState.ValueRW, moveInput, elapsedTime, releaseGraceSeconds);
@@ -168,6 +172,19 @@ public partial struct PlayerMovementDirectionSystem : ISystem
 
 
     #region Helpers
+    /// <summary>
+    /// Clears keyboard/D-pad stabilization state when an analog stick owns movement input.
+    /// </summary>
+    /// <param name="movementState">Mutable movement state that stores digital input bookkeeping.</param>
+    private static void ClearDigitalInputState(ref PlayerMovementState movementState)
+    {
+        movementState.PrevMoveMask = 0;
+        movementState.CurrMoveMask = 0;
+        movementState.MovePressTimes = float4.zero;
+        movementState.ReleaseHoldMask = 0;
+        movementState.ReleaseHoldUntilTime = 0f;
+    }
+
     /// <summary>
     /// This method resolves the digital input direction based on the current and previous input masks,
     /// and the configured release grace period. 

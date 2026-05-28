@@ -44,6 +44,8 @@ public partial struct PlayerInputBridgeSystem : ISystem
         float powerUpPrimary = 0f;
         float powerUpSecondary = 0f;
         float swapPowerUpSlots = 0f;
+        bool moveUsesAnalogSource = false;
+        bool lookUsesAnalogSource = false;
         bool isInputReady = PlayerInputRuntime.IsReady;
         bool isGameplayPaused = PlayerGameplayPauseUtility.IsHardGameplayPauseActive();
         bool useMousePointerLook = PlayerInputRuntime.ShouldUseMousePointerLook();
@@ -55,14 +57,18 @@ public partial struct PlayerInputBridgeSystem : ISystem
             {
                 Vector2 moveValue = moveAction.ReadValue<Vector2>();
                 move = new float2(moveValue.x, moveValue.y);
+                moveUsesAnalogSource = PlayerInputControlSourceUtility.IsAnalogVectorSource(moveAction.activeControl);
             }
 
             if (lookAction != null && !useMousePointerLook)
             {
                 Vector2 lookValue = Vector2.zero;
 
-                if (PlayerInputRuntime.TryReadControllerLookVector(out Vector2 resolvedLookValue))
+                if (PlayerInputRuntime.TryReadControllerLookVector(out Vector2 resolvedLookValue, out bool resolvedLookUsesAnalogSource))
+                {
                     lookValue = resolvedLookValue;
+                    lookUsesAnalogSource = resolvedLookUsesAnalogSource;
+                }
 
                 look = new float2(lookValue.x, lookValue.y);
             }
@@ -104,44 +110,32 @@ public partial struct PlayerInputBridgeSystem : ISystem
             {
                 if (isFinalized)
                 {
-                    inputState.ValueRW.Move = float2.zero;
-                    inputState.ValueRW.Look = float2.zero;
-                    inputState.ValueRW.Shoot = 0f;
-                    inputState.ValueRW.PowerUpPrimary = 0f;
-                    inputState.ValueRW.PowerUpSecondary = 0f;
-                    inputState.ValueRW.SwapPowerUpSlots = 0f;
+                    ResetInputState(ref inputState.ValueRW);
                     assignedLocalInput = true;
                     continue;
                 }
 
                 if (isGameplayPaused)
                 {
-                    inputState.ValueRW.Move = float2.zero;
-                    inputState.ValueRW.Look = float2.zero;
-                    inputState.ValueRW.Shoot = 0f;
-                    inputState.ValueRW.PowerUpPrimary = 0f;
-                    inputState.ValueRW.PowerUpSecondary = 0f;
-                    inputState.ValueRW.SwapPowerUpSlots = 0f;
+                    ResetInputState(ref inputState.ValueRW);
                     assignedLocalInput = true;
                     continue;
                 }
 
-                inputState.ValueRW.Move = move;
-                inputState.ValueRW.Look = look;
-                inputState.ValueRW.Shoot = shoot;
-                inputState.ValueRW.PowerUpPrimary = powerUpPrimary;
-                inputState.ValueRW.PowerUpSecondary = powerUpSecondary;
-                inputState.ValueRW.SwapPowerUpSlots = swapPowerUpSlots;
+                WriteInputState(ref inputState.ValueRW,
+                                move,
+                                look,
+                                moveUsesAnalogSource,
+                                lookUsesAnalogSource,
+                                shoot,
+                                powerUpPrimary,
+                                powerUpSecondary,
+                                swapPowerUpSlots);
                 assignedLocalInput = true;
                 continue;
             }
 
-            inputState.ValueRW.Move = float2.zero;
-            inputState.ValueRW.Look = float2.zero;
-            inputState.ValueRW.Shoot = 0f;
-            inputState.ValueRW.PowerUpPrimary = 0f;
-            inputState.ValueRW.PowerUpSecondary = 0f;
-            inputState.ValueRW.SwapPowerUpSlots = 0f;
+            ResetInputState(ref inputState.ValueRW);
         }
 
         #if UNITY_EDITOR
@@ -152,6 +146,57 @@ public partial struct PlayerInputBridgeSystem : ISystem
         }
 
         #endif
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Clears all input channels and their source metadata for players that should not consume local input this frame.
+    /// </summary>
+    /// <param name="inputState">Mutable ECS input state stored on one player entity.</param>
+    private static void ResetInputState(ref PlayerInputState inputState)
+    {
+        WriteInputState(ref inputState,
+                        float2.zero,
+                        float2.zero,
+                        false,
+                        false,
+                        0f,
+                        0f,
+                        0f,
+                        0f);
+    }
+
+    /// <summary>
+    /// Writes gameplay input values and analog-source metadata into one ECS input state.
+    /// </summary>
+    /// <param name="inputState">Mutable ECS input state stored on one player entity.</param>
+    /// <param name="move">Resolved movement vector for this frame.</param>
+    /// <param name="look">Resolved controller look vector for this frame.</param>
+    /// <param name="moveUsesAnalogSource">True when movement came from an analog stick-like source.</param>
+    /// <param name="lookUsesAnalogSource">True when look came from an analog stick-like source.</param>
+    /// <param name="shoot">Resolved shooting trigger value.</param>
+    /// <param name="powerUpPrimary">Resolved primary active-tool trigger value.</param>
+    /// <param name="powerUpSecondary">Resolved secondary active-tool trigger value.</param>
+    /// <param name="swapPowerUpSlots">Resolved active-slot swap trigger value.</param>
+    private static void WriteInputState(ref PlayerInputState inputState,
+                                        float2 move,
+                                        float2 look,
+                                        bool moveUsesAnalogSource,
+                                        bool lookUsesAnalogSource,
+                                        float shoot,
+                                        float powerUpPrimary,
+                                        float powerUpSecondary,
+                                        float swapPowerUpSlots)
+    {
+        inputState.Move = move;
+        inputState.Look = look;
+        inputState.MoveUsesAnalogSource = moveUsesAnalogSource ? (byte)1 : (byte)0;
+        inputState.LookUsesAnalogSource = lookUsesAnalogSource ? (byte)1 : (byte)0;
+        inputState.Shoot = shoot;
+        inputState.PowerUpPrimary = powerUpPrimary;
+        inputState.PowerUpSecondary = powerUpSecondary;
+        inputState.SwapPowerUpSlots = swapPowerUpSlots;
     }
     #endregion
     #endregion

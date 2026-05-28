@@ -87,6 +87,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
     {
         inputState.Move = float2.zero;
         inputState.Look = float2.zero;
+        inputState.MoveUsesAnalogSource = 0;
+        inputState.LookUsesAnalogSource = 0;
         inputState.Shoot = 0f;
         inputState.PowerUpPrimary = 0f;
         inputState.PowerUpSecondary = 0f;
