@@ -38,8 +38,9 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(true);
 
-        foreach ((RefRO<PlayerCameraAnchor> cameraAnchor, RefRO<PlayerRuntimeCameraConfig> runtimeCameraConfig) in SystemAPI.Query<RefRO<PlayerCameraAnchor>, RefRO<PlayerRuntimeCameraConfig>>())
+        foreach ((RefRO<PlayerCameraAnchor> cameraAnchor, RefRO<PlayerRuntimeCameraConfig> runtimeCameraConfig, Entity entity) in SystemAPI.Query<RefRO<PlayerCameraAnchor>, RefRO<PlayerRuntimeCameraConfig>>().WithEntityAccess())
         {
             PlayerRuntimeCameraConfig cameraConfig = runtimeCameraConfig.ValueRO;
 
@@ -65,8 +66,12 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             else
                 continue;
 
-            float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
-            camera.transform.position = newPosition;
+            // Apply the damage shake already evolved this frame by PlayerCameraFollowSystem (the single trauma owner).
+            // Removing the previously applied offset before smoothing keeps the shake from feeding the follow spring.
+            PlayerCameraShakeState shakeState = shakeStateLookup.HasComponent(entity) ? shakeStateLookup[entity] : default;
+            float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+            float3 newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
+            PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
             break;
         }
     }

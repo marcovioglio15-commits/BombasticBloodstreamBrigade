@@ -166,6 +166,24 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraDeadZoneRadius:
                 runtimeCamera.Values.DeadZoneRadius = resolvedValue;
                 return;
+            case PlayerRuntimeControllerFieldId.CameraShakeDuration:
+                runtimeCamera.Shake.DurationSeconds = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakePositionalAmplitude:
+                runtimeCamera.Shake.PositionalAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRotationalAmplitude:
+                runtimeCamera.Shake.RotationalAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeFrequency:
+                runtimeCamera.Shake.Frequency = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeDamageForFullStrength:
+                runtimeCamera.Shake.DamageForFullStrength = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeFalloffMode:
+                runtimeCamera.Shake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
+                return;
             case PlayerRuntimeControllerFieldId.ShootingTriggerMode:
                 runtimeShooting.TriggerMode = PlayerRuntimeScalingEnumUtility.ResolveShootingTriggerMode(resolvedValue);
                 return;
@@ -326,6 +344,12 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.ShootingKnockbackEnabled:
                 runtimeShooting.Values.Knockback.Enabled = resolvedValue ? (byte)1 : (byte)0;
                 return;
+            case PlayerRuntimeControllerFieldId.CameraShakeEnabled:
+                runtimeCamera.Shake.Enabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeScaleWithDamage:
+                runtimeCamera.Shake.ScaleWithDamage = resolvedValue ? (byte)1 : (byte)0;
+                return;
         }
     }
 
@@ -380,7 +404,8 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
         {
             Behavior = baseCamera.Behavior,
             FollowOffset = baseCamera.FollowOffset,
-            Values = baseCamera.Values
+            Values = baseCamera.Values,
+            Shake = baseCamera.Shake
         };
     }
 

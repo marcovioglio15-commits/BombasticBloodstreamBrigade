@@ -24158,11 +24158,7 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - Passive_RearShield
-  - Passive_OrbitalSpear
-  - Passive_OrbitalWings
-  - Passive_OrbitalShield
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

@@ -76,6 +76,7 @@ public struct PlayerRuntimeCameraConfig : IComponentData
     public CameraBehavior Behavior;
     public float3 FollowOffset;
     public CameraValuesBlob Values;
+    public CameraShakeBlob Shake;
 }
 
 /// <summary>
@@ -87,6 +88,7 @@ public struct PlayerBaseCameraConfig : IComponentData
     public CameraBehavior Behavior;
     public float3 FollowOffset;
     public CameraValuesBlob Values;
+    public CameraShakeBlob Shake;
 }
 
 /// <summary>
@@ -370,7 +372,15 @@ public enum PlayerRuntimeControllerFieldId : byte
     ShootingElementCustomImpedimentProcSlowPercent = 149,
     ShootingElementCustomImpedimentMaxSlowPercent = 150,
     ShootingElementCustomImpedimentDurationSeconds = 151,
-    ShootingAppliedElementDynamicSlot = 152
+    ShootingAppliedElementDynamicSlot = 152,
+    CameraShakeEnabled = 153,
+    CameraShakeDuration = 154,
+    CameraShakePositionalAmplitude = 155,
+    CameraShakeRotationalAmplitude = 156,
+    CameraShakeFrequency = 157,
+    CameraShakeFalloffMode = 158,
+    CameraShakeScaleWithDamage = 159,
+    CameraShakeDamageForFullStrength = 160
 }
 
 /// <summary>

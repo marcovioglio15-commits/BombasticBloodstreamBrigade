@@ -64,6 +64,67 @@ internal static class PlayerControllerCameraWarningUtility
                                      deadZoneRadius,
                                      maxFollowDistance));
     }
+
+    /// <summary>
+    /// Refreshes the damage-shake coherence warnings without mutating the serialized settings. Called by the camera
+    /// section whenever the shake enabled flag, an amplitude, the duration, the frequency or the damage-scaling
+    /// settings change. Out-of-range values are surfaced here and clamped defensively by the runtime shake utility.
+    /// </summary>
+    /// <param name="warningsRoot">Container that receives the warning HelpBoxes.</param>
+    /// <param name="shakeEnabled">True when the damage shake is enabled; no warnings are shown while disabled.</param>
+    /// <param name="durationProperty">Serialized shake duration property, or null when unavailable.</param>
+    /// <param name="positionalAmplitudeProperty">Serialized positional amplitude property, or null when unavailable.</param>
+    /// <param name="rotationalAmplitudeProperty">Serialized rotational amplitude property, or null when unavailable.</param>
+    /// <param name="frequencyProperty">Serialized frequency property, or null when unavailable.</param>
+    /// <param name="scaleWithDamageProperty">Serialized scale-with-damage flag, or null when unavailable.</param>
+    /// <param name="damageForFullStrengthProperty">Serialized damage-for-full-strength property, or null when unavailable.</param>
+    public static void RefreshShakeValueWarnings(VisualElement warningsRoot,
+                                                 bool shakeEnabled,
+                                                 SerializedProperty durationProperty,
+                                                 SerializedProperty positionalAmplitudeProperty,
+                                                 SerializedProperty rotationalAmplitudeProperty,
+                                                 SerializedProperty frequencyProperty,
+                                                 SerializedProperty scaleWithDamageProperty,
+                                                 SerializedProperty damageForFullStrengthProperty)
+    {
+        if (warningsRoot == null)
+            return;
+
+        warningsRoot.Clear();
+
+        if (!shakeEnabled)
+            return;
+
+        // Resolve current values once; missing properties default to neutral values that raise no warning.
+        float duration = durationProperty != null ? durationProperty.floatValue : 1f;
+        float positionalAmplitude = positionalAmplitudeProperty != null ? positionalAmplitudeProperty.floatValue : 1f;
+        float rotationalAmplitude = rotationalAmplitudeProperty != null ? rotationalAmplitudeProperty.floatValue : 0f;
+        float frequency = frequencyProperty != null ? frequencyProperty.floatValue : 1f;
+        bool scaleWithDamage = scaleWithDamageProperty != null && scaleWithDamageProperty.boolValue;
+        float damageForFullStrength = damageForFullStrengthProperty != null ? damageForFullStrengthProperty.floatValue : 1f;
+
+        // Duration governs the whole envelope: a non-positive value collapses the shake to nothing.
+        if (duration <= 0f)
+            AddWarning(warningsRoot, "Duration is 0 or negative; the damage shake will not play.");
+
+        // Individual amplitude and frequency ranges.
+        if (positionalAmplitude < 0f)
+            AddWarning(warningsRoot, "Positional Amplitude is negative; runtime clamps it to 0.");
+
+        if (rotationalAmplitude < 0f)
+            AddWarning(warningsRoot, "Rotational Amplitude is negative; runtime clamps it to 0.");
+
+        if (frequency < 0f)
+            AddWarning(warningsRoot, "Frequency is negative; runtime clamps it to 0 (a static, non-oscillating push).");
+
+        // Cross-field coherence: with both amplitudes at zero there is no visible shake even at full trauma.
+        if (positionalAmplitude <= 0f && rotationalAmplitude <= 0f)
+            AddWarning(warningsRoot, "Both Positional and Rotational Amplitude are 0; the shake has no visible effect while enabled.");
+
+        // Damage scaling needs a positive reference or every hit collapses to a full-strength shake at runtime.
+        if (scaleWithDamage && damageForFullStrength <= 0f)
+            AddWarning(warningsRoot, "Damage For Full Strength must be greater than 0 while Scale With Damage is enabled; runtime treats it as near-zero, so every hit shakes at full strength.");
+    }
     #endregion
 
     #region Private Methods

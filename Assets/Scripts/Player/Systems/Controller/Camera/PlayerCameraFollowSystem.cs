@@ -61,6 +61,13 @@ public partial struct PlayerCameraFollowSystem : ISystem
         float deltaTime = ResolvePresentationDeltaTime(SystemAPI.Time.DeltaTime, isSceneTransitioning);
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+
+        // Damage-shake inputs: shake state is rewritten here (single owner), survivability and grace are read-only.
+        ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(false);
+        ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(true);
+        ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(true);
+        ComponentLookup<PlayerDamageGraceState> damageGraceLookup = SystemAPI.GetComponentLookup<PlayerDamageGraceState>(true);
+        float shakeNoiseTime = (float)SystemAPI.Time.ElapsedTime;
         int cameraInstanceId = camera.GetInstanceID();
 
         if (cameraInstanceId != lastCameraInstanceId)
@@ -80,6 +87,28 @@ public partial struct PlayerCameraFollowSystem : ISystem
             if (localToWorldLookup.HasComponent(entity))
                 playerPosition = localToWorldLookup[entity].Position;
 
+            // Evolve the damage shake once for the player before behavior branching so the room-fixed camera
+            // (driven by PlayerCameraRoomAnchorSystem) reads the same offset without recomputing trauma.
+            PlayerCameraShakeState shakeState = default;
+            bool hasShakeState = shakeStateLookup.HasComponent(entity);
+
+            if (hasShakeState)
+            {
+                shakeState = shakeStateLookup[entity];
+                float currentDamageDeadline = damageGraceLookup.HasComponent(entity) ? damageGraceLookup[entity].IgnoreDamageUntilTime : 0f;
+                float currentSurvivability = (healthLookup.HasComponent(entity) ? healthLookup[entity].Current : 0f)
+                                           + (shieldLookup.HasComponent(entity) ? shieldLookup[entity].Current : 0f);
+                PlayerCameraShakeRuntimeUtility.UpdateState(ref shakeState,
+                                                           in cameraConfig.Shake,
+                                                           currentDamageDeadline,
+                                                           currentSurvivability,
+                                                           deltaTime,
+                                                           shakeNoiseTime,
+                                                           camera.transform.right,
+                                                           camera.transform.up);
+                shakeStateLookup[entity] = shakeState;
+            }
+
             if (cameraConfig.Behavior == CameraBehavior.RoomFixed)
                 continue;
 
@@ -91,14 +120,14 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
             float3 offset = cameraConfig.FollowOffset;
 
-            // For FollowWithAutoOffset, we calculate the initial offset from the camera to the player
-            // and maintain that offset.
+            // For FollowWithAutoOffset, capture the initial camera-to-player offset once. The previously applied
+            // shake offset is removed first so a shake active during reacquisition cannot bias the captured offset.
             switch (cameraConfig.Behavior)
             {
                 case CameraBehavior.FollowWithAutoOffset:
                     if (!hasAutoOffset)
                     {
-                        autoOffset = (float3)camera.transform.position - playerPosition;
+                        autoOffset = (float3)camera.transform.position - shakeState.PreviousAppliedPositionOffset - playerPosition;
                         hasAutoOffset = true;
                     }
 
@@ -107,7 +136,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                 case CameraBehavior.ChildOfPlayer:
                     if (!hasChildOffset)
                     {
-                        float3 worldOffset = (float3)camera.transform.position - playerPosition;
+                        float3 worldOffset = (float3)camera.transform.position - shakeState.PreviousAppliedPositionOffset - playerPosition;
                         quaternion inverseRotation = math.inverse(localTransform.ValueRO.Rotation);
                         childLocalOffset = math.rotate(inverseRotation, worldOffset);
                         hasChildOffset = true;
@@ -119,17 +148,21 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
             float3 targetPosition = playerPosition + offset;
 
-            // Handle camera behavior modes. For ChildOfPlayer, directly sets the camera's position and rotation
+            // Resolve the un-shaken base position per behavior, then layer the shake offset and roll once.
             switch (cameraConfig.Behavior)
             {
                 case CameraBehavior.ChildOfPlayer:
                     float3 rotatedOffset = math.rotate(localTransform.ValueRO.Rotation, offset);
-                    camera.transform.position = playerPosition + rotatedOffset;
-                    camera.transform.rotation = localTransform.ValueRO.Rotation;
+                    PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
+                                                                 playerPosition + rotatedOffset,
+                                                                 in shakeState,
+                                                                 true,
+                                                                 localTransform.ValueRO.Rotation);
                     break;
                 default:
-                    float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, targetPosition, cameraConfig.Values, ref followVelocity, deltaTime);
-                    camera.transform.position = newPosition;
+                    float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+                    float3 newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource, targetPosition, cameraConfig.Values, ref followVelocity, deltaTime);
+                    PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
                     break;
             }
 

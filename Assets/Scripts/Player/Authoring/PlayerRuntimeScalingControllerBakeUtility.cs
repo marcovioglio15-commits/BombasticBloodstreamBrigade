@@ -130,7 +130,8 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
                 SmoothTime = cameraSettings.Values.SmoothTime,
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
-            }
+            },
+            Shake = PlayerControllerConfigBakeUtility.BuildCameraShakeBlob(cameraSettings.DamageShake)
         };
     }
 
@@ -430,6 +431,30 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
                 return true;
             case "cameraSettings.values.deadZoneRadius":
                 fieldId = PlayerRuntimeControllerFieldId.CameraDeadZoneRadius;
+                return true;
+            case "cameraSettings.damageShake.enabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeEnabled;
+                return true;
+            case "cameraSettings.damageShake.durationSeconds":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeDuration;
+                return true;
+            case "cameraSettings.damageShake.positionalAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakePositionalAmplitude;
+                return true;
+            case "cameraSettings.damageShake.rotationalAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRotationalAmplitude;
+                return true;
+            case "cameraSettings.damageShake.frequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeFrequency;
+                return true;
+            case "cameraSettings.damageShake.falloff":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeFalloffMode;
+                return true;
+            case "cameraSettings.damageShake.scaleWithDamage":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeScaleWithDamage;
+                return true;
+            case "cameraSettings.damageShake.damageForFullStrength":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeDamageForFullStrength;
                 return true;
             case "shootingSettings.triggerMode":
                 fieldId = PlayerRuntimeControllerFieldId.ShootingTriggerMode;

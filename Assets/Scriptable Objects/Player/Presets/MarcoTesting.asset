@@ -101,6 +101,15 @@ MonoBehaviour:
       smoothTime: 0.1
       maxFollowDistance: 999
       deadZoneRadius: 0
+    damageShake:
+      enabled: 1
+      durationSeconds: 0.25
+      positionalAmplitude: 0.4
+      rotationalAmplitude: 1.5
+      frequency: 10
+      falloff: 1
+      scaleWithDamage: 0
+      damageForFullStrength: 25
   shootingSettings:
     triggerMode: 2
     projectilesInheritPlayerSpeed: 1

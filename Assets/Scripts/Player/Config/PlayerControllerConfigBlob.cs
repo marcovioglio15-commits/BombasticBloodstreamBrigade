@@ -201,6 +201,7 @@ public struct CameraConfig
     public CameraBehavior Behavior;
     public float3 FollowOffset;
     public CameraValuesBlob Values;
+    public CameraShakeBlob Shake;
 }
 
 /// <summary>
@@ -212,5 +213,21 @@ public struct CameraValuesBlob
     public float SmoothTime;
     public float MaxFollowDistance;
     public float DeadZoneRadius;
+}
+
+/// <summary>
+/// Holds the trauma-based damage camera-shake tuning resolved at bake time. Numeric ranges are clamped
+/// defensively at point of use by the runtime shake utility rather than at bake.
+/// </summary>
+public struct CameraShakeBlob
+{
+    public byte Enabled;
+    public float DurationSeconds;
+    public float PositionalAmplitude;
+    public float RotationalAmplitude;
+    public float Frequency;
+    public CameraShakeFalloff Falloff;
+    public byte ScaleWithDamage;
+    public float DamageForFullStrength;
 }
 #endregion

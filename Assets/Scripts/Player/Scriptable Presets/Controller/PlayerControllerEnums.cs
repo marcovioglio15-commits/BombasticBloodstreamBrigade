@@ -49,6 +49,14 @@ public enum CameraBehavior
 }
 
 [Serializable]
+public enum CameraShakeFalloff : byte
+{
+    Linear = 0,
+    Smooth = 1,
+    Quadratic = 2
+}
+
+[Serializable]
 public enum ShootingTriggerMode
 {
     AutomaticToggle = 0,

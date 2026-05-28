@@ -55,6 +55,31 @@ public static class PlayerControllerConfigBakeUtility
     }
 
     /// <summary>
+    /// Builds the runtime camera damage-shake blob from authoring shake settings. Shared by the controller config
+    /// blob, the immutable baseline camera config and the mutable runtime camera config so every bake path emits
+    /// identical shake data. Raw values are baked as-authored and clamped defensively by the runtime shake utility.
+    /// </summary>
+    /// <param name="shake">Authoring damage-shake settings, or null to emit a disabled shake block.</param>
+    /// <returns>Runtime-ready camera shake blob.</returns>
+    public static CameraShakeBlob BuildCameraShakeBlob(CameraDamageShakeSettings shake)
+    {
+        if (shake == null)
+            return default;
+
+        return new CameraShakeBlob
+        {
+            Enabled = shake.Enabled ? (byte)1 : (byte)0,
+            DurationSeconds = shake.DurationSeconds,
+            PositionalAmplitude = shake.PositionalAmplitude,
+            RotationalAmplitude = shake.RotationalAmplitude,
+            Frequency = shake.Frequency,
+            Falloff = shake.Falloff,
+            ScaleWithDamage = shake.ScaleWithDamage ? (byte)1 : (byte)0,
+            DamageForFullStrength = shake.DamageForFullStrength
+        };
+    }
+
+    /// <summary>
     /// Builds the animator parameter hash config from the selected animation bindings preset.
     /// Called by PlayerAuthoringBaker before ECS animation runtime state is added.
     /// </summary>
@@ -295,7 +320,8 @@ public static class PlayerControllerConfigBakeUtility
                 SmoothTime = cameraSettings.Values.SmoothTime,
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
-            }
+            },
+            Shake = BuildCameraShakeBlob(cameraSettings.DamageShake)
         };
 
         root.Camera = cameraConfig;

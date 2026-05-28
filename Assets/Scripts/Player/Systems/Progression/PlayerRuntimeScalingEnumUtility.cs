@@ -69,6 +69,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe CameraShakeFalloff from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static CameraShakeFalloff ResolveCameraShakeFalloff(float value)
+    {
+        return (CameraShakeFalloff)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
     /// Resolves a safe ShootingTriggerMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>
