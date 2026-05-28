@@ -22,7 +22,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 511ecd7c84f31f54ab0c9c3e326a2f28
+      defaultWavePresetGuid: 8c2e3310ef9dd3a41a2640e5ada9482b
     - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
       spawnerGuid: 6900e62466181a3c35bb420f2496adf1
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
