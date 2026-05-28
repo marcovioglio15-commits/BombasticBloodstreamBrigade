@@ -106,7 +106,7 @@ MonoBehaviour:
       durationSeconds: 0.25
       positionalAmplitude: 0.4
       rotationalAmplitude: 1.5
-      frequency: 10
+      frequency: 5
       falloff: 1
       scaleWithDamage: 0
       damageForFullStrength: 25
