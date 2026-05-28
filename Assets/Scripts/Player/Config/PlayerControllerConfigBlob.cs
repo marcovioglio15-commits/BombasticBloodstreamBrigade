@@ -193,9 +193,8 @@ public struct ConeConfig
 
 #region Camera
 /// <summary>
-/// Holds configuration data related to camera behavior, 
-/// including the camera follow behavior, offset from the player, 
-/// and values such as follow speed, camera lag, damping,
+/// Holds configuration data related to camera behavior, including the follow behavior, the offset from
+/// the player, and the follow spring tuning values (smooth time, max follow distance, dead zone radius).
 /// </summary>
 public struct CameraConfig
 {
@@ -205,14 +204,12 @@ public struct CameraConfig
 }
 
 /// <summary>
-/// Holds camera-related values such as follow speed, camera lag, 
-/// damping, max follow distance, and dead zone radius for camera movement.
+/// Holds camera-related values driving the critically damped follow spring: smooth time,
+/// max follow distance (leash) and dead zone radius.
 /// </summary>
 public struct CameraValuesBlob
 {
-    public float FollowSpeed;
-    public float CameraLag;
-    public float Damping;
+    public float SmoothTime;
     public float MaxFollowDistance;
     public float DeadZoneRadius;
 }

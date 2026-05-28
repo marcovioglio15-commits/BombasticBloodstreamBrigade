@@ -60,12 +60,14 @@ public sealed class CameraSettings
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Ensures the camera values block stays structurally valid. Numeric ranges are never snapped here:
+    /// out-of-range values are surfaced as non-destructive editor warnings and clamped defensively at point of use.
+    /// </summary>
     public void Validate()
     {
         if (values == null)
             values = new CameraValues();
-
-        values.Validate();
     }
     #endregion
 }
@@ -74,49 +76,24 @@ public sealed class CameraSettings
 public sealed class CameraValues
 {
     #region Serialized Fields
-    [Tooltip("Follow speed for camera target tracking.")]
-    [FormerlySerializedAs("m_FollowSpeed")]
-    [SerializeField] private float followSpeed = 8f;
+    [Tooltip("Approximate seconds for the follow camera to reach the player. Drives a critically damped spring (SmoothDamp): velocity-continuous, no overshoot, frame-rate independent. Lower is snappier, higher is floatier; 0 makes the camera snap instantly.")]
+    [SerializeField] private float smoothTime = 0.15f;
 
-    [Tooltip("Lag applied to the camera when following the target.")]
-    [FormerlySerializedAs("m_CameraLag")]
-    [SerializeField] private float cameraLag = 0.1f;
-
-    [Tooltip("Damping applied to camera movement smoothing.")]
-    [FormerlySerializedAs("m_Damping")]
-    [SerializeField] private float damping = 0.15f;
-
-    [Tooltip("Maximum distance the camera can lag behind.")]
+    [Tooltip("Maximum distance the camera is allowed to lag behind the target. The target is leashed to this radius before smoothing. 0 disables the leash so the spring alone governs the follow.")]
     [FormerlySerializedAs("m_MaxFollowDistance")]
     [SerializeField] private float maxFollowDistance = 6f;
 
-    [Tooltip("Radius around the target where the camera stays still.")]
+    [Tooltip("Radius around the target where the camera stays still. The spring eases to rest a dead-zone radius short of the target instead of snapping at the threshold.")]
     [FormerlySerializedAs("m_DeadZoneRadius")]
     [SerializeField] private float deadZoneRadius = 0.2f;
     #endregion
 
     #region Properties
-    public float FollowSpeed
+    public float SmoothTime
     {
         get
         {
-            return followSpeed;
-        }
-    }
-
-    public float CameraLag
-    {
-        get
-        {
-            return cameraLag;
-        }
-    }
-
-    public float Damping
-    {
-        get
-        {
-            return damping;
+            return smoothTime;
         }
     }
 
@@ -134,26 +111,6 @@ public sealed class CameraValues
         {
             return deadZoneRadius;
         }
-    }
-    #endregion
-
-    #region Validation
-    public void Validate()
-    {
-        if (followSpeed < 0f)
-            followSpeed = 0f;
-
-        if (cameraLag < 0f)
-            cameraLag = 0f;
-
-        if (damping < 0f)
-            damping = 0f;
-
-        if (maxFollowDistance < 0f)
-            maxFollowDistance = 0f;
-
-        if (deadZoneRadius < 0f)
-            deadZoneRadius = 0f;
     }
     #endregion
 }

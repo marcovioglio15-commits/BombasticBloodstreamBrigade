@@ -127,9 +127,7 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
             FollowOffset = new float3(followOffset.x, followOffset.y, followOffset.z),
             Values = new CameraValuesBlob
             {
-                FollowSpeed = cameraSettings.Values.FollowSpeed,
-                CameraLag = cameraSettings.Values.CameraLag,
-                Damping = cameraSettings.Values.Damping,
+                SmoothTime = cameraSettings.Values.SmoothTime,
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
             }
@@ -424,14 +422,8 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
             case "cameraSettings.followOffset.z":
                 fieldId = PlayerRuntimeControllerFieldId.CameraFollowOffsetZ;
                 return true;
-            case "cameraSettings.values.followSpeed":
-                fieldId = PlayerRuntimeControllerFieldId.CameraFollowSpeed;
-                return true;
-            case "cameraSettings.values.cameraLag":
-                fieldId = PlayerRuntimeControllerFieldId.CameraLag;
-                return true;
-            case "cameraSettings.values.damping":
-                fieldId = PlayerRuntimeControllerFieldId.CameraDamping;
+            case "cameraSettings.values.smoothTime":
+                fieldId = PlayerRuntimeControllerFieldId.CameraSmoothTime;
                 return true;
             case "cameraSettings.values.maxFollowDistance":
                 fieldId = PlayerRuntimeControllerFieldId.CameraMaxFollowDistance;

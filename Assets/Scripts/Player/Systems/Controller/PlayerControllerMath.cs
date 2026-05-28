@@ -13,6 +13,7 @@ public static class PlayerControllerMath
     public const byte DigitalRightFlag = 8;
     public const float DigitalNormalizedDiagonal = 0.70710678f;
     private const float CameraFollowNoiseEpsilon = 0.001f;
+    private const float MinimumCameraSmoothTime = 0.0001f;
 
     /// Normalizes a direction vector while ignoring the vertical component, 
     /// returning a fallback direction if the input is too small.
@@ -487,53 +488,88 @@ public static class PlayerControllerMath
 
     #region Camera Helpers
     /// <summary>
-    /// This method calculates a smoothed camera position by interpolating between 
-    /// the current position and a target position,
-    /// accounting for factors such as follow speed, camera lag, damping, 
-    /// and constraints like dead zones and maximum follow distance.
+    /// Advances the camera toward its target using a critically damped spring (the Unity SmoothDamp model).
+    /// The target is first leashed to MaxFollowDistance and softened by DeadZoneRadius, then the spring
+    /// integrates the remaining motion. The spring is velocity-continuous and frame-rate independent, which
+    /// removes the lazy-start/stop feel and residual stutter of a first-order exponential follow.
+    /// Used by PlayerCameraFollowSystem and PlayerCameraRoomAnchorSystem, each owning its own velocity state.
     /// </summary>
-    /// <param name="current"></param>
-    /// <param name="target"></param>
-    /// <param name="values"></param>
-    /// <param name="deltaTime"></param>
-    /// <returns> The new smoothed camera position after applying the interpolation and constraints.</returns>
-    public static float3 SmoothCameraPosition(float3 current, float3 target, in CameraValuesBlob values, float deltaTime)
+    /// <param name="current">Current camera position.</param>
+    /// <param name="target">Desired follow target (player or room anchor) for this frame.</param>
+    /// <param name="values">Resolved camera tuning values (smooth time, leash, dead zone).</param>
+    /// <param name="followVelocity">Persistent spring velocity owned by the calling system; updated in place.</param>
+    /// <param name="deltaTime">Presentation delta time for this frame.</param>
+    /// <returns>The new camera position after the spring step.</returns>
+    public static float3 SmoothCameraPosition(float3 current,
+                                              float3 target,
+                                              in CameraValuesBlob values,
+                                              ref float3 followVelocity,
+                                              float deltaTime)
     {
+        // A non-positive step cannot integrate the spring: hold position and preserve velocity for next frame.
+        if (deltaTime <= 0f)
+            return current;
+
         float3 toTarget = target - current;
         float distance = math.length(toTarget);
         float deadZoneRadius = math.max(0f, values.DeadZoneRadius);
-        float minimumFollowDistance = math.max(deadZoneRadius, CameraFollowNoiseEpsilon);
 
-        // Preserve configured dead zone behavior and additionally filter tiny float-scale oscillations
-        // that can still appear when DeadZoneRadius is zero.
-        if (distance <= minimumFollowDistance)
-            return current;
-
+        // Leash: pull the spring start up to MaxFollowDistance behind the target so the camera never trails further.
         if (values.MaxFollowDistance > 0f && distance > values.MaxFollowDistance)
         {
-            current = target - (toTarget / distance) * values.MaxFollowDistance;
+            float3 leashDirection = toTarget / distance;
+            current = target - leashDirection * values.MaxFollowDistance;
             toTarget = target - current;
             distance = values.MaxFollowDistance;
         }
 
-        // Dead-zone softening:
-        // Instead of snapping from "no movement" to full follow right after the threshold,
-        // move only by the excess distance outside the dead zone.
-        // This keeps the dead-zone behavior while removing the visible micro-jump at close camera distances.
-        if (distance > 1e-6f)
+        // Dead-zone softening: chase only the portion of the distance outside the dead zone, so the spring
+        // eases to rest a dead-zone radius short of the target instead of reacting from the exact threshold.
+        if (distance > CameraFollowNoiseEpsilon)
         {
-            float3 direction = toTarget / distance;
-            float effectiveDistance = math.max(0f, distance - deadZoneRadius);
-            target = current + direction * effectiveDistance;
-            toTarget = target - current;
-            distance = effectiveDistance;
+            float3 chaseDirection = toTarget / distance;
+            float chaseDistance = math.max(0f, distance - deadZoneRadius);
+            target = current + chaseDirection * chaseDistance;
         }
+        else
+            target = current;
 
-        float smooth = math.max(0.0001f, values.CameraLag + values.Damping);
-        float t = 1f - math.exp(-(values.FollowSpeed * deltaTime) / smooth);
-        t = math.clamp(t, 0f, 1f);
+        float smoothTime = math.max(MinimumCameraSmoothTime, values.SmoothTime);
+        return CriticallyDampedStep(current, target, ref followVelocity, smoothTime, deltaTime);
+    }
 
-        return current + toTarget * t;
+    /// <summary>
+    /// Integrates one critically damped spring step toward the target, matching Unity's SmoothDamp solution
+    /// (no overshoot, frame-rate independent) while operating directly on float3 with a per-axis overshoot guard.
+    /// </summary>
+    /// <param name="current">Spring start position for this step.</param>
+    /// <param name="target">Spring target position for this step.</param>
+    /// <param name="velocity">Spring velocity carried between frames; updated in place.</param>
+    /// <param name="smoothTime">Approximate seconds to reach the target.</param>
+    /// <param name="deltaTime">Integration delta time.</param>
+    /// <returns>The integrated position for this step.</returns>
+    private static float3 CriticallyDampedStep(float3 current,
+                                               float3 target,
+                                               ref float3 velocity,
+                                               float smoothTime,
+                                               float deltaTime)
+    {
+        // Closed-form critically damped solution: omega is the spring frequency, exponential the stable decay term.
+        float omega = 2f / smoothTime;
+        float x = omega * deltaTime;
+        float exponential = 1f / (1f + x + 0.48f * x * x + 0.235f * x * x * x);
+        float3 change = current - target;
+        float3 temp = (velocity + omega * change) * deltaTime;
+        velocity = (velocity - omega * temp) * exponential;
+        float3 output = target + (change + temp) * exponential;
+
+        // Per-axis overshoot guard: clamp to the target on any axis the spring stepped past it this frame.
+        bool3 targetAboveStart = (target - current) > 0f;
+        bool3 outputAboveTarget = output > target;
+        bool3 overshoot = targetAboveStart == outputAboveTarget;
+        output = math.select(output, target, overshoot);
+        velocity = math.select(velocity, float3.zero, overshoot);
+        return output;
     }
     #endregion
 }

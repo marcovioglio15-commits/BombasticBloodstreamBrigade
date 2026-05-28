@@ -157,14 +157,8 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraFollowOffsetZ:
                 runtimeCamera.FollowOffset.z = resolvedValue;
                 return;
-            case PlayerRuntimeControllerFieldId.CameraFollowSpeed:
-                runtimeCamera.Values.FollowSpeed = resolvedValue;
-                return;
-            case PlayerRuntimeControllerFieldId.CameraLag:
-                runtimeCamera.Values.CameraLag = resolvedValue;
-                return;
-            case PlayerRuntimeControllerFieldId.CameraDamping:
-                runtimeCamera.Values.Damping = resolvedValue;
+            case PlayerRuntimeControllerFieldId.CameraSmoothTime:
+                runtimeCamera.Values.SmoothTime = math.max(0f, resolvedValue);
                 return;
             case PlayerRuntimeControllerFieldId.CameraMaxFollowDistance:
                 runtimeCamera.Values.MaxFollowDistance = resolvedValue;

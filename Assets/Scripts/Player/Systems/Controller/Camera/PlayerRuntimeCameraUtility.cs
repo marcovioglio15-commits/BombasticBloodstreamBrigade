@@ -15,6 +15,12 @@ internal static class PlayerRuntimeCameraUtility
     #region Fields
     private static readonly List<GameObject> rootObjectBuffer = new List<GameObject>(16);
     private static readonly List<Camera> cameraBuffer = new List<Camera>(4);
+
+    // Cached resolution so multiple per-frame callers (camera follow, room anchor, movement direction)
+    // share a single result instead of each traversing the loaded scene hierarchy every frame.
+    private static Camera cachedCamera;
+    private static int cachedActiveSceneHandle;
+    private static bool hasCachedActiveScene;
     #endregion
 
     #region Methods
@@ -22,13 +28,42 @@ internal static class PlayerRuntimeCameraUtility
     #region Public Methods
     /// <summary>
     /// Resolves the active gameplay base camera, preferring cameras owned by Unity's active scene.
+    /// The result is cached and reused while the active scene is unchanged and the cached camera stays
+    /// renderable, so the hierarchy traversal only runs on scene changes or when the camera is destroyed.
     /// </summary>
     /// <param name="camera">Resolved camera when a valid base camera is available.</param>
     /// <returns>True when a valid base camera was found.</returns>
     public static bool TryResolveGameplayCamera(out Camera camera)
     {
-        camera = null;
         Scene activeScene = SceneManager.GetActiveScene();
+
+        // Fast path: reuse the previously resolved camera while nothing relevant changed.
+        if (hasCachedActiveScene && cachedActiveSceneHandle == activeScene.handle && IsValidBaseCamera(cachedCamera))
+        {
+            camera = cachedCamera;
+            return true;
+        }
+
+        // Slow path: re-run the full resolution and refresh the cache (also retries while no camera exists yet).
+        bool resolved = TryResolveGameplayCameraUncached(activeScene, out camera);
+        cachedCamera = resolved ? camera : null;
+        cachedActiveSceneHandle = activeScene.handle;
+        hasCachedActiveScene = true;
+        return resolved;
+    }
+    #endregion
+
+    #region Camera Resolution
+    /// <summary>
+    /// Performs the uncached gameplay base camera resolution by inspecting the active scene first, then the
+    /// tagged main camera, then any remaining renderable base camera.
+    /// </summary>
+    /// <param name="activeScene">Scene currently marked active by Unity.</param>
+    /// <param name="camera">Resolved camera when a valid base camera is available.</param>
+    /// <returns>True when a valid base camera was found.</returns>
+    private static bool TryResolveGameplayCameraUncached(Scene activeScene, out Camera camera)
+    {
+        camera = null;
 
         if (TryResolveSceneCamera(activeScene, true, out camera))
             return true;

@@ -8,6 +8,7 @@ using UnityEngine;
 public partial struct PlayerCameraRoomAnchorSystem : ISystem
 {
     #region Fields
+    private float3 anchorFollowVelocity;
     private EntityQuery runOutcomeQuery;
     #endregion
 
@@ -64,7 +65,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             else
                 continue;
 
-            float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, anchorPosition, cameraConfig.Values, deltaTime);
+            float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
             camera.transform.position = newPosition;
             break;
         }

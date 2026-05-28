@@ -320,22 +320,43 @@ internal static class PlayerControllerPresetsPanelSectionsUtility
                                                                                             scalingRulesProperty,
                                                                                             new string[]
         {
-            "followSpeed",
-            "cameraLag",
-            "damping",
+            "smoothTime",
             "maxFollowDistance",
             "deadZoneRadius"
         });
         section.Add(valuesFoldout);
+
+        SerializedProperty smoothTimeProperty = valuesProperty != null ? valuesProperty.FindPropertyRelative("smoothTime") : null;
+        SerializedProperty maxFollowDistanceProperty = valuesProperty != null ? valuesProperty.FindPropertyRelative("maxFollowDistance") : null;
+        SerializedProperty deadZoneRadiusProperty = valuesProperty != null ? valuesProperty.FindPropertyRelative("deadZoneRadius") : null;
+
+        VisualElement cameraWarningsRoot = new VisualElement();
+        cameraWarningsRoot.style.marginTop = 4f;
+        section.Add(cameraWarningsRoot);
 
         System.Action updateView = () =>
         {
             CameraBehavior behavior = (CameraBehavior)behaviorProperty.enumValueIndex;
             offsetField.style.display = behavior == CameraBehavior.FollowWithOffset ? DisplayStyle.Flex : DisplayStyle.None;
             anchorField.style.display = behavior == CameraBehavior.RoomFixed ? DisplayStyle.Flex : DisplayStyle.None;
+
+            // ChildOfPlayer parents the camera and bypasses the follow spring, so its smoothing values are inert.
+            bool usesFollowSpring = behavior != CameraBehavior.ChildOfPlayer;
+            valuesFoldout.style.display = usesFollowSpring ? DisplayStyle.Flex : DisplayStyle.None;
+            PlayerControllerCameraWarningUtility.RefreshCameraValueWarnings(cameraWarningsRoot,
+                                                                           usesFollowSpring,
+                                                                           smoothTimeProperty,
+                                                                           maxFollowDistanceProperty,
+                                                                           deadZoneRadiusProperty);
         };
 
         behaviorField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            updateView();
+        });
+
+        // Camera value edits bubble up from the foldout's bound fields and must refresh the coherence warnings.
+        valuesFoldout.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
             updateView();
         });

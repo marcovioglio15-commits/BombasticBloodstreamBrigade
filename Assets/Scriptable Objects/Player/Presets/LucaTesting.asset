@@ -98,9 +98,7 @@ MonoBehaviour:
     followOffset: {x: 0, y: 10, z: -8}
     roomAnchor: {fileID: 0}
     values:
-      followSpeed: 8
-      cameraLag: 0.1
-      damping: 0.15
+      smoothTime: 0.15
       maxFollowDistance: 999
       deadZoneRadius: 0
   shootingSettings:

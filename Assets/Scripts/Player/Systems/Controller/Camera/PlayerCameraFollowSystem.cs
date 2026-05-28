@@ -17,6 +17,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private float3 childLocalOffset;
     private CameraBehavior lastBehavior;
     private int lastCameraInstanceId;
+    private float3 followVelocity;
     private EntityQuery runOutcomeQuery;
     #endregion
 
@@ -127,7 +128,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     camera.transform.rotation = localTransform.ValueRO.Rotation;
                     break;
                 default:
-                    float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, targetPosition, cameraConfig.Values, deltaTime);
+                    float3 newPosition = PlayerControllerMath.SmoothCameraPosition(camera.transform.position, targetPosition, cameraConfig.Values, ref followVelocity, deltaTime);
                     camera.transform.position = newPosition;
                     break;
             }
@@ -137,12 +138,14 @@ public partial struct PlayerCameraFollowSystem : ISystem
     }
 
     /// <summary>
-    /// Clears camera offset caches when camera ownership or behavior changes.
+    /// Clears camera offset caches and the follow spring velocity when camera ownership or behavior changes,
+    /// preventing a stale velocity from lurching the camera when a fresh target is reacquired.
     /// </summary>
     private void ResetCachedOffsets()
     {
         hasAutoOffset = false;
         hasChildOffset = false;
+        followVelocity = float3.zero;
     }
 
     /// <summary>

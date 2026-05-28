@@ -493,9 +493,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                       controllerPreset.CameraSettings.FollowOffset.z),
             Values = new CameraValuesBlob
             {
-                FollowSpeed = controllerPreset.CameraSettings.Values.FollowSpeed,
-                CameraLag = controllerPreset.CameraSettings.Values.CameraLag,
-                Damping = controllerPreset.CameraSettings.Values.Damping,
+                SmoothTime = controllerPreset.CameraSettings.Values.SmoothTime,
                 MaxFollowDistance = controllerPreset.CameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = controllerPreset.CameraSettings.Values.DeadZoneRadius
             }

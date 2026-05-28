@@ -292,9 +292,7 @@ public static class PlayerControllerConfigBakeUtility
             FollowOffset = new float3(cameraSettings.FollowOffset.x, cameraSettings.FollowOffset.y, cameraSettings.FollowOffset.z),
             Values = new CameraValuesBlob
             {
-                FollowSpeed = cameraSettings.Values.FollowSpeed,
-                CameraLag = cameraSettings.Values.CameraLag,
-                Damping = cameraSettings.Values.Damping,
+                SmoothTime = cameraSettings.Values.SmoothTime,
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
             }

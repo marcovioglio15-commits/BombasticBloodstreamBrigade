@@ -59,8 +59,11 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             return;
         }
 
-        bool hasCamera = PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera);
-        float3 cameraForward = hasCamera ? (float3)camera.transform.forward : new float3(0f, 0f, 1f);
+        // Camera basis is resolved lazily inside the loop and only for camera-relative movement,
+        // so frames where no moving entity needs the camera forward skip the lookup entirely.
+        bool cameraResolved = false;
+        bool hasCamera = false;
+        float3 cameraForward = new float3(0f, 0f, 1f);
 
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
@@ -79,6 +82,17 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             {
                 movementState.ValueRW.DesiredDirection = float3.zero;
                 continue;
+            }
+
+            // Resolve the camera forward once, and only when this entity actually drives camera-relative movement.
+            if (movementConfig.MovementReference == ReferenceFrame.CameraForward && !cameraResolved)
+            {
+                hasCamera = PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera resolvedCamera);
+
+                if (hasCamera)
+                    cameraForward = resolvedCamera.transform.forward;
+
+                cameraResolved = true;
             }
 
             float3 playerForward = PlayerControllerMath.NormalizePlanar(math.forward(localTransform.ValueRO.Rotation), new float3(0f, 0f, 1f));
