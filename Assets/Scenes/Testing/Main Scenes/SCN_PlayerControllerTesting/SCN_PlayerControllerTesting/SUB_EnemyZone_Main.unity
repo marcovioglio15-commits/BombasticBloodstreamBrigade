@@ -1488,7 +1488,7 @@ PrefabInstance:
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: 941e260559d38d746a8ceefdc02d7bcd, type: 2}
+      objectReference: {fileID: 11400000, guid: f5806548a7d36db49a100dd225c0d152, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: spawnerEnabled
       value: 1
