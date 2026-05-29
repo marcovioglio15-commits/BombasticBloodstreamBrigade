@@ -25,6 +25,11 @@ public struct PlayerCameraShakeState : IComponentData
     #endregion
 
     #region Frame Output
+    // Smooth envelope magnitude in the [0..1] range resolved from the remaining trauma this frame, before any
+    // noise modulation. Drives the connected-gamepad rumble so the haptic ramps down cleanly instead of buzzing
+    // with the per-axis noise that shapes the camera offset.
+    public float ShakeMagnitude;
+
     // World-space shake offset added to the camera position this frame.
     public float3 PositionOffset;
 

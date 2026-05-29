@@ -48,7 +48,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3586293773358214259
 Transform:
   m_ObjectHideFlags: 0
@@ -174,6 +174,9 @@ MonoBehaviour:
   drawDebugGizmos: 1
   debugRayLength: 0.45
   debugGizmoColor: {r: 1, g: 0.52, b: 0.18, a: 1}
+  drawPointerPreviewGizmo: 1
+  pointerPreviewLength: 6
+  pointerPreviewColor: {r: 0.19, g: 0.93, b: 1, a: 0.9}
 --- !u!114 &3174256217465809914
 MonoBehaviour:
   m_ObjectHideFlags: 0

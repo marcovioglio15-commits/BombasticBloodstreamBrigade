@@ -157,6 +157,16 @@ public sealed class CameraDamageShakeSettings
 
     [Tooltip("Damage amount (health plus shield removed by one hit) that produces a full-strength shake when Scale With Damage is enabled. Lighter hits shake proportionally less.")]
     [SerializeField] private float damageForFullStrength = 25f;
+
+    [Header("Controller Rumble")]
+    [Tooltip("When enabled, a connected gamepad rumbles alongside the camera shake using the same trauma envelope. Disable to keep the on-screen shake without any controller vibration.")]
+    [SerializeField] private bool rumbleEnabled = true;
+
+    [Tooltip("Heavy (low-frequency) motor intensity at full shake strength, in the [0..1] range. The motor follows the same trauma decay as the shake, so it fades out together with the on-screen kick. 0 silences the heavy motor.")]
+    [SerializeField] private float rumbleLowFrequency = 0.6f;
+
+    [Tooltip("Light (high-frequency) motor intensity at full shake strength, in the [0..1] range. The motor follows the same trauma decay as the shake, so it fades out together with the on-screen kick. 0 silences the light motor.")]
+    [SerializeField] private float rumbleHighFrequency = 0.35f;
     #endregion
 
     #region Properties
@@ -221,6 +231,30 @@ public sealed class CameraDamageShakeSettings
         get
         {
             return damageForFullStrength;
+        }
+    }
+
+    public bool RumbleEnabled
+    {
+        get
+        {
+            return rumbleEnabled;
+        }
+    }
+
+    public float RumbleLowFrequency
+    {
+        get
+        {
+            return rumbleLowFrequency;
+        }
+    }
+
+    public float RumbleHighFrequency
+    {
+        get
+        {
+            return rumbleHighFrequency;
         }
     }
     #endregion

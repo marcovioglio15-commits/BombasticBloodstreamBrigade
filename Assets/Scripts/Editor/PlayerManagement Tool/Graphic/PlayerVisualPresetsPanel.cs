@@ -668,7 +668,8 @@ public sealed class PlayerVisualPresetsPanel
         RuntimeBridge = 0,
         Outline = 1,
         DamageFeedback = 2,
-        PowerUpVfx = 3
+        PowerUpVfx = 3,
+        VisualPointer = 4
     }
 
     internal sealed class VisualSubSectionTabEntry

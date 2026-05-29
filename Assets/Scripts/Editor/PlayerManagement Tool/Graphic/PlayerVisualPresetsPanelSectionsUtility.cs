@@ -131,6 +131,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                PlayerVisualPresetsPanel.VisualSubSectionType.PowerUpVfx,
                                "VFX",
                                BuildPowerUpVfxSubSection(panel));
+        AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.VisualPointer,
+                               "Visual Pointer",
+                               PlayerVisualPresetsPanelPointerSectionUtility.BuildVisualPointerSubSection(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;

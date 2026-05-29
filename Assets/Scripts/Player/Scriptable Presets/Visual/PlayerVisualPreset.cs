@@ -208,6 +208,37 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Uniform scale multiplier applied to projectile attached VFX instances.")]
     [SerializeField] private float playerProjectileVfxScaleMultiplier = 1f;
 
+    #region Visual Pointer
+    [Header("Visual Pointer")]
+    [Tooltip("When enabled, a precision laser aiming pointer is rendered straight out of the weapon muzzle along the current shot direction.")]
+    [SerializeField] private bool enablePointer;
+
+    [Tooltip("Laser Beam visual preset ID whose palette colors are reused to tint the aiming pointer. Resolved against the Laser Beam visual presets authored above.")]
+    [PlayerLaserBeamVisualPresetSelector]
+    [SerializeField] private int pointerVisualPresetId = PlayerLaserBeamVisualDefaultsUtility.DefaultVisualPresetId;
+
+    [Tooltip("Rendered beam diameter of the aiming pointer in world units.")]
+    [SerializeField] private float pointerWidth = 0.05f;
+
+    [Tooltip("Multiplier applied to the projectile range-derived length so the pointer can be shortened or extended relative to the real shot reach.")]
+    [SerializeField] private float pointerLengthMultiplier = 1f;
+
+    [Tooltip("Optional hard cap on the rendered pointer length in world units. Set 0 to follow the resolved projectile range without a cap.")]
+    [SerializeField] private float pointerMaxLength;
+
+    [Tooltip("Opacity multiplier applied to the aiming pointer body. Use lower values for a subtle sight line.")]
+    [SerializeField] private float pointerOpacity = 0.7f;
+
+    [Tooltip("Vertical lift in world units applied to the aiming pointer to avoid floor z-fighting.")]
+    [SerializeField] private float pointerVerticalLift = PlayerLaserBeamVisualDefaultsUtility.DefaultVerticalLift;
+
+    [Tooltip("When enabled, the pointer length stops adapting to the projectile range and stays fixed while the Orbital Projectiles (Perfect Circle) power-up is active, since orbiting shots no longer travel in a straight line.")]
+    [SerializeField] private bool freezePointerWithOrbitalProjectiles = true;
+
+    [Tooltip("Fixed pointer length in world units used while the Orbital Projectiles power-up is active and freezing is enabled. Set 0 to keep the authored base shot range instead.")]
+    [SerializeField] private float pointerOrbitalFrozenLength;
+    #endregion
+
     [Header("Scaling")]
     [Tooltip("Add Scaling rules applied to supported visual preset fields at bake time without mutating this asset.")]
     [SerializeField] private List<PlayerStatScalingRule> scalingRules = new List<PlayerStatScalingRule>();
@@ -541,6 +572,78 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return playerProjectileVfxScaleMultiplier;
+        }
+    }
+
+    public bool EnablePointer
+    {
+        get
+        {
+            return enablePointer;
+        }
+    }
+
+    public int PointerVisualPresetId
+    {
+        get
+        {
+            return pointerVisualPresetId;
+        }
+    }
+
+    public float PointerWidth
+    {
+        get
+        {
+            return pointerWidth;
+        }
+    }
+
+    public float PointerLengthMultiplier
+    {
+        get
+        {
+            return pointerLengthMultiplier;
+        }
+    }
+
+    public float PointerMaxLength
+    {
+        get
+        {
+            return pointerMaxLength;
+        }
+    }
+
+    public float PointerOpacity
+    {
+        get
+        {
+            return pointerOpacity;
+        }
+    }
+
+    public float PointerVerticalLift
+    {
+        get
+        {
+            return pointerVerticalLift;
+        }
+    }
+
+    public bool FreezePointerWithOrbitalProjectiles
+    {
+        get
+        {
+            return freezePointerWithOrbitalProjectiles;
+        }
+    }
+
+    public float PointerOrbitalFrozenLength
+    {
+        get
+        {
+            return pointerOrbitalFrozenLength;
         }
     }
 

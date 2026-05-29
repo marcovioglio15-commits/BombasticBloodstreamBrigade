@@ -101,7 +101,9 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
     /// <summary>
     /// Builds the separate damage-shake dropdown with scaling-aware fields, conditional visibility and warnings.
     /// The detail fields only appear while the shake is enabled, and the damage-reference field only appears while
-    /// the shake scales with damage, so designers see exactly the knobs that affect the current configuration.
+    /// the shake scales with damage, so designers see exactly the knobs that affect the current configuration. A
+    /// nested Controller Rumble sub-foldout exposes the connected-gamepad motor amplitudes, which collapse while the
+    /// rumble is disabled since they share the shake's trauma envelope.
     /// </summary>
     /// <param name="section">Section container that receives the shake foldout.</param>
     /// <param name="cameraProperty">Serialized camera settings block owning the damage-shake sub-block.</param>
@@ -123,6 +125,9 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
         SerializedProperty falloffProperty = shakeProperty.FindPropertyRelative("falloff");
         SerializedProperty scaleWithDamageProperty = shakeProperty.FindPropertyRelative("scaleWithDamage");
         SerializedProperty damageForFullStrengthProperty = shakeProperty.FindPropertyRelative("damageForFullStrength");
+        SerializedProperty rumbleEnabledProperty = shakeProperty.FindPropertyRelative("rumbleEnabled");
+        SerializedProperty rumbleLowFrequencyProperty = shakeProperty.FindPropertyRelative("rumbleLowFrequency");
+        SerializedProperty rumbleHighFrequencyProperty = shakeProperty.FindPropertyRelative("rumbleHighFrequency");
 
         if (enabledProperty == null ||
             durationProperty == null ||
@@ -131,7 +136,10 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
             frequencyProperty == null ||
             falloffProperty == null ||
             scaleWithDamageProperty == null ||
-            damageForFullStrengthProperty == null)
+            damageForFullStrengthProperty == null ||
+            rumbleEnabledProperty == null ||
+            rumbleLowFrequencyProperty == null ||
+            rumbleHighFrequencyProperty == null)
         {
             return;
         }
@@ -165,6 +173,27 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
         shakeWarningsRoot.style.marginTop = 4f;
         shakeBody.Add(shakeWarningsRoot);
 
+        // Controller rumble lives inside the shake body so it inherits the master enable: vibrating only makes sense
+        // while the damage shake itself accumulates trauma. Its motor knobs collapse while the rumble is disabled.
+        Foldout rumbleFoldout = new Foldout();
+        rumbleFoldout.text = "Controller Rumble";
+        rumbleFoldout.value = false;
+        shakeBody.Add(rumbleFoldout);
+
+        VisualElement rumbleEnabledField = PlayerScalingFieldElementFactory.CreateField(rumbleEnabledProperty, scalingRulesProperty, "Enabled");
+        rumbleFoldout.Add(rumbleEnabledField);
+
+        VisualElement rumbleBody = new VisualElement();
+        rumbleBody.style.flexDirection = FlexDirection.Column;
+        rumbleFoldout.Add(rumbleBody);
+
+        rumbleBody.Add(PlayerScalingFieldElementFactory.CreateField(rumbleLowFrequencyProperty, scalingRulesProperty, "Low-Frequency Motor"));
+        rumbleBody.Add(PlayerScalingFieldElementFactory.CreateField(rumbleHighFrequencyProperty, scalingRulesProperty, "High-Frequency Motor"));
+
+        VisualElement rumbleWarningsRoot = new VisualElement();
+        rumbleWarningsRoot.style.marginTop = 4f;
+        rumbleBody.Add(rumbleWarningsRoot);
+
         System.Action updateShakeView = () =>
         {
             bool shakeEnabled = enabledProperty.boolValue;
@@ -180,6 +209,14 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
                                                                           frequencyProperty,
                                                                           scaleWithDamageProperty,
                                                                           damageForFullStrengthProperty);
+
+            // The motor amplitudes only matter while the rumble itself is enabled.
+            bool rumbleEnabled = rumbleEnabledProperty.boolValue;
+            rumbleBody.style.display = rumbleEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+            PlayerControllerCameraWarningUtility.RefreshRumbleValueWarnings(rumbleWarningsRoot,
+                                                                           rumbleEnabled,
+                                                                           rumbleLowFrequencyProperty,
+                                                                           rumbleHighFrequencyProperty);
         };
 
         // Toggling enabled/scaleWithDamage or editing a value bubbles a change event that refreshes the view.

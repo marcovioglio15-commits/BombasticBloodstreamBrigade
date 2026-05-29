@@ -599,6 +599,14 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerLaserBeamVisualBakeUtility.PopulateSourceVariantBuffer(authoring, laserBeamSourceVariantBuffer);
         PlayerLaserBeamVisualBakeUtility.PopulateImpactVariantBuffer(authoring, laserBeamImpactVariantBuffer);
         PlayerLaserBeamVisualBakeUtility.PopulateVisualPresetBuffer(authoring, laserBeamVisualPresetBuffer);
+
+        // Bake the optional aiming laser pointer that reuses the Laser Beam body material and palette colors.
+        if (PlayerVisualPointerBakeUtility.TryBuildConfig(visualPreset,
+                                                          controllerPreset.ShootingSettings.Values,
+                                                          out PlayerVisualPointerConfig visualPointerConfig))
+        {
+            AddComponent(entity, visualPointerConfig);
+        }
         DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> powerUpVfxPrefabBindingsBuffer = default;
         bool hasPowerUpVfxRuntime = false;
 

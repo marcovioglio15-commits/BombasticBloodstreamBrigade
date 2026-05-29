@@ -125,6 +125,44 @@ internal static class PlayerControllerCameraWarningUtility
         if (scaleWithDamage && damageForFullStrength <= 0f)
             AddWarning(warningsRoot, "Damage For Full Strength must be greater than 0 while Scale With Damage is enabled; runtime treats it as near-zero, so every hit shakes at full strength.");
     }
+
+    /// <summary>
+    /// Refreshes the controller-rumble coherence warnings without mutating the serialized settings. Called by the
+    /// camera section whenever the rumble enable flag or a motor amplitude changes. Motor amplitudes are normalized
+    /// [0..1] intensities; out-of-range values are surfaced here and clamped defensively by the runtime rumble system.
+    /// </summary>
+    /// <param name="warningsRoot">Container that receives the warning HelpBoxes.</param>
+    /// <param name="rumbleEnabled">True when the rumble is enabled; no warnings are shown while disabled.</param>
+    /// <param name="lowFrequencyProperty">Serialized low-frequency motor amplitude, or null when unavailable.</param>
+    /// <param name="highFrequencyProperty">Serialized high-frequency motor amplitude, or null when unavailable.</param>
+    public static void RefreshRumbleValueWarnings(VisualElement warningsRoot,
+                                                  bool rumbleEnabled,
+                                                  SerializedProperty lowFrequencyProperty,
+                                                  SerializedProperty highFrequencyProperty)
+    {
+        if (warningsRoot == null)
+            return;
+
+        warningsRoot.Clear();
+
+        if (!rumbleEnabled)
+            return;
+
+        // Resolve current values once; missing properties default to neutral values that raise no warning.
+        float lowFrequency = lowFrequencyProperty != null ? lowFrequencyProperty.floatValue : 0.5f;
+        float highFrequency = highFrequencyProperty != null ? highFrequencyProperty.floatValue : 0.5f;
+
+        // Each motor amplitude must stay within the gamepad's normalized [0..1] range.
+        if (lowFrequency < 0f || lowFrequency > 1f)
+            AddWarning(warningsRoot, "Low-Frequency Motor is outside the [0..1] range; runtime clamps it before driving the gamepad.");
+
+        if (highFrequency < 0f || highFrequency > 1f)
+            AddWarning(warningsRoot, "High-Frequency Motor is outside the [0..1] range; runtime clamps it before driving the gamepad.");
+
+        // Cross-field coherence: with both motors at zero the rumble produces no vibration even at full trauma.
+        if (lowFrequency <= 0f && highFrequency <= 0f)
+            AddWarning(warningsRoot, "Both rumble motors are 0; the controller will not vibrate while Controller Rumble is enabled.");
+    }
     #endregion
 
     #region Private Methods

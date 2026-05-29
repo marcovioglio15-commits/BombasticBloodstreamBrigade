@@ -57,6 +57,7 @@ internal static class PlayerCameraShakeRuntimeUtility
             state.LastDamageDeadline = currentDamageDeadline;
             state.LastSurvivability = currentSurvivability;
             state.Trauma = 0f;
+            state.ShakeMagnitude = 0f;
             state.PositionOffset = float3.zero;
             state.RollRadians = 0f;
             return;
@@ -82,13 +83,16 @@ internal static class PlayerCameraShakeRuntimeUtility
         // No active shake leaves a zeroed output so the camera systems apply nothing this frame.
         if (!shakeEnabled || state.Trauma <= 0f)
         {
+            state.ShakeMagnitude = 0f;
             state.PositionOffset = float3.zero;
             state.RollRadians = 0f;
             return;
         }
 
-        // Map the remaining trauma through the chosen envelope and modulate the noise sample by it.
+        // Map the remaining trauma through the chosen envelope and modulate the noise sample by it. The smooth
+        // magnitude is cached on the state so the rumble system can drive the gamepad without re-deriving it.
         float magnitude = ResolveEnvelope(config.Falloff, state.Trauma);
+        state.ShakeMagnitude = magnitude;
         float noisePhase = noiseTime * math.max(0f, config.Frequency);
         float positionalAmplitude = math.max(0f, config.PositionalAmplitude) * magnitude;
         float3 planarOffset = cameraRight * (SampleSignedNoise(noisePhase, NoiseSeedX) * positionalAmplitude)

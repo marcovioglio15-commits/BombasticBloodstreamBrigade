@@ -181,6 +181,12 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraShakeDamageForFullStrength:
                 runtimeCamera.Shake.DamageForFullStrength = math.max(0f, resolvedValue);
                 return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRumbleLowFrequency:
+                runtimeCamera.Shake.RumbleLowFrequency = math.saturate(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRumbleHighFrequency:
+                runtimeCamera.Shake.RumbleHighFrequency = math.saturate(resolvedValue);
+                return;
             case PlayerRuntimeControllerFieldId.CameraShakeFalloffMode:
                 runtimeCamera.Shake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
                 return;
@@ -349,6 +355,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
                 return;
             case PlayerRuntimeControllerFieldId.CameraShakeScaleWithDamage:
                 runtimeCamera.Shake.ScaleWithDamage = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRumbleEnabled:
+                runtimeCamera.Shake.RumbleEnabled = resolvedValue ? (byte)1 : (byte)0;
                 return;
         }
     }

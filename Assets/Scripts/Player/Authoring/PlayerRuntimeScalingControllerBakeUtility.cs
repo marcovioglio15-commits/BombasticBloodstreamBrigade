@@ -456,6 +456,15 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
             case "cameraSettings.damageShake.damageForFullStrength":
                 fieldId = PlayerRuntimeControllerFieldId.CameraShakeDamageForFullStrength;
                 return true;
+            case "cameraSettings.damageShake.rumbleEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleEnabled;
+                return true;
+            case "cameraSettings.damageShake.rumbleLowFrequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleLowFrequency;
+                return true;
+            case "cameraSettings.damageShake.rumbleHighFrequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleHighFrequency;
+                return true;
             case "shootingSettings.triggerMode":
                 fieldId = PlayerRuntimeControllerFieldId.ShootingTriggerMode;
                 return true;

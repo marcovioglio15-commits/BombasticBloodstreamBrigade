@@ -22,13 +22,13 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: b7a74f7fd87798546abeb0f3dae30f83
+      defaultWavePresetGuid: 941e260559d38d746a8ceefdc02d7bcd
     - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
       spawnerGuid: 6900e62466181a3c35bb420f2496adf1
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_WaveOnlyCowards
       defaultEnabled: 1
-      defaultWavePresetGuid: db86207e9215aea4f917700a8e852c0a
+      defaultWavePresetGuid: 72b0b1d7ca095574db299aaf47e39233
   wavePresetFolders:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
@@ -37,79 +37,97 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Empty.asset
       assetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
       preset: {fileID: 11400000, guid: 00faa5bb1b1b4574c826cfbad8b060fb, type: 2}
-    - presetName: PF_EnemySpawner_ShortRangeTest
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_ShortRangeTest.asset
-      assetGuid: 5c5b92375b7411546814a8b4ccdbe2a5
-      preset: {fileID: 11400000, guid: 5c5b92375b7411546814a8b4ccdbe2a5, type: 2}
-    - presetName: PF_EnemySpawner_Testing_AcidWanderers
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_AcidWanderers.asset
-      assetGuid: 7fdb6c11e4b219c46a717e6356bc6e63
-      preset: {fileID: 11400000, guid: 7fdb6c11e4b219c46a717e6356bc6e63, type: 2}
-    - presetName: PF_EnemySpawner_Testing_BOSS
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_BOSS.asset
-      assetGuid: 4826d72d4b14a294eb52f5ff0aa4984c
-      preset: {fileID: 11400000, guid: 4826d72d4b14a294eb52f5ff0aa4984c, type: 2}
-    - presetName: PF_EnemySpawner_Testing_Bombardier
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_Bombardier.asset
-      assetGuid: f7adab1593e4c684694aa5fb33dc9f11
-      preset: {fileID: 11400000, guid: f7adab1593e4c684694aa5fb33dc9f11, type: 2}
-    - presetName: PF_EnemySpawner_Testing_Cowards
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_Cowards.asset
-      assetGuid: 45a410f0515124a49af5a8d4ff198eec
-      preset: {fileID: 11400000, guid: 45a410f0515124a49af5a8d4ff198eec, type: 2}
-    - presetName: PF_EnemySpawner_Testing_DVD
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_DVD.asset
-      assetGuid: d83ea893f3b670446a6b82587119e832
-      preset: {fileID: 11400000, guid: d83ea893f3b670446a6b82587119e832, type: 2}
-    - presetName: PF_EnemySpawner_Testing_Shooters
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_Shooters.asset
-      assetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
-      preset: {fileID: 11400000, guid: 7a80f659dadfe5c46bd9bf341d74e1a2, type: 2}
-    - presetName: PF_EnemySpawner_Testing_Stealer
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_Stealer.asset
-      assetGuid: 9fc1b52c81cf85641bcdc7dfb94f6e9a
-      preset: {fileID: 11400000, guid: 9fc1b52c81cf85641bcdc7dfb94f6e9a, type: 2}
-    - presetName: PF_EnemySpawner_Testing_VilDemonio
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_VilDemonio.asset
-      assetGuid: 67bd4df904839cb4d989f4a55a0eecab
-      preset: {fileID: 11400000, guid: 67bd4df904839cb4d989f4a55a0eecab, type: 2}
-    - presetName: PF_EnemySpawner_Testing_Wanderer
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Testing_Wanderer.asset
-      assetGuid: d20a60aa22e5f7d48a19138dac9a2d7d
-      preset: {fileID: 11400000, guid: d20a60aa22e5f7d48a19138dac9a2d7d, type: 2}
-    - presetName: PF_EnemySpawner_WaveOnlyCowards_Comics_Hard
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_WaveOnlyCowards_Comics_Hard.asset
-      assetGuid: db86207e9215aea4f917700a8e852c0a
-      preset: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
-    - presetName: PF_EnemySpawner_WaveOnlyCowards_Comics_Medium
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_WaveOnlyCowards_Comics_Medium.asset
-      assetGuid: 9e22183972f48b6499bcddd50a3b6867
-      preset: {fileID: 11400000, guid: 9e22183972f48b6499bcddd50a3b6867, type: 2}
-    - presetName: PF_EnemySpawner_WavePreset_Massive
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_WavePreset_Massive.asset
-      assetGuid: c2554c3ad890887489e366de81ee389a
-      preset: {fileID: 11400000, guid: c2554c3ad890887489e366de81ee389a, type: 2}
+    - presetName: PF_EnemySpawner_Wave_Comics_Easy
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Easy.asset
+      assetGuid: 941e260559d38d746a8ceefdc02d7bcd
+      preset: {fileID: 11400000, guid: 941e260559d38d746a8ceefdc02d7bcd, type: 2}
+    - presetName: PF_EnemySpawner_Wave_Comics_Easy_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Easy_Cowards.asset
+      assetGuid: 72b0b1d7ca095574db299aaf47e39233
+      preset: {fileID: 11400000, guid: 72b0b1d7ca095574db299aaf47e39233, type: 2}
     - presetName: PF_EnemySpawner_Wave_Comics_Hard
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Hard.asset
       assetGuid: 511ecd7c84f31f54ab0c9c3e326a2f28
       preset: {fileID: 11400000, guid: 511ecd7c84f31f54ab0c9c3e326a2f28, type: 2}
+    - presetName: PF_EnemySpawner_Wave_Comics_Hard_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Hard_Cowards.asset
+      assetGuid: db86207e9215aea4f917700a8e852c0a
+      preset: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
     - presetName: PF_EnemySpawner_Wave_Comics_Medium
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Medium.asset
       assetGuid: b7a74f7fd87798546abeb0f3dae30f83
       preset: {fileID: 11400000, guid: b7a74f7fd87798546abeb0f3dae30f83, type: 2}
-    - presetName: PF_EnemySpawner_Wave_EasyMedium
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_EasyMedium.asset
-      assetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
-      preset: {fileID: 11400000, guid: 9cbb29f3fe1317e4db97052b606d7bf0, type: 2}
+    - presetName: PF_EnemySpawner_Wave_Comics_Medium_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Medium_Cowards.asset
+      assetGuid: 9e22183972f48b6499bcddd50a3b6867
+      preset: {fileID: 11400000, guid: 9e22183972f48b6499bcddd50a3b6867, type: 2}
+    - presetName: PF_EnemySpawner_Wave_GruntDVDFun
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_GruntDVDFun.asset
+      assetGuid: 085e828ebb21b7045ae9e4b42612f20c
+      preset: {fileID: 11400000, guid: 085e828ebb21b7045ae9e4b42612f20c, type: 2}
     - presetName: PF_EnemySpawner_Wave_LeFunny
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_LeFunny.asset
       assetGuid: 9183ee2949edfe84b85f91f9355de07f
       preset: {fileID: 11400000, guid: 9183ee2949edfe84b85f91f9355de07f, type: 2}
+  - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite
+    displayName: Wave Preset/OutdatedButNotQuite
+    wavePresets:
+    - presetName: PF_EnemySpawner_WavePreset_Massive
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_WavePreset_Massive.asset
+      assetGuid: c2554c3ad890887489e366de81ee389a
+      preset: {fileID: 11400000, guid: c2554c3ad890887489e366de81ee389a, type: 2}
+    - presetName: PF_EnemySpawner_Wave_EasyMedium
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_EasyMedium.asset
+      assetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
+      preset: {fileID: 11400000, guid: 9cbb29f3fe1317e4db97052b606d7bf0, type: 2}
     - presetName: PF_EnemySpawner_Wave_MediumHard
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_MediumHard.asset
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_MediumHard.asset
       assetGuid: 8c2e3310ef9dd3a41a2640e5ada9482b
       preset: {fileID: 11400000, guid: 8c2e3310ef9dd3a41a2640e5ada9482b, type: 2}
     - presetName: PF_EnemySpawner_Wave_MediumHardNoCowards
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_MediumHardNoCowards.asset
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_MediumHardNoCowards.asset
       assetGuid: 8dbc3c3fa5c3e1d479efcbc752ca897c
       preset: {fileID: 11400000, guid: 8dbc3c3fa5c3e1d479efcbc752ca897c, type: 2}
+  - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing
+    displayName: Wave Preset/Testing
+    wavePresets:
+    - presetName: PF_EnemySpawner_ShortRangeTest
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_ShortRangeTest.asset
+      assetGuid: 5c5b92375b7411546814a8b4ccdbe2a5
+      preset: {fileID: 11400000, guid: 5c5b92375b7411546814a8b4ccdbe2a5, type: 2}
+    - presetName: PF_EnemySpawner_Testing_AcidWanderers
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_AcidWanderers.asset
+      assetGuid: 7fdb6c11e4b219c46a717e6356bc6e63
+      preset: {fileID: 11400000, guid: 7fdb6c11e4b219c46a717e6356bc6e63, type: 2}
+    - presetName: PF_EnemySpawner_Testing_BOSS
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_BOSS.asset
+      assetGuid: 4826d72d4b14a294eb52f5ff0aa4984c
+      preset: {fileID: 11400000, guid: 4826d72d4b14a294eb52f5ff0aa4984c, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Bombardier
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Bombardier.asset
+      assetGuid: f7adab1593e4c684694aa5fb33dc9f11
+      preset: {fileID: 11400000, guid: f7adab1593e4c684694aa5fb33dc9f11, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Cowards.asset
+      assetGuid: 45a410f0515124a49af5a8d4ff198eec
+      preset: {fileID: 11400000, guid: 45a410f0515124a49af5a8d4ff198eec, type: 2}
+    - presetName: PF_EnemySpawner_Testing_DVD
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_DVD.asset
+      assetGuid: d83ea893f3b670446a6b82587119e832
+      preset: {fileID: 11400000, guid: d83ea893f3b670446a6b82587119e832, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Shooters
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Shooters.asset
+      assetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
+      preset: {fileID: 11400000, guid: 7a80f659dadfe5c46bd9bf341d74e1a2, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Stealer
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Stealer.asset
+      assetGuid: 9fc1b52c81cf85641bcdc7dfb94f6e9a
+      preset: {fileID: 11400000, guid: 9fc1b52c81cf85641bcdc7dfb94f6e9a, type: 2}
+    - presetName: PF_EnemySpawner_Testing_VilDemonio
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_VilDemonio.asset
+      assetGuid: 67bd4df904839cb4d989f4a55a0eecab
+      preset: {fileID: 11400000, guid: 67bd4df904839cb4d989f4a55a0eecab, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Wanderer
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Wanderer.asset
+      assetGuid: d20a60aa22e5f7d48a19138dac9a2d7d
+      preset: {fileID: 11400000, guid: d20a60aa22e5f7d48a19138dac9a2d7d, type: 2}

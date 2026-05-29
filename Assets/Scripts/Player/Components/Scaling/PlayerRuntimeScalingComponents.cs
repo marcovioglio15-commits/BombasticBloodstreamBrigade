@@ -380,7 +380,10 @@ public enum PlayerRuntimeControllerFieldId : byte
     CameraShakeFrequency = 157,
     CameraShakeFalloffMode = 158,
     CameraShakeScaleWithDamage = 159,
-    CameraShakeDamageForFullStrength = 160
+    CameraShakeDamageForFullStrength = 160,
+    CameraShakeRumbleEnabled = 161,
+    CameraShakeRumbleLowFrequency = 162,
+    CameraShakeRumbleHighFrequency = 163
 }
 
 /// <summary>

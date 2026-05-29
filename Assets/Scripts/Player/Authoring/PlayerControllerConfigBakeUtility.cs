@@ -75,7 +75,10 @@ public static class PlayerControllerConfigBakeUtility
             Frequency = shake.Frequency,
             Falloff = shake.Falloff,
             ScaleWithDamage = shake.ScaleWithDamage ? (byte)1 : (byte)0,
-            DamageForFullStrength = shake.DamageForFullStrength
+            DamageForFullStrength = shake.DamageForFullStrength,
+            RumbleEnabled = shake.RumbleEnabled ? (byte)1 : (byte)0,
+            RumbleLowFrequency = shake.RumbleLowFrequency,
+            RumbleHighFrequency = shake.RumbleHighFrequency
         };
     }
 

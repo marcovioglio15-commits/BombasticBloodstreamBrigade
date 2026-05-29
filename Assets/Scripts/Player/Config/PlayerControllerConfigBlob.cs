@@ -229,5 +229,11 @@ public struct CameraShakeBlob
     public CameraShakeFalloff Falloff;
     public byte ScaleWithDamage;
     public float DamageForFullStrength;
+
+    // Connected-gamepad rumble layered on the same trauma envelope as the camera shake. Motor intensities are
+    // normalized [0..1] amplitudes consumed by the damage-shake rumble system at point of use.
+    public byte RumbleEnabled;
+    public float RumbleLowFrequency;
+    public float RumbleHighFrequency;
 }
 #endregion

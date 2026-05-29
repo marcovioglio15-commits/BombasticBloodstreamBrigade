@@ -110,6 +110,9 @@ MonoBehaviour:
       falloff: 1
       scaleWithDamage: 0
       damageForFullStrength: 25
+      rumbleEnabled: 1
+      rumbleLowFrequency: 0.6
+      rumbleHighFrequency: 0.35
   shootingSettings:
     triggerMode: 2
     projectilesInheritPlayerSpeed: 1
