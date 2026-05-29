@@ -86,6 +86,7 @@ public partial struct ProjectileSpawnSystem : ISystem
         ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(false);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileAttachedVfxConfig>(true);
+        ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerMuzzleFlashVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup = SystemAPI.GetBufferLookup<ProjectileHitHistoryElement>(false);
 
@@ -107,6 +108,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                              ref elementalPayloadLookup,
                              ref projectileActiveLookup,
                              in projectileAttachedVfxConfigLookup,
+                             in muzzleFlashVfxConfigLookup,
                              ref powerUpVfxRequestLookup,
                              ref projectileHitHistoryLookup);
     }
@@ -216,6 +218,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       ref ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup,
                                       ref ComponentLookup<ProjectileActive> projectileActiveLookup,
                                       in ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup,
+                                      in ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup,
                                       ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup,
                                       ref BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup)
     {
@@ -248,6 +251,10 @@ public partial struct ProjectileSpawnSystem : ISystem
                                      out passiveToolsState);
             int requestsCount = shooterShootRequests.Length;
             int spawnedProjectileCount = 0;
+
+            // Captured from the first spawned projectile so the per-volley muzzle flash uses the real shot origin and direction.
+            float3 muzzleFlashOrigin = float3.zero;
+            quaternion muzzleFlashRotation = quaternion.identity;
 
             for (int requestIndex = 0; requestIndex < requestsCount; requestIndex++)
             {
@@ -346,11 +353,26 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                 scaleMultiplier,
                                                 in projectileAttachedVfxConfigLookup,
                                                 ref powerUpVfxRequestLookup);
+
+                // Cache the first spawned shot pose so a single muzzle flash represents the whole volley.
+                if (spawnedProjectileCount == 0)
+                {
+                    muzzleFlashOrigin = projectileTransform.Position;
+                    muzzleFlashRotation = projectileTransform.Rotation;
+                }
+
                 spawnedProjectileCount++;
             }
 
             if (spawnedProjectileCount > 0)
+            {
                 RegisterShooterShotPulse(shooterEntity, elapsedTime, ref shootingStateLookup);
+                TryEnqueueMuzzleFlashVfx(shooterEntity,
+                                         muzzleFlashOrigin,
+                                         muzzleFlashRotation,
+                                         in muzzleFlashVfxConfigLookup,
+                                         ref powerUpVfxRequestLookup);
+            }
 
             shooterShootRequests.Clear();
         }
@@ -638,6 +660,52 @@ public partial struct ProjectileSpawnSystem : ISystem
             FollowValidationSpawnVersion = 0u,
             Velocity = float3.zero,
             KeepAliveWhileFollowTargetValid = 1,
+            FollowMuzzlePose = 1
+        });
+    }
+
+    /// <summary>
+    /// Queues one muzzle-flash VFX request at the shot origin once per volley when the shooter visual preset provides one.
+    /// The request follows the muzzle pose for its short authored lifetime so the flash stays attached to the weapon while the player moves.
+    /// </summary>
+    /// <param name="shooterEntity">Player entity that owns the muzzle-flash config and VFX request buffer.</param>
+    /// <param name="muzzleOrigin">World-space projectile origin captured from the first spawned shot.</param>
+    /// <param name="muzzleRotation">World-space shot rotation captured from the first spawned shot.</param>
+    /// <param name="muzzleFlashVfxConfigLookup">Read-only lookup for the optional muzzle-flash VFX config.</param>
+    /// <param name="powerUpVfxRequestLookup">Writable lookup for player-owned VFX request buffers.</param>
+    private static void TryEnqueueMuzzleFlashVfx(Entity shooterEntity,
+                                                 float3 muzzleOrigin,
+                                                 quaternion muzzleRotation,
+                                                 in ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup,
+                                                 ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup)
+    {
+        if (!muzzleFlashVfxConfigLookup.HasComponent(shooterEntity))
+            return;
+
+        if (!powerUpVfxRequestLookup.HasBuffer(shooterEntity))
+            return;
+
+        PlayerMuzzleFlashVfxConfig config = muzzleFlashVfxConfigLookup[shooterEntity];
+
+        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
+            return;
+
+        quaternion rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(muzzleRotation);
+        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestLookup[shooterEntity];
+        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
+        {
+            PrefabEntity = config.PrefabEntity,
+            SourcePrefab = config.SourcePrefab,
+            Position = muzzleOrigin + math.rotate(rotation, config.SpawnOffset),
+            Rotation = rotation,
+            UniformScale = math.max(MinimumVfxScale, config.UniformScale),
+            ParticleSimulationSpeedMultiplier = 1f,
+            LifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, config.LifetimeSeconds),
+            FollowTargetEntity = shooterEntity,
+            FollowPositionOffset = config.SpawnOffset,
+            FollowValidationEntity = Entity.Null,
+            FollowValidationSpawnVersion = 0u,
+            Velocity = float3.zero,
             FollowMuzzlePose = 1
         });
     }

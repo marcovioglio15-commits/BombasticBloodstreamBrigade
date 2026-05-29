@@ -615,7 +615,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
              visualPreset.HealthIncreaseVfxPrefab != null ||
              visualPreset.ShieldIncreaseVfxPrefab != null ||
              visualPreset.ChargeShotVfxPrefab != null ||
-             visualPreset.PlayerProjectileVfxPrefab != null))
+             visualPreset.PlayerProjectileVfxPrefab != null ||
+             visualPreset.MuzzleFlashVfxPrefab != null))
         {
             EnsurePowerUpVfxRuntime(authoring,
                                     entity,
@@ -665,6 +666,13 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                out PlayerProjectileAttachedVfxConfig projectileAttachedVfxConfig))
             {
                 AddComponent(entity, projectileAttachedVfxConfig);
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildMuzzleFlashVfxConfig(visualPreset,
+                                                                        resolveVisualVfxPrefabEntity,
+                                                                        out PlayerMuzzleFlashVfxConfig muzzleFlashVfxConfig))
+            {
+                AddComponent(entity, muzzleFlashVfxConfig);
             }
         }
 

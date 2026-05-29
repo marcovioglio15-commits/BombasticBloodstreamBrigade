@@ -586,6 +586,18 @@ public enum PlayerChargeShotVfxPlaybackMode : byte
 }
 
 /// <summary>
+/// Runtime VFX settings spawned at the projectile origin every time the player fires a shot.
+/// </summary>
+public struct PlayerMuzzleFlashVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float LifetimeSeconds;
+}
+
+/// <summary>
 /// Runtime VFX settings spawned when player level progression advances.
 /// </summary>
 public struct PlayerLevelUpVfxConfig : IComponentData

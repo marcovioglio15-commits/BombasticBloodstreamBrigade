@@ -120,6 +120,10 @@ MonoBehaviour:
   playerProjectileVfxPrefab: {fileID: 3264601393849410126, guid: 4fdbc86243810fa40b6c172f5535dcd8, type: 3}
   playerProjectileVfxSpawnOffset: {x: 0, y: 0, z: -0.35}
   playerProjectileVfxScaleMultiplier: 0.35
+  muzzleFlashVfxPrefab: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+  muzzleFlashVfxSpawnOffset: {x: 0, y: 0.15, z: -0.1}
+  muzzleFlashVfxScaleMultiplier: 1
+  muzzleFlashVfxLifetimeSeconds: 0.12
   enablePointer: 1
   pointerVisualPresetId: 0
   pointerWidth: 0.05
