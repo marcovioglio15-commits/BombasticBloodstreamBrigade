@@ -6,18 +6,14 @@ using UnityEngine.InputSystem;
 /// Drives a connected gamepad's rumble from the damage-shake trauma already evolved by
 /// <see cref="PlayerCameraFollowSystem"/> (the single trauma owner). It runs after the follow system so it reads the
 /// smooth shake magnitude resolved this frame, scales the two motor amplitudes by it and writes them to the active
-/// gamepad. The same pause/end-of-run gates as the camera systems force the motors to rest, and redundant motor
-/// writes are skipped so the input backend is only touched when the haptic intensity actually changes.
+/// gamepad. The same pause/end-of-run gates as the camera systems force the motors to rest, and once at rest the
+/// stop is sent a single time so the idle majority of the run costs no input-backend writes while a fading hit can
+/// never strand a residual motor speed (an endless faint rumble).
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(PlayerCameraFollowSystem))]
 public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
 {
-    #region Constants
-    // Minimum motor-speed delta that justifies re-sending haptics, avoiding per-frame writes while the value is flat.
-    private const float MotorSpeedEpsilon = 0.0025f;
-    #endregion
-
     #region Fields
     private EntityQuery runOutcomeQuery;
     private float lastAppliedLowFrequency;
@@ -146,8 +142,11 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
 
     #region Motor Output
     /// <summary>
-    /// Writes the resolved motor speeds to the active gamepad, skipping redundant writes while the value is flat and
-    /// re-sending unconditionally when the active gamepad changes so a newly selected pad receives the current value.
+    /// Writes the resolved motor speeds to the active gamepad. While the motors are at rest the stop is delivered
+    /// exactly once and then suppressed, which both avoids per-frame writes during the idle majority of the run and
+    /// guarantees a fading hit always lands on a clean zero: a residual sub-perceptible motor speed can never get
+    /// stranded on (the cause of an endless faint rumble). Active intensities are refreshed every frame over the
+    /// short shake window, and a write is forced whenever the active gamepad changes so a newly selected pad syncs.
     /// </summary>
     /// <param name="lowFrequency">Heavy (low-frequency) motor speed to apply in the [0..1] range.</param>
     /// <param name="highFrequency">Light (high-frequency) motor speed to apply in the [0..1] range.</param>
@@ -165,11 +164,11 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
         bool deviceChanged = gamepad.deviceId != lastGamepadDeviceId;
         lastGamepadDeviceId = gamepad.deviceId;
 
-        // Skip the input-backend write while the same pad keeps an unchanged intensity within the dead band.
-        if (!deviceChanged &&
-            hasAppliedMotorSpeeds == 1 &&
-            math.abs(lowFrequency - lastAppliedLowFrequency) < MotorSpeedEpsilon &&
-            math.abs(highFrequency - lastAppliedHighFrequency) < MotorSpeedEpsilon)
+        // Once already resting on the same pad, suppress further idle writes; any non-rest target always writes.
+        bool targetAtRest = lowFrequency <= 0f && highFrequency <= 0f;
+        bool alreadyResting = hasAppliedMotorSpeeds == 1 && lastAppliedLowFrequency <= 0f && lastAppliedHighFrequency <= 0f;
+
+        if (targetAtRest && alreadyResting && !deviceChanged)
             return;
 
         gamepad.SetMotorSpeeds(lowFrequency, highFrequency);
