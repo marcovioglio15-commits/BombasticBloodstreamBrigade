@@ -120,9 +120,9 @@ MonoBehaviour:
   playerProjectileVfxPrefab: {fileID: 3264601393849410126, guid: 4fdbc86243810fa40b6c172f5535dcd8, type: 3}
   playerProjectileVfxSpawnOffset: {x: 0, y: 0, z: -0.35}
   playerProjectileVfxScaleMultiplier: 0.35
-  enablePointer: 0
+  enablePointer: 1
   pointerVisualPresetId: 0
-  pointerWidth: 0.01
+  pointerWidth: 0.05
   pointerLengthMultiplier: 1
   pointerMaxLength: 0
   pointerOpacity: 0.7

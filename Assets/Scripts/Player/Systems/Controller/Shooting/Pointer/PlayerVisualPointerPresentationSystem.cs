@@ -8,8 +8,7 @@ using UnityEngine.Rendering;
 /// Renders the precision aiming laser pointer straight out of the player weapon for every entity that enabled it in its visual preset.
 /// The pointer reuses the Laser Beam body material and palette, adapts its length to the projectile range, and freezes while orbital shots are active.
 /// </summary>
-[UpdateInGroup(typeof(PlayerControllerSystemGroup))]
-[UpdateAfter(typeof(PlayerLaserBeamSimulationSystem))]
+[UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct PlayerVisualPointerPresentationSystem : ISystem
 {
     #region Methods
