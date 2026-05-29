@@ -34,6 +34,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private static readonly Color EnemyWanderTargetColor = new Color(0.36f, 1f, 0.82f, 0.94f);
     private static readonly Color EnemyShortRangeDashTargetColor = new Color(1f, 0.42f, 0.78f, 0.94f);
     private static readonly Color EnemyAcidTrailSegmentColor = new Color(0.58f, 1f, 0.18f, 0.82f);
+    private static readonly Color EnemyDetachedAcidTrailSegmentColor = new Color(1f, 0.62f, 0.12f, 0.78f);
     private static readonly Color SpawnerSpawnRadiusColor = new Color(0.2f, 0.9f, 0.42f, 0.94f);
     private static readonly Color SpawnerDespawnRadiusColor = new Color(1f, 0.66f, 0.24f, 0.94f);
     private static readonly Color BombRadiusColor = new Color(1f, 0.4f, 0.12f, 0.94f);
@@ -49,6 +50,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private static EntityQuery bombQuery;
     private static EntityQuery projectileQuery;
     private static EntityQuery orbitalProjectionQuery;
+    private static EntityQuery detachedAcidTrailQuery;
     #endregion
 
     #region Properties
@@ -85,6 +87,7 @@ public static class RuntimeEntityGizmoRenderUtility
 
         DrawPlayerGizmos(primitiveDrawer, cachedEntityManager, playerEntity, in playerTransform);
         DrawEnemyGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
+        DrawDetachedAcidTrailGizmos(primitiveDrawer);
         DrawSpawnerGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
         DrawBombGizmos(primitiveDrawer, cachedEntityManager, playerTransform.Position);
         RuntimeEntityProjectileGizmoUtility.DrawProjectileGizmos(primitiveDrawer,
@@ -112,6 +115,7 @@ public static class RuntimeEntityGizmoRenderUtility
         bombQuery = default;
         projectileQuery = default;
         orbitalProjectionQuery = default;
+        detachedAcidTrailQuery = default;
     }
     #endregion
 
@@ -148,6 +152,7 @@ public static class RuntimeEntityGizmoRenderUtility
                                                                 ComponentType.ReadOnly<ProjectileActive>());
         orbitalProjectionQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerOrbitalProjectionInstance>(),
                                                                        ComponentType.ReadOnly<LocalTransform>());
+        detachedAcidTrailQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemyDetachedAcidTrailSegment>());
         return true;
     }
 
@@ -411,6 +416,40 @@ public static class RuntimeEntityGizmoRenderUtility
         }
 
         return drewSegment;
+    }
+
+    /// <summary>
+    /// Draws detached Acid Wanderer hazard sections that keep damaging the player after their owner died, reusing the
+    /// enemy wander debug toggle so live and post-death acid hazards are validated together with a distinct fading color.
+    /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    private static void DrawDetachedAcidTrailGizmos(IRuntimeGizmoPrimitiveDrawer primitiveDrawer)
+    {
+        if (!RuntimeGizmoDebugState.EnemyWanderTargetEnabled || detachedAcidTrailQuery.IsEmptyIgnoreFilter)
+            return;
+
+        NativeArray<EnemyDetachedAcidTrailSegment> detachedSegments = detachedAcidTrailQuery.ToComponentDataArray<EnemyDetachedAcidTrailSegment>(Allocator.Temp);
+
+        try
+        {
+            // Render each surviving hazard capsule so the player can see the damage that outlives the dead owner.
+            for (int segmentIndex = 0; segmentIndex < detachedSegments.Length; segmentIndex++)
+            {
+                EnemyDetachedAcidTrailSegment segment = detachedSegments[segmentIndex];
+
+                if (segment.Radius <= 0f || segment.RemainingLifetime <= 0f)
+                    continue;
+
+                primitiveDrawer.DrawWireDisc(ToVector3(segment.StartPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
+                primitiveDrawer.DrawWireDisc(ToVector3(segment.EndPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
+                primitiveDrawer.DrawLink(ToVector3(segment.StartPosition), ToVector3(segment.EndPosition), EnemyDetachedAcidTrailSegmentColor);
+            }
+        }
+        finally
+        {
+            if (detachedSegments.IsCreated)
+                detachedSegments.Dispose();
+        }
     }
     #endregion
 
