@@ -103,7 +103,7 @@ MonoBehaviour:
       deadZoneRadius: 0
     damageShake:
       enabled: 1
-      durationSeconds: 0.25
+      durationSeconds: 0.35
       positionalAmplitude: 0.4
       rotationalAmplitude: 1.5
       frequency: 5
