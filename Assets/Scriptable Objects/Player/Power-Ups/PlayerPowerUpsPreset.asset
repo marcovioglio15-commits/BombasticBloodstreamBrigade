@@ -15349,7 +15349,7 @@ MonoBehaviour:
           scaleVfxToRadius: 1
           vfxScaleMultiplier: 1
         projectileOrbitOverride:
-          pathMode: 0
+          pathMode: 1
           radialEntrySpeed: 12
           orbitalSpeed: 8
           orbitRadiusMin: 4
@@ -24158,7 +24158,9 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveOrbitalProjectiles
+  - Passive_MegaProjectiles
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

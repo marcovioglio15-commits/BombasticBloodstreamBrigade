@@ -70,6 +70,13 @@ public partial struct ProjectileSimulationSystem : ISystem
     [WithAll(typeof(ProjectileActive))]
     private partial struct ProjectileSimulationJob : IJobEntity
     {
+        #region Constants
+        // Below this squared horizontal step the facing is left untouched to avoid jitter when an orbital projectile barely moves.
+        private const float MinimumFacingDisplacementSquared = 1e-8f;
+        // Exponential facing-follow rate (per second): higher tracks the travel direction tighter, lower eases the radial-to-orbit turn more.
+        private const float OrbitFacingSmoothingRate = 16f;
+        #endregion
+
         #region Fields
         public float DeltaTime;
         public float GlobalTime;
@@ -160,6 +167,8 @@ public partial struct ProjectileSimulationSystem : ISystem
         /// <summary>
         /// Applies a resolved projectile position using the exact frame displacement as the authoritative source for
         /// distance, lifetime and velocity updates. This keeps collision reconstruction aligned with non-linear paths.
+        /// Used by orbital (Perfect Circle) projectiles, so it also eases the projectile facing toward its curved travel
+        /// direction; otherwise the spawn-time facing would stay fixed and the attached VFX would not rotate with the orbit.
         /// </summary>
         /// <param name="projectileTransform">Projectile transform to update.</param>
         /// <param name="runtimeState">Projectile runtime state that tracks range and lifetime.</param>
@@ -174,6 +183,17 @@ public partial struct ProjectileSimulationSystem : ISystem
             projectileTransform.Position = targetPosition;
             runtimeState.TraveledDistance += math.length(displacement);
             runtimeState.ElapsedLifetime += DeltaTime;
+
+            // Ease facing toward the horizontal travel direction (spawn convention: +Z along motion) so the radial-to-orbit turn is smooth instead of snapping; frame-rate independent.
+            float3 facingDisplacement = new float3(displacement.x, 0f, displacement.z);
+
+            if (math.lengthsq(facingDisplacement) > MinimumFacingDisplacementSquared)
+            {
+                quaternion targetRotation = quaternion.LookRotationSafe(facingDisplacement, math.up());
+                projectileTransform.Rotation = math.slerp(projectileTransform.Rotation,
+                                                          targetRotation,
+                                                          1f - math.exp(-OrbitFacingSmoothingRate * DeltaTime));
+            }
 
             if (DeltaTime > 1e-6f)
             {
