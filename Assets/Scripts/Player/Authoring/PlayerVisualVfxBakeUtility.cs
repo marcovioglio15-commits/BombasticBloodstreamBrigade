@@ -14,6 +14,7 @@ public static class PlayerVisualVfxBakeUtility
     private const float DefaultChargeShotVfxLifetimeSeconds = 1f;
     private const float DefaultProjectileAttachedVfxLifetimeSeconds = 12f;
     private const float MinimumScale = 0.01f;
+    private const float MinimumMuzzleFlashLifetimeSeconds = 0.05f;
     #endregion
 
     #region Methods
@@ -47,6 +48,37 @@ public static class PlayerVisualVfxBakeUtility
             UniformScale = math.max(MinimumScale, visualPreset.LevelUpVfxScaleMultiplier),
             LifetimeSeconds = ManagedVfxPrefabLifetimeUtility.ResolvePrefabLifetimeSeconds(prefab, DefaultLevelUpVfxLifetimeSeconds),
             TriggerMode = ResolveLevelUpTriggerMode(visualPreset.LevelUpVfxTriggerMode)
+        };
+        return true;
+    }
+
+    /// <summary>
+    /// Builds the optional muzzle-flash VFX config from the resolved visual preset. Unlike the other one-shot VFX, its lifetime is authored explicitly instead of being read from the prefab.
+    /// </summary>
+    /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <param name="config">Built ECS config when a prefab is assigned.</param>
+    /// <returns>True when the preset contains a Muzzle Flash VFX prefab.</returns>
+    public static bool TryBuildMuzzleFlashVfxConfig(PlayerVisualPreset visualPreset,
+                                                    Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
+                                                    out PlayerMuzzleFlashVfxConfig config)
+    {
+        config = default;
+
+        if (visualPreset == null || visualPreset.MuzzleFlashVfxPrefab == null)
+            return false;
+
+        GameObject prefab = visualPreset.MuzzleFlashVfxPrefab;
+        Entity prefabEntity = resolveDynamicVfxPrefabEntity != null ? resolveDynamicVfxPrefabEntity(prefab) : Entity.Null;
+        Vector3 spawnOffset = visualPreset.MuzzleFlashVfxSpawnOffset;
+
+        config = new PlayerMuzzleFlashVfxConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = prefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(MinimumScale, visualPreset.MuzzleFlashVfxScaleMultiplier),
+            LifetimeSeconds = math.max(MinimumMuzzleFlashLifetimeSeconds, visualPreset.MuzzleFlashVfxLifetimeSeconds)
         };
         return true;
     }

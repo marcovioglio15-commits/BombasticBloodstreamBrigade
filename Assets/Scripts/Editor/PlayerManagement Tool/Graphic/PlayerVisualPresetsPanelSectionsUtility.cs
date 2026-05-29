@@ -478,12 +478,39 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                                            "Player Projectile VFX Scale",
                                                                            "Uniform scale multiplier applied to projectile attached VFX instances.");
 
+        Foldout muzzleFlashVfxFoldout = BuildOptionalPlayerVfxFoldout(panel,
+                                                                     presetSerializedObject,
+                                                                     scalingRulesProperty,
+                                                                     "Muzzle Flash VFX",
+                                                                     "MuzzleFlash",
+                                                                     "Optional one-shot VFX spawned at the projectile origin every time the player fires a shot.",
+                                                                     "muzzleFlashVfxPrefab",
+                                                                     "Muzzle Flash VFX Prefab",
+                                                                     "Optional one-shot VFX prefab spawned at the projectile origin on every shot.",
+                                                                     "Assign a Muzzle Flash VFX prefab to enable offset, scale, and lifetime controls.",
+                                                                     null,
+                                                                     null,
+                                                                     null,
+                                                                     "muzzleFlashVfxSpawnOffset",
+                                                                     "Muzzle Flash VFX Offset",
+                                                                     "Yaw-relative offset applied to Muzzle Flash VFX from the resolved muzzle pose. Positive Y always moves upward in world space.",
+                                                                     "muzzleFlashVfxScaleMultiplier",
+                                                                     "Muzzle Flash VFX Scale",
+                                                                     "Uniform scale multiplier applied to the Muzzle Flash VFX instance.",
+                                                                     null,
+                                                                     null,
+                                                                     null,
+                                                                     "muzzleFlashVfxLifetimeSeconds",
+                                                                     "Muzzle Flash VFX Lifetime",
+                                                                     "Lifetime in seconds before the Muzzle Flash VFX instance despawns. Use short values for a brief flash.");
+
         container.Add(powerUpsVfxFoldout);
         container.Add(levelUpVfxFoldout);
         container.Add(healthIncreaseVfxFoldout);
         container.Add(shieldIncreaseVfxFoldout);
         container.Add(chargeShotVfxFoldout);
         container.Add(playerProjectileVfxFoldout);
+        container.Add(muzzleFlashVfxFoldout);
 
         AddPropertyField(panel,
                          powerUpsVfxFoldout,
@@ -584,7 +611,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                          string scaleTooltip,
                                                          string extraTogglePropertyName = null,
                                                          string extraToggleLabel = null,
-                                                         string extraToggleTooltip = null)
+                                                         string extraToggleTooltip = null,
+                                                         string lifetimePropertyName = null,
+                                                         string lifetimeLabel = null,
+                                                         string lifetimeTooltip = null)
     {
         Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout(title,
                                                                           "NashCore.PlayerManagement.Visual.VFX." + stateSuffix,
@@ -598,6 +628,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         SerializedProperty scaleProperty = presetSerializedObject.FindProperty(scalePropertyName);
         SerializedProperty extraToggleProperty = !string.IsNullOrWhiteSpace(extraTogglePropertyName)
             ? presetSerializedObject.FindProperty(extraTogglePropertyName)
+            : null;
+        SerializedProperty lifetimeProperty = !string.IsNullOrWhiteSpace(lifetimePropertyName)
+            ? presetSerializedObject.FindProperty(lifetimePropertyName)
             : null;
         HelpBox missingPrefabBox = new HelpBox(missingPrefabMessage, HelpBoxMessageType.Info);
         VisualElement detailsContainer = new VisualElement();
@@ -629,6 +662,12 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                  scalingRulesProperty,
                                  scaleLabel,
                                  scaleTooltip);
+        AddScalablePropertyField(panel,
+                                 detailsContainer,
+                                 lifetimeProperty,
+                                 scalingRulesProperty,
+                                 lifetimeLabel,
+                                 lifetimeTooltip);
 
         AddScalablePropertyField(panel,
                                  detailsContainer,
@@ -646,7 +685,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                            offsetProperty,
                                            offsetLabel,
                                            scaleProperty,
-                                           scaleLabel);
+                                           scaleLabel,
+                                           lifetimeProperty,
+                                           lifetimeLabel);
 
         if (prefabProperty != null)
         {
@@ -660,7 +701,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                    offsetProperty,
                                                    offsetLabel,
                                                    scaleProperty,
-                                                   scaleLabel);
+                                                   scaleLabel,
+                                                   lifetimeProperty,
+                                                   lifetimeLabel);
             });
         }
 
@@ -672,7 +715,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                            offsetProperty,
                                            offsetLabel,
                                            scaleProperty,
-                                           scaleLabel);
+                                           scaleLabel,
+                                           lifetimeProperty,
+                                           lifetimeLabel);
         TrackOptionalPlayerVfxWarningField(foldout,
                                            offsetProperty,
                                            modeProperty,
@@ -681,7 +726,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                            offsetProperty,
                                            offsetLabel,
                                            scaleProperty,
-                                           scaleLabel);
+                                           scaleLabel,
+                                           lifetimeProperty,
+                                           lifetimeLabel);
         TrackOptionalPlayerVfxWarningField(foldout,
                                            scaleProperty,
                                            modeProperty,
@@ -690,7 +737,20 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                            offsetProperty,
                                            offsetLabel,
                                            scaleProperty,
-                                           scaleLabel);
+                                           scaleLabel,
+                                           lifetimeProperty,
+                                           lifetimeLabel);
+        TrackOptionalPlayerVfxWarningField(foldout,
+                                           lifetimeProperty,
+                                           modeProperty,
+                                           prefabProperty,
+                                           warningsContainer,
+                                           offsetProperty,
+                                           offsetLabel,
+                                           scaleProperty,
+                                           scaleLabel,
+                                           lifetimeProperty,
+                                           lifetimeLabel);
         return foldout;
     }
 
@@ -702,7 +762,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                            SerializedProperty offsetProperty,
                                                            string offsetLabel,
                                                            SerializedProperty scaleProperty,
-                                                           string scaleLabel)
+                                                           string scaleLabel,
+                                                           SerializedProperty lifetimeProperty,
+                                                           string lifetimeLabel)
     {
         if (root == null || trackedProperty == null)
             return;
@@ -715,7 +777,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                              offsetProperty,
                                              offsetLabel,
                                              scaleProperty,
-                                             scaleLabel);
+                                             scaleLabel,
+                                             lifetimeProperty,
+                                             lifetimeLabel);
         });
     }
 
@@ -727,7 +791,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                            SerializedProperty offsetProperty,
                                                            string offsetLabel,
                                                            SerializedProperty scaleProperty,
-                                                           string scaleLabel)
+                                                           string scaleLabel,
+                                                           SerializedProperty lifetimeProperty,
+                                                           string lifetimeLabel)
     {
         bool hasPrefab = prefabProperty != null && prefabProperty.objectReferenceValue != null;
 
@@ -743,7 +809,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                          offsetProperty,
                                          offsetLabel,
                                          scaleProperty,
-                                         scaleLabel);
+                                         scaleLabel,
+                                         lifetimeProperty,
+                                         lifetimeLabel);
     }
 
     private static void RefreshOptionalPlayerVfxWarnings(bool hasPrefab,
@@ -752,7 +820,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                         SerializedProperty offsetProperty,
                                                         string offsetLabel,
                                                         SerializedProperty scaleProperty,
-                                                        string scaleLabel)
+                                                        string scaleLabel,
+                                                        SerializedProperty lifetimeProperty,
+                                                        string lifetimeLabel)
     {
         if (warningsContainer == null)
             return;
@@ -771,6 +841,9 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         AddNonPositiveFloatWarning(warningsContainer,
                                    scaleProperty,
                                    scaleLabel + " should be greater than zero.");
+        AddNonPositiveFloatWarning(warningsContainer,
+                                   lifetimeProperty,
+                                   (string.IsNullOrWhiteSpace(lifetimeLabel) ? "Lifetime" : lifetimeLabel) + " should be greater than zero.");
     }
 
     private static void AddInvalidEnumWarning(VisualElement container,

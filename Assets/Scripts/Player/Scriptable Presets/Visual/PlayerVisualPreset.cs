@@ -208,6 +208,20 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Uniform scale multiplier applied to projectile attached VFX instances.")]
     [SerializeField] private float playerProjectileVfxScaleMultiplier = 1f;
 
+    #region Muzzle Flash VFX
+    [Tooltip("Optional one-shot VFX prefab spawned at the projectile origin every time the player fires a shot.")]
+    [SerializeField] private GameObject muzzleFlashVfxPrefab;
+
+    [Tooltip("Yaw-relative offset applied to Muzzle Flash VFX from the resolved muzzle pose. Positive Y always moves upward in world space.")]
+    [SerializeField] private Vector3 muzzleFlashVfxSpawnOffset = Vector3.zero;
+
+    [Tooltip("Uniform scale multiplier applied to the Muzzle Flash VFX instance.")]
+    [SerializeField] private float muzzleFlashVfxScaleMultiplier = 1f;
+
+    [Tooltip("Lifetime in seconds before the Muzzle Flash VFX instance despawns. Use short values for a brief flash.")]
+    [SerializeField] private float muzzleFlashVfxLifetimeSeconds = 0.12f;
+    #endregion
+
     #region Visual Pointer
     [Header("Visual Pointer")]
     [Tooltip("When enabled, a precision laser aiming pointer is rendered straight out of the weapon muzzle along the current shot direction.")]
@@ -572,6 +586,38 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return playerProjectileVfxScaleMultiplier;
+        }
+    }
+
+    public GameObject MuzzleFlashVfxPrefab
+    {
+        get
+        {
+            return muzzleFlashVfxPrefab;
+        }
+    }
+
+    public Vector3 MuzzleFlashVfxSpawnOffset
+    {
+        get
+        {
+            return muzzleFlashVfxSpawnOffset;
+        }
+    }
+
+    public float MuzzleFlashVfxScaleMultiplier
+    {
+        get
+        {
+            return muzzleFlashVfxScaleMultiplier;
+        }
+    }
+
+    public float MuzzleFlashVfxLifetimeSeconds
+    {
+        get
+        {
+            return muzzleFlashVfxLifetimeSeconds;
         }
     }
 
