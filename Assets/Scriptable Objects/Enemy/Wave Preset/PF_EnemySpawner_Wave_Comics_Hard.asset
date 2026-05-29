@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PF_EnemySpawner_Wave_Comics_Hard
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveLabel: PF_EnemySpawner_Grunts
+  - waveLabel: Wave 1
     previewInScene: 1
     startMode: 0
     startDelaySeconds: 1

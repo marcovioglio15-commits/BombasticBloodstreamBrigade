@@ -182,7 +182,7 @@ PrefabInstance:
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
+      objectReference: {fileID: 11400000, guid: 72b0b1d7ca095574db299aaf47e39233, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: waves.Array.size
       value: 1
@@ -753,7 +753,7 @@ Transform:
   m_GameObject: {fileID: 52554554}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.88709, y: 1.6172, z: -3.96}
+  m_LocalPosition: {x: 14.4, y: 1.6172, z: -3.96}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1488,7 +1488,7 @@ PrefabInstance:
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: b7a74f7fd87798546abeb0f3dae30f83, type: 2}
+      objectReference: {fileID: 11400000, guid: 941e260559d38d746a8ceefdc02d7bcd, type: 2}
     - target: {fileID: 8575402114385844121, guid: 781d2582b36eb1048b0a3b1a4fdc34a3, type: 3}
       propertyPath: spawnerEnabled
       value: 1
