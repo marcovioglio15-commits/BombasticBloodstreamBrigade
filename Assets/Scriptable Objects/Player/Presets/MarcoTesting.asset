@@ -91,7 +91,7 @@ MonoBehaviour:
     m_Values:
       m_RotationDamping: 0.1
       m_RotationMaxSpeed: 1620
-      m_RotationDeadZone: 0.1
+      m_RotationDeadZone: 0.5
       m_DigitalReleaseGraceSeconds: 0.08
   cameraSettings:
     behavior: 2
@@ -103,8 +103,8 @@ MonoBehaviour:
       deadZoneRadius: 0
     damageShake:
       enabled: 1
-      durationSeconds: 0.35
-      positionalAmplitude: 0.4
+      durationSeconds: 0.4
+      positionalAmplitude: 0.5
       rotationalAmplitude: 1.5
       frequency: 5
       falloff: 1
