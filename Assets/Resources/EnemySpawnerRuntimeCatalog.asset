@@ -22,56 +22,60 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 941e260559d38d746a8ceefdc02d7bcd
+      defaultWavePresetGuid: b7a74f7fd87798546abeb0f3dae30f83
     - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
       spawnerGuid: 6900e62466181a3c35bb420f2496adf1
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_WaveOnlyCowards
       defaultEnabled: 1
-      defaultWavePresetGuid: 72b0b1d7ca095574db299aaf47e39233
+      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
   wavePresetFolders:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
     wavePresets:
-    - presetName: PF_EnemySpawner_Empty
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Empty.asset
-      assetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
-      preset: {fileID: 11400000, guid: 00faa5bb1b1b4574c826cfbad8b060fb, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Easy
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Easy.asset
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_1_Easy
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_1_Easy.asset
       assetGuid: 941e260559d38d746a8ceefdc02d7bcd
       preset: {fileID: 11400000, guid: 941e260559d38d746a8ceefdc02d7bcd, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Easy_Cowards
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Easy_Cowards.asset
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_1_Easy_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_1_Easy_Cowards.asset
       assetGuid: 72b0b1d7ca095574db299aaf47e39233
       preset: {fileID: 11400000, guid: 72b0b1d7ca095574db299aaf47e39233, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Hard
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Hard.asset
-      assetGuid: 511ecd7c84f31f54ab0c9c3e326a2f28
-      preset: {fileID: 11400000, guid: 511ecd7c84f31f54ab0c9c3e326a2f28, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Hard_Cowards
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Hard_Cowards.asset
-      assetGuid: db86207e9215aea4f917700a8e852c0a
-      preset: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Medium
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Medium.asset
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_2_Medium
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_2_Medium.asset
       assetGuid: b7a74f7fd87798546abeb0f3dae30f83
       preset: {fileID: 11400000, guid: b7a74f7fd87798546abeb0f3dae30f83, type: 2}
-    - presetName: PF_EnemySpawner_Wave_Comics_Medium_Cowards
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Medium_Cowards.asset
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_2_Medium_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_2_Medium_Cowards.asset
       assetGuid: 9e22183972f48b6499bcddd50a3b6867
       preset: {fileID: 11400000, guid: 9e22183972f48b6499bcddd50a3b6867, type: 2}
-    - presetName: PF_EnemySpawner_Wave_GruntDVDFun
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_GruntDVDFun.asset
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_3_Hard
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_3_Hard.asset
+      assetGuid: 511ecd7c84f31f54ab0c9c3e326a2f28
+      preset: {fileID: 11400000, guid: 511ecd7c84f31f54ab0c9c3e326a2f28, type: 2}
+    - presetName: PF_EnemySpawner_Wave_Main_Comics_3_Hard_Cowards
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_3_Hard_Cowards.asset
+      assetGuid: db86207e9215aea4f917700a8e852c0a
+      preset: {fileID: 11400000, guid: db86207e9215aea4f917700a8e852c0a, type: 2}
+    - presetName: PF_EnemySpawner_zWave_Challenge_BulletBallet
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_zWave_Challenge_BulletBallet.asset
+      assetGuid: f5806548a7d36db49a100dd225c0d152
+      preset: {fileID: 11400000, guid: f5806548a7d36db49a100dd225c0d152, type: 2}
+    - presetName: PF_EnemySpawner_zWave_Challenge_GruntDVDFun
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_zWave_Challenge_GruntDVDFun.asset
       assetGuid: 085e828ebb21b7045ae9e4b42612f20c
       preset: {fileID: 11400000, guid: 085e828ebb21b7045ae9e4b42612f20c, type: 2}
-    - presetName: PF_EnemySpawner_Wave_LeFunny
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_LeFunny.asset
+    - presetName: PF_EnemySpawner_zWave_Challenge_Impossible
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_zWave_Challenge_Impossible.asset
       assetGuid: 9183ee2949edfe84b85f91f9355de07f
       preset: {fileID: 11400000, guid: 9183ee2949edfe84b85f91f9355de07f, type: 2}
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite
     displayName: Wave Preset/OutdatedButNotQuite
     wavePresets:
+    - presetName: PF_EnemySpawner_Empty
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+      assetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+      preset: {fileID: 11400000, guid: 00faa5bb1b1b4574c826cfbad8b060fb, type: 2}
     - presetName: PF_EnemySpawner_WavePreset_Massive
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_WavePreset_Massive.asset
       assetGuid: c2554c3ad890887489e366de81ee389a

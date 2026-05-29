@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06dc4d4afdfd91e4186770a067a8f030, type: 3}
-  m_Name: PF_EnemySpawner_Wave_LeFunny
+  m_Name: PF_EnemySpawner_zWave_Challenge_Impossible
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
   - waveLabel: Wave 1
