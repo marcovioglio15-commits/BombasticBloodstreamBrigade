@@ -267,6 +267,49 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
     }
 
     /// <summary>
+    /// Stops new emission on a follow VFX that just lost its target so the retained trail and live particles fade
+    /// from the last followed pose instead of freezing a continuously refreshed head vertex at the stationary detach
+    /// position. Already emitted particles and trail history are preserved so the effect ages out naturally.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance detached from an invalid follow target.</param>
+    /// <returns>Longest authored trail history time in seconds, used by the caller to keep the detached instance alive until its trail finishes fading.</returns>
+    public static float StopEmissionForDetach(PlayerPowerUpManagedVfxInstance instance)
+    {
+        // Stop spawning new particles while letting already emitted particles complete their own lifetime.
+        if (instance.ParticleSystems != null)
+        {
+            for (int particleIndex = 0; particleIndex < instance.ParticleSystems.Length; particleIndex++)
+            {
+                ParticleSystem particleSystem = instance.ParticleSystems[particleIndex];
+
+                if (particleSystem == null)
+                    continue;
+
+                particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
+        }
+
+        float longestTrailTime = 0f;
+
+        if (instance.TrailRenderers == null)
+            return longestTrailTime;
+
+        // Disable trail emission so the head stops being refreshed and the whole history ages out smoothly.
+        for (int trailIndex = 0; trailIndex < instance.TrailRenderers.Length; trailIndex++)
+        {
+            TrailRenderer trailRenderer = instance.TrailRenderers[trailIndex];
+
+            if (trailRenderer == null)
+                continue;
+
+            trailRenderer.emitting = false;
+            longestTrailTime = Mathf.Max(longestTrailTime, Mathf.Max(0f, trailRenderer.time));
+        }
+
+        return longestTrailTime;
+    }
+
+    /// <summary>
     /// Stops visual playback before returning an instance to the managed pool.
     /// </summary>
     /// <param name="instance">Managed VFX instance being stopped.</param>

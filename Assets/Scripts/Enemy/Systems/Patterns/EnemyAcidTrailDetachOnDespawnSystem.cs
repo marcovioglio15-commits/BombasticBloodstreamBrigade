@@ -4,8 +4,13 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Detaches live Acid Wanderer trail segments from enemies that are about to return to the pool.
+/// Must run after every despawn-request producer so killed owners are captured the same frame; all
+/// kill sources resolve before <see cref="EnemyKilledEventsSystem"/>, which therefore acts as the
+/// reliable barrier guaranteeing the detach happens before <see cref="EnemyFinalizeDespawnSystem"/>
+/// clears the segment buffer during pooling.
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
+[UpdateAfter(typeof(EnemyKilledEventsSystem))]
 [UpdateAfter(typeof(EnemyAcidTrailVfxSpawnSystem))]
 [UpdateBefore(typeof(PlayerPowerUpVfxSpawnSystem))]
 [UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]

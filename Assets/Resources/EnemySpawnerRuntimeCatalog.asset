@@ -33,10 +33,6 @@ MonoBehaviour:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
     wavePresets:
-    - presetName: PF_EnemySpawner_Empty
-      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Empty.asset
-      assetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
-      preset: {fileID: 11400000, guid: 00faa5bb1b1b4574c826cfbad8b060fb, type: 2}
     - presetName: PF_EnemySpawner_Wave_Comics_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Comics_Easy.asset
       assetGuid: 941e260559d38d746a8ceefdc02d7bcd
@@ -72,6 +68,10 @@ MonoBehaviour:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite
     displayName: Wave Preset/OutdatedButNotQuite
     wavePresets:
+    - presetName: PF_EnemySpawner_Empty
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+      assetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+      preset: {fileID: 11400000, guid: 00faa5bb1b1b4574c826cfbad8b060fb, type: 2}
     - presetName: PF_EnemySpawner_WavePreset_Massive
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_WavePreset_Massive.asset
       assetGuid: c2554c3ad890887489e366de81ee389a

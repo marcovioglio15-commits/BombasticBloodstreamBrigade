@@ -376,6 +376,10 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.FollowMuzzlePose = false;
         instance.DetachWhenFollowTargetInvalid = false;
         instance.KeepAliveWhileFollowTargetValid = false;
+
+        // Stop emission so the trail fades from the last pose, then keep the instance alive long enough to finish fading.
+        float longestTrailTime = PlayerPowerUpManagedVfxPresentationUtility.StopEmissionForDetach(instance);
+        instance.RemainingSeconds = math.max(instance.RemainingSeconds, longestTrailTime);
         return true;
     }
 
