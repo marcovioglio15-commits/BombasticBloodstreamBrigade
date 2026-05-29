@@ -24156,7 +24156,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveChargeShot
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:

@@ -252,9 +252,10 @@ public partial struct ProjectileSpawnSystem : ISystem
             int requestsCount = shooterShootRequests.Length;
             int spawnedProjectileCount = 0;
 
-            // Captured from the first spawned projectile so the per-volley muzzle flash uses the real shot origin and direction.
+            // Captured from the first spawned primary projectile so the per-volley muzzle flash uses the real shot origin and direction.
             float3 muzzleFlashOrigin = float3.zero;
             quaternion muzzleFlashRotation = quaternion.identity;
+            bool spawnedPrimaryShot = false;
 
             for (int requestIndex = 0; requestIndex < requestsCount; requestIndex++)
             {
@@ -354,25 +355,28 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                 in projectileAttachedVfxConfigLookup,
                                                 ref powerUpVfxRequestLookup);
 
-                // Cache the first spawned shot pose so a single muzzle flash represents the whole volley.
-                if (spawnedProjectileCount == 0)
+                // Cache the first spawned primary (non-split) shot pose so a single muzzle flash represents the whole volley.
+                // Split-child projectiles spawn from despawn/hit points, not the muzzle, so they must not retrigger the flash.
+                if (request.IsSplitChild == 0 && !spawnedPrimaryShot)
                 {
                     muzzleFlashOrigin = projectileTransform.Position;
                     muzzleFlashRotation = projectileTransform.Rotation;
+                    spawnedPrimaryShot = true;
                 }
 
                 spawnedProjectileCount++;
             }
 
             if (spawnedProjectileCount > 0)
-            {
                 RegisterShooterShotPulse(shooterEntity, elapsedTime, ref shootingStateLookup);
+
+            // Only primary shots originate from the weapon muzzle, so split-child spawns never retrigger the flash.
+            if (spawnedPrimaryShot)
                 TryEnqueueMuzzleFlashVfx(shooterEntity,
                                          muzzleFlashOrigin,
                                          muzzleFlashRotation,
                                          in muzzleFlashVfxConfigLookup,
                                          ref powerUpVfxRequestLookup);
-            }
 
             shooterShootRequests.Clear();
         }
