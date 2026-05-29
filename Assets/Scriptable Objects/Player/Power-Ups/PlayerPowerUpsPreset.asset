@@ -24159,7 +24159,7 @@ MonoBehaviour:
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
-  - PassiveOrbitalProjectiles
+  - PassiveBouncingProjectiles
   - Passive_MegaProjectiles
   passiveTools:
   - commonData:

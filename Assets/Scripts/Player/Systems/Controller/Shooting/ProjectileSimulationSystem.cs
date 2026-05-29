@@ -50,7 +50,8 @@ public partial struct ProjectileSimulationSystem : ISystem
             GlobalTime = (float)SystemAPI.Time.ElapsedTime,
             MovementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true),
             PassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true),
-            PlayerWorldTransformLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true)
+            PlayerWorldTransformLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true),
+            BounceStateLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(true)
         };
 
         // Schedule the job to run in parallel across all entities matching the query,
@@ -71,10 +72,10 @@ public partial struct ProjectileSimulationSystem : ISystem
     private partial struct ProjectileSimulationJob : IJobEntity
     {
         #region Constants
-        // Below this squared horizontal step the facing is left untouched to avoid jitter when an orbital projectile barely moves.
-        private const float MinimumFacingDisplacementSquared = 1e-8f;
-        // Exponential facing-follow rate (per second): higher tracks the travel direction tighter, lower eases the radial-to-orbit turn more.
-        private const float OrbitFacingSmoothingRate = 16f;
+        // Below this squared horizontal direction magnitude the facing is left untouched to avoid jitter when a projectile barely moves.
+        private const float MinimumFacingDirectionSquared = 1e-8f;
+        // Exponential facing-follow rate (per second): higher tracks the travel direction tighter, lower eases direction changes (orbit entry, wall bounce) more.
+        private const float FacingSmoothingRate = 16f;
         #endregion
 
         #region Fields
@@ -83,11 +84,13 @@ public partial struct ProjectileSimulationSystem : ISystem
         [ReadOnly] public ComponentLookup<PlayerMovementState> MovementStateLookup;
         [ReadOnly] public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsLookup;
         [ReadOnly] public ComponentLookup<LocalToWorld> PlayerWorldTransformLookup;
+        [ReadOnly] public ComponentLookup<ProjectileBounceState> BounceStateLookup;
         #endregion
 
         #region Methods
         #region Execute
-        private void Execute(ref LocalTransform projectileTransform,
+        private void Execute(Entity projectileEntity,
+                             ref LocalTransform projectileTransform,
                              ref ProjectileRuntimeState runtimeState,
                              ref Projectile projectile,
                              ref ProjectilePerfectCircleState perfectCircleState,
@@ -115,6 +118,10 @@ public partial struct ProjectileSimulationSystem : ISystem
             projectileTransform.Position += displacement;
             runtimeState.TraveledDistance += ProjectileKinematicsUtility.ResolveLinearRangeStepDistance(in projectile, DeltaTime);
             runtimeState.ElapsedLifetime += DeltaTime;
+
+            // Bouncing projectiles change direction on wall impact; ease the facing toward the new velocity so the attached VFX turns smoothly instead of snapping.
+            if (BounceStateLookup.HasComponent(projectileEntity))
+                EaseFacingTowardDirection(ref projectileTransform, projectile.Velocity, DeltaTime);
         }
         #endregion
 
@@ -184,16 +191,8 @@ public partial struct ProjectileSimulationSystem : ISystem
             runtimeState.TraveledDistance += math.length(displacement);
             runtimeState.ElapsedLifetime += DeltaTime;
 
-            // Ease facing toward the horizontal travel direction (spawn convention: +Z along motion) so the radial-to-orbit turn is smooth instead of snapping; frame-rate independent.
-            float3 facingDisplacement = new float3(displacement.x, 0f, displacement.z);
-
-            if (math.lengthsq(facingDisplacement) > MinimumFacingDisplacementSquared)
-            {
-                quaternion targetRotation = quaternion.LookRotationSafe(facingDisplacement, math.up());
-                projectileTransform.Rotation = math.slerp(projectileTransform.Rotation,
-                                                          targetRotation,
-                                                          1f - math.exp(-OrbitFacingSmoothingRate * DeltaTime));
-            }
+            // Ease facing toward the curved travel direction so the radial-to-orbit turn is smooth instead of snapping.
+            EaseFacingTowardDirection(ref projectileTransform, displacement, DeltaTime);
 
             if (DeltaTime > 1e-6f)
             {
@@ -202,6 +201,31 @@ public partial struct ProjectileSimulationSystem : ISystem
             }
 
             projectile.Velocity = float3.zero;
+        }
+        #endregion
+
+        #region Facing
+        /// <summary>
+        /// Eases the projectile rotation toward a horizontal travel direction (spawn convention: +Z along motion), frame-rate independent.
+        /// Shared by non-linear direction changes (orbit entry and wall bounce) so the attached VFX turns smoothly instead of snapping.
+        /// </summary>
+        /// <param name="projectileTransform">Projectile transform whose rotation is eased in place.</param>
+        /// <param name="travelDirection">Current travel direction; only its horizontal component drives the facing.</param>
+        /// <param name="deltaTime">Current frame delta time used for frame-rate-independent smoothing.</param>
+        private static void EaseFacingTowardDirection(ref LocalTransform projectileTransform,
+                                                      float3 travelDirection,
+                                                      float deltaTime)
+        {
+            // Keep facing on the horizontal plane to match the top-down spawn orientation.
+            float3 horizontalDirection = new float3(travelDirection.x, 0f, travelDirection.z);
+
+            if (math.lengthsq(horizontalDirection) <= MinimumFacingDirectionSquared)
+                return;
+
+            quaternion targetRotation = quaternion.LookRotationSafe(horizontalDirection, math.up());
+            projectileTransform.Rotation = math.slerp(projectileTransform.Rotation,
+                                                      targetRotation,
+                                                      1f - math.exp(-FacingSmoothingRate * deltaTime));
         }
         #endregion
 
