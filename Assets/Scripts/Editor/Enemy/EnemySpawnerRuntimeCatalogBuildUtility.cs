@@ -57,6 +57,7 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
         HashSet<string> referencedSubScenePaths = new HashSet<string>();
         List<string> scenePaths = BuildManagedScenePaths();
         SceneSetup[] originalSetup = EditorSceneManager.GetSceneManagerSetup();
+        bool completedSceneScan = false;
 
         try
         {
@@ -101,14 +102,18 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
                     EditorSceneManager.SaveScene(openedScene);
                 }
 
-                // Only close scenes that this method opened; already-open scenes are restored by RestoreSceneManagerSetup.
+                // Only close scenes that this method opened; already-open scenes (including editing SubScenes) are left intact.
                 if (!wasAlreadyOpen)
                     EditorSceneManager.CloseScene(openedScene, true);
             }
+
+            completedSceneScan = true;
         }
         finally
         {
-            if (originalSetup != null && originalSetup.Length > 0)
+            // Restore the original layout only when the scan failed: the happy path already closed every scene it
+            // opened, so a full RestoreSceneManagerSetup would needlessly reload scenes open for editing and close them.
+            if (!completedSceneScan && originalSetup != null && originalSetup.Length > 0)
                 EditorSceneManager.RestoreSceneManagerSetup(originalSetup);
         }
 
@@ -266,8 +271,8 @@ public static class EnemySpawnerRuntimeCatalogBuildUtility
 
     /// <summary>
     /// Appends spawners from one referenced SubScene asset to the selected parent scene entry.
-    /// SubScene assets that are already open in the editor are reused in-place and never closed by this method;
-    /// cleanup is delegated to <see cref="BuildSceneEntries"/>'s RestoreSceneManagerSetup finally block.
+    /// SubScene assets already open in the editor are reused in-place and left open; only SubScenes opened by this
+    /// method are closed once scanning completes, so editing sessions are never disturbed.
     /// </summary>
     /// <param name="subScene">SubScene component found inside the parent scene.</param>
     /// <param name="spawnerEntries">Target spawner list for the parent scene catalog entry.</param>
