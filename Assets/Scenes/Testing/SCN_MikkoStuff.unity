@@ -8937,6 +8937,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_VFX_BulletMesh
       objectReference: {fileID: 0}
+    - target: {fileID: 3264601393849410126, guid: 4fdbc86243810fa40b6c172f5535dcd8, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8953,6 +8957,10 @@ PrefabInstance:
     - target: {fileID: 672474950645290884, guid: 926cebe333855e4419f62865c3de81fe, type: 3}
       propertyPath: m_Name
       value: PF_VFX_ShieldIncrease
+      objectReference: {fileID: 0}
+    - target: {fileID: 672474950645290884, guid: 926cebe333855e4419f62865c3de81fe, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8239739340192225976, guid: 926cebe333855e4419f62865c3de81fe, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9007,6 +9015,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5999372236794778029, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.40566033
+      objectReference: {fileID: 0}
+    - target: {fileID: 5999372236794778029, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.631223
+      objectReference: {fileID: 0}
+    - target: {fileID: 5999372236794778029, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6513283037121004192, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -9121,6 +9141,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2d4c258ff73598041bfa362b3f171544, type: 3}
+--- !u!1001 &3173727415859787986
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565893659510252857, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
+      propertyPath: m_Name
+      value: PF_VFX_GunMuzzleFlash
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 37299dd5809809446b838a59efc726e3, type: 3}
 --- !u!1001 &3360200745489635728
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9391,3 +9468,4 @@ SceneRoots:
   - {fileID: 922391460088034560}
   - {fileID: 1865184948}
   - {fileID: 484707677090803421}
+  - {fileID: 3173727415859787986}
