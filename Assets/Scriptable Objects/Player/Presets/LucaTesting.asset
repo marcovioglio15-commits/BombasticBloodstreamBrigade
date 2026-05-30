@@ -113,6 +113,17 @@ MonoBehaviour:
       rumbleEnabled: 1
       rumbleLowFrequency: 0.6
       rumbleHighFrequency: 0.35
+    fireShake:
+      enabled: 1
+      durationSeconds: 0.18
+      positionalAmplitude: 0.18
+      rotationalAmplitude: 0.6
+      frequency: 28
+      falloff: 2
+      suppressOnLaserBeam: 1
+      rumbleEnabled: 1
+      rumbleLowFrequency: 0.25
+      rumbleHighFrequency: 0.45
   shootingSettings:
     triggerMode: 0
     projectilesInheritPlayerSpeed: 0

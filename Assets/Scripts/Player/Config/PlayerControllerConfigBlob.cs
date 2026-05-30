@@ -194,7 +194,8 @@ public struct ConeConfig
 #region Camera
 /// <summary>
 /// Holds configuration data related to camera behavior, including the follow behavior, the offset from
-/// the player, and the follow spring tuning values (smooth time, max follow distance, dead zone radius).
+/// the player, the follow spring tuning values (smooth time, max follow distance, dead zone radius) and the two
+/// independent trauma-based shake channels (damage on hit, fire on primary-shot spawn).
 /// </summary>
 public struct CameraConfig
 {
@@ -202,6 +203,7 @@ public struct CameraConfig
     public float3 FollowOffset;
     public CameraValuesBlob Values;
     public CameraShakeBlob Shake;
+    public CameraFireShakeBlob FireShake;
 }
 
 /// <summary>
@@ -232,6 +234,31 @@ public struct CameraShakeBlob
 
     // Connected-gamepad rumble layered on the same trauma envelope as the camera shake. Motor intensities are
     // normalized [0..1] amplitudes consumed by the damage-shake rumble system at point of use.
+    public byte RumbleEnabled;
+    public float RumbleLowFrequency;
+    public float RumbleHighFrequency;
+}
+
+/// <summary>
+/// Holds the trauma-based fire camera-shake tuning resolved at bake time. Mirrors <see cref="CameraShakeBlob"/>
+/// minus the damage-scaling fields since fire trauma is added once per primary-shot spawn. Numeric ranges are
+/// clamped defensively at point of use by the runtime shake utility rather than at bake.
+/// </summary>
+public struct CameraFireShakeBlob
+{
+    public byte Enabled;
+    public float DurationSeconds;
+    public float PositionalAmplitude;
+    public float RotationalAmplitude;
+    public float Frequency;
+    public CameraShakeFalloff Falloff;
+
+    // When non-zero, the Laser Beam simulation skips enqueuing fire-shake pulses so the continuous beam tick can never
+    // stack trauma into a sustained kick or rumble. The trauma already in flight still decays normally.
+    public byte SuppressOnLaserBeam;
+
+    // Connected-gamepad rumble layered on the same trauma envelope as the fire shake. Motor intensities are
+    // normalized [0..1] amplitudes consumed by the shared camera-shake rumble system at point of use.
     public byte RumbleEnabled;
     public float RumbleLowFrequency;
     public float RumbleHighFrequency;

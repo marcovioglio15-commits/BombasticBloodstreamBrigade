@@ -65,6 +65,7 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
         section.Add(cameraWarningsRoot);
 
         BuildDamageShakeFoldout(section, cameraProperty, scalingRulesProperty);
+        BuildFireShakeFoldout(section, cameraProperty, scalingRulesProperty);
 
         System.Action updateView = () =>
         {
@@ -220,6 +221,121 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
         };
 
         // Toggling enabled/scaleWithDamage or editing a value bubbles a change event that refreshes the view.
+        shakeFoldout.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            updateShakeView();
+        });
+
+        updateShakeView();
+    }
+
+    /// <summary>
+    /// Builds the separate fire-shake dropdown rendered right under Damage Shake. The detail fields only appear while
+    /// the shake is enabled, and the nested Controller Rumble sub-foldout collapses its motor knobs while the rumble
+    /// itself is disabled, mirroring the Damage Shake UI so the two channels read as a matched pair.
+    /// </summary>
+    /// <param name="section">Section container that receives the fire shake foldout.</param>
+    /// <param name="cameraProperty">Serialized camera settings block owning the fire-shake sub-block.</param>
+    /// <param name="scalingRulesProperty">Scaling-rules array used by the scaling-aware fire shake fields.</param>
+    private static void BuildFireShakeFoldout(VisualElement section,
+                                                SerializedProperty cameraProperty,
+                                                SerializedProperty scalingRulesProperty)
+    {
+        SerializedProperty shakeProperty = cameraProperty.FindPropertyRelative("fireShake");
+
+        if (shakeProperty == null)
+            return;
+
+        SerializedProperty enabledProperty = shakeProperty.FindPropertyRelative("enabled");
+        SerializedProperty durationProperty = shakeProperty.FindPropertyRelative("durationSeconds");
+        SerializedProperty positionalAmplitudeProperty = shakeProperty.FindPropertyRelative("positionalAmplitude");
+        SerializedProperty rotationalAmplitudeProperty = shakeProperty.FindPropertyRelative("rotationalAmplitude");
+        SerializedProperty frequencyProperty = shakeProperty.FindPropertyRelative("frequency");
+        SerializedProperty falloffProperty = shakeProperty.FindPropertyRelative("falloff");
+        SerializedProperty suppressOnLaserBeamProperty = shakeProperty.FindPropertyRelative("suppressOnLaserBeam");
+        SerializedProperty rumbleEnabledProperty = shakeProperty.FindPropertyRelative("rumbleEnabled");
+        SerializedProperty rumbleLowFrequencyProperty = shakeProperty.FindPropertyRelative("rumbleLowFrequency");
+        SerializedProperty rumbleHighFrequencyProperty = shakeProperty.FindPropertyRelative("rumbleHighFrequency");
+
+        if (enabledProperty == null ||
+            durationProperty == null ||
+            positionalAmplitudeProperty == null ||
+            rotationalAmplitudeProperty == null ||
+            frequencyProperty == null ||
+            falloffProperty == null ||
+            suppressOnLaserBeamProperty == null ||
+            rumbleEnabledProperty == null ||
+            rumbleLowFrequencyProperty == null ||
+            rumbleHighFrequencyProperty == null)
+        {
+            return;
+        }
+
+        Foldout shakeFoldout = new Foldout();
+        shakeFoldout.text = "Fire Shake";
+        shakeFoldout.value = false;
+        section.Add(shakeFoldout);
+
+        VisualElement enabledField = PlayerScalingFieldElementFactory.CreateField(enabledProperty, scalingRulesProperty, "Enabled");
+        shakeFoldout.Add(enabledField);
+
+        // Body holds every detail knob and collapses entirely while the fire shake is disabled.
+        VisualElement shakeBody = new VisualElement();
+        shakeBody.style.flexDirection = FlexDirection.Column;
+        shakeFoldout.Add(shakeBody);
+
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(durationProperty, scalingRulesProperty, "Duration (s)"));
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(positionalAmplitudeProperty, scalingRulesProperty, "Positional Amplitude"));
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(rotationalAmplitudeProperty, scalingRulesProperty, "Rotational Amplitude (deg)"));
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(frequencyProperty, scalingRulesProperty, "Frequency (Hz)"));
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(falloffProperty, scalingRulesProperty, "Falloff"));
+        shakeBody.Add(PlayerScalingFieldElementFactory.CreateField(suppressOnLaserBeamProperty, scalingRulesProperty, "Suppress While Laser Firing"));
+
+        VisualElement shakeWarningsRoot = new VisualElement();
+        shakeWarningsRoot.style.marginTop = 4f;
+        shakeBody.Add(shakeWarningsRoot);
+
+        // Controller rumble lives inside the shake body so it inherits the master enable: vibrating only makes sense
+        // while the fire shake itself accumulates trauma. Its motor knobs collapse while the rumble is disabled.
+        Foldout rumbleFoldout = new Foldout();
+        rumbleFoldout.text = "Controller Rumble";
+        rumbleFoldout.value = false;
+        shakeBody.Add(rumbleFoldout);
+
+        VisualElement rumbleEnabledField = PlayerScalingFieldElementFactory.CreateField(rumbleEnabledProperty, scalingRulesProperty, "Enabled");
+        rumbleFoldout.Add(rumbleEnabledField);
+
+        VisualElement rumbleBody = new VisualElement();
+        rumbleBody.style.flexDirection = FlexDirection.Column;
+        rumbleFoldout.Add(rumbleBody);
+
+        rumbleBody.Add(PlayerScalingFieldElementFactory.CreateField(rumbleLowFrequencyProperty, scalingRulesProperty, "Low-Frequency Motor"));
+        rumbleBody.Add(PlayerScalingFieldElementFactory.CreateField(rumbleHighFrequencyProperty, scalingRulesProperty, "High-Frequency Motor"));
+
+        VisualElement rumbleWarningsRoot = new VisualElement();
+        rumbleWarningsRoot.style.marginTop = 4f;
+        rumbleBody.Add(rumbleWarningsRoot);
+
+        System.Action updateShakeView = () =>
+        {
+            bool shakeEnabled = enabledProperty.boolValue;
+            shakeBody.style.display = shakeEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+            PlayerControllerCameraWarningUtility.RefreshFireShakeValueWarnings(shakeWarningsRoot,
+                                                                                shakeEnabled,
+                                                                                durationProperty,
+                                                                                positionalAmplitudeProperty,
+                                                                                rotationalAmplitudeProperty,
+                                                                                frequencyProperty);
+
+            // The motor amplitudes only matter while the rumble itself is enabled.
+            bool rumbleEnabled = rumbleEnabledProperty.boolValue;
+            rumbleBody.style.display = rumbleEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+            PlayerControllerCameraWarningUtility.RefreshRumbleValueWarnings(rumbleWarningsRoot,
+                                                                            rumbleEnabled,
+                                                                            rumbleLowFrequencyProperty,
+                                                                            rumbleHighFrequencyProperty);
+        };
+
         shakeFoldout.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
             updateShakeView();

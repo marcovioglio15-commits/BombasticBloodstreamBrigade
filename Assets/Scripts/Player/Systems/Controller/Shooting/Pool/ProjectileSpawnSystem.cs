@@ -73,6 +73,7 @@ public partial struct ProjectileSpawnSystem : ISystem
         // Refresh lookups after structural changes performed during pool expansion.
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         ComponentLookup<PlayerShootingState> shootingStateLookup = SystemAPI.GetComponentLookup<PlayerShootingState>(false);
+        ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(false);
         ComponentLookup<LocalTransform> projectileTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(false);
         ComponentLookup<Projectile> projectileLookup = SystemAPI.GetComponentLookup<Projectile>(false);
         ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup = SystemAPI.GetComponentLookup<ProjectileRuntimeState>(false);
@@ -95,6 +96,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                              (float)SystemAPI.Time.ElapsedTime,
                              in passiveToolsLookup,
                              ref shootingStateLookup,
+                             ref cameraShakeStateLookup,
                              ref projectileTransformLookup,
                              ref projectileLookup,
                              ref projectileRuntimeLookup,
@@ -205,6 +207,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       float elapsedTime,
                                       in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
                                       ref ComponentLookup<PlayerShootingState> shootingStateLookup,
+                                      ref ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup,
                                       ref ComponentLookup<LocalTransform> projectileTransformLookup,
                                       ref ComponentLookup<Projectile> projectileLookup,
                                       ref ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup,
@@ -372,11 +375,15 @@ public partial struct ProjectileSpawnSystem : ISystem
 
             // Only primary shots originate from the weapon muzzle, so split-child spawns never retrigger the flash.
             if (spawnedPrimaryShot)
+            {
                 TryEnqueueMuzzleFlashVfx(shooterEntity,
                                          muzzleFlashOrigin,
                                          muzzleFlashRotation,
                                          in muzzleFlashVfxConfigLookup,
                                          ref powerUpVfxRequestLookup);
+                // Same primary-shot gate keeps split-child spawns from retriggering the Fire Shake camera feedback.
+                EnqueueFireShakeRequest(shooterEntity, ref cameraShakeStateLookup);
+            }
 
             shooterShootRequests.Clear();
         }
@@ -489,6 +496,25 @@ public partial struct ProjectileSpawnSystem : ISystem
 
         DynamicBuffer<ProjectileHitHistoryElement> hitHistory = projectileHitHistoryLookup[projectileEntity];
         hitHistory.Clear();
+    }
+
+    /// <summary>
+    /// Marks the shooter's camera shake state as having pulsed a fire request this frame. The camera follow system
+    /// consumes the flag when it evolves the fire-shake trauma, so a single per-volley call here lands as exactly one
+    /// unit of added trauma even if multiple primary shots fire in the same frame. Shooters without the player camera
+    /// shake state (enemies, autonomous spawners) are silently skipped so this hook stays generic to the spawn flow.
+    /// </summary>
+    /// <param name="shooterEntity">Shooter entity that emitted at least one primary projectile this frame.</param>
+    /// <param name="cameraShakeStateLookup">Mutable lookup used to flag the pending fire request.</param>
+    private static void EnqueueFireShakeRequest(Entity shooterEntity,
+                                                 ref ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup)
+    {
+        if (!cameraShakeStateLookup.HasComponent(shooterEntity))
+            return;
+
+        PlayerCameraShakeState shakeState = cameraShakeStateLookup[shooterEntity];
+        shakeState.FireRequestPending = 1;
+        cameraShakeStateLookup[shooterEntity] = shakeState;
     }
 
     /// <summary>

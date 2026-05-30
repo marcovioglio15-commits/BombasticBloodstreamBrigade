@@ -5,7 +5,10 @@ using Unity.Transforms;
 #region Systems
 /// <summary>
 /// Applies look rotation to player entities while avoiding redundant component writes when
-/// target direction and angular speed are already satisfied.
+/// target direction and angular speed are already satisfied. Analog stick magnitude scales the
+/// per-frame rotation step so tiny stick deflections produce proportionally tiny rotation
+/// instead of full-speed pulses, which removes the visible stutter when the stick wiggles
+/// around the dead-zone.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerLookMultiplierSystem))]
@@ -14,6 +17,10 @@ public partial struct PlayerLookRotationSystem : ISystem
     #region Constants
     private const float RotationEpsilon = 1e-5f;
     private const float DirectionDeltaEpsilonSq = 1e-6f;
+    // Smallest analog magnitude treated as full-deflection so the response curve always reaches 1.
+    private const float AnalogMagnitudeFullDeflection = 1f;
+    // Floor multiplier applied while no analog response is computable, so digital and pointer look stay at full speed.
+    private const float DigitalResponseMultiplier = 1f;
     private static readonly float3 UpAxis = new float3(0f, 1f, 0f);
     private static readonly float3 ForwardAxis = new float3(0f, 0f, 1f);
     #endregion
@@ -112,6 +119,11 @@ public partial struct PlayerLookRotationSystem : ISystem
                                                                                        out float laserRotationSpeedMultiplier))
                 rotationSpeedMultiplier = laserRotationSpeedMultiplier;
 
+            // Analog response: tiny stick tilts produce tiny per-frame steps so noise around the dead-zone cannot
+            // flicker the player heading. Digital, mouse pointer and missing-input cases stay at full speed.
+            float analogResponseMultiplier = ResolveAnalogResponseMultiplier(playerEntity,
+                                                                              in inputStateLookup,
+                                                                              lookConfig.Values.RotationDeadZone);
             float targetSpeedDeg = lookConfig.RotationSpeed * rotationSpeedMultiplier;
             float maxSpeedDeg = lookConfig.Values.RotationMaxSpeed * rotationSpeedMultiplier;
 
@@ -132,7 +144,7 @@ public partial struct PlayerLookRotationSystem : ISystem
             if (maxSpeedDeg > 0f)
                 angularSpeedDeg = math.min(angularSpeedDeg, maxSpeedDeg);
 
-            float maxStep = math.radians(angularSpeedDeg) * deltaTime;
+            float maxStep = math.radians(angularSpeedDeg) * deltaTime * analogResponseMultiplier;
 
             if (maxStep <= RotationEpsilon)
             {
@@ -171,6 +183,39 @@ public partial struct PlayerLookRotationSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves the analog response multiplier applied to the per-frame rotation step. With an analog stick the
+    /// stick magnitude is smooth-stepped from the configured dead-zone up to full deflection, so a barely-tilted
+    /// stick rotates very slowly and noise around the dead-zone can no longer fire visible rotation pulses. Digital,
+    /// mouse pointer or missing inputs return the neutral multiplier so they keep rotating at full speed.
+    /// </summary>
+    /// <param name="playerEntity">Player entity providing the current input state.</param>
+    /// <param name="inputStateLookup">Read-only lookup for the player input state component.</param>
+    /// <param name="rotationDeadZone">Dead-zone radius authored on the look preset, used as the response floor.</param>
+    /// <returns>Multiplier in the [0..1] range scaling the rotation step for analog sources.</returns>
+    private static float ResolveAnalogResponseMultiplier(Entity playerEntity,
+                                                          in ComponentLookup<PlayerInputState> inputStateLookup,
+                                                          float rotationDeadZone)
+    {
+        if (!inputStateLookup.HasComponent(playerEntity))
+            return DigitalResponseMultiplier;
+
+        PlayerInputState inputState = inputStateLookup[playerEntity];
+
+        if (inputState.LookUsesAnalogSource == 0)
+            return DigitalResponseMultiplier;
+
+        float magnitude = math.length(inputState.Look);
+        float deadZone = math.max(0f, rotationDeadZone);
+
+        // Below the dead-zone the look direction is already frozen by the direction system, so no rotation step.
+        if (magnitude <= deadZone)
+            return 0f;
+
+        float normalized = math.saturate((magnitude - deadZone) / math.max(1e-4f, AnalogMagnitudeFullDeflection - deadZone));
+        return math.smoothstep(0f, 1f, normalized);
+    }
+
     /// <summary>
     /// Updates current look direction and angular speed only when values drift beyond epsilon.
     /// </summary>

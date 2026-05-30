@@ -100,6 +100,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                            + (shieldLookup.HasComponent(entity) ? shieldLookup[entity].Current : 0f);
                 PlayerCameraShakeRuntimeUtility.UpdateState(ref shakeState,
                                                            in cameraConfig.Shake,
+                                                           in cameraConfig.FireShake,
                                                            currentDamageDeadline,
                                                            currentSurvivability,
                                                            deltaTime,

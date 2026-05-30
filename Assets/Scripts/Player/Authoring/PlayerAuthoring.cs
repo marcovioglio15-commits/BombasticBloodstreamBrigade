@@ -497,7 +497,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                 MaxFollowDistance = controllerPreset.CameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = controllerPreset.CameraSettings.Values.DeadZoneRadius
             },
-            Shake = PlayerControllerConfigBakeUtility.BuildCameraShakeBlob(controllerPreset.CameraSettings.DamageShake)
+            Shake = PlayerControllerConfigBakeUtility.BuildCameraShakeBlob(controllerPreset.CameraSettings.DamageShake),
+            FireShake = PlayerControllerConfigBakeUtility.BuildCameraFireShakeBlob(controllerPreset.CameraSettings.FireShake)
         });
         AddComponent(entity, new PlayerCameraShakeState());
         AddComponent(entity, PlayerRuntimeScalingControllerBakeUtility.BuildBaseShootingConfig(sourceControllerPreset));

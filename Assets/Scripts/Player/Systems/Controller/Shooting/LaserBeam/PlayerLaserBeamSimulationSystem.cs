@@ -74,6 +74,8 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(false);
+        ComponentLookup<PlayerRuntimeCameraConfig> runtimeCameraConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeCameraConfig>(true);
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(true);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
@@ -266,6 +268,14 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                     GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShootLaserTick, spawnPosition);
             }
 
+            // Beam start and each damage tick mark a fresh Fire Shake pulse. Continuous beam frames between ticks would
+            // otherwise stack one trauma unit per frame, sustaining the shake at saturation regardless of fire rate.
+            // The pulse is also gated by the per-player Suppress On Laser Beam toggle authored on the fire-shake block
+            // so designers can keep the regular-shot shake while silencing it during the laser's continuous tick.
+            if ((beamStartedThisFrame || beamTickReadyThisFrame) &&
+                !IsFireShakeSuppressedByLaserBeam(playerEntity, in runtimeCameraConfigLookup))
+                EnqueueFireShakeRequest(playerEntity, ref cameraShakeStateLookup);
+
             float3 baseDirection = PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO);
             float travelDistance = hasTriggeredActiveLaser
                 ? PlayerLaserBeamUtility.ResolveMaximumTravelDistance(projectileSpeed,
@@ -356,6 +366,42 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves whether the per-player Fire Shake configuration asks the Laser Beam to skip enqueuing fire-shake
+    /// pulses. Used to keep the laser's continuous tick from stacking a sustained camera kick or rumble while still
+    /// letting regular-shot fire-shake play through the normal projectile spawn path.
+    /// </summary>
+    /// <param name="playerEntity">Player entity currently firing the beam.</param>
+    /// <param name="runtimeCameraConfigLookup">Read-only lookup for the runtime camera config carrying the toggle.</param>
+    /// <returns>True when the Fire Shake must remain silent for this laser-firing frame.</returns>
+    private static bool IsFireShakeSuppressedByLaserBeam(Entity playerEntity,
+                                                          in ComponentLookup<PlayerRuntimeCameraConfig> runtimeCameraConfigLookup)
+    {
+        if (!runtimeCameraConfigLookup.HasComponent(playerEntity))
+            return false;
+
+        return runtimeCameraConfigLookup[playerEntity].FireShake.SuppressOnLaserBeam != 0;
+    }
+
+    /// <summary>
+    /// Marks the player's camera shake state as having pulsed a fire request this frame for the Laser Beam. The
+    /// camera follow system consumes the flag when it evolves the fire-shake trauma, so each beam start and damage
+    /// tick lands as exactly one unit of added trauma. Players without the shake state are silently skipped so the
+    /// utility stays safe for laser-only spawn flows that do not own the camera (testing tools, future split worlds).
+    /// </summary>
+    /// <param name="playerEntity">Player entity currently firing the beam.</param>
+    /// <param name="cameraShakeStateLookup">Mutable lookup used to flag the pending fire request.</param>
+    private static void EnqueueFireShakeRequest(Entity playerEntity,
+                                                 ref ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup)
+    {
+        if (!cameraShakeStateLookup.HasComponent(playerEntity))
+            return;
+
+        PlayerCameraShakeState shakeState = cameraShakeStateLookup[playerEntity];
+        shakeState.FireRequestPending = 1;
+        cameraShakeStateLookup[playerEntity] = shakeState;
+    }
+
     /// <summary>
     /// Appends one beam lane using either the straight-line builder or the Perfect Circle sampler, depending on passive state.
     /// </summary>

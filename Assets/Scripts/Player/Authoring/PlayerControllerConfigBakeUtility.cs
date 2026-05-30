@@ -83,6 +83,33 @@ public static class PlayerControllerConfigBakeUtility
     }
 
     /// <summary>
+    /// Builds the runtime camera fire-shake blob from authoring fire-shake settings. Shared by the controller config
+    /// blob, the immutable baseline camera config and the mutable runtime camera config so every bake path emits
+    /// identical fire-shake data. Raw values are baked as-authored and clamped defensively by the runtime shake utility.
+    /// </summary>
+    /// <param name="fireShake">Authoring fire-shake settings, or null to emit a disabled fire-shake block.</param>
+    /// <returns>Runtime-ready camera fire-shake blob.</returns>
+    public static CameraFireShakeBlob BuildCameraFireShakeBlob(CameraFireShakeSettings fireShake)
+    {
+        if (fireShake == null)
+            return default;
+
+        return new CameraFireShakeBlob
+        {
+            Enabled = fireShake.Enabled ? (byte)1 : (byte)0,
+            DurationSeconds = fireShake.DurationSeconds,
+            PositionalAmplitude = fireShake.PositionalAmplitude,
+            RotationalAmplitude = fireShake.RotationalAmplitude,
+            Frequency = fireShake.Frequency,
+            Falloff = fireShake.Falloff,
+            SuppressOnLaserBeam = fireShake.SuppressOnLaserBeam ? (byte)1 : (byte)0,
+            RumbleEnabled = fireShake.RumbleEnabled ? (byte)1 : (byte)0,
+            RumbleLowFrequency = fireShake.RumbleLowFrequency,
+            RumbleHighFrequency = fireShake.RumbleHighFrequency
+        };
+    }
+
+    /// <summary>
     /// Builds the animator parameter hash config from the selected animation bindings preset.
     /// Called by PlayerAuthoringBaker before ECS animation runtime state is added.
     /// </summary>
@@ -324,7 +351,8 @@ public static class PlayerControllerConfigBakeUtility
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
             },
-            Shake = BuildCameraShakeBlob(cameraSettings.DamageShake)
+            Shake = BuildCameraShakeBlob(cameraSettings.DamageShake),
+            FireShake = BuildCameraFireShakeBlob(cameraSettings.FireShake)
         };
 
         root.Camera = cameraConfig;

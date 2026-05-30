@@ -3,12 +3,12 @@ using Unity.Mathematics;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Drives a connected gamepad's rumble from the damage-shake trauma already evolved by
+/// Drives a connected gamepad's rumble from both shake channels (damage and fire) already evolved by
 /// <see cref="PlayerCameraFollowSystem"/> (the single trauma owner). It runs after the follow system so it reads the
-/// smooth shake magnitude resolved this frame, scales the two motor amplitudes by it and writes them to the active
-/// gamepad. The same pause/end-of-run gates as the camera systems force the motors to rest, and once at rest the
-/// stop is sent a single time so the idle majority of the run costs no input-backend writes while a fading hit can
-/// never strand a residual motor speed (an endless faint rumble).
+/// smooth shake magnitudes resolved this frame, mixes the per-channel motor amplitudes by them and writes the sum to
+/// the active gamepad. The same pause/end-of-run gates as the camera systems force the motors to rest, and once at
+/// rest the stop is sent a single time so the idle majority of the run costs no input-backend writes while a fading
+/// shake can never strand a residual motor speed (an endless faint rumble).
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(PlayerCameraFollowSystem))]
@@ -47,16 +47,23 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
         float targetLowFrequency = 0f;
         float targetHighFrequency = 0f;
 
-        // While not silenced, take the single player's shake magnitude and scale the configured motor amplitudes.
+        // While not silenced, sum the per-channel motor speeds so a simultaneous hit and fire shake mix on the gamepad.
         if (!ShouldSilenceRumble(isSceneTransitioning))
         {
             foreach ((RefRO<PlayerCameraShakeState> shakeState, RefRO<PlayerRuntimeCameraConfig> cameraConfig)
                      in SystemAPI.Query<RefRO<PlayerCameraShakeState>, RefRO<PlayerRuntimeCameraConfig>>())
             {
-                ResolveMotorSpeeds(in cameraConfig.ValueRO.Shake,
-                                   shakeState.ValueRO.ShakeMagnitude,
-                                   out targetLowFrequency,
-                                   out targetHighFrequency);
+                ResolveDamageMotorSpeeds(in cameraConfig.ValueRO.Shake,
+                                          shakeState.ValueRO.ShakeMagnitude,
+                                          out float damageLowFrequency,
+                                          out float damageHighFrequency);
+                ResolveFireMotorSpeeds(in cameraConfig.ValueRO.FireShake,
+                                        shakeState.ValueRO.FireShakeMagnitude,
+                                        out float fireLowFrequency,
+                                        out float fireHighFrequency);
+                // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping shakes would clip.
+                targetLowFrequency = math.saturate(damageLowFrequency + fireLowFrequency);
+                targetHighFrequency = math.saturate(damageHighFrequency + fireHighFrequency);
                 break;
             }
         }
@@ -113,21 +120,49 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
 
     #region Motor Resolution
     /// <summary>
-    /// Resolves the two normalized motor speeds from the rumble config and the current shake envelope magnitude.
-    /// Both motors share the shake's trauma envelope, so the vibration ramps down together with the on-screen kick.
+    /// Resolves the two normalized motor speeds from the damage rumble config and the current damage envelope
+    /// magnitude. Both motors share the same trauma envelope, so the vibration ramps down together with the
+    /// on-screen kick.
     /// </summary>
-    /// <param name="shake">Resolved runtime shake config carrying the rumble enable flag and motor amplitudes.</param>
-    /// <param name="shakeMagnitude">Smooth envelope magnitude in the [0..1] range resolved by the shake utility.</param>
+    /// <param name="shake">Resolved runtime damage shake config carrying the rumble enable flag and motor amplitudes.</param>
+    /// <param name="shakeMagnitude">Smooth damage envelope magnitude in the [0..1] range resolved by the shake utility.</param>
     /// <param name="lowFrequency">Resolved heavy (low-frequency) motor speed in the [0..1] range.</param>
     /// <param name="highFrequency">Resolved light (high-frequency) motor speed in the [0..1] range.</param>
-    private static void ResolveMotorSpeeds(in CameraShakeBlob shake,
-                                           float shakeMagnitude,
-                                           out float lowFrequency,
-                                           out float highFrequency)
+    private static void ResolveDamageMotorSpeeds(in CameraShakeBlob shake,
+                                                  float shakeMagnitude,
+                                                  out float lowFrequency,
+                                                  out float highFrequency)
     {
         float magnitude = math.saturate(shakeMagnitude);
 
         // No rumble requested or no trauma left this frame leaves both motors at rest.
+        if (shake.RumbleEnabled == 0 || magnitude <= 0f)
+        {
+            lowFrequency = 0f;
+            highFrequency = 0f;
+            return;
+        }
+
+        lowFrequency = math.saturate(shake.RumbleLowFrequency) * magnitude;
+        highFrequency = math.saturate(shake.RumbleHighFrequency) * magnitude;
+    }
+
+    /// <summary>
+    /// Mirror of <see cref="ResolveDamageMotorSpeeds"/> for the fire shake channel. The two channels carry independent
+    /// rumble settings, so a designer can drive only one motor for fire while damage uses both, or balance the two
+    /// shakes without coupling their amplitudes.
+    /// </summary>
+    /// <param name="shake">Resolved runtime fire shake config carrying the rumble enable flag and motor amplitudes.</param>
+    /// <param name="shakeMagnitude">Smooth fire envelope magnitude in the [0..1] range resolved by the shake utility.</param>
+    /// <param name="lowFrequency">Resolved heavy (low-frequency) motor speed in the [0..1] range.</param>
+    /// <param name="highFrequency">Resolved light (high-frequency) motor speed in the [0..1] range.</param>
+    private static void ResolveFireMotorSpeeds(in CameraFireShakeBlob shake,
+                                                float shakeMagnitude,
+                                                out float lowFrequency,
+                                                out float highFrequency)
+    {
+        float magnitude = math.saturate(shakeMagnitude);
+
         if (shake.RumbleEnabled == 0 || magnitude <= 0f)
         {
             lowFrequency = 0f;

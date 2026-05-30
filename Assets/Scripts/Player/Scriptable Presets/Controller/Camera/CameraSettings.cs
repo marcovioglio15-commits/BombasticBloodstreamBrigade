@@ -27,6 +27,10 @@ public sealed class CameraSettings
     [Header("Camera Damage Shake")]
     [Tooltip("Customizable trauma-based camera shake played when the player takes valid damage.")]
     [SerializeField] private CameraDamageShakeSettings damageShake = new CameraDamageShakeSettings();
+
+    [Header("Camera Fire Shake")]
+    [Tooltip("Customizable trauma-based camera shake played every time the player fires a primary shot. Splitting projectiles spawned from existing shots do not retrigger this shake.")]
+    [SerializeField] private CameraFireShakeSettings fireShake = new CameraFireShakeSettings();
     #endregion
 
     #region Properties
@@ -69,12 +73,21 @@ public sealed class CameraSettings
             return damageShake;
         }
     }
+
+    public CameraFireShakeSettings FireShake
+    {
+        get
+        {
+            return fireShake;
+        }
+    }
     #endregion
 
     #region Validation
     /// <summary>
-    /// Ensures the camera value and damage-shake blocks stay structurally valid. Numeric ranges are never snapped
-    /// here: out-of-range values are surfaced as non-destructive editor warnings and clamped defensively at point of use.
+    /// Ensures the camera value, damage-shake and fire-shake blocks stay structurally valid. Numeric ranges are never
+    /// snapped here: out-of-range values are surfaced as non-destructive editor warnings and clamped defensively at
+    /// point of use.
     /// </summary>
     public void Validate()
     {
@@ -83,6 +96,9 @@ public sealed class CameraSettings
 
         if (damageShake == null)
             damageShake = new CameraDamageShakeSettings();
+
+        if (fireShake == null)
+            fireShake = new CameraFireShakeSettings();
     }
     #endregion
 }
@@ -231,6 +247,131 @@ public sealed class CameraDamageShakeSettings
         get
         {
             return damageForFullStrength;
+        }
+    }
+
+    public bool RumbleEnabled
+    {
+        get
+        {
+            return rumbleEnabled;
+        }
+    }
+
+    public float RumbleLowFrequency
+    {
+        get
+        {
+            return rumbleLowFrequency;
+        }
+    }
+
+    public float RumbleHighFrequency
+    {
+        get
+        {
+            return rumbleHighFrequency;
+        }
+    }
+    #endregion
+}
+
+/// <summary>
+/// Stores the trauma-based fire shake settings mirroring <see cref="CameraDamageShakeSettings"/> but driven by the
+/// player's primary-shot events instead of incoming damage. The shake fires once per primary projectile spawn and is
+/// suppressed for split-child shots so secondary fragments never retrigger the kick. The connected-gamepad rumble
+/// follows the same trauma envelope and rests as soon as the trauma decays back to zero.
+/// </summary>
+[Serializable]
+public sealed class CameraFireShakeSettings
+{
+    #region Serialized Fields
+    [Tooltip("Master toggle for the fire-driven camera shake. When disabled no trauma is accumulated and no offset is applied even if the player shoots.")]
+    [SerializeField] private bool enabled = true;
+
+    [Tooltip("Seconds a single full-strength shot takes to fully fade out. Trauma decays linearly at 1/Duration per second, so rapid fire stacks into a sustained shake while a single shot fades quickly. Base feel is a snappy 0.18s kick.")]
+    [SerializeField] private float durationSeconds = 0.18f;
+
+    [Tooltip("Maximum positional displacement in world units applied along the camera screen plane at full shake strength.")]
+    [SerializeField] private float positionalAmplitude = 0.18f;
+
+    [Tooltip("Maximum roll in degrees applied around the camera view axis at full shake strength. Set to 0 to keep the shake purely positional.")]
+    [SerializeField] private float rotationalAmplitude = 0.6f;
+
+    [Tooltip("Perlin noise sampling speed in cycles per second. Higher values feel sharper and more frantic, lower values feel like a slow sway. 0 produces a static, non-oscillating push.")]
+    [SerializeField] private float frequency = 28f;
+
+    [Tooltip("Envelope shape mapping the remaining trauma to the shake magnitude. Linear is constant decay, Smooth eases in and out, Quadratic keeps a punchy peak with a soft tail.")]
+    [SerializeField] private CameraShakeFalloff falloff = CameraShakeFalloff.Quadratic;
+
+    [Tooltip("When enabled, the fire shake is fully suppressed while the player is firing a Laser Beam (passive or active-triggered). Use this to keep the continuous laser tick from stacking trauma into a sustained kick or rumble.")]
+    [SerializeField] private bool suppressOnLaserBeam = true;
+
+    [Header("Controller Rumble")]
+    [Tooltip("When enabled, a connected gamepad rumbles alongside the camera shake using the same trauma envelope. Disable to keep the on-screen shake without any controller vibration.")]
+    [SerializeField] private bool rumbleEnabled = true;
+
+    [Tooltip("Heavy (low-frequency) motor intensity at full shake strength, in the [0..1] range. The motor follows the same trauma decay as the shake, so it fades out together with the on-screen kick. 0 silences the heavy motor.")]
+    [SerializeField] private float rumbleLowFrequency = 0.25f;
+
+    [Tooltip("Light (high-frequency) motor intensity at full shake strength, in the [0..1] range. The motor follows the same trauma decay as the shake, so it fades out together with the on-screen kick. 0 silences the light motor.")]
+    [SerializeField] private float rumbleHighFrequency = 0.45f;
+    #endregion
+
+    #region Properties
+    public bool Enabled
+    {
+        get
+        {
+            return enabled;
+        }
+    }
+
+    public float DurationSeconds
+    {
+        get
+        {
+            return durationSeconds;
+        }
+    }
+
+    public float PositionalAmplitude
+    {
+        get
+        {
+            return positionalAmplitude;
+        }
+    }
+
+    public float RotationalAmplitude
+    {
+        get
+        {
+            return rotationalAmplitude;
+        }
+    }
+
+    public float Frequency
+    {
+        get
+        {
+            return frequency;
+        }
+    }
+
+    public CameraShakeFalloff Falloff
+    {
+        get
+        {
+            return falloff;
+        }
+    }
+
+    public bool SuppressOnLaserBeam
+    {
+        get
+        {
+            return suppressOnLaserBeam;
         }
     }
 

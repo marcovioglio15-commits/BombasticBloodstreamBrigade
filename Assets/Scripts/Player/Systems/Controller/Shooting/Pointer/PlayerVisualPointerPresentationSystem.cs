@@ -7,8 +7,11 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Renders the precision aiming laser pointer straight out of the player weapon for every entity that enabled it in its visual preset.
 /// The pointer reuses the Laser Beam body material and palette, adapts its length to the projectile range, and freezes while orbital shots are active.
+/// Direction is locked to the player's actual transform forward (same source the Laser Beam uses), so the pointer always matches the
+/// visible player heading even under fast rotation or while the Laser Beam optional rotation-speed nerf is active.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateAfter(typeof(PlayerLookRotationSystem))]
 public partial struct PlayerVisualPointerPresentationSystem : ISystem
 {
     #region Methods
@@ -22,7 +25,6 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
     {
         state.RequireForUpdate<PlayerVisualPointerConfig>();
         state.RequireForUpdate<PlayerRuntimeShootingConfig>();
-        state.RequireForUpdate<PlayerLookState>();
         state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<LocalTransform>();
     }
@@ -47,13 +49,11 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
 
         foreach ((RefRO<PlayerVisualPointerConfig> pointerConfig,
                   RefRO<PlayerRuntimeShootingConfig> runtimeShootingConfig,
-                  RefRO<PlayerLookState> lookState,
                   RefRO<LocalTransform> localTransform,
                   DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   Entity playerEntity)
                  in SystemAPI.Query<RefRO<PlayerVisualPointerConfig>,
                                     RefRO<PlayerRuntimeShootingConfig>,
-                                    RefRO<PlayerLookState>,
                                     RefRO<LocalTransform>,
                                     DynamicBuffer<PlayerPassiveToolsStateElement>>()
                              .WithEntityAccess())
@@ -77,8 +77,9 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
             if (length <= PlayerLaserBeamUtility.MinimumTravelDistance)
                 continue;
 
-            float3 direction = PlayerProjectileRequestUtility.ResolveShootDirection(in lookState.ValueRO,
-                                                                                    in localTransform.ValueRO);
+            // Use the same forward resolution the Laser Beam uses so the aiming pointer is always glued to the visible
+            // player heading and never lags behind under damped or laser-nerfed rotation.
+            float3 direction = PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO);
             float3 origin = PlayerVisualPointerPresentationUtility.ResolveOrigin(playerEntity,
                                                                                  in localTransform.ValueRO,
                                                                                  in runtimeShootingConfig.ValueRO,

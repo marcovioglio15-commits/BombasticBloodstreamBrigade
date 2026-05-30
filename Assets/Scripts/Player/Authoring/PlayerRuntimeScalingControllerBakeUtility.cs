@@ -131,7 +131,8 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
                 MaxFollowDistance = cameraSettings.Values.MaxFollowDistance,
                 DeadZoneRadius = cameraSettings.Values.DeadZoneRadius
             },
-            Shake = PlayerControllerConfigBakeUtility.BuildCameraShakeBlob(cameraSettings.DamageShake)
+            Shake = PlayerControllerConfigBakeUtility.BuildCameraShakeBlob(cameraSettings.DamageShake),
+            FireShake = PlayerControllerConfigBakeUtility.BuildCameraFireShakeBlob(cameraSettings.FireShake)
         };
     }
 
@@ -464,6 +465,36 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
                 return true;
             case "cameraSettings.damageShake.rumbleHighFrequency":
                 fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleHighFrequency;
+                return true;
+            case "cameraSettings.fireShake.enabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeEnabled;
+                return true;
+            case "cameraSettings.fireShake.durationSeconds":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeDuration;
+                return true;
+            case "cameraSettings.fireShake.positionalAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakePositionalAmplitude;
+                return true;
+            case "cameraSettings.fireShake.rotationalAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRotationalAmplitude;
+                return true;
+            case "cameraSettings.fireShake.frequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeFrequency;
+                return true;
+            case "cameraSettings.fireShake.falloff":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeFalloffMode;
+                return true;
+            case "cameraSettings.fireShake.rumbleEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRumbleEnabled;
+                return true;
+            case "cameraSettings.fireShake.rumbleLowFrequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRumbleLowFrequency;
+                return true;
+            case "cameraSettings.fireShake.rumbleHighFrequency":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRumbleHighFrequency;
+                return true;
+            case "cameraSettings.fireShake.suppressOnLaserBeam":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeSuppressOnLaserBeam;
                 return true;
             case "shootingSettings.triggerMode":
                 fieldId = PlayerRuntimeControllerFieldId.ShootingTriggerMode;

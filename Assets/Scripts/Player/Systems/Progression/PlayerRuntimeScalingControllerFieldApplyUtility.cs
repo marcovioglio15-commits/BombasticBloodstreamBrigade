@@ -190,6 +190,27 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraShakeFalloffMode:
                 runtimeCamera.Shake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
                 return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeDuration:
+                runtimeCamera.FireShake.DurationSeconds = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakePositionalAmplitude:
+                runtimeCamera.FireShake.PositionalAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRotationalAmplitude:
+                runtimeCamera.FireShake.RotationalAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeFrequency:
+                runtimeCamera.FireShake.Frequency = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRumbleLowFrequency:
+                runtimeCamera.FireShake.RumbleLowFrequency = math.saturate(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRumbleHighFrequency:
+                runtimeCamera.FireShake.RumbleHighFrequency = math.saturate(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeFalloffMode:
+                runtimeCamera.FireShake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
+                return;
             case PlayerRuntimeControllerFieldId.ShootingTriggerMode:
                 runtimeShooting.TriggerMode = PlayerRuntimeScalingEnumUtility.ResolveShootingTriggerMode(resolvedValue);
                 return;
@@ -359,6 +380,15 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraShakeRumbleEnabled:
                 runtimeCamera.Shake.RumbleEnabled = resolvedValue ? (byte)1 : (byte)0;
                 return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeEnabled:
+                runtimeCamera.FireShake.Enabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRumbleEnabled:
+                runtimeCamera.FireShake.RumbleEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeSuppressOnLaserBeam:
+                runtimeCamera.FireShake.SuppressOnLaserBeam = resolvedValue ? (byte)1 : (byte)0;
+                return;
         }
     }
 
@@ -414,7 +444,8 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             Behavior = baseCamera.Behavior,
             FollowOffset = baseCamera.FollowOffset,
             Values = baseCamera.Values,
-            Shake = baseCamera.Shake
+            Shake = baseCamera.Shake,
+            FireShake = baseCamera.FireShake
         };
     }
 

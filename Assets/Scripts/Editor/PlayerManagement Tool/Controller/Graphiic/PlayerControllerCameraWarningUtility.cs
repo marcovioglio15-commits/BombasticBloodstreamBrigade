@@ -127,6 +127,58 @@ internal static class PlayerControllerCameraWarningUtility
     }
 
     /// <summary>
+    /// Refreshes the fire-shake coherence warnings without mutating the serialized settings. Mirrors
+    /// <see cref="RefreshShakeValueWarnings"/> minus the damage-scaling block since fire trauma is added per
+    /// primary-shot spawn and does not scale with damage. Out-of-range values are surfaced here and clamped
+    /// defensively by the runtime shake utility.
+    /// </summary>
+    /// <param name="warningsRoot">Container that receives the warning HelpBoxes.</param>
+    /// <param name="shakeEnabled">True when the fire shake is enabled; no warnings are shown while disabled.</param>
+    /// <param name="durationProperty">Serialized fire shake duration property, or null when unavailable.</param>
+    /// <param name="positionalAmplitudeProperty">Serialized positional amplitude property, or null when unavailable.</param>
+    /// <param name="rotationalAmplitudeProperty">Serialized rotational amplitude property, or null when unavailable.</param>
+    /// <param name="frequencyProperty">Serialized frequency property, or null when unavailable.</param>
+    public static void RefreshFireShakeValueWarnings(VisualElement warningsRoot,
+                                                      bool shakeEnabled,
+                                                      SerializedProperty durationProperty,
+                                                      SerializedProperty positionalAmplitudeProperty,
+                                                      SerializedProperty rotationalAmplitudeProperty,
+                                                      SerializedProperty frequencyProperty)
+    {
+        if (warningsRoot == null)
+            return;
+
+        warningsRoot.Clear();
+
+        if (!shakeEnabled)
+            return;
+
+        // Resolve current values once; missing properties default to neutral values that raise no warning.
+        float duration = durationProperty != null ? durationProperty.floatValue : 1f;
+        float positionalAmplitude = positionalAmplitudeProperty != null ? positionalAmplitudeProperty.floatValue : 1f;
+        float rotationalAmplitude = rotationalAmplitudeProperty != null ? rotationalAmplitudeProperty.floatValue : 0f;
+        float frequency = frequencyProperty != null ? frequencyProperty.floatValue : 1f;
+
+        // Duration governs the whole envelope: a non-positive value collapses the shake to nothing.
+        if (duration <= 0f)
+            AddWarning(warningsRoot, "Duration is 0 or negative; the fire shake will not play.");
+
+        // Individual amplitude and frequency ranges.
+        if (positionalAmplitude < 0f)
+            AddWarning(warningsRoot, "Positional Amplitude is negative; runtime clamps it to 0.");
+
+        if (rotationalAmplitude < 0f)
+            AddWarning(warningsRoot, "Rotational Amplitude is negative; runtime clamps it to 0.");
+
+        if (frequency < 0f)
+            AddWarning(warningsRoot, "Frequency is negative; runtime clamps it to 0 (a static, non-oscillating push).");
+
+        // Cross-field coherence: with both amplitudes at zero there is no visible shake even at full trauma.
+        if (positionalAmplitude <= 0f && rotationalAmplitude <= 0f)
+            AddWarning(warningsRoot, "Both Positional and Rotational Amplitude are 0; the fire shake has no visible effect while enabled.");
+    }
+
+    /// <summary>
     /// Refreshes the controller-rumble coherence warnings without mutating the serialized settings. Called by the
     /// camera section whenever the rumble enable flag or a motor amplitude changes. Motor amplitudes are normalized
     /// [0..1] intensities; out-of-range values are surfaced here and clamped defensively by the runtime rumble system.

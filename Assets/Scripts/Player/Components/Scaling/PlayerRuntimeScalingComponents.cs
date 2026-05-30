@@ -77,6 +77,7 @@ public struct PlayerRuntimeCameraConfig : IComponentData
     public float3 FollowOffset;
     public CameraValuesBlob Values;
     public CameraShakeBlob Shake;
+    public CameraFireShakeBlob FireShake;
 }
 
 /// <summary>
@@ -89,6 +90,7 @@ public struct PlayerBaseCameraConfig : IComponentData
     public float3 FollowOffset;
     public CameraValuesBlob Values;
     public CameraShakeBlob Shake;
+    public CameraFireShakeBlob FireShake;
 }
 
 /// <summary>
@@ -383,7 +385,17 @@ public enum PlayerRuntimeControllerFieldId : byte
     CameraShakeDamageForFullStrength = 160,
     CameraShakeRumbleEnabled = 161,
     CameraShakeRumbleLowFrequency = 162,
-    CameraShakeRumbleHighFrequency = 163
+    CameraShakeRumbleHighFrequency = 163,
+    CameraFireShakeEnabled = 164,
+    CameraFireShakeDuration = 165,
+    CameraFireShakePositionalAmplitude = 166,
+    CameraFireShakeRotationalAmplitude = 167,
+    CameraFireShakeFrequency = 168,
+    CameraFireShakeFalloffMode = 169,
+    CameraFireShakeRumbleEnabled = 170,
+    CameraFireShakeRumbleLowFrequency = 171,
+    CameraFireShakeRumbleHighFrequency = 172,
+    CameraFireShakeSuppressOnLaserBeam = 173
 }
 
 /// <summary>
