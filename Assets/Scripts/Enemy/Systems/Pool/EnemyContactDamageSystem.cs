@@ -123,6 +123,7 @@ public partial struct EnemyContactDamageSystem : ISystem
                                                   .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>()
                                                   .WithEntityAccess())
         {
+            EnemyData currentEnemyData = enemyData.ValueRO;
             EnemyRuntimeState nextState = runtimeState.ValueRO;
             nextState.ContactDamageCooldown -= deltaTime;
             nextState.AreaDamageCooldown -= deltaTime;
@@ -134,13 +135,16 @@ public partial struct EnemyContactDamageSystem : ISystem
             if (nextState.AreaDamageCooldown < 0f)
                 nextState.AreaDamageCooldown = 0f;
 
-            float3 delta = enemyTransform.ValueRO.Position - playerPosition;
+            // Radius checks use the same hit center drawn by enemy footprint and runtime debug gizmos.
+            LocalTransform currentEnemyTransform = enemyTransform.ValueRO;
+            float3 enemyHitCenter = EnemyHitboxCenterUtility.ResolveWorldCenter(in currentEnemyTransform, in currentEnemyData);
+            float3 delta = enemyHitCenter - playerPosition;
             delta.y = 0f;
             float sqrDistance = math.lengthsq(delta);
 
-            if (enemyData.ValueRO.ContactDamageEnabled != 0)
+            if (currentEnemyData.ContactDamageEnabled != 0)
             {
-                float contactRadius = math.max(0f, enemyData.ValueRO.ContactRadius);
+                float contactRadius = math.max(0f, currentEnemyData.ContactRadius);
 
                 if (contactRadius > 0f)
                 {
@@ -148,16 +152,16 @@ public partial struct EnemyContactDamageSystem : ISystem
 
                     if (sqrDistance <= contactRadiusSquared && nextState.ContactDamageCooldown <= 0f)
                     {
-                        accumulatedContactDamage += math.max(0f, enemyData.ValueRO.ContactAmountPerTick);
-                        nextState.ContactDamageCooldown = math.max(0.01f, enemyData.ValueRO.ContactTickInterval);
+                        accumulatedContactDamage += math.max(0f, currentEnemyData.ContactAmountPerTick);
+                        nextState.ContactDamageCooldown = math.max(0.01f, currentEnemyData.ContactTickInterval);
                         hitPlayerThisTick = true;
                     }
                 }
             }
 
-            if (enemyData.ValueRO.AreaDamageEnabled != 0)
+            if (currentEnemyData.AreaDamageEnabled != 0)
             {
-                float areaRadius = math.max(0f, enemyData.ValueRO.AreaRadius);
+                float areaRadius = math.max(0f, currentEnemyData.AreaRadius);
 
                 if (areaRadius > 0f)
                 {
@@ -165,8 +169,8 @@ public partial struct EnemyContactDamageSystem : ISystem
 
                     if (sqrDistance <= areaRadiusSquared && nextState.AreaDamageCooldown <= 0f)
                     {
-                        accumulatedAreaPercentDamage += math.max(0f, enemyData.ValueRO.AreaAmountPerTickPercent);
-                        nextState.AreaDamageCooldown = math.max(0.01f, enemyData.ValueRO.AreaTickInterval);
+                        accumulatedAreaPercentDamage += math.max(0f, currentEnemyData.AreaAmountPerTickPercent);
+                        nextState.AreaDamageCooldown = math.max(0.01f, currentEnemyData.AreaTickInterval);
                         hitPlayerThisTick = true;
                     }
                 }
@@ -182,7 +186,7 @@ public partial struct EnemyContactDamageSystem : ISystem
                 EnemyPatternRuntimeState patternRuntimeState = patternRuntimeStateLookup[enemyEntity];
                 bool stolen = EnemyPowerUpStealerRuntimeUtility.TryStealForTrigger(enemyEntity,
                                                                                    playerEntity,
-                                                                                   enemyTransform.ValueRO.Position,
+                                                                                   enemyHitCenter,
                                                                                    playerPosition,
                                                                                    in nextState,
                                                                                    in patternRuntimeState,
@@ -198,7 +202,7 @@ public partial struct EnemyContactDamageSystem : ISystem
                 {
                     EnemyPowerUpStealerRuntimeUtility.TryStealForTrigger(enemyEntity,
                                                                          playerEntity,
-                                                                         enemyTransform.ValueRO.Position,
+                                                                         enemyHitCenter,
                                                                          playerPosition,
                                                                          in nextState,
                                                                          in patternRuntimeState,

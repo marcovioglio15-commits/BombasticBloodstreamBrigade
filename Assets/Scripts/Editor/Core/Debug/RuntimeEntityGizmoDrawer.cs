@@ -81,6 +81,10 @@ public static class RuntimeEntityGizmoDrawer
     /// </summary>
     private sealed class SceneViewPrimitiveDrawer : IRuntimeGizmoPrimitiveDrawer
     {
+        #region Constants
+        private const int EllipseSegmentCount = 48;
+        #endregion
+
         #region Fields
         private GUIStyle currentLabelStyle;
         #endregion
@@ -105,11 +109,31 @@ public static class RuntimeEntityGizmoDrawer
         /// <param name="color">Final Handles color.</param>
         public void DrawWireDisc(Vector3 center, float radius, Color color)
         {
-            if (radius <= 0f)
+            DrawWireEllipse(center, radius, radius, color);
+        }
+
+        /// <summary>
+        /// Draws one planar Scene view ellipse using Handles line segments.
+        /// </summary>
+        /// <param name="center">World-space center of the ellipse.</param>
+        /// <param name="radiusX">Ellipse half-axis along world X.</param>
+        /// <param name="radiusZ">Ellipse half-axis along world Z.</param>
+        /// <param name="color">Final Handles color.</param>
+        public void DrawWireEllipse(Vector3 center, float radiusX, float radiusZ, Color color)
+        {
+            if (radiusX <= 0f || radiusZ <= 0f)
                 return;
 
             Handles.color = color;
-            Handles.DrawWireDisc(center, Vector3.up, radius);
+            float angleStep = Mathf.PI * 2f / EllipseSegmentCount;
+            Vector3 previousPoint = ResolveEllipsePoint(center, radiusX, radiusZ, 0f);
+
+            for (int segmentIndex = 1; segmentIndex <= EllipseSegmentCount; segmentIndex++)
+            {
+                Vector3 currentPoint = ResolveEllipsePoint(center, radiusX, radiusZ, angleStep * segmentIndex);
+                Handles.DrawLine(previousPoint, currentPoint);
+                previousPoint = currentPoint;
+            }
         }
 
         /// <summary>
@@ -173,6 +197,21 @@ public static class RuntimeEntityGizmoDrawer
 
             Vector3 labelPosition = position + Vector3.up * LabelVerticalOffset;
             Handles.Label(labelPosition, text, currentLabelStyle);
+        }
+
+        /// <summary>
+        /// Resolves one planar XZ ellipse sample used by the Scene view backend.
+        /// </summary>
+        /// <param name="center">World-space center of the ellipse.</param>
+        /// <param name="radiusX">Ellipse half-axis along world X.</param>
+        /// <param name="radiusZ">Ellipse half-axis along world Z.</param>
+        /// <param name="angle">Sample angle in radians.</param>
+        /// <returns>World-space sample point on the ellipse perimeter.</returns>
+        private static Vector3 ResolveEllipsePoint(Vector3 center, float radiusX, float radiusZ, float angle)
+        {
+            float x = Mathf.Cos(angle) * radiusX;
+            float z = Mathf.Sin(angle) * radiusZ;
+            return new Vector3(center.x + x, center.y, center.z + z);
         }
         #endregion
 

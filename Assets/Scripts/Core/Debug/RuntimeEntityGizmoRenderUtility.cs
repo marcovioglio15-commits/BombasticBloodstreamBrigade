@@ -19,6 +19,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private const float EnemyDrawDistance = 60f;
     private const float SpawnerDrawDistance = 140f;
     private const float BombDrawDistance = 40f;
+    private const float EnemyHitCenterMarkerRadius = 0.08f;
     private const int MaxEnemyDrawCount = 160;
     private const int MaxSpawnerDrawCount = 32;
     private const int MaxBombDrawCount = 32;
@@ -31,6 +32,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private static readonly Color EnemyContactRadiusColor = new Color(1f, 0.28f, 0.28f, 0.94f);
     private static readonly Color EnemyAreaRadiusColor = new Color(1f, 0.52f, 0.18f, 0.94f);
     private static readonly Color EnemySeparationRadiusColor = new Color(0.24f, 0.72f, 1f, 0.94f);
+    private static readonly Color EnemyHitCenterOffsetColor = new Color(1f, 1f, 1f, 0.72f);
     private static readonly Color EnemyWanderTargetColor = new Color(0.36f, 1f, 0.82f, 0.94f);
     private static readonly Color EnemyShortRangeDashTargetColor = new Color(1f, 0.42f, 0.78f, 0.94f);
     private static readonly Color EnemyAcidTrailSegmentColor = new Color(0.58f, 1f, 0.18f, 0.82f);
@@ -295,26 +297,34 @@ public static class RuntimeEntityGizmoRenderUtility
 
                 EnemyData enemyData = entityManager.GetComponentData<EnemyData>(enemyEntity);
                 Vector3 enemyPosition = ToVector3(enemyTransform.Position);
+                Vector3 enemyHitCenterPosition = ToVector3(EnemyHitboxCenterUtility.ResolveWorldCenter(in enemyTransform, in enemyData));
                 bool drewEnemyGizmo = false;
+                bool drewHitCenterGizmo = false;
 
                 // Draw the gameplay radii that directly affect collision, damage and steering.
                 if (RuntimeGizmoDebugState.EnemyBodyRadiusEnabled)
                 {
-                    primitiveDrawer.DrawWireDisc(enemyPosition, enemyData.BodyRadius, EnemyBodyRadiusColor);
+                    DrawEnemyBodyHitArea(primitiveDrawer, enemyHitCenterPosition, in enemyData);
                     drewEnemyGizmo = true;
+                    drewHitCenterGizmo = true;
                 }
 
                 if (RuntimeGizmoDebugState.EnemyContactRadiusEnabled && enemyData.ContactDamageEnabled != 0)
                 {
-                    primitiveDrawer.DrawWireDisc(enemyPosition, enemyData.ContactRadius, EnemyContactRadiusColor);
+                    primitiveDrawer.DrawWireDisc(enemyHitCenterPosition, enemyData.ContactRadius, EnemyContactRadiusColor);
                     drewEnemyGizmo = true;
+                    drewHitCenterGizmo = true;
                 }
 
                 if (RuntimeGizmoDebugState.EnemyAreaRadiusEnabled && enemyData.AreaDamageEnabled != 0)
                 {
-                    primitiveDrawer.DrawWireDisc(enemyPosition, enemyData.AreaRadius, EnemyAreaRadiusColor);
+                    primitiveDrawer.DrawWireDisc(enemyHitCenterPosition, enemyData.AreaRadius, EnemyAreaRadiusColor);
                     drewEnemyGizmo = true;
+                    drewHitCenterGizmo = true;
                 }
+
+                if (drewHitCenterGizmo && EnemyHitboxCenterUtility.HasPlanarOffset(in enemyData))
+                    DrawEnemyHitCenterOffset(primitiveDrawer, enemyPosition, enemyHitCenterPosition);
 
                 if (RuntimeGizmoDebugState.EnemySeparationRadiusEnabled)
                 {
@@ -389,6 +399,50 @@ public static class RuntimeEntityGizmoRenderUtility
             if (enemyEntities.IsCreated)
                 enemyEntities.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Draws the precise enemy projectile hit footprint while falling back to the legacy radius when axes are missing.
+    /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="enemyHitCenter">World-space enemy hit center.</param>
+    /// <param name="enemyData">Runtime enemy data containing the baked body hit axes.</param>
+    private static void DrawEnemyBodyHitArea(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
+                                             Vector3 enemyHitCenter,
+                                             in EnemyData enemyData)
+    {
+        float fallbackRadius = math.max(0.05f, enemyData.BodyRadius);
+        float radiusX = ResolveEnemyBodyAxis(enemyData.BodyRadiusX, fallbackRadius);
+        float radiusZ = ResolveEnemyBodyAxis(enemyData.BodyRadiusZ, fallbackRadius);
+        primitiveDrawer.DrawWireEllipse(enemyHitCenter, radiusX, radiusZ, EnemyBodyRadiusColor);
+    }
+
+    /// <summary>
+    /// Draws a compact link from the entity root to the effective gameplay hit center when an offset is authored.
+    /// </summary>
+    /// <param name="primitiveDrawer">Active rendering backend receiving primitive calls.</param>
+    /// <param name="enemyPosition">World-space entity root position.</param>
+    /// <param name="enemyHitCenter">World-space gameplay hit center used by enemy radius checks.</param>
+    private static void DrawEnemyHitCenterOffset(IRuntimeGizmoPrimitiveDrawer primitiveDrawer,
+                                                 Vector3 enemyPosition,
+                                                 Vector3 enemyHitCenter)
+    {
+        primitiveDrawer.DrawLink(enemyPosition, enemyHitCenter, EnemyHitCenterOffsetColor);
+        primitiveDrawer.DrawMarker(enemyHitCenter, EnemyHitCenterMarkerRadius, EnemyHitCenterOffsetColor);
+    }
+
+    /// <summary>
+    /// Resolves one enemy body axis with legacy-radius fallback for older baked entities.
+    /// </summary>
+    /// <param name="axisRadius">Baked hitbox half-axis.</param>
+    /// <param name="fallbackRadius">Legacy circular body radius.</param>
+    /// <returns>Positive body hit half-axis used for debug drawing.</returns>
+    private static float ResolveEnemyBodyAxis(float axisRadius, float fallbackRadius)
+    {
+        if (axisRadius > 0f)
+            return axisRadius;
+
+        return fallbackRadius;
     }
 
     /// <summary>

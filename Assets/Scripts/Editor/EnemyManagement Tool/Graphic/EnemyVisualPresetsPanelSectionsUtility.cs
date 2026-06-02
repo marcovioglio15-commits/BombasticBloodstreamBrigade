@@ -123,6 +123,10 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                "Outline",
                                BuildOutlineSubSection(panel));
         AddVisualSubSectionTab(panel,
+                               EnemyVisualPresetsPanel.VisualSubSectionType.Footprint,
+                               "Footprint UI",
+                               EnemyVisualPresetsPanelFootprintSectionUtility.BuildFootprintSubSection(panel));
+        AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.DamageFeedback,
                                "Damage Feedback",
                                BuildDamageFeedbackSubSection(panel));
@@ -510,13 +514,13 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         target.Add(sectionLabel);
     }
 
-    private static void AddSliderField(EnemyVisualPresetsPanel panel,
-                                       VisualElement target,
-                                       SerializedProperty property,
-                                       string label,
-                                       float lowValue,
-                                       float highValue,
-                                       string tooltip)
+    internal static void AddSliderField(EnemyVisualPresetsPanel panel,
+                                        VisualElement target,
+                                        SerializedProperty property,
+                                        string label,
+                                        float lowValue,
+                                        float highValue,
+                                        string tooltip)
     {
         if (panel == null)
             return;

@@ -17,7 +17,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
         PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
         EnemySpawnWarningPresentationSystem.DestroyRuntimeState();
         EnemyOffensiveEngagementBillboardRuntimeUtility.Shutdown();
-        EnemyWorldSpaceStatusBarsSyncSystem.DestroyRuntimeState();
+        EnemyGroundIndicatorSyncSystem.DestroyRuntimeState();
         PlayerDroppedPowerUpContainerViewRuntimeUtility.Shutdown();
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);

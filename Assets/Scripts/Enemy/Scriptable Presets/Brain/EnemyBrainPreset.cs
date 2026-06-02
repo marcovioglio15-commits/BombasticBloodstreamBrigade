@@ -184,6 +184,12 @@ public sealed class EnemyBrainSteeringSettings
 
     [Tooltip("Physical body radius used for projectile hit checks and overlap handling.")]
     [SerializeField] private float bodyRadius = 0.55f;
+
+    [Tooltip("Horizontal X scale applied to Body Radius when resolving the projectile hit ellipse.")]
+    [SerializeField] private float bodyRadiusXScale = 1f;
+
+    [Tooltip("Horizontal Z scale applied to Body Radius when resolving the projectile hit ellipse.")]
+    [SerializeField] private float bodyRadiusZScale = 1f;
     #endregion
 
     #endregion
@@ -212,6 +218,38 @@ public sealed class EnemyBrainSteeringSettings
             return bodyRadius;
         }
     }
+
+    public float BodyRadiusXScale
+    {
+        get
+        {
+            return bodyRadiusXScale;
+        }
+    }
+
+    public float BodyRadiusZScale
+    {
+        get
+        {
+            return bodyRadiusZScale;
+        }
+    }
+
+    public float BodyRadiusX
+    {
+        get
+        {
+            return ResolveScaledBodyRadius(bodyRadiusXScale);
+        }
+    }
+
+    public float BodyRadiusZ
+    {
+        get
+        {
+            return ResolveScaledBodyRadius(bodyRadiusZScale);
+        }
+    }
     #endregion
 
     #region Methods
@@ -230,6 +268,21 @@ public sealed class EnemyBrainSteeringSettings
 
         if (bodyRadius < 0.05f)
             bodyRadius = 0.05f;
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Resolves one authored axis scale into a safe body hit radius without mutating the source asset.
+    /// </summary>
+    /// <param name="scale">Designer-authored axis scale applied to the base body radius.</param>
+    /// <returns>Scaled radius, or the base body radius when the scale is not finite.</returns>
+    private float ResolveScaledBodyRadius(float scale)
+    {
+        if (float.IsNaN(scale) || float.IsInfinity(scale))
+            return bodyRadius;
+
+        return bodyRadius * Mathf.Max(0f, scale);
     }
     #endregion
 

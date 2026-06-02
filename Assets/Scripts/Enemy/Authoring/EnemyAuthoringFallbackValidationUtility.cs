@@ -22,6 +22,8 @@ public static class EnemyAuthoringFallbackValidationUtility
     /// <param name="separationRadius">Fallback neighbor separation radius.</param>
     /// <param name="separationWeight">Fallback neighbor separation weight.</param>
     /// <param name="bodyRadius">Fallback body radius.</param>
+    /// <param name="bodyRadiusXScale">Fallback X-axis scale applied to the body hit radius.</param>
+    /// <param name="bodyRadiusZScale">Fallback Z-axis scale applied to the body hit radius.</param>
     /// <param name="contactRadius">Fallback contact damage radius.</param>
     /// <param name="contactAmountPerTick">Fallback contact damage amount.</param>
     /// <param name="contactTickInterval">Fallback contact damage interval.</param>
@@ -42,6 +44,8 @@ public static class EnemyAuthoringFallbackValidationUtility
                                               ref float separationRadius,
                                               ref float separationWeight,
                                               ref float bodyRadius,
+                                              ref float bodyRadiusXScale,
+                                              ref float bodyRadiusZScale,
                                               ref float contactRadius,
                                               ref float contactAmountPerTick,
                                               ref float contactTickInterval,

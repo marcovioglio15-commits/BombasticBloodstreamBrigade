@@ -46,7 +46,6 @@ public sealed class EnemyMasterPresetsPanel
 
     private PopupField<GameObject> enemyPrefabPopup;
     private Label activeStatusLabel;
-    private Label testUiStatusLabel;
     private GameObject selectedEnemyPrefab;
     private bool suppressStateWrite;
     #endregion
@@ -269,18 +268,6 @@ public sealed class EnemyMasterPresetsPanel
         set
         {
             activeStatusLabel = value;
-        }
-    }
-
-    internal Label TestUiStatusLabel
-    {
-        get
-        {
-            return testUiStatusLabel;
-        }
-        set
-        {
-            testUiStatusLabel = value;
         }
     }
 
@@ -567,21 +554,6 @@ public sealed class EnemyMasterPresetsPanel
     internal void AssignPresetToPrefab()
     {
         EnemyMasterPresetsPanelPrefabActivationUtility.AssignPresetToPrefab(this);
-    }
-
-    internal void GenerateTestUiOnPrefab()
-    {
-        EnemyMasterPresetsPanelPrefabActivationUtility.GenerateTestUiOnPrefab(this);
-    }
-
-    internal void DeleteTestUiOnPrefab()
-    {
-        EnemyMasterPresetsPanelPrefabActivationUtility.DeleteTestUiOnPrefab(this);
-    }
-
-    internal void RefreshTestUiStatus()
-    {
-        EnemyMasterPresetsPanelPrefabActivationUtility.RefreshTestUiStatus(this);
     }
 
     internal void ReloadSelectedPrefabReference()

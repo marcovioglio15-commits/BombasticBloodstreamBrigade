@@ -20,6 +20,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         DeclarePresetDependencies(authoring);
         Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+        float bakedBodyRadiusX = math.max(0.05f, authoring.BodyRadiusX);
+        float bakedBodyRadiusZ = math.max(0.05f, authoring.BodyRadiusZ);
+        float bakedBodyRadius = math.max(bakedBodyRadiusX, bakedBodyRadiusZ);
+        bool rotateHitCenterOffset = ShouldRotateHitCenterOffset(authoring);
+        float2 bakedHitCenterOffsetXZ = ResolveHitCenterOffsetXZ(authoring, rotateHitCenterOffset);
 
         AddComponent(entity, new EnemyData
         {
@@ -31,7 +36,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             RotationSpeedDegreesPerSecond = authoring.RotationSpeedDegreesPerSecond,
             SeparationRadius = math.max(0.1f, authoring.SeparationRadius),
             SeparationWeight = math.max(0f, authoring.SeparationWeight),
-            BodyRadius = math.max(0.05f, authoring.BodyRadius),
+            BodyRadius = bakedBodyRadius,
+            BodyRadiusX = bakedBodyRadiusX,
+            BodyRadiusZ = bakedBodyRadiusZ,
+            HitCenterOffsetXZ = bakedHitCenterOffsetXZ,
+            RotateHitCenterOffset = rotateHitCenterOffset ? (byte)1 : (byte)0,
             MinimumWallDistance = math.max(0f, authoring.MinimumWallDistance),
             PriorityTier = math.clamp(authoring.PriorityTier, -128, 128),
             SteeringAggressiveness = math.clamp(authoring.SteeringAggressiveness, 0f, 2.5f),
@@ -208,6 +217,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             VisibleDistanceHysteresis = math.max(0f, authoring.VisibleDistanceHysteresis),
             UseDistanceCulling = authoring.EnableDistanceCulling ? (byte)1 : (byte)0
         });
+        AddComponent(entity, BuildGroundIndicatorConfig(authoring));
         AddComponent(entity, new OutlineVisualConfig
         {
             Enabled = authoring.EnableOutline ? (byte)1 : (byte)0,
@@ -321,16 +331,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             AddComponentObject(entity, resolvedBillboardView);
         }
 
-        EnemyWorldSpaceStatusBarsView resolvedStatusBarsView = ResolveWorldSpaceStatusBarsView(authoring);
-        Entity statusBarsViewEntity = RegisterStatusBarsViewEntity(resolvedStatusBarsView);
-        AddComponent(entity, new EnemyWorldSpaceStatusBarsLink
-        {
-            ViewEntity = statusBarsViewEntity
-        });
-        AddComponent(entity, new EnemyWorldSpaceStatusBarsRuntimeLink
-        {
-            ViewEntity = Entity.Null
-        });
+        EnemyGroundIndicatorView resolvedGroundIndicatorView = ResolveGroundIndicatorView(authoring);
+
+        if (resolvedGroundIndicatorView != null)
+            AddComponentObject(entity, resolvedGroundIndicatorView);
 
         AddComponent(entity, new EnemyOwnerSpawner
         {
@@ -381,6 +385,24 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return false;
 
         return compiledPattern.ShooterConfigs.Count > 0 || compiledPattern.HasShooterRuntimeSettings;
+    }
+
+    /// <summary>
+    /// Normalizes authored shadow coverage enum values before they are written into ECS.
+    /// </summary>
+    /// <param name="coverageMode">Authoring enum value resolved from the visual preset.</param>
+    /// <returns>Supported coverage mode used by runtime footprint presentation.</returns>
+    private static EnemyShadowCoverageMode ResolveShadowCoverageMode(EnemyShadowCoverageMode coverageMode)
+    {
+        switch (coverageMode)
+        {
+            case EnemyShadowCoverageMode.ShadowOnly:
+            case EnemyShadowCoverageMode.ShadowAndSpatialUi:
+                return coverageMode;
+
+            default:
+                return EnemyShadowCoverageMode.ShadowOnly;
+        }
     }
 
     /// <summary>
@@ -909,28 +931,130 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         return null;
     }
 
-    private static EnemyWorldSpaceStatusBarsView ResolveWorldSpaceStatusBarsView(EnemyAuthoring authoring)
+    /// <summary>
+    /// Resolves the ground-indicator view referenced on the authoring component or falls back to the first
+    /// component found anywhere under the enemy hierarchy.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used to resolve the view reference.</param>
+    /// <returns>Resolved view component, or null when no indicator is authored on the prefab.</returns>
+    private static EnemyGroundIndicatorView ResolveGroundIndicatorView(EnemyAuthoring authoring)
     {
         if (authoring == null)
             return null;
 
-        EnemyWorldSpaceStatusBarsView assignedStatusBarsView = authoring.WorldSpaceStatusBarsView;
+        EnemyGroundIndicatorView assignedView = authoring.GroundIndicatorView;
 
-        if (assignedStatusBarsView != null &&
-            assignedStatusBarsView.gameObject != null)
+        if (assignedView != null &&
+            assignedView.gameObject != null)
         {
-            return assignedStatusBarsView;
+            return assignedView;
         }
 
-        EnemyWorldSpaceStatusBarsView fallbackStatusBarsView = authoring.GetComponentInChildren<EnemyWorldSpaceStatusBarsView>(true);
+        EnemyGroundIndicatorView fallbackView = authoring.GetComponentInChildren<EnemyGroundIndicatorView>(true);
 
-        if (fallbackStatusBarsView != null &&
-            fallbackStatusBarsView.gameObject != null)
+        if (fallbackView != null &&
+            fallbackView.gameObject != null)
         {
-            return fallbackStatusBarsView;
+            return fallbackView;
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Builds the ground-indicator ECS configuration from the authoring resolved values. The SuppressRings
+    /// byte is resolved from the Boss UI setting so the runtime never has to recompute it.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used to read every footprint field.</param>
+    /// <returns>Baked ground-indicator configuration component data.</returns>
+    private static EnemyGroundIndicatorConfig BuildGroundIndicatorConfig(EnemyAuthoring authoring)
+    {
+        // Resolve the boss-UI gate that suppresses the rings when the screen-space boss HUD owns the bars.
+        bool suppressRings = ShouldSuppressGroundIndicatorRings(authoring);
+        // HeightOffset and RingDistanceFromShadow stay un-clamped: negative values are intentional
+        // affordances for sinking the indicator below the pivot or overlapping rings with the shadow.
+        bool rotateHitCenterOffset = ShouldRotateHitCenterOffset(authoring);
+        float2 hitCenterOffsetXZ = ResolveHitCenterOffsetXZ(authoring, rotateHitCenterOffset);
+        return new EnemyGroundIndicatorConfig
+        {
+            CoverageMode = ResolveShadowCoverageMode(authoring.ShadowCoverageMode),
+            RingDistanceFromShadow = authoring.RingDistanceFromShadow,
+            RingThickness = math.max(0f, authoring.SpatialUiRingThickness),
+            RingSpacing = math.max(0f, authoring.SpatialUiRingSpacing),
+            RingArcDegrees = EnemyGroundIndicatorFootprintUtility.ResolveRuntimeRingArcDegrees(authoring.RingArcDegrees),
+            HeightOffset = authoring.SpatialUiHeightOffset,
+            PositionOffsetXZ = hitCenterOffsetXZ,
+            ShadowAlpha = math.saturate(authoring.ShadowAlpha),
+            ShadowEdgeSoftness = math.max(0f, authoring.ShadowEdgeSoftness),
+            RingEdgeSoftness = math.max(0f, authoring.RingEdgeSoftness),
+            RingAngularSoftness = math.max(0f, authoring.RingAngularSoftness),
+            ShadowColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShadowColor),
+            HealthFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.HealthRingFillColor),
+            HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.HealthRingBackgroundColor),
+            ShieldFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingFillColor),
+            ShieldBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingBackgroundColor),
+            SuppressRings = suppressRings ? (byte)1 : (byte)0
+        };
+    }
+
+    /// <summary>
+    /// Resolves the baked local planar hit-center offset shared by gameplay hit checks and ground presentation.
+    /// The visual bounds contribution is detected from authored body renderers when the root rotation represents body facing.
+    /// Self-spinning enemies keep the preset fine-tune only so the gameplay center stays stable while the visual rotates.
+    /// </summary>
+    /// <param name="authoring">Source authoring component exposing visual footprint settings.</param>
+    /// <param name="rotateHitCenterOffset">True when the resolved offset should rotate with the entity root.</param>
+    /// <returns>Local root-space XZ offset from entity root to gameplay hit center.</returns>
+    private static float2 ResolveHitCenterOffsetXZ(EnemyAuthoring authoring, bool rotateHitCenterOffset)
+    {
+        if (authoring == null)
+            return float2.zero;
+
+        Vector2 authoredPositionOffset = authoring.PositionOffsetXZ;
+        float2 manualOffsetXZ = new float2(authoredPositionOffset.x, authoredPositionOffset.y);
+
+        if (!rotateHitCenterOffset)
+            return manualOffsetXZ;
+
+        return EnemyHitCenterBakeUtility.ResolveLocalHitCenterOffsetXZ(authoring, manualOffsetXZ);
+    }
+
+    /// <summary>
+    /// Resolves whether the hit-center offset should follow the entity root rotation.
+    /// Continuous self-rotation is visual spin, not body facing, so offsets remain root-stable for those enemies.
+    /// </summary>
+    /// <param name="authoring">Source authoring component exposing movement settings.</param>
+    /// <returns>True when the baked hit-center offset should rotate with LocalTransform.Rotation.</returns>
+    private static bool ShouldRotateHitCenterOffset(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return true;
+
+        return EnemyHitCenterBakeUtility.ShouldRotateHitCenterOffset(authoring.RotationSpeedDegreesPerSecond);
+    }
+
+    /// <summary>
+    /// Resolves whether the ground-indicator rings should be hidden because the boss HUD already shows
+    /// health and shield as screen-space bars. Shadow rendering is unaffected.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used to inspect the boss UI configuration.</param>
+    /// <returns>True when the rings should be suppressed for this enemy.</returns>
+    private static bool ShouldSuppressGroundIndicatorRings(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return false;
+
+        EnemyVisualPreset visualPreset = authoring.VisualPreset;
+
+        if (visualPreset == null)
+            return false;
+
+        EnemyBossVisualUiSettings bossUi = visualPreset.BossUi;
+
+        if (bossUi == null || !bossUi.Enabled || !bossUi.ShowHealthBar)
+            return false;
+
+        return authoring.BossPatternPreset != null;
     }
 
     private static EnemyOffensiveEngagementBillboardView ResolveOffensiveEngagementBillboardView(EnemyAuthoring authoring)
@@ -1672,19 +1796,6 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return default;
 
         return new FixedString64Bytes(trimmedValue);
-    }
-
-    private Entity RegisterStatusBarsViewEntity(EnemyWorldSpaceStatusBarsView statusBarsView)
-    {
-        if (statusBarsView == null)
-            return Entity.Null;
-
-        GameObject viewGameObject = statusBarsView.gameObject;
-
-        if (viewGameObject == null)
-            return Entity.Null;
-
-        return GetEntity(viewGameObject, TransformUsageFlags.Dynamic);
     }
 
     /// <summary>

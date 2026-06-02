@@ -31,6 +31,23 @@ MonoBehaviour:
     enableOutline: 1
     outlineThickness: 6
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
+  footprint:
+    shadowCoverageMode: 0
+    spatialUiHeightOffset: -0.2
+    positionOffsetXZ: {x: 0, y: 0}
+    ringDistanceFromShadow: 0
+    spatialUiRingThickness: 0.1
+    spatialUiRingSpacing: 0.03
+    ringArcDegrees: 90
+    shadowColor: {r: 0, g: 0, b: 0, a: 1}
+    shadowAlpha: 1
+    shadowEdgeSoftness: 0.08
+    healthRingFillColor: {r: 0.92, g: 0.18, b: 0.16, a: 0.95}
+    healthRingBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}
+    shieldRingFillColor: {r: 0.25, g: 0.85, b: 1, a: 0.95}
+    shieldRingBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}
+    ringEdgeSoftness: 0.05
+    ringAngularSoftness: 0.02
   offensiveEngagementFeedback:
     enableColorBlend: 1
     colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}

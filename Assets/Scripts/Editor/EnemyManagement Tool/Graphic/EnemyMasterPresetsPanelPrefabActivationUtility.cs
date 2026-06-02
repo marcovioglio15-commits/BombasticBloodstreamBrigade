@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Handles enemy prefab activation, generated test UI actions and related status refresh for enemy master preset panels.
+/// Handles enemy prefab activation and related status refresh for enemy master preset panels.
 /// </summary>
 internal static class EnemyMasterPresetsPanelPrefabActivationUtility
 {
@@ -104,7 +104,6 @@ internal static class EnemyMasterPresetsPanelPrefabActivationUtility
         }
 
         RefreshActiveStatus(panel);
-        RefreshTestUiStatus(panel);
     }
 
     /// <summary>
@@ -196,129 +195,6 @@ internal static class EnemyMasterPresetsPanelPrefabActivationUtility
 
         EnemyManagementDraftSession.MarkDirty();
         RefreshActiveStatus(panel);
-        RefreshTestUiStatus(panel);
-    }
-
-    /// <summary>
-    /// Generates the temporary test UI on the selected enemy prefab.
-    /// </summary>
-    /// <param name="panel">Owning panel that stores selected preset and selected prefab state.</param>
-
-    public static void GenerateTestUiOnPrefab(EnemyMasterPresetsPanel panel)
-    {
-        if (panel.SelectedEnemyPrefab == null)
-        {
-            EditorUtility.DisplayDialog("Generate Test UI", "Select an enemy prefab first.", "OK");
-            return;
-        }
-
-        EnemyAuthoring authoring = panel.SelectedEnemyPrefab.GetComponentInChildren<EnemyAuthoring>(true);
-
-        if (authoring == null)
-        {
-            EditorUtility.DisplayDialog("Generate Test UI", "EnemyAuthoring component not found on selected prefab.", "OK");
-            return;
-        }
-
-        EnemyWorldSpaceStatusBarsView assignedView = authoring.WorldSpaceStatusBarsView;
-
-        if (assignedView != null && !EnemyStatusBarsTestUiPrefabUtility.IsGeneratedTestUiView(assignedView))
-        {
-            bool replaceCustomView = EditorUtility.DisplayDialog("Generate Test UI",
-                                                                 "Selected prefab already has a custom world-space status bars view assigned. Replace it with generated test UI?",
-                                                                 "Replace",
-                                                                 "Cancel");
-
-            if (!replaceCustomView)
-                return;
-        }
-
-        EnemyTestUiSettings testUiSettings = panel.SelectedPreset != null ? panel.SelectedPreset.TestUiSettings : null;
-        bool generated = EnemyStatusBarsTestUiPrefabUtility.TryGenerateTestUi(panel.SelectedEnemyPrefab, testUiSettings, out string message);
-
-        if (!generated)
-        {
-            EditorUtility.DisplayDialog("Generate Test UI", message, "OK");
-            return;
-        }
-
-        ReloadSelectedPrefabReference(panel);
-        EnemyManagementDraftSession.MarkDirty();
-        RefreshActiveStatus(panel);
-        panel.BuildActiveDetailsSection();
-    }
-
-    /// <summary>
-    /// Deletes the generated temporary test UI from the selected enemy prefab.
-    /// </summary>
-    /// <param name="panel">Owning panel that stores selected prefab state.</param>
-
-    public static void DeleteTestUiOnPrefab(EnemyMasterPresetsPanel panel)
-    {
-        if (panel.SelectedEnemyPrefab == null)
-        {
-            EditorUtility.DisplayDialog("Delete Test UI", "Select an enemy prefab first.", "OK");
-            return;
-        }
-
-        bool confirmed = EditorUtility.DisplayDialog("Delete Test UI",
-                                                     "Delete generated test UI from selected enemy prefab?",
-                                                     "Delete",
-                                                     "Cancel");
-
-        if (!confirmed)
-            return;
-
-        bool deleted = EnemyStatusBarsTestUiPrefabUtility.TryDeleteTestUi(panel.SelectedEnemyPrefab, out string message);
-
-        if (!deleted)
-        {
-            EditorUtility.DisplayDialog("Delete Test UI", message, "OK");
-            return;
-        }
-
-        ReloadSelectedPrefabReference(panel);
-        EnemyManagementDraftSession.MarkDirty();
-        RefreshActiveStatus(panel);
-        panel.BuildActiveDetailsSection();
-    }
-
-    /// <summary>
-    /// Refreshes the generated/custom test UI status label for the selected prefab.
-    /// </summary>
-    /// <param name="panel">Owning panel that stores selected prefab state and UI labels.</param>
-
-    public static void RefreshTestUiStatus(EnemyMasterPresetsPanel panel)
-    {
-        if (panel.TestUiStatusLabel == null)
-            return;
-
-        if (panel.SelectedEnemyPrefab == null)
-        {
-            panel.TestUiStatusLabel.text = "No enemy prefab selected.";
-            return;
-        }
-
-        EnemyAuthoring authoring = panel.SelectedEnemyPrefab.GetComponentInChildren<EnemyAuthoring>(true);
-
-        if (authoring == null)
-        {
-            panel.TestUiStatusLabel.text = "EnemyAuthoring component not found on prefab.";
-            return;
-        }
-
-        EnemyWorldSpaceStatusBarsView assignedView = authoring.WorldSpaceStatusBarsView;
-
-        if (assignedView == null)
-        {
-            panel.TestUiStatusLabel.text = "No world-space status bars view assigned on selected prefab.";
-            return;
-        }
-
-        bool hasGeneratedTestUi = EnemyStatusBarsTestUiPrefabUtility.IsGeneratedTestUiView(assignedView);
-        panel.TestUiStatusLabel.text = hasGeneratedTestUi
-            ? "Generated test UI is assigned on selected prefab."
-            : "A custom world-space status bars view is assigned on selected prefab.";
     }
 
     /// <summary>

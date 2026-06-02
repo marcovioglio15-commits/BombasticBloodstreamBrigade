@@ -18,6 +18,10 @@ public struct EnemyData : IComponentData
     public float SeparationRadius;
     public float SeparationWeight;
     public float BodyRadius;
+    public float BodyRadiusX;
+    public float BodyRadiusZ;
+    public float2 HitCenterOffsetXZ;
+    public byte RotateHitCenterOffset;
     public float MinimumWallDistance;
     public int PriorityTier;
     public float SteeringAggressiveness;
@@ -88,6 +92,31 @@ public struct EnemyVisualConfig : IComponentData
     public float MaxVisibleDistance;
     public float VisibleDistanceHysteresis;
     public byte UseDistanceCulling;
+}
+
+/// <summary>
+/// Stores immutable ground-footprint presentation settings consumed by the shader-driven ground indicator
+/// that renders the enemy hit-box shadow plus the two concentric fillable rings or arcs for health and shield.
+/// </summary>
+public struct EnemyGroundIndicatorConfig : IComponentData
+{
+    public EnemyShadowCoverageMode CoverageMode;
+    public float RingDistanceFromShadow;
+    public float RingThickness;
+    public float RingSpacing;
+    public float RingArcDegrees;
+    public float HeightOffset;
+    public float2 PositionOffsetXZ;
+    public float ShadowAlpha;
+    public float ShadowEdgeSoftness;
+    public float RingEdgeSoftness;
+    public float RingAngularSoftness;
+    public float4 ShadowColor;
+    public float4 HealthFillColor;
+    public float4 HealthBackgroundColor;
+    public float4 ShieldFillColor;
+    public float4 ShieldBackgroundColor;
+    public byte SuppressRings;
 }
 
 /// <summary>
@@ -174,21 +203,6 @@ public struct EnemyDeathVfxConfig : IComponentData
     public FixedString64Bytes DebrisParticleChildName;
 }
 
-/// <summary>
-/// Stores the entity that owns the world-space status bars companion view for an enemy.
-/// </summary>
-public struct EnemyWorldSpaceStatusBarsLink : IComponentData
-{
-    public Entity ViewEntity;
-}
-
-/// <summary>
-/// Caches the resolved world-space status bars view entity instance used at runtime.
-/// </summary>
-public struct EnemyWorldSpaceStatusBarsRuntimeLink : IComponentData
-{
-    public Entity ViewEntity;
-}
 
 /// <summary>
 /// Stores the owner spawner of an enemy entity.

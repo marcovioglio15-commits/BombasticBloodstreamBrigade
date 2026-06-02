@@ -70,17 +70,29 @@ public sealed class RuntimeEntityGizmoGameViewRenderer : MonoBehaviour
         /// <param name="color">Final GL line color.</param>
         public void DrawWireDisc(Vector3 center, float radius, Color color)
         {
-            if (targetCamera == null || radius <= 0f)
+            DrawWireEllipse(center, radius, radius, color);
+        }
+
+        /// <summary>
+        /// Draws one projected wire ellipse by tessellating the gameplay footprint into screen-space line segments.
+        /// </summary>
+        /// <param name="center">World-space center of the ellipse.</param>
+        /// <param name="radiusX">Ellipse half-axis along world X.</param>
+        /// <param name="radiusZ">Ellipse half-axis along world Z.</param>
+        /// <param name="color">Final GL line color.</param>
+        public void DrawWireEllipse(Vector3 center, float radiusX, float radiusZ, Color color)
+        {
+            if (targetCamera == null || radiusX <= 0f || radiusZ <= 0f)
                 return;
 
             float angleStep = Mathf.PI * 2f / CircleSegmentCount;
-            Vector3 previousWorldPoint = ResolveDiscPoint(center, radius, 0f);
+            Vector3 previousWorldPoint = ResolveEllipsePoint(center, radiusX, radiusZ, 0f);
 
-            // Sample the gameplay disc around the XZ plane and project each segment to the current Game view.
+            // Sample the gameplay ellipse around the XZ plane and project each segment to the current Game view.
             for (int segmentIndex = 1; segmentIndex <= CircleSegmentCount; segmentIndex++)
             {
                 float angle = angleStep * segmentIndex;
-                Vector3 currentWorldPoint = ResolveDiscPoint(center, radius, angle);
+                Vector3 currentWorldPoint = ResolveEllipsePoint(center, radiusX, radiusZ, angle);
 
                 if (TryProjectPoint(previousWorldPoint, out Vector2 previousScreenPoint) &&
                     TryProjectPoint(currentWorldPoint, out Vector2 currentScreenPoint))
@@ -173,10 +185,18 @@ public sealed class RuntimeEntityGizmoGameViewRenderer : MonoBehaviour
         #endregion
 
         #region Private Methods
-        private static Vector3 ResolveDiscPoint(Vector3 center, float radius, float angle)
+        /// <summary>
+        /// Resolves one point on a planar XZ ellipse for projected debug rendering.
+        /// </summary>
+        /// <param name="center">World-space center of the ellipse.</param>
+        /// <param name="radiusX">Ellipse half-axis along world X.</param>
+        /// <param name="radiusZ">Ellipse half-axis along world Z.</param>
+        /// <param name="angle">Sample angle in radians.</param>
+        /// <returns>World-space sample point on the ellipse perimeter.</returns>
+        private static Vector3 ResolveEllipsePoint(Vector3 center, float radiusX, float radiusZ, float angle)
         {
-            float x = Mathf.Cos(angle) * radius;
-            float z = Mathf.Sin(angle) * radius;
+            float x = Mathf.Cos(angle) * radiusX;
+            float z = Mathf.Sin(angle) * radiusZ;
             return new Vector3(center.x + x, center.y, center.z + z);
         }
 

@@ -31,6 +31,8 @@ MonoBehaviour:
     separationRadius: 1.1
     separationWeight: 2
     bodyRadius: 0.55
+    bodyRadiusXScale: 1
+    bodyRadiusZScale: 1
   tacticalNavigation:
     candidateBudget: 2
     navigationInfluence: 0.72

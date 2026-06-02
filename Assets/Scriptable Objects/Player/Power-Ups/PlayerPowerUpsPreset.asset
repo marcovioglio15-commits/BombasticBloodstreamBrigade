@@ -14588,10 +14588,10 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
-          trailSpawnDistance: 0.1
-          trailSpawnIntervalSeconds: 0.1
+          trailSpawnDistance: 0.25
+          trailSpawnIntervalSeconds: 0.01
           trailRadius: 0.6
-          maxActiveSegmentsPerPlayer: 30
+          maxActiveSegmentsPerPlayer: 100
           trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
         elementalAreaTick:
           effectData:

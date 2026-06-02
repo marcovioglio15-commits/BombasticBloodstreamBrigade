@@ -174,12 +174,6 @@ public static class EnemyPoolUtility
                     WaveIndex = -1
                 });
 
-            if (!entityManager.HasComponent<EnemyWorldSpaceStatusBarsRuntimeLink>(enemyEntity))
-                entityManager.AddComponentData(enemyEntity, new EnemyWorldSpaceStatusBarsRuntimeLink
-                {
-                    ViewEntity = Entity.Null
-                });
-
             EnemyPoolVisualUtility.EnsureVisualComponents(entityManager, enemyEntity);
 
             if (!entityManager.HasComponent<EnemyActive>(enemyEntity))

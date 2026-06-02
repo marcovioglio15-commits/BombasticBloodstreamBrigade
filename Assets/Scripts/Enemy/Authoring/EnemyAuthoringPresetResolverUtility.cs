@@ -120,6 +120,22 @@ public static class EnemyAuthoringPresetResolverUtility
         return resolvedVisualPreset.Outline;
     }
 
+    /// <summary>
+    /// Resolves ground-footprint settings from the active visual preset.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override the visual preset.</param>
+    /// <param name="fallbackVisualPreset">Fallback visual preset assigned directly on the authoring component.</param>
+    /// <returns>Footprint settings, or null when no visual preset is available.</returns>
+    public static EnemyVisualFootprintSettings ResolveFootprintSettings(EnemyMasterPreset masterPreset, EnemyVisualPreset fallbackVisualPreset)
+    {
+        EnemyVisualPreset resolvedVisualPreset = ResolveVisualPreset(masterPreset, fallbackVisualPreset);
+
+        if (resolvedVisualPreset == null)
+            return null;
+
+        return resolvedVisualPreset.Footprint;
+    }
+
     public static EnemyOffensiveEngagementFeedbackSettings ResolveOffensiveEngagementFeedbackSettings(EnemyMasterPreset masterPreset,
                                                                                                       EnemyVisualPreset fallbackVisualPreset)
     {

@@ -18,6 +18,15 @@ public interface IRuntimeGizmoPrimitiveDrawer
     void DrawWireDisc(Vector3 center, float radius, Color color);
 
     /// <summary>
+    /// Draws one planar wire ellipse centered on the supplied world position.
+    /// </summary>
+    /// <param name="center">World-space center of the ellipse.</param>
+    /// <param name="radiusX">Ellipse half-axis along world X.</param>
+    /// <param name="radiusZ">Ellipse half-axis along world Z.</param>
+    /// <param name="color">Final line color used by the active rendering backend.</param>
+    void DrawWireEllipse(Vector3 center, float radiusX, float radiusZ, Color color);
+
+    /// <summary>
     /// Draws one directional indicator starting from a world-space origin.
     /// </summary>
     /// <param name="origin">World-space starting point of the vector.</param>

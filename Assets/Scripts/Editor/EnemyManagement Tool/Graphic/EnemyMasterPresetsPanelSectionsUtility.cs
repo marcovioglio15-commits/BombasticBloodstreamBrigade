@@ -198,8 +198,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         sectionContainer.Add(activeStatusLabel);
         panel.RefreshActiveStatus();
 
-        BuildTestUiActionsSection(panel, sectionContainer);
-        BuildTestUiSettingsSection(panel, sectionContainer);
     }
 
     /// <summary>
@@ -521,30 +519,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
-    /// Adds one tracked property field that marks the draft session dirty on change.
-    /// </summary>
-    /// <param name="parent">Parent container that receives the field.</param>
-    /// <param name="property">Serialized property to bind.</param>
-    /// <param name="label">Display label shown by the field.</param>
-
-    private static void AddTrackedPropertyField(VisualElement parent, SerializedProperty property, string label)
-    {
-        if (parent == null)
-            return;
-
-        if (property == null)
-            return;
-
-        PropertyField field = new PropertyField(property, label);
-        field.BindProperty(property);
-        field.RegisterValueChangeCallback(evt =>
-        {
-            EnemyManagementDraftSession.MarkDirty();
-        });
-        parent.Add(field);
-    }
-
-    /// <summary>
     /// Builds one object-field row for assigning and managing one linked sub preset.
     /// </summary>
     /// <param name="panel">Owning panel that provides synchronization callbacks.</param>
@@ -627,123 +601,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         return container;
     }
 
-    /// <summary>
-    /// Builds the Test UI actions subsection under the active preset section.
-    /// </summary>
-    /// <param name="panel">Owning panel that provides prefab and action callbacks.</param>
-    /// <param name="sectionContainer">Section container that receives the subsection.</param>
-
-    private static void BuildTestUiActionsSection(EnemyMasterPresetsPanel panel, VisualElement sectionContainer)
-    {
-        if (sectionContainer == null)
-            return;
-
-        VisualElement actionsContainer = new VisualElement();
-        actionsContainer.style.marginTop = 10f;
-        sectionContainer.Add(actionsContainer);
-
-        Label headerLabel = new Label("Test UI Actions");
-        headerLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        headerLabel.style.marginBottom = 4f;
-        actionsContainer.Add(headerLabel);
-
-        if (panel.SelectedEnemyPrefab == null)
-        {
-            Label noPrefabLabel = new Label("Select an enemy prefab to enable Test UI actions.");
-            noPrefabLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
-            actionsContainer.Add(noPrefabLabel);
-            return;
-        }
-
-        EnemyAuthoring enemyAuthoring = panel.SelectedEnemyPrefab.GetComponentInChildren<EnemyAuthoring>(true);
-
-        if (enemyAuthoring == null)
-        {
-            Label missingAuthoringLabel = new Label("EnemyAuthoring component not found on selected prefab.");
-            missingAuthoringLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
-            actionsContainer.Add(missingAuthoringLabel);
-            return;
-        }
-
-        VisualElement buttonsRow = new VisualElement();
-        buttonsRow.style.flexDirection = FlexDirection.Row;
-        buttonsRow.style.marginTop = 2f;
-
-        Button generateButton = new Button(panel.GenerateTestUiOnPrefab);
-        generateButton.text = "Generate Test UI";
-        generateButton.tooltip = "Generate world-space health and shield bars on selected prefab and assign them to EnemyAuthoring.";
-        buttonsRow.Add(generateButton);
-
-        bool hasGeneratedTestUi = EnemyStatusBarsTestUiPrefabUtility.HasGeneratedTestUi(panel.SelectedEnemyPrefab);
-
-        Button deleteButton = new Button(panel.DeleteTestUiOnPrefab);
-        deleteButton.text = "Delete Test UI";
-        deleteButton.tooltip = "Delete generated test status bars from selected prefab and clear assignment if generated.";
-        deleteButton.style.marginLeft = 4f;
-        deleteButton.SetEnabled(hasGeneratedTestUi);
-        buttonsRow.Add(deleteButton);
-
-        actionsContainer.Add(buttonsRow);
-
-        Label testUiStatusLabel = new Label();
-        testUiStatusLabel.style.marginTop = 2f;
-        testUiStatusLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
-        panel.TestUiStatusLabel = testUiStatusLabel;
-        actionsContainer.Add(testUiStatusLabel);
-        panel.RefreshTestUiStatus();
-    }
-
-    /// <summary>
-    /// Builds the Test UI settings subsection under the active preset section.
-    /// </summary>
-    /// <param name="panel">Owning panel that provides serialized context.</param>
-    /// <param name="sectionContainer">Section container that receives the subsection.</param>
-
-    private static void BuildTestUiSettingsSection(EnemyMasterPresetsPanel panel, VisualElement sectionContainer)
-    {
-        if (panel == null)
-            return;
-
-        if (sectionContainer == null)
-            return;
-
-        SerializedProperty testUiSettingsProperty = panel.PresetSerializedObject.FindProperty("testUiSettings");
-
-        if (testUiSettingsProperty == null)
-            return;
-
-        VisualElement settingsContainer = new VisualElement();
-        settingsContainer.style.marginTop = 10f;
-        sectionContainer.Add(settingsContainer);
-
-        Label headerLabel = new Label("Test UI Settings");
-        headerLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        headerLabel.style.marginBottom = 4f;
-        settingsContainer.Add(headerLabel);
-
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("worldOffset"), "World Offset");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("rootWidthPixels"), "Root Width Pixels");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("rootHeightPixels"), "Root Height Pixels");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("worldScale"), "World Scale");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("canvasSortingOrder"), "Canvas Sorting Order");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("healthBarWidthPixels"), "Health Bar Width");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("healthBarHeightPixels"), "Health Bar Height");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("healthBarYOffsetPixels"), "Health Bar Y Offset");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldBarWidthPixels"), "Shield Bar Width");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldBarHeightPixels"), "Shield Bar Height");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldBarYOffsetPixels"), "Shield Bar Y Offset");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("healthFillColor"), "Health Fill Color");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("healthBackgroundColor"), "Health Background Color");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldFillColor"), "Shield Fill Color");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldBackgroundColor"), "Shield Background Color");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("hideShieldWhenEmpty"), "Hide Shield When Empty");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("hideWhenEnemyInactive"), "Hide When Enemy Inactive");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("hideWhenEnemyCulled"), "Hide When Enemy Culled");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("smoothingSeconds"), "Smoothing Seconds");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("shieldSmoothingSeconds"), "Shield Smoothing Seconds");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("billboardToCamera"), "Billboard To Camera");
-        AddTrackedPropertyField(settingsContainer, testUiSettingsProperty.FindPropertyRelative("billboardYawOnly"), "Billboard Yaw Only");
-    }
     #endregion
 
     #endregion

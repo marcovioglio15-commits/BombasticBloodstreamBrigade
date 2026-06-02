@@ -21,11 +21,26 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultSpawnVfxScaleMultiplier = 1f;
     private const float DefaultDeathVfxLifetimeSeconds = 0.75f;
     private const float DefaultDeathVfxScaleMultiplier = 1f;
+    private const float DefaultSpatialUiRingThickness = 0.08f;
+    private const float DefaultSpatialUiRingSpacing = 0.03f;
+    private const float DefaultSpatialUiHeightOffset = 0.035f;
+    private const float DefaultRingDistanceFromShadow = 0.05f;
+    private static readonly Vector2 DefaultPositionOffsetXZ = Vector2.zero;
+    private const float DefaultShadowAlpha = 1f;
+    private const float DefaultShadowEdgeSoftness = 0.08f;
+    private const float DefaultRingEdgeSoftness = 0.05f;
+    private const float DefaultRingAngularSoftness = 0.02f;
+    private static readonly Color DefaultShadowColor = new Color(0f, 0f, 0f, 0.55f);
+    private static readonly Color DefaultHealthRingFillColor = new Color(0.92f, 0.18f, 0.16f, 0.95f);
+    private static readonly Color DefaultHealthRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
+    private static readonly Color DefaultShieldRingFillColor = new Color(0.25f, 0.85f, 1f, 0.95f);
+    private static readonly Color DefaultShieldRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
     private static readonly Color DefaultDamageFlashColor = new Color(1f, 0.15f, 0.15f, 1f);
     private static readonly Color DefaultOutlineColor = Color.black;
     private const float DefaultDamageFlashDurationSeconds = 0.06f;
     private const float DefaultDamageFlashMaximumBlend = 0.85f;
     private const float DefaultOutlineThickness = 1f;
+    private const int GizmoEllipseSegmentCount = 48;
     #endregion
 
     #region Fields
@@ -87,6 +102,14 @@ public sealed class EnemyAuthoring : MonoBehaviour
     [SerializeField]
     [HideInInspector] private float bodyRadius = 0.55f;
 
+    [Tooltip("Fallback horizontal X scale applied to Body Radius when MasterPreset and BrainPreset are missing.")]
+    [SerializeField]
+    [HideInInspector] private float bodyRadiusXScale = 1f;
+
+    [Tooltip("Fallback horizontal Z scale applied to Body Radius when MasterPreset and BrainPreset are missing.")]
+    [SerializeField]
+    [HideInInspector] private float bodyRadiusZScale = 1f;
+
     [Tooltip("Fallback contact radius used when MasterPreset and BrainPreset are missing.")]
     [SerializeField]
     [HideInInspector] private float contactRadius = 1.2f;
@@ -144,8 +167,9 @@ public sealed class EnemyAuthoring : MonoBehaviour
     [Tooltip("Optional transform used as anchor for attached elemental status VFX.")]
     [SerializeField] private Transform elementalVfxAnchor;
 
-    [Tooltip("Optional world-space status bars view used to display fillable health and shield images above this enemy.")]
-    [SerializeField] private EnemyWorldSpaceStatusBarsView worldSpaceStatusBarsView;
+    [Tooltip("Optional ground-indicator view that renders the shader-driven shadow plus fillable health and shield rings on the floor under this enemy.")]
+    [FormerlySerializedAs("worldSpaceStatusBarsView")]
+    [SerializeField] private EnemyGroundIndicatorView groundIndicatorView;
 
     [Tooltip("Optional billboard sprite view used by offensive engagement feedback before short-range or weapon attacks commit.")]
     [SerializeField] private EnemyOffensiveEngagementBillboardView offensiveEngagementBillboardView;
@@ -328,12 +352,33 @@ public sealed class EnemyAuthoring : MonoBehaviour
     {
         get
         {
+            return math.max(BodyRadiusX, BodyRadiusZ);
+        }
+    }
+
+    public float BodyRadiusX
+    {
+        get
+        {
             EnemyBrainSteeringSettings settings = ResolveSteeringSettings();
 
             if (settings == null)
-                return bodyRadius;
+                return ResolveScaledBodyRadius(bodyRadius, bodyRadiusXScale);
 
-            return settings.BodyRadius;
+            return settings.BodyRadiusX;
+        }
+    }
+
+    public float BodyRadiusZ
+    {
+        get
+        {
+            EnemyBrainSteeringSettings settings = ResolveSteeringSettings();
+
+            if (settings == null)
+                return ResolveScaledBodyRadius(bodyRadius, bodyRadiusZScale);
+
+            return settings.BodyRadiusZ;
         }
     }
 
@@ -828,6 +873,214 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public EnemyShadowCoverageMode ShadowCoverageMode
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return EnemyShadowCoverageMode.ShadowOnly;
+
+            return settings.ShadowCoverageMode;
+        }
+    }
+
+    public float SpatialUiRingThickness
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultSpatialUiRingThickness;
+
+            return settings.SpatialUiRingThickness;
+        }
+    }
+
+    public float SpatialUiRingSpacing
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultSpatialUiRingSpacing;
+
+            return settings.SpatialUiRingSpacing;
+        }
+    }
+
+    public float SpatialUiHeightOffset
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultSpatialUiHeightOffset;
+
+            return settings.SpatialUiHeightOffset;
+        }
+    }
+
+    public float RingDistanceFromShadow
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultRingDistanceFromShadow;
+
+            return settings.RingDistanceFromShadow;
+        }
+    }
+
+    public float RingArcDegrees
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return EnemyVisualFootprintSettings.DefaultRingArcDegrees;
+
+            return settings.RingArcDegrees;
+        }
+    }
+
+    public Vector2 PositionOffsetXZ
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultPositionOffsetXZ;
+
+            return settings.PositionOffsetXZ;
+        }
+    }
+
+    public Color ShadowColor
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShadowColor;
+
+            return settings.ShadowColor;
+        }
+    }
+
+    public float ShadowAlpha
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShadowAlpha;
+
+            return settings.ShadowAlpha;
+        }
+    }
+
+    public float ShadowEdgeSoftness
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShadowEdgeSoftness;
+
+            return settings.ShadowEdgeSoftness;
+        }
+    }
+
+    public Color HealthRingFillColor
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultHealthRingFillColor;
+
+            return settings.HealthRingFillColor;
+        }
+    }
+
+    public Color HealthRingBackgroundColor
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultHealthRingBackgroundColor;
+
+            return settings.HealthRingBackgroundColor;
+        }
+    }
+
+    public Color ShieldRingFillColor
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShieldRingFillColor;
+
+            return settings.ShieldRingFillColor;
+        }
+    }
+
+    public Color ShieldRingBackgroundColor
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShieldRingBackgroundColor;
+
+            return settings.ShieldRingBackgroundColor;
+        }
+    }
+
+    public float RingEdgeSoftness
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultRingEdgeSoftness;
+
+            return settings.RingEdgeSoftness;
+        }
+    }
+
+    public float RingAngularSoftness
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultRingAngularSoftness;
+
+            return settings.RingAngularSoftness;
+        }
+    }
+
     public Color DamageFlashColor
     {
         get
@@ -891,11 +1144,11 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
-    public EnemyWorldSpaceStatusBarsView WorldSpaceStatusBarsView
+    public EnemyGroundIndicatorView GroundIndicatorView
     {
         get
         {
-            return worldSpaceStatusBarsView;
+            return groundIndicatorView;
         }
     }
 
@@ -926,6 +1179,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
                                                                       ref separationRadius,
                                                                       ref separationWeight,
                                                                       ref bodyRadius,
+                                                                      ref bodyRadiusXScale,
+                                                                      ref bodyRadiusZScale,
                                                                       ref contactRadius,
                                                                       ref contactAmountPerTick,
                                                                       ref contactTickInterval,
@@ -949,6 +1204,183 @@ public sealed class EnemyAuthoring : MonoBehaviour
         if (advancedPatternPreset != null)
             advancedPatternPreset.ValidateValues();
     }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Draws a preview of the resolved ground indicator footprint in the scene view so authors can
+    /// sanity-check shadow size, ring distance, ring thickness and ring arc without entering Play mode.
+    /// The preview matches the geometry the shader will draw at runtime.
+    /// </summary>
+    private void OnDrawGizmosSelected()
+    {
+        // Resolve world position from the same local hit-center offset used by baking. The shadow source
+        // is the contact damage radius, not the body radius used for enemy-vs-enemy steering.
+        Transform selfTransform = transform;
+        float bakedContactRadius = math.max(0.05f, ContactRadius);
+        float ringDistance = math.max(0f, RingDistanceFromShadow);
+        float ringThickness = math.max(0f, SpatialUiRingThickness);
+        float ringSpacing = math.max(0f, SpatialUiRingSpacing);
+        float heightOffset = SpatialUiHeightOffset;
+        Vector2 positionOffset = PositionOffsetXZ;
+        float2 manualOffsetXZ = new float2(positionOffset.x, positionOffset.y);
+        bool rotateHitCenterOffset = EnemyHitCenterBakeUtility.ShouldRotateHitCenterOffset(RotationSpeedDegreesPerSecond);
+        float2 localHitCenterOffsetXZ = manualOffsetXZ;
+
+        if (rotateHitCenterOffset)
+            localHitCenterOffsetXZ = EnemyHitCenterBakeUtility.ResolveLocalHitCenterOffsetXZ(this, manualOffsetXZ);
+
+        Vector3 origin = EnemyHitboxCenterUtility.ResolveWorldCenter(selfTransform.position,
+                                                                     selfTransform.rotation,
+                                                                     selfTransform.lossyScale,
+                                                                     localHitCenterOffsetXZ,
+                                                                     rotateHitCenterOffset,
+                                                                     heightOffset);
+
+        // Contact damage hit area (white) — drawn as a circle on the local XZ plane.
+        Gizmos.color = new Color(1f, 1f, 1f, 0.85f);
+        DrawEllipseGizmo(origin, bakedContactRadius, bakedContactRadius);
+
+        // Health ring band (red) — radii are taken from the contact circle outer edge.
+        float healthInner = math.max(0.001f, bakedContactRadius + ringDistance);
+        float healthOuter = healthInner + ringThickness;
+        float ringArcDegrees = EnemyGroundIndicatorFootprintUtility.ResolveRuntimeRingArcDegrees(RingArcDegrees);
+        float ringArcCenterAngleRadians = ResolveGroundIndicatorGizmoArcCenterAngleRadians(origin);
+        Gizmos.color = new Color(0.95f, 0.25f, 0.2f, 0.85f);
+        DrawRingArcGizmo(origin, healthInner, healthOuter, ringArcDegrees, ringArcCenterAngleRadians);
+
+        // Shield ring band (cyan) is only meaningful when the enemy has shield capacity.
+        if (MaxShield <= 0f)
+            return;
+        float shieldInner = healthOuter + ringSpacing;
+        float shieldOuter = shieldInner + ringThickness;
+        Gizmos.color = new Color(0.25f, 0.85f, 1f, 0.85f);
+        DrawRingArcGizmo(origin, shieldInner, shieldOuter, ringArcDegrees, ringArcCenterAngleRadians);
+    }
+
+    /// <summary>
+    /// Draws one ellipse outline on the world XZ plane using the current Gizmos.color.
+    /// </summary>
+    /// <param name="origin">World-space center of the ellipse.</param>
+    /// <param name="radiusX">Half-axis along world X.</param>
+    /// <param name="radiusZ">Half-axis along world Z.</param>
+    private static void DrawEllipseGizmo(Vector3 origin, float radiusX, float radiusZ)
+    {
+        float angularStep = (2f * Mathf.PI) / GizmoEllipseSegmentCount;
+        Vector3 previousPoint = origin + new Vector3(radiusX, 0f, 0f);
+
+        for (int segmentIndex = 1; segmentIndex <= GizmoEllipseSegmentCount; segmentIndex++)
+        {
+            float currentAngle = segmentIndex * angularStep;
+            Vector3 currentPoint = origin + new Vector3(Mathf.Cos(currentAngle) * radiusX,
+                                                        0f,
+                                                        Mathf.Sin(currentAngle) * radiusZ);
+            Gizmos.DrawLine(previousPoint, currentPoint);
+            previousPoint = currentPoint;
+        }
+    }
+
+    /// <summary>
+    /// Draws a ring band as either a full pair of ellipses or a camera-facing arc with side connectors.
+    /// Used by editor previews to mirror the runtime shader arc setting from the visual preset.
+    /// </summary>
+    /// <param name="origin">World-space center of the ring band.</param>
+    /// <param name="innerRadius">Inner radius of the ring band.</param>
+    /// <param name="outerRadius">Outer radius of the ring band.</param>
+    /// <param name="arcDegrees">Visible ring arc width in degrees.</param>
+    /// <param name="centerAngleRadians">World XZ angle used as the center of the arc.</param>
+    private static void DrawRingArcGizmo(Vector3 origin,
+                                         float innerRadius,
+                                         float outerRadius,
+                                         float arcDegrees,
+                                         float centerAngleRadians)
+    {
+        float resolvedArcDegrees = Mathf.Clamp(arcDegrees, 0f, EnemyVisualFootprintSettings.DefaultRingArcDegrees);
+
+        if (resolvedArcDegrees >= EnemyVisualFootprintSettings.DefaultRingArcDegrees - 0.001f)
+        {
+            DrawEllipseGizmo(origin, innerRadius, innerRadius);
+            DrawEllipseGizmo(origin, outerRadius, outerRadius);
+            return;
+        }
+
+        if (resolvedArcDegrees <= 0.001f)
+            return;
+
+        // Resolve arc endpoints once so both radii and side connectors use the exact same angles.
+        float halfArcRadians = resolvedArcDegrees * Mathf.Deg2Rad * 0.5f;
+        float startAngleRadians = centerAngleRadians - halfArcRadians;
+        float endAngleRadians = centerAngleRadians + halfArcRadians;
+        DrawArcGizmo(origin, innerRadius, startAngleRadians, endAngleRadians, resolvedArcDegrees);
+        DrawArcGizmo(origin, outerRadius, startAngleRadians, endAngleRadians, resolvedArcDegrees);
+        Gizmos.DrawLine(ResolveArcPoint(origin, innerRadius, startAngleRadians),
+                        ResolveArcPoint(origin, outerRadius, startAngleRadians));
+        Gizmos.DrawLine(ResolveArcPoint(origin, innerRadius, endAngleRadians),
+                        ResolveArcPoint(origin, outerRadius, endAngleRadians));
+    }
+
+    /// <summary>
+    /// Draws one circular arc on the world XZ plane using a segment count proportional to the authored arc width.
+    /// </summary>
+    /// <param name="origin">World-space center of the arc.</param>
+    /// <param name="radius">Arc radius on the XZ plane.</param>
+    /// <param name="startAngleRadians">Start angle in radians.</param>
+    /// <param name="endAngleRadians">End angle in radians.</param>
+    /// <param name="arcDegrees">Arc width in degrees used to choose preview tessellation density.</param>
+    private static void DrawArcGizmo(Vector3 origin,
+                                     float radius,
+                                     float startAngleRadians,
+                                     float endAngleRadians,
+                                     float arcDegrees)
+    {
+        int segmentCount = Mathf.Max(2, Mathf.CeilToInt(GizmoEllipseSegmentCount * arcDegrees / EnemyVisualFootprintSettings.DefaultRingArcDegrees));
+        float angularStep = (endAngleRadians - startAngleRadians) / segmentCount;
+        Vector3 previousPoint = ResolveArcPoint(origin, radius, startAngleRadians);
+
+        // Step through the arc without allocating temporary point arrays.
+        for (int segmentIndex = 1; segmentIndex <= segmentCount; segmentIndex++)
+        {
+            float currentAngleRadians = startAngleRadians + angularStep * segmentIndex;
+            Vector3 currentPoint = ResolveArcPoint(origin, radius, currentAngleRadians);
+            Gizmos.DrawLine(previousPoint, currentPoint);
+            previousPoint = currentPoint;
+        }
+    }
+
+    /// <summary>
+    /// Resolves the Scene View camera-facing angle used by editor footprint gizmos.
+    /// </summary>
+    /// <param name="origin">World-space enemy footprint center.</param>
+    /// <returns>Camera-facing XZ angle in radians, or zero when no camera vector is available.</returns>
+    private static float ResolveGroundIndicatorGizmoArcCenterAngleRadians(Vector3 origin)
+    {
+        Camera currentCamera = Camera.current;
+
+        if (currentCamera == null)
+            return 0f;
+
+        Vector3 toCamera = currentCamera.transform.position - origin;
+        toCamera.y = 0f;
+
+        if (toCamera.sqrMagnitude <= 0.0001f)
+            return 0f;
+
+        return Mathf.Atan2(toCamera.z, toCamera.x);
+    }
+
+    /// <summary>
+    /// Resolves one point on a circular XZ arc.
+    /// </summary>
+    /// <param name="origin">World-space center of the arc.</param>
+    /// <param name="radius">Arc radius.</param>
+    /// <param name="angleRadians">Angle measured on the world XZ plane.</param>
+    /// <returns>World-space point on the arc.</returns>
+    private static Vector3 ResolveArcPoint(Vector3 origin, float radius, float angleRadians)
+    {
+        return origin + new Vector3(Mathf.Cos(angleRadians) * radius,
+                                    0f,
+                                    Mathf.Sin(angleRadians) * radius);
+    }
+#endif
     #endregion
 
     #region Helpers
@@ -1030,12 +1462,35 @@ public sealed class EnemyAuthoring : MonoBehaviour
     }
 
     /// <summary>
+    /// Resolves the active ground-footprint visual settings source.
+    /// </summary>
+    /// <returns>Resolved footprint settings or null when no preset source is available.</returns>
+    private EnemyVisualFootprintSettings ResolveFootprintSettings()
+    {
+        return EnemyAuthoringPresetResolverUtility.ResolveFootprintSettings(masterPreset, visualPreset);
+    }
+
+    /// <summary>
     /// Resolves the active offensive engagement feedback settings source.
     /// </summary>
     /// <returns>Resolved offensive engagement feedback settings or null when no preset source is available.</returns>
     private EnemyOffensiveEngagementFeedbackSettings ResolveOffensiveEngagementFeedbackSettings()
     {
         return EnemyAuthoringPresetResolverUtility.ResolveOffensiveEngagementFeedbackSettings(masterPreset, visualPreset);
+    }
+
+    /// <summary>
+    /// Resolves one fallback body-hit axis radius without mutating authoring fallback fields during validation.
+    /// </summary>
+    /// <param name="baseRadius">Fallback base body radius.</param>
+    /// <param name="scale">Fallback axis scale applied to the base body radius.</param>
+    /// <returns>Scaled fallback axis radius, or the base radius when the scale is not finite.</returns>
+    private static float ResolveScaledBodyRadius(float baseRadius, float scale)
+    {
+        if (float.IsNaN(scale) || float.IsInfinity(scale))
+            return math.max(0f, baseRadius);
+
+        return math.max(0f, baseRadius) * math.max(0f, scale);
     }
     #endregion
 

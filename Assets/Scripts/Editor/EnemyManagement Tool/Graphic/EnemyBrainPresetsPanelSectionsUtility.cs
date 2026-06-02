@@ -414,7 +414,10 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
 
         AddPropertyField(panel, container, steeringProperty, "separationRadius", "Separation Radius", "Radius used to search neighboring enemies for separation steering.");
         AddPropertyField(panel, container, steeringProperty, "separationWeight", "Separation Weight", "Weight applied to the separation vector before velocity clamping.");
-        AddPropertyField(panel, container, steeringProperty, "bodyRadius", "Body Radius", "Physical body radius used for projectile hit checks and overlap handling.");
+        AddPropertyField(panel, container, steeringProperty, "bodyRadius", "Body Radius", "Base physical body radius used for projectile hit checks and overlap handling.");
+        AddPropertyField(panel, container, steeringProperty, "bodyRadiusXScale", "Body Radius X Scale", "Horizontal X scale applied to Body Radius when resolving the projectile hit ellipse.");
+        AddPropertyField(panel, container, steeringProperty, "bodyRadiusZScale", "Body Radius Z Scale", "Horizontal Z scale applied to Body Radius when resolving the projectile hit ellipse.");
+        AddSteeringWarnings(steeringProperty, container);
         return container;
     }
 
@@ -544,6 +547,23 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Adds steering warnings for authored values that bake to clamped or invisible hit areas.
+    /// </summary>
+    /// <param name="steeringProperty">Serialized steering settings block.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    private static void AddSteeringWarnings(SerializedProperty steeringProperty, VisualElement container)
+    {
+        if (steeringProperty == null || container == null)
+            return;
+
+        AddNonPositiveWarning(steeringProperty, "separationRadius", "Separation Radius", "runtime bake clamps it to the minimum neighbor-search radius.", container);
+        AddNegativeWarning(steeringProperty, "separationWeight", "Separation Weight", container);
+        AddNonPositiveWarning(steeringProperty, "bodyRadius", "Body Radius", "runtime bake clamps the body hitbox to the minimum supported size.", container);
+        AddNonPositiveWarning(steeringProperty, "bodyRadiusXScale", "Body Radius X Scale", "the X half-axis would be zero or negative, so runtime bake clamps it.", container);
+        AddNonPositiveWarning(steeringProperty, "bodyRadiusZScale", "Body Radius Z Scale", "the Z half-axis would be zero or negative, so runtime bake clamps it.", container);
+    }
+
+    /// <summary>
     /// Adds one warning when a tactical float value is negative.
     /// </summary>
     /// <param name="parentProperty">Serialized tactical navigation parent.</param>
@@ -562,6 +582,50 @@ internal static class EnemyBrainPresetsPanelSectionsUtility
 
         if (property != null && property.floatValue < 0f)
             warningLines.Add(displayName + " is negative. Runtime bake clamps it to a safe range.");
+    }
+
+    /// <summary>
+    /// Adds one immediate warning box when a float value is negative.
+    /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="relativePropertyName">Relative float property name.</param>
+    /// <param name="displayName">Display name used in warning text.</param>
+    /// <param name="container">Parent element receiving the warning.</param>
+    private static void AddNegativeWarning(SerializedProperty parentProperty,
+                                           string relativePropertyName,
+                                           string displayName,
+                                           VisualElement container)
+    {
+        if (parentProperty == null || container == null)
+            return;
+
+        SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
+
+        if (property != null && property.floatValue < 0f)
+            container.Add(new HelpBox(displayName + " is negative. Runtime bake clamps it to a safe range.", HelpBoxMessageType.Warning));
+    }
+
+    /// <summary>
+    /// Adds one immediate warning box when a float value is zero or negative.
+    /// </summary>
+    /// <param name="parentProperty">Serialized parent object.</param>
+    /// <param name="relativePropertyName">Relative float property name.</param>
+    /// <param name="displayName">Display name used in warning text.</param>
+    /// <param name="impact">Short description of the runtime consequence.</param>
+    /// <param name="container">Parent element receiving the warning.</param>
+    private static void AddNonPositiveWarning(SerializedProperty parentProperty,
+                                              string relativePropertyName,
+                                              string displayName,
+                                              string impact,
+                                              VisualElement container)
+    {
+        if (parentProperty == null || container == null)
+            return;
+
+        SerializedProperty property = parentProperty.FindPropertyRelative(relativePropertyName);
+
+        if (property != null && property.floatValue <= 0f)
+            container.Add(new HelpBox(displayName + " is zero or negative: " + impact, HelpBoxMessageType.Warning));
     }
     #endregion
 

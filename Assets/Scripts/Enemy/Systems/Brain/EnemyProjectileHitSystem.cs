@@ -109,15 +109,19 @@ public partial struct EnemyProjectileHitSystem : ISystem
             return;
 
         NativeArray<float3> enemyPositions = CollectionHelper.CreateNativeArray<float3>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
-        NativeArray<float> enemyRadii = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        NativeArray<float2> enemyRadiusAxes = CollectionHelper.CreateNativeArray<float2>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
 
         float maxEnemyRadius = 0.05f;
 
         for (int enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++)
         {
-            enemyPositions[enemyIndex] = enemyTransforms[enemyIndex].Position;
-            float bodyRadius = math.max(0.05f, enemyDataArray[enemyIndex].BodyRadius);
-            enemyRadii[enemyIndex] = bodyRadius;
+            EnemyData currentEnemyData = enemyDataArray[enemyIndex];
+            LocalTransform currentEnemyTransform = enemyTransforms[enemyIndex];
+            enemyPositions[enemyIndex] = EnemyHitboxCenterUtility.ResolveWorldCenter(in currentEnemyTransform, in currentEnemyData);
+            float bodyRadiusX = math.max(0.05f, currentEnemyData.BodyRadiusX);
+            float bodyRadiusZ = math.max(0.05f, currentEnemyData.BodyRadiusZ);
+            float bodyRadius = math.max(math.max(0.05f, currentEnemyData.BodyRadius), math.max(bodyRadiusX, bodyRadiusZ));
+            enemyRadiusAxes[enemyIndex] = new float2(bodyRadiusX, bodyRadiusZ);
 
             if (bodyRadius > maxEnemyRadius)
             {
@@ -148,7 +152,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
             ProjectilePositions = projectilePositions,
             ProjectileRadii = projectileRadii,
             EnemyPositions = enemyPositions,
-            EnemyRadii = enemyRadii,
+            EnemyRadiusAxes = enemyRadiusAxes,
             CellMap = enemyCellMap,
             InverseCellSize = inverseCellSize,
             MaxEnemyRadius = maxEnemyRadius,
@@ -836,7 +840,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
         [ReadOnly] public NativeArray<float3> ProjectilePositions;
         [ReadOnly] public NativeArray<float> ProjectileRadii;
         [ReadOnly] public NativeArray<float3> EnemyPositions;
-        [ReadOnly] public NativeArray<float> EnemyRadii;
+        [ReadOnly] public NativeArray<float2> EnemyRadiusAxes;
         [ReadOnly] public NativeParallelMultiHashMap<int, int> CellMap;
         [ReadOnly] public float InverseCellSize;
         [ReadOnly] public float MaxEnemyRadius;
@@ -873,11 +877,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
                     {
                         float3 delta = projectilePosition - EnemyPositions[enemyIndex];
                         delta.y = 0f;
-                        float sqrDistance = math.lengthsq(delta);
-                        float radius = math.max(0.01f, EnemyRadii[enemyIndex] + projectileRadius);
-                        float radiusSquared = radius * radius;
 
-                        if (sqrDistance > radiusSquared)
+                        if (!IsProjectileOverlappingEnemyEllipse(delta, projectileRadius, EnemyRadiusAxes[enemyIndex]))
                             continue;
 
                         streamWriter.Write(enemyIndex);
@@ -887,6 +888,21 @@ public partial struct EnemyProjectileHitSystem : ISystem
             }
 
             streamWriter.EndForEachIndex();
+        }
+
+        /// <summary>
+        /// Tests one projectile circle against an enemy ellipse in planar XZ space using inflated half-axes.
+        /// </summary>
+        /// <param name="delta">Planar vector from enemy center to projectile center.</param>
+        /// <param name="projectileRadius">Projectile impact radius added to both ellipse axes.</param>
+        /// <param name="enemyRadiusAxes">Enemy body ellipse half-axes in X and Z world units.</param>
+        /// <returns>True when the projectile circle overlaps the inflated enemy hit ellipse.</returns>
+        private static bool IsProjectileOverlappingEnemyEllipse(float3 delta, float projectileRadius, float2 enemyRadiusAxes)
+        {
+            float2 inflatedAxes = math.max(new float2(0.01f, 0.01f), enemyRadiusAxes + math.max(0.005f, projectileRadius));
+            float normalizedX = delta.x / inflatedAxes.x;
+            float normalizedZ = delta.z / inflatedAxes.y;
+            return normalizedX * normalizedX + normalizedZ * normalizedZ <= 1f;
         }
     }
     #endregion
