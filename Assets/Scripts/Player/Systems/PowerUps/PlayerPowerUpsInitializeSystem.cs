@@ -18,7 +18,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingPassiveBulletTimeStateQuery;
     private EntityQuery missingLaserBeamStateQuery;
     private EntityQuery missingElementalTrailStateQuery;
-    private EntityQuery missingElementalTrailAttachedVfxStateQuery;
     private EntityQuery missingBombRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionRequestBufferQuery;
     private EntityQuery missingOrbitalProjectionPrefabBindingBufferQuery;
@@ -104,11 +103,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingElementalTrailStateQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerElementalTrailState>()
-            .Build();
-
-        missingElementalTrailAttachedVfxStateQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerPowerUpsConfigElement>()
-            .WithNone<PlayerElementalTrailAttachedVfxState>()
             .Build();
 
         missingBombRequestBufferQuery = SystemAPI.QueryBuilder()
@@ -246,7 +240,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             in missingPassiveBulletTimeStateQuery,
             in missingLaserBeamStateQuery,
             in missingElementalTrailStateQuery,
-            in missingElementalTrailAttachedVfxStateQuery,
             in missingBombRequestBufferQuery,
             in missingElementalTrailSegmentBufferQuery,
             in missingLaserBeamLaneBufferQuery,
@@ -343,11 +336,6 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingElementalTrailState)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingElementalTrailState(ref commandBuffer, in missingElementalTrailStateQuery);
-        }
-
-        if (missingFlags.HasMissingElementalTrailAttachedVfxState)
-        {
-            PlayerPowerUpsInitializeBootstrapUtility.AddMissingElementalTrailAttachedVfxState(ref commandBuffer, in missingElementalTrailAttachedVfxStateQuery);
         }
 
         if (missingFlags.HasMissingBombRequestBuffer)

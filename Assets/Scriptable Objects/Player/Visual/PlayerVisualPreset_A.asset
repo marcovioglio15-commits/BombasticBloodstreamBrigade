@@ -27,7 +27,7 @@ MonoBehaviour:
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   damageFlashDurationSeconds: 0.7
   damageFlashMaximumBlend: 10
-  elementalTrailAttachedVfxPrefab: {fileID: 5679156216372977872, guid: 92d93d035892fff40a63205dfd234520, type: 3}
+  elementalTrailAttachedVfxPrefab: {fileID: 5127294714520930670, guid: f9f4969fbeb739b4ab67598bba82a55e, type: 3}
   elementalTrailAttachedVfxScaleMultiplier: 1
   elementalEnemyVfxByElement:
   - elementType: 0

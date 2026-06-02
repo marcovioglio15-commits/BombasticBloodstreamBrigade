@@ -253,25 +253,6 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     }
 
     /// <summary>
-    /// Adds PlayerElementalTrailAttachedVfxState to entities missing it.
-    /// </summary>
-    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
-    /// <param name="missingElementalTrailAttachedVfxStateQuery">Query selecting entities without PlayerElementalTrailAttachedVfxState.</param>
-
-    public static void AddMissingElementalTrailAttachedVfxState(
-        ref EntityCommandBuffer commandBuffer,
-        in EntityQuery missingElementalTrailAttachedVfxStateQuery)
-    {
-        PlayerElementalTrailAttachedVfxState initialState = new PlayerElementalTrailAttachedVfxState
-        {
-            VfxEntity = Entity.Null,
-            PrefabEntity = Entity.Null
-        };
-
-        AddComponentForEntities(ref commandBuffer, in missingElementalTrailAttachedVfxStateQuery, initialState);
-    }
-
-    /// <summary>
     /// Adds PlayerBombSpawnRequest buffers to entities missing them.
     /// </summary>
     /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>

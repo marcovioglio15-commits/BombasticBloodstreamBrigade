@@ -95,7 +95,8 @@ internal static class EnemyPatternDefaultsUtility
             AcidTrailDebugDrawSegments = 1,
             AcidTrailVfxPrefabEntity = Entity.Null,
             AcidTrailScaleVfxToRadius = 1,
-            AcidTrailVfxScaleMultiplier = 1f
+            AcidTrailVfxScaleMultiplier = 1f,
+            AcidTrailVfxOffset = new float3(0f, 0.02f, 0f)
         };
     }
 

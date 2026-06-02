@@ -162,7 +162,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             }
         }
 
-        if (request.FollowTargetEntity == Entity.Null && capConfig.MaxSamePrefabPerCell > 0)
+        bool shouldCheckAreaCellCap = request.FollowTargetEntity == Entity.Null &&
+                                      request.BypassAreaCellCap == 0 &&
+                                      capConfig.MaxSamePrefabPerCell > 0;
+
+        if (shouldCheckAreaCellCap)
         {
             int areaCount = CountAreaInstances(request.PrefabEntity,
                                                request.SourcePrefab.Value,

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_VFX_AcidPuddleBody
+  m_Shader: {fileID: 4800000, guid: a4c9e7d2b6f54481aaf1c33e75d2f10b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BubbleRimWidth: 0.18
+    - _BubbleSheenSize: 0.14
+    - _CoreSize: 0
+    - _EdgeFeather: 0.22
+    - _Emission: 1.25
+    - _MistDriftSpeed: 0.45
+    - _Opacity: 0.2
+    - _PopDropletFrequency: 8
+    - _PopRingThickness: 0.16
+    - _PosterizeBlend: 0.133
+    - _PosterizeSteps: 3
+    - _PuddleRole: 0
+    - _RippleFrequency: 6
+    - _SwirlSpeed: 0.55
+    - _SwirlStrength: 0.36
+    m_Colors:
+    - _BodyColor: {r: 0.32, g: 0.78, b: 0.16, a: 1}
+    - _DeepColor: {r: 0.06, g: 0.24, b: 0.04, a: 1}
+    - _HighlightColor: {r: 0.78, g: 1, b: 0.36, a: 1}
+    - _RimColor: {r: 0.95, g: 1, b: 0.74, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

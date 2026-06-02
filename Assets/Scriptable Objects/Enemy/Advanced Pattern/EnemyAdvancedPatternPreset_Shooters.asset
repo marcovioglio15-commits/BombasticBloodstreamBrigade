@@ -66,6 +66,7 @@ MonoBehaviour:
           trailSegmentVfxPrefab: {fileID: 0}
           scaleTrailSegmentVfxToRadius: 1
           trailSegmentVfxScaleMultiplier: 1
+          trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
           debugDrawSegments: 1
       coward:
         detectionRadius: 8
@@ -330,6 +331,7 @@ MonoBehaviour:
           trailSegmentVfxPrefab: {fileID: 0}
           scaleTrailSegmentVfxToRadius: 1
           trailSegmentVfxScaleMultiplier: 1
+          trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
           debugDrawSegments: 1
       coward:
         detectionRadius: 8
@@ -594,6 +596,7 @@ MonoBehaviour:
           trailSegmentVfxPrefab: {fileID: 0}
           scaleTrailSegmentVfxToRadius: 1
           trailSegmentVfxScaleMultiplier: 1
+          trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
           debugDrawSegments: 1
       coward:
         detectionRadius: 8
@@ -858,6 +861,7 @@ MonoBehaviour:
           trailSegmentVfxPrefab: {fileID: 0}
           scaleTrailSegmentVfxToRadius: 1
           trailSegmentVfxScaleMultiplier: 1
+          trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
           debugDrawSegments: 1
       coward:
         detectionRadius: 8
@@ -1122,6 +1126,7 @@ MonoBehaviour:
           trailSegmentVfxPrefab: {fileID: 0}
           scaleTrailSegmentVfxToRadius: 1
           trailSegmentVfxScaleMultiplier: 1
+          trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
           debugDrawSegments: 1
       coward:
         detectionRadius: 8
@@ -1399,6 +1404,7 @@ MonoBehaviour:
             trailSegmentVfxPrefab: {fileID: 0}
             scaleTrailSegmentVfxToRadius: 1
             trailSegmentVfxScaleMultiplier: 1
+            trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
             debugDrawSegments: 1
         coward:
           detectionRadius: 8
@@ -1663,6 +1669,7 @@ MonoBehaviour:
             trailSegmentVfxPrefab: {fileID: 0}
             scaleTrailSegmentVfxToRadius: 1
             trailSegmentVfxScaleMultiplier: 1
+            trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
             debugDrawSegments: 1
         coward:
           detectionRadius: 8
@@ -1927,6 +1934,7 @@ MonoBehaviour:
             trailSegmentVfxPrefab: {fileID: 0}
             scaleTrailSegmentVfxToRadius: 1
             trailSegmentVfxScaleMultiplier: 1
+            trailSegmentVfxOffset: {x: 0, y: 0.02, z: 0}
             debugDrawSegments: 1
         coward:
           detectionRadius: 8

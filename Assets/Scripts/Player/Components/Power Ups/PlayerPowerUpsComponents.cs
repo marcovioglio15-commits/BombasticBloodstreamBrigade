@@ -487,15 +487,6 @@ public struct PlayerElementalTrailState : IComponentData
 }
 
 /// <summary>
-/// Stores runtime handle of the attached elemental trail VFX entity.
-/// </summary>
-public struct PlayerElementalTrailAttachedVfxState : IComponentData
-{
-    public Entity VfxEntity;
-    public Entity PrefabEntity;
-}
-
-/// <summary>
 /// Tracks trail segment entities currently owned by one player.
 /// </summary>
 [InternalBufferCapacity(0)]
@@ -555,6 +546,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public uint FollowValidationSpawnVersion;
     public float3 Velocity;
     public int RefreshKey;
+    public byte BypassAreaCellCap;
     public byte ForceLooping;
     public byte DetachWhenFollowTargetInvalid;
     public byte KeepAliveWhileFollowTargetValid;

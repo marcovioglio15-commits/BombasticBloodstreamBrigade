@@ -1541,6 +1541,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         patternConfig.AcidTrailVfxPrefabEntity = acidVfxPrefabEntity;
         patternConfig.AcidTrailScaleVfxToRadius = compiledPattern.AcidTrailScaleSegmentVfxToRadius ? (byte)1 : (byte)0;
         patternConfig.AcidTrailVfxScaleMultiplier = math.max(0.01f, compiledPattern.AcidTrailSegmentVfxScaleMultiplier);
+        patternConfig.AcidTrailVfxOffset = new float3(compiledPattern.AcidTrailSegmentVfxOffset.x,
+                                                       compiledPattern.AcidTrailSegmentVfxOffset.y,
+                                                       compiledPattern.AcidTrailSegmentVfxOffset.z);
         AppendManagedVfxPrefabBinding(managedVfxPrefabBindings, acidVfxPrefabEntity, acidVfxPrefab);
     }
 

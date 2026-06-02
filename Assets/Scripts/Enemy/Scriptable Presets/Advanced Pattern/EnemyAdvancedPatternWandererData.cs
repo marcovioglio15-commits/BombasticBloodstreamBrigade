@@ -345,6 +345,9 @@ public sealed class EnemyWandererAcidPayload
     [Range(0.01f, 8f)]
     [SerializeField] private float trailSegmentVfxScaleMultiplier = 1f;
 
+    [Tooltip("Local offset added to each acid trail segment VFX spawn position. Useful to lift the puddle above the floor or align it with the gameplay zone.")]
+    [SerializeField] private Vector3 trailSegmentVfxOffset = new Vector3(0f, 0.02f, 0f);
+
     [Tooltip("When enabled, runtime enemy wander-target gizmos also draw this enemy's acid trail segments.")]
     [SerializeField] private bool debugDrawSegments = true;
     #endregion
@@ -437,6 +440,14 @@ public sealed class EnemyWandererAcidPayload
         get
         {
             return trailSegmentVfxScaleMultiplier;
+        }
+    }
+
+    public Vector3 TrailSegmentVfxOffset
+    {
+        get
+        {
+            return trailSegmentVfxOffset;
         }
     }
 

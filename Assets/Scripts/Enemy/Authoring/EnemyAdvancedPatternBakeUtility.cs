@@ -113,6 +113,7 @@ public static class EnemyAdvancedPatternBakeUtility
         result.AcidTrailSegmentVfxPrefab = null;
         result.AcidTrailScaleSegmentVfxToRadius = true;
         result.AcidTrailSegmentVfxScaleMultiplier = 1f;
+        result.AcidTrailSegmentVfxOffset = new UnityEngine.Vector3(0f, 0.02f, 0f);
         result.DropItemsConfig = EnemyDropItemsBakeUtility.CreateDefaultConfig();
         return result;
     }
@@ -272,6 +273,7 @@ public static class EnemyAdvancedPatternBakeUtility
         result.AcidTrailSegmentVfxPrefab = acid.TrailSegmentVfxPrefab;
         result.AcidTrailScaleSegmentVfxToRadius = acid.ScaleTrailSegmentVfxToRadius;
         result.AcidTrailSegmentVfxScaleMultiplier = math.max(0.01f, acid.TrailSegmentVfxScaleMultiplier);
+        result.AcidTrailSegmentVfxOffset = acid.TrailSegmentVfxOffset;
     }
 
     internal static void ApplyStationaryPayload(EnemyPatternModulePayloadData payload, ref EnemyPatternConfig patternConfig)
@@ -779,6 +781,7 @@ public sealed class EnemyCompiledPatternBakeResult
     public GameObject AcidTrailSegmentVfxPrefab;
     public bool AcidTrailScaleSegmentVfxToRadius;
     public float AcidTrailSegmentVfxScaleMultiplier;
+    public UnityEngine.Vector3 AcidTrailSegmentVfxOffset;
     public EnemyDropItemsConfig DropItemsConfig;
     public readonly List<EnemyShooterConfigElement> ShooterConfigs = new List<EnemyShooterConfigElement>();
     public readonly List<EnemyBombardierConfigElement> BombardierConfigs = new List<EnemyBombardierConfigElement>();

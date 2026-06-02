@@ -112,12 +112,10 @@ public partial struct EnemyAcidTrailDetachOnDespawnSystem : ISystem
                                                                         in EnemyPatternConfig config)
     {
         float scaleMultiplier = math.max(MinimumScale, config.AcidTrailVfxScaleMultiplier);
-        float trailWidthOverride = 0f;
 
         if (config.AcidTrailScaleVfxToRadius != 0)
         {
             float segmentDiameter = math.max(MinimumScale, segment.Radius * 2f);
-            trailWidthOverride = segmentDiameter * scaleMultiplier;
             scaleMultiplier *= segmentDiameter;
         }
 
@@ -125,17 +123,16 @@ public partial struct EnemyAcidTrailDetachOnDespawnSystem : ISystem
         {
             PrefabEntity = config.AcidTrailVfxPrefabEntity,
             SourcePrefab = default,
-            Position = segment.EndPosition,
+            Position = segment.EndPosition + config.AcidTrailVfxOffset,
             Rotation = quaternion.identity,
             UniformScale = math.max(MinimumScale, scaleMultiplier),
-            TrailRendererWidthOverride = trailWidthOverride,
-            TrailRendererTimeOverrideSeconds = math.max(MinimumLifetimeSeconds, segment.RemainingLifetime),
             LifetimeSeconds = math.max(MinimumLifetimeSeconds, segment.RemainingLifetime),
             FollowTargetEntity = Entity.Null,
             FollowPositionOffset = float3.zero,
             FollowValidationEntity = Entity.Null,
             FollowValidationSpawnVersion = 0u,
-            Velocity = float3.zero
+            Velocity = float3.zero,
+            BypassAreaCellCap = 1
         };
     }
     #endregion

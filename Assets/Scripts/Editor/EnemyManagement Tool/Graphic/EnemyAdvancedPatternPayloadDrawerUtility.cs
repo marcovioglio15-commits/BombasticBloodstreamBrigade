@@ -314,6 +314,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         acidFoldout.Add(acidVfxOptionsContainer);
         EnemyAdvancedPatternDrawerUtility.AddField(acidVfxOptionsContainer, acidProperty.FindPropertyRelative("scaleTrailSegmentVfxToRadius"), "Scale VFX To Radius");
         AddFloatSliderField(acidVfxOptionsContainer, acidProperty.FindPropertyRelative("trailSegmentVfxScaleMultiplier"), "VFX Scale Multiplier", 0.01f, 8f);
+        EnemyAdvancedPatternDrawerUtility.AddField(acidVfxOptionsContainer, acidProperty.FindPropertyRelative("trailSegmentVfxOffset"), "VFX Local Offset");
         RefreshAcidVfxOptionsVisibility(trailSegmentVfxPrefabProperty, acidVfxOptionsContainer);
 
         acidFoldout.TrackPropertyValue(trailSegmentVfxPrefabProperty, changedProperty =>

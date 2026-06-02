@@ -32,6 +32,9 @@ internal static class EnemyAcidTrailBakeUtility
         patternConfig.AcidTrailVfxPrefabEntity = Unity.Entities.Entity.Null;
         patternConfig.AcidTrailScaleVfxToRadius = acid.ScaleTrailSegmentVfxToRadius ? (byte)1 : (byte)0;
         patternConfig.AcidTrailVfxScaleMultiplier = math.max(0.01f, acid.TrailSegmentVfxScaleMultiplier);
+        patternConfig.AcidTrailVfxOffset = new float3(acid.TrailSegmentVfxOffset.x,
+                                                       acid.TrailSegmentVfxOffset.y,
+                                                       acid.TrailSegmentVfxOffset.z);
     }
 
     /// <summary>

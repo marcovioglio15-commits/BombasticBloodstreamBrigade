@@ -86,6 +86,7 @@ public struct EnemyPatternConfig : IComponentData
     public Entity AcidTrailVfxPrefabEntity;
     public byte AcidTrailScaleVfxToRadius;
     public float AcidTrailVfxScaleMultiplier;
+    public float3 AcidTrailVfxOffset;
 }
 
 /// <summary>
