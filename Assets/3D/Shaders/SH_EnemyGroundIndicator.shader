@@ -1,4 +1,4 @@
-Shader "NashCore/Enemy Ground Indicator"
+Shader "Custom/Enemy Ground Indicator"
 {
     // Unlit URP transparent shader that draws the enemy hit-box shadow plus the two
     // concentric fillable rings (health + shield) on a flat quad lying on the world

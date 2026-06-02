@@ -26,7 +26,7 @@ public static class EnemyGroundIndicatorMigrationUtility
     #region Methods
 
     #region Menu Entry
-    [MenuItem(MenuPath)]
+    //[MenuItem(MenuPath)]
     public static void MigrateAllEnemyPrefabs()
     {
         // Resolve the migration material and the built-in Quad mesh once so each prefab reuses them.
