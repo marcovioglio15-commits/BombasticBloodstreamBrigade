@@ -346,26 +346,15 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         return container;
     }
 
+    /// <summary>
+    /// Builds the Damage Feedback subsection by delegating to <see cref="PlayerVisualPresetsPanelDamageFeedbackSectionUtility"/> so the per-channel vignette logic lives in its own utility file.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel providing the serialized preset.</param>
+    /// <returns>Configured subsection element holding the Damage Flash and per-channel Damage Vignette foldouts.</returns>
     private static VisualElement BuildDamageFeedbackSubSection(PlayerVisualPresetsPanel panel)
     {
         VisualElement container = CreateSubSectionContainer("Damage Feedback");
-        SerializedObject presetSerializedObject = panel.PresetSerializedObject;
-
-        AddPropertyField(panel,
-                         container,
-                         presetSerializedObject.FindProperty("damageFlashColor"),
-                         "Flash Color",
-                         "Tint color applied during the brief damage flash after a valid hit.");
-        AddPropertyField(panel,
-                         container,
-                         presetSerializedObject.FindProperty("damageFlashDurationSeconds"),
-                         "Flash Duration Seconds",
-                         "Flash duration in seconds. Use very small values for a 1-3 frame reaction.");
-        AddPropertyField(panel,
-                         container,
-                         presetSerializedObject.FindProperty("damageFlashMaximumBlend"),
-                         "Flash Maximum Blend",
-                         "Maximum overlay strength reached immediately after a valid hit.");
+        PlayerVisualPresetsPanelDamageFeedbackSectionUtility.Build(panel, container);
         return container;
     }
 

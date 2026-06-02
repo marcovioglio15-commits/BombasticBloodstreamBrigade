@@ -120,6 +120,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Maximum overlay strength reached immediately after a valid hit.")]
     [SerializeField] private float damageFlashMaximumBlend = 0.85f;
 
+    [Header("Damage Feedback - Shield Damage Vignette")]
+    [Tooltip("Full-screen overlay played when the player takes damage that is fully absorbed by the shield. Configures the sprite, peak alpha and fade timings driven by the scene UI binder.")]
+    [SerializeField] private PlayerVisualDamageVignetteSettings shieldDamageVignette = new PlayerVisualDamageVignetteSettings();
+
+    [Header("Damage Feedback - Health Damage Vignette")]
+    [Tooltip("Full-screen overlay played when the player takes damage that reaches health. Configures the sprite, peak alpha and fade timings driven by the scene UI binder.")]
+    [SerializeField] private PlayerVisualDamageVignetteSettings healthDamageVignette = new PlayerVisualDamageVignetteSettings();
+
     [Header("VFX")]
     [Tooltip("Optional attached VFX prefab activated while Elemental Trail passive is enabled.")]
     [SerializeField] private GameObject elementalTrailAttachedVfxPrefab;
@@ -354,6 +362,22 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return damageFlashMaximumBlend;
+        }
+    }
+
+    public PlayerVisualDamageVignetteSettings ShieldDamageVignette
+    {
+        get
+        {
+            return shieldDamageVignette;
+        }
+    }
+
+    public PlayerVisualDamageVignetteSettings HealthDamageVignette
+    {
+        get
+        {
+            return healthDamageVignette;
         }
     }
 
@@ -765,10 +789,18 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (scalingRules == null)
             scalingRules = new List<PlayerStatScalingRule>();
 
+        if (shieldDamageVignette == null)
+            shieldDamageVignette = new PlayerVisualDamageVignetteSettings();
+
+        if (healthDamageVignette == null)
+            healthDamageVignette = new PlayerVisualDamageVignetteSettings();
+
         outline.Validate();
         laserBeam.Validate();
         ValidateScalingRules();
         PlayerElementalVfxAssignmentUtility.ValidateAssignments(elementalEnemyVfxByElement);
+        shieldDamageVignette.Validate(name, "Shield Damage Vignette");
+        healthDamageVignette.Validate(name, "Health Damage Vignette");
     }
     #endregion
 

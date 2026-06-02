@@ -120,6 +120,10 @@ public sealed class HUDManager : MonoBehaviour
     [Header("Dropped Power-Up Containers")]
     [Tooltip("Serialized HUD section that handles dropped active power-up prompts and overlay swaps.")]
     [SerializeField] private HUDPowerUpContainerInteractionSection powerUpContainerInteractionSection = new HUDPowerUpContainerInteractionSection();
+
+    [Header("Damage Feedback Vignettes")]
+    [Tooltip("Serialized HUD section that fades the two full-screen damage vignette overlays driven by the active player visual preset.")]
+    [SerializeField] private HUDPlayerDamageVignetteSection damageVignetteSection = new HUDPlayerDamageVignetteSection();
     #endregion
 
     private World defaultWorld;
@@ -166,6 +170,7 @@ public sealed class HUDManager : MonoBehaviour
         comboCounterSection.Initialize();
         milestoneSelectionSection.Initialize();
         powerUpContainerInteractionSection.Initialize();
+        damageVignetteSection.Initialize();
         TryInitializeEcsBindings();
         ApplyInitialVisualState();
     }
@@ -202,6 +207,7 @@ public sealed class HUDManager : MonoBehaviour
         comboCounterSection.Update(entityManager, playerEntity);
         milestoneSelectionSection.Update(entityManager, playerEntity);
         powerUpContainerInteractionSection.Update(entityManager, playerEntity);
+        damageVignetteSection.Update(entityManager, playerEntity);
     }
     #endregion
 
@@ -448,12 +454,14 @@ public sealed class HUDManager : MonoBehaviour
         powerUpOverlaySection.ApplyInitialVisualState();
         runTimerSection.ApplyInitialVisualState();
         comboCounterSection.ApplyInitialVisualState();
+        damageVignetteSection.ApplyInitialVisualState();
 
         HandleMissingLevelText();
         runTimerSection.HandleMissingPlayer();
         comboCounterSection.HandleMissingPlayer();
         milestoneSelectionSection.HandleMissingPlayer();
         powerUpContainerInteractionSection.HandleMissingPlayer();
+        damageVignetteSection.HandleMissingPlayer();
     }
 
     private void HandleMissingPlayer()
@@ -467,6 +475,7 @@ public sealed class HUDManager : MonoBehaviour
         comboCounterSection.HandleMissingPlayer();
         milestoneSelectionSection.HandleMissingPlayer();
         powerUpContainerInteractionSection.HandleMissingPlayer();
+        damageVignetteSection.HandleMissingPlayer();
     }
 
     private void HandleMissingHealthBar()

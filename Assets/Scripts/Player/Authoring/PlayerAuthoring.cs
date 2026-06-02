@@ -582,6 +582,13 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             RemainingSeconds = 0f,
             AppliedBlend = 0f
         });
+
+        // Damage Feedback vignette config + state. The presentation system seeds previous health/shield on the first frame so the initial bake values stay neutral.
+        if (PlayerDamageVignetteBakeUtility.TryBuildConfig(visualPreset, out PlayerDamageVignetteConfig damageVignetteConfig))
+        {
+            AddComponent(entity, damageVignetteConfig);
+            AddComponent(entity, PlayerDamageVignetteBakeUtility.BuildInitialState());
+        }
         Vector3 authoringPosition = authoring.transform.position;
         Quaternion authoringRotation = authoring.transform.rotation;
         AddComponent(entity, new PlayerAnimatedMuzzleWorldPose
