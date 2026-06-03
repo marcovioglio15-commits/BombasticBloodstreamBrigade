@@ -73,6 +73,8 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     private float cachedOuterRadius;
     private float cachedHeightOffset;
     private float2 cachedPositionOffsetXZ;
+    private bool cachedLockRingsToWorld;
+    private float cachedLockedRingsAngleRadians;
     private bool cachedHasShield;
     private bool colorsInitialized;
     private float4 cachedShadowColor;
@@ -151,6 +153,15 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
                                                                              cachedHeightOffset);
         selfTransform.position = targetPosition;
         selfTransform.rotation = GroundPlaneRotation;
+
+        // When the rings are locked to world, the fill anchor stays at the baked angle (camera-independent)
+        // so the depleting gap reveals a fixed world-space direction regardless of camera orientation.
+        if (cachedLockRingsToWorld)
+        {
+            currentCameraAngleRadians = cachedLockedRingsAngleRadians;
+            return;
+        }
+
         currentCameraAngleRadians = EnemyGroundIndicatorFootprintUtility.ResolveCameraFacingAngleRadians(targetPosition,
                                                                                                          cameraTransform,
                                                                                                          currentCameraAngleRadians);
@@ -178,6 +189,8 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
         // having to detect layout-affecting changes first.
         cachedHeightOffset = config.HeightOffset;
         cachedPositionOffsetXZ = config.PositionOffsetXZ;
+        cachedLockRingsToWorld = config.LockRingsToWorld != 0;
+        cachedLockedRingsAngleRadians = config.LockedRingsAngleRadians;
 
         bool layoutChanged = ApplyFootprintLayoutIfChanged(contactRadiusX, contactRadiusZ, in config, hasVisibleShieldRing);
         bool colorsChanged = ApplyColorsIfChanged(in config);

@@ -993,8 +993,23 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.HealthRingBackgroundColor),
             ShieldFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingFillColor),
             ShieldBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingBackgroundColor),
-            SuppressRings = suppressRings ? (byte)1 : (byte)0
+            SuppressRings = suppressRings ? (byte)1 : (byte)0,
+            LockRingsToWorld = authoring.LockRingsToWorld ? (byte)1 : (byte)0,
+            LockedRingsAngleRadians = ConvertWorldHeadingDegreesToPixelAngleRadians(authoring.LockedRingsWorldAngleDegrees)
         };
+    }
+
+    /// <summary>
+    /// Converts an authored world-heading offset (degrees from world +Z rotating clockwise around +Y) into the
+    /// pixel-angle radians expected by the ground indicator shader. The shader resolves the fill arc anchor by
+    /// comparing pixel angles in world XZ space, so we pre-convert at bake time to keep the runtime cost to a
+    /// single component copy.
+    /// </summary>
+    /// <param name="worldHeadingDegrees">Authored world-heading angle in degrees (0 = +Z, 90 = +X).</param>
+    /// <returns>Equivalent pixel angle in radians used by the shader fill-anchor computation.</returns>
+    private static float ConvertWorldHeadingDegreesToPixelAngleRadians(float worldHeadingDegrees)
+    {
+        return math.radians(90f) - math.radians(worldHeadingDegrees);
     }
 
     /// <summary>

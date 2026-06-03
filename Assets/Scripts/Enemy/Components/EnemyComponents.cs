@@ -117,6 +117,8 @@ public struct EnemyGroundIndicatorConfig : IComponentData
     public float4 ShieldFillColor;
     public float4 ShieldBackgroundColor;
     public byte SuppressRings;
+    public byte LockRingsToWorld;
+    public float LockedRingsAngleRadians;
 }
 
 /// <summary>

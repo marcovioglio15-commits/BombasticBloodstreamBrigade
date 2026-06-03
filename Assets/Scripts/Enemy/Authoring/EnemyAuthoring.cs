@@ -30,6 +30,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultShadowEdgeSoftness = 0.08f;
     private const float DefaultRingEdgeSoftness = 0.05f;
     private const float DefaultRingAngularSoftness = 0.02f;
+    private const bool DefaultLockRingsToWorld = false;
+    private const float DefaultLockedRingsWorldAngleDegrees = 0f;
     private static readonly Color DefaultShadowColor = new Color(0f, 0f, 0f, 0.55f);
     private static readonly Color DefaultHealthRingFillColor = new Color(0.92f, 0.18f, 0.16f, 0.95f);
     private static readonly Color DefaultHealthRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
@@ -1078,6 +1080,32 @@ public sealed class EnemyAuthoring : MonoBehaviour
                 return DefaultRingAngularSoftness;
 
             return settings.RingAngularSoftness;
+        }
+    }
+
+    public bool LockRingsToWorld
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultLockRingsToWorld;
+
+            return settings.LockRingsToWorld;
+        }
+    }
+
+    public float LockedRingsWorldAngleDegrees
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultLockedRingsWorldAngleDegrees;
+
+            return settings.LockedRingsWorldAngleDegrees;
         }
     }
 

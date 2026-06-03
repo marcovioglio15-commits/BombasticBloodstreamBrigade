@@ -79,6 +79,14 @@ public sealed class EnemyVisualFootprintSettings
     [SerializeField] private float ringAngularSoftness = 0.02f;
     #endregion
 
+    #region Ring Orientation
+    [Tooltip("When enabled, the fillable arcs stop tracking the active camera and stay anchored to a fixed world-space direction defined by Locked Ring World Angle. Useful for top-down cameras where camera-facing rotation is undesired.")]
+    [SerializeField] private bool lockRingsToWorld;
+
+    [Tooltip("World-space anchor direction for the depleting fill when Lock Rings To World is enabled, expressed as a degree offset from world forward (+Z) rotating clockwise around +Y. 0 = +Z, 90 = +X, 180 = -Z, 270 = -X.")]
+    [SerializeField] private float lockedRingsWorldAngleDegrees;
+    #endregion
+
     #endregion
 
     #endregion
@@ -209,6 +217,22 @@ public sealed class EnemyVisualFootprintSettings
         get
         {
             return ringAngularSoftness;
+        }
+    }
+
+    public bool LockRingsToWorld
+    {
+        get
+        {
+            return lockRingsToWorld;
+        }
+    }
+
+    public float LockedRingsWorldAngleDegrees
+    {
+        get
+        {
+            return lockedRingsWorldAngleDegrees;
         }
     }
     #endregion

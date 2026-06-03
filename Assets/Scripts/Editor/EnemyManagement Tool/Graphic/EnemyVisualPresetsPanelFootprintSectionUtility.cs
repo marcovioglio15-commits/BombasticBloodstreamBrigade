@@ -191,6 +191,39 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                                 "shieldRingBackgroundColor",
                                                                 "Shield Ring Background Color",
                                                                 "Background color of the shield ring track shown behind the depleting fill. Alpha controls track opacity.");
+        BuildRingOrientationControls(panel, container, footprintProperty);
+    }
+
+    /// <summary>
+    /// Builds the ring-orientation controls. The locked-angle slider is shown only when Lock Rings To World
+    /// is enabled, since otherwise the fill anchor tracks the active camera and the authored angle is unused.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel.</param>
+    /// <param name="container">Container receiving the controls.</param>
+    /// <param name="footprintProperty">Serialized footprint settings property.</param>
+    private static void BuildRingOrientationControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    {
+        SerializedProperty lockProperty = footprintProperty.FindPropertyRelative("lockRingsToWorld");
+
+        if (lockProperty == null)
+            return;
+
+        EnemyVisualPresetsPanelSectionsUtility.AddReactiveToggleField(panel,
+                                                                       container,
+                                                                       lockProperty,
+                                                                       "Lock Rings To World",
+                                                                       "When enabled, the fillable arcs stop tracking the active camera and stay anchored to a fixed world-space direction defined by Locked Rings World Angle.");
+
+        if (!lockProperty.boolValue)
+            return;
+
+        EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
+                                                              container,
+                                                              footprintProperty.FindPropertyRelative("lockedRingsWorldAngleDegrees"),
+                                                              "Locked Rings World Angle",
+                                                              0f,
+                                                              360f,
+                                                              "World-space anchor direction for the depleting fill, expressed as a degree offset from world forward (+Z) rotating clockwise around +Y. 0 = +Z, 90 = +X, 180 = -Z, 270 = -X.");
     }
 
     /// <summary>
@@ -226,6 +259,11 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
         AddRangeWarning(footprintProperty, container, "ringArcDegrees", 0.0001f, EnemyVisualFootprintSettings.DefaultRingArcDegrees, "Ring Arc Degrees should be greater than 0 and at most 360 degrees.");
         AddRangeWarning(footprintProperty, container, "ringEdgeSoftness", 0f, 1f, "Ring Edge Softness should stay between 0 and 1.");
         AddRangeWarning(footprintProperty, container, "ringAngularSoftness", 0f, 1f, "Ring Angular Softness should stay between 0 and 1 radians.");
+
+        SerializedProperty lockProperty = footprintProperty.FindPropertyRelative("lockRingsToWorld");
+
+        if (lockProperty != null && lockProperty.boolValue)
+            AddRangeWarning(footprintProperty, container, "lockedRingsWorldAngleDegrees", 0f, 360f, "Locked Rings World Angle should stay between 0 and 360 degrees.");
     }
 
     /// <summary>

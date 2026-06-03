@@ -29,16 +29,16 @@ MonoBehaviour:
   damageFlashMaximumBlend: 10
   shieldDamageVignette:
     sprite: {fileID: 21300000, guid: 0148305d60e820946807162d30836940, type: 3}
+    maxAlpha: 0.7
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    fadeInSeconds: 0.1
+    fadeOutSeconds: 0.7
+  healthDamageVignette:
+    sprite: {fileID: 21300000, guid: 0953df81232c20e48a8e8c23eda0c918, type: 3}
     maxAlpha: 1
     tint: {r: 1, g: 1, b: 1, a: 1}
     fadeInSeconds: 0.1
-    fadeOutSeconds: 0.5
-  healthDamageVignette:
-    sprite: {fileID: 21300000, guid: 0953df81232c20e48a8e8c23eda0c918, type: 3}
-    maxAlpha: 0.4
-    tint: {r: 1, g: 1, b: 1, a: 1}
-    fadeInSeconds: 0.1
-    fadeOutSeconds: 0.45
+    fadeOutSeconds: 0.7
   elementalTrailAttachedVfxPrefab: {fileID: 5127294714520930670, guid: f9f4969fbeb739b4ab67598bba82a55e, type: 3}
   elementalTrailAttachedVfxScaleMultiplier: 1
   elementalEnemyVfxByElement:

@@ -557,11 +557,11 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="property">Serialized boolean property.</param>
     /// <param name="label">Visible control label.</param>
     /// <param name="tooltip">Tooltip explaining the setting.</param>
-    private static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
-                                               VisualElement target,
-                                               SerializedProperty property,
-                                               string label,
-                                               string tooltip)
+    internal static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
+                                                VisualElement target,
+                                                SerializedProperty property,
+                                                string label,
+                                                string tooltip)
     {
         AddReactiveToggleField(panel, target, property, label, tooltip, "Edit Enemy Visual Settings");
     }
@@ -575,12 +575,12 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="label">Visible control label.</param>
     /// <param name="tooltip">Tooltip explaining the setting.</param>
     /// <param name="undoLabel">Undo label used for the serialized edit.</param>
-    private static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
-                                               VisualElement target,
-                                               SerializedProperty property,
-                                               string label,
-                                               string tooltip,
-                                               string undoLabel)
+    internal static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
+                                                VisualElement target,
+                                                SerializedProperty property,
+                                                string label,
+                                                string tooltip,
+                                                string undoLabel)
     {
         if (panel == null || target == null || property == null)
             return;

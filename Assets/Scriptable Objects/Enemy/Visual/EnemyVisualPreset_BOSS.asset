@@ -48,6 +48,8 @@ MonoBehaviour:
     shieldRingBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}
     ringEdgeSoftness: 0.05
     ringAngularSoftness: 0.02
+    lockRingsToWorld: 0
+    lockedRingsWorldAngleDegrees: 0
   offensiveEngagementFeedback:
     enableColorBlend: 0
     colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
