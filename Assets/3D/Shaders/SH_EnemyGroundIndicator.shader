@@ -19,9 +19,9 @@ Shader "Custom/Enemy Ground Indicator"
         // outer ring radius used to convert UV into local ellipse coordinates.
         _Fill("Fill (healthN, shieldN, cameraAngleRad, outerRadius)", Vector) = (1, 0, 0, 0.5)
 
-        // Softness controls: ring radial AA, angular AA at arc edges, and visible
-        // ring arc width in radians. 2PI keeps the legacy full-ring presentation.
-        _Softness("Softness (ringEdge, ringAngular, ringArcRad, _)", Vector) = (0.05, 0.02, 6.28318530718, 0)
+        // Softness controls: ring radial AA, angular AA at arc edges, visible
+        // ring arc width in radians, and a 0/1 flag that hides every ring layer.
+        _Softness("Softness (ringEdge, ringAngular, ringArcRad, ringsVisible)", Vector) = (0.05, 0.02, 6.28318530718, 1)
 
         _ShadowColor("Shadow Color", Color) = (0, 0, 0, 0.55)
         _HealthFillColor("Health Fill Color", Color) = (0.92, 0.18, 0.16, 0.95)
@@ -188,6 +188,7 @@ Shader "Custom/Enemy Ground Indicator"
                 float ringThickness = max(0.0, _RingParams.y);
                 float ringSpacing = max(0.0, _RingParams.z);
                 float hasShield = saturate(_RingParams.w);
+                float ringsVisible = saturate(_Softness.w);
 
                 float healthInnerRadius = averageHitRadius + ringDistance;
                 float healthOuterRadius = healthInnerRadius + ringThickness;
@@ -201,8 +202,8 @@ Shader "Custom/Enemy Ground Indicator"
                 float deltaAngle = WrapToPi(pixelAngle - cameraAngle);
 
                 float ringArcMask = ResolveArcAngularMask(deltaAngle, _Softness.z, _Softness.y);
-                float healthBand = ResolveRingBandMask(radiusForRing, healthInnerRadius, healthOuterRadius, ringRadialSoftness) * ringArcMask;
-                float shieldBand = ResolveRingBandMask(radiusForRing, shieldInnerRadius, shieldOuterRadius, ringRadialSoftness) * hasShield * ringArcMask;
+                float healthBand = ResolveRingBandMask(radiusForRing, healthInnerRadius, healthOuterRadius, ringRadialSoftness) * ringArcMask * ringsVisible;
+                float shieldBand = ResolveRingBandMask(radiusForRing, shieldInnerRadius, shieldOuterRadius, ringRadialSoftness) * hasShield * ringArcMask * ringsVisible;
                 float healthFillMask = ResolveFillAngularMask(deltaAngle, _Fill.x, _Softness.z, _Softness.y);
                 float shieldFillMask = ResolveFillAngularMask(deltaAngle, _Fill.y, _Softness.z, _Softness.y);
 

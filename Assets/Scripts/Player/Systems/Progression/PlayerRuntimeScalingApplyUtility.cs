@@ -33,6 +33,9 @@ internal static class PlayerRuntimeScalingApplyUtility
     /// <param name="runtimeAppliedElementSlots">Mutable applied-element slot buffer rebuilt in place.</param>
     /// <param name="baseHealth">Immutable health baseline.</param>
     /// <param name="runtimeHealth">Mutable runtime health config rebuilt in place.</param>
+    /// <param name="baseDeathAnimation">Immutable death-animation baseline.</param>
+    /// <param name="runtimeDeathAnimation">Mutable runtime death-animation config rebuilt in place.</param>
+    /// <param name="deathAnimationScaling">Death-animation visual scaling metadata baked from Add Scaling rules.</param>
     /// <param name="progressionScaling">Progression scaling metadata baked from Add Scaling rules.</param>
     /// <param name="baseGamePhases">Immutable progression-phase baselines.</param>
     /// <param name="runtimeGamePhases">Mutable runtime progression phases rebuilt in place.</param>
@@ -67,6 +70,9 @@ internal static class PlayerRuntimeScalingApplyUtility
                                 DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlots,
                                 in PlayerBaseHealthStatisticsConfig baseHealth,
                                 ref PlayerRuntimeHealthStatisticsConfig runtimeHealth,
+                                in PlayerBaseDeathAnimationConfig baseDeathAnimation,
+                                ref PlayerDeathAnimationConfig runtimeDeathAnimation,
+                                DynamicBuffer<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScaling,
                                 DynamicBuffer<PlayerRuntimeProgressionScalingElement> progressionScaling,
                                 DynamicBuffer<PlayerBaseGamePhaseElement> baseGamePhases,
                                 DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
@@ -136,6 +142,7 @@ internal static class PlayerRuntimeScalingApplyUtility
         runtimeShooting = PlayerRuntimeScalingControllerFieldApplyUtility.CopyShooting(in baseShooting);
         PlayerElementBulletSettingsUtility.CopyBaseAppliedElementsToRuntime(baseAppliedElementSlots, runtimeAppliedElementSlots);
         runtimeHealth = PlayerRuntimeScalingControllerFieldApplyUtility.CopyHealth(in baseHealth);
+        runtimeDeathAnimation = PlayerRuntimeScalingDeathAnimationApplyUtility.CopyDeathAnimation(in baseDeathAnimation);
         ApplyControllerScaling(controllerScaling,
                                ref runtimeMovement,
                                ref runtimeLook,
@@ -143,6 +150,9 @@ internal static class PlayerRuntimeScalingApplyUtility
                                ref runtimeShooting,
                                runtimeAppliedElementSlots,
                                ref runtimeHealth);
+        PlayerRuntimeScalingDeathAnimationApplyUtility.ApplyScaling(deathAnimationScaling,
+                                                                    variableContext,
+                                                                    ref runtimeDeathAnimation);
         RebuildRuntimeGamePhases(baseGamePhases, runtimeGamePhases, progressionScaling);
         SyncPowerUpConfigs(basePowerUpConfigs, powerUpScaling, ref powerUpsConfig, unlockCatalog, equippedPassiveTools);
         PlayerPassiveToolsAggregationUtility.RebuildPassiveToolsState(equippedPassiveTools,

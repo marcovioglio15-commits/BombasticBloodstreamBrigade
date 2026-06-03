@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 /// <summary>
@@ -38,6 +39,8 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         state.RequireForUpdate<PlayerLaserBeamSourceVariantElement>();
         state.RequireForUpdate<PlayerLaserBeamImpactVariantElement>();
         state.RequireForUpdate<PlayerLaserBeamVisualPresetElement>();
+        state.RequireForUpdate<PlayerRuntimeShootingConfig>();
+        state.RequireForUpdate<LocalTransform>();
     }
 
     /// <summary>
@@ -75,6 +78,9 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         BufferLookup<PlayerLaserBeamSourceVariantElement> sourceVariantLookup = SystemAPI.GetBufferLookup<PlayerLaserBeamSourceVariantElement>(true);
         BufferLookup<PlayerLaserBeamImpactVariantElement> impactVariantLookup = SystemAPI.GetBufferLookup<PlayerLaserBeamImpactVariantElement>(true);
         BufferLookup<PlayerLaserBeamVisualPresetElement> visualPresetLookup = SystemAPI.GetBufferLookup<PlayerLaserBeamVisualPresetElement>(true);
+        ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
+        ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        ComponentLookup<Parent> parentLookup = SystemAPI.GetComponentLookup<Parent>(true);
         float elapsedTimeSeconds = (float)SystemAPI.Time.ElapsedTime;
         float deltaTimeSeconds = SystemAPI.Time.DeltaTime;
 
@@ -83,12 +89,16 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                   DynamicBuffer<PlayerLaserBeamStormTickPulse> stormTickPulses,
                   DynamicBuffer<PlayerLaserBeamLaneElement> laserBeamLanes,
                   RefRO<PlayerLaserBeamVisualConfig> visualConfig,
+                  RefRO<LocalTransform> localTransform,
+                  RefRO<PlayerRuntimeShootingConfig> runtimeShootingConfig,
                   Entity playerEntity)
                  in SystemAPI.Query<DynamicBuffer<PlayerPassiveToolsStateElement>,
                                     RefRO<PlayerLaserBeamState>,
                                     DynamicBuffer<PlayerLaserBeamStormTickPulse>,
                                     DynamicBuffer<PlayerLaserBeamLaneElement>,
-                                    RefRO<PlayerLaserBeamVisualConfig>>()
+                                    RefRO<PlayerLaserBeamVisualConfig>,
+                                    RefRO<LocalTransform>,
+                                    RefRO<PlayerRuntimeShootingConfig>>()
                              .WithEntityAccess())
         {
             if (!sourceVariantLookup.HasBuffer(playerEntity) ||
@@ -116,6 +126,13 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
             if (!shouldRender)
             {
                 PlayerLaserBeamPresentationRuntimeUtility.DisableManagedInstance(playerEntity, managedInstances);
+                FollowShutdownTailIfActive(playerEntity,
+                                           in localTransform.ValueRO,
+                                           in runtimeShootingConfig.ValueRO,
+                                           in visualConfig.ValueRO,
+                                           in muzzleLookup,
+                                           in transformLookup,
+                                           in parentLookup);
                 continue;
             }
 
@@ -154,6 +171,10 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
 
             if (!managedInstance.RootObject.activeSelf)
                 managedInstance.RootObject.SetActive(true);
+
+            PlayerLaserBeamPresentationShutdownTailUtility.RecordActivePose(managedInstance,
+                                                                            laneEndpoints[0].MuzzlePoint,
+                                                                            PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO));
 
             PlayerLaserBeamResolvedPalette palette = PlayerLaserBeamPresentationRuntimeGeometryUtility.ResolvePalette(laserBeamConfig.VisualPresetId,
                                                                                                                        visualPresetBuffer);
@@ -240,6 +261,46 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         }
 
         PlayerLaserBeamPresentationRuntimeUtility.AdvanceManagedInstanceShutdownTails(managedInstances, deltaTimeSeconds);
+    }
+    #endregion
+
+    #region Shutdown Tail
+    /// <summary>
+    /// Updates the fading managed tail so its source remains attached to the current player muzzle pose after release.
+    /// </summary>
+    /// <param name="playerEntity">Player entity owning the managed beam instance.</param>
+    /// <param name="localTransform">Current player transform used to resolve direction and fallback origin.</param>
+    /// <param name="runtimeShootingConfig">Runtime shooting config used to resolve the authored muzzle offset.</param>
+    /// <param name="visualConfig">Visual config that provides the beam vertical lift applied to rendered anchors.</param>
+    /// <param name="muzzleLookup">Lookup used to read the baked muzzle anchor entity.</param>
+    /// <param name="transformLookup">Lookup used to read local transforms along the muzzle hierarchy.</param>
+    /// <param name="parentLookup">Lookup used to climb from the muzzle anchor back to the player entity.</param>
+    private static void FollowShutdownTailIfActive(Entity playerEntity,
+                                                   in LocalTransform localTransform,
+                                                   in PlayerRuntimeShootingConfig runtimeShootingConfig,
+                                                   in PlayerLaserBeamVisualConfig visualConfig,
+                                                   in ComponentLookup<ShooterMuzzleAnchor> muzzleLookup,
+                                                   in ComponentLookup<LocalTransform> transformLookup,
+                                                   in ComponentLookup<Parent> parentLookup)
+    {
+        PlayerLaserBeamManagedInstance managedInstance;
+
+        if (!managedInstances.TryGetValue(playerEntity, out managedInstance))
+            return;
+
+        if (managedInstance == null || managedInstance.ShutdownTailActive == 0)
+            return;
+
+        float3 anchorPoint = PlayerLaserBeamUtility.ResolveCurrentFrameSpawnPosition(playerEntity,
+                                                                                     in localTransform,
+                                                                                     in runtimeShootingConfig,
+                                                                                     in muzzleLookup,
+                                                                                     in transformLookup,
+                                                                                     in parentLookup);
+        anchorPoint.y += visualConfig.VerticalLift;
+        PlayerLaserBeamPresentationShutdownTailUtility.FollowShutdownTail(managedInstance,
+                                                                          anchorPoint,
+                                                                          PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform));
     }
     #endregion
 

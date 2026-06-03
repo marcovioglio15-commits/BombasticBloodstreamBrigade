@@ -12,7 +12,10 @@ internal sealed class PlayerLaserBeamManagedInstance
     public Transform RootTransform;
     public float ShutdownTailRemainingSeconds;
     public float ShutdownTailLastFadeNormalized;
+    public float3 ShutdownTailAnchorPoint;
+    public float3 ShutdownTailDirection;
     public byte ShutdownTailActive;
+    public byte ShutdownTailAnchorInitialized;
     public readonly List<PlayerLaserBeamManagedBodyVisual> BodyVisuals = new List<PlayerLaserBeamManagedBodyVisual>(16);
     public readonly List<PlayerLaserBeamManagedParticleVisual> SourceVisuals = new List<PlayerLaserBeamManagedParticleVisual>(8);
     public readonly List<PlayerLaserBeamManagedParticleVisual> TerminalCapVisuals = new List<PlayerLaserBeamManagedParticleVisual>(8);

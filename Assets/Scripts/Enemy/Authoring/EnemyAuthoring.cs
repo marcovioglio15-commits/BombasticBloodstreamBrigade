@@ -25,6 +25,7 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultSpatialUiRingSpacing = 0.03f;
     private const float DefaultSpatialUiHeightOffset = 0.035f;
     private const float DefaultRingDistanceFromShadow = 0.05f;
+    private const bool DefaultHealthRingsEnabled = true;
     private static readonly Vector2 DefaultPositionOffsetXZ = Vector2.zero;
     private const float DefaultShadowAlpha = 1f;
     private const float DefaultShadowEdgeSoftness = 0.08f;
@@ -927,6 +928,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public bool HealthRingsEnabled
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultHealthRingsEnabled;
+
+            return settings.HealthRingsEnabled;
+        }
+    }
+
     public float RingDistanceFromShadow
     {
         get
@@ -1267,6 +1281,9 @@ public sealed class EnemyAuthoring : MonoBehaviour
         // Contact damage hit area (white) — drawn as a circle on the local XZ plane.
         Gizmos.color = new Color(1f, 1f, 1f, 0.85f);
         DrawEllipseGizmo(origin, bakedContactRadius, bakedContactRadius);
+
+        if (!HealthRingsEnabled)
+            return;
 
         // Health ring band (red) — radii are taken from the contact circle outer edge.
         float healthInner = math.max(0.001f, bakedContactRadius + ringDistance);

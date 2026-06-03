@@ -28,13 +28,19 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
             return;
 
-        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
+        // Dying bypasses the hard-pause gate: room-fixed cameras must still receive the shake offset and roll while the
+        // freeze system pins gameplay time to zero on the lethal hit.
+        bool isDying = PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery);
+
+        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning && !isDying)
             return;
 
         if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera))
             return;
 
-        float deltaTime = ResolvePresentationDeltaTime(SystemAPI.Time.DeltaTime, isSceneTransitioning);
+        float deltaTime = PlayerGameplayPauseUtility.ResolveFeedbackDeltaTime(SystemAPI.Time.DeltaTime,
+                                                                              runOutcomeQuery,
+                                                                              isSceneTransitioning);
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
@@ -72,20 +78,12 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
             float3 newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
             PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
+            // FOV is intentionally not applied here: PlayerCameraFollowSystem (the single trauma owner) already wrote it
+            // once per frame, so re-applying would double-count the delta against PreviousAppliedFovDelta.
             break;
         }
     }
 
-    #endregion
-
-    #region Helpers
-    private static float ResolvePresentationDeltaTime(float scaledDeltaTime, bool isSceneTransitioning)
-    {
-        if (!isSceneTransitioning || scaledDeltaTime > 0f)
-            return scaledDeltaTime;
-
-        return Time.unscaledDeltaTime;
-    }
     #endregion
 
 }

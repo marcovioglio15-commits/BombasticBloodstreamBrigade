@@ -79,6 +79,26 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe CameraShakeMotionMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static CameraShakeMotionMode ResolveCameraShakeMotionMode(float value)
+    {
+        return (CameraShakeMotionMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe CameraShakeRumbleMotionMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static CameraShakeRumbleMotionMode ResolveCameraShakeRumbleMotionMode(float value)
+    {
+        return (CameraShakeRumbleMotionMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe ShootingTriggerMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>
@@ -306,6 +326,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     public static LaserBeamCapShape ResolveLaserBeamCapShape(float value)
     {
         return (LaserBeamCapShape)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
+    /// Resolves a safe PlayerDeathAnimationEasing from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static PlayerDeathAnimationEasing ResolvePlayerDeathAnimationEasing(float value)
+    {
+        return (PlayerDeathAnimationEasing)ResolveEnumIndex(value, 3);
     }
     #endregion
 

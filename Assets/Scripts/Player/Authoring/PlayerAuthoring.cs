@@ -383,6 +383,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerProgressionPreset progressionPreset = authoring.GetProgressionPreset();
         PlayerPowerUpsPreset powerUpsPreset = authoring.GetPowerUpsPreset();
         PlayerVisualPreset visualPreset = authoring.MasterPreset != null ? authoring.MasterPreset.VisualPreset : null;
+        PlayerVisualPreset sourceVisualPreset = visualPreset;
         PlayerProgressionPreset sourceProgressionPreset = progressionPreset;
         PlayerPowerUpsPreset sourcePowerUpsPreset = powerUpsPreset;
         PlayerAnimationBindingsPreset animationBindingsPreset = authoring.MasterPreset != null ? authoring.MasterPreset.AnimationBindingsPreset : null;
@@ -589,6 +590,23 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             AddComponent(entity, damageVignetteConfig);
             AddComponent(entity, PlayerDamageVignetteBakeUtility.BuildInitialState());
         }
+
+        // Death animation config + state. Always present on the player entity (defaults are used when no visual preset
+        // authors the section) so PlayerRunOutcomeSystem can always read the dying-window duration from one place.
+        PlayerDeathAnimationBakeUtility.BuildConfig(visualPreset,
+                                                     out PlayerDeathAnimationConfig deathAnimationConfig,
+                                                     out GameObject deathAnimationDespawnVfxPrefab);
+        AddComponent(entity, PlayerDeathAnimationBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(entity, deathAnimationConfig);
+        AddComponent(entity, PlayerDeathAnimationBakeUtility.BuildInitialState());
+        AddComponentObject(entity, new PlayerDeathAnimationManagedConfig
+        {
+            DespawnVfxPrefab = deathAnimationDespawnVfxPrefab
+        });
+        DynamicBuffer<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingBuffer = AddBuffer<PlayerRuntimeDeathAnimationScalingElement>(entity);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulateDeathAnimationScalingMetadata(sourceVisualPreset, deathAnimationScalingBuffer);
+#endif
         Vector3 authoringPosition = authoring.transform.position;
         Quaternion authoringRotation = authoring.transform.rotation;
         AddComponent(entity, new PlayerAnimatedMuzzleWorldPose

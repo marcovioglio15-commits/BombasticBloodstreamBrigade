@@ -19,11 +19,48 @@ public static class PlayerLaserBeamUtility
     public const float MaximumSupportedBodyWidth = 12f;
     public const int MaximumSupportedBounceSegments = 12;
     private const float DirectionEpsilon = 1e-6f;
+    private const int MaximumMuzzleParentHops = 24;
     #endregion
 
     #region Methods
 
     #region Public Methods
+    #region Current-Frame Origin
+    /// <summary>
+    /// Resolves the Laser Beam origin from the latest player transform and baked muzzle hierarchy data.
+    /// This avoids reading child LocalToWorld inside the controller group, where transform-system output can still
+    /// represent the previous frame while the player LocalTransform has already advanced.
+    /// </summary>
+    /// <param name="playerEntity">Player entity that owns the active Laser Beam.</param>
+    /// <param name="playerTransform">Current player transform after controller movement and look rotation.</param>
+    /// <param name="runtimeShootingConfig">Runtime shooting config that provides the authored local shoot offset.</param>
+    /// <param name="muzzleLookup">Lookup used to read the baked muzzle anchor entity.</param>
+    /// <param name="transformLookup">Lookup used to read local transforms along the muzzle hierarchy.</param>
+    /// <param name="parentLookup">Lookup used to climb from the muzzle anchor back to the player entity.</param>
+    /// <returns>Current-frame world-space Laser Beam spawn position.</returns>
+    internal static float3 ResolveCurrentFrameSpawnPosition(Entity playerEntity,
+                                                            in LocalTransform playerTransform,
+                                                            in PlayerRuntimeShootingConfig runtimeShootingConfig,
+                                                            in ComponentLookup<ShooterMuzzleAnchor> muzzleLookup,
+                                                            in ComponentLookup<LocalTransform> transformLookup,
+                                                            in ComponentLookup<Parent> parentLookup)
+    {
+        float3 shootOffset = runtimeShootingConfig.ShootOffset;
+
+        if (TryResolveCurrentFrameMuzzlePose(playerEntity,
+                                             in playerTransform,
+                                             in muzzleLookup,
+                                             in transformLookup,
+                                             in parentLookup,
+                                             out float3 muzzlePosition,
+                                             out quaternion muzzleRotation))
+            return muzzlePosition + math.rotate(muzzleRotation, shootOffset);
+
+        return playerTransform.Position + math.rotate(playerTransform.Rotation, shootOffset);
+    }
+    #endregion
+
+    #region Runtime Geometry
     /// <summary>
     /// Resolves the current Laser Beam travel budget from active time, virtual projectile speed and base range or lifetime limits.
     /// </summary>
@@ -371,8 +408,101 @@ public static class PlayerLaserBeamUtility
         return appendedSegments > 0;
     }
     #endregion
+    #endregion
 
     #region Private Methods
+    #region Current-Frame Origin
+    /// <summary>
+    /// Attempts to reconstruct a muzzle pose against the current player transform without consuming LocalToWorld output.
+    /// The baked local hierarchy is composed upward until it reaches the player, then the latest player pose is applied.
+    /// </summary>
+    /// <param name="playerEntity">Player entity that owns the muzzle anchor reference.</param>
+    /// <param name="playerTransform">Current player transform used as the root pose.</param>
+    /// <param name="muzzleLookup">Lookup used to read the baked muzzle anchor entity.</param>
+    /// <param name="transformLookup">Lookup used to read local transforms along the muzzle hierarchy.</param>
+    /// <param name="parentLookup">Lookup used to climb from the muzzle anchor back to the player entity.</param>
+    /// <param name="position">Resolved current-frame muzzle position.</param>
+    /// <param name="rotation">Resolved current-frame muzzle rotation.</param>
+    /// <returns>True when a current-frame muzzle pose could be resolved.</returns>
+    private static bool TryResolveCurrentFrameMuzzlePose(Entity playerEntity,
+                                                         in LocalTransform playerTransform,
+                                                         in ComponentLookup<ShooterMuzzleAnchor> muzzleLookup,
+                                                         in ComponentLookup<LocalTransform> transformLookup,
+                                                         in ComponentLookup<Parent> parentLookup,
+                                                         out float3 position,
+                                                         out quaternion rotation)
+    {
+        if (!muzzleLookup.HasComponent(playerEntity))
+        {
+            position = float3.zero;
+            rotation = quaternion.identity;
+            return false;
+        }
+
+        Entity muzzleEntity = muzzleLookup[playerEntity].AnchorEntity;
+
+        if (muzzleEntity == Entity.Null || !transformLookup.HasComponent(muzzleEntity))
+        {
+            position = float3.zero;
+            rotation = quaternion.identity;
+            return false;
+        }
+
+        LocalTransform accumulatedTransform = transformLookup[muzzleEntity];
+        Entity currentEntity = muzzleEntity;
+
+        // Compose local transforms toward the player so lateral motion uses the current player frame, not stale LocalToWorld data.
+        for (int hopIndex = 0; hopIndex < MaximumMuzzleParentHops; hopIndex++)
+        {
+            if (!parentLookup.HasComponent(currentEntity))
+            {
+                position = accumulatedTransform.Position;
+                rotation = accumulatedTransform.Rotation;
+                return true;
+            }
+
+            Entity parentEntity = parentLookup[currentEntity].Value;
+
+            if (parentEntity == playerEntity)
+            {
+                LocalTransform worldTransform = ComposeChildTransform(in playerTransform, in accumulatedTransform);
+                position = worldTransform.Position;
+                rotation = worldTransform.Rotation;
+                return true;
+            }
+
+            if (parentEntity == Entity.Null || !transformLookup.HasComponent(parentEntity))
+                break;
+
+            LocalTransform parentTransform = transformLookup[parentEntity];
+            accumulatedTransform = ComposeChildTransform(in parentTransform, in accumulatedTransform);
+            currentEntity = parentEntity;
+        }
+
+        position = float3.zero;
+        rotation = quaternion.identity;
+        return false;
+    }
+
+    /// <summary>
+    /// Composes one child transform into its parent space using Unity.Entities uniform-scale transform semantics.
+    /// </summary>
+    /// <param name="parentTransform">Parent transform that defines the destination space.</param>
+    /// <param name="childTransform">Child transform expressed in parent local space.</param>
+    /// <returns>Child transform expressed in the parent parent's space.</returns>
+    private static LocalTransform ComposeChildTransform(in LocalTransform parentTransform,
+                                                        in LocalTransform childTransform)
+    {
+        return new LocalTransform
+        {
+            Position = parentTransform.Position + math.rotate(parentTransform.Rotation, childTransform.Position * parentTransform.Scale),
+            Rotation = math.mul(parentTransform.Rotation, childTransform.Rotation),
+            Scale = parentTransform.Scale * childTransform.Scale
+        };
+    }
+    #endregion
+
+    #region Runtime Bounds
     /// <summary>
     /// Resolves the absolute maximum travel distance allowed by the inherited range and lifetime caps.
     /// </summary>
@@ -417,6 +547,7 @@ public static class PlayerLaserBeamUtility
                IsFinite(value.y) &&
                IsFinite(value.z);
     }
+    #endregion
     #endregion
 
     #endregion

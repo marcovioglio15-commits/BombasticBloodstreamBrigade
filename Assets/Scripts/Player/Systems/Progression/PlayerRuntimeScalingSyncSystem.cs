@@ -49,6 +49,9 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
                                  .WithAll<PlayerRuntimeShootingAppliedElementSlot>()
                                  .WithAll<PlayerBaseHealthStatisticsConfig>()
                                  .WithAll<PlayerRuntimeHealthStatisticsConfig>()
+                                 .WithAll<PlayerBaseDeathAnimationConfig>()
+                                 .WithAll<PlayerDeathAnimationConfig>()
+                                 .WithAll<PlayerRuntimeDeathAnimationScalingElement>()
                                  .WithAll<PlayerRuntimeProgressionScalingElement>()
                                  .WithAll<PlayerBaseGamePhaseElement>()
                                  .WithAll<PlayerRuntimeGamePhaseElement>()
@@ -97,6 +100,9 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(false);
         ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup = SystemAPI.GetComponentLookup<PlayerBaseHealthStatisticsConfig>(true);
         ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup = SystemAPI.GetComponentLookup<PlayerRuntimeHealthStatisticsConfig>(false);
+        ComponentLookup<PlayerBaseDeathAnimationConfig> baseDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerBaseDeathAnimationConfig>(true);
+        ComponentLookup<PlayerDeathAnimationConfig> runtimeDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerDeathAnimationConfig>(false);
+        BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeDeathAnimationScalingElement>(true);
         BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProgressionScalingElement>(true);
         BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerBaseGamePhaseElement>(true);
         BufferLookup<PlayerRuntimeGamePhaseElement> runtimeGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerRuntimeGamePhaseElement>(false);
@@ -141,6 +147,9 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
                                                                  runtimeAppliedElementSlotsLookup,
                                                                  baseHealthLookup,
                                                                  runtimeHealthLookup,
+                                                                 baseDeathAnimationLookup,
+                                                                 runtimeDeathAnimationLookup,
+                                                                 deathAnimationScalingLookup,
                                                                  progressionScalingLookup,
                                                                  baseGamePhasesLookup,
                                                                  runtimeGamePhasesLookup,

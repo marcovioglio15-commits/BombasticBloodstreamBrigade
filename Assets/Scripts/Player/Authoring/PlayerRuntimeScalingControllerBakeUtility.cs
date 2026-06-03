@@ -466,6 +466,33 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
             case "cameraSettings.damageShake.rumbleHighFrequency":
                 fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleHighFrequency;
                 return true;
+            case "cameraSettings.damageShake.motionMode":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeMotionMode;
+                return true;
+            case "cameraSettings.damageShake.axisRightEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeAxisRightEnabled;
+                return true;
+            case "cameraSettings.damageShake.axisUpEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeAxisUpEnabled;
+                return true;
+            case "cameraSettings.damageShake.axisForwardEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeAxisForwardEnabled;
+                return true;
+            case "cameraSettings.damageShake.forwardAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeForwardAmplitude;
+                return true;
+            case "cameraSettings.damageShake.zoomEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeZoomEnabled;
+                return true;
+            case "cameraSettings.damageShake.zoomFovDelta":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeZoomFovDelta;
+                return true;
+            case "cameraSettings.damageShake.rumbleMotionMode":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleMotionMode;
+                return true;
+            case "cameraSettings.damageShake.rumbleImpulseDurationSeconds":
+                fieldId = PlayerRuntimeControllerFieldId.CameraShakeRumbleImpulseDuration;
+                return true;
             case "cameraSettings.fireShake.enabled":
                 fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeEnabled;
                 return true;
@@ -495,6 +522,33 @@ internal static class PlayerRuntimeScalingControllerBakeUtility
                 return true;
             case "cameraSettings.fireShake.suppressOnLaserBeam":
                 fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeSuppressOnLaserBeam;
+                return true;
+            case "cameraSettings.fireShake.motionMode":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeMotionMode;
+                return true;
+            case "cameraSettings.fireShake.axisRightEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeAxisRightEnabled;
+                return true;
+            case "cameraSettings.fireShake.axisUpEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeAxisUpEnabled;
+                return true;
+            case "cameraSettings.fireShake.axisForwardEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeAxisForwardEnabled;
+                return true;
+            case "cameraSettings.fireShake.forwardAmplitude":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeForwardAmplitude;
+                return true;
+            case "cameraSettings.fireShake.zoomEnabled":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeZoomEnabled;
+                return true;
+            case "cameraSettings.fireShake.zoomFovDelta":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeZoomFovDelta;
+                return true;
+            case "cameraSettings.fireShake.rumbleMotionMode":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRumbleMotionMode;
+                return true;
+            case "cameraSettings.fireShake.rumbleImpulseDurationSeconds":
+                fieldId = PlayerRuntimeControllerFieldId.CameraFireShakeRumbleImpulseDuration;
                 return true;
             case "shootingSettings.triggerMode":
                 fieldId = PlayerRuntimeControllerFieldId.ShootingTriggerMode;

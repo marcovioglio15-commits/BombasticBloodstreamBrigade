@@ -104,24 +104,42 @@ MonoBehaviour:
     damageShake:
       enabled: 1
       durationSeconds: 0.25
-      positionalAmplitude: 0.5
-      rotationalAmplitude: 1.5
-      frequency: 22
       falloff: 1
+      motionMode: 0
       scaleWithDamage: 0
       damageForFullStrength: 25
+      axisRightEnabled: 1
+      axisUpEnabled: 1
+      axisForwardEnabled: 0
+      positionalAmplitude: 0.5
+      forwardAmplitude: 0.2
+      rotationalAmplitude: 1.5
+      frequency: 22
+      zoomEnabled: 0
+      zoomFovDelta: -3
       rumbleEnabled: 1
+      rumbleMotionMode: 0
+      rumbleImpulseDurationSeconds: 0.12
       rumbleLowFrequency: 0.6
       rumbleHighFrequency: 0.35
     fireShake:
       enabled: 1
       durationSeconds: 0.18
+      falloff: 2
+      motionMode: 0
+      suppressOnLaserBeam: 1
+      axisRightEnabled: 1
+      axisUpEnabled: 1
+      axisForwardEnabled: 0
       positionalAmplitude: 0.18
+      forwardAmplitude: 0.1
       rotationalAmplitude: 0.6
       frequency: 28
-      falloff: 2
-      suppressOnLaserBeam: 1
+      zoomEnabled: 0
+      zoomFovDelta: -1.5
       rumbleEnabled: 1
+      rumbleMotionMode: 0
+      rumbleImpulseDurationSeconds: 0.08
       rumbleLowFrequency: 0.25
       rumbleHighFrequency: 0.45
   shootingSettings:

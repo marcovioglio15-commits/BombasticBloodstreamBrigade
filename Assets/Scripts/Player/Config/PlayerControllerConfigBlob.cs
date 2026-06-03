@@ -218,49 +218,89 @@ public struct CameraValuesBlob
 }
 
 /// <summary>
-/// Holds the trauma-based damage camera-shake tuning resolved at bake time. Numeric ranges are clamped
-/// defensively at point of use by the runtime shake utility rather than at bake.
+/// Holds the trauma-based damage camera-shake tuning resolved at bake time. Numeric ranges are clamped defensively at
+/// point of use by the runtime shake utility rather than at bake. Carries the new multi-axis, FOV-zoom and single-impulse
+/// authoring so the runtime shake utility can mix tactile feedback options from one consistent blob.
 /// </summary>
 public struct CameraShakeBlob
 {
+    #region Envelope
     public byte Enabled;
     public float DurationSeconds;
-    public float PositionalAmplitude;
-    public float RotationalAmplitude;
-    public float Frequency;
     public CameraShakeFalloff Falloff;
+    // Continuous (0) plays the perlin oscillation; SingleImpulse (1) skips the noise and emits one clean jolt
+    // following the trauma envelope.
+    public CameraShakeMotionMode MotionMode;
+    #endregion
+
+    #region Damage Scaling
     public byte ScaleWithDamage;
     public float DamageForFullStrength;
+    #endregion
 
-    // Connected-gamepad rumble layered on the same trauma envelope as the camera shake. Motor intensities are
-    // normalized [0..1] amplitudes consumed by the damage-shake rumble system at point of use.
+    #region Axes & Amplitudes
+    public byte AxisRightEnabled;
+    public byte AxisUpEnabled;
+    public byte AxisForwardEnabled;
+    public float PositionalAmplitude;
+    public float ForwardAmplitude;
+    public float RotationalAmplitude;
+    public float Frequency;
+    #endregion
+
+    #region Zoom
+    public byte ZoomEnabled;
+    public float ZoomFovDelta;
+    #endregion
+
+    #region Rumble
     public byte RumbleEnabled;
+    public CameraShakeRumbleMotionMode RumbleMotionMode;
+    public float RumbleImpulseDurationSeconds;
     public float RumbleLowFrequency;
     public float RumbleHighFrequency;
+    #endregion
 }
 
 /// <summary>
-/// Holds the trauma-based fire camera-shake tuning resolved at bake time. Mirrors <see cref="CameraShakeBlob"/>
-/// minus the damage-scaling fields since fire trauma is added once per primary-shot spawn. Numeric ranges are
-/// clamped defensively at point of use by the runtime shake utility rather than at bake.
+/// Holds the trauma-based fire camera-shake tuning resolved at bake time. Mirrors <see cref="CameraShakeBlob"/> minus
+/// the damage-scaling fields since fire trauma is added once per primary-shot spawn. Numeric ranges are clamped
+/// defensively at point of use by the runtime shake utility rather than at bake.
 /// </summary>
 public struct CameraFireShakeBlob
 {
+    #region Envelope
     public byte Enabled;
     public float DurationSeconds;
-    public float PositionalAmplitude;
-    public float RotationalAmplitude;
-    public float Frequency;
     public CameraShakeFalloff Falloff;
+    public CameraShakeMotionMode MotionMode;
 
     // When non-zero, the Laser Beam simulation skips enqueuing fire-shake pulses so the continuous beam tick can never
     // stack trauma into a sustained kick or rumble. The trauma already in flight still decays normally.
     public byte SuppressOnLaserBeam;
+    #endregion
 
-    // Connected-gamepad rumble layered on the same trauma envelope as the fire shake. Motor intensities are
-    // normalized [0..1] amplitudes consumed by the shared camera-shake rumble system at point of use.
+    #region Axes & Amplitudes
+    public byte AxisRightEnabled;
+    public byte AxisUpEnabled;
+    public byte AxisForwardEnabled;
+    public float PositionalAmplitude;
+    public float ForwardAmplitude;
+    public float RotationalAmplitude;
+    public float Frequency;
+    #endregion
+
+    #region Zoom
+    public byte ZoomEnabled;
+    public float ZoomFovDelta;
+    #endregion
+
+    #region Rumble
     public byte RumbleEnabled;
+    public CameraShakeRumbleMotionMode RumbleMotionMode;
+    public float RumbleImpulseDurationSeconds;
     public float RumbleLowFrequency;
     public float RumbleHighFrequency;
+    #endregion
 }
 #endregion

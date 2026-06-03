@@ -12,7 +12,7 @@ public enum EnemyShadowCoverageMode : byte
 
 /// <summary>
 /// Stores ground-footprint presentation settings consumed by the shader-driven enemy ground indicator,
-/// which renders the hit-box shadow plus two concentric fillable rings or arcs for health and shield.
+/// which renders the hit-box shadow and optionally two concentric fillable rings or arcs for health and shield.
 /// </summary>
 [Serializable]
 public sealed class EnemyVisualFootprintSettings
@@ -34,6 +34,9 @@ public sealed class EnemyVisualFootprintSettings
 
     [Tooltip("Local root-space XZ fine-tune added after the automatic visual-bounds center detection. Contact damage, debug rings, shadow and the indicator use this same resolved center.")]
     [SerializeField] private Vector2 positionOffsetXZ = Vector2.zero;
+
+    [Tooltip("When enabled, the ground footprint renders health and shield rings around the hit-box shadow. Disable this to keep only the shadow while preserving the same hit-footprint center.")]
+    [SerializeField] private bool healthRingsEnabled = true;
 
     [Tooltip("World-space gap between the shadow outer edge and the inner edge of the first fillable ring.")]
     [SerializeField] private float ringDistanceFromShadow = 0.05f;
@@ -121,6 +124,14 @@ public sealed class EnemyVisualFootprintSettings
         get
         {
             return spatialUiHeightOffset;
+        }
+    }
+
+    public bool HealthRingsEnabled
+    {
+        get
+        {
+            return healthRingsEnabled;
         }
     }
 

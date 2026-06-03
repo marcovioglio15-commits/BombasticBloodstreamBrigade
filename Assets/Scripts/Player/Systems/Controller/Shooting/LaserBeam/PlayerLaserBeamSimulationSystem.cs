@@ -64,8 +64,6 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             ? WorldWallCollisionUtility.BuildWallsCollisionFilter(wallsLayerMask)
             : default;
 
-        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
-
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         ComponentLookup<PlayerInputState> inputStateLookup = SystemAPI.GetComponentLookup<PlayerInputState>(true);
         ComponentLookup<PlayerMovementState> movementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true);
@@ -73,7 +71,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-        ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<Parent> parentLookup = SystemAPI.GetComponentLookup<Parent>(true);
         ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(false);
         ComponentLookup<PlayerRuntimeCameraConfig> runtimeCameraConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeCameraConfig>(true);
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(true);
@@ -253,12 +251,12 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             float coneAngleDegrees = effectivePassiveToolsState.HasShotgun != 0
                 ? math.max(0f, effectivePassiveToolsState.Shotgun.ConeAngleDegrees)
                 : 0f;
-            float3 spawnPosition = PlayerProjectileRequestUtility.ResolveShootSpawnPosition(playerEntity,
-                                                                                            in localTransform.ValueRO,
-                                                                                            in currentRuntimeShootingConfig,
-                                                                                            in muzzleLookup,
-                                                                                            in transformLookup,
-                                                                                            in localToWorldLookup);
+            float3 spawnPosition = PlayerLaserBeamUtility.ResolveCurrentFrameSpawnPosition(playerEntity,
+                                                                                           in localTransform.ValueRO,
+                                                                                           in currentRuntimeShootingConfig,
+                                                                                           in muzzleLookup,
+                                                                                           in transformLookup,
+                                                                                           in parentLookup);
             if (canEnqueueAudioRequests)
             {
                 if (beamStartedThisFrame)

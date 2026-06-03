@@ -135,6 +135,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                PlayerVisualPresetsPanel.VisualSubSectionType.VisualPointer,
                                "Visual Pointer",
                                PlayerVisualPresetsPanelPointerSectionUtility.BuildVisualPointerSubSection(panel));
+        AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.DeathAnimation,
+                               "Death Animation",
+                               BuildDeathAnimationSubSection(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;
@@ -355,6 +359,19 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
     {
         VisualElement container = CreateSubSectionContainer("Damage Feedback");
         PlayerVisualPresetsPanelDamageFeedbackSectionUtility.Build(panel, container);
+        return container;
+    }
+
+    /// <summary>
+    /// Builds the Death Animation subsection by delegating to <see cref="PlayerVisualPresetsPanelDeathAnimationSectionUtility"/>
+    /// so the cinematic-tween authoring logic lives in its own utility file.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel providing the serialized preset.</param>
+    /// <returns>Configured subsection element holding the camera tween, despawn VFX and visual bridge controls.</returns>
+    private static VisualElement BuildDeathAnimationSubSection(PlayerVisualPresetsPanel panel)
+    {
+        VisualElement container = CreateSubSectionContainer("Death Animation");
+        PlayerVisualPresetsPanelDeathAnimationSectionUtility.Build(panel, container);
         return container;
     }
 

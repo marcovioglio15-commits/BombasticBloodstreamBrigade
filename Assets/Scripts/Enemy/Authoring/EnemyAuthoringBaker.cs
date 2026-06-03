@@ -963,14 +963,14 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
     /// <summary>
     /// Builds the ground-indicator ECS configuration from the authoring resolved values. The SuppressRings
-    /// byte is resolved from the Boss UI setting so the runtime never has to recompute it.
+    /// byte is resolved from the Footprint UI and Boss UI settings so the runtime never has to recompute it.
     /// </summary>
     /// <param name="authoring">Source authoring component used to read every footprint field.</param>
     /// <returns>Baked ground-indicator configuration component data.</returns>
     private static EnemyGroundIndicatorConfig BuildGroundIndicatorConfig(EnemyAuthoring authoring)
     {
-        // Resolve the boss-UI gate that suppresses the rings when the screen-space boss HUD owns the bars.
-        bool suppressRings = ShouldSuppressGroundIndicatorRings(authoring);
+        // Resolve all authored gates that hide rings while keeping the shadow presentation active.
+        bool suppressRings = !authoring.HealthRingsEnabled || ShouldSuppressGroundIndicatorRings(authoring);
         // HeightOffset and RingDistanceFromShadow stay un-clamped: negative values are intentional
         // affordances for sinking the indicator below the pivot or overlapping rings with the shadow.
         bool rotateHitCenterOffset = ShouldRotateHitCenterOffset(authoring);

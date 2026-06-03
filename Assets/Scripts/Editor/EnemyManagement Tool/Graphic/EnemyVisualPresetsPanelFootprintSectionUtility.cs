@@ -3,8 +3,8 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds the Footprint UI subsection used by the enemy visual presets management tool.
-/// Controls cover the shader-driven shadow disc plus the two concentric fillable rings or arcs,
-/// including per-enemy ring colors and ring-only knobs that hide automatically when Boss UI suppresses them.
+/// Controls cover the shader-driven shadow disc plus the optional concentric fillable rings or arcs,
+/// including per-enemy ring colors and ring-only knobs that hide automatically when runtime gates suppress them.
 /// </summary>
 internal static class EnemyVisualPresetsPanelFootprintSectionUtility
 {
@@ -25,19 +25,53 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
             return container;
 
         bool ringsSuppressed = ResolveRingsSuppressedByBossUi(panel);
-        BuildShadowControls(panel, container, footprintProperty);
+        SerializedProperty ringsEnabledProperty = footprintProperty.FindPropertyRelative("healthRingsEnabled");
+        bool healthRingsEnabled = ringsEnabledProperty == null || ringsEnabledProperty.boolValue;
+        bool ringWarningsSuppressed = ringsSuppressed || !healthRingsEnabled;
+        Foldout shadowLayoutFoldout = CreateFootprintFoldout(footprintProperty,
+                                                             "Shadow Layout",
+                                                             "ShadowLayout",
+                                                             "Footprint size, center and vertical placement used by the shader-driven shadow.");
+        Foldout shadowAppearanceFoldout = CreateFootprintFoldout(footprintProperty,
+                                                                 "Shadow Appearance",
+                                                                 "ShadowAppearance",
+                                                                 "Visual color and softness controls applied to the hit-box shadow.");
+        Foldout healthRingsFoldout = CreateFootprintFoldout(footprintProperty,
+                                                            "Health Rings",
+                                                            "HealthRings",
+                                                            "Health and shield ring enable, layout, appearance and orientation controls.");
+
+        container.Add(shadowLayoutFoldout);
+        container.Add(shadowAppearanceFoldout);
+        container.Add(healthRingsFoldout);
+        BuildShadowLayoutControls(panel, shadowLayoutFoldout, footprintProperty);
+        BuildShadowAppearanceControls(panel, shadowAppearanceFoldout, footprintProperty);
+
+        if (ringsEnabledProperty != null)
+        {
+            EnemyVisualPresetsPanelSectionsUtility.AddReactiveToggleField(panel,
+                                                                          healthRingsFoldout,
+                                                                          ringsEnabledProperty,
+                                                                          "Health Rings Enabled",
+                                                                          "When enabled, the ground footprint renders health and shield rings around the hit-box shadow. Disable this to keep only the shadow.");
+        }
 
         if (ringsSuppressed)
         {
-            container.Add(new HelpBox("Ring controls are hidden because Boss UI is enabled on this preset. The screen-space boss HUD owns health and shield bars, so the world-space rings are suppressed at runtime. Shadow controls above still apply.",
-                                       HelpBoxMessageType.Info));
+            healthRingsFoldout.Add(new HelpBox("Ring controls are hidden because Boss UI is enabled on this preset. The screen-space boss HUD owns health and shield bars, so the world-space rings are suppressed at runtime. Shadow controls above still apply.",
+                                               HelpBoxMessageType.Info));
+        }
+        else if (!healthRingsEnabled)
+        {
+            healthRingsFoldout.Add(new HelpBox("Ring controls are hidden because Health Rings Enabled is off. The shadow remains active and uses the layout settings above.",
+                                               HelpBoxMessageType.Info));
         }
         else
         {
-            BuildRingControls(panel, container, footprintProperty);
+            BuildRingControls(panel, healthRingsFoldout, footprintProperty);
         }
 
-        AddFootprintWarnings(footprintProperty, container, ringsSuppressed);
+        AddFootprintWarnings(footprintProperty, container, ringWarningsSuppressed);
         return container;
     }
     #endregion
@@ -69,12 +103,33 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     }
 
     /// <summary>
-    /// Builds the shadow-only controls that are always visible in the subsection.
+    /// Creates one themed foldout bound to the edited footprint property so expanded state persists across panel refreshes.
+    /// </summary>
+    /// <param name="footprintProperty">Serialized footprint settings property used to derive a stable state key.</param>
+    /// <param name="title">Visible foldout title.</param>
+    /// <param name="stateSuffix">Local state-key suffix unique inside the footprint subsection.</param>
+    /// <param name="tooltip">Tooltip explaining the group purpose.</param>
+    /// <returns>Configured themed foldout.</returns>
+    private static Foldout CreateFootprintFoldout(SerializedProperty footprintProperty,
+                                                  string title,
+                                                  string stateSuffix,
+                                                  string tooltip)
+    {
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(footprintProperty,
+                                                                                  title,
+                                                                                  stateSuffix,
+                                                                                  true);
+        foldout.tooltip = tooltip;
+        return foldout;
+    }
+
+    /// <summary>
+    /// Builds shadow layout controls that are always visible because the ground shadow remains active even when rings are hidden.
     /// </summary>
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildShadowControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildShadowLayoutControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 container,
@@ -95,6 +150,16 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                                 "positionOffsetXZ",
                                                                 "Position Offset (XZ)",
                                                                 "Local root-space XZ fine-tune added after automatic visual-bounds center detection. Contact damage, debug rings and shadow use this same resolved center.");
+    }
+
+    /// <summary>
+    /// Builds shadow appearance controls that are independent from health and shield ring visibility.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel.</param>
+    /// <param name="container">Container receiving the controls.</param>
+    /// <param name="footprintProperty">Serialized footprint settings property.</param>
+    private static void BuildShadowAppearanceControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    {
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 container,
                                                                 footprintProperty,
@@ -125,73 +190,89 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
     private static void BuildRingControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
+        Foldout layoutFoldout = CreateFootprintFoldout(footprintProperty,
+                                                       "Ring Layout",
+                                                       "RingLayout",
+                                                       "Distance, thickness, spacing and arc width used by health and shield rings.");
+        Foldout appearanceFoldout = CreateFootprintFoldout(footprintProperty,
+                                                           "Ring Appearance",
+                                                           "RingAppearance",
+                                                           "Fill colors, track colors and edge softness for health and shield rings.");
+        Foldout orientationFoldout = CreateFootprintFoldout(footprintProperty,
+                                                            "Ring Orientation",
+                                                            "RingOrientation",
+                                                            "Camera-facing or fixed-world fill-anchor controls for partial ring arcs.");
+
+        container.Add(layoutFoldout);
+        container.Add(appearanceFoldout);
+        container.Add(orientationFoldout);
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              layoutFoldout,
                                                               footprintProperty.FindPropertyRelative("ringDistanceFromShadow"),
                                                               "Ring Distance From Shadow",
                                                               -0.5f,
                                                               1.5f,
                                                               "World-space gap between the shadow outer edge and the inner edge of the first fillable ring. Negative values let the ring overlap the shadow for compact widgets.");
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              layoutFoldout,
                                                               footprintProperty.FindPropertyRelative("spatialUiRingThickness"),
                                                               "Ring Thickness",
                                                               0f,
                                                               1f,
                                                               "World-space radial thickness of each fillable ring drawn around the enemy shadow.");
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              layoutFoldout,
                                                               footprintProperty.FindPropertyRelative("spatialUiRingSpacing"),
                                                               "Ring Spacing",
                                                               0f,
                                                               1f,
                                                               "World-space gap between the health ring and the shield ring when both are drawn.");
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              layoutFoldout,
                                                               footprintProperty.FindPropertyRelative("ringArcDegrees"),
                                                               "Ring Arc Degrees",
                                                               1f,
                                                               EnemyVisualFootprintSettings.DefaultRingArcDegrees,
                                                               "Angular width in degrees used by health and shield tracks. Use 360 for full rings, or a smaller value to render only a camera-facing arc.");
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              appearanceFoldout,
                                                               footprintProperty.FindPropertyRelative("ringEdgeSoftness"),
                                                               "Ring Edge Softness",
                                                               0f,
                                                               1f,
                                                               "Normalized radial falloff applied at the inner and outer edges of each ring band. Higher values produce softer ring borders.");
         EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
-                                                              container,
+                                                              appearanceFoldout,
                                                               footprintProperty.FindPropertyRelative("ringAngularSoftness"),
                                                               "Ring Angular Softness",
                                                               0f,
                                                               1f,
                                                               "Angular falloff in radians applied at the depleting edge of each ring fill. Higher values smooth the edge as the ring drains.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                container,
+                                                                appearanceFoldout,
                                                                 footprintProperty,
                                                                 "healthRingFillColor",
                                                                 "Health Ring Fill Color",
                                                                 "Fill color of the health ring when the enemy is at full health. Alpha controls ring opacity.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                container,
+                                                                appearanceFoldout,
                                                                 footprintProperty,
                                                                 "healthRingBackgroundColor",
                                                                 "Health Ring Background Color",
                                                                 "Background color of the health ring track shown behind the depleting fill. Alpha controls track opacity.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                container,
+                                                                appearanceFoldout,
                                                                 footprintProperty,
                                                                 "shieldRingFillColor",
                                                                 "Shield Ring Fill Color",
                                                                 "Fill color of the shield ring when the enemy is at full shield. Alpha controls ring opacity.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                container,
+                                                                appearanceFoldout,
                                                                 footprintProperty,
                                                                 "shieldRingBackgroundColor",
                                                                 "Shield Ring Background Color",
                                                                 "Background color of the shield ring track shown behind the depleting fill. Alpha controls track opacity.");
-        BuildRingOrientationControls(panel, container, footprintProperty);
+        BuildRingOrientationControls(panel, orientationFoldout, footprintProperty);
     }
 
     /// <summary>
@@ -228,13 +309,13 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
 
     /// <summary>
     /// Adds authored-value warnings for the footprint subsection without mutating the serialized values.
-    /// Ring warnings are skipped when the rings are suppressed by Boss UI so the user is not bothered
-    /// by ring-related warnings that do not affect runtime presentation.
+    /// Ring warnings are skipped when authored runtime gates hide rings so the user is not bothered
+    /// by ring-related warnings that do not affect presentation.
     /// </summary>
     /// <param name="footprintProperty">Serialized footprint settings.</param>
     /// <param name="container">Parent element receiving warning boxes.</param>
-    /// <param name="ringsSuppressed">True when ring controls are hidden by Boss UI suppression.</param>
-    private static void AddFootprintWarnings(SerializedProperty footprintProperty, VisualElement container, bool ringsSuppressed)
+    /// <param name="ringWarningsSuppressed">True when ring-related warnings should be hidden with the ring controls.</param>
+    private static void AddFootprintWarnings(SerializedProperty footprintProperty, VisualElement container, bool ringWarningsSuppressed)
     {
         if (footprintProperty == null || container == null)
             return;
@@ -251,7 +332,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
         AddRangeWarning(footprintProperty, container, "shadowAlpha", 0f, 1f, "Shadow Alpha should stay between 0 and 1.");
         AddRangeWarning(footprintProperty, container, "shadowEdgeSoftness", 0f, 1f, "Shadow Edge Softness should stay between 0 and 1.");
 
-        if (ringsSuppressed)
+        if (ringWarningsSuppressed)
             return;
 
         EnemyVisualPresetsPanelSectionsUtility.AddNegativeValueWarning(footprintProperty, container, "spatialUiRingThickness", "Ring Thickness must be zero or positive.");

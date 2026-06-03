@@ -14,6 +14,10 @@ public partial struct PlayerDamageVignettePresentationSystem : ISystem
     private const float DamageDetectionEpsilon = 0.0001f;
     #endregion
 
+    #region Fields
+    private EntityQuery runOutcomeQuery;
+    #endregion
+
     #region Methods
 
     #region Lifecycle
@@ -24,11 +28,16 @@ public partial struct PlayerDamageVignettePresentationSystem : ISystem
         state.RequireForUpdate<PlayerDamageVignetteState>();
         state.RequireForUpdate<PlayerHealth>();
         state.RequireForUpdate<PlayerShield>();
+        runOutcomeQuery = state.GetEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
+                                               ComponentType.ReadOnly<PlayerRunOutcomeState>());
     }
 
     public void OnUpdate(ref SystemState state)
     {
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+        float deltaTime = PlayerGameplayPauseUtility.ResolveFeedbackDeltaTime(SystemAPI.Time.DeltaTime,
+                                                                              runOutcomeQuery,
+                                                                              isSceneTransitioning);
 
         foreach ((RefRO<PlayerDamageVignetteConfig> vignetteConfig,
                   RefRW<PlayerDamageVignetteState> vignetteState,

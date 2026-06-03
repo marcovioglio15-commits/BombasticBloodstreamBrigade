@@ -190,6 +190,21 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
             case PlayerRuntimeControllerFieldId.CameraShakeFalloffMode:
                 runtimeCamera.Shake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
                 return;
+            case PlayerRuntimeControllerFieldId.CameraShakeMotionMode:
+                runtimeCamera.Shake.MotionMode = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeMotionMode(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeForwardAmplitude:
+                runtimeCamera.Shake.ForwardAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeZoomFovDelta:
+                runtimeCamera.Shake.ZoomFovDelta = resolvedValue;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRumbleMotionMode:
+                runtimeCamera.Shake.RumbleMotionMode = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeRumbleMotionMode(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeRumbleImpulseDuration:
+                runtimeCamera.Shake.RumbleImpulseDurationSeconds = math.max(0f, resolvedValue);
+                return;
             case PlayerRuntimeControllerFieldId.CameraFireShakeDuration:
                 runtimeCamera.FireShake.DurationSeconds = math.max(0f, resolvedValue);
                 return;
@@ -210,6 +225,21 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
                 return;
             case PlayerRuntimeControllerFieldId.CameraFireShakeFalloffMode:
                 runtimeCamera.FireShake.Falloff = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeFalloff(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeMotionMode:
+                runtimeCamera.FireShake.MotionMode = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeMotionMode(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeForwardAmplitude:
+                runtimeCamera.FireShake.ForwardAmplitude = math.max(0f, resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeZoomFovDelta:
+                runtimeCamera.FireShake.ZoomFovDelta = resolvedValue;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRumbleMotionMode:
+                runtimeCamera.FireShake.RumbleMotionMode = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeRumbleMotionMode(resolvedValue);
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeRumbleImpulseDuration:
+                runtimeCamera.FireShake.RumbleImpulseDurationSeconds = math.max(0f, resolvedValue);
                 return;
             case PlayerRuntimeControllerFieldId.ShootingTriggerMode:
                 runtimeShooting.TriggerMode = PlayerRuntimeScalingEnumUtility.ResolveShootingTriggerMode(resolvedValue);
@@ -388,6 +418,30 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
                 return;
             case PlayerRuntimeControllerFieldId.CameraFireShakeSuppressOnLaserBeam:
                 runtimeCamera.FireShake.SuppressOnLaserBeam = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeAxisRightEnabled:
+                runtimeCamera.Shake.AxisRightEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeAxisUpEnabled:
+                runtimeCamera.Shake.AxisUpEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeAxisForwardEnabled:
+                runtimeCamera.Shake.AxisForwardEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraShakeZoomEnabled:
+                runtimeCamera.Shake.ZoomEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeAxisRightEnabled:
+                runtimeCamera.FireShake.AxisRightEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeAxisUpEnabled:
+                runtimeCamera.FireShake.AxisUpEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeAxisForwardEnabled:
+                runtimeCamera.FireShake.AxisForwardEnabled = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case PlayerRuntimeControllerFieldId.CameraFireShakeZoomEnabled:
+                runtimeCamera.FireShake.ZoomEnabled = resolvedValue ? (byte)1 : (byte)0;
                 return;
         }
     }

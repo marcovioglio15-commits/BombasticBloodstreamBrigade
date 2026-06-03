@@ -52,13 +52,19 @@ public partial struct PlayerCameraFollowSystem : ISystem
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
             return;
 
-        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning)
+        // Dying bypasses the hard-pause gate: the freeze system pinned Time.timeScale to zero on the lethal hit but the
+        // camera shake feedback must keep evolving (it switches to unscaled time below) so the player feels the final beat.
+        bool isDying = PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery);
+
+        if (PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning && !isDying)
             return;
 
         if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera))
             return;
 
-        float deltaTime = ResolvePresentationDeltaTime(SystemAPI.Time.DeltaTime, isSceneTransitioning);
+        float deltaTime = PlayerGameplayPauseUtility.ResolveFeedbackDeltaTime(SystemAPI.Time.DeltaTime,
+                                                                              runOutcomeQuery,
+                                                                              isSceneTransitioning);
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
 
@@ -106,8 +112,10 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                                            deltaTime,
                                                            shakeNoiseTime,
                                                            camera.transform.right,
-                                                           camera.transform.up);
+                                                           camera.transform.up,
+                                                           camera.transform.forward);
                 shakeStateLookup[entity] = shakeState;
+                PlayerCameraShakeRuntimeUtility.ApplyFovToCamera(camera, in shakeState);
             }
 
             if (cameraConfig.Behavior == CameraBehavior.RoomFixed)
@@ -182,19 +190,6 @@ public partial struct PlayerCameraFollowSystem : ISystem
         followVelocity = float3.zero;
     }
 
-    /// <summary>
-    /// Resolves a camera presentation delta that can settle during transition-owned time-scale pauses.
-    /// </summary>
-    /// <param name="scaledDeltaTime">DOTS scaled delta time for the current frame.</param>
-    /// <param name="isSceneTransitioning">True while the scene manager is loading or fading between scenes.</param>
-    /// <returns>Delta time suitable for presentation-only camera smoothing.</returns>
-    private static float ResolvePresentationDeltaTime(float scaledDeltaTime, bool isSceneTransitioning)
-    {
-        if (!isSceneTransitioning || scaledDeltaTime > 0f)
-            return scaledDeltaTime;
-
-        return Time.unscaledDeltaTime;
-    }
     #endregion
 
 

@@ -5,10 +5,12 @@ using Unity.Mathematics;
 /// <summary>
 /// Stores the runtime trauma and damage-detection baselines for both camera-shake channels (damage on hit and fire
 /// on primary-shot spawn), together with the per-frame combined shake output. Trauma and output are evolved once
-/// per frame by <see cref="PlayerCameraFollowSystem"/> (the single owner). The resulting offset/roll are consumed by
-/// both player camera systems when they write the camera transform, so room-fixed and follow cameras stay in sync
-/// without recomputing or double-counting trauma. The two channels keep independent trauma and rumble magnitudes so
-/// fire-rate stacking does not interfere with damage feedback and the gamepad rumble is the sum of both envelopes.
+/// per frame by <see cref="PlayerCameraFollowSystem"/> (the single owner). The resulting offset/roll/FOV delta are
+/// consumed by the player camera systems when they write the camera transform and the FOV, so room-fixed and follow
+/// cameras stay in sync without recomputing or double-counting trauma. The two channels keep independent trauma and
+/// rumble magnitudes so fire-rate stacking does not interfere with damage feedback and the gamepad rumble is the sum
+/// of both envelopes. The Continuous motion mode uses perlin noise; the SingleImpulse motion mode keeps a clean
+/// per-channel direction sample chosen at trauma onset so the offset feels like a clear push instead of an oscillation.
 /// </summary>
 public struct PlayerCameraShakeState : IComponentData
 {
@@ -24,6 +26,17 @@ public struct PlayerCameraShakeState : IComponentData
 
     // 0 until the first observed frame seeds the damage-detection baselines, preventing a spawn-time shake.
     public byte Initialized;
+
+    // Sign in {-1, 0, 1} chosen for each axis at the last accepted damage hit; consumed by the SingleImpulse path so
+    // every fresh hit picks a fully random direction once instead of oscillating through the noise field.
+    public float3 DamageImpulseDirection;
+
+    // Sign in {-1, 0, 1} chosen for the view-axis roll at the last accepted damage hit; consumed by the SingleImpulse
+    // path to give the roll a clear direction instead of sampling noise.
+    public float DamageImpulseRollSign;
+
+    // Seconds remaining on the damage single-impulse rumble burst, only consumed while RumbleMotionMode == SingleImpulse.
+    public float DamageRumbleImpulseRemainingSeconds;
     #endregion
 
     #region Fire Trauma State
@@ -34,6 +47,15 @@ public struct PlayerCameraShakeState : IComponentData
     // consumes the flag (clearing it back to 0) when it evolves the fire trauma envelope, so a single fire pulse
     // adds trauma exactly once even if multiple producers run before the consumer.
     public byte FireRequestPending;
+
+    // Sign in {-1, 0, 1} chosen for each axis at the last consumed fire pulse; same role as DamageImpulseDirection.
+    public float3 FireImpulseDirection;
+
+    // Sign in {-1, 0, 1} chosen for the view-axis roll at the last consumed fire pulse.
+    public float FireImpulseRollSign;
+
+    // Seconds remaining on the fire single-impulse rumble burst, only consumed while RumbleMotionMode == SingleImpulse.
+    public float FireRumbleImpulseRemainingSeconds;
     #endregion
 
     #region Frame Output
@@ -53,11 +75,18 @@ public struct PlayerCameraShakeState : IComponentData
     // View-axis roll in radians layered on top of the base camera rotation this frame (sum of damage and fire channels).
     public float RollRadians;
 
+    // Field-of-view delta in degrees applied on top of the base camera FOV this frame (sum of damage and fire channels).
+    public float FovDelta;
+
     // Offset applied last frame; removed before smoothing so the shake never feeds back into the follow spring.
     public float3 PreviousAppliedPositionOffset;
 
     // Roll applied last frame; removed before re-applying so the shake never accumulates into the base rotation.
     public float PreviousAppliedRollRadians;
+
+    // FOV delta applied last frame; consumed by the camera follow system to restore the un-shaken base FOV before
+    // re-layering this frame's delta, so the zoom can never accumulate into the authored field of view.
+    public float PreviousAppliedFovDelta;
     #endregion
 }
 #endregion

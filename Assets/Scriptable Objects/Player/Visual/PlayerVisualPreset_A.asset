@@ -39,6 +39,21 @@ MonoBehaviour:
     tint: {r: 1, g: 1, b: 1, a: 1}
     fadeInSeconds: 0.1
     fadeOutSeconds: 0.7
+  deathAnimation:
+    enabled: 1
+    playbackDurationSeconds: 2
+    cameraZoomEnabled: 1
+    cameraTargetFovDelta: -1
+    cameraPositionLerpEnabled: 1
+    cameraPositionLerpAmount: 0.6
+    cameraCompletionNormalizedTime: 0.6
+    easingMode: 1
+    despawnVfxPrefab: {fileID: 7550252483311059252, guid: e3ad1e727d0729844ab1862e3ddac869, type: 3}
+    despawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
+    despawnVfxScaleMultiplier: 1
+    despawnVfxSpawnNormalizedTime: 0.6
+    despawnVfxLifetimeSeconds: 1.5
+    hidePlayerVisualOnVfxSpawn: 1
   elementalTrailAttachedVfxPrefab: {fileID: 5127294714520930670, guid: f9f4969fbeb739b4ab67598bba82a55e, type: 3}
   elementalTrailAttachedVfxScaleMultiplier: 1
   elementalEnemyVfxByElement:

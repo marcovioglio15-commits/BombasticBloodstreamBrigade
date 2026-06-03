@@ -395,7 +395,25 @@ public enum PlayerRuntimeControllerFieldId : byte
     CameraFireShakeRumbleEnabled = 170,
     CameraFireShakeRumbleLowFrequency = 171,
     CameraFireShakeRumbleHighFrequency = 172,
-    CameraFireShakeSuppressOnLaserBeam = 173
+    CameraFireShakeSuppressOnLaserBeam = 173,
+    CameraShakeMotionMode = 174,
+    CameraShakeAxisRightEnabled = 175,
+    CameraShakeAxisUpEnabled = 176,
+    CameraShakeAxisForwardEnabled = 177,
+    CameraShakeForwardAmplitude = 178,
+    CameraShakeZoomEnabled = 179,
+    CameraShakeZoomFovDelta = 180,
+    CameraShakeRumbleMotionMode = 181,
+    CameraShakeRumbleImpulseDuration = 182,
+    CameraFireShakeMotionMode = 183,
+    CameraFireShakeAxisRightEnabled = 184,
+    CameraFireShakeAxisUpEnabled = 185,
+    CameraFireShakeAxisForwardEnabled = 186,
+    CameraFireShakeForwardAmplitude = 187,
+    CameraFireShakeZoomEnabled = 188,
+    CameraFireShakeZoomFovDelta = 189,
+    CameraFireShakeRumbleMotionMode = 190,
+    CameraFireShakeRumbleImpulseDuration = 191
 }
 
 /// <summary>
@@ -453,6 +471,44 @@ public struct PlayerRuntimePowerUpScalingElement : IBufferElementData
     public byte BaseBooleanValue;
     public byte IsInteger;
     public FixedString64Bytes BaseTokenValue;
+    public FixedString512Bytes Formula;
+}
+
+/// <summary>
+/// Identifies one player visual death-animation field that can be rewritten from a runtime scaling formula.
+/// none.
+/// </summary>
+public enum PlayerRuntimeDeathAnimationFieldId : byte
+{
+    Enabled = 0,
+    PlaybackDurationSeconds = 1,
+    CameraZoomEnabled = 2,
+    CameraTargetFovDelta = 3,
+    CameraPositionLerpEnabled = 4,
+    CameraPositionLerpAmount = 5,
+    CameraCompletionNormalizedTime = 6,
+    EasingMode = 7,
+    DespawnVfxSpawnOffsetX = 8,
+    DespawnVfxSpawnOffsetY = 9,
+    DespawnVfxSpawnOffsetZ = 10,
+    DespawnVfxScaleMultiplier = 11,
+    DespawnVfxSpawnNormalizedTime = 12,
+    DespawnVfxLifetimeSeconds = 13,
+    HidePlayerVisualOnVfxSpawn = 14
+}
+
+/// <summary>
+/// Stores one death-animation visual scaling entry baked from Add Scaling authoring data.
+/// none.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerRuntimeDeathAnimationScalingElement : IBufferElementData
+{
+    public PlayerRuntimeDeathAnimationFieldId FieldId;
+    public byte ValueType;
+    public float BaseValue;
+    public byte BaseBooleanValue;
+    public byte IsInteger;
     public FixedString512Bytes Formula;
 }
 #endregion

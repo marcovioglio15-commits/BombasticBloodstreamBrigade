@@ -35,6 +35,7 @@ MonoBehaviour:
     shadowCoverageMode: 0
     spatialUiHeightOffset: -0.5
     positionOffsetXZ: {x: 0, y: 0}
+    healthRingsEnabled: 1
     ringDistanceFromShadow: 0
     spatialUiRingThickness: 0.1
     spatialUiRingSpacing: 0.03

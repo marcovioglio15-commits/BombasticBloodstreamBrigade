@@ -57,6 +57,20 @@ public enum CameraShakeFalloff : byte
 }
 
 [Serializable]
+public enum CameraShakeMotionMode : byte
+{
+    Continuous = 0,
+    SingleImpulse = 1
+}
+
+[Serializable]
+public enum CameraShakeRumbleMotionMode : byte
+{
+    Continuous = 0,
+    SingleImpulse = 1
+}
+
+[Serializable]
 public enum ShootingTriggerMode
 {
     AutomaticToggle = 0,

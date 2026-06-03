@@ -71,6 +71,9 @@ public partial struct PlayerLevelUpSystem : ISystem
         state.RequireForUpdate<PlayerRuntimeShootingAppliedElementSlot>();
         state.RequireForUpdate<PlayerBaseHealthStatisticsConfig>();
         state.RequireForUpdate<PlayerRuntimeHealthStatisticsConfig>();
+        state.RequireForUpdate<PlayerBaseDeathAnimationConfig>();
+        state.RequireForUpdate<PlayerDeathAnimationConfig>();
+        state.RequireForUpdate<PlayerRuntimeDeathAnimationScalingElement>();
         state.RequireForUpdate<PlayerRuntimeProgressionScalingElement>();
         state.RequireForUpdate<PlayerBaseGamePhaseElement>();
         state.RequireForUpdate<PlayerBaseComboCounterConfig>();
@@ -110,6 +113,8 @@ public partial struct PlayerLevelUpSystem : ISystem
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(false);
         ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup = SystemAPI.GetComponentLookup<PlayerBaseHealthStatisticsConfig>(true);
         ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup = SystemAPI.GetComponentLookup<PlayerRuntimeHealthStatisticsConfig>(false);
+        ComponentLookup<PlayerBaseDeathAnimationConfig> baseDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerBaseDeathAnimationConfig>(true);
+        ComponentLookup<PlayerDeathAnimationConfig> runtimeDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerDeathAnimationConfig>(false);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
@@ -125,6 +130,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneSelectionOffersLookup = SystemAPI.GetBufferLookup<PlayerMilestonePowerUpSelectionOfferElement>(false);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);
         BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeControllerScalingElement>(true);
+        BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeDeathAnimationScalingElement>(true);
         BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProgressionScalingElement>(true);
         BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerBaseGamePhaseElement>(true);
         BufferLookup<PlayerRuntimeGamePhaseElement> runtimeGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerRuntimeGamePhaseElement>(false);
@@ -183,6 +189,9 @@ public partial struct PlayerLevelUpSystem : ISystem
                                                                                                  runtimeAppliedElementSlotsLookup,
                                                                                                  baseHealthLookup,
                                                                                                  runtimeHealthLookup,
+                                                                                                 baseDeathAnimationLookup,
+                                                                                                 runtimeDeathAnimationLookup,
+                                                                                                 deathAnimationScalingLookup,
                                                                                                  progressionScalingLookup,
                                                                                                  baseGamePhasesLookup,
                                                                                                  runtimeGamePhasesLookup,
@@ -325,6 +334,9 @@ public partial struct PlayerLevelUpSystem : ISystem
                                                                                                runtimeAppliedElementSlotsLookup,
                                                                                                baseHealthLookup,
                                                                                                runtimeHealthLookup,
+                                                                                               baseDeathAnimationLookup,
+                                                                                               runtimeDeathAnimationLookup,
+                                                                                               deathAnimationScalingLookup,
                                                                                                progressionScalingLookup,
                                                                                                baseGamePhasesLookup,
                                                                                                runtimeGamePhasesLookup,

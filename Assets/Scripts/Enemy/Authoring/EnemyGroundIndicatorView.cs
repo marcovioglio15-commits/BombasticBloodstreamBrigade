@@ -87,6 +87,8 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     private float cachedRingEdgeSoftness;
     private float cachedRingAngularSoftness;
     private float cachedRingArcRadians;
+    private bool cachedRingsVisible;
+    private bool softnessInitialized;
     private bool visibilityStateInitialized;
     private bool lastVisibilityState = true;
     private bool enemyActiveStateInitialized;
@@ -323,6 +325,7 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
         EnemyGroundIndicatorLayout layout = EnemyGroundIndicatorFootprintUtility.ResolveLayout(contactRadiusX,
                                                                                                 contactRadiusZ,
                                                                                                 in config,
+                                                                                                !suppressRings,
                                                                                                 hasVisibleShieldRing);
         bool changed = !footprintInitialized
                        || !Mathf.Approximately(cachedShadowRadiusX, layout.ShadowRadiusX)
@@ -396,11 +399,14 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
         float resolvedRingAngular = math.max(0f, config.RingAngularSoftness);
         float resolvedRingArcDegrees = EnemyGroundIndicatorFootprintUtility.ResolveRuntimeRingArcDegrees(config.RingArcDegrees);
         float resolvedRingArcRadians = math.radians(resolvedRingArcDegrees);
-        bool changed = !Mathf.Approximately(cachedShadowAlpha, resolvedShadowAlpha)
+        bool ringsVisible = !suppressRings;
+        bool changed = !softnessInitialized
+                       || !Mathf.Approximately(cachedShadowAlpha, resolvedShadowAlpha)
                        || !Mathf.Approximately(cachedShadowEdgeSoftness, resolvedShadowSoftness)
                        || !Mathf.Approximately(cachedRingEdgeSoftness, resolvedRingEdge)
                        || !Mathf.Approximately(cachedRingAngularSoftness, resolvedRingAngular)
-                       || !Mathf.Approximately(cachedRingArcRadians, resolvedRingArcRadians);
+                       || !Mathf.Approximately(cachedRingArcRadians, resolvedRingArcRadians)
+                       || cachedRingsVisible != ringsVisible;
 
         if (!changed)
             return false;
@@ -409,12 +415,14 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
         cachedPropertyBlock.SetVector(SoftnessPropertyId, new Vector4(resolvedRingEdge,
                                                                       resolvedRingAngular,
                                                                       resolvedRingArcRadians,
-                                                                      0f));
+                                                                      ringsVisible ? 1f : 0f));
         cachedShadowAlpha = resolvedShadowAlpha;
         cachedShadowEdgeSoftness = resolvedShadowSoftness;
         cachedRingEdgeSoftness = resolvedRingEdge;
         cachedRingAngularSoftness = resolvedRingAngular;
         cachedRingArcRadians = resolvedRingArcRadians;
+        cachedRingsVisible = ringsVisible;
+        softnessInitialized = true;
         return true;
     }
 

@@ -43,9 +43,12 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerRuntimeShootingAppliedElementSlot>();
         state.RequireForUpdate<PlayerBaseHealthStatisticsConfig>();
         state.RequireForUpdate<PlayerRuntimeHealthStatisticsConfig>();
+        state.RequireForUpdate<PlayerBaseDeathAnimationConfig>();
+        state.RequireForUpdate<PlayerDeathAnimationConfig>();
         state.RequireForUpdate<PlayerProgressionConfig>();
         state.RequireForUpdate<PlayerRuntimeScalingState>();
         state.RequireForUpdate<PlayerRuntimeControllerScalingElement>();
+        state.RequireForUpdate<PlayerRuntimeDeathAnimationScalingElement>();
         state.RequireForUpdate<PlayerRuntimeProgressionScalingElement>();
         state.RequireForUpdate<PlayerBaseGamePhaseElement>();
         state.RequireForUpdate<PlayerRuntimeGamePhaseElement>();
@@ -97,6 +100,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup = SystemAPI.GetBufferLookup<PlayerRuntimeShootingAppliedElementSlot>(false);
         ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup = SystemAPI.GetComponentLookup<PlayerBaseHealthStatisticsConfig>(true);
         ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup = SystemAPI.GetComponentLookup<PlayerRuntimeHealthStatisticsConfig>(false);
+        ComponentLookup<PlayerBaseDeathAnimationConfig> baseDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerBaseDeathAnimationConfig>(true);
+        ComponentLookup<PlayerDeathAnimationConfig> runtimeDeathAnimationLookup = SystemAPI.GetComponentLookup<PlayerDeathAnimationConfig>(false);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(false);
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
@@ -116,6 +121,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);
         BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProgressionScalingElement>(true);
+        BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeDeathAnimationScalingElement>(true);
         BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerBaseGamePhaseElement>(true);
         BufferLookup<PlayerRuntimeGamePhaseElement> runtimeGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerRuntimeGamePhaseElement>(false);
         ComponentLookup<PlayerBaseComboCounterConfig> baseComboConfigLookup = SystemAPI.GetComponentLookup<PlayerBaseComboCounterConfig>(true);
@@ -304,6 +310,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                           runtimeAppliedElementSlotsLookup,
                                           baseHealthLookup,
                                           runtimeHealthLookup,
+                                          baseDeathAnimationLookup,
+                                          runtimeDeathAnimationLookup,
+                                          deathAnimationScalingLookup,
                                           progressionScalingLookup,
                                           baseGamePhasesLookup,
                                           runtimeGamePhasesLookup,
@@ -349,9 +358,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                        in lookState,
                                                        in movementState,
                                                        in runtimeMovementConfig,
-                                                       in runtimeShootingConfig,
-                                                       runtimeAppliedElementSlots,
-                                                       in passiveToolsState,
+                                                                in runtimeShootingConfig,
+                                                                runtimeAppliedElementSlots,
+                                                                in passiveToolsState,
                                                                 in muzzleLookup,
                                                                 in transformLookup,
                                                                 in localToWorldLookup,
@@ -427,6 +436,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                           runtimeAppliedElementSlotsLookup,
                                           baseHealthLookup,
                                           runtimeHealthLookup,
+                                          baseDeathAnimationLookup,
+                                          runtimeDeathAnimationLookup,
+                                          deathAnimationScalingLookup,
                                           progressionScalingLookup,
                                           baseGamePhasesLookup,
                                           runtimeGamePhasesLookup,
@@ -472,9 +484,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                        in lookState,
                                                        in movementState,
                                                        in runtimeMovementConfig,
-                                                       in runtimeShootingConfig,
-                                                       runtimeAppliedElementSlots,
-                                                       in passiveToolsState,
+                                                                in runtimeShootingConfig,
+                                                                runtimeAppliedElementSlots,
+                                                                in passiveToolsState,
                                                                 in muzzleLookup,
                                                                 in transformLookup,
                                                                 in localToWorldLookup,
@@ -548,6 +560,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                           runtimeAppliedElementSlotsLookup,
                                           baseHealthLookup,
                                           runtimeHealthLookup,
+                                          baseDeathAnimationLookup,
+                                          runtimeDeathAnimationLookup,
+                                          deathAnimationScalingLookup,
                                           progressionScalingLookup,
                                           baseGamePhasesLookup,
                                           runtimeGamePhasesLookup,
@@ -687,6 +702,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     /// <param name="runtimeShootingLookup">Mutable runtime shooting config lookup.</param>
     /// <param name="baseHealthLookup">Immutable health baseline lookup.</param>
     /// <param name="runtimeHealthLookup">Mutable runtime health config lookup.</param>
+    /// <param name="baseDeathAnimationLookup">Immutable death-animation baseline lookup.</param>
+    /// <param name="runtimeDeathAnimationLookup">Mutable runtime death-animation config lookup.</param>
+    /// <param name="deathAnimationScalingLookup">Death-animation visual scaling metadata lookup.</param>
     /// <param name="progressionScalingLookup">Progression scaling metadata lookup.</param>
     /// <param name="baseGamePhasesLookup">Immutable runtime-phase baseline lookup.</param>
     /// <param name="runtimeGamePhasesLookup">Mutable runtime-phase buffer lookup.</param>
@@ -726,6 +744,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                   BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup,
                                                   ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup,
                                                   ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup,
+                                                  ComponentLookup<PlayerBaseDeathAnimationConfig> baseDeathAnimationLookup,
+                                                  ComponentLookup<PlayerDeathAnimationConfig> runtimeDeathAnimationLookup,
+                                                  BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup,
                                                   BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup,
                                                   BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup,
                                                   BufferLookup<PlayerRuntimeGamePhaseElement> runtimeGamePhasesLookup,
@@ -775,6 +796,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                              runtimeAppliedElementSlotsLookup,
                                                              baseHealthLookup,
                                                              runtimeHealthLookup,
+                                                             baseDeathAnimationLookup,
+                                                             runtimeDeathAnimationLookup,
+                                                             deathAnimationScalingLookup,
                                                              progressionScalingLookup,
                                                              baseGamePhasesLookup,
                                                              runtimeGamePhasesLookup,

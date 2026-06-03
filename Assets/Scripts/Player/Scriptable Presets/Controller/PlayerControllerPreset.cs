@@ -337,6 +337,11 @@ public sealed class PlayerHealthStatisticsSettings
     #endregion
 
     #region Validation
+    /// <summary>
+    /// Snaps structurally invalid values back to safe defaults. Numeric ranges are surfaced as non-destructive editor
+    /// warnings by the tool instead of being clamped here, except for the hard floors (max health below 1, negative
+    /// reserves, negative durations) that would otherwise break the runtime contract.
+    /// </summary>
     public void Validate()
     {
         if (maxHealth < 1f)

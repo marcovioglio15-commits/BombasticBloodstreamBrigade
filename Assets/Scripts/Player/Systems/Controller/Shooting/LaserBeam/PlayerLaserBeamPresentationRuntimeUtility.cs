@@ -11,7 +11,6 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
 {
     #region Constants
     private const int LaserBeamVisualSortingOrder = 12;
-    private const float ShutdownTailDurationSeconds = 0.12f;
     #endregion
 
     #region Fields
@@ -125,7 +124,7 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
             return;
 
         managedInstance.ShutdownTailActive = 1;
-        managedInstance.ShutdownTailRemainingSeconds = ShutdownTailDurationSeconds;
+        managedInstance.ShutdownTailRemainingSeconds = PlayerLaserBeamPresentationShutdownTailUtility.DurationSeconds;
         managedInstance.ShutdownTailLastFadeNormalized = 1f;
         StopParticleVisuals(managedInstance.SourceVisuals, false);
         StopParticleVisuals(managedInstance.TerminalCapVisuals, false);
@@ -144,6 +143,7 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
         managedInstance.ShutdownTailActive = 0;
         managedInstance.ShutdownTailRemainingSeconds = 0f;
         managedInstance.ShutdownTailLastFadeNormalized = 1f;
+        PlayerLaserBeamPresentationShutdownTailUtility.ResetRootTransform(managedInstance);
     }
 
     /// <summary>
@@ -184,7 +184,7 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
             }
 
             float previousFadeNormalized = math.max(1e-5f, managedInstance.ShutdownTailLastFadeNormalized);
-            float fadeNormalized = managedInstance.ShutdownTailRemainingSeconds / ShutdownTailDurationSeconds;
+            float fadeNormalized = managedInstance.ShutdownTailRemainingSeconds / PlayerLaserBeamPresentationShutdownTailUtility.DurationSeconds;
             ApplyManagedInstanceDissipationFade(managedInstance, previousFadeNormalized, fadeNormalized);
             managedInstance.ShutdownTailLastFadeNormalized = fadeNormalized;
         }
@@ -531,6 +531,8 @@ internal static class PlayerLaserBeamPresentationRuntimeUtility
         managedInstance.ShutdownTailActive = 0;
         managedInstance.ShutdownTailRemainingSeconds = 0f;
         managedInstance.ShutdownTailLastFadeNormalized = 1f;
+        PlayerLaserBeamPresentationShutdownTailUtility.ResetRootTransform(managedInstance);
+        PlayerLaserBeamPresentationShutdownTailUtility.ClearPose(managedInstance);
         StopParticleVisuals(managedInstance.SourceVisuals, true);
         StopParticleVisuals(managedInstance.TerminalCapVisuals, true);
         StopParticleVisuals(managedInstance.ContactFlareVisuals, true);

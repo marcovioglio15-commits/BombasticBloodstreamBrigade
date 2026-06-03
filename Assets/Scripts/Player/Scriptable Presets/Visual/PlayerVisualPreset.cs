@@ -128,6 +128,10 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Full-screen overlay played when the player takes damage that reaches health. Configures the sprite, peak alpha and fade timings driven by the scene UI binder.")]
     [SerializeField] private PlayerVisualDamageVignetteSettings healthDamageVignette = new PlayerVisualDamageVignetteSettings();
 
+    [Header("Death Animation")]
+    [Tooltip("Cinematic camera zoom-in (FOV pulse plus optional camera-to-player dolly) and optional despawn VFX played in parallel with defeat feedbacks while the run-outcome state is in its dying payback window. The Payback Duration is authored inside this block; disabling the block skips the payback and opens the end-of-run UI immediately.")]
+    [SerializeField] private PlayerDeathAnimationSettings deathAnimation = new PlayerDeathAnimationSettings();
+
     [Header("VFX")]
     [Tooltip("Optional attached VFX prefab activated while Elemental Trail passive is enabled.")]
     [SerializeField] private GameObject elementalTrailAttachedVfxPrefab;
@@ -378,6 +382,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return healthDamageVignette;
+        }
+    }
+
+    public PlayerDeathAnimationSettings DeathAnimation
+    {
+        get
+        {
+            return deathAnimation;
         }
     }
 
@@ -795,12 +807,16 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (healthDamageVignette == null)
             healthDamageVignette = new PlayerVisualDamageVignetteSettings();
 
+        if (deathAnimation == null)
+            deathAnimation = new PlayerDeathAnimationSettings();
+
         outline.Validate();
         laserBeam.Validate();
         ValidateScalingRules();
         PlayerElementalVfxAssignmentUtility.ValidateAssignments(elementalEnemyVfxByElement);
         shieldDamageVignette.Validate(name, "Shield Damage Vignette");
         healthDamageVignette.Validate(name, "Health Damage Vignette");
+        deathAnimation.Validate();
     }
     #endregion
 

@@ -140,6 +140,48 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Disables the runtime visual bridge GameObject for the requested player entity. Used by the death animation
+    /// presentation system to hide the player rig the frame the despawn VFX takes over so the VFX visually replaces
+    /// the player. No-op when the entity has no managed instance (the bridge was never spawned, e.g. an Animator
+    /// companion was used instead).
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose managed bridge GameObject should be disabled.</param>
+    /// <returns>True when an instance was found and hidden, otherwise false.</returns>
+    public static bool TryHideRuntimeBridgeInstance(Entity playerEntity)
+    {
+        if (!managedInstances.TryGetValue(playerEntity, out ManagedPlayerVisualInstance managedInstance))
+            return false;
+
+        if (managedInstance == null || managedInstance.InstanceObject == null)
+            return false;
+
+        if (managedInstance.InstanceObject.activeSelf)
+            managedInstance.InstanceObject.SetActive(false);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Enables the runtime visual bridge GameObject for the requested player entity after a death-animation hide.
+    /// Used when the same player entity returns to an idle run state and the bridge instance should be reused.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose managed bridge GameObject should be enabled.</param>
+    /// <returns>True when an instance was found and shown, otherwise false.</returns>
+    public static bool TryShowRuntimeBridgeInstance(Entity playerEntity)
+    {
+        if (!managedInstances.TryGetValue(playerEntity, out ManagedPlayerVisualInstance managedInstance))
+            return false;
+
+        if (managedInstance == null || managedInstance.InstanceObject == null)
+            return false;
+
+        if (!managedInstance.InstanceObject.activeSelf)
+            managedInstance.InstanceObject.SetActive(true);
+
+        return true;
+    }
+
     private static void QueueAnimatorAssignment(EntityManager entityManager, Entity playerEntity, Animator targetAnimatorComponent)
     {
         if (targetAnimatorComponent == null)

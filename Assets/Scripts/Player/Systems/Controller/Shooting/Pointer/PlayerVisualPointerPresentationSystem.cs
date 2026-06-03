@@ -11,7 +11,6 @@ using UnityEngine.Rendering;
 /// visible player heading even under fast rotation or while the Laser Beam optional rotation-speed nerf is active.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
-[UpdateAfter(typeof(PlayerLookRotationSystem))]
 public partial struct PlayerVisualPointerPresentationSystem : ISystem
 {
     #region Methods

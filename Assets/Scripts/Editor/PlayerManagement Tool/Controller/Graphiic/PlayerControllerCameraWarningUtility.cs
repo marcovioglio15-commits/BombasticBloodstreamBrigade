@@ -1,4 +1,5 @@
 using System.Globalization;
+using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine.UIElements;
 
@@ -85,7 +86,14 @@ internal static class PlayerControllerCameraWarningUtility
                                                  SerializedProperty rotationalAmplitudeProperty,
                                                  SerializedProperty frequencyProperty,
                                                  SerializedProperty scaleWithDamageProperty,
-                                                 SerializedProperty damageForFullStrengthProperty)
+                                                 SerializedProperty damageForFullStrengthProperty,
+                                                 SerializedProperty motionModeProperty,
+                                                 SerializedProperty axisRightEnabledProperty,
+                                                 SerializedProperty axisUpEnabledProperty,
+                                                 SerializedProperty axisForwardEnabledProperty,
+                                                 SerializedProperty forwardAmplitudeProperty,
+                                                 SerializedProperty zoomEnabledProperty,
+                                                 SerializedProperty zoomFovDeltaProperty)
     {
         if (warningsRoot == null)
             return;
@@ -102,6 +110,13 @@ internal static class PlayerControllerCameraWarningUtility
         float frequency = frequencyProperty != null ? frequencyProperty.floatValue : 1f;
         bool scaleWithDamage = scaleWithDamageProperty != null && scaleWithDamageProperty.boolValue;
         float damageForFullStrength = damageForFullStrengthProperty != null ? damageForFullStrengthProperty.floatValue : 1f;
+        bool isContinuous = motionModeProperty == null || motionModeProperty.enumValueIndex == (int)CameraShakeMotionMode.Continuous;
+        bool axisRightEnabled = axisRightEnabledProperty == null || axisRightEnabledProperty.boolValue;
+        bool axisUpEnabled = axisUpEnabledProperty == null || axisUpEnabledProperty.boolValue;
+        bool axisForwardEnabled = axisForwardEnabledProperty != null && axisForwardEnabledProperty.boolValue;
+        float forwardAmplitude = forwardAmplitudeProperty != null ? forwardAmplitudeProperty.floatValue : 0f;
+        bool zoomEnabled = zoomEnabledProperty != null && zoomEnabledProperty.boolValue;
+        float zoomFovDelta = zoomFovDeltaProperty != null ? zoomFovDeltaProperty.floatValue : 0f;
 
         // Duration governs the whole envelope: a non-positive value collapses the shake to nothing.
         if (duration <= 0f)
@@ -114,12 +129,27 @@ internal static class PlayerControllerCameraWarningUtility
         if (rotationalAmplitude < 0f)
             AddWarning(warningsRoot, "Rotational Amplitude is negative; runtime clamps it to 0.");
 
-        if (frequency < 0f)
+        if (forwardAmplitude < 0f)
+            AddWarning(warningsRoot, "Forward Amplitude is negative; runtime clamps it to 0.");
+
+        if (isContinuous && frequency < 0f)
             AddWarning(warningsRoot, "Frequency is negative; runtime clamps it to 0 (a static, non-oscillating push).");
 
-        // Cross-field coherence: with both amplitudes at zero there is no visible shake even at full trauma.
-        if (positionalAmplitude <= 0f && rotationalAmplitude <= 0f)
-            AddWarning(warningsRoot, "Both Positional and Rotational Amplitude are 0; the shake has no visible effect while enabled.");
+        // With every motion-producing axis off and no roll/zoom, the shake produces nothing visible.
+        bool hasPlanarMotion = (axisRightEnabled || axisUpEnabled) && positionalAmplitude > 0f;
+        bool hasForwardMotion = axisForwardEnabled && forwardAmplitude > 0f;
+        bool hasRollMotion = rotationalAmplitude > 0f;
+        bool hasZoomMotion = zoomEnabled && math.abs(zoomFovDelta) > 0f;
+
+        if (!hasPlanarMotion && !hasForwardMotion && !hasRollMotion && !hasZoomMotion)
+            AddWarning(warningsRoot, "No motion source is active (all axes disabled or amplitudes 0, no roll, no zoom); the shake has no visible effect while enabled.");
+
+        // Axis enables only matter while their amplitude is positive.
+        if (axisForwardEnabled && forwardAmplitude <= 0f)
+            AddWarning(warningsRoot, "Forward axis is enabled but Forward Amplitude is 0; the forward push has no visible effect.");
+
+        if (zoomEnabled && math.abs(zoomFovDelta) <= 0f)
+            AddWarning(warningsRoot, "Zoom is enabled but Zoom FOV Delta is 0; the FOV pulse has no visible effect.");
 
         // Damage scaling needs a positive reference or every hit collapses to a full-strength shake at runtime.
         if (scaleWithDamage && damageForFullStrength <= 0f)
@@ -143,7 +173,14 @@ internal static class PlayerControllerCameraWarningUtility
                                                       SerializedProperty durationProperty,
                                                       SerializedProperty positionalAmplitudeProperty,
                                                       SerializedProperty rotationalAmplitudeProperty,
-                                                      SerializedProperty frequencyProperty)
+                                                      SerializedProperty frequencyProperty,
+                                                      SerializedProperty motionModeProperty,
+                                                      SerializedProperty axisRightEnabledProperty,
+                                                      SerializedProperty axisUpEnabledProperty,
+                                                      SerializedProperty axisForwardEnabledProperty,
+                                                      SerializedProperty forwardAmplitudeProperty,
+                                                      SerializedProperty zoomEnabledProperty,
+                                                      SerializedProperty zoomFovDeltaProperty)
     {
         if (warningsRoot == null)
             return;
@@ -158,6 +195,13 @@ internal static class PlayerControllerCameraWarningUtility
         float positionalAmplitude = positionalAmplitudeProperty != null ? positionalAmplitudeProperty.floatValue : 1f;
         float rotationalAmplitude = rotationalAmplitudeProperty != null ? rotationalAmplitudeProperty.floatValue : 0f;
         float frequency = frequencyProperty != null ? frequencyProperty.floatValue : 1f;
+        bool isContinuous = motionModeProperty == null || motionModeProperty.enumValueIndex == (int)CameraShakeMotionMode.Continuous;
+        bool axisRightEnabled = axisRightEnabledProperty == null || axisRightEnabledProperty.boolValue;
+        bool axisUpEnabled = axisUpEnabledProperty == null || axisUpEnabledProperty.boolValue;
+        bool axisForwardEnabled = axisForwardEnabledProperty != null && axisForwardEnabledProperty.boolValue;
+        float forwardAmplitude = forwardAmplitudeProperty != null ? forwardAmplitudeProperty.floatValue : 0f;
+        bool zoomEnabled = zoomEnabledProperty != null && zoomEnabledProperty.boolValue;
+        float zoomFovDelta = zoomFovDeltaProperty != null ? zoomFovDeltaProperty.floatValue : 0f;
 
         // Duration governs the whole envelope: a non-positive value collapses the shake to nothing.
         if (duration <= 0f)
@@ -170,12 +214,25 @@ internal static class PlayerControllerCameraWarningUtility
         if (rotationalAmplitude < 0f)
             AddWarning(warningsRoot, "Rotational Amplitude is negative; runtime clamps it to 0.");
 
-        if (frequency < 0f)
+        if (forwardAmplitude < 0f)
+            AddWarning(warningsRoot, "Forward Amplitude is negative; runtime clamps it to 0.");
+
+        if (isContinuous && frequency < 0f)
             AddWarning(warningsRoot, "Frequency is negative; runtime clamps it to 0 (a static, non-oscillating push).");
 
-        // Cross-field coherence: with both amplitudes at zero there is no visible shake even at full trauma.
-        if (positionalAmplitude <= 0f && rotationalAmplitude <= 0f)
-            AddWarning(warningsRoot, "Both Positional and Rotational Amplitude are 0; the fire shake has no visible effect while enabled.");
+        bool hasPlanarMotion = (axisRightEnabled || axisUpEnabled) && positionalAmplitude > 0f;
+        bool hasForwardMotion = axisForwardEnabled && forwardAmplitude > 0f;
+        bool hasRollMotion = rotationalAmplitude > 0f;
+        bool hasZoomMotion = zoomEnabled && math.abs(zoomFovDelta) > 0f;
+
+        if (!hasPlanarMotion && !hasForwardMotion && !hasRollMotion && !hasZoomMotion)
+            AddWarning(warningsRoot, "No motion source is active (all axes disabled or amplitudes 0, no roll, no zoom); the fire shake has no visible effect while enabled.");
+
+        if (axisForwardEnabled && forwardAmplitude <= 0f)
+            AddWarning(warningsRoot, "Forward axis is enabled but Forward Amplitude is 0; the forward push has no visible effect.");
+
+        if (zoomEnabled && math.abs(zoomFovDelta) <= 0f)
+            AddWarning(warningsRoot, "Zoom is enabled but Zoom FOV Delta is 0; the FOV pulse has no visible effect.");
     }
 
     /// <summary>
@@ -190,7 +247,9 @@ internal static class PlayerControllerCameraWarningUtility
     public static void RefreshRumbleValueWarnings(VisualElement warningsRoot,
                                                   bool rumbleEnabled,
                                                   SerializedProperty lowFrequencyProperty,
-                                                  SerializedProperty highFrequencyProperty)
+                                                  SerializedProperty highFrequencyProperty,
+                                                  SerializedProperty rumbleMotionModeProperty,
+                                                  SerializedProperty rumbleImpulseDurationProperty)
     {
         if (warningsRoot == null)
             return;
@@ -203,6 +262,8 @@ internal static class PlayerControllerCameraWarningUtility
         // Resolve current values once; missing properties default to neutral values that raise no warning.
         float lowFrequency = lowFrequencyProperty != null ? lowFrequencyProperty.floatValue : 0.5f;
         float highFrequency = highFrequencyProperty != null ? highFrequencyProperty.floatValue : 0.5f;
+        bool isSingleImpulse = rumbleMotionModeProperty != null && rumbleMotionModeProperty.enumValueIndex == (int)CameraShakeRumbleMotionMode.SingleImpulse;
+        float impulseDuration = rumbleImpulseDurationProperty != null ? rumbleImpulseDurationProperty.floatValue : 0f;
 
         // Each motor amplitude must stay within the gamepad's normalized [0..1] range.
         if (lowFrequency < 0f || lowFrequency > 1f)
@@ -214,6 +275,10 @@ internal static class PlayerControllerCameraWarningUtility
         // Cross-field coherence: with both motors at zero the rumble produces no vibration even at full trauma.
         if (lowFrequency <= 0f && highFrequency <= 0f)
             AddWarning(warningsRoot, "Both rumble motors are 0; the controller will not vibrate while Controller Rumble is enabled.");
+
+        // Single Impulse needs a positive duration; runtime treats anything non-positive as an instant rest.
+        if (isSingleImpulse && impulseDuration <= 0f)
+            AddWarning(warningsRoot, "Single Impulse rumble duration is 0 or negative; the burst will not be perceptible.");
     }
     #endregion
 

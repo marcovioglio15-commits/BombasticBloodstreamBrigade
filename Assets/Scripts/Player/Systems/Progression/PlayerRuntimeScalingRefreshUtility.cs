@@ -26,6 +26,9 @@ internal static class PlayerRuntimeScalingRefreshUtility
     /// <param name="runtimeAppliedElementSlotsLookup">Mutable runtime shooting applied-element slot lookup.</param>
     /// <param name="baseHealthLookup">Immutable health baseline lookup.</param>
     /// <param name="runtimeHealthLookup">Mutable runtime health config lookup.</param>
+    /// <param name="baseDeathAnimationLookup">Immutable death-animation baseline lookup.</param>
+    /// <param name="runtimeDeathAnimationLookup">Mutable runtime death-animation config lookup.</param>
+    /// <param name="deathAnimationScalingLookup">Death-animation visual scaling metadata lookup.</param>
     /// <param name="progressionScalingLookup">Progression scaling metadata lookup.</param>
     /// <param name="baseGamePhasesLookup">Immutable progression-phase baseline lookup.</param>
     /// <param name="runtimeGamePhasesLookup">Mutable runtime progression-phase lookup.</param>
@@ -61,6 +64,9 @@ internal static class PlayerRuntimeScalingRefreshUtility
                                          BufferLookup<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlotsLookup,
                                          ComponentLookup<PlayerBaseHealthStatisticsConfig> baseHealthLookup,
                                          ComponentLookup<PlayerRuntimeHealthStatisticsConfig> runtimeHealthLookup,
+                                         ComponentLookup<PlayerBaseDeathAnimationConfig> baseDeathAnimationLookup,
+                                         ComponentLookup<PlayerDeathAnimationConfig> runtimeDeathAnimationLookup,
+                                         BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup,
                                          BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup,
                                          BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup,
                                          BufferLookup<PlayerRuntimeGamePhaseElement> runtimeGamePhasesLookup,
@@ -102,6 +108,9 @@ internal static class PlayerRuntimeScalingRefreshUtility
             !runtimeAppliedElementSlotsLookup.HasBuffer(entity) ||
             !baseHealthLookup.HasComponent(entity) ||
             !runtimeHealthLookup.HasComponent(entity) ||
+            !baseDeathAnimationLookup.HasComponent(entity) ||
+            !runtimeDeathAnimationLookup.HasComponent(entity) ||
+            !deathAnimationScalingLookup.HasBuffer(entity) ||
             !progressionScalingLookup.HasBuffer(entity) ||
             !baseGamePhasesLookup.HasBuffer(entity) ||
             !runtimeGamePhasesLookup.HasBuffer(entity) ||
@@ -145,6 +154,9 @@ internal static class PlayerRuntimeScalingRefreshUtility
         DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlots = runtimeAppliedElementSlotsLookup[entity];
         PlayerBaseHealthStatisticsConfig baseHealth = baseHealthLookup[entity];
         PlayerRuntimeHealthStatisticsConfig runtimeHealth = runtimeHealthLookup[entity];
+        PlayerBaseDeathAnimationConfig baseDeathAnimation = baseDeathAnimationLookup[entity];
+        PlayerDeathAnimationConfig runtimeDeathAnimation = runtimeDeathAnimationLookup[entity];
+        DynamicBuffer<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScaling = deathAnimationScalingLookup[entity];
         DynamicBuffer<PlayerRuntimeProgressionScalingElement> progressionScaling = progressionScalingLookup[entity];
         DynamicBuffer<PlayerBaseGamePhaseElement> baseGamePhases = baseGamePhasesLookup[entity];
         DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases = runtimeGamePhasesLookup[entity];
@@ -188,6 +200,9 @@ internal static class PlayerRuntimeScalingRefreshUtility
                                                                  runtimeAppliedElementSlots,
                                                                  in baseHealth,
                                                                  ref runtimeHealth,
+                                                                 in baseDeathAnimation,
+                                                                 ref runtimeDeathAnimation,
+                                                                 deathAnimationScaling,
                                                                  progressionScaling,
                                                                  baseGamePhases,
                                                                  runtimeGamePhases,
@@ -223,6 +238,7 @@ internal static class PlayerRuntimeScalingRefreshUtility
         runtimeCameraLookup[entity] = runtimeCamera;
         runtimeShootingLookup[entity] = runtimeShooting;
         runtimeHealthLookup[entity] = runtimeHealth;
+        runtimeDeathAnimationLookup[entity] = runtimeDeathAnimation;
         runtimeComboConfigLookup[entity] = runtimeComboConfig;
         comboCounterStateLookup[entity] = comboCounterState;
         PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigLookup[entity], in powerUpsConfig);

@@ -58,11 +58,13 @@ public static class EnemyGroundIndicatorFootprintUtility
     /// <param name="contactRadiusX">Contact-damage hit half-axis along world X (the player-damage area).</param>
     /// <param name="contactRadiusZ">Contact-damage hit half-axis along world Z (the player-damage area).</param>
     /// <param name="config">Baked ground-indicator configuration.</param>
+    /// <param name="ringsVisible">True when health and shield rings should reserve footprint space.</param>
     /// <param name="hasShieldRing">True when the shield ring should reserve outer footprint space.</param>
     /// <returns>Resolved ground-indicator layout used by the managed view.</returns>
     public static EnemyGroundIndicatorLayout ResolveLayout(float contactRadiusX,
                                                            float contactRadiusZ,
                                                            in EnemyGroundIndicatorConfig config,
+                                                           bool ringsVisible,
                                                            bool hasShieldRing)
     {
         // Clamp axes so degenerate authored values still produce a visible widget.
@@ -71,7 +73,9 @@ public static class EnemyGroundIndicatorFootprintUtility
         float ringDistance = math.max(0f, config.RingDistanceFromShadow);
         float ringThickness = math.max(0f, config.RingThickness);
         float ringSpacing = math.max(0f, config.RingSpacing);
-        float ringPadding = ResolveOuterRingPadding(ringDistance, ringThickness, ringSpacing, hasShieldRing);
+        float ringPadding = ringsVisible
+            ? ResolveOuterRingPadding(ringDistance, ringThickness, ringSpacing, hasShieldRing)
+            : 0f;
 
         float shadowRadiusX = hitRadiusX;
         float shadowRadiusZ = hitRadiusZ;

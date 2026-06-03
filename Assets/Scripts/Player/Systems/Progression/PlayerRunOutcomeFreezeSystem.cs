@@ -3,8 +3,15 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Freezes all player-driven runtime state once a run outcome becomes final so no late input, dashes, milestones, or time-scale resumes can continue.
-/// None.
+/// Freezes player-driven runtime state across the dying playback window and the finalized run outcome. Two distinct
+/// phases are handled here:
+/// - Dying: the player took the lethal hit but the run-end UI has not appeared yet. Input/movement/look/shooting/dash
+///   are reset once so the player cannot keep firing or moving from the dead state, and Time.timeScale is pinned to
+///   zero so the rest of the gameplay simulation halts; only the camera shake, damage flash, vignette, rumble and
+///   death animation keep evolving (they switch to unscaled time during dying through
+///   <see cref="PlayerGameplayPauseUtility.ResolveFeedbackDeltaTime"/>).
+/// - Finalized: dying playback elapsed (or victory was reached). On the first finalized frame milestone runtime state
+///   is cancelled and the input reset runs again as a safety net for victory paths that bypass dying.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup), OrderFirst = true)]
 public partial struct PlayerRunOutcomeFreezeSystem : ISystem
@@ -13,7 +20,7 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
 
     #region Lifecycle
     /// <summary>
-    /// Declares the runtime state required to freeze gameplay after victory or defeat.
+    /// Declares the runtime state required to freeze gameplay after defeat or victory is detected.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
@@ -27,7 +34,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
     }
 
     /// <summary>
-    /// Clears active player runtime state and milestone runtime side effects while keeping the finalized run outcome intact.
+    /// Runs the per-phase freeze. The dying phase only resets active runtime state once; the finalized phase resets
+    /// state once again and pins Time.timeScale to zero every frame so the rest of the simulation cannot keep moving.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -36,9 +44,8 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
         ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionLookup = SystemAPI.GetComponentLookup<PlayerMilestonePowerUpSelectionState>(false);
         ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneResumeLookup = SystemAPI.GetComponentLookup<PlayerMilestoneTimeScaleResumeState>(false);
         BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneOfferLookup = SystemAPI.GetBufferLookup<PlayerMilestonePowerUpSelectionOfferElement>(false);
-        bool anyFinalizedRunFound = false;
+        bool anyDyingOrFinalizedRunFound = false;
 
-        // Reset all runtime-driven player state exactly once per finalized run.
         foreach ((RefRW<PlayerRunOutcomeState> runOutcomeState,
                   RefRW<PlayerInputState> inputState,
                   RefRW<PlayerMovementState> movementState,
@@ -53,32 +60,119 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
                              .WithAll<PlayerControllerConfig>()
                              .WithEntityAccess())
         {
+            ApplyDyingFreezeIfNeeded(ref runOutcomeState.ValueRW,
+                                     ref inputState.ValueRW,
+                                     ref movementState.ValueRW,
+                                     ref lookState.ValueRW,
+                                     ref shootingState.ValueRW,
+                                     entity,
+                                     ref dashLookup);
+
+            // Dying alone is enough to halt gameplay time: the player took the lethal hit, every gameplay simulation
+            // must freeze immediately, and only the feedback presentation systems keep evolving (they switch to unscaled
+            // time during dying).
+            if (runOutcomeState.ValueRO.IsDying != 0 || runOutcomeState.ValueRO.IsFinalized != 0)
+                anyDyingOrFinalizedRunFound = true;
+
             if (runOutcomeState.ValueRO.IsFinalized == 0)
                 continue;
 
-            anyFinalizedRunFound = true;
-
-            if (runOutcomeState.ValueRO.RuntimeFreezeApplied == 0)
-            {
-                ResetInputState(ref inputState.ValueRW);
-                ResetMovementState(ref movementState.ValueRW);
-                ResetLookState(ref lookState.ValueRW);
-                ResetShootingState(ref shootingState.ValueRW);
-                ResetDashState(entity, ref dashLookup);
-                ResetMilestoneRuntimeState(entity,
-                                           ref milestoneSelectionLookup,
-                                           ref milestoneResumeLookup,
-                                           ref milestoneOfferLookup);
-                runOutcomeState.ValueRW.RuntimeFreezeApplied = 1;
-            }
+            ApplyFinalizedFreezeIfNeeded(ref runOutcomeState.ValueRW,
+                                          ref inputState.ValueRW,
+                                          ref movementState.ValueRW,
+                                          ref lookState.ValueRW,
+                                          ref shootingState.ValueRW,
+                                          entity,
+                                          ref dashLookup,
+                                          ref milestoneSelectionLookup,
+                                          ref milestoneResumeLookup,
+                                          ref milestoneOfferLookup);
         }
 
-        if (anyFinalizedRunFound)
+        // Pin gameplay time to zero from the first dying frame so every simulation system halts; feedback presentation
+        // systems use unscaled time during dying so they keep evolving (camera shake, flash, vignette, death animation).
+        if (anyDyingOrFinalizedRunFound)
             Time.timeScale = 0f;
     }
     #endregion
 
-    #region Helpers
+    #region Phase Application
+    /// <summary>
+    /// Applies the one-shot dying freeze: input/movement/look/shooting and any active dash are reset the first frame
+    /// the dying flag is set. Subsequent dying frames skip the reset so the rest of the simulation keeps observing the
+    /// already-frozen runtime state without paying for redundant writes.
+    /// </summary>
+    /// <param name="runOutcomeState">Mutable run outcome state used to gate the one-shot apply.</param>
+    /// <param name="inputState">Mutable runtime input state stored on the player entity.</param>
+    /// <param name="movementState">Mutable movement state stored on the player entity.</param>
+    /// <param name="lookState">Mutable look state stored on the player entity.</param>
+    /// <param name="shootingState">Mutable shooting state stored on the player entity.</param>
+    /// <param name="entity">Player entity whose optional dash state should be cleared.</param>
+    /// <param name="dashLookup">Component lookup used to mutate PlayerDashState.</param>
+    private static void ApplyDyingFreezeIfNeeded(ref PlayerRunOutcomeState runOutcomeState,
+                                                  ref PlayerInputState inputState,
+                                                  ref PlayerMovementState movementState,
+                                                  ref PlayerLookState lookState,
+                                                  ref PlayerShootingState shootingState,
+                                                  Entity entity,
+                                                  ref ComponentLookup<PlayerDashState> dashLookup)
+    {
+        if (runOutcomeState.IsDying == 0)
+            return;
+
+        if (runOutcomeState.DyingFreezeApplied != 0)
+            return;
+
+        ResetInputState(ref inputState);
+        ResetMovementState(ref movementState);
+        ResetLookState(ref lookState);
+        ResetShootingState(ref shootingState);
+        ResetDashState(entity, ref dashLookup);
+        runOutcomeState.DyingFreezeApplied = 1;
+    }
+
+    /// <summary>
+    /// Applies the one-shot finalized freeze. Resets every runtime channel again so victory paths (which bypass dying)
+    /// also clear input, and cancels any milestone runtime state so the run-end UI never finds an in-flight selection.
+    /// </summary>
+    /// <param name="runOutcomeState">Mutable run outcome state used to gate the one-shot apply.</param>
+    /// <param name="inputState">Mutable runtime input state stored on the player entity.</param>
+    /// <param name="movementState">Mutable movement state stored on the player entity.</param>
+    /// <param name="lookState">Mutable look state stored on the player entity.</param>
+    /// <param name="shootingState">Mutable shooting state stored on the player entity.</param>
+    /// <param name="entity">Player entity whose optional dash and milestone state should be cleared.</param>
+    /// <param name="dashLookup">Component lookup used to mutate PlayerDashState.</param>
+    /// <param name="milestoneSelectionLookup">Lookup used to mutate milestone selection state.</param>
+    /// <param name="milestoneResumeLookup">Lookup used to mutate time-scale resume state.</param>
+    /// <param name="milestoneOfferLookup">Lookup used to clear rolled milestone offers.</param>
+    private static void ApplyFinalizedFreezeIfNeeded(ref PlayerRunOutcomeState runOutcomeState,
+                                                      ref PlayerInputState inputState,
+                                                      ref PlayerMovementState movementState,
+                                                      ref PlayerLookState lookState,
+                                                      ref PlayerShootingState shootingState,
+                                                      Entity entity,
+                                                      ref ComponentLookup<PlayerDashState> dashLookup,
+                                                      ref ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionLookup,
+                                                      ref ComponentLookup<PlayerMilestoneTimeScaleResumeState> milestoneResumeLookup,
+                                                      ref BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneOfferLookup)
+    {
+        if (runOutcomeState.RuntimeFreezeApplied != 0)
+            return;
+
+        ResetInputState(ref inputState);
+        ResetMovementState(ref movementState);
+        ResetLookState(ref lookState);
+        ResetShootingState(ref shootingState);
+        ResetDashState(entity, ref dashLookup);
+        ResetMilestoneRuntimeState(entity,
+                                   ref milestoneSelectionLookup,
+                                   ref milestoneResumeLookup,
+                                   ref milestoneOfferLookup);
+        runOutcomeState.RuntimeFreezeApplied = 1;
+    }
+    #endregion
+
+    #region Reset Helpers
     /// <summary>
     /// Clears all live player input channels so later gameplay systems observe a fully idle controller.
     /// </summary>

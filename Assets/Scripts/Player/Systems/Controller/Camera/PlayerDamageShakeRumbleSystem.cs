@@ -55,10 +55,12 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
             {
                 ResolveDamageMotorSpeeds(in cameraConfig.ValueRO.Shake,
                                           shakeState.ValueRO.ShakeMagnitude,
+                                          shakeState.ValueRO.DamageRumbleImpulseRemainingSeconds,
                                           out float damageLowFrequency,
                                           out float damageHighFrequency);
                 ResolveFireMotorSpeeds(in cameraConfig.ValueRO.FireShake,
                                         shakeState.ValueRO.FireShakeMagnitude,
+                                        shakeState.ValueRO.FireRumbleImpulseRemainingSeconds,
                                         out float fireLowFrequency,
                                         out float fireHighFrequency);
                 // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping shakes would clip.
@@ -105,6 +107,8 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     #region Gating
     /// <summary>
     /// Resolves whether the rumble must rest this frame, mirroring the camera systems' pause and end-of-run guards.
+    /// Dying bypasses the hard-pause guard: the freeze system pins gameplay time to zero on the lethal hit, but the
+    /// rumble feedback must keep playing along the trauma envelope so the final beat is felt on the controller.
     /// </summary>
     /// <param name="isSceneTransitioning">True while the scene manager is loading or fading between scenes.</param>
     /// <returns>True when the motors must be forced to rest for the current frame.</returns>
@@ -112,6 +116,9 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     {
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
             return true;
+
+        if (PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery))
+            return false;
 
         // A hard time-scale pause freezes gameplay, but a transition-owned pause must still settle the motors to rest.
         return PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning;
@@ -126,25 +133,40 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     /// </summary>
     /// <param name="shake">Resolved runtime damage shake config carrying the rumble enable flag and motor amplitudes.</param>
     /// <param name="shakeMagnitude">Smooth damage envelope magnitude in the [0..1] range resolved by the shake utility.</param>
+    /// <param name="impulseRemainingSeconds">Seconds left on the SingleImpulse burst; ignored while Continuous.</param>
     /// <param name="lowFrequency">Resolved heavy (low-frequency) motor speed in the [0..1] range.</param>
     /// <param name="highFrequency">Resolved light (high-frequency) motor speed in the [0..1] range.</param>
     private static void ResolveDamageMotorSpeeds(in CameraShakeBlob shake,
                                                   float shakeMagnitude,
+                                                  float impulseRemainingSeconds,
                                                   out float lowFrequency,
                                                   out float highFrequency)
     {
-        float magnitude = math.saturate(shakeMagnitude);
-
-        // No rumble requested or no trauma left this frame leaves both motors at rest.
-        if (shake.RumbleEnabled == 0 || magnitude <= 0f)
+        // No rumble requested leaves both motors at rest regardless of trauma or impulse window.
+        if (shake.RumbleEnabled == 0)
         {
             lowFrequency = 0f;
             highFrequency = 0f;
             return;
         }
 
-        lowFrequency = math.saturate(shake.RumbleLowFrequency) * magnitude;
-        highFrequency = math.saturate(shake.RumbleHighFrequency) * magnitude;
+        switch (shake.RumbleMotionMode)
+        {
+            case CameraShakeRumbleMotionMode.SingleImpulse:
+                ResolveImpulseMotorSpeeds(impulseRemainingSeconds,
+                                          shake.RumbleLowFrequency,
+                                          shake.RumbleHighFrequency,
+                                          out lowFrequency,
+                                          out highFrequency);
+                return;
+            default:
+                ResolveContinuousMotorSpeeds(shakeMagnitude,
+                                             shake.RumbleLowFrequency,
+                                             shake.RumbleHighFrequency,
+                                             out lowFrequency,
+                                             out highFrequency);
+                return;
+        }
     }
 
     /// <summary>
@@ -154,24 +176,94 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     /// </summary>
     /// <param name="shake">Resolved runtime fire shake config carrying the rumble enable flag and motor amplitudes.</param>
     /// <param name="shakeMagnitude">Smooth fire envelope magnitude in the [0..1] range resolved by the shake utility.</param>
+    /// <param name="impulseRemainingSeconds">Seconds left on the SingleImpulse burst; ignored while Continuous.</param>
     /// <param name="lowFrequency">Resolved heavy (low-frequency) motor speed in the [0..1] range.</param>
     /// <param name="highFrequency">Resolved light (high-frequency) motor speed in the [0..1] range.</param>
     private static void ResolveFireMotorSpeeds(in CameraFireShakeBlob shake,
                                                 float shakeMagnitude,
+                                                float impulseRemainingSeconds,
                                                 out float lowFrequency,
                                                 out float highFrequency)
     {
-        float magnitude = math.saturate(shakeMagnitude);
-
-        if (shake.RumbleEnabled == 0 || magnitude <= 0f)
+        if (shake.RumbleEnabled == 0)
         {
             lowFrequency = 0f;
             highFrequency = 0f;
             return;
         }
 
-        lowFrequency = math.saturate(shake.RumbleLowFrequency) * magnitude;
-        highFrequency = math.saturate(shake.RumbleHighFrequency) * magnitude;
+        switch (shake.RumbleMotionMode)
+        {
+            case CameraShakeRumbleMotionMode.SingleImpulse:
+                ResolveImpulseMotorSpeeds(impulseRemainingSeconds,
+                                          shake.RumbleLowFrequency,
+                                          shake.RumbleHighFrequency,
+                                          out lowFrequency,
+                                          out highFrequency);
+                return;
+            default:
+                ResolveContinuousMotorSpeeds(shakeMagnitude,
+                                             shake.RumbleLowFrequency,
+                                             shake.RumbleHighFrequency,
+                                             out lowFrequency,
+                                             out highFrequency);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Resolves the motor speeds for the Continuous rumble mode: both motors track the trauma envelope so the vibration
+    /// ramps down together with the on-screen kick.
+    /// </summary>
+    /// <param name="shakeMagnitude">Smooth envelope magnitude in the [0..1] range.</param>
+    /// <param name="rumbleLowFrequencyAmplitude">Authored low-frequency motor amplitude.</param>
+    /// <param name="rumbleHighFrequencyAmplitude">Authored high-frequency motor amplitude.</param>
+    /// <param name="lowFrequency">Resolved heavy motor speed in [0..1].</param>
+    /// <param name="highFrequency">Resolved light motor speed in [0..1].</param>
+    private static void ResolveContinuousMotorSpeeds(float shakeMagnitude,
+                                                      float rumbleLowFrequencyAmplitude,
+                                                      float rumbleHighFrequencyAmplitude,
+                                                      out float lowFrequency,
+                                                      out float highFrequency)
+    {
+        float magnitude = math.saturate(shakeMagnitude);
+
+        if (magnitude <= 0f)
+        {
+            lowFrequency = 0f;
+            highFrequency = 0f;
+            return;
+        }
+
+        lowFrequency = math.saturate(rumbleLowFrequencyAmplitude) * magnitude;
+        highFrequency = math.saturate(rumbleHighFrequencyAmplitude) * magnitude;
+    }
+
+    /// <summary>
+    /// Resolves the motor speeds for the SingleImpulse rumble mode: a clean burst at the authored amplitudes lasts for
+    /// the configured impulse duration and then rests. Decoupling from the trauma envelope keeps the burst feel sharp
+    /// and predictable so a long-tailed envelope does not stretch the rumble into a sustained vibration.
+    /// </summary>
+    /// <param name="impulseRemainingSeconds">Seconds left on the impulse window resolved by the shake utility.</param>
+    /// <param name="rumbleLowFrequencyAmplitude">Authored low-frequency motor amplitude.</param>
+    /// <param name="rumbleHighFrequencyAmplitude">Authored high-frequency motor amplitude.</param>
+    /// <param name="lowFrequency">Resolved heavy motor speed in [0..1].</param>
+    /// <param name="highFrequency">Resolved light motor speed in [0..1].</param>
+    private static void ResolveImpulseMotorSpeeds(float impulseRemainingSeconds,
+                                                   float rumbleLowFrequencyAmplitude,
+                                                   float rumbleHighFrequencyAmplitude,
+                                                   out float lowFrequency,
+                                                   out float highFrequency)
+    {
+        if (impulseRemainingSeconds <= 0f)
+        {
+            lowFrequency = 0f;
+            highFrequency = 0f;
+            return;
+        }
+
+        lowFrequency = math.saturate(rumbleLowFrequencyAmplitude);
+        highFrequency = math.saturate(rumbleHighFrequencyAmplitude);
     }
     #endregion
 
