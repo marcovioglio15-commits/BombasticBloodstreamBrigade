@@ -95,6 +95,62 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         activeInstances.Clear();
         pooledInstances.Clear();
     }
+
+    /// <summary>
+    /// Disables the GameObject of every active managed VFX instance whose follow target matches the requested player
+    /// entity. Used by the death animation system the frame the player visual bridge hides so player-attached VFX
+    /// (Charge Shot, Level-Up, Health/Shield Increase, Muzzle Flash follow-pose VFX, Elemental Trail attached, etc.)
+    /// disappear together with the rig instead of floating around the now-invisible player. The instances are kept on
+    /// the active list so the same call can re-show them via <see cref="ShowPlayerAttachedInstances"/>; they will be
+    /// pooled normally when their lifetime expires.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose attached VFX should be hidden.</param>
+    public static void HidePlayerAttachedInstances(Entity playerEntity)
+    {
+        if (playerEntity == Entity.Null)
+            return;
+
+        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
+        {
+            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
+
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
+                continue;
+
+            if (!instance.HasFollowTarget || instance.FollowTargetEntity != playerEntity)
+                continue;
+
+            if (instance.InstanceObject.activeSelf)
+                instance.InstanceObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Re-enables the GameObject of every active managed VFX instance whose follow target matches the requested player
+    /// entity. Mirror of <see cref="HidePlayerAttachedInstances"/> used when the run-outcome transitions back to idle
+    /// without finalizing (rare; mostly a defensive escape hatch). Does not extend lifetimes: the instance keeps
+    /// counting down the remaining seconds it had when it was hidden.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose attached VFX should be re-shown.</param>
+    public static void ShowPlayerAttachedInstances(Entity playerEntity)
+    {
+        if (playerEntity == Entity.Null)
+            return;
+
+        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
+        {
+            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
+
+            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
+                continue;
+
+            if (!instance.HasFollowTarget || instance.FollowTargetEntity != playerEntity)
+                continue;
+
+            if (!instance.InstanceObject.activeSelf)
+                instance.InstanceObject.SetActive(true);
+        }
+    }
     #endregion
 
     #region Spawn

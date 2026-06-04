@@ -256,10 +256,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
         if (deathState.Active == 0)
         {
             if (deathState.VisualBridgeHidden != 0)
-            {
-                PlayerManagedVisualAnimatorBridgeSystem.TryShowRuntimeBridgeInstance(playerEntity);
-                deathState.VisualBridgeHidden = 0;
-            }
+                RestoreVisualPresentationForEntity(playerEntity, ref deathState);
 
             deathState.CurrentFovDelta = 0f;
             deathState.CurrentPositionOffset = float3.zero;
@@ -272,13 +269,25 @@ public partial struct PlayerDeathAnimationSystem : ISystem
         deathState.VfxSpawned = 0;
 
         if (deathState.VisualBridgeHidden != 0)
-            PlayerManagedVisualAnimatorBridgeSystem.TryShowRuntimeBridgeInstance(playerEntity);
+            RestoreVisualPresentationForEntity(playerEntity, ref deathState);
 
-        deathState.VisualBridgeHidden = 0;
         deathState.CurrentFovDelta = 0f;
         deathState.CurrentPositionOffset = float3.zero;
         deathState.PreviousAppliedFovDelta = 0f;
         deathState.PreviousAppliedPositionOffset = float3.zero;
+    }
+
+    /// <summary>
+    /// Re-enables the runtime visual bridge and every player-attached VFX/beam the death animation hid. Used when the
+    /// run-outcome state returns to idle without finalizing so a respawned player keeps its visual presentation intact.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose visual presentation should be restored.</param>
+    /// <param name="deathState">Mutable animation state whose visual-bridge-hidden flag must be cleared.</param>
+    private static void RestoreVisualPresentationForEntity(Entity playerEntity, ref PlayerDeathAnimationState deathState)
+    {
+        PlayerManagedVisualAnimatorBridgeSystem.TryShowRuntimeBridgeInstance(playerEntity);
+        PlayerPowerUpManagedVfxRuntimeUtility.ShowPlayerAttachedInstances(playerEntity);
+        deathState.VisualBridgeHidden = 0;
     }
     #endregion
 
@@ -309,10 +318,18 @@ public partial struct PlayerDeathAnimationSystem : ISystem
 
         // Visual bridge hide can happen even when no VFX is authored, as long as the preset asks for it. Treat it as a
         // sibling one-shot so designers can hide the player rig at the spawn-time threshold regardless of VFX presence.
+        // Same frame also hides every player-attached VFX (Charge Shot, Level-Up, Health/Shield Increase, Muzzle Flash
+        // follow-pose, Elemental Trail attached, Laser Beam managed visual) and stops the aiming pointer draw so the
+        // despawn effect plays against a clean stage instead of a halo of floating effects around the invisible rig.
+        // The VFX/beam/pointer suppression is gated by VisualBridgeHidden so it fires once per run even when no managed
+        // bridge instance exists (e.g. Animator companion mode): the toggle is what matters, not whether the bridge
+        // call succeeded.
         if (deathConfig.HidePlayerVisualOnVfxSpawn != 0 && deathState.VisualBridgeHidden == 0)
         {
-            if (PlayerManagedVisualAnimatorBridgeSystem.TryHideRuntimeBridgeInstance(playerEntity))
-                deathState.VisualBridgeHidden = 1;
+            PlayerManagedVisualAnimatorBridgeSystem.TryHideRuntimeBridgeInstance(playerEntity);
+            PlayerPowerUpManagedVfxRuntimeUtility.HidePlayerAttachedInstances(playerEntity);
+            PlayerLaserBeamPresentationSystem.TryHideManagedInstance(playerEntity);
+            deathState.VisualBridgeHidden = 1;
         }
 
         if (deathConfig.HasDespawnVfxPrefab == 0)
