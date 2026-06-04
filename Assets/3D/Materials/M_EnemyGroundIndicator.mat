@@ -30,6 +30,7 @@ Material:
     - _RingParams: {r: 0.05, g: 0.08, b: 0.03, a: 0}
     - _Fill: {r: 1, g: 0, b: 0, a: 0}
     - _Softness: {r: 0.05, g: 0.02, b: 6.2831855, a: 0}
+    - _BackgroundAlphas: {r: 1, g: 1, b: 0, a: 0}
     - _ShadowColor: {r: 0, g: 0, b: 0, a: 0.55}
     - _HealthFillColor: {r: 0.92, g: 0.18, b: 0.16, a: 0.95}
     - _HealthBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}

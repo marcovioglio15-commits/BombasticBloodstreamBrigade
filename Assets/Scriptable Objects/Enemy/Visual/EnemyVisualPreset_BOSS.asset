@@ -45,8 +45,10 @@ MonoBehaviour:
     shadowEdgeSoftness: 0.08
     healthRingFillColor: {r: 0.92, g: 0.18, b: 0.16, a: 0.95}
     healthRingBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}
+    healthRingBackgroundAlpha: 1
     shieldRingFillColor: {r: 0.25, g: 0.85, b: 1, a: 0.95}
     shieldRingBackgroundColor: {r: 0.04, g: 0.04, b: 0.04, a: 0.7}
+    shieldRingBackgroundAlpha: 1
     ringEdgeSoftness: 0.05
     ringAngularSoftness: 0.02
     lockRingsToWorld: 0

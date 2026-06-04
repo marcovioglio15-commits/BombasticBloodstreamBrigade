@@ -991,8 +991,10 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             ShadowColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShadowColor),
             HealthFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.HealthRingFillColor),
             HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.HealthRingBackgroundColor),
+            HealthBackgroundAlpha = math.saturate(authoring.HealthRingBackgroundAlpha),
             ShieldFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingFillColor),
             ShieldBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(authoring.ShieldRingBackgroundColor),
+            ShieldBackgroundAlpha = math.saturate(authoring.ShieldRingBackgroundAlpha),
             SuppressRings = suppressRings ? (byte)1 : (byte)0,
             LockRingsToWorld = authoring.LockRingsToWorld ? (byte)1 : (byte)0,
             LockedRingsAngleRadians = ConvertWorldHeadingDegreesToPixelAngleRadians(authoring.LockedRingsWorldAngleDegrees)

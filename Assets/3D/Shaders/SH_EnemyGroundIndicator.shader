@@ -23,6 +23,11 @@ Shader "Custom/Enemy Ground Indicator"
         // ring arc width in radians, and a 0/1 flag that hides every ring layer.
         _Softness("Softness (ringEdge, ringAngular, ringArcRad, ringsVisible)", Vector) = (0.05, 0.02, 6.28318530718, 1)
 
+        // Independent background alpha multipliers (one per ring) applied on top of
+        // _HealthBackgroundColor.a / _ShieldBackgroundColor.a so authors can tune
+        // background opacity without touching the saved color asset.
+        _BackgroundAlphas("Background Alphas (healthBg, shieldBg, _, _)", Vector) = (1, 1, 0, 0)
+
         _ShadowColor("Shadow Color", Color) = (0, 0, 0, 0.55)
         _HealthFillColor("Health Fill Color", Color) = (0.92, 0.18, 0.16, 0.95)
         _HealthBackgroundColor("Health Background Color", Color) = (0.04, 0.04, 0.04, 0.7)
@@ -66,6 +71,7 @@ Shader "Custom/Enemy Ground Indicator"
                 float4 _RingParams;
                 float4 _Fill;
                 float4 _Softness;
+                float4 _BackgroundAlphas;
                 float4 _ShadowColor;
                 float4 _HealthFillColor;
                 float4 _HealthBackgroundColor;
@@ -208,9 +214,13 @@ Shader "Custom/Enemy Ground Indicator"
                 float shieldFillMask = ResolveFillAngularMask(deltaAngle, _Fill.y, _Softness.z, _Softness.y);
 
                 // Compose ring colors: full-ring background underneath, fill on top.
-                float4 healthBackground = float4(_HealthBackgroundColor.rgb, _HealthBackgroundColor.a * healthBand);
+                // Independent background alphas are applied as multipliers so authors can
+                // tune track opacity without having to edit the saved color asset.
+                float healthBackgroundAlphaMultiplier = saturate(_BackgroundAlphas.x);
+                float shieldBackgroundAlphaMultiplier = saturate(_BackgroundAlphas.y);
+                float4 healthBackground = float4(_HealthBackgroundColor.rgb, _HealthBackgroundColor.a * healthBackgroundAlphaMultiplier * healthBand);
                 float4 healthFill = float4(_HealthFillColor.rgb, _HealthFillColor.a * healthBand * healthFillMask);
-                float4 shieldBackground = float4(_ShieldBackgroundColor.rgb, _ShieldBackgroundColor.a * shieldBand);
+                float4 shieldBackground = float4(_ShieldBackgroundColor.rgb, _ShieldBackgroundColor.a * shieldBackgroundAlphaMultiplier * shieldBand);
                 float4 shieldFill = float4(_ShieldFillColor.rgb, _ShieldFillColor.a * shieldBand * shieldFillMask);
 
                 // Front-to-back composition with shadow at the bottom and shield on top.

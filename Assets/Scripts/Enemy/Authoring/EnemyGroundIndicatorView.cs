@@ -23,6 +23,7 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     private static readonly int HealthBackgroundColorPropertyId = Shader.PropertyToID("_HealthBackgroundColor");
     private static readonly int ShieldFillColorPropertyId = Shader.PropertyToID("_ShieldFillColor");
     private static readonly int ShieldBackgroundColorPropertyId = Shader.PropertyToID("_ShieldBackgroundColor");
+    private static readonly int BackgroundAlphasPropertyId = Shader.PropertyToID("_BackgroundAlphas");
     #endregion
 
     #region Fields
@@ -82,6 +83,8 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     private float4 cachedHealthBackgroundColor;
     private float4 cachedShieldFillColor;
     private float4 cachedShieldBackgroundColor;
+    private float cachedHealthBackgroundAlpha;
+    private float cachedShieldBackgroundAlpha;
     private float cachedShadowAlpha;
     private float cachedShadowEdgeSoftness;
     private float cachedRingEdgeSoftness;
@@ -361,12 +364,16 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     /// <returns>True when any color changed and the property block needs a refresh.</returns>
     private bool ApplyColorsIfChanged(in EnemyGroundIndicatorConfig config)
     {
+        float resolvedHealthBackgroundAlpha = math.saturate(config.HealthBackgroundAlpha);
+        float resolvedShieldBackgroundAlpha = math.saturate(config.ShieldBackgroundAlpha);
         bool changed = !colorsInitialized
                        || !AreColorsApproximatelyEqual(cachedShadowColor, config.ShadowColor)
                        || !AreColorsApproximatelyEqual(cachedHealthFillColor, config.HealthFillColor)
                        || !AreColorsApproximatelyEqual(cachedHealthBackgroundColor, config.HealthBackgroundColor)
                        || !AreColorsApproximatelyEqual(cachedShieldFillColor, config.ShieldFillColor)
-                       || !AreColorsApproximatelyEqual(cachedShieldBackgroundColor, config.ShieldBackgroundColor);
+                       || !AreColorsApproximatelyEqual(cachedShieldBackgroundColor, config.ShieldBackgroundColor)
+                       || !Mathf.Approximately(cachedHealthBackgroundAlpha, resolvedHealthBackgroundAlpha)
+                       || !Mathf.Approximately(cachedShieldBackgroundAlpha, resolvedShieldBackgroundAlpha);
 
         if (!changed)
             return false;
@@ -377,11 +384,17 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
         cachedPropertyBlock.SetColor(HealthBackgroundColorPropertyId, ToColor(config.HealthBackgroundColor));
         cachedPropertyBlock.SetColor(ShieldFillColorPropertyId, ToColor(config.ShieldFillColor));
         cachedPropertyBlock.SetColor(ShieldBackgroundColorPropertyId, ToColor(config.ShieldBackgroundColor));
+        cachedPropertyBlock.SetVector(BackgroundAlphasPropertyId, new Vector4(resolvedHealthBackgroundAlpha,
+                                                                              resolvedShieldBackgroundAlpha,
+                                                                              0f,
+                                                                              0f));
         cachedShadowColor = config.ShadowColor;
         cachedHealthFillColor = config.HealthFillColor;
         cachedHealthBackgroundColor = config.HealthBackgroundColor;
         cachedShieldFillColor = config.ShieldFillColor;
         cachedShieldBackgroundColor = config.ShieldBackgroundColor;
+        cachedHealthBackgroundAlpha = resolvedHealthBackgroundAlpha;
+        cachedShieldBackgroundAlpha = resolvedShieldBackgroundAlpha;
         colorsInitialized = true;
         return true;
     }

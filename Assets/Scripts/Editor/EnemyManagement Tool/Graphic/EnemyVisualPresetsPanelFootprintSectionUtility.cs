@@ -260,6 +260,13 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                                 "healthRingBackgroundColor",
                                                                 "Health Ring Background Color",
                                                                 "Background color of the health ring track shown behind the depleting fill. Alpha controls track opacity.");
+        EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
+                                                              appearanceFoldout,
+                                                              footprintProperty.FindPropertyRelative("healthRingBackgroundAlpha"),
+                                                              "Health Ring Background Alpha",
+                                                              0f,
+                                                              1f,
+                                                              "Final opacity multiplier applied to the health ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 appearanceFoldout,
                                                                 footprintProperty,
@@ -272,6 +279,13 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                                 "shieldRingBackgroundColor",
                                                                 "Shield Ring Background Color",
                                                                 "Background color of the shield ring track shown behind the depleting fill. Alpha controls track opacity.");
+        EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
+                                                              appearanceFoldout,
+                                                              footprintProperty.FindPropertyRelative("shieldRingBackgroundAlpha"),
+                                                              "Shield Ring Background Alpha",
+                                                              0f,
+                                                              1f,
+                                                              "Final opacity multiplier applied to the shield ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.");
         BuildRingOrientationControls(panel, orientationFoldout, footprintProperty);
     }
 
@@ -340,6 +354,8 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
         AddRangeWarning(footprintProperty, container, "ringArcDegrees", 0.0001f, EnemyVisualFootprintSettings.DefaultRingArcDegrees, "Ring Arc Degrees should be greater than 0 and at most 360 degrees.");
         AddRangeWarning(footprintProperty, container, "ringEdgeSoftness", 0f, 1f, "Ring Edge Softness should stay between 0 and 1.");
         AddRangeWarning(footprintProperty, container, "ringAngularSoftness", 0f, 1f, "Ring Angular Softness should stay between 0 and 1 radians.");
+        AddRangeWarning(footprintProperty, container, "healthRingBackgroundAlpha", 0f, 1f, "Health Ring Background Alpha should stay between 0 and 1.");
+        AddRangeWarning(footprintProperty, container, "shieldRingBackgroundAlpha", 0f, 1f, "Shield Ring Background Alpha should stay between 0 and 1.");
 
         SerializedProperty lockProperty = footprintProperty.FindPropertyRelative("lockRingsToWorld");
 

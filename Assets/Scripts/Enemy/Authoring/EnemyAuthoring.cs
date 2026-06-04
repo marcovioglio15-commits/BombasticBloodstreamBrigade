@@ -36,8 +36,10 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private static readonly Color DefaultShadowColor = new Color(0f, 0f, 0f, 0.55f);
     private static readonly Color DefaultHealthRingFillColor = new Color(0.92f, 0.18f, 0.16f, 0.95f);
     private static readonly Color DefaultHealthRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
+    private const float DefaultHealthRingBackgroundAlpha = 1f;
     private static readonly Color DefaultShieldRingFillColor = new Color(0.25f, 0.85f, 1f, 0.95f);
     private static readonly Color DefaultShieldRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
+    private const float DefaultShieldRingBackgroundAlpha = 1f;
     private static readonly Color DefaultDamageFlashColor = new Color(1f, 0.15f, 0.15f, 1f);
     private static readonly Color DefaultOutlineColor = Color.black;
     private const float DefaultDamageFlashDurationSeconds = 0.06f;
@@ -1045,6 +1047,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public float HealthRingBackgroundAlpha
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultHealthRingBackgroundAlpha;
+
+            return settings.HealthRingBackgroundAlpha;
+        }
+    }
+
     public Color ShieldRingFillColor
     {
         get
@@ -1068,6 +1083,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
                 return DefaultShieldRingBackgroundColor;
 
             return settings.ShieldRingBackgroundColor;
+        }
+    }
+
+    public float ShieldRingBackgroundAlpha
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultShieldRingBackgroundAlpha;
+
+            return settings.ShieldRingBackgroundAlpha;
         }
     }
 
