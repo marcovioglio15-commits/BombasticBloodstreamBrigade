@@ -24,7 +24,7 @@ MonoBehaviour:
     maxVisibleDistance: 55
     visibleDistanceHysteresis: 6
   damageFeedback:
-    flashColor: {r: 0, g: 0.5566038, b: 0.53041065, a: 1}
+    flashColor: {r: 0.8679245, g: 0.57289845, b: 0.16785331, a: 1}
     flashDurationSeconds: 0.3
     flashMaximumBlend: 0.8
   outline:
