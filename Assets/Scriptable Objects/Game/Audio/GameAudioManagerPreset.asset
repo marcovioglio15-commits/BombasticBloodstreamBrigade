@@ -41,7 +41,7 @@ MonoBehaviour:
     eventCode: MC_SFX_Shoot_Projectile_Player
     displayName: Player Projectile Shot
     description: Requested when the player emits one projectile shot batch.
-    eventPath: event:/SFX/sfx_jump
+    eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
     volume: 1
     pitch: 1
     spatialize: 0
@@ -87,7 +87,7 @@ MonoBehaviour:
     eventPath: 
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -98,10 +98,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Shoot_Cannon
     displayName: Charged Cannon Shot
     description: Requested when a charged shot is released successfully.
-    eventPath: 
+    eventPath: event:/SFX/Weapon/SFX_Shoot_Cannon
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -112,10 +112,10 @@ MonoBehaviour:
     eventCode: MC_SFX_HealthDamage
     displayName: Player Health Damage
     description: Requested when accepted damage reaches the player's health bar.
-    eventPath: 
+    eventPath: event:/SFX/Damag&shild/MC_SFX_HealthDamage
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -127,10 +127,10 @@ MonoBehaviour:
     displayName: Player Shield Damage
     description: Requested when accepted damage is absorbed by the player's shield
       bar.
-    eventPath: 
+    eventPath: event:/SFX/Damag&shild/MC_SFX_ShieldDamage
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -141,10 +141,10 @@ MonoBehaviour:
     eventCode: MC_SFX_HealthRecharge
     displayName: Player Health Recharge
     description: Requested when runtime healing restores player health.
-    eventPath: 
+    eventPath: event:/SFX/Damag&shild/MC_SFX_HealthRecharge
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -155,10 +155,10 @@ MonoBehaviour:
     eventCode: MC_SFX_ShieldRecharge
     displayName: Player Shield Recharge
     description: Requested when runtime shield compensation restores player shield.
-    eventPath: 
+    eventPath: event:/SFX/Damag&shild/MC_SFX_ShieldRecharge
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -169,10 +169,10 @@ MonoBehaviour:
     eventCode: MC_SFX_LevelUp
     displayName: Level Up
     description: Requested after a level-up that does not open a milestone selection.
-    eventPath: 
+    eventPath: event:/SFX/LevelProgression/MC_SFX_LevelUp
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -183,10 +183,10 @@ MonoBehaviour:
     eventCode: MC_SFX_LevelUpMilestone
     displayName: Milestone Level Up
     description: Requested after a level-up reaches a milestone.
-    eventPath: 
+    eventPath: event:/SFX/LevelProgression/MC_SFX_LevelUp
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -197,10 +197,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_EnergyFull
     displayName: Active Energy Full
     description: Requested when an active tool reaches its energy requirement.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_EnergyFull
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -211,10 +211,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_Charge
     displayName: Active Charge
     description: Requested when a charge-bar active tool starts charging.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_Charge
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -225,10 +225,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_Release
     displayName: Active Release
     description: Requested when a charge-bar active tool is released.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_Release
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -239,10 +239,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_Dash
     displayName: Active Dash
     description: Requested when a dash-type active tool starts dashing.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_Dash
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -253,10 +253,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_Throw
     displayName: Active Throw
     description: Requested when a throw/deploy-type active tool is used.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_Throw
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -267,10 +267,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Misc_Death
     displayName: Player Death
     description: Requested when the run outcome resolves to defeat.
-    eventPath: 
+    eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_DeathCry_01
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -281,10 +281,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Misc_Spawn
     displayName: Player Spawn
     description: Requested when player progression runtime state is initialized.
-    eventPath: 
+    eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Spawn
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -295,10 +295,10 @@ MonoBehaviour:
     eventCode: MC_SFX_Misc_Victory
     displayName: Player Victory
     description: Requested when the run outcome resolves to victory.
-    eventPath: 
+    eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_01
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -312,9 +312,9 @@ MonoBehaviour:
     eventPath: 
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
-    maximumDistance: 45
+    maximumDistance: 180
     rateLimit:
       enabled: 0
       maxPlaysPerWindow: 0
@@ -323,10 +323,10 @@ MonoBehaviour:
     eventCode: MISC_SFX_BulletImpact_Player
     displayName: Bullet Impact Player
     description: Requested when an enemy projectile impacts the player.
-    eventPath: 
+    eventPath: event:/SFX/Impacts/NASH_SfxMISC_SFX_BulletImpact
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -338,10 +338,10 @@ MonoBehaviour:
     displayName: Laser Impact
     description: Requested when the player's laser beam damages enemies on its tick
       cadence.
-    eventPath: 
+    eventPath: event:/SFX/Impacts/NASH_SfxMISC_SFX_LaserImpact
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -352,10 +352,10 @@ MonoBehaviour:
     eventCode: MISC_SFX_Explosion_Bomb
     displayName: Bomb Explosion
     description: Requested when a bomb active tool explodes.
-    eventPath: 
+    eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_001
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -366,10 +366,10 @@ MonoBehaviour:
     eventCode: MISC_SFX_Explosion_Passive
     displayName: Passive Explosion
     description: Requested when passive explosion power-up payloads resolve.
-    eventPath: 
+    eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_002
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
@@ -380,10 +380,10 @@ MonoBehaviour:
     eventCode: MISC_SFX_Explosion_Enemy
     displayName: Enemy Explosion
     description: Reserved for exploding enemy payloads once authored.
-    eventPath: 
+    eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_004
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     rateLimit:
