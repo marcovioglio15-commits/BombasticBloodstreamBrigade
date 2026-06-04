@@ -25,7 +25,7 @@ MonoBehaviour:
     outlineThickness: 5
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  damageFlashDurationSeconds: 0.7
+  damageFlashDurationSeconds: 0.6
   damageFlashMaximumBlend: 10
   shieldDamageVignette:
     sprite: {fileID: 21300000, guid: 0148305d60e820946807162d30836940, type: 3}
