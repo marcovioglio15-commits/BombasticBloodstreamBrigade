@@ -15,7 +15,7 @@ MonoBehaviour:
   m_Active: 1
   m_Settings:
     technique: 1
-    maxDrawDistance: 1000
+    maxDrawDistance: 300
     decalLayers: 0
     dBufferSettings:
       surfaceData: 2
@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Active: 1
   m_Settings:
     AOMethod: 0
-    Downsample: 0
+    Downsample: 1
     AfterOpaque: 0
     Source: 1
     NormalSamples: 1

@@ -25,6 +25,17 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     #region Public Methods
     /// <summary>
+    /// Number of currently active managed VFX instances.
+    /// </summary>
+    public static int ActiveInstanceCount
+    {
+        get
+        {
+            return activeInstances.Count;
+        }
+    }
+
+    /// <summary>
     /// Advances active managed VFX lifetimes, follow targets and velocity movement.
     /// </summary>
     /// <param name="entityManager">Entity manager used to read target transforms and enemy despawn state.</param>

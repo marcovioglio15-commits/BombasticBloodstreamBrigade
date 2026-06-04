@@ -10,6 +10,16 @@ using Unity.Entities;
 [UpdateBefore(typeof(EnemyFinalizeDespawnSystem))]
 public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 {
+    #region Constants
+#if UNITY_ANDROID || UNITY_SWITCH
+    private const int MaxManagedVfxSpawnRequestsPerFrame = 32;
+    private const int MaxActiveManagedVfx = 160;
+#else
+    private const int MaxManagedVfxSpawnRequestsPerFrame = 64;
+    private const int MaxActiveManagedVfx = 256;
+#endif
+    #endregion
+
     #region Methods
 
     #region Lifecycle
@@ -43,6 +53,8 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         PlayerPowerUpManagedVfxRuntimeUtility.UpdateActiveInstances(entityManager, SystemAPI.Time.DeltaTime);
 
+        int remainingFrameSpawnBudget = MaxManagedVfxSpawnRequestsPerFrame;
+
         foreach ((DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests,
                   DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
                   RefRO<PlayerPowerUpVfxCapConfig> vfxCapConfig)
@@ -57,11 +69,18 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 
             for (int requestIndex = 0; requestIndex < vfxRequests.Length; requestIndex++)
             {
+                if (remainingFrameSpawnBudget <= 0)
+                    break;
+
                 PlayerPowerUpVfxSpawnRequest request = vfxRequests[requestIndex];
-                PlayerPowerUpManagedVfxRuntimeUtility.TrySpawn(entityManager,
-                                                               prefabBindings,
-                                                               in request,
-                                                               in capConfig);
+                int activeInstanceCountBeforeSpawn = PlayerPowerUpManagedVfxRuntimeUtility.ActiveInstanceCount;
+                bool acceptedRequest = PlayerPowerUpManagedVfxRuntimeUtility.TrySpawn(entityManager,
+                                                                                      prefabBindings,
+                                                                                      in request,
+                                                                                      in capConfig);
+
+                if (acceptedRequest && PlayerPowerUpManagedVfxRuntimeUtility.ActiveInstanceCount > activeInstanceCountBeforeSpawn)
+                    remainingFrameSpawnBudget--;
             }
 
             vfxRequests.Clear();
@@ -90,6 +109,9 @@ public partial struct PlayerPowerUpVfxSpawnSystem : ISystem
 
         if (config.MaxActiveOneShotVfx < 0)
             config.MaxActiveOneShotVfx = 0;
+
+        if (config.MaxActiveOneShotVfx == 0 || config.MaxActiveOneShotVfx > MaxActiveManagedVfx)
+            config.MaxActiveOneShotVfx = MaxActiveManagedVfx;
 
         return config;
     }
