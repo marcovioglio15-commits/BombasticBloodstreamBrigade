@@ -25,11 +25,11 @@ MonoBehaviour:
     outlineThickness: 5
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  damageFlashDurationSeconds: 0.7
+  damageFlashDurationSeconds: 0.6
   damageFlashMaximumBlend: 10
   shieldDamageVignette:
     sprite: {fileID: 21300000, guid: 0148305d60e820946807162d30836940, type: 3}
-    maxAlpha: 0.7
+    maxAlpha: 0.35
     tint: {r: 1, g: 1, b: 1, a: 1}
     fadeInSeconds: 0.1
     fadeOutSeconds: 0.7
@@ -50,7 +50,7 @@ MonoBehaviour:
     easingMode: 1
     despawnVfxPrefab: {fileID: 7550252483311059252, guid: e3ad1e727d0729844ab1862e3ddac869, type: 3}
     despawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
-    despawnVfxScaleMultiplier: 1
+    despawnVfxScaleMultiplier: 2
     despawnVfxSpawnNormalizedTime: 0.6
     despawnVfxLifetimeSeconds: 1.5
     hidePlayerVisualOnVfxSpawn: 1
