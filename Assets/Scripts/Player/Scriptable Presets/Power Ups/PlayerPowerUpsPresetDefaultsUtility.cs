@@ -17,6 +17,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdSpawnObject = "Module_SpawnObject";
     internal const string ModuleIdDash = "Module_Dash";
     internal const string ModuleIdTimeDilationEnemies = "Module_TimeDilationEnemies";
+    internal const string ModuleIdImpactFrame = "Module_ImpactFrame";
     internal const string ModuleIdHeal = "Module_Heal";
     internal const string ModuleIdSpawnTrailSegment = "Module_SpawnTrailSegment";
     internal const string ModuleIdAreaTickApplyElement = "Module_AreaTickApplyElement";
@@ -161,6 +162,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdSpawnObject, "Spawn Object", PowerUpModuleKind.SpawnObject, PowerUpModuleStage.Execute, "Spawns a configured object with optional damage payload."));
         definitions.Add(CreateModuleDefinition(ModuleIdDash, "Dash", PowerUpModuleKind.Dash, PowerUpModuleStage.Execute, "Moves player rapidly with optional invulnerability."));
         definitions.Add(CreateModuleDefinition(ModuleIdTimeDilationEnemies, "Time Dilation Enemies", PowerUpModuleKind.TimeDilationEnemies, PowerUpModuleStage.Execute, "Slows enemy simulation for a short duration."));
+        definitions.Add(CreateModuleDefinition(ModuleIdImpactFrame, "Impact Frame", PowerUpModuleKind.ImpactFrame, PowerUpModuleStage.Execute, "Runs a global time impact and fullscreen filter when an active power-up activation succeeds."));
         definitions.Add(CreateModuleDefinition(ModuleIdHeal, "Heal", PowerUpModuleKind.Heal, PowerUpModuleStage.Execute, "Applies instant heal or heal-over-time."));
         definitions.Add(CreateModuleDefinition(ModuleIdSpawnTrailSegment, "Spawn Trail Segment", PowerUpModuleKind.SpawnTrailSegment, PowerUpModuleStage.Hook, "Spawns trail segments while moving."));
         definitions.Add(CreateModuleDefinition(ModuleIdAreaTickApplyElement, "Area Tick Apply Element", PowerUpModuleKind.AreaTickApplyElement, PowerUpModuleStage.Hook, "Applies elemental stacks in area over time."));
@@ -379,6 +381,27 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                 break;
             case PowerUpModuleKind.Heal:
                 payload.HealMissingHealth.Configure(PowerUpHealApplicationMode.Instant, 35f, 0f, 0.2f, PowerUpHealStackPolicy.Refresh);
+                break;
+            case PowerUpModuleKind.ImpactFrame:
+                payload.ImpactFrame.Configure(ImpactFrameDurationMode.UseEarliestLimit,
+                                              6,
+                                              60f,
+                                              0.12f,
+                                              0.02f,
+                                              0.08f,
+                                              ImpactFrameEasingMode.EaseOutCubic,
+                                              95f,
+                                              false,
+                                              1f,
+                                              new UnityEngine.Color(0.96f, 0.78f, 0.55f, 0.45f),
+                                              0.65f,
+                                              0.55f,
+                                              0.6f,
+                                              0.012f,
+                                              0.18f,
+                                              320f,
+                                              0.35f,
+                                              0.22f);
                 break;
             case PowerUpModuleKind.Stackable:
                 payload.Stackable.Configure(2);

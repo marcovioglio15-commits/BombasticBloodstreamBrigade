@@ -301,6 +301,36 @@ public struct PlayerBulletTimeState : IComponentData
 }
 
 /// <summary>
+/// Holds runtime state for active Impact Frame time-scale and presentation effects.
+/// </summary>
+public struct PlayerImpactFrameState : IComponentData
+{
+    public byte IsActive;
+    public byte Phase;
+    public byte HasFrameLimit;
+    public byte HasSecondLimit;
+    public int RemainingFrames;
+    public float RemainingUnscaledSeconds;
+    public float ReferenceFrameRate;
+    public float EaseInUnscaledSeconds;
+    public float EaseOutUnscaledSeconds;
+    public ImpactFrameEasingMode EasingMode;
+    public float TimeSlowdownPercent;
+    public float OverlayIntensity;
+    public float4 FilterTintRgba;
+    public float DesaturationAmount;
+    public float VignetteIntensity;
+    public float VignetteSoftness;
+    public float ChromaticAberration;
+    public float ScanlineIntensity;
+    public float ScanlineFrequency;
+    public float FlashIntensity;
+    public float RadialDistortion;
+    public float PhaseElapsedUnscaledSeconds;
+    public float CurrentBlend;
+}
+
+/// <summary>
 /// Holds runtime state for heal-over-time effects triggered by power ups.
 /// </summary>
 public struct PlayerHealOverTimeState : IComponentData

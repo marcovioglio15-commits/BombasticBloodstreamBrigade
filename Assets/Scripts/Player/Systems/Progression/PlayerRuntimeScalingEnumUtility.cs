@@ -259,6 +259,26 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe ImpactFrameDurationMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static ImpactFrameDurationMode ResolveImpactFrameDurationMode(float value)
+    {
+        return (ImpactFrameDurationMode)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
+    /// Resolves a safe ImpactFrameEasingMode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static ImpactFrameEasingMode ResolveImpactFrameEasingMode(float value)
+    {
+        return (ImpactFrameEasingMode)ResolveEnumIndex(value, 4);
+    }
+
+    /// <summary>
     /// Resolves a safe PlayerComboDamageBreakMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

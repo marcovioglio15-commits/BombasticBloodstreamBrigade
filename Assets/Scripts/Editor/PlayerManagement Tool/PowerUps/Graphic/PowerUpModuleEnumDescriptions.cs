@@ -28,6 +28,7 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.SpawnObject,
         PowerUpModuleKind.Dash,
         PowerUpModuleKind.TimeDilationEnemies,
+        PowerUpModuleKind.ImpactFrame,
         PowerUpModuleKind.Heal,
         PowerUpModuleKind.SpawnTrailSegment,
         PowerUpModuleKind.AreaTickApplyElement,
@@ -123,6 +124,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Executes dash movement payload.";
             case PowerUpModuleKind.TimeDilationEnemies:
                 return "Applies bullet-time slow effect to enemies.";
+            case PowerUpModuleKind.ImpactFrame:
+                return "Applies a global time slowdown and fullscreen impact filter when an active power-up activation succeeds.";
             case PowerUpModuleKind.Heal:
                 return "Applies instant or over-time heal payload.";
             case PowerUpModuleKind.SpawnTrailSegment:
@@ -201,6 +204,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.TimeDilationEnemies:
                 relativePropertyPath = "bulletTime";
                 payloadLabel = "Time Dilation Payload";
+                return true;
+            case PowerUpModuleKind.ImpactFrame:
+                relativePropertyPath = "impactFrame";
+                payloadLabel = "Impact Frame Payload";
                 return true;
             case PowerUpModuleKind.SpawnTrailSegment:
                 relativePropertyPath = "trailSpawn";

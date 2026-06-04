@@ -43,6 +43,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         ref byte isShootingSuppressed,
                                         ref PlayerDashState dashState,
                                         ref PlayerBulletTimeState bulletTimeState,
+                                        ref PlayerImpactFrameState impactFrameState,
                                         ref PlayerHealOverTimeState healOverTimeState,
                                         DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
                                         DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
@@ -101,6 +102,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 ref shieldChanged,
                                                                                 ref dashState,
                                                                                 ref bulletTimeState,
+                                                                                ref impactFrameState,
                                                                                 moveInput,
                                                                                 lastValidMovementDirection,
                                                                                 orbitalProjectionRequests,
@@ -138,7 +140,8 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                    moveInput,
                                                                                    lastValidMovementDirection,
                                                                                    ref dashState,
-                                                                                   ref bulletTimeState);
+                                                                                   ref bulletTimeState,
+                                                                                   ref impactFrameState);
             return;
         }
 
@@ -208,7 +211,11 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                              ref otherSlotIsActive,
                                                                              ref otherSlotMaintenanceTickTimer,
                                                                              ref dashState,
-                                                                             ref bulletTimeState);
+                                                                             ref bulletTimeState,
+                                                                             ref impactFrameState);
+
+        if (slotConfig.HasImpactFrame != 0)
+            PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
 
         if (slotConfig.ToolKind == ActiveToolKind.PortableHealthPack)
             ExecutePortableHealthPack(in slotConfig,
@@ -303,6 +310,9 @@ public static class PlayerPowerUpActivationSlotUtility
                     return false;
 
                 return true;
+            case ActiveToolKind.ImpactFrame:
+                return slotConfig.HasImpactFrame != 0 &&
+                       PlayerImpactFrameRuntimeUtility.CanActivate(in slotConfig.ImpactFrame);
             case ActiveToolKind.Shotgun:
                 if (slotConfig.Shotgun.ProjectileCount <= 0)
                     return false;

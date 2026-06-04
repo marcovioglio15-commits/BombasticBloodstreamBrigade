@@ -63,6 +63,21 @@ MonoBehaviour:
       restoreCamera: 1
       offset: {x: 0, y: 0, z: 0, w: 0}
       cameraFieldOfView: 60
+--- !u!114 &6739082231451603345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0df24104227436ba888f20109e70670, type: 3}
+  m_Name: PlayerImpactFrameRendererFeature
+  m_EditorClassIdentifier:
+  m_Active: 1
+  impactFrameShader: {fileID: 4800000, guid: d59ef73bfb42468aaa1d65a9a7bb58a9, type: 3}
+  renderPassEvent: 600
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92,7 +107,8 @@ MonoBehaviour:
   - {fileID: 31270471079559890}
   - {fileID: -1453864735903406047}
   - {fileID: -7764291305387647634}
-  m_RendererFeatureMap: ad6b866f10d7b46cd202a8e853186f0021a802c1b9d5d2eb6e1db7d931b23f94
+  - {fileID: 6739082231451603345}
+  m_RendererFeatureMap: ad6b866f10d7b46cd202a8e853186f0021a802c1b9d5d2eb6e1db7d931b23f9491d1d1959507865d
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}

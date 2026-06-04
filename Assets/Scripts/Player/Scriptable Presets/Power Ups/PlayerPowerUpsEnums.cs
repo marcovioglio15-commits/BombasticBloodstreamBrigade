@@ -30,7 +30,30 @@ public enum ActiveToolKind
     ChargeShot = 5,
     PortableHealthPack = 6,
     PassiveToggle = 7,
-    OrbitalProjections = 8
+    OrbitalProjections = 8,
+    ImpactFrame = 9
+}
+
+/// <summary>
+/// Selects the easing curve used by the Impact Frame transitions during impact entry and recovery.
+/// </summary>
+public enum ImpactFrameEasingMode
+{
+    Linear = 0,
+    EaseInOutSine = 1,
+    EaseOutCubic = 2,
+    EaseInExpo = 3,
+    EaseOutExpo = 4
+}
+
+/// <summary>
+/// Selects which duration source ends the Impact Frame effect first.
+/// </summary>
+public enum ImpactFrameDurationMode
+{
+    UseEarliestLimit = 0,
+    FramesOnly = 1,
+    UnscaledSecondsOnly = 2
 }
 
 public enum PowerUpResourceType

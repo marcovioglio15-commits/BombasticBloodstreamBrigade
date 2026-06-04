@@ -47,6 +47,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
+    /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules and activated on valid release.</param>
     /// <param name="moveInput">Raw movement input used as final fallback for chained Dash modules.</param>
     /// <param name="lastValidMovementDirection">Cached movement direction used as fallback for chained Dash modules.</param>
     /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
@@ -91,6 +92,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                              ref bool shieldChanged,
                                              ref PlayerDashState dashState,
                                              ref PlayerBulletTimeState bulletTimeState,
+                                             ref PlayerImpactFrameState impactFrameState,
                                              float2 moveInput,
                                              float3 lastValidMovementDirection,
                                              DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
@@ -182,7 +184,11 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                        ref otherSlotIsActive,
                                        ref otherSlotMaintenanceTickTimer,
                                        ref dashState,
-                                       ref bulletTimeState);
+                                       ref bulletTimeState,
+                                       ref impactFrameState);
+
+                if (slotConfig.HasImpactFrame != 0)
+                    PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
 
                 PlayerPowerUpActivationExecutionUtility.ExecuteChargeShot(in slotConfig,
                                                                           in localTransform,
@@ -260,6 +266,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="lastValidMovementDirection">Cached movement direction used by optional Dash payloads.</param>
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
+    /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules and activated on toggle-on.</param>
     public static void ProcessPassiveToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                 bool pressedThisFrame,
                                                 ref float slotEnergy,
@@ -287,7 +294,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                 float2 moveInput,
                                                 float3 lastValidMovementDirection,
                                                 ref PlayerDashState dashState,
-                                                ref PlayerBulletTimeState bulletTimeState)
+                                                ref PlayerBulletTimeState bulletTimeState,
+                                                ref PlayerImpactFrameState impactFrameState)
     {
         if (isActive != 0)
         {
@@ -337,11 +345,16 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                ref otherSlotIsActive,
                                ref otherSlotMaintenanceTickTimer,
                                ref dashState,
-                               ref bulletTimeState);
+                               ref bulletTimeState,
+                               ref impactFrameState);
 
         isActive = 1;
         maintenanceTickTimer = 0f;
         cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
+
+        if (slotConfig.HasImpactFrame != 0)
+            PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
+
         PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
                                                                     in lookState,
                                                                     in movementState,
@@ -366,6 +379,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="otherSlotMaintenanceTickTimer">Mutable opposite-slot maintenance accumulator.</param>
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
+    /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules.</param>
     public static void InterruptOtherSlot(in PlayerPowerUpSlotConfig slotConfig,
                                           ref float otherSlotCharge,
                                           ref float otherSlotCooldownRemaining,
@@ -373,7 +387,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                           ref byte otherSlotIsActive,
                                           ref float otherSlotMaintenanceTickTimer,
                                           ref PlayerDashState dashState,
-                                          ref PlayerBulletTimeState bulletTimeState)
+                                          ref PlayerBulletTimeState bulletTimeState,
+                                          ref PlayerImpactFrameState impactFrameState)
     {
         otherSlotCharge = 0f;
         otherSlotIsCharging = 0;
@@ -400,6 +415,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         dashState.TransitionOutDuration = 0f;
         dashState.WallBounceIntensity = 0f;
         PlayerBulletTimeRuntimeUtility.Clear(ref bulletTimeState);
+        PlayerImpactFrameRuntimeUtility.Clear(ref impactFrameState);
     }
     #endregion
 

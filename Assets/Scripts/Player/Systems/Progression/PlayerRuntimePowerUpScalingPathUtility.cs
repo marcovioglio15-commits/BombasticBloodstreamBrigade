@@ -130,6 +130,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
         if (PlayerRuntimePowerUpBombScalingApplyUtility.TryApplyValue(payloadPath, resolvedValue, ref activeSlotConfig.Bomb))
             return;
 
+        if (PlayerRuntimePowerUpImpactFrameScalingApplyUtility.TryApplyValue(payloadPath, resolvedValue, ref activeSlotConfig.ImpactFrame))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -874,6 +877,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
             return;
 
         if (PlayerRuntimePowerUpBombScalingApplyUtility.TryApplyBooleanValue(payloadPath, resolvedValue, ref activeSlotConfig.Bomb))
+            return;
+
+        if (PlayerRuntimePowerUpImpactFrameScalingApplyUtility.TryApplyBooleanValue(payloadPath, resolvedValue, ref activeSlotConfig.ImpactFrame))
             return;
 
         switch (payloadPath)

@@ -235,6 +235,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                         bool hasBomb,
                                                         bool hasDash,
                                                         bool hasBulletTime,
+                                                        bool hasImpactFrame,
                                                         bool hasHealthPack,
                                                         bool hasOrbitalProjections)
     {
@@ -258,6 +259,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
         if (hasOrbitalProjections)
             return ActiveToolKind.OrbitalProjections;
+
+        if (hasImpactFrame)
+            return ActiveToolKind.ImpactFrame;
 
         return ActiveToolKind.Custom;
     }
@@ -324,6 +328,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               float bulletTimeDuration,
                                               float bulletTimeEnemySlowPercent,
                                               float bulletTimeTransitionTimeSeconds,
+                                              bool hasImpactFrame,
+                                              in ImpactFramePowerUpConfig impactFrameConfig,
                                               bool hasTriggerPress,
                                               bool hasTriggerRelease,
                                               bool hasHoldCharge,
@@ -449,6 +455,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 EnemySlowPercent = math.clamp(bulletTimeEnemySlowPercent, 0f, 100f),
                 TransitionTimeSeconds = math.max(0f, bulletTimeTransitionTimeSeconds)
             },
+            ImpactFrame = impactFrameConfig,
+            HasImpactFrame = hasImpactFrame ? (byte)1 : (byte)0,
             Shotgun = new ShotgunPowerUpConfig
             {
                 ProjectileCount = math.max(1, shotgunProjectileCount),

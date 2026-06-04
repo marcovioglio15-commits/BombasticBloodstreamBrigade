@@ -198,6 +198,8 @@ public static class PlayerPowerUpActiveBakeUtility
         float bulletTimeDuration = 0.05f;
         float bulletTimeEnemySlowPercent = 0f;
         float bulletTimeTransitionTimeSeconds = 0f;
+        bool hasImpactFrame = false;
+        ImpactFramePowerUpConfig impactFrameConfig = default;
         bool hasHealthPack = false;
         bool hasHealthPackOverTime = false;
         float healthPackHealAmount = 0f;
@@ -417,6 +419,14 @@ public static class PlayerPowerUpActiveBakeUtility
                     bulletTimeTransitionTimeSeconds = math.max(bulletTimeTransitionTimeSeconds,
                                                                math.max(0f, bulletTimeModuleData.TransitionTimeSeconds));
                     break;
+                case PowerUpModuleKind.ImpactFrame:
+                    if (PlayerPowerUpImpactFrameBakeUtility.TryBuildConfig(payload.ImpactFrame, out ImpactFramePowerUpConfig resolvedImpactFrameConfig))
+                    {
+                        hasImpactFrame = true;
+                        impactFrameConfig = resolvedImpactFrameConfig;
+                    }
+
+                    break;
                 case PowerUpModuleKind.OrbitalProjections:
                     PowerUpOrbitalProjectionsModuleData orbitalProjectionsData = payload.OrbitalProjections;
 
@@ -471,6 +481,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasBomb,
                                                                                               hasDash,
                                                                                               hasBulletTime,
+                                                                                              hasImpactFrame,
                                                                                               hasHealthPack,
                                                                                               hasOrbitalProjections);
 
@@ -575,6 +586,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        bulletTimeDuration,
                                                                        bulletTimeEnemySlowPercent,
                                                                        bulletTimeTransitionTimeSeconds,
+                                                                       hasImpactFrame,
+                                                                       in impactFrameConfig,
                                                                        hasTriggerPress,
                                                                        hasTriggerRelease,
                                                                        hasHoldCharge,

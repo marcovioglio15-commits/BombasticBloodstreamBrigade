@@ -447,6 +447,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.ProjectileSplit:
                 case PowerUpModuleKind.Dash:
                 case PowerUpModuleKind.TimeDilationEnemies:
+                case PowerUpModuleKind.ImpactFrame:
                 case PowerUpModuleKind.Heal:
                 case PowerUpModuleKind.LaserBeam:
                 case PowerUpModuleKind.Stackable:
@@ -493,6 +494,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasSpawnObject = moduleKinds.Contains(PowerUpModuleKind.SpawnObject);
         bool hasDash = moduleKinds.Contains(PowerUpModuleKind.Dash);
         bool hasBulletTime = moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies);
+        bool hasImpactFrame = moduleKinds.Contains(PowerUpModuleKind.ImpactFrame);
         bool hasHeal = moduleKinds.Contains(PowerUpModuleKind.Heal);
         bool hasCharacterTuning = moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
         bool hasDeathExplosion = moduleKinds.Contains(PowerUpModuleKind.DeathExplosion);
@@ -505,36 +507,36 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasBounce = moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles);
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasIgnoredPassiveOnlyModules = hasTrail || hasOrbit || hasBounce || hasSplit || hasTriggerEvent;
-        int executeKindCount = 0;
+        int primaryExecuteKindCount = 0;
 
         if (hasHoldCharge)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasShotgunPattern)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasSpawnObject)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasDash)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasBulletTime)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasHeal)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
         if (hasOrbitalProjections)
-            executeKindCount += 1;
+            primaryExecuteKindCount += 1;
 
-        if (executeKindCount == 0 && !hasCharacterTuning)
+        if (primaryExecuteKindCount == 0 && !hasCharacterTuning && !hasImpactFrame)
             warningLines.Add("No execute module selected. This active power up compiles as undefined.");
-        else if (executeKindCount == 0)
+        else if (primaryExecuteKindCount == 0 && !hasImpactFrame)
             warningLines.Add("No active execute module selected. Only Character Tuning acquisition effects will apply.");
 
-        if (executeKindCount > 1)
-            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections.");
+        if (primaryExecuteKindCount > 1)
+            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections. ImpactFrame also runs as an activation side effect when paired with another active tool.");
 
         if (hasDeathExplosion && !hasSpawnObject)
             warningLines.Add("DeathExplosion is ignored unless SpawnObject is also bound.");
@@ -569,6 +571,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasShotgun = moduleKinds.Contains(PowerUpModuleKind.ProjectilesPatternCone);
         bool hasHeal = moduleKinds.Contains(PowerUpModuleKind.Heal);
         bool hasBulletTime = moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies);
+        bool hasImpactFrame = moduleKinds.Contains(PowerUpModuleKind.ImpactFrame);
         bool hasCharacterTuning = moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
@@ -587,6 +590,9 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
 
         if (moduleKinds.Contains(PowerUpModuleKind.Dash))
             ignoredActiveModules.Add(PowerUpModuleEnumDescriptions.FormatModuleKindOption(PowerUpModuleKind.Dash));
+
+        if (hasImpactFrame && !hasPassiveRuntimeConsumer)
+            warningLines.Add("ImpactFrame can run when a toggleable active switches on, but it does not provide a persistent toggle effect by itself.");
 
         if (ignoredActiveModules.Count > 0)
             warningLines.Add("Ignored while GateResource Is Toggleable is enabled: " + string.Join(", ", ignoredActiveModules));

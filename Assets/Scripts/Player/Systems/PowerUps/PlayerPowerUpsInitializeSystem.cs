@@ -12,6 +12,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingPassiveToolsStateQuery;
     private EntityQuery missingDashQuery;
     private EntityQuery missingBulletTimeStateQuery;
+    private EntityQuery missingImpactFrameStateQuery;
     private EntityQuery missingHealOverTimeStateQuery;
     private EntityQuery missingPassiveExplosionStateQuery;
     private EntityQuery missingPassiveHealStateQuery;
@@ -73,6 +74,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingBulletTimeStateQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerBulletTimeState>()
+            .Build();
+
+        missingImpactFrameStateQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerImpactFrameState>()
             .Build();
 
         missingHealOverTimeStateQuery = SystemAPI.QueryBuilder()
@@ -264,12 +270,14 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         bool hasMissingOrbitalProjectionPrefabBindingBuffer = !missingOrbitalProjectionPrefabBindingBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingOrbitalProjectionLostBuffer = !missingOrbitalProjectionLostBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
+        bool hasMissingImpactFrameState = !missingImpactFrameStateQuery.IsEmptyIgnoreFilter;
 
         if (!missingFlags.HasAnyMissing &&
             !hasMissingOrbitalProjectionRequestBuffer &&
             !hasMissingOrbitalProjectionPrefabBindingBuffer &&
             !hasMissingOrbitalProjectionLostBuffer &&
-            !hasMissingLaserBeamStormTickPulseBuffer)
+            !hasMissingLaserBeamStormTickPulseBuffer &&
+            !hasMissingImpactFrameState)
         {
             return;
         }
@@ -306,6 +314,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (missingFlags.HasMissingBulletTimeState)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingBulletTimeState(ref commandBuffer, in missingBulletTimeStateQuery);
+        }
+
+        if (hasMissingImpactFrameState)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingImpactFrameState(ref commandBuffer, in missingImpactFrameStateQuery);
         }
 
         if (missingFlags.HasMissingHealOverTimeState)

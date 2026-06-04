@@ -80,6 +80,8 @@ public static class PlayerPowerUpActivationExecutionUtility
             case ActiveToolKind.BulletTime:
                 ExecuteBulletTime(in slotConfig, ref bulletTimeState);
                 break;
+            case ActiveToolKind.ImpactFrame:
+                break;
             case ActiveToolKind.Shotgun:
                 ExecuteShotgun(in slotConfig,
                                in localTransform,

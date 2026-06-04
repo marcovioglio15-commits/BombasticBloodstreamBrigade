@@ -82,6 +82,15 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Overrides base projectile spawning with one or more continuous liquid beam lanes."));
         }
 
+        if (!validModuleIds.Contains(PlayerPowerUpsPresetDefaultsUtility.ModuleIdImpactFrame))
+        {
+            moduleDefinitions.Add(PlayerPowerUpsPresetDefaultsUtility.CreateModuleDefinition(PlayerPowerUpsPresetDefaultsUtility.ModuleIdImpactFrame,
+                                                                                             "Impact Frame",
+                                                                                             PowerUpModuleKind.ImpactFrame,
+                                                                                             PowerUpModuleStage.Execute,
+                                                                                             "Runs a global time impact and fullscreen filter when an active power-up activation succeeds."));
+        }
+
         ApplyUnifiedBindings(preset.ActivePowerUpsMutable, moduleDefinitions);
         ApplyUnifiedBindings(preset.PassivePowerUpsMutable, moduleDefinitions);
     }

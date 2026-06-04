@@ -61,6 +61,8 @@ public struct PlayerPowerUpSlotConfig
     public BombPowerUpConfig Bomb;
     public DashPowerUpConfig Dash;
     public BulletTimePowerUpConfig BulletTime;
+    public ImpactFramePowerUpConfig ImpactFrame;
+    public byte HasImpactFrame;
     public ShotgunPowerUpConfig Shotgun;
     public ChargeShotPowerUpConfig ChargeShot;
     public PortableHealthPackPowerUpConfig PortableHealthPack;
@@ -114,6 +116,33 @@ public struct BulletTimePowerUpConfig
     public float Duration;
     public float EnemySlowPercent;
     public float TransitionTimeSeconds;
+}
+
+/// <summary>
+/// Holds baked runtime configuration for the Impact Frame side-effect triggered on power-up activation.
+/// Drives global time scale and the on-screen impact overlay shader.
+/// </summary>
+public struct ImpactFramePowerUpConfig
+{
+    public ImpactFrameDurationMode DurationMode;
+    public int DurationFrames;
+    public float ReferenceFrameRate;
+    public float MaximumUnscaledDurationSeconds;
+    public float EaseInUnscaledSeconds;
+    public float EaseOutUnscaledSeconds;
+    public ImpactFrameEasingMode EasingMode;
+    public float TimeSlowdownPercent;
+    public byte RefreshOnShorterRequest;
+    public float OverlayIntensity;
+    public float4 FilterTintRgba;
+    public float DesaturationAmount;
+    public float VignetteIntensity;
+    public float VignetteSoftness;
+    public float ChromaticAberration;
+    public float ScanlineIntensity;
+    public float ScanlineFrequency;
+    public float FlashIntensity;
+    public float RadialDistortion;
 }
 
 /// <summary>

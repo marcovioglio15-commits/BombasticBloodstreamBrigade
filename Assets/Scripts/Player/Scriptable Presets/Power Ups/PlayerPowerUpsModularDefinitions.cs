@@ -47,6 +47,10 @@ public sealed class PowerUpModuleData
     [Tooltip("Time dilation settings used by TimeDilationEnemies modules.")]
     [SerializeField] private BulletTimeToolData bulletTime = new BulletTimeToolData();
 
+    [Header("Execute - Impact Frame")]
+    [Tooltip("Customizable global time slowdown plus screen filter triggered on power-up activation. Used by ImpactFrame modules.")]
+    [SerializeField] private PowerUpImpactFrameModuleData impactFrame = new PowerUpImpactFrameModuleData();
+
     [Header("Execute - Heal")]
     [Tooltip("Healing settings used by Heal modules.")]
     [SerializeField] private PowerUpHealMissingHealthModuleData healMissingHealth = new PowerUpHealMissingHealthModuleData();
@@ -164,6 +168,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpImpactFrameModuleData ImpactFrame
+    {
+        get
+        {
+            return impactFrame;
+        }
+    }
+
     public PowerUpHealMissingHealthModuleData HealMissingHealth
     {
         get
@@ -277,6 +289,9 @@ public sealed class PowerUpModuleData
         if (bulletTime == null)
             bulletTime = new BulletTimeToolData();
 
+        if (impactFrame == null)
+            impactFrame = new PowerUpImpactFrameModuleData();
+
         if (healMissingHealth == null)
             healMissingHealth = new PowerUpHealMissingHealthModuleData();
 
@@ -314,6 +329,7 @@ public sealed class PowerUpModuleData
         bomb.Validate();
         dash.Validate();
         bulletTime.Validate();
+        impactFrame.Validate();
         healMissingHealth.Validate();
         deathExplosion.Validate();
         projectileOrbitOverride.Validate();

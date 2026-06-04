@@ -56,6 +56,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.Dash:
                 PowerUpDashPayloadDrawerUtility.BuildDashPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.ImpactFrame:
+                PowerUpImpactFramePayloadDrawerUtility.BuildImpactFramePayloadUi(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.Heal:
                 BuildHealPayloadUi(payloadContainer, payloadProperty);
                 return;

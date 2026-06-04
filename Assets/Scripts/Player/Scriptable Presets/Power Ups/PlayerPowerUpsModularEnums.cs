@@ -35,7 +35,8 @@ public enum PowerUpModuleKind
     ProjectileSplit = 17,
     Stackable = 18,
     LaserBeam = 19,
-    OrbitalProjections = 20
+    OrbitalProjections = 20,
+    ImpactFrame = 21
 }
 
 public enum PowerUpTriggerEventType
@@ -80,6 +81,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.Dash:
             case PowerUpModuleKind.TimeDilationEnemies:
             case PowerUpModuleKind.Heal:
+            case PowerUpModuleKind.ImpactFrame:
                 return PowerUpModuleStage.Execute;
             case PowerUpModuleKind.CharacterTuning:
             case PowerUpModuleKind.Stackable:

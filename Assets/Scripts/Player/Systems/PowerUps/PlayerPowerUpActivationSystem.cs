@@ -74,6 +74,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerOrbitalProjectionSpawnRequest>();
         state.RequireForUpdate<ShootRequest>();
         state.RequireForUpdate<PlayerBulletTimeState>();
+        state.RequireForUpdate<PlayerImpactFrameState>();
         state.RequireForUpdate<PlayerHealOverTimeState>();
         state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerLaserBeamState>();
@@ -107,6 +108,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<PlayerBulletTimeState> bulletTimeLookup = SystemAPI.GetComponentLookup<PlayerBulletTimeState>(false);
+        ComponentLookup<PlayerImpactFrameState> impactFrameLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameState>(false);
         ComponentLookup<PlayerHealOverTimeState> healOverTimeLookup = SystemAPI.GetComponentLookup<PlayerHealOverTimeState>(false);
         ComponentLookup<PlayerChargeCharacterTuningState> chargeCharacterTuningStateLookup = SystemAPI.GetComponentLookup<PlayerChargeCharacterTuningState>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
@@ -175,6 +177,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!bulletTimeLookup.HasComponent(entity))
                 continue;
 
+            if (!impactFrameLookup.HasComponent(entity))
+                continue;
+
             if (!healOverTimeLookup.HasComponent(entity))
                 continue;
 
@@ -222,6 +227,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             ref PlayerPassiveToolsState passiveToolsState = ref PlayerPassiveToolsStateBufferUtility.GetStateRef(passiveToolsStateBuffer);
             LocalTransform localTransform = transformLookup[entity];
             PlayerBulletTimeState bulletTimeState = bulletTimeLookup[entity];
+            PlayerImpactFrameState impactFrameState = impactFrameLookup[entity];
             PlayerHealOverTimeState healOverTimeState = healOverTimeLookup[entity];
             PlayerChargeCharacterTuningState chargeCharacterTuningState = chargeCharacterTuningStateLookup[entity];
             PlayerProgressionConfig progressionConfig = progressionConfigLookup[entity];
@@ -381,6 +387,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref isShootingSuppressed,
                                                                 ref dashState.ValueRW,
                                                                 ref bulletTimeState,
+                                                                ref impactFrameState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
@@ -507,6 +514,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref isShootingSuppressed,
                                                                 ref dashState.ValueRW,
                                                                 ref bulletTimeState,
+                                                                ref impactFrameState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
@@ -619,6 +627,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             powerUpsState.ValueRW.IsShootingSuppressed = isShootingSuppressed;
             laserBeamState.ValueRW = mutableLaserBeamState;
             bulletTimeLookup[entity] = bulletTimeState;
+            impactFrameLookup[entity] = impactFrameState;
             healOverTimeLookup[entity] = healOverTimeState;
             chargeCharacterTuningStateLookup[entity] = chargeCharacterTuningState;
             playerExperienceLookup[entity] = playerExperience;
