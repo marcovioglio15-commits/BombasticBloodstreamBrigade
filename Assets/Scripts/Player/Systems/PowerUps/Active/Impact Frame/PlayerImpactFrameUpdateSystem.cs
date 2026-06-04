@@ -76,6 +76,8 @@ public partial struct PlayerImpactFrameUpdateSystem : ISystem
     /// <returns>Presentation snapshot for the active fullscreen filter.</returns>
     private static PlayerImpactFramePresentationSnapshot BuildSnapshot(in PlayerImpactFrameState impactFrameState, float currentBlend)
     {
+        float lifetimeProgress = math.saturate(impactFrameState.EffectElapsedUnscaledSeconds /
+                                               math.max(0.0001f, impactFrameState.TotalDurationUnscaledSeconds));
         return new PlayerImpactFramePresentationSnapshot(currentBlend,
                                                          impactFrameState.OverlayIntensity,
                                                          impactFrameState.FilterTintRgba,
@@ -86,7 +88,22 @@ public partial struct PlayerImpactFrameUpdateSystem : ISystem
                                                          impactFrameState.ScanlineIntensity,
                                                          impactFrameState.ScanlineFrequency,
                                                          impactFrameState.FlashIntensity,
-                                                         impactFrameState.RadialDistortion);
+                                                         impactFrameState.RadialDistortion,
+                                                         impactFrameState.ShockwaveIntensity,
+                                                         impactFrameState.ShockwaveRadius,
+                                                         impactFrameState.ShockwaveThickness,
+                                                         impactFrameState.ZoomPunchIntensity,
+                                                         impactFrameState.InvertIntensity,
+                                                         impactFrameState.PosterizeIntensity,
+                                                         impactFrameState.PosterizeSteps,
+                                                         impactFrameState.EdgeInkIntensity,
+                                                         impactFrameState.ScreenTearIntensity,
+                                                         impactFrameState.ScreenTearFrequency,
+                                                         impactFrameState.PaletteFlashIntensity,
+                                                         impactFrameState.PaletteFlashTintRgba,
+                                                         lifetimeProgress,
+                                                         impactFrameState.EffectOriginWorldPosition,
+                                                         impactFrameState.HasWorldOrigin);
     }
     #endregion
 

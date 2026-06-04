@@ -71,6 +71,43 @@ public sealed class PowerUpImpactFrameModuleData
 
     [Tooltip("Time warp ring radial distortion applied to the screen center, 0 disables the distortion.")]
     [SerializeField] private float radialDistortion = 0.22f;
+
+    [Header("Advanced Screen Effects")]
+    [Tooltip("Expanding shockwave ring intensity. 0 disables the ring; values near 1 create a strong displacement pulse.")]
+    [SerializeField] private float shockwaveIntensity = 0.35f;
+
+    [Tooltip("Maximum normalized viewport radius reached by the shockwave ring during the effect.")]
+    [SerializeField] private float shockwaveRadius = 0.65f;
+
+    [Tooltip("Normalized thickness of the shockwave ring. Smaller values create a sharper ring.")]
+    [SerializeField] private float shockwaveThickness = 0.12f;
+
+    [Tooltip("Radial zoom punch intensity applied during the first part of the impact. 0 disables the punch.")]
+    [SerializeField] private float zoomPunchIntensity = 0.18f;
+
+    [Tooltip("Color inversion intensity applied at peak impact. 0 disables inversion, 1 fully inverts screen colors.")]
+    [SerializeField] private float invertIntensity;
+
+    [Tooltip("Posterization blend amount. 0 keeps continuous color, 1 uses stepped arcade-style colors.")]
+    [SerializeField] private float posterizeIntensity;
+
+    [Tooltip("Number of color steps used by posterization. Values below 2 are ignored at runtime.")]
+    [SerializeField] private float posterizeSteps = 6f;
+
+    [Tooltip("Ink-like edge contrast intensity derived from local color differences. 0 disables edge ink.")]
+    [SerializeField] private float edgeInkIntensity = 0.2f;
+
+    [Tooltip("Horizontal screen tear intensity. 0 disables tear lines.")]
+    [SerializeField] private float screenTearIntensity;
+
+    [Tooltip("Screen tear line frequency across the vertical viewport.")]
+    [SerializeField] private float screenTearFrequency = 24f;
+
+    [Tooltip("Palette flash intensity blended over the filtered result.")]
+    [SerializeField] private float paletteFlashIntensity = 0.25f;
+
+    [Tooltip("Palette flash tint. Alpha controls maximum flash strength in addition to Palette Flash Intensity.")]
+    [SerializeField] private Color paletteFlashTint = new Color(1f, 0.9f, 0.45f, 0.7f);
     #endregion
 
     #endregion
@@ -227,6 +264,102 @@ public sealed class PowerUpImpactFrameModuleData
             return radialDistortion;
         }
     }
+
+    public float ShockwaveIntensity
+    {
+        get
+        {
+            return shockwaveIntensity;
+        }
+    }
+
+    public float ShockwaveRadius
+    {
+        get
+        {
+            return shockwaveRadius;
+        }
+    }
+
+    public float ShockwaveThickness
+    {
+        get
+        {
+            return shockwaveThickness;
+        }
+    }
+
+    public float ZoomPunchIntensity
+    {
+        get
+        {
+            return zoomPunchIntensity;
+        }
+    }
+
+    public float InvertIntensity
+    {
+        get
+        {
+            return invertIntensity;
+        }
+    }
+
+    public float PosterizeIntensity
+    {
+        get
+        {
+            return posterizeIntensity;
+        }
+    }
+
+    public float PosterizeSteps
+    {
+        get
+        {
+            return posterizeSteps;
+        }
+    }
+
+    public float EdgeInkIntensity
+    {
+        get
+        {
+            return edgeInkIntensity;
+        }
+    }
+
+    public float ScreenTearIntensity
+    {
+        get
+        {
+            return screenTearIntensity;
+        }
+    }
+
+    public float ScreenTearFrequency
+    {
+        get
+        {
+            return screenTearFrequency;
+        }
+    }
+
+    public float PaletteFlashIntensity
+    {
+        get
+        {
+            return paletteFlashIntensity;
+        }
+    }
+
+    public Color PaletteFlashTint
+    {
+        get
+        {
+            return paletteFlashTint;
+        }
+    }
     #endregion
 
     #region Methods
@@ -254,6 +387,18 @@ public sealed class PowerUpImpactFrameModuleData
     /// <param name="scanlineFrequencyValue">Authored scanline frequency.</param>
     /// <param name="flashIntensityValue">Authored flash burst intensity.</param>
     /// <param name="radialDistortionValue">Authored radial distortion intensity.</param>
+    /// <param name="shockwaveIntensityValue">Authored shockwave ring intensity.</param>
+    /// <param name="shockwaveRadiusValue">Authored shockwave ring maximum radius.</param>
+    /// <param name="shockwaveThicknessValue">Authored shockwave ring thickness.</param>
+    /// <param name="zoomPunchIntensityValue">Authored radial zoom punch intensity.</param>
+    /// <param name="invertIntensityValue">Authored color inversion intensity.</param>
+    /// <param name="posterizeIntensityValue">Authored posterization blend amount.</param>
+    /// <param name="posterizeStepsValue">Authored posterization color-step count.</param>
+    /// <param name="edgeInkIntensityValue">Authored ink edge intensity.</param>
+    /// <param name="screenTearIntensityValue">Authored horizontal screen tear intensity.</param>
+    /// <param name="screenTearFrequencyValue">Authored horizontal screen tear frequency.</param>
+    /// <param name="paletteFlashIntensityValue">Authored palette flash intensity.</param>
+    /// <param name="paletteFlashTintValue">Authored palette flash tint.</param>
     public void Configure(ImpactFrameDurationMode durationModeValue,
                           int durationFramesValue,
                           float referenceFrameRateValue,
@@ -272,7 +417,19 @@ public sealed class PowerUpImpactFrameModuleData
                           float scanlineIntensityValue,
                           float scanlineFrequencyValue,
                           float flashIntensityValue,
-                          float radialDistortionValue)
+                          float radialDistortionValue,
+                          float shockwaveIntensityValue,
+                          float shockwaveRadiusValue,
+                          float shockwaveThicknessValue,
+                          float zoomPunchIntensityValue,
+                          float invertIntensityValue,
+                          float posterizeIntensityValue,
+                          float posterizeStepsValue,
+                          float edgeInkIntensityValue,
+                          float screenTearIntensityValue,
+                          float screenTearFrequencyValue,
+                          float paletteFlashIntensityValue,
+                          Color paletteFlashTintValue)
     {
         durationMode = durationModeValue;
         durationFrames = durationFramesValue;
@@ -293,6 +450,18 @@ public sealed class PowerUpImpactFrameModuleData
         scanlineFrequency = scanlineFrequencyValue;
         flashIntensity = flashIntensityValue;
         radialDistortion = radialDistortionValue;
+        shockwaveIntensity = shockwaveIntensityValue;
+        shockwaveRadius = shockwaveRadiusValue;
+        shockwaveThickness = shockwaveThicknessValue;
+        zoomPunchIntensity = zoomPunchIntensityValue;
+        invertIntensity = invertIntensityValue;
+        posterizeIntensity = posterizeIntensityValue;
+        posterizeSteps = posterizeStepsValue;
+        edgeInkIntensity = edgeInkIntensityValue;
+        screenTearIntensity = screenTearIntensityValue;
+        screenTearFrequency = screenTearFrequencyValue;
+        paletteFlashIntensity = paletteFlashIntensityValue;
+        paletteFlashTint = paletteFlashTintValue;
     }
     #endregion
 

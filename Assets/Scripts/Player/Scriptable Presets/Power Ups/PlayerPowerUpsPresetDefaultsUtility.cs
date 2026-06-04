@@ -401,7 +401,19 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                               0.18f,
                                               320f,
                                               0.35f,
-                                              0.22f);
+                                              0.22f,
+                                              0.35f,
+                                              0.65f,
+                                              0.12f,
+                                              0.18f,
+                                              0f,
+                                              0f,
+                                              6f,
+                                              0.2f,
+                                              0f,
+                                              24f,
+                                              0.25f,
+                                              new UnityEngine.Color(1f, 0.9f, 0.45f, 0.7f));
                 break;
             case PowerUpModuleKind.Stackable:
                 payload.Stackable.Configure(2);

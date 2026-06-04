@@ -374,6 +374,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -667,6 +679,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -960,6 +984,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1253,6 +1289,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1546,6 +1594,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1839,6 +1899,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -2132,6 +2204,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -2425,6 +2509,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -2718,6 +2814,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3011,6 +3119,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3304,6 +3424,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3597,6 +3729,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 1
@@ -3890,6 +4034,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -4183,6 +4339,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -4476,6 +4644,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -4769,6 +4949,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5062,6 +5254,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5355,6 +5559,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5648,6 +5864,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5941,6 +6169,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -6235,6 +6475,18 @@ MonoBehaviour:
         scanlineFrequency: 320
         flashIntensity: 0.35
         radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -6541,6 +6793,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -6834,6 +7098,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -7127,6 +7403,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -7420,6 +7708,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -7714,6 +8014,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -8020,6 +8332,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -8313,6 +8637,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -8606,6 +8942,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -8899,6 +9247,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9196,6 +9556,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9493,6 +9865,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9799,6 +10183,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10092,6 +10488,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10385,6 +10793,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10691,6 +11111,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10984,6 +11416,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -11277,6 +11721,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -11583,6 +12039,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -11876,6 +12344,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -12169,6 +12649,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 1
@@ -12475,6 +12967,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -12768,6 +13272,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13061,6 +13577,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13364,6 +13892,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13657,6 +14197,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13951,6 +14503,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -14255,6 +14819,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -14546,6 +15122,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -14851,6 +15439,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15144,6 +15744,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15450,6 +16062,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15756,6 +16380,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -16050,6 +16686,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -16356,6 +17004,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -16662,6 +17322,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -16968,6 +17640,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -17270,6 +17954,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -17562,6 +18258,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -17864,6 +18572,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -18156,6 +18876,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -18448,6 +19180,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -18750,6 +19494,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -19042,6 +19798,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -19344,6 +20112,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -19636,6 +20416,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -19938,6 +20730,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -20230,6 +21034,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -20532,6 +21348,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -20824,6 +21652,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -21126,6 +21966,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -21418,6 +22270,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -21721,6 +22585,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -22024,6 +22900,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -22326,6 +23214,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -22618,6 +23518,18 @@ MonoBehaviour:
           scanlineFrequency: 320
           flashIntensity: 0.35
           radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
         healMissingHealth:
           applyMode: 0
           healAmount: 0

@@ -87,7 +87,9 @@ public partial struct PlayerBombSpawnSystem : ISystem
                     AffectAllEnemiesInRadius = request.AffectAllEnemiesInRadius,
                     ExplosionVfxPrefabEntity = request.ExplosionVfxPrefabEntity,
                     ScaleVfxToRadius = request.ScaleVfxToRadius,
-                    VfxScaleMultiplier = math.max(0.01f, request.VfxScaleMultiplier)
+                    VfxScaleMultiplier = math.max(0.01f, request.VfxScaleMultiplier),
+                    ImpactFrame = request.ImpactFrame,
+                    HasImpactFrame = request.HasImpactFrame
                 };
 
                 if (entityManager.HasComponent<BombFuseState>(request.BombPrefabEntity))

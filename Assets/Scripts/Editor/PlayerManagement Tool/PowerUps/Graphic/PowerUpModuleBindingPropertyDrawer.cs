@@ -13,6 +13,31 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
     #endregion
 
+    #region Helper Types
+    /// <summary>
+    /// Stores per-drawer caches used to avoid repeated module option scans and payload rebuilds.
+    /// </summary>
+    private sealed class BindingDrawerState
+    {
+        #region Fields
+        public readonly List<string> ModuleIdOptions;
+        public string OverridePayloadRebuildKey;
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Creates a binding drawer state from the module option list captured when the drawer opens.
+        /// </summary>
+        /// <param name="moduleIdOptions">Module IDs available to this binding drawer.</param>
+        public BindingDrawerState(List<string> moduleIdOptions)
+        {
+            ModuleIdOptions = moduleIdOptions;
+            OverridePayloadRebuildKey = string.Empty;
+        }
+        #endregion
+    }
+    #endregion
+
     #region Methods
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
@@ -40,6 +65,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         if (moduleIdOptions.Count == 0)
             moduleIdOptions.Add(string.Empty);
 
+        BindingDrawerState drawerState = new BindingDrawerState(moduleIdOptions);
         string initialValue = ResolveInitialModuleId(moduleIdProperty.stringValue, moduleIdOptions);
         PopupField<string> modulePopup = new PopupField<string>("Module", moduleIdOptions, initialValue);
         modulePopup.tooltip = "Module ID reference from Modules Management.";
@@ -60,6 +86,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         VisualElement overrideContainer = new VisualElement();
         overrideContainer.style.marginLeft = 10f;
+        overrideContainer.userData = drawerState;
         root.Add(overrideContainer);
 
         RefreshBindingUi(property,
@@ -71,6 +98,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                          modulePopup,
                          moduleKindInfoBox,
                          overrideContainer,
+                         drawerState,
                          false);
 
         modulePopup.RegisterValueChangedCallback(evt =>
@@ -90,6 +118,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              modulePopup,
                              moduleKindInfoBox,
                              overrideContainer,
+                             drawerState,
                              useOverrideProperty.boolValue);
         });
 
@@ -104,6 +133,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              modulePopup,
                              moduleKindInfoBox,
                              overrideContainer,
+                             drawerState,
                              useOverrideProperty != null && useOverrideProperty.boolValue);
         });
 
@@ -118,6 +148,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              modulePopup,
                              moduleKindInfoBox,
                              overrideContainer,
+                             drawerState,
                              changedProperty.boolValue);
         });
 
@@ -130,13 +161,14 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                          SerializedProperty stageProperty,
                                          SerializedProperty useOverrideProperty,
                                          SerializedProperty overridePayloadProperty,
-	                                         PopupField<string> modulePopup,
-	                                         HelpBox moduleKindInfoBox,
-	                                         VisualElement overrideContainer,
-	                                         bool seedOverridePayload)
+                                         PopupField<string> modulePopup,
+                                         HelpBox moduleKindInfoBox,
+                                         VisualElement overrideContainer,
+                                         BindingDrawerState drawerState,
+                                         bool seedOverridePayload)
     {
         string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
-        List<string> options = BuildModuleIdOptions(serializedObject);
+        List<string> options = ResolveModuleIdOptions(serializedObject, drawerState);
 
         if (options.Count == 0)
             options.Add(string.Empty);
@@ -193,7 +225,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                  moduleDefaultPayloadProperty,
                                  moduleResolved,
                                  moduleKind,
-                                 bindingProperty);
+                                 bindingProperty,
+                                 drawerState);
     }
 
     private static void UpdateModuleInfoBox(HelpBox infoBox, bool moduleResolved, PowerUpModuleKind moduleKind, string moduleDisplayName)
@@ -221,13 +254,33 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                  SerializedProperty moduleDefaultPayloadProperty,
                                                  bool moduleResolved,
                                                  PowerUpModuleKind moduleKind,
-                                                 SerializedProperty bindingProperty)
+                                                 SerializedProperty bindingProperty,
+                                                 BindingDrawerState drawerState)
     {
         if (overrideContainer == null)
             return;
 
         bool showOverride = useOverrideProperty != null && useOverrideProperty.boolValue;
         overrideContainer.style.display = showOverride ? DisplayStyle.Flex : DisplayStyle.None;
+
+        string rebuildKey = BuildOverridePayloadRebuildKey(showOverride,
+                                                           moduleResolved,
+                                                           moduleKind,
+                                                           useOverrideProperty,
+                                                           overridePayloadProperty,
+                                                           moduleDefaultPayloadProperty,
+                                                           bindingProperty);
+        BindingDrawerState resolvedDrawerState = ResolveDrawerState(overrideContainer, drawerState);
+
+        if (resolvedDrawerState != null &&
+            string.Equals(resolvedDrawerState.OverridePayloadRebuildKey, rebuildKey, System.StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        if (resolvedDrawerState != null)
+            resolvedDrawerState.OverridePayloadRebuildKey = rebuildKey;
+
         overrideContainer.Clear();
 
         if (!showOverride)
@@ -583,6 +636,75 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         boxElement.style.marginLeft = leftMargin;
         boxElement.style.marginRight = 2f;
+    }
+
+    /// <summary>
+    /// Resolves module popup options without rescanning the module catalog on every binding refresh.
+    /// </summary>
+    /// <param name="serializedObject">Serialized preset used as fallback when no drawer cache exists.</param>
+    /// <param name="drawerState">Optional per-drawer state with prebuilt module options.</param>
+    /// <returns>Module ID options used by the binding popup.</returns>
+    private static List<string> ResolveModuleIdOptions(SerializedObject serializedObject, BindingDrawerState drawerState)
+    {
+        if (drawerState != null &&
+            drawerState.ModuleIdOptions != null &&
+            drawerState.ModuleIdOptions.Count > 0)
+        {
+            return drawerState.ModuleIdOptions;
+        }
+
+        return BuildModuleIdOptions(serializedObject);
+    }
+
+    /// <summary>
+    /// Resolves the cache object attached to the override payload container.
+    /// </summary>
+    /// <param name="overrideContainer">Container that owns override payload UI.</param>
+    /// <param name="drawerState">Drawer state passed by the current refresh path.</param>
+    /// <returns>Reusable drawer state, or null when none is available.</returns>
+    private static BindingDrawerState ResolveDrawerState(VisualElement overrideContainer, BindingDrawerState drawerState)
+    {
+        if (drawerState != null)
+            return drawerState;
+
+        if (overrideContainer == null)
+            return null;
+
+        BindingDrawerState containerState = overrideContainer.userData as BindingDrawerState;
+        return containerState;
+    }
+
+    /// <summary>
+    /// Builds an identity key for the override payload subtree currently required by a binding.
+    /// </summary>
+    /// <param name="showOverride">True when override payload UI should be visible.</param>
+    /// <param name="moduleResolved">True when the selected module resolves in the module catalog.</param>
+    /// <param name="moduleKind">Resolved module kind that selects the payload drawer.</param>
+    /// <param name="useOverrideProperty">Serialized flag that controls override visibility.</param>
+    /// <param name="overridePayloadProperty">Serialized override payload root.</param>
+    /// <param name="moduleDefaultPayloadProperty">Serialized default payload root of the selected module.</param>
+    /// <param name="bindingProperty">Serialized binding property represented by this drawer.</param>
+    /// <returns>Stable key used to skip redundant payload rebuilds.</returns>
+    private static string BuildOverridePayloadRebuildKey(bool showOverride,
+                                                         bool moduleResolved,
+                                                         PowerUpModuleKind moduleKind,
+                                                         SerializedProperty useOverrideProperty,
+                                                         SerializedProperty overridePayloadProperty,
+                                                         SerializedProperty moduleDefaultPayloadProperty,
+                                                         SerializedProperty bindingProperty)
+    {
+        string useOverridePath = useOverrideProperty != null ? useOverrideProperty.propertyPath : string.Empty;
+        string overridePayloadPath = overridePayloadProperty != null ? overridePayloadProperty.propertyPath : string.Empty;
+        string defaultPayloadPath = moduleDefaultPayloadProperty != null ? moduleDefaultPayloadProperty.propertyPath : string.Empty;
+        string bindingPath = bindingProperty != null ? bindingProperty.propertyPath : string.Empty;
+        return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}",
+                             showOverride,
+                             moduleResolved,
+                             (int)moduleKind,
+                             useOverridePath,
+                             overridePayloadPath,
+                             defaultPayloadPath,
+                             bindingPath);
     }
 
     private static string ResolveInitialModuleId(string currentId, List<string> options)

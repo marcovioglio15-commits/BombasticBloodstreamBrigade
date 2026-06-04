@@ -8,6 +8,7 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerBombFuseSystem))]
+[UpdateBefore(typeof(PlayerImpactFrameUpdateSystem))]
 public partial struct PlayerBombExplosionSystem : ISystem
 {
     #region Fields
@@ -37,6 +38,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         Allocator frameAllocator = state.WorldUpdateAllocator;
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        ComponentLookup<PlayerImpactFrameState> impactFrameLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameState>(false);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
@@ -92,6 +94,8 @@ public partial struct PlayerBombExplosionSystem : ISystem
             if (canEnqueueAudioRequests)
                 GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.ExplosionBomb, fuseState.Position);
 
+            TryActivateImpactFrame(in fuseState, ref impactFrameLookup);
+
             if (enemyCount > 0)
                 ApplyExplosionToEnemies(entityManager,
                                         in fuseState,
@@ -140,6 +144,30 @@ public partial struct PlayerBombExplosionSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Starts the carried Impact Frame payload when a player-spawned bomb reaches its explosion frame.
+    /// </summary>
+    /// <param name="fuseState">Runtime bomb fuse state containing the owner and optional Impact Frame config.</param>
+    /// <param name="impactFrameLookup">Mutable lookup for the owning player's Impact Frame state.</param>
+    private static void TryActivateImpactFrame(in BombFuseState fuseState,
+                                               ref ComponentLookup<PlayerImpactFrameState> impactFrameLookup)
+    {
+        if (fuseState.HasImpactFrame == 0)
+            return;
+
+        if (fuseState.OwnerEntity == Entity.Null)
+            return;
+
+        if (!impactFrameLookup.HasComponent(fuseState.OwnerEntity))
+            return;
+
+        PlayerImpactFrameState impactFrameState = impactFrameLookup[fuseState.OwnerEntity];
+        PlayerImpactFrameRuntimeUtility.ActivateAtWorldPosition(ref impactFrameState,
+                                                                in fuseState.ImpactFrame,
+                                                                fuseState.Position);
+        impactFrameLookup[fuseState.OwnerEntity] = impactFrameState;
+    }
+
     private static void EnqueueExplosionVfxRequest(in BombFuseState fuseState,
                                                    in ComponentLookup<LocalTransform> localTransformLookup,
                                                    ref BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup)

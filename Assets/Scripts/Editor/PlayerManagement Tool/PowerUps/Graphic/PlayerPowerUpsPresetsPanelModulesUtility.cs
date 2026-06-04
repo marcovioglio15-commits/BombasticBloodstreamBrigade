@@ -235,12 +235,59 @@ public static class PlayerPowerUpsPresetsPanelModulesUtility
                                                                             ResolveModuleFoldoutState(panel, foldoutStateKey));
         card.Add(foldout);
 
+        VisualElement lazyContent = new VisualElement();
+        foldout.Add(lazyContent);
+
+        EnsureModuleDefinitionFoldoutContent(panel,
+                                             moduleDefinitionsProperty,
+                                             moduleProperty,
+                                             moduleIndex,
+                                             lazyContent,
+                                             foldout.value);
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            EnsureModuleDefinitionFoldoutContent(panel,
+                                                 moduleDefinitionsProperty,
+                                                 moduleProperty,
+                                                 moduleIndex,
+                                                 lazyContent,
+                                                 evt.newValue);
+        });
+
+        return card;
+    }
+
+    /// <summary>
+    /// Builds the heavy serialized module UI only when a module card is actually expanded.
+    /// </summary>
+    /// <param name="panel">Power-ups panel that schedules structural mutations.</param>
+    /// <param name="moduleDefinitionsProperty">Serialized module definitions array owning the card.</param>
+    /// <param name="moduleProperty">Serialized module definition represented by the card.</param>
+    /// <param name="moduleIndex">Current array index used by move, duplicate and delete actions.</param>
+    /// <param name="contentContainer">Foldout child container receiving the deferred UI subtree.</param>
+    /// <param name="expanded">True when the foldout is open and content is needed.</param>
+    private static void EnsureModuleDefinitionFoldoutContent(PlayerPowerUpsPresetsPanel panel,
+                                                             SerializedProperty moduleDefinitionsProperty,
+                                                             SerializedProperty moduleProperty,
+                                                             int moduleIndex,
+                                                             VisualElement contentContainer,
+                                                             bool expanded)
+    {
+        if (contentContainer == null)
+            return;
+
+        if (!expanded)
+            return;
+
+        if (contentContainer.childCount > 0)
+            return;
+
         VisualElement actionsRow = new VisualElement();
         actionsRow.style.flexDirection = FlexDirection.Row;
         actionsRow.style.marginLeft = 14f;
         actionsRow.style.marginTop = 2f;
         actionsRow.style.marginBottom = 4f;
-        foldout.Add(actionsRow);
+        contentContainer.Add(actionsRow);
 
         Button duplicateButton = new Button(() =>
         {
@@ -293,9 +340,7 @@ public static class PlayerPowerUpsPresetsPanelModulesUtility
 
         PropertyField moduleField = new PropertyField(moduleProperty);
         moduleField.BindProperty(moduleProperty);
-        foldout.Add(moduleField);
-
-        return card;
+        contentContainer.Add(moduleField);
     }
     #endregion
 

@@ -41,6 +41,18 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         SerializedProperty scanlineFrequencyProperty = impactFramePayloadProperty.FindPropertyRelative("scanlineFrequency");
         SerializedProperty flashIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("flashIntensity");
         SerializedProperty radialDistortionProperty = impactFramePayloadProperty.FindPropertyRelative("radialDistortion");
+        SerializedProperty shockwaveIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("shockwaveIntensity");
+        SerializedProperty shockwaveRadiusProperty = impactFramePayloadProperty.FindPropertyRelative("shockwaveRadius");
+        SerializedProperty shockwaveThicknessProperty = impactFramePayloadProperty.FindPropertyRelative("shockwaveThickness");
+        SerializedProperty zoomPunchIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("zoomPunchIntensity");
+        SerializedProperty invertIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("invertIntensity");
+        SerializedProperty posterizeIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("posterizeIntensity");
+        SerializedProperty posterizeStepsProperty = impactFramePayloadProperty.FindPropertyRelative("posterizeSteps");
+        SerializedProperty edgeInkIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("edgeInkIntensity");
+        SerializedProperty screenTearIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("screenTearIntensity");
+        SerializedProperty screenTearFrequencyProperty = impactFramePayloadProperty.FindPropertyRelative("screenTearFrequency");
+        SerializedProperty paletteFlashIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("paletteFlashIntensity");
+        SerializedProperty paletteFlashTintProperty = impactFramePayloadProperty.FindPropertyRelative("paletteFlashTint");
 
         if (durationModeProperty == null ||
             durationFramesProperty == null ||
@@ -60,7 +72,19 @@ public static class PowerUpImpactFramePayloadDrawerUtility
             scanlineIntensityProperty == null ||
             scanlineFrequencyProperty == null ||
             flashIntensityProperty == null ||
-            radialDistortionProperty == null)
+            radialDistortionProperty == null ||
+            shockwaveIntensityProperty == null ||
+            shockwaveRadiusProperty == null ||
+            shockwaveThicknessProperty == null ||
+            zoomPunchIntensityProperty == null ||
+            invertIntensityProperty == null ||
+            posterizeIntensityProperty == null ||
+            posterizeStepsProperty == null ||
+            edgeInkIntensityProperty == null ||
+            screenTearIntensityProperty == null ||
+            screenTearFrequencyProperty == null ||
+            paletteFlashIntensityProperty == null ||
+            paletteFlashTintProperty == null)
         {
             HelpBox errorBox = new HelpBox("Impact Frame payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(errorBox);
@@ -70,10 +94,12 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         Foldout timingFoldout = CreatePayloadFoldout("Timing", true);
         Foldout timeScaleFoldout = CreatePayloadFoldout("Time Scale", true);
         Foldout filterFoldout = CreatePayloadFoldout("Screen Filter", true);
+        Foldout advancedEffectsFoldout = CreatePayloadFoldout("Advanced Screen Effects", false);
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         payloadContainer.Add(timingFoldout);
         payloadContainer.Add(timeScaleFoldout);
         payloadContainer.Add(filterFoldout);
+        payloadContainer.Add(advancedEffectsFoldout);
         payloadContainer.Add(warningBox);
 
         VisualElement durationModeField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(timingFoldout, durationModeProperty, "Duration Mode");
@@ -98,6 +124,19 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         VisualElement flashIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, flashIntensityProperty, "Flash Intensity");
         VisualElement radialDistortionField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, radialDistortionProperty, "Radial Distortion");
 
+        VisualElement shockwaveIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveIntensityProperty, "Shockwave Intensity");
+        VisualElement shockwaveRadiusField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveRadiusProperty, "Shockwave Radius");
+        VisualElement shockwaveThicknessField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveThicknessProperty, "Shockwave Thickness");
+        VisualElement zoomPunchIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, zoomPunchIntensityProperty, "Zoom Punch Intensity");
+        VisualElement invertIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, invertIntensityProperty, "Invert Intensity");
+        VisualElement posterizeIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, posterizeIntensityProperty, "Posterize Intensity");
+        VisualElement posterizeStepsField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, posterizeStepsProperty, "Posterize Steps");
+        VisualElement edgeInkIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, edgeInkIntensityProperty, "Edge Ink Intensity");
+        VisualElement screenTearIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, screenTearIntensityProperty, "Screen Tear Intensity");
+        VisualElement screenTearFrequencyField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, screenTearFrequencyProperty, "Screen Tear Frequency");
+        VisualElement paletteFlashIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, paletteFlashIntensityProperty, "Palette Flash Intensity");
+        VisualElement paletteFlashTintField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, paletteFlashTintProperty, "Palette Flash Tint");
+
         Action refreshView = () =>
         {
             ImpactFrameDurationMode durationMode = ResolveDurationMode(durationModeProperty);
@@ -106,6 +145,13 @@ public static class PowerUpImpactFramePayloadDrawerUtility
             SetDisplay(durationFramesField, showFrameFields);
             SetDisplay(referenceFrameRateField, showFrameFields);
             SetDisplay(maximumUnscaledDurationSecondsField, showDurationSeconds);
+            SetDisplay(vignetteSoftnessField, HasPositiveFloat(vignetteIntensityProperty));
+            SetDisplay(scanlineFrequencyField, HasPositiveFloat(scanlineIntensityProperty));
+            SetDisplay(shockwaveRadiusField, HasPositiveFloat(shockwaveIntensityProperty));
+            SetDisplay(shockwaveThicknessField, HasPositiveFloat(shockwaveIntensityProperty));
+            SetDisplay(posterizeStepsField, HasPositiveFloat(posterizeIntensityProperty));
+            SetDisplay(screenTearFrequencyField, HasPositiveFloat(screenTearIntensityProperty));
+            SetDisplay(paletteFlashTintField, HasPositiveFloat(paletteFlashIntensityProperty));
             RefreshWarnings(durationModeProperty,
                             durationFramesProperty,
                             referenceFrameRateProperty,
@@ -122,6 +168,17 @@ public static class PowerUpImpactFramePayloadDrawerUtility
                             scanlineFrequencyProperty,
                             flashIntensityProperty,
                             radialDistortionProperty,
+                            shockwaveIntensityProperty,
+                            shockwaveRadiusProperty,
+                            shockwaveThicknessProperty,
+                            zoomPunchIntensityProperty,
+                            invertIntensityProperty,
+                            posterizeIntensityProperty,
+                            posterizeStepsProperty,
+                            edgeInkIntensityProperty,
+                            screenTearIntensityProperty,
+                            screenTearFrequencyProperty,
+                            paletteFlashIntensityProperty,
                             warningBox);
         };
 
@@ -144,6 +201,18 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         RegisterRefreshCallback(scanlineFrequencyField, refreshView);
         RegisterRefreshCallback(flashIntensityField, refreshView);
         RegisterRefreshCallback(radialDistortionField, refreshView);
+        RegisterRefreshCallback(shockwaveIntensityField, refreshView);
+        RegisterRefreshCallback(shockwaveRadiusField, refreshView);
+        RegisterRefreshCallback(shockwaveThicknessField, refreshView);
+        RegisterRefreshCallback(zoomPunchIntensityField, refreshView);
+        RegisterRefreshCallback(invertIntensityField, refreshView);
+        RegisterRefreshCallback(posterizeIntensityField, refreshView);
+        RegisterRefreshCallback(posterizeStepsField, refreshView);
+        RegisterRefreshCallback(edgeInkIntensityField, refreshView);
+        RegisterRefreshCallback(screenTearIntensityField, refreshView);
+        RegisterRefreshCallback(screenTearFrequencyField, refreshView);
+        RegisterRefreshCallback(paletteFlashIntensityField, refreshView);
+        RegisterRefreshCallback(paletteFlashTintField, refreshView);
         refreshView();
     }
     #endregion
@@ -194,6 +263,16 @@ public static class PowerUpImpactFramePayloadDrawerUtility
     }
 
     /// <summary>
+    /// Resolves whether a numeric serialized field currently enables a dependent option row.
+    /// </summary>
+    /// <param name="property">Serialized float property used as an intensity or enable amount.</param>
+    /// <returns>True when the property exists and its value is greater than zero.</returns>
+    private static bool HasPositiveFloat(SerializedProperty property)
+    {
+        return property != null && property.floatValue > 0f;
+    }
+
+    /// <summary>
     /// Reads the authored duration mode from one serialized enum property.
     /// </summary>
     /// <param name="durationModeProperty">Serialized duration mode property.</param>
@@ -233,6 +312,17 @@ public static class PowerUpImpactFramePayloadDrawerUtility
     /// <param name="scanlineFrequencyProperty">Serialized scanline frequency property.</param>
     /// <param name="flashIntensityProperty">Serialized flash intensity property.</param>
     /// <param name="radialDistortionProperty">Serialized radial distortion property.</param>
+    /// <param name="shockwaveIntensityProperty">Serialized shockwave intensity property.</param>
+    /// <param name="shockwaveRadiusProperty">Serialized shockwave radius property.</param>
+    /// <param name="shockwaveThicknessProperty">Serialized shockwave thickness property.</param>
+    /// <param name="zoomPunchIntensityProperty">Serialized zoom punch intensity property.</param>
+    /// <param name="invertIntensityProperty">Serialized invert intensity property.</param>
+    /// <param name="posterizeIntensityProperty">Serialized posterize intensity property.</param>
+    /// <param name="posterizeStepsProperty">Serialized posterize step count property.</param>
+    /// <param name="edgeInkIntensityProperty">Serialized edge ink intensity property.</param>
+    /// <param name="screenTearIntensityProperty">Serialized screen tear intensity property.</param>
+    /// <param name="screenTearFrequencyProperty">Serialized screen tear frequency property.</param>
+    /// <param name="paletteFlashIntensityProperty">Serialized palette flash intensity property.</param>
     /// <param name="warningBox">HelpBox receiving the generated warning text.</param>
     private static void RefreshWarnings(SerializedProperty durationModeProperty,
                                         SerializedProperty durationFramesProperty,
@@ -250,6 +340,17 @@ public static class PowerUpImpactFramePayloadDrawerUtility
                                         SerializedProperty scanlineFrequencyProperty,
                                         SerializedProperty flashIntensityProperty,
                                         SerializedProperty radialDistortionProperty,
+                                        SerializedProperty shockwaveIntensityProperty,
+                                        SerializedProperty shockwaveRadiusProperty,
+                                        SerializedProperty shockwaveThicknessProperty,
+                                        SerializedProperty zoomPunchIntensityProperty,
+                                        SerializedProperty invertIntensityProperty,
+                                        SerializedProperty posterizeIntensityProperty,
+                                        SerializedProperty posterizeStepsProperty,
+                                        SerializedProperty edgeInkIntensityProperty,
+                                        SerializedProperty screenTearIntensityProperty,
+                                        SerializedProperty screenTearFrequencyProperty,
+                                        SerializedProperty paletteFlashIntensityProperty,
                                         HelpBox warningBox)
     {
         if (warningBox == null)
@@ -282,12 +383,27 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         AddUnitRangeWarning(warnings, scanlineIntensityProperty, "Scanline Intensity");
         AddUnitRangeWarning(warnings, flashIntensityProperty, "Flash Intensity");
         AddUnitRangeWarning(warnings, radialDistortionProperty, "Radial Distortion");
+        AddUnitRangeWarning(warnings, shockwaveIntensityProperty, "Shockwave Intensity");
+        AddUnitRangeWarning(warnings, shockwaveRadiusProperty, "Shockwave Radius");
+        AddUnitRangeWarning(warnings, shockwaveThicknessProperty, "Shockwave Thickness");
+        AddUnitRangeWarning(warnings, zoomPunchIntensityProperty, "Zoom Punch Intensity");
+        AddUnitRangeWarning(warnings, invertIntensityProperty, "Invert Intensity");
+        AddUnitRangeWarning(warnings, posterizeIntensityProperty, "Posterize Intensity");
+        AddUnitRangeWarning(warnings, edgeInkIntensityProperty, "Edge Ink Intensity");
+        AddUnitRangeWarning(warnings, screenTearIntensityProperty, "Screen Tear Intensity");
+        AddUnitRangeWarning(warnings, paletteFlashIntensityProperty, "Palette Flash Intensity");
 
         if (chromaticAberrationProperty.floatValue < 0f)
             warnings.Add("Chromatic Aberration should not be negative.");
 
         if (scanlineIntensityProperty.floatValue > 0f && scanlineFrequencyProperty.floatValue <= 0f)
             warnings.Add("Scanline Frequency must be greater than 0 when scanlines are enabled.");
+
+        if (posterizeIntensityProperty.floatValue > 0f && posterizeStepsProperty.floatValue < 2f)
+            warnings.Add("Posterize Steps must be at least 2 when posterization is enabled.");
+
+        if (screenTearIntensityProperty.floatValue > 0f && screenTearFrequencyProperty.floatValue <= 0f)
+            warnings.Add("Screen Tear Frequency must be greater than 0 when screen tear is enabled.");
 
         warningBox.text = string.Join("\n", warnings);
         warningBox.style.display = warnings.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;

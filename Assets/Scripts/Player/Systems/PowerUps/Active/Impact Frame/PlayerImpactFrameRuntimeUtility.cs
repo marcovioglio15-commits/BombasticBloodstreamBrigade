@@ -33,6 +33,78 @@ public static class PlayerImpactFrameRuntimeUtility
     /// <param name="impactFrameConfig">Runtime config authored on the active power-up slot.</param>
     public static void Activate(ref PlayerImpactFrameState impactFrameState, in ImpactFramePowerUpConfig impactFrameConfig)
     {
+        ActivateInternal(ref impactFrameState, in impactFrameConfig, float3.zero, 0);
+    }
+
+    /// <summary>
+    /// Starts or refreshes one Impact Frame request from a spatial world position such as a spawned-object explosion.
+    /// </summary>
+    /// <param name="impactFrameState">Mutable runtime state updated in place.</param>
+    /// <param name="impactFrameConfig">Runtime config authored on the active power-up slot.</param>
+    /// <param name="worldPosition">World position used by screen-space effects that need an origin.</param>
+    public static void ActivateAtWorldPosition(ref PlayerImpactFrameState impactFrameState,
+                                               in ImpactFramePowerUpConfig impactFrameConfig,
+                                               float3 worldPosition)
+    {
+        ActivateInternal(ref impactFrameState, in impactFrameConfig, worldPosition, 1);
+    }
+
+    /// <summary>
+    /// Clears all Impact Frame state immediately.
+    /// </summary>
+    /// <param name="impactFrameState">Mutable runtime state reset in place.</param>
+    public static void Clear(ref PlayerImpactFrameState impactFrameState)
+    {
+        impactFrameState = default;
+    }
+
+    /// <summary>
+    /// Advances Impact Frame phase timers using unscaled time.
+    /// </summary>
+    /// <param name="impactFrameState">Mutable runtime state updated in place.</param>
+    /// <param name="unscaledDeltaTime">Current unscaled frame delta.</param>
+    /// <returns>True while the effect remains active after this tick.</returns>
+    public static bool Tick(ref PlayerImpactFrameState impactFrameState, float unscaledDeltaTime)
+    {
+        if (impactFrameState.IsActive == 0)
+            return false;
+
+        float safeDeltaTime = math.max(0f, unscaledDeltaTime);
+        impactFrameState.EffectElapsedUnscaledSeconds += safeDeltaTime;
+
+        switch (impactFrameState.Phase)
+        {
+            case PhaseEaseIn:
+                TickEaseIn(ref impactFrameState, safeDeltaTime);
+                break;
+            case PhaseHold:
+                TickHold(ref impactFrameState, safeDeltaTime);
+                break;
+            case PhaseEaseOut:
+                TickEaseOut(ref impactFrameState, safeDeltaTime);
+                break;
+            default:
+                Clear(ref impactFrameState);
+                break;
+        }
+
+        return impactFrameState.IsActive != 0;
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Shared activation path used by centered and spatial Impact Frame requests.
+    /// </summary>
+    /// <param name="impactFrameState">Mutable runtime state updated in place.</param>
+    /// <param name="impactFrameConfig">Runtime config authored on the active power-up slot.</param>
+    /// <param name="worldPosition">Optional world position used by spatial effects.</param>
+    /// <param name="hasWorldOrigin">One when worldPosition should drive the screen-space origin.</param>
+    private static void ActivateInternal(ref PlayerImpactFrameState impactFrameState,
+                                         in ImpactFramePowerUpConfig impactFrameConfig,
+                                         float3 worldPosition,
+                                         byte hasWorldOrigin)
+    {
         if (!IsValidConfig(in impactFrameConfig))
             return;
 
@@ -68,54 +140,29 @@ public static class PlayerImpactFrameRuntimeUtility
         impactFrameState.ScanlineFrequency = math.max(0f, impactFrameConfig.ScanlineFrequency);
         impactFrameState.FlashIntensity = math.clamp(impactFrameConfig.FlashIntensity, 0f, 1f);
         impactFrameState.RadialDistortion = math.clamp(impactFrameConfig.RadialDistortion, 0f, 1f);
+        impactFrameState.ShockwaveIntensity = math.clamp(impactFrameConfig.ShockwaveIntensity, 0f, 1f);
+        impactFrameState.ShockwaveRadius = math.clamp(impactFrameConfig.ShockwaveRadius, 0f, 1f);
+        impactFrameState.ShockwaveThickness = math.clamp(impactFrameConfig.ShockwaveThickness, 0.001f, 1f);
+        impactFrameState.ZoomPunchIntensity = math.clamp(impactFrameConfig.ZoomPunchIntensity, 0f, 1f);
+        impactFrameState.InvertIntensity = math.clamp(impactFrameConfig.InvertIntensity, 0f, 1f);
+        impactFrameState.PosterizeIntensity = math.clamp(impactFrameConfig.PosterizeIntensity, 0f, 1f);
+        impactFrameState.PosterizeSteps = math.max(2f, impactFrameConfig.PosterizeSteps);
+        impactFrameState.EdgeInkIntensity = math.clamp(impactFrameConfig.EdgeInkIntensity, 0f, 1f);
+        impactFrameState.ScreenTearIntensity = math.clamp(impactFrameConfig.ScreenTearIntensity, 0f, 1f);
+        impactFrameState.ScreenTearFrequency = math.max(0f, impactFrameConfig.ScreenTearFrequency);
+        impactFrameState.PaletteFlashIntensity = math.clamp(impactFrameConfig.PaletteFlashIntensity, 0f, 1f);
+        impactFrameState.PaletteFlashTintRgba = math.saturate(impactFrameConfig.PaletteFlashTintRgba);
+        impactFrameState.TotalDurationUnscaledSeconds = math.max(ComparisonEpsilon,
+                                                                 requestedDurationSeconds +
+                                                                 impactFrameState.EaseInUnscaledSeconds +
+                                                                 impactFrameState.EaseOutUnscaledSeconds);
+        impactFrameState.EffectElapsedUnscaledSeconds = 0f;
+        impactFrameState.EffectOriginWorldPosition = worldPosition;
+        impactFrameState.HasWorldOrigin = hasWorldOrigin;
         impactFrameState.PhaseElapsedUnscaledSeconds = 0f;
         impactFrameState.CurrentBlend = impactFrameState.EaseInUnscaledSeconds > ComparisonEpsilon ? 0f : 1f;
         impactFrameState.Phase = impactFrameState.EaseInUnscaledSeconds > ComparisonEpsilon ? PhaseEaseIn : PhaseHold;
     }
-
-    /// <summary>
-    /// Clears all Impact Frame state immediately.
-    /// </summary>
-    /// <param name="impactFrameState">Mutable runtime state reset in place.</param>
-    public static void Clear(ref PlayerImpactFrameState impactFrameState)
-    {
-        impactFrameState = default;
-    }
-
-    /// <summary>
-    /// Advances Impact Frame phase timers using unscaled time.
-    /// </summary>
-    /// <param name="impactFrameState">Mutable runtime state updated in place.</param>
-    /// <param name="unscaledDeltaTime">Current unscaled frame delta.</param>
-    /// <returns>True while the effect remains active after this tick.</returns>
-    public static bool Tick(ref PlayerImpactFrameState impactFrameState, float unscaledDeltaTime)
-    {
-        if (impactFrameState.IsActive == 0)
-            return false;
-
-        float safeDeltaTime = math.max(0f, unscaledDeltaTime);
-
-        switch (impactFrameState.Phase)
-        {
-            case PhaseEaseIn:
-                TickEaseIn(ref impactFrameState, safeDeltaTime);
-                break;
-            case PhaseHold:
-                TickHold(ref impactFrameState, safeDeltaTime);
-                break;
-            case PhaseEaseOut:
-                TickEaseOut(ref impactFrameState, safeDeltaTime);
-                break;
-            default:
-                Clear(ref impactFrameState);
-                break;
-        }
-
-        return impactFrameState.IsActive != 0;
-    }
-    #endregion
-
-    #region Private Methods
     /// <summary>
     /// Resolves whether a runtime config can produce a visible or time-scale effect.
     /// </summary>

@@ -346,6 +346,10 @@ public static class PlayerPowerUpActivationExecutionUtility
         Entity explosionVfxPrefabEntity = enableDamagePayload != 0 ? slotConfig.Bomb.ExplosionVfxPrefabEntity : Entity.Null;
         byte scaleVfxToRadius = enableDamagePayload != 0 ? slotConfig.Bomb.ScaleVfxToRadius : (byte)0;
         float vfxScaleMultiplier = enableDamagePayload != 0 ? math.max(0.01f, slotConfig.Bomb.VfxScaleMultiplier) : 1f;
+        byte hasImpactFrame = slotConfig.HasImpactFrame != 0 &&
+                              PlayerImpactFrameRuntimeUtility.CanActivate(in slotConfig.ImpactFrame)
+            ? (byte)1
+            : (byte)0;
 
         bombRequests.Add(new PlayerBombSpawnRequest
         {
@@ -364,7 +368,9 @@ public static class PlayerPowerUpActivationExecutionUtility
             AffectAllEnemiesInRadius = affectAll,
             ExplosionVfxPrefabEntity = explosionVfxPrefabEntity,
             ScaleVfxToRadius = scaleVfxToRadius,
-            VfxScaleMultiplier = vfxScaleMultiplier
+            VfxScaleMultiplier = vfxScaleMultiplier,
+            ImpactFrame = slotConfig.ImpactFrame,
+            HasImpactFrame = hasImpactFrame
         });
     }
 

@@ -143,6 +143,18 @@ public struct ImpactFramePowerUpConfig
     public float ScanlineFrequency;
     public float FlashIntensity;
     public float RadialDistortion;
+    public float ShockwaveIntensity;
+    public float ShockwaveRadius;
+    public float ShockwaveThickness;
+    public float ZoomPunchIntensity;
+    public float InvertIntensity;
+    public float PosterizeIntensity;
+    public float PosterizeSteps;
+    public float EdgeInkIntensity;
+    public float ScreenTearIntensity;
+    public float ScreenTearFrequency;
+    public float PaletteFlashIntensity;
+    public float4 PaletteFlashTintRgba;
 }
 
 /// <summary>

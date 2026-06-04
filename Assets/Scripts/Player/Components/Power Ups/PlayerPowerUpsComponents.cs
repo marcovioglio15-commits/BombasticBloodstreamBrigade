@@ -326,6 +326,22 @@ public struct PlayerImpactFrameState : IComponentData
     public float ScanlineFrequency;
     public float FlashIntensity;
     public float RadialDistortion;
+    public float ShockwaveIntensity;
+    public float ShockwaveRadius;
+    public float ShockwaveThickness;
+    public float ZoomPunchIntensity;
+    public float InvertIntensity;
+    public float PosterizeIntensity;
+    public float PosterizeSteps;
+    public float EdgeInkIntensity;
+    public float ScreenTearIntensity;
+    public float ScreenTearFrequency;
+    public float PaletteFlashIntensity;
+    public float4 PaletteFlashTintRgba;
+    public float TotalDurationUnscaledSeconds;
+    public float EffectElapsedUnscaledSeconds;
+    public float3 EffectOriginWorldPosition;
+    public byte HasWorldOrigin;
     public float PhaseElapsedUnscaledSeconds;
     public float CurrentBlend;
 }
@@ -365,6 +381,8 @@ public struct PlayerBombSpawnRequest : IBufferElementData
     public Entity ExplosionVfxPrefabEntity;
     public byte ScaleVfxToRadius;
     public float VfxScaleMultiplier;
+    public ImpactFramePowerUpConfig ImpactFrame;
+    public byte HasImpactFrame;
 }
 
 /// <summary>
@@ -386,6 +404,8 @@ public struct BombFuseState : IComponentData
     public Entity ExplosionVfxPrefabEntity;
     public byte ScaleVfxToRadius;
     public float VfxScaleMultiplier;
+    public ImpactFramePowerUpConfig ImpactFrame;
+    public byte HasImpactFrame;
 }
 
 /// <summary>

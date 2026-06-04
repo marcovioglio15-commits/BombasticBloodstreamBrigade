@@ -283,12 +283,67 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
                                                                             false);
         card.Add(foldout);
 
+        VisualElement lazyContent = new VisualElement();
+        foldout.Add(lazyContent);
+
+        EnsureBindingFoldoutContent(powerUpProperty,
+                                    moduleBindingsProperty,
+                                    bindingProperty,
+                                    bindingIndex,
+                                    cardsContainer,
+                                    countLabel,
+                                    lazyContent,
+                                    foldout.value);
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            EnsureBindingFoldoutContent(powerUpProperty,
+                                        moduleBindingsProperty,
+                                        bindingProperty,
+                                        bindingIndex,
+                                        cardsContainer,
+                                        countLabel,
+                                        lazyContent,
+                                        evt.newValue);
+        });
+
+        return card;
+    }
+
+    /// <summary>
+    /// Builds one binding card body on demand so collapsed cards do not instantiate payload drawers.
+    /// </summary>
+    /// <param name="powerUpProperty">Serialized power-up definition owning the binding.</param>
+    /// <param name="moduleBindingsProperty">Serialized bindings array used for move limits.</param>
+    /// <param name="bindingProperty">Serialized binding represented by the card.</param>
+    /// <param name="bindingIndex">Current binding array index used by structural actions.</param>
+    /// <param name="cardsContainer">Container rebuilt after structural mutations.</param>
+    /// <param name="countLabel">Visible bindings count label updated after mutations.</param>
+    /// <param name="contentContainer">Foldout child container receiving deferred UI.</param>
+    /// <param name="expanded">True when the foldout is open and content is required.</param>
+    private static void EnsureBindingFoldoutContent(SerializedProperty powerUpProperty,
+                                                    SerializedProperty moduleBindingsProperty,
+                                                    SerializedProperty bindingProperty,
+                                                    int bindingIndex,
+                                                    VisualElement cardsContainer,
+                                                    Label countLabel,
+                                                    VisualElement contentContainer,
+                                                    bool expanded)
+    {
+        if (contentContainer == null)
+            return;
+
+        if (!expanded)
+            return;
+
+        if (contentContainer.childCount > 0)
+            return;
+
         VisualElement actionsRow = new VisualElement();
         actionsRow.style.flexDirection = FlexDirection.Row;
         actionsRow.style.marginLeft = 14f;
         actionsRow.style.marginTop = 2f;
         actionsRow.style.marginBottom = 4f;
-        foldout.Add(actionsRow);
+        contentContainer.Add(actionsRow);
 
         Button duplicateButton = new Button(() =>
         {
@@ -341,9 +396,7 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
         PropertyField bindingField = new PropertyField(bindingProperty);
         bindingField.BindProperty(bindingProperty);
-        foldout.Add(bindingField);
-
-        return card;
+        contentContainer.Add(bindingField);
     }
 
     private static void AddBinding(SerializedProperty powerUpProperty, VisualElement cardsContainer, Label countLabel)

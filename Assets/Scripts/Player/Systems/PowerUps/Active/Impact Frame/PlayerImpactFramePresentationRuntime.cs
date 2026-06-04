@@ -18,6 +18,21 @@ public readonly struct PlayerImpactFramePresentationSnapshot
     public readonly float ScanlineFrequency;
     public readonly float FlashIntensity;
     public readonly float RadialDistortion;
+    public readonly float ShockwaveIntensity;
+    public readonly float ShockwaveRadius;
+    public readonly float ShockwaveThickness;
+    public readonly float ZoomPunchIntensity;
+    public readonly float InvertIntensity;
+    public readonly float PosterizeIntensity;
+    public readonly float PosterizeSteps;
+    public readonly float EdgeInkIntensity;
+    public readonly float ScreenTearIntensity;
+    public readonly float ScreenTearFrequency;
+    public readonly float PaletteFlashIntensity;
+    public readonly float4 PaletteFlashTintRgba;
+    public readonly float LifetimeProgress;
+    public readonly float3 EffectOriginWorldPosition;
+    public readonly byte HasWorldOrigin;
     #endregion
 
     #region Constructors
@@ -35,6 +50,21 @@ public readonly struct PlayerImpactFramePresentationSnapshot
     /// <param name="scanlineFrequency">Scanline frequency in vertical lines.</param>
     /// <param name="flashIntensity">White flash additive intensity.</param>
     /// <param name="radialDistortion">Radial screen distortion strength.</param>
+    /// <param name="shockwaveIntensity">Expanding shockwave ring intensity.</param>
+    /// <param name="shockwaveRadius">Maximum normalized shockwave radius.</param>
+    /// <param name="shockwaveThickness">Normalized shockwave ring thickness.</param>
+    /// <param name="zoomPunchIntensity">Radial zoom punch intensity.</param>
+    /// <param name="invertIntensity">Color inversion intensity.</param>
+    /// <param name="posterizeIntensity">Posterization blend intensity.</param>
+    /// <param name="posterizeSteps">Posterization color-step count.</param>
+    /// <param name="edgeInkIntensity">Local edge darkening intensity.</param>
+    /// <param name="screenTearIntensity">Horizontal tear intensity.</param>
+    /// <param name="screenTearFrequency">Horizontal tear frequency.</param>
+    /// <param name="paletteFlashIntensity">Palette flash blend intensity.</param>
+    /// <param name="paletteFlashTintRgba">Palette flash tint and alpha.</param>
+    /// <param name="lifetimeProgress">Normalized progress across the whole visible effect.</param>
+    /// <param name="effectOriginWorldPosition">World position used by spatial effects.</param>
+    /// <param name="hasWorldOrigin">One when effectOriginWorldPosition should be projected by the camera.</param>
     public PlayerImpactFramePresentationSnapshot(float blend,
                                                  float overlayIntensity,
                                                  float4 filterTintRgba,
@@ -45,7 +75,22 @@ public readonly struct PlayerImpactFramePresentationSnapshot
                                                  float scanlineIntensity,
                                                  float scanlineFrequency,
                                                  float flashIntensity,
-                                                 float radialDistortion)
+                                                 float radialDistortion,
+                                                 float shockwaveIntensity,
+                                                 float shockwaveRadius,
+                                                 float shockwaveThickness,
+                                                 float zoomPunchIntensity,
+                                                 float invertIntensity,
+                                                 float posterizeIntensity,
+                                                 float posterizeSteps,
+                                                 float edgeInkIntensity,
+                                                 float screenTearIntensity,
+                                                 float screenTearFrequency,
+                                                 float paletteFlashIntensity,
+                                                 float4 paletteFlashTintRgba,
+                                                 float lifetimeProgress,
+                                                 float3 effectOriginWorldPosition,
+                                                 byte hasWorldOrigin)
     {
         Blend = blend;
         OverlayIntensity = overlayIntensity;
@@ -58,6 +103,21 @@ public readonly struct PlayerImpactFramePresentationSnapshot
         ScanlineFrequency = scanlineFrequency;
         FlashIntensity = flashIntensity;
         RadialDistortion = radialDistortion;
+        ShockwaveIntensity = shockwaveIntensity;
+        ShockwaveRadius = shockwaveRadius;
+        ShockwaveThickness = shockwaveThickness;
+        ZoomPunchIntensity = zoomPunchIntensity;
+        InvertIntensity = invertIntensity;
+        PosterizeIntensity = posterizeIntensity;
+        PosterizeSteps = posterizeSteps;
+        EdgeInkIntensity = edgeInkIntensity;
+        ScreenTearIntensity = screenTearIntensity;
+        ScreenTearFrequency = screenTearFrequency;
+        PaletteFlashIntensity = paletteFlashIntensity;
+        PaletteFlashTintRgba = paletteFlashTintRgba;
+        LifetimeProgress = lifetimeProgress;
+        EffectOriginWorldPosition = effectOriginWorldPosition;
+        HasWorldOrigin = hasWorldOrigin;
     }
     #endregion
 }
@@ -84,6 +144,20 @@ internal static class PlayerImpactFramePresentationRuntime
     private static readonly int scanlineFrequencyId = Shader.PropertyToID("_ScanlineFrequency");
     private static readonly int flashIntensityId = Shader.PropertyToID("_FlashIntensity");
     private static readonly int radialDistortionId = Shader.PropertyToID("_RadialDistortion");
+    private static readonly int shockwaveIntensityId = Shader.PropertyToID("_ShockwaveIntensity");
+    private static readonly int shockwaveRadiusId = Shader.PropertyToID("_ShockwaveRadius");
+    private static readonly int shockwaveThicknessId = Shader.PropertyToID("_ShockwaveThickness");
+    private static readonly int zoomPunchIntensityId = Shader.PropertyToID("_ZoomPunchIntensity");
+    private static readonly int invertIntensityId = Shader.PropertyToID("_InvertIntensity");
+    private static readonly int posterizeIntensityId = Shader.PropertyToID("_PosterizeIntensity");
+    private static readonly int posterizeStepsId = Shader.PropertyToID("_PosterizeSteps");
+    private static readonly int edgeInkIntensityId = Shader.PropertyToID("_EdgeInkIntensity");
+    private static readonly int screenTearIntensityId = Shader.PropertyToID("_ScreenTearIntensity");
+    private static readonly int screenTearFrequencyId = Shader.PropertyToID("_ScreenTearFrequency");
+    private static readonly int paletteFlashIntensityId = Shader.PropertyToID("_PaletteFlashIntensity");
+    private static readonly int paletteFlashTintId = Shader.PropertyToID("_PaletteFlashTint");
+    private static readonly int lifetimeProgressId = Shader.PropertyToID("_LifetimeProgress");
+    private static readonly int effectCenterId = Shader.PropertyToID("_EffectCenter");
     private static Material material;
     private static PlayerImpactFramePresentationSnapshot snapshot;
     private static bool isActive;
@@ -128,7 +202,7 @@ internal static class PlayerImpactFramePresentationRuntime
         if (!EnsureMaterial(impactFrameShader))
             return false;
 
-        ConfigureMaterial();
+        ConfigureMaterial(camera);
         configuredMaterial = material;
         return true;
     }
@@ -222,11 +296,13 @@ internal static class PlayerImpactFramePresentationRuntime
     /// <summary>
     /// Writes the current snapshot values into the fullscreen material.
     /// </summary>
-    private static void ConfigureMaterial()
+    private static void ConfigureMaterial(Camera camera)
     {
         float blend = math.saturate(snapshot.Blend);
         float overlayIntensity = math.saturate(snapshot.OverlayIntensity);
         float4 tint = math.saturate(snapshot.FilterTintRgba);
+        float4 paletteTint = math.saturate(snapshot.PaletteFlashTintRgba);
+        Vector2 effectCenter = ResolveEffectCenter(camera);
         material.SetFloat(blendId, blend);
         material.SetFloat(overlayIntensityId, overlayIntensity);
         material.SetVector(filterTintId, new Vector4(tint.x, tint.y, tint.z, tint.w));
@@ -238,6 +314,40 @@ internal static class PlayerImpactFramePresentationRuntime
         material.SetFloat(scanlineFrequencyId, math.max(0f, snapshot.ScanlineFrequency));
         material.SetFloat(flashIntensityId, math.saturate(snapshot.FlashIntensity));
         material.SetFloat(radialDistortionId, math.saturate(snapshot.RadialDistortion));
+        material.SetFloat(shockwaveIntensityId, math.saturate(snapshot.ShockwaveIntensity));
+        material.SetFloat(shockwaveRadiusId, math.saturate(snapshot.ShockwaveRadius));
+        material.SetFloat(shockwaveThicknessId, math.clamp(snapshot.ShockwaveThickness, 0.001f, 1f));
+        material.SetFloat(zoomPunchIntensityId, math.saturate(snapshot.ZoomPunchIntensity));
+        material.SetFloat(invertIntensityId, math.saturate(snapshot.InvertIntensity));
+        material.SetFloat(posterizeIntensityId, math.saturate(snapshot.PosterizeIntensity));
+        material.SetFloat(posterizeStepsId, math.max(2f, snapshot.PosterizeSteps));
+        material.SetFloat(edgeInkIntensityId, math.saturate(snapshot.EdgeInkIntensity));
+        material.SetFloat(screenTearIntensityId, math.saturate(snapshot.ScreenTearIntensity));
+        material.SetFloat(screenTearFrequencyId, math.max(0f, snapshot.ScreenTearFrequency));
+        material.SetFloat(paletteFlashIntensityId, math.saturate(snapshot.PaletteFlashIntensity));
+        material.SetVector(paletteFlashTintId, new Vector4(paletteTint.x, paletteTint.y, paletteTint.z, paletteTint.w));
+        material.SetFloat(lifetimeProgressId, math.saturate(snapshot.LifetimeProgress));
+        material.SetVector(effectCenterId, effectCenter);
+    }
+
+    /// <summary>
+    /// Resolves the screen-space origin used by shockwave and zoom effects.
+    /// </summary>
+    /// <param name="camera">Camera currently rendering the fullscreen pass.</param>
+    /// <returns>Viewport-space origin clamped to the visible screen.</returns>
+    private static Vector2 ResolveEffectCenter(Camera camera)
+    {
+        if (snapshot.HasWorldOrigin == 0 || camera == null)
+            return new Vector2(0.5f, 0.5f);
+
+        Vector3 viewportPosition = camera.WorldToViewportPoint(new Vector3(snapshot.EffectOriginWorldPosition.x,
+                                                                           snapshot.EffectOriginWorldPosition.y,
+                                                                           snapshot.EffectOriginWorldPosition.z));
+
+        if (viewportPosition.z <= 0f)
+            return new Vector2(0.5f, 0.5f);
+
+        return new Vector2(math.saturate(viewportPosition.x), math.saturate(viewportPosition.y));
     }
     #endregion
 

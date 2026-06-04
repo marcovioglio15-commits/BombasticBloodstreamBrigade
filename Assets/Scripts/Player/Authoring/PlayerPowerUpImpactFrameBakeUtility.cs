@@ -30,6 +30,7 @@ internal static class PlayerPowerUpImpactFrameBakeUtility
             return false;
 
         Color filterTint = impactFrameData.FilterTint;
+        Color paletteFlashTint = impactFrameData.PaletteFlashTint;
         impactFrameConfig = new ImpactFramePowerUpConfig
         {
             DurationMode = impactFrameData.DurationMode,
@@ -53,7 +54,22 @@ internal static class PlayerPowerUpImpactFrameBakeUtility
             ScanlineIntensity = math.clamp(impactFrameData.ScanlineIntensity, 0f, 1f),
             ScanlineFrequency = math.max(0f, impactFrameData.ScanlineFrequency),
             FlashIntensity = math.clamp(impactFrameData.FlashIntensity, 0f, 1f),
-            RadialDistortion = math.clamp(impactFrameData.RadialDistortion, 0f, 1f)
+            RadialDistortion = math.clamp(impactFrameData.RadialDistortion, 0f, 1f),
+            ShockwaveIntensity = math.clamp(impactFrameData.ShockwaveIntensity, 0f, 1f),
+            ShockwaveRadius = math.clamp(impactFrameData.ShockwaveRadius, 0f, 1f),
+            ShockwaveThickness = math.clamp(impactFrameData.ShockwaveThickness, 0.001f, 1f),
+            ZoomPunchIntensity = math.clamp(impactFrameData.ZoomPunchIntensity, 0f, 1f),
+            InvertIntensity = math.clamp(impactFrameData.InvertIntensity, 0f, 1f),
+            PosterizeIntensity = math.clamp(impactFrameData.PosterizeIntensity, 0f, 1f),
+            PosterizeSteps = math.max(2f, impactFrameData.PosterizeSteps),
+            EdgeInkIntensity = math.clamp(impactFrameData.EdgeInkIntensity, 0f, 1f),
+            ScreenTearIntensity = math.clamp(impactFrameData.ScreenTearIntensity, 0f, 1f),
+            ScreenTearFrequency = math.max(0f, impactFrameData.ScreenTearFrequency),
+            PaletteFlashIntensity = math.clamp(impactFrameData.PaletteFlashIntensity, 0f, 1f),
+            PaletteFlashTintRgba = new float4(math.saturate(paletteFlashTint.r),
+                                              math.saturate(paletteFlashTint.g),
+                                              math.saturate(paletteFlashTint.b),
+                                              math.saturate(paletteFlashTint.a))
         };
         return impactFrameConfig.TimeSlowdownPercent > 0f || impactFrameConfig.OverlayIntensity > 0f;
     }

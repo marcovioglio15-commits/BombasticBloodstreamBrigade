@@ -287,12 +287,71 @@ public static class PlayerPowerUpsPresetsPanelEntriesUtility
                                                                                                                                                        foldoutStateKey));
         card.Add(foldout);
 
+        VisualElement lazyContent = new VisualElement();
+        foldout.Add(lazyContent);
+
+        EnsurePowerUpDefinitionFoldoutContent(panel,
+                                              powerUpsProperty,
+                                              powerUpProperty,
+                                              powerUpIndex,
+                                              isActiveSection,
+                                              moduleCatalogById,
+                                              foldout,
+                                              lazyContent,
+                                              foldout.value);
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            EnsurePowerUpDefinitionFoldoutContent(panel,
+                                                  powerUpsProperty,
+                                                  powerUpProperty,
+                                                  powerUpIndex,
+                                                  isActiveSection,
+                                                  moduleCatalogById,
+                                                  foldout,
+                                                  lazyContent,
+                                                  evt.newValue);
+        });
+
+        return card;
+    }
+
+    /// <summary>
+    /// Builds one power-up card body on demand so closed entries do not instantiate nested binding payloads.
+    /// </summary>
+    /// <param name="panel">Power-ups panel that schedules structural mutations.</param>
+    /// <param name="powerUpsProperty">Serialized active or passive power-up array owning the card.</param>
+    /// <param name="powerUpProperty">Serialized power-up definition represented by the card.</param>
+    /// <param name="powerUpIndex">Current array index used by move, duplicate and delete actions.</param>
+    /// <param name="isActiveSection">True when the card belongs to Active Power Ups.</param>
+    /// <param name="moduleCatalogById">Module catalog used to compute coverage warnings.</param>
+    /// <param name="foldout">Foldout whose title is refreshed when the serialized entry changes.</param>
+    /// <param name="contentContainer">Foldout child container receiving deferred UI.</param>
+    /// <param name="expanded">True when the foldout is open and content is required.</param>
+    private static void EnsurePowerUpDefinitionFoldoutContent(PlayerPowerUpsPresetsPanel panel,
+                                                              SerializedProperty powerUpsProperty,
+                                                              SerializedProperty powerUpProperty,
+                                                              int powerUpIndex,
+                                                              bool isActiveSection,
+                                                              Dictionary<string, PowerUpModuleCatalogEntry> moduleCatalogById,
+                                                              Foldout foldout,
+                                                              VisualElement contentContainer,
+                                                              bool expanded)
+    {
+        if (contentContainer == null)
+            return;
+
+        if (!expanded)
+            return;
+
+        if (contentContainer.childCount > 0)
+            return;
+
         VisualElement actionsRow = new VisualElement();
         actionsRow.style.flexDirection = FlexDirection.Row;
         actionsRow.style.marginLeft = 14f;
         actionsRow.style.marginTop = 2f;
         actionsRow.style.marginBottom = 4f;
-        foldout.Add(actionsRow);
+        contentContainer.Add(actionsRow);
 
         Button duplicateButton = new Button(() =>
         {
@@ -346,7 +405,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesUtility
         HelpBox coverageWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         coverageWarningBox.style.marginLeft = 14f;
         coverageWarningBox.style.marginBottom = 4f;
-        foldout.Add(coverageWarningBox);
+        contentContainer.Add(coverageWarningBox);
 
         PlayerPowerUpsPresetsPanelEntriesSupportUtility.UpdatePowerUpCardPresentation(powerUpProperty,
                                                                                       powerUpIndex,
@@ -370,9 +429,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesUtility
                                                                                           coverageWarningBox,
                                                                                           updatedModuleCatalogById);
         });
-        foldout.Add(powerUpField);
-
-        return card;
+        contentContainer.Add(powerUpField);
     }
     #endregion
 

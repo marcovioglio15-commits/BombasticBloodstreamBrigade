@@ -82,6 +82,51 @@ internal static class PlayerRuntimePowerUpImpactFrameScalingApplyUtility
             case "impactFrame.radialDistortion":
                 impactFrameConfig.RadialDistortion = math.clamp(resolvedValue, 0f, 1f);
                 return true;
+            case "impactFrame.shockwaveIntensity":
+                impactFrameConfig.ShockwaveIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.shockwaveRadius":
+                impactFrameConfig.ShockwaveRadius = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.shockwaveThickness":
+                impactFrameConfig.ShockwaveThickness = math.clamp(resolvedValue, 0.001f, 1f);
+                return true;
+            case "impactFrame.zoomPunchIntensity":
+                impactFrameConfig.ZoomPunchIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.invertIntensity":
+                impactFrameConfig.InvertIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.posterizeIntensity":
+                impactFrameConfig.PosterizeIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.posterizeSteps":
+                impactFrameConfig.PosterizeSteps = math.max(2f, resolvedValue);
+                return true;
+            case "impactFrame.edgeInkIntensity":
+                impactFrameConfig.EdgeInkIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.screenTearIntensity":
+                impactFrameConfig.ScreenTearIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.screenTearFrequency":
+                impactFrameConfig.ScreenTearFrequency = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashIntensity":
+                impactFrameConfig.PaletteFlashIntensity = math.clamp(resolvedValue, 0f, 1f);
+                return true;
+            case "impactFrame.paletteFlashTint.r":
+                impactFrameConfig.PaletteFlashTintRgba.x = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.g":
+                impactFrameConfig.PaletteFlashTintRgba.y = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.b":
+                impactFrameConfig.PaletteFlashTintRgba.z = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.a":
+                impactFrameConfig.PaletteFlashTintRgba.w = math.saturate(resolvedValue);
+                return true;
             default:
                 return false;
         }

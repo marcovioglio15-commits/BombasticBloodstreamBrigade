@@ -214,7 +214,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                              ref bulletTimeState,
                                                                              ref impactFrameState);
 
-        if (slotConfig.HasImpactFrame != 0)
+        if (ShouldTriggerImpactFrameOnActivation(in slotConfig))
             PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
 
         if (slotConfig.ToolKind == ActiveToolKind.PortableHealthPack)
@@ -258,6 +258,27 @@ public static class PlayerPowerUpActivationSlotUtility
         cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
     }
 
+    #endregion
+
+    #region Impact Frame
+    /// <summary>
+    /// Resolves whether the Impact Frame side-effect should run on input activation for this active tool.
+    /// </summary>
+    /// <param name="slotConfig">Active slot configuration being executed.</param>
+    /// <returns>True when the effect should start immediately instead of waiting for a delayed spawned object payoff.</returns>
+    private static bool ShouldTriggerImpactFrameOnActivation(in PlayerPowerUpSlotConfig slotConfig)
+    {
+        if (slotConfig.HasImpactFrame == 0)
+            return false;
+
+        switch (slotConfig.ToolKind)
+        {
+            case ActiveToolKind.Bomb:
+                return false;
+            default:
+                return true;
+        }
+    }
     #endregion
 
     #region Checks
