@@ -50,7 +50,7 @@ MonoBehaviour:
     easingMode: 1
     despawnVfxPrefab: {fileID: 7550252483311059252, guid: e3ad1e727d0729844ab1862e3ddac869, type: 3}
     despawnVfxSpawnOffset: {x: 0, y: 0, z: 0}
-    despawnVfxScaleMultiplier: 1
+    despawnVfxScaleMultiplier: 2
     despawnVfxSpawnNormalizedTime: 0.6
     despawnVfxLifetimeSeconds: 1.5
     hidePlayerVisualOnVfxSpawn: 1
