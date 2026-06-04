@@ -23,7 +23,7 @@ public sealed class HUDMilestoneSelectionSection
     [Tooltip("Root panel shown while a milestone power-up selection is active.")]
     [SerializeField] private GameObject panelRoot;
 
-    [Tooltip("Header text used as a designer-authored template. The [CurrentPlayerLevel] token is replaced at runtime.")]
+    [Tooltip("Header text used as an authored template. The [CurrentPlayerLevel] token is replaced at runtime.")]
     [SerializeField] private TMP_Text headerText;
 
     [Tooltip("When enabled, milestone option titles are shown without the generated numeric prefix.")]

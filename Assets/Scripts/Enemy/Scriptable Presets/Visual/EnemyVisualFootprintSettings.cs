@@ -69,7 +69,7 @@ public sealed class EnemyVisualFootprintSettings
     [Tooltip("Background color of the health ring track shown behind the depleting fill. Alpha controls track opacity.")]
     [SerializeField] private Color healthRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
 
-    [Tooltip("Final opacity multiplier applied to the health ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.")]
+    [Tooltip("Final opacity multiplier applied to the health ring background on top of its color alpha.")]
     [SerializeField] private float healthRingBackgroundAlpha = 1f;
 
     [Tooltip("Fill color of the shield ring when the enemy is at full shield. Alpha controls ring opacity.")]
@@ -78,7 +78,7 @@ public sealed class EnemyVisualFootprintSettings
     [Tooltip("Background color of the shield ring track shown behind the depleting fill. Alpha controls track opacity.")]
     [SerializeField] private Color shieldRingBackgroundColor = new Color(0.04f, 0.04f, 0.04f, 0.7f);
 
-    [Tooltip("Final opacity multiplier applied to the shield ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.")]
+    [Tooltip("Final opacity multiplier applied to the shield ring background on top of its color alpha.")]
     [SerializeField] private float shieldRingBackgroundAlpha = 1f;
 
     [Tooltip("Normalized radial falloff applied at the inner and outer edges of each ring band. Higher values produce softer ring borders.")]

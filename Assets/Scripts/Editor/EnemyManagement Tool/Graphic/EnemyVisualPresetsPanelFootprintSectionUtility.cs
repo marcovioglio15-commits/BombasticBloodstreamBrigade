@@ -266,7 +266,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                               "Health Ring Background Alpha",
                                                               0f,
                                                               1f,
-                                                              "Final opacity multiplier applied to the health ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.");
+                                                              "Final opacity multiplier applied to the health ring background on top of its color alpha.");
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 appearanceFoldout,
                                                                 footprintProperty,
@@ -285,7 +285,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                               "Shield Ring Background Alpha",
                                                               0f,
                                                               1f,
-                                                              "Final opacity multiplier applied to the shield ring background on top of its color alpha. Lets authors tune track visibility without re-saving the color asset.");
+                                                              "Final opacity multiplier applied to the shield ring background on top of its color alpha.");
         BuildRingOrientationControls(panel, orientationFoldout, footprintProperty);
     }
 

@@ -364,7 +364,7 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
         shortRangeInteractionDefinitions.Add(CreateDefaultModule(DefaultShortRangeDashModuleId,
                                                                  "Dash",
                                                                  EnemyPatternModuleKind.ShortRangeDash,
-                                                                 "Takes aim, then commits to one designer-authored dash path toward the player."));
+                                                                 "Takes aim, then commits to one authored dash path toward the player."));
 
         weaponInteractionDefinitions.Add(CreateDefaultModule(DefaultWeaponShooterModuleId,
                                                              "Shooter",

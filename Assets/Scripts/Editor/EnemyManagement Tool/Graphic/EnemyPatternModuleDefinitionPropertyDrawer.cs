@@ -255,7 +255,7 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
                     : "Coward: retreats from the player while scoring open-space escape routes and respecting wall clearance.";
 
             case EnemyPatternModuleKind.ShortRangeDash:
-                return "Short-Range Dash: takes aim, locks a target line toward the player, executes one sampled designer-authored dash path, then returns to the core movement module until its recovery cooldown ends.";
+                return "Short-Range Dash: takes aim, locks a target line toward the player, executes one sampled authored dash path, then returns to the core movement module until its recovery cooldown ends.";
 
             case EnemyPatternModuleKind.Shooter:
                 return editorMode == EnemyAdvancedPatternPayloadEditorMode.WeaponInteraction
