@@ -81,6 +81,7 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<Parent> parentLookup = SystemAPI.GetComponentLookup<Parent>(true);
+        ComponentLookup<PlayerDeathAnimationState> deathAnimationStateLookup = SystemAPI.GetComponentLookup<PlayerDeathAnimationState>(true);
         float elapsedTimeSeconds = (float)SystemAPI.Time.ElapsedTime;
         float deltaTimeSeconds = SystemAPI.Time.DeltaTime;
 
@@ -101,6 +102,11 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
                                     RefRO<PlayerRuntimeShootingConfig>>()
                              .WithEntityAccess())
         {
+            // Once the death animation hides the player rig, the laser beam visual must stay hidden together with it
+            // instead of re-enabling its managed instance on the next pass.
+            if (IsVisualPresentationSuppressed(playerEntity, in deathAnimationStateLookup))
+                continue;
+
             if (!sourceVariantLookup.HasBuffer(playerEntity) ||
                 !impactVariantLookup.HasBuffer(playerEntity) ||
                 !visualPresetLookup.HasBuffer(playerEntity))
@@ -261,6 +267,53 @@ public partial struct PlayerLaserBeamPresentationSystem : ISystem
         }
 
         PlayerLaserBeamPresentationRuntimeUtility.AdvanceManagedInstanceShutdownTails(managedInstances, deltaTimeSeconds);
+    }
+    #endregion
+
+    #region Visual Presentation Gate
+    /// <summary>
+    /// Resolves whether the player's runtime visual bridge is currently suppressed by the death animation, in which
+    /// case the Laser Beam presentation must skip the render pass for this entity to keep the beam hidden alongside
+    /// the rig.
+    /// </summary>
+    /// <param name="playerEntity">Player entity owning the laser beam visual.</param>
+    /// <param name="deathAnimationStateLookup">Read-only lookup into the death animation state component.</param>
+    /// <returns>True when the player visual is suppressed and the beam must stay hidden, otherwise false.</returns>
+    private static bool IsVisualPresentationSuppressed(Entity playerEntity,
+                                                        in ComponentLookup<PlayerDeathAnimationState> deathAnimationStateLookup)
+    {
+        if (!deathAnimationStateLookup.HasComponent(playerEntity))
+            return false;
+
+        return deathAnimationStateLookup[playerEntity].VisualBridgeHidden != 0;
+    }
+    #endregion
+
+    #region Death Animation Hooks
+    /// <summary>
+    /// Hard-hides the managed Laser Beam visual for the requested player entity, skipping the dissipation tail so the
+    /// beam disappears on the same frame the player rig is hidden by the death animation system. The instance stays
+    /// in the pool so a fresh run can rebuild on top of it. No-op when no managed instance exists for this player.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose Laser Beam visual should be hidden.</param>
+    /// <returns>True when a managed instance was found and hidden, otherwise false.</returns>
+    public static bool TryHideManagedInstance(Entity playerEntity)
+    {
+        if (!managedInstances.TryGetValue(playerEntity, out PlayerLaserBeamManagedInstance managedInstance))
+            return false;
+
+        if (managedInstance == null || managedInstance.RootObject == null)
+            return false;
+
+        // Clear the dissipation tail tracking so timeScale=0 cannot leave the beam mid-fade, then hide the root.
+        managedInstance.ShutdownTailActive = 0;
+        managedInstance.ShutdownTailRemainingSeconds = 0f;
+        managedInstance.ShutdownTailLastFadeNormalized = 1f;
+
+        if (managedInstance.RootObject.activeSelf)
+            managedInstance.RootObject.SetActive(false);
+
+        return true;
     }
     #endregion
 

@@ -45,6 +45,7 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<PlayerDeathAnimationState> deathAnimationStateLookup = SystemAPI.GetComponentLookup<PlayerDeathAnimationState>(true);
 
         foreach ((RefRO<PlayerVisualPointerConfig> pointerConfig,
                   RefRO<PlayerRuntimeShootingConfig> runtimeShootingConfig,
@@ -60,6 +61,11 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
             PlayerVisualPointerConfig config = pointerConfig.ValueRO;
 
             if (config.Enabled == 0)
+                continue;
+
+            // Skip rendering the aiming pointer once the death animation has hidden the player rig, so the laser line
+            // does not survive beside the now-invisible player.
+            if (IsVisualPresentationSuppressed(playerEntity, in deathAnimationStateLookup))
                 continue;
 
             Material bodyMaterial = config.BodyMaterial.Value;
@@ -93,6 +99,22 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves whether the player's visual presentation is currently suppressed by the death animation, in which case
+    /// the aiming pointer must skip its draw call for this entity.
+    /// </summary>
+    /// <param name="playerEntity">Player entity owning the pointer config.</param>
+    /// <param name="deathAnimationStateLookup">Read-only lookup into the death animation state component.</param>
+    /// <returns>True when the player visual is suppressed and the pointer must stay hidden, otherwise false.</returns>
+    private static bool IsVisualPresentationSuppressed(Entity playerEntity,
+                                                        in ComponentLookup<PlayerDeathAnimationState> deathAnimationStateLookup)
+    {
+        if (!deathAnimationStateLookup.HasComponent(playerEntity))
+            return false;
+
+        return deathAnimationStateLookup[playerEntity].VisualBridgeHidden != 0;
+    }
+
     /// <summary>
     /// Submits one pointer beam draw for the current frame using the shared mesh and a steady-body property block.
     /// </summary>
