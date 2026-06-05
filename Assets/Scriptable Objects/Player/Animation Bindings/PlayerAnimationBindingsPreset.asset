@@ -33,14 +33,14 @@ MonoBehaviour:
   isShootingParameter: IsShooting
   isDashingParameter: IsDashing
   shotPulseParameter: ShotPulse
-  proceduralRecoilEnabled: 0
+  proceduralRecoilEnabled: 1
   proceduralRecoilKick: 0.2
   proceduralRecoilRecoveryPerSecond: 7
   proceduralRecoilParameter: ProcRecoil
-  proceduralAimWeightEnabled: 0
+  proceduralAimWeightEnabled: 1
   proceduralAimWeightSmoothing: 12
   proceduralAimWeightParameter: ProcAimWeight
-  proceduralLeanEnabled: 0
+  proceduralLeanEnabled: 1
   proceduralLeanSmoothing: 10
   proceduralLeanParameter: ProcLean
   idleClip: {fileID: -7682889681619475870, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}

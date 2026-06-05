@@ -81,7 +81,7 @@ public sealed class PowerUpModuleData
     [SerializeField] private PowerUpLaserBeamModuleData laserBeam = new PowerUpLaserBeamModuleData();
 
     [Header("Hook - Switch Weapon")]
-    [Tooltip("Alternate weapon mesh selection used by SwitchWeapon modules while Base Gun remains visible.")]
+    [Tooltip("Alternate weapon mesh selection shown alongside the always-visible Base Gun while the owning power-up is equipped, replacing the Player Visual Preset optional attachment.")]
     [SerializeField]
     private PowerUpSwitchWeaponModuleData switchWeapon = new PowerUpSwitchWeaponModuleData();
 
@@ -364,7 +364,7 @@ public sealed class PowerUpModuleData
 }
 
 /// <summary>
-/// Defines the alternate weapon mesh displayed beside Base Gun while a Switch Weapon module is active.
+/// Defines the alternate weapon mesh shown alongside Base Gun instead of the Player Visual Preset optional attachment.
 /// </summary>
 [Serializable]
 public sealed class PowerUpSwitchWeaponModuleData

@@ -148,7 +148,7 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.LaserBeam:
                 return "Replaces base projectile emission with one or more continuous liquid-laser lanes derived from current shooting and projectile passives.";
             case PowerUpModuleKind.SwitchWeapon:
-                return "Keeps Base Gun visible and displays one selected alternate weapon mesh while the owning passive or toggleable active power-up is in effect.";
+                return "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with one selected Cannon, Gatling, or Railgun mesh while the owning passive or toggleable active power-up is in effect.";
             default:
                 return "No description available.";
         }

@@ -666,11 +666,12 @@ public sealed class PlayerVisualPresetsPanel
     internal enum VisualSubSectionType
     {
         RuntimeBridge = 0,
-        Outline = 1,
-        DamageFeedback = 2,
-        PowerUpVfx = 3,
-        VisualPointer = 4,
-        DeathAnimation = 5
+        WeaponVisuals = 1,
+        Outline = 2,
+        DamageFeedback = 3,
+        PowerUpVfx = 4,
+        VisualPointer = 5,
+        DeathAnimation = 6
     }
 
     internal sealed class VisualSubSectionTabEntry

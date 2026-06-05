@@ -54,16 +54,20 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerAnimatorControllerReference> animatorControllerLookup = SystemAPI.GetComponentLookup<PlayerAnimatorControllerReference>(true);
         ComponentLookup<PlayerAnimatorAvatarReference> animatorAvatarLookup = SystemAPI.GetComponentLookup<PlayerAnimatorAvatarReference>(true);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         EntityManager entityManager = state.EntityManager;
         float deltaTime = SystemAPI.Time.DeltaTime;
         int processedAnimatorEntities = 0;
 
         foreach ((RefRW<PlayerAnimatorParameterConfig> parameterConfig,
+                  RefRO<PlayerVisualRuntimeBridgeConfig> visualBridgeConfig,
                   RefRO<OutlineVisualConfig> outlineConfig,
                   RefRW<PlayerAnimatorRuntimeState> animatorRuntimeState,
                   Entity entity)
                  in SystemAPI.Query<RefRW<PlayerAnimatorParameterConfig>,
+                                    RefRO<PlayerVisualRuntimeBridgeConfig>,
                                     RefRO<OutlineVisualConfig>,
                                     RefRW<PlayerAnimatorRuntimeState>>()
                              .WithEntityAccess())
@@ -123,7 +127,12 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             EnsureAnimatorRuntimeSettings(animator, ref animatorRuntimeState.ValueRW);
             PlayerOutlineRuntimeMaterialSyncUtility.ApplyFromOutlineConfig(in outlineConfig.ValueRO);
             EnsureAnimatorOutline(animator, in outlineConfig.ValueRO);
-            ApplyWeaponVisual(animator, entity, in passiveToolsStateLookup);
+            ApplyWeaponVisual(animator,
+                              entity,
+                              in visualBridgeConfig.ValueRO,
+                              in powerUpsConfigLookup,
+                              in powerUpsStateLookup,
+                              in passiveToolsStateLookup);
 
             if (!animator.enabled)
                 animator.enabled = true;
@@ -151,20 +160,20 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             bool shootPulseThisFrame = shootingState.ShotPulseVersion != animatorRuntimeState.ValueRO.LastShotPulseVersion;
             bool isDashing = dashLookup.HasComponent(entity) && dashLookup[entity].IsDashing != 0;
 
+            // Damping stays on during deceleration so the BlendTree blends from the directional cell into the (0,0) idle
+            // cell instead of snapping when isMoving flips to false at the threshold boundary.
             WriteFloatParameter(animator,
                                 in resolvedParameterConfig,
                                 resolvedParameterConfig.HasMoveX,
                                 resolvedParameterConfig.MoveXHash,
                                 localMove.x,
-                                deltaTime,
-                                isMoving);
+                                deltaTime);
             WriteFloatParameter(animator,
                                 in resolvedParameterConfig,
                                 resolvedParameterConfig.HasMoveY,
                                 resolvedParameterConfig.MoveYHash,
                                 localMove.y,
-                                deltaTime,
-                                isMoving);
+                                deltaTime);
             WriteFloatParameter(animator,
                                 in resolvedParameterConfig,
                                 resolvedParameterConfig.HasMoveSpeed,
@@ -220,13 +229,19 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
 
     #region Helpers
     /// <summary>
-    /// Applies the aggregated Switch Weapon visual override while preserving the prefab-authored configuration when inactive.
+    /// Keeps Base Gun visible and resolves the equipped Switch Weapon attachment or scalable preset default attachment.
     /// </summary>
     /// <param name="animator">Animator used to resolve the owning visual hierarchy.</param>
-    /// <param name="entity">Player entity whose passive-tool state drives the override.</param>
+    /// <param name="entity">Player entity whose equipped active and passive power-ups drive the override.</param>
+    /// <param name="visualBridgeConfig">Current scalable weapon visual references and default optional attachment.</param>
+    /// <param name="powerUpsConfigLookup">Read-only lookup containing equipped active-slot configs.</param>
+    /// <param name="powerUpsStateLookup">Read-only lookup containing active-slot equip-order metadata.</param>
     /// <param name="passiveToolsStateLookup">Read-only lookup containing the aggregated passive-tool state.</param>
     private static void ApplyWeaponVisual(Animator animator,
                                           Entity entity,
+                                          in PlayerVisualRuntimeBridgeConfig visualBridgeConfig,
+                                          in BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
+                                          in ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
                                           in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup)
     {
         if (animator == null)
@@ -246,7 +261,18 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
 
         PlayerPassiveToolsState passiveToolsState;
         PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup, out passiveToolsState);
-        weaponVisualSet.Apply(passiveToolsState.HasWeaponSwitch != 0, passiveToolsState.WeaponVisualSlot);
+        PlayerPowerUpsConfig powerUpsConfig;
+        PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup, out powerUpsConfig);
+        PlayerPowerUpsState powerUpsState = powerUpsStateLookup.HasComponent(entity)
+            ? powerUpsStateLookup[entity]
+            : default;
+        PlayerPassiveToolsAggregationUtility.AccumulateEquippedActiveWeaponSwitch(in powerUpsConfig,
+                                                                                   powerUpsState.PrimaryEquipOrder,
+                                                                                   powerUpsState.SecondaryEquipOrder,
+                                                                                   ref passiveToolsState);
+        weaponVisualSet.Apply(in visualBridgeConfig,
+                              passiveToolsState.HasWeaponSwitch != 0,
+                              passiveToolsState.WeaponVisualSlot);
     }
 
     private static float3 ResolveLookDirection(in PlayerLookState lookState, float3 fallback)

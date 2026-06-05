@@ -97,7 +97,7 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Switch Weapon",
                                                                                              PowerUpModuleKind.SwitchWeapon,
                                                                                              PowerUpModuleStage.Hook,
-                                                                                             "Keeps Base Gun visible and displays one selected alternate weapon mesh while the owning power-up is active."));
+                                                                                             "Keeps Base Gun visible and replaces the configured optional attachment with one selected Cannon, Gatling, or Railgun mesh while the owning power-up is equipped."));
         }
 
         ApplyUnifiedBindings(preset.ActivePowerUpsMutable, moduleDefinitions);

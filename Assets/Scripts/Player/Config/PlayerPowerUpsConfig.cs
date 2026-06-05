@@ -68,6 +68,11 @@ public struct PlayerPowerUpSlotConfig
     public PortableHealthPackPowerUpConfig PortableHealthPack;
     public PlayerPassiveToolConfig TriggeredProjectilePassiveTool;
     public PlayerPassiveToolConfig TogglePassiveTool;
+
+    // Switch Weapon hook captured from any active power-up. Equipped active slots participate in the final visual
+    // aggregation independently from one-shot, charge, or toggle activation state.
+    public byte HasActiveWeaponSwitch;
+    public PlayerWeaponVisualSlot ActiveWeaponVisualSlot;
 }
 
 /// <summary>

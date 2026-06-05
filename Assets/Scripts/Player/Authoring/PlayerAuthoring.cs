@@ -557,7 +557,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             TryAddAnimatorAssetFallbackComponents(entity, resolvedAnimatorComponent, animationBindingsPreset);
         }
 
-        AddComponent(entity, new PlayerVisualRuntimeBridgeConfig
+        PlayerVisualRuntimeBridgeConfig visualRuntimeBridgeConfig = new PlayerVisualRuntimeBridgeConfig
         {
             VisualPrefab = resolvedRuntimeVisualBridgePrefab,
             PositionOffset = new float3(authoring.RuntimeVisualBridgeOffset.x,
@@ -565,7 +565,15 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                         authoring.RuntimeVisualBridgeOffset.z),
             SyncRotation = authoring.RuntimeVisualBridgeSyncRotation ? (byte)1 : (byte)0,
             SpawnWhenAnimatorMissing = authoring.SpawnRuntimeVisualBridgeWhenAnimatorMissing ? (byte)1 : (byte)0
-        });
+        };
+        PlayerWeaponVisualBakeUtility.ApplyRuntimeConfig(visualPreset, ref visualRuntimeBridgeConfig);
+        AddComponent(entity, visualRuntimeBridgeConfig);
+        AddComponent(entity, PlayerWeaponVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(entity, new PlayerWeaponVisualScalingState());
+        DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> weaponVisualScalingBuffer = AddBuffer<PlayerRuntimeWeaponVisualScalingElement>(entity);
+#if UNITY_EDITOR
+        PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(sourceVisualPreset, weaponVisualScalingBuffer);
+#endif
         AddComponent(entity, new OutlineVisualConfig
         {
             Enabled = authoring.EnableOutline ? (byte)1 : (byte)0,

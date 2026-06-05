@@ -106,6 +106,11 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Local-space position offset applied to the runtime visual bridge relative to the ECS player transform.")]
     [SerializeField] private Vector3 runtimeVisualBridgeOffset = Vector3.zero;
 
+    [Header("Weapon Visuals")]
+    [Tooltip("Scalable prefab-relative weapon mesh references and the optional attachment shown alongside the always-visible Base Gun while no equipped power-up owns Switch Weapon.")]
+    [SerializeField]
+    private PlayerWeaponVisualSettings weaponVisuals = new PlayerWeaponVisualSettings();
+
     [Header("Outline")]
     [Tooltip("Outline settings applied to compatible player renderers.")]
     [SerializeField] private PlayerVisualOutlineSettings outline = new PlayerVisualOutlineSettings();
@@ -334,6 +339,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         get
         {
             return runtimeVisualBridgeOffset;
+        }
+    }
+
+    public PlayerWeaponVisualSettings WeaponVisuals
+    {
+        get
+        {
+            return weaponVisuals;
         }
     }
 
@@ -792,6 +805,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (outline == null)
             outline = new PlayerVisualOutlineSettings();
 
+        if (weaponVisuals == null)
+            weaponVisuals = new PlayerWeaponVisualSettings();
+
         if (elementalEnemyVfxByElement == null)
             elementalEnemyVfxByElement = new List<ElementalVfxByElementData>();
 
@@ -811,6 +827,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
             deathAnimation = new PlayerDeathAnimationSettings();
 
         outline.Validate();
+        weaponVisuals.Validate(runtimeVisualBridgePrefab, name);
         laserBeam.Validate();
         ValidateScalingRules();
         PlayerElementalVfxAssignmentUtility.ValidateAssignments(elementalEnemyVfxByElement);

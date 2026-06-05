@@ -451,6 +451,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.Heal:
                 case PowerUpModuleKind.LaserBeam:
                 case PowerUpModuleKind.Stackable:
+                case PowerUpModuleKind.SwitchWeapon:
                     return true;
                 default:
                     return false;
@@ -474,6 +475,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             case PowerUpModuleKind.TimeDilationEnemies:
             case PowerUpModuleKind.LaserBeam:
             case PowerUpModuleKind.Stackable:
+            case PowerUpModuleKind.SwitchWeapon:
                 return true;
             default:
                 return false;

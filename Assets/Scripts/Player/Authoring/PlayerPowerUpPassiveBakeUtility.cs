@@ -227,7 +227,8 @@ public static class PlayerPowerUpPassiveBakeUtility
         bool hasOrbitalProjections = false;
         FixedList4096Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
         bool hasWeaponSwitch = false;
-        PlayerWeaponVisualSlot weaponVisualSlot = PlayerWeaponVisualSlot.BaseGun;
+        // Neutral default: only used when hasWeaponSwitch stays false, in which case downstream consumption is gated off.
+        PlayerWeaponVisualSlot weaponVisualSlot = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -715,7 +716,7 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasLaserBeam = 0,
             HasOrbitalProjections = 0,
             HasWeaponSwitch = 0,
-            WeaponVisualSlot = PlayerWeaponVisualSlot.BaseGun,
+            WeaponVisualSlot = default,
             ProjectileSize = PlayerPowerUpPassiveConfigBuildUtility.BuildProjectileSizePassiveConfig(passiveTool.ProjectileSizeData),
             ElementalProjectiles = PlayerPowerUpPassiveConfigBuildUtility.BuildElementalProjectilesPassiveConfig(passiveTool.ElementalProjectilesData),
             PerfectCircle = PlayerPowerUpPassiveConfigBuildUtility.BuildPerfectCirclePassiveConfig(passiveTool.PerfectCircleData),

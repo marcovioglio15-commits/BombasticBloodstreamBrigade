@@ -100,11 +100,12 @@ public enum PassiveToolKind
 }
 
 /// <summary>
-/// Selects an authored weapon mesh; active Switch Weapon modules resolve only Cannon, Gatling, or Railgun.
+/// Selects one optional player weapon attachment shown alongside the permanently visible Base Gun. Visual presets may
+/// use None as their no-power-up default, while Switch Weapon modules expose only Cannon, Gatling, and Railgun.
 /// </summary>
 public enum PlayerWeaponVisualSlot
 {
-    BaseGun = 0,
+    None = 0,
     Cannon = 1,
     Gatling = 2,
     Railgun = 3

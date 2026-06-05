@@ -371,6 +371,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               bool applyCharacterTuningOnActiveTrigger,
                                               in PlayerPassiveToolConfig triggeredProjectilePassiveTool,
                                               in PlayerPassiveToolConfig togglePassiveTool,
+                                              bool hasActiveWeaponSwitch,
+                                              PlayerWeaponVisualSlot activeWeaponVisualSlot,
                                               ActiveToolKind resolvedToolKind,
                                               out PlayerPowerUpSlotConfig slotConfig)
     {
@@ -514,7 +516,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 StackPolicy = healthPackStackPolicy
             },
             TriggeredProjectilePassiveTool = triggeredProjectilePassiveTool,
-            TogglePassiveTool = togglePassiveTool
+            TogglePassiveTool = togglePassiveTool,
+            HasActiveWeaponSwitch = hasActiveWeaponSwitch ? (byte)1 : (byte)0,
+            ActiveWeaponVisualSlot = activeWeaponVisualSlot
         };
     }
 

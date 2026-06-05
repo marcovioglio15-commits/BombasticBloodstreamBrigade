@@ -41,41 +41,6 @@ public static class PlayerGameplayVisualSetupUtility
     private const float GeneratedMinimumPlanarDistance = 0.72f;
     #endregion
 
-    #region Data
-    /// <summary>
-    /// Stores the weapon mesh active states authored on the existing visual prefab before a generated rebuild.
-    /// </summary>
-    private readonly struct WeaponVisualAuthoredState
-    {
-        public readonly bool IsDefined;
-        public readonly bool BaseGunActive;
-        public readonly bool CannonActive;
-        public readonly bool GatlingActive;
-        public readonly bool RailgunActive;
-
-        /// <summary>
-        /// Creates one immutable authored weapon visual state snapshot.
-        /// </summary>
-        /// <param name="isDefined">Whether all expected weapon mesh objects were resolved.</param>
-        /// <param name="baseGunActive">Authored Base Gun active state.</param>
-        /// <param name="cannonActive">Authored Cannon active state.</param>
-        /// <param name="gatlingActive">Authored Gatling active state.</param>
-        /// <param name="railgunActive">Authored Railgun active state.</param>
-        public WeaponVisualAuthoredState(bool isDefined,
-                                         bool baseGunActive,
-                                         bool cannonActive,
-                                         bool gatlingActive,
-                                         bool railgunActive)
-        {
-            IsDefined = isDefined;
-            BaseGunActive = baseGunActive;
-            CannonActive = cannonActive;
-            GatlingActive = gatlingActive;
-            RailgunActive = railgunActive;
-        }
-    }
-    #endregion
-
     #region Methods
 
     #region Public Methods
@@ -141,7 +106,6 @@ public static class PlayerGameplayVisualSetupUtility
 
         try
         {
-            WeaponVisualAuthoredState weaponVisualAuthoredState = CaptureWeaponVisualAuthoredState(prefabContentsRoot.transform);
             prefabContentsRoot.name = "PF_PlayerVisual";
             DestroyAllChildren(prefabContentsRoot.transform);
 
@@ -197,11 +161,6 @@ public static class PlayerGameplayVisualSetupUtility
             Transform cannonTransform = FindRequiredChild(modelInstance.transform, CannonObjectName);
             Transform gatlingTransform = FindRequiredChild(modelInstance.transform, GatlingObjectName);
             Transform railgunTransform = FindRequiredChild(modelInstance.transform, RailgunObjectName);
-            ApplyWeaponVisualAuthoredState(baseGunTransform.gameObject,
-                                           cannonTransform.gameObject,
-                                           gatlingTransform.gameObject,
-                                           railgunTransform.gameObject,
-                                           in weaponVisualAuthoredState);
             weaponVisualSet.Configure(baseGunTransform.gameObject,
                                       cannonTransform.gameObject,
                                       gatlingTransform.gameObject,
@@ -708,66 +667,6 @@ public static class PlayerGameplayVisualSetupUtility
             throw new InvalidOperationException(string.Format("Unable to find '{0}' inside the player model hierarchy.", targetName));
 
         return resolvedTransform;
-    }
-
-    /// <summary>
-    /// Captures an existing visual prefab's weapon mesh active states so generated rebuilds preserve designer intent.
-    /// </summary>
-    /// <param name="visualRoot">Existing visual prefab hierarchy root.</param>
-    /// <returns>Defined authored state when every expected weapon mesh exists, otherwise an undefined state.</returns>
-    private static WeaponVisualAuthoredState CaptureWeaponVisualAuthoredState(Transform visualRoot)
-    {
-        Transform baseGunTransform = FindChildRecursive(visualRoot, BaseGunObjectName);
-        Transform cannonTransform = FindChildRecursive(visualRoot, CannonObjectName);
-        Transform gatlingTransform = FindChildRecursive(visualRoot, GatlingObjectName);
-        Transform railgunTransform = FindChildRecursive(visualRoot, RailgunObjectName);
-        bool isDefined = baseGunTransform != null &&
-                         cannonTransform != null &&
-                         gatlingTransform != null &&
-                         railgunTransform != null;
-
-        if (!isDefined)
-            return default;
-
-        return new WeaponVisualAuthoredState(true,
-                                             baseGunTransform.gameObject.activeSelf,
-                                             cannonTransform.gameObject.activeSelf,
-                                             gatlingTransform.gameObject.activeSelf,
-                                             railgunTransform.gameObject.activeSelf);
-    }
-
-    /// <summary>
-    /// Restores a previously captured authored weapon visual state onto a newly generated model hierarchy.
-    /// </summary>
-    /// <param name="baseGunObject">Generated Base Gun mesh object.</param>
-    /// <param name="cannonObject">Generated Cannon mesh object.</param>
-    /// <param name="gatlingObject">Generated Gatling mesh object.</param>
-    /// <param name="railgunObject">Generated Railgun mesh object.</param>
-    /// <param name="authoredState">Existing prefab state to preserve when defined.</param>
-    private static void ApplyWeaponVisualAuthoredState(GameObject baseGunObject,
-                                                       GameObject cannonObject,
-                                                       GameObject gatlingObject,
-                                                       GameObject railgunObject,
-                                                       in WeaponVisualAuthoredState authoredState)
-    {
-        if (!authoredState.IsDefined)
-            return;
-
-        SetActive(baseGunObject, authoredState.BaseGunActive);
-        SetActive(cannonObject, authoredState.CannonActive);
-        SetActive(gatlingObject, authoredState.GatlingActive);
-        SetActive(railgunObject, authoredState.RailgunActive);
-    }
-
-    /// <summary>
-    /// Applies one active state only when the generated target requires a change.
-    /// </summary>
-    /// <param name="targetObject">Generated mesh object to update.</param>
-    /// <param name="isActive">Desired authored active state.</param>
-    private static void SetActive(GameObject targetObject, bool isActive)
-    {
-        if (targetObject != null && targetObject.activeSelf != isActive)
-            targetObject.SetActive(isActive);
     }
 
     /// <summary>

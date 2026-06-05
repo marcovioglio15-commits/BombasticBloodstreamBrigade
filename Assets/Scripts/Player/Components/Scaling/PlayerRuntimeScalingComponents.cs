@@ -215,6 +215,27 @@ public struct PlayerRuntimeScalingState : IComponentData
     public uint LastScalableStatsHash;
     public byte Initialized;
 }
+
+/// <summary>
+/// Stores the immutable weapon visual baseline used to rebuild scalable reference selectors and default attachment selection.
+/// </summary>
+public struct PlayerBaseWeaponVisualConfig : IComponentData
+{
+    public FixedString128Bytes BaseGunReference;
+    public FixedString128Bytes CannonReference;
+    public FixedString128Bytes GatlingReference;
+    public FixedString128Bytes RailgunReference;
+    public PlayerWeaponVisualSlot DefaultAdditionalWeaponVisual;
+}
+
+/// <summary>
+/// Tracks the shared runtime scaling hash last applied to weapon visual configuration.
+/// </summary>
+public struct PlayerWeaponVisualScalingState : IComponentData
+{
+    public uint LastScalableStatsHash;
+    public byte Initialized;
+}
 #endregion
 
 #region Scaling Metadata
@@ -509,6 +530,32 @@ public struct PlayerRuntimeDeathAnimationScalingElement : IBufferElementData
     public float BaseValue;
     public byte BaseBooleanValue;
     public byte IsInteger;
+    public FixedString512Bytes Formula;
+}
+
+/// <summary>
+/// Identifies one scalable weapon visual field stored on the runtime visual bridge configuration.
+/// </summary>
+public enum PlayerRuntimeWeaponVisualFieldId : byte
+{
+    BaseGunReference = 0,
+    CannonReference = 1,
+    GatlingReference = 2,
+    RailgunReference = 3,
+    DefaultAdditionalWeaponVisual = 4
+}
+
+/// <summary>
+/// Stores one weapon visual scaling rule baked from the Player Visual Preset.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerRuntimeWeaponVisualScalingElement : IBufferElementData
+{
+    public PlayerRuntimeWeaponVisualFieldId FieldId;
+    public byte ValueType;
+    public float BaseValue;
+    public byte IsInteger;
+    public FixedString128Bytes BaseTokenValue;
     public FixedString512Bytes Formula;
 }
 #endregion

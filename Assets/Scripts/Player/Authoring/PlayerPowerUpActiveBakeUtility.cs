@@ -232,6 +232,8 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasCharacterTuning = false;
         bool applyCharacterTuningOnActiveTrigger = false;
         bool hasOrbitalProjections = false;
+        bool hasActiveWeaponSwitch = false;
+        PlayerWeaponVisualSlot activeWeaponVisualSlot = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -453,6 +455,15 @@ public static class PlayerPowerUpActiveBakeUtility
                     }
 
                     break;
+                case PowerUpModuleKind.SwitchWeapon:
+                    if (payload.SwitchWeapon == null)
+                        break;
+
+                    // Capture the alternate mesh selection directly on the active slot so equipped charge, one-shot,
+                    // and toggle power-ups share the same persistent visual aggregation path.
+                    hasActiveWeaponSwitch = true;
+                    activeWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot((float)payload.SwitchWeapon.WeaponSlot);
+                    break;
             }
         }
 
@@ -629,6 +640,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        applyCharacterTuningOnActiveTrigger,
                                                                        in triggeredProjectilePassiveTool,
                                                                        in togglePassiveTool,
+                                                                       hasActiveWeaponSwitch,
+                                                                       activeWeaponVisualSlot,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
     }

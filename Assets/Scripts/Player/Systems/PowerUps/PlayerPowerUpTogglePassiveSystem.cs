@@ -106,7 +106,6 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
                                      ref toggleBulletTimeTransitionTimeSeconds);
-
             if (healthChanged)
                 healthLookup[playerEntity] = updatedHealth;
 
@@ -171,7 +170,14 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                                  ref float toggleBulletTimeSlowPercent,
                                                  ref float toggleBulletTimeTransitionTimeSeconds)
     {
-        if (slotConfig.IsDefined == 0 || slotConfig.ToolKind != ActiveToolKind.PassiveToggle || slotConfig.Toggleable == 0)
+        if (slotConfig.IsDefined == 0)
+        {
+            isActive = 0;
+            maintenanceTickTimer = 0f;
+            return;
+        }
+
+        if (slotConfig.ToolKind != ActiveToolKind.PassiveToggle || slotConfig.Toggleable == 0)
         {
             isActive = 0;
             maintenanceTickTimer = 0f;

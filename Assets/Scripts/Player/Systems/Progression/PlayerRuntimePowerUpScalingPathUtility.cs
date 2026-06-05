@@ -7,7 +7,7 @@ using Unity.Mathematics;
 /// <summary>
 /// Applies runtime power-up scaling values to active and passive configs using modular payload paths.
 /// </summary>
-internal static class PlayerRuntimePowerUpScalingPathUtility
+public static class PlayerRuntimePowerUpScalingPathUtility
 {
     #region Constants
     private const string PassiveLaserBeamPayloadPrefix = "laserBeam.";
@@ -135,6 +135,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
 
         switch (payloadPath)
         {
+            case "switchWeapon.weaponSlot":
+                activeSlotConfig.ActiveWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
+                return;
             case "resourceGate.activationResource":
                 activeSlotConfig.ActivationResource = PlayerRuntimeScalingEnumUtility.ResolvePowerUpResourceType(resolvedValue);
                 return;

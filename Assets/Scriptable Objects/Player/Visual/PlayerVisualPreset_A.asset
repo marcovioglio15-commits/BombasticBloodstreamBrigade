@@ -20,6 +20,12 @@ MonoBehaviour:
   spawnRuntimeVisualBridgeWhenAnimatorMissing: 1
   runtimeVisualBridgeSyncRotation: 1
   runtimeVisualBridgeOffset: {x: 0, y: 0, z: 0}
+  weaponVisuals:
+    baseGunReference: base gun
+    cannonReference: cannon
+    gatlingReference: gatling
+    railgunReference: railgun
+    defaultAdditionalWeaponVisual: 2
   outline:
     enableOutline: 1
     outlineThickness: 5

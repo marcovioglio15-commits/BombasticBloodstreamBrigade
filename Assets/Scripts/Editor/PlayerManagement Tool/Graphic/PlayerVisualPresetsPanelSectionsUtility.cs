@@ -120,6 +120,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                "Runtime Bridge",
                                BuildRuntimeBridgeSubSection(panel));
         AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.WeaponVisuals,
+                               "Weapon Visuals",
+                               BuildWeaponVisualsSubSection(panel));
+        AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.Outline,
                                "Outline",
                                BuildOutlineSubSection(panel));
@@ -347,6 +351,18 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                          "Outline color written to compatible player materials exposing _OutlineColor.",
                          outlineChangedCallback);
         ApplySelectedPlayerOutlineMaterial(panel);
+        return container;
+    }
+
+    /// <summary>
+    /// Builds scalable weapon mesh references and the no-power-up default selection.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel providing the serialized preset.</param>
+    /// <returns>Configured Weapon Visuals subsection.</returns>
+    private static VisualElement BuildWeaponVisualsSubSection(PlayerVisualPresetsPanel panel)
+    {
+        VisualElement container = CreateSubSectionContainer("Weapon Visuals");
+        PlayerVisualPresetsPanelWeaponVisualSectionUtility.Build(panel, container);
         return container;
     }
 

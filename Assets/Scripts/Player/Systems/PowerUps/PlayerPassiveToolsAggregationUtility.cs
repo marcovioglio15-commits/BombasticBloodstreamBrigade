@@ -101,7 +101,8 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.ProjectileSpeedMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeSecondsMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeRangeMultiplier = 1f;
-        passiveToolsState.WeaponVisualSlot = PlayerWeaponVisualSlot.BaseGun;
+        // The HasWeaponSwitch flag gates downstream consumption, so the neutral default needs no defined enum value.
+        passiveToolsState.WeaponVisualSlot = default;
     }
 
     /// <summary>
@@ -435,9 +436,47 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.LaserBeam.SourceShape = passiveToolConfig.LaserBeam.SourceShape;
         passiveToolsState.LaserBeam.TerminalCapShape = passiveToolConfig.LaserBeam.TerminalCapShape;
     }
+
+    /// <summary>
+    /// Applies the Switch Weapon hook owned by equipped active power-ups after passive and toggle aggregation.
+    /// When both active slots define the hook, the most recently equipped power-up owns the optional attachment.
+    /// </summary>
+    /// <param name="powerUpsConfig">Current equipped active-slot configuration.</param>
+    /// <param name="primaryEquipOrder">Monotonic equip order associated with the primary slot.</param>
+    /// <param name="secondaryEquipOrder">Monotonic equip order associated with the secondary slot.</param>
+    /// <param name="passiveToolsState">Aggregated runtime state receiving the selected active Switch Weapon hook.</param>
+    public static void AccumulateEquippedActiveWeaponSwitch(in PlayerPowerUpsConfig powerUpsConfig,
+                                                            int primaryEquipOrder,
+                                                            int secondaryEquipOrder,
+                                                            ref PlayerPassiveToolsState passiveToolsState)
+    {
+        bool hasPrimaryWeaponSwitch = HasEquippedActiveWeaponSwitch(in powerUpsConfig.PrimarySlot);
+        bool hasSecondaryWeaponSwitch = HasEquippedActiveWeaponSwitch(in powerUpsConfig.SecondarySlot);
+
+        if (!hasPrimaryWeaponSwitch && !hasSecondaryWeaponSwitch)
+            return;
+
+        // Resolve conflicts by equip order so slot swaps do not unexpectedly change the visible attachment.
+        PlayerPowerUpSlotConfig selectedSlot = hasSecondaryWeaponSwitch &&
+                                               (!hasPrimaryWeaponSwitch || secondaryEquipOrder > primaryEquipOrder)
+            ? powerUpsConfig.SecondarySlot
+            : powerUpsConfig.PrimarySlot;
+        passiveToolsState.HasWeaponSwitch = 1;
+        passiveToolsState.WeaponVisualSlot = selectedSlot.ActiveWeaponVisualSlot;
+    }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Checks whether one equipped active slot owns a baked Switch Weapon hook.
+    /// </summary>
+    /// <param name="slotConfig">Active slot configuration to inspect.</param>
+    /// <returns>True when the slot is equipped and defines Switch Weapon.</returns>
+    private static bool HasEquippedActiveWeaponSwitch(in PlayerPowerUpSlotConfig slotConfig)
+    {
+        return slotConfig.IsDefined != 0 && slotConfig.HasActiveWeaponSwitch != 0;
+    }
+
     /// <summary>
     /// Appends orbital projection configs from one passive payload into the aggregate passive snapshot.
     /// </summary>

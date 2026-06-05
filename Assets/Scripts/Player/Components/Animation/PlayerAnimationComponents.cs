@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -76,6 +77,11 @@ public struct PlayerVisualRuntimeBridgeConfig : IComponentData
     #region Fields
     public UnityObjectRef<GameObject> VisualPrefab;
     public float3 PositionOffset;
+    public FixedString128Bytes BaseGunReference;
+    public FixedString128Bytes CannonReference;
+    public FixedString128Bytes GatlingReference;
+    public FixedString128Bytes RailgunReference;
+    public PlayerWeaponVisualSlot DefaultAdditionalWeaponVisual;
     public byte SyncRotation;
     public byte SpawnWhenAnimatorMissing;
     #endregion
