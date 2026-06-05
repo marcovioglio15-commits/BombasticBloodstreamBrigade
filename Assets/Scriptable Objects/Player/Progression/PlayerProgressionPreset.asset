@@ -465,7 +465,7 @@ MonoBehaviour:
     containerPrefab: {fileID: 7549901088543619621, guid: 518a26c8b52a63e42a92768c649a250c, type: 3}
     interactionRadius: 2.25
     interactionMode: 0
-    storedStateMode: 0
+    storedStateMode: 1
     interactionLockDuration: 0.25
     overlayPanelTimeScaleResumeDurationSeconds: 0.2
     interactActionId: 8b2a0df2-6707-41c3-9c21-fbdf36800b13
