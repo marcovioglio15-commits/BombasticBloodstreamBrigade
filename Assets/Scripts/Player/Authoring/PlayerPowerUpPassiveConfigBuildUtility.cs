@@ -31,7 +31,8 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasHeal != 0 ||
                config.HasBulletTime != 0 ||
                config.HasLaserBeam != 0 ||
-               config.HasOrbitalProjections != 0;
+               config.HasOrbitalProjections != 0 ||
+               config.HasWeaponSwitch != 0;
     }
 
     /// <summary>
@@ -69,6 +70,9 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
             return PassiveToolKind.Custom;
 
         if (config.HasHeal != 0)
+            return PassiveToolKind.Custom;
+
+        if (config.HasWeaponSwitch != 0)
             return PassiveToolKind.Custom;
 
         return PassiveToolKind.ProjectileSize;

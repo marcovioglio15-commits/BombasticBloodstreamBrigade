@@ -349,6 +349,18 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe PlayerWeaponVisualSlot from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static PlayerWeaponVisualSlot ResolvePlayerWeaponVisualSlot(float value)
+    {
+        return (PlayerWeaponVisualSlot)math.clamp((int)math.round(value),
+                                                  (int)PlayerWeaponVisualSlot.Cannon,
+                                                  (int)PlayerWeaponVisualSlot.Railgun);
+    }
+
+    /// <summary>
     /// Resolves a safe PlayerDeathAnimationEasing from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

@@ -127,7 +127,19 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         {
             isCharging = 1;
 
-            if (canEnqueueAudioRequests)
+            // Mute the charge sting when the slot has a resource gate that cannot pay the activation cost
+            // right now: the release branch is already gated, so the charge cue would otherwise tease an
+            // activation the player will never get to release.
+            if (canEnqueueAudioRequests &&
+                PlayerPowerUpResourceCostUtility.CanPayActivationCost(in slotConfig,
+                                                                      slotEnergy,
+                                                                      playerEntity,
+                                                                      ref healthLookup,
+                                                                      ref updatedHealth,
+                                                                      ref healthChanged,
+                                                                      ref shieldLookup,
+                                                                      ref updatedShield,
+                                                                      ref shieldChanged))
                 GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.ActiveCharge, localTransform.Position);
         }
 

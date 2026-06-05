@@ -82,6 +82,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.LaserBeam:
                 BuildLaserBeamPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.SwitchWeapon:
+                BuildSwitchWeaponPayloadUi(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.AreaTickApplyElement:
                 BuildAreaTickApplyElementPayloadUi(payloadContainer, payloadProperty);
                 return;
@@ -91,6 +94,40 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         }
 
         BuildDefaultPayloadUi(payloadContainer, payloadProperty, payloadLabel);
+    }
+
+    /// <summary>
+    /// Builds the scaling-aware alternate-weapon selector and reports legacy Base Gun selections without mutating them.
+    /// </summary>
+    /// <param name="payloadContainer">Container receiving the Switch Weapon controls and warnings.</param>
+    /// <param name="payloadProperty">Serialized Switch Weapon payload property.</param>
+    private static void BuildSwitchWeaponPayloadUi(VisualElement payloadContainer, SerializedProperty payloadProperty)
+    {
+        SerializedProperty weaponSlotProperty = payloadProperty.FindPropertyRelative("weaponSlot");
+        VisualElement weaponSlotField = AddField(payloadContainer, weaponSlotProperty, "Alternate Weapon Mesh");
+        HelpBox behaviorBox = new HelpBox("Switch Weapon always keeps Base Gun visible and selects exactly one alternate mesh.",
+                                          HelpBoxMessageType.Info);
+        HelpBox warningBox = new HelpBox("Base Gun is a legacy neutral value and is not an alternate mesh. Bake and Add Scaling resolve it to Cannon.",
+                                         HelpBoxMessageType.Warning);
+        payloadContainer.Add(behaviorBox);
+        payloadContainer.Add(warningBox);
+
+        Action refreshWarning = () =>
+        {
+            int selectedValue = weaponSlotProperty != null
+                ? weaponSlotProperty.intValue
+                : (int)PlayerWeaponVisualSlot.BaseGun;
+            bool showWarning = selectedValue < (int)PlayerWeaponVisualSlot.Cannon ||
+                               selectedValue > (int)PlayerWeaponVisualSlot.Railgun;
+            warningBox.text = selectedValue == (int)PlayerWeaponVisualSlot.BaseGun
+                ? "Base Gun is a legacy neutral value and is not an alternate mesh. Bake and Add Scaling resolve it to Cannon."
+                : "The selected value is outside the supported alternate weapon range. Bake and Add Scaling clamp it to Cannon, Gatling, or Railgun.";
+            warningBox.style.display = showWarning ? DisplayStyle.Flex : DisplayStyle.None;
+        };
+
+        RegisterRefreshCallback(weaponSlotField, refreshWarning);
+        TrackWarningProperty(payloadContainer, weaponSlotProperty, property => refreshWarning());
+        refreshWarning();
     }
 
     /// <summary>

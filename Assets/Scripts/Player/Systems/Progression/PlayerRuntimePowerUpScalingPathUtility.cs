@@ -398,6 +398,9 @@ internal static class PlayerRuntimePowerUpScalingPathUtility
 
         switch (payloadPath)
         {
+            case "switchWeapon.weaponSlot":
+                passiveToolConfig.WeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
+                return;
             case "projectileOrbitOverride.pathMode":
                 passiveToolConfig.PerfectCircle.PathMode = PlayerRuntimeScalingEnumUtility.ResolveProjectileOrbitPathMode(resolvedValue);
                 return;

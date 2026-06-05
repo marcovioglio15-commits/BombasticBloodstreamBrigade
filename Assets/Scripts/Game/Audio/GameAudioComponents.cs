@@ -34,19 +34,23 @@ public struct GameAudioEventBindingElement : IBufferElementData
     public byte Spatialize;
     public float MinimumDistance;
     public float MaximumDistance;
+    public byte SingleInstance;
     public byte RateLimitEnabled;
     public int MaxPlaysPerWindow;
     public float WindowSeconds;
 }
 
 /// <summary>
-/// Runtime request emitted by gameplay systems and consumed by GameAudioPlaybackSystem.
+/// Runtime request emitted by gameplay systems and consumed by GameAudioPlaybackSystem. When StopRequest is set
+/// the playback system stops the previously stored single-instance voice for EventId instead of triggering a new
+/// playback, so continuous events (looped or long clips) can be silenced from gameplay state changes.
 /// </summary>
 public struct GameAudioEventRequest : IBufferElementData
 {
     public GameAudioEventId EventId;
     public float3 Position;
     public byte HasPosition;
+    public byte StopRequest;
     public float VolumeMultiplier;
     public float PitchMultiplier;
 }

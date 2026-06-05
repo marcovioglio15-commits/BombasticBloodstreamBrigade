@@ -91,6 +91,15 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Runs a global time impact and fullscreen filter when an active power-up activation succeeds."));
         }
 
+        if (!validModuleIds.Contains(PlayerPowerUpsPresetDefaultsUtility.ModuleIdSwitchWeapon))
+        {
+            moduleDefinitions.Add(PlayerPowerUpsPresetDefaultsUtility.CreateModuleDefinition(PlayerPowerUpsPresetDefaultsUtility.ModuleIdSwitchWeapon,
+                                                                                             "Switch Weapon",
+                                                                                             PowerUpModuleKind.SwitchWeapon,
+                                                                                             PowerUpModuleStage.Hook,
+                                                                                             "Keeps Base Gun visible and displays one selected alternate weapon mesh while the owning power-up is active."));
+        }
+
         ApplyUnifiedBindings(preset.ActivePowerUpsMutable, moduleDefinitions);
         ApplyUnifiedBindings(preset.PassivePowerUpsMutable, moduleDefinitions);
     }

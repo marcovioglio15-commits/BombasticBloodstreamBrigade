@@ -47,8 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAuthoring
   masterPreset: {fileID: 11400000, guid: 2aa7920f2d0dab444bbb97e34b3f90d8, type: 2}
   powerUpsCheatPresetLibrary: {fileID: 0}
-  weaponReference: {fileID: 7060846113767367343}
-  animatorComponent: {fileID: 5461839557302833356}
+  weaponReference: {fileID: 4550506119952220767}
+  animatorComponent: {fileID: 3008654836369372802}
   runtimeVisualBridgePrefab: {fileID: 8300188409459899355, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   spawnRuntimeVisualBridgeWhenAnimatorMissing: 1
   runtimeVisualBridgeSyncRotation: 1
@@ -113,6 +113,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -0.434
       objectReference: {fileID: 0}
+    - target: {fileID: 1841338353516906218, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1917377410754265397, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -157,6 +161,46 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_Controller
+      value:
+      objectReference: {fileID: 9100000, guid: d668587abcbd5084f96f693fed712a69, type: 2}
+    - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3190244921923884617, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3295436658900218543, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.059
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.855
+      objectReference: {fileID: 0}
+    - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.538
+      objectReference: {fileID: 0}
+    - target: {fileID: 6718387042578914064, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7668028273146848242, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.388
@@ -188,13 +232,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1917377410754265397, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &5461839557302833356 stripped
+--- !u!95 &3008654836369372802 stripped
 Animator:
-  m_CorrespondingSourceObject: {fileID: 4637369599215178129, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7060846113767367343 stripped
+--- !u!4 &4550506119952220767 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 7668028273146848242, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}

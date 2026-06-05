@@ -36,12 +36,14 @@ public partial struct GameAudioPlaybackSystem : ISystem
     }
 
     /// <summary>
-    /// Stops managed background music when the ECS audio playback system is destroyed.
+    /// Stops managed background music and any still-tracked single-instance gameplay voice when the ECS audio
+    /// playback system is destroyed so stale FMOD handles do not survive into the next play session.
     /// </summary>
     /// <param name="state">Mutable system state.</param>
     public void OnDestroy(ref SystemState state)
     {
         GameAudioFmodRuntimeUtility.StopBackgroundMusic();
+        GameAudioFmodRuntimeUtility.StopAllTrackedSingleInstances();
     }
 
     /// <summary>
@@ -86,6 +88,14 @@ public partial struct GameAudioPlaybackSystem : ISystem
         {
             GameAudioEventRequest request = requests[requestIndex];
 
+            // Stop requests bypass binding resolution and rate-limits: their only job is to silence the tracked
+            // single-instance voice for the event id so continuous sources end cleanly.
+            if (request.StopRequest != 0)
+            {
+                GameAudioFmodRuntimeUtility.StopTrackedSingleInstanceById(request.EventId);
+                continue;
+            }
+
             if (!TryResolveBinding(bindings, request.EventId, out GameAudioEventBindingElement binding))
                 continue;
 
@@ -97,12 +107,24 @@ public partial struct GameAudioPlaybackSystem : ISystem
                            math.max(0f, request.VolumeMultiplier);
             float pitch = math.max(0.0001f, binding.Pitch) *
                           math.max(0.0001f, request.PitchMultiplier);
+            // Per-binding values authored in the Audio Manager preset take precedence; non-positive values
+            // fall back to the global defaults so missing per-event tuning never collapses into a 0-distance curve.
+            float minimumDistance = binding.MinimumDistance > 0f
+                ? binding.MinimumDistance
+                : math.max(0f, runtimeConfig.DefaultMinimumDistance);
+            float maximumDistance = binding.MaximumDistance > 0f
+                ? math.max(minimumDistance, binding.MaximumDistance)
+                : math.max(minimumDistance, runtimeConfig.DefaultMaximumDistance);
 
-            GameAudioFmodRuntimeUtility.PlayOneShot(ResolveManagedEventPath(in binding),
+            GameAudioFmodRuntimeUtility.PlayOneShot(binding.EventId,
+                                                    ResolveManagedEventPath(in binding),
                                                     request.Position,
                                                     request.HasPosition != 0 && binding.Spatialize != 0,
                                                     volume,
                                                     pitch,
+                                                    minimumDistance,
+                                                    maximumDistance,
+                                                    binding.SingleInstance != 0,
                                                     runtimeConfig.LogMissingEventPaths != 0);
         }
 

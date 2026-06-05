@@ -38,7 +38,8 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.BouncingProjectiles,
         PowerUpModuleKind.ProjectileSplit,
         PowerUpModuleKind.Stackable,
-        PowerUpModuleKind.LaserBeam
+        PowerUpModuleKind.LaserBeam,
+        PowerUpModuleKind.SwitchWeapon
     };
     #endregion
 
@@ -146,6 +147,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Allows a Character Tuning power-up to be rolled multiple times up to a configured cap.";
             case PowerUpModuleKind.LaserBeam:
                 return "Replaces base projectile emission with one or more continuous liquid-laser lanes derived from current shooting and projectile passives.";
+            case PowerUpModuleKind.SwitchWeapon:
+                return "Keeps Base Gun visible and displays one selected alternate weapon mesh while the owning passive or toggleable active power-up is in effect.";
             default:
                 return "No description available.";
         }
@@ -244,6 +247,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.LaserBeam:
                 relativePropertyPath = "laserBeam";
                 payloadLabel = "Laser Beam Payload";
+                return true;
+            case PowerUpModuleKind.SwitchWeapon:
+                relativePropertyPath = "switchWeapon";
+                payloadLabel = "Switch Weapon Payload";
                 return true;
             default:
                 relativePropertyPath = string.Empty;

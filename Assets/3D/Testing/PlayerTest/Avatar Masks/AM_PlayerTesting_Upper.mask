@@ -7,125 +7,159 @@ AvatarMask:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: AM_PlayerTesting_Upper
-  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000000000000000000
   m_Elements:
   - m_Path: 
-    m_Weight: 1
-  - m_Path: MeshPlayer
     m_Weight: 0
-  - m_Path: MeshPlayer/CH_PlayerTest
+  - m_Path: base gun
     m_Weight: 0
-  - m_Path: MeshPlayer/Gun_Mesh
+  - m_Path: cannon
     m_Weight: 0
-  - m_Path: Root_EXP
+  - m_Path: CH_Player
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP
+  - m_Path: gatling
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/L_Leg_EXP
+  - m_Path: PlayerRig
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/L_Leg_EXP/L_Knee_EXP
+  - m_Path: PlayerRig/ROOT
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/L_Leg_EXP/L_Knee_EXP/L_Ankle_EXP
+  - m_Path: PlayerRig/ROOT/spine
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/pelvis.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/L_Leg_EXP/L_Knee_EXP/L_Ankle_EXP/L_Foot_EXP
+  - m_Path: PlayerRig/ROOT/spine/pelvis.R
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/L_Leg_EXP/L_Knee_EXP/L_Ankle_EXP/L_Foot_EXP/L_Foot_END_EXP
+  - m_Path: PlayerRig/ROOT/spine/spine.001
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/breast.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/breast.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/GunHandleBack
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/GunHandleBack/GunBarrel
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Index01.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Index01.L/Index02.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Index01.L/Index02.L/Index03.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/little01.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/little01.L/little02.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/little01.L/little02.L/little03.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/middle01.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/middle01.L/middle02.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/middle01.L/middle02.L/middle03.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/ring01.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/ring01.L/ring02.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/ring01.L/ring02.L/ring03.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Thumb01.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Thumb01.L/Thumb02.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.L/upper_arm.L/forearm.L/hand.L/Thumb01.L/Thumb02.L/Thumb03.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Index01.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Index01.R/Index02.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Index01.R/Index02.R/Index03.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/little01.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/little01.R/little02.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/little01.R/little02.R/little03.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/middle01.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/middle01.R/middle02.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/middle01.R/middle02.R/middle03.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/ring01.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/ring01.R/ring02.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/ring01.R/ring02.R/ring03.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Thumb01.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Thumb01.R/Thumb02.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/shoulder.R/upper_arm.R/forearm.R/hand.R/Thumb01.R/Thumb02.R/Thumb03.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005/spine.006
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005/spine.006/HairBase.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005/spine.006/HairBase.L/HairTip.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005/spine.006/HairBase.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/spine.004/spine.005/spine.006/HairBase.R/HairTip.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/WingBase.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/WingBase.L/WingTip.L
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/WingBase.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/spine.001/spine.002/spine.003/WingBase.R/WingTip.R
+    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/thigh.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/R_Leg_EXP
+  - m_Path: PlayerRig/ROOT/spine/thigh.L/shin.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/R_Leg_EXP/R_Knee_EXP
+  - m_Path: PlayerRig/ROOT/spine/thigh.L/shin.L/foot.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/R_Leg_EXP/R_Knee_EXP/R_Ankle_EXP
+  - m_Path: PlayerRig/ROOT/spine/thigh.L/shin.L/foot.L/heel.02.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/R_Leg_EXP/R_Knee_EXP/R_Ankle_EXP/R_Foot_EXP
+  - m_Path: PlayerRig/ROOT/spine/thigh.L/shin.L/foot.L/toe.L
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/R_Leg_EXP/R_Knee_EXP/R_Ankle_EXP/R_Foot_EXP/R_Foot_END_EXP
+  - m_Path: PlayerRig/ROOT/spine/thigh.R
     m_Weight: 0
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Index_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Index_EXP/L_Index_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Index_EXP/L_Index_Mid_EXP/L_Index_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Middle_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Middle_EXP/L_Middle_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Middle_EXP/L_Middle_Mid_EXP/L_Middle_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Pinky_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Pinky_EXP/L_Pinky_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Pinky_EXP/L_Pinky_Mid_EXP/L_Pinky_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Ring_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Ring_EXP/L_Ring_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Ring_EXP/L_Ring_Mid_EXP/L_Ring_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Thumb_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Thumb_EXP/L_Thumb_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/L_Clavicle_EXP/L_Shoulder_EXP/L_Elbow_EXP/L_Wrist_EXP/L_Thumb_EXP/L_Thumb_Mid_EXP/L_Thumb_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/Neck_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/Neck_EXP/Head_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Index_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Index_EXP/R_Index_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Index_EXP/R_Index_Mid_EXP/R_Index_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Middle_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Middle_EXP/R_Middle_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Middle_EXP/R_Middle_Mid_EXP/R_Middle_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Pinky_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Pinky_EXP/R_Pinky_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Pinky_EXP/R_Pinky_Mid_EXP/R_Pinky_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Ring_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Ring_EXP/R_Ring_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Ring_EXP/R_Ring_Mid_EXP/R_Ring_END_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Thumb_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Thumb_EXP/R_Thumb_Mid_EXP
-    m_Weight: 1
-  - m_Path: Root_EXP/Hips_EXP/Spine_01_EXP/Spine_02_EXP/Spine_03_EXP/Chest_EXP/R_Clavicle_EXP/R_Shoulder_EXP/R_Elbow_EXP/R_Wrist_EXP/R_Thumb_EXP/R_Thumb_Mid_EXP/R_Thumb_END_EXP
-    m_Weight: 1
+  - m_Path: PlayerRig/ROOT/spine/thigh.R/shin.R
+    m_Weight: 0
+  - m_Path: PlayerRig/ROOT/spine/thigh.R/shin.R/foot.R
+    m_Weight: 0
+  - m_Path: PlayerRig/ROOT/spine/thigh.R/shin.R/foot.R/heel.02.R
+    m_Weight: 0
+  - m_Path: PlayerRig/ROOT/spine/thigh.R/shin.R/foot.R/toe.R
+    m_Weight: 0
+  - m_Path: railgun
+    m_Weight: 0

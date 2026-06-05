@@ -14,12 +14,24 @@ public static class PlayerGameplayVisualSetupUtility
     #region Constants
     private const string PlayerPrefabPath = "Assets/Prefabs/Player/PF_Player.prefab";
     private const string PlayerVisualPrefabPath = "Assets/Prefabs/Player/PF_PlayerVisual.prefab";
-    private const string PlayerModelPrefabPath = "Assets/3D/Testing/PlayerTest/SK_PlayerTest_withGun.fbx";
+    private const string PlayerModelPrefabPath = "Assets/3D/Character/SK_PlayerFinal.fbx";
+    private const string FlyAnimationPackPath = "Assets/3D/Character/AN_FlyPack.fbx";
     private const string ShootClipPath = "Assets/3D/Testing/PlayerTest/PlayerTestAnimations/AN_MovementForward-Shoot.fbx";
+    private const string AimBackwardClipPath = "Assets/3D/Testing/PlayerTest/PlayerTestAnimations/AN_MovementBackwards-Aim.fbx";
+    private const string AimLeftClipPath = "Assets/3D/Testing/PlayerTest/PlayerTestAnimations/AN_MovementLeft-Aim.fbx";
+    private const string AimRightClipPath = "Assets/3D/Testing/PlayerTest/PlayerTestAnimations/AN_MovementRight-Aim.fbx";
     private const string AnimationBindingsPresetPath = "Assets/Scriptable Objects/Player/Animation Bindings/PlayerAnimationBindingsPreset.asset";
     private const string AnimatorControllerPath = "Assets/3D/Testing/PlayerTest/Animation Contorller/AC_PlayerTesting.controller";
-    private const string GunMeshObjectName = "Gun_Mesh";
+    private const string LowerBodyMaskPath = "Assets/3D/Testing/PlayerTest/Avatar Masks/AM_PlayerTesting_Lower.mask";
+    private const string UpperBodyMaskPath = "Assets/3D/Testing/PlayerTest/Avatar Masks/AM_PlayerTesting_Upper.mask";
+    private const string GunBarrelObjectName = "GunBarrel";
+    private const string BaseGunObjectName = "base gun";
+    private const string CannonObjectName = "cannon";
+    private const string GatlingObjectName = "gatling";
+    private const string RailgunObjectName = "railgun";
     private const string MuzzleAnchorObjectName = "MuzzleAnchor";
+    private const string LowerBodyLayerName = "LowerBody";
+    private const string LowerMoveStateName = "BT_Lower_Move";
     private const string UpperBodyLayerName = "UpperBody";
     private const string UpperAimStateName = "BT_Upper_Aim";
     private const string UpperShootStateName = "ST_Upper_Shoot";
@@ -27,6 +39,41 @@ public static class PlayerGameplayVisualSetupUtility
     private const float MuzzleForwardPadding = 0.01f;
     private const float GeneratedForwardShotOffset = 0.14f;
     private const float GeneratedMinimumPlanarDistance = 0.72f;
+    #endregion
+
+    #region Data
+    /// <summary>
+    /// Stores the weapon mesh active states authored on the existing visual prefab before a generated rebuild.
+    /// </summary>
+    private readonly struct WeaponVisualAuthoredState
+    {
+        public readonly bool IsDefined;
+        public readonly bool BaseGunActive;
+        public readonly bool CannonActive;
+        public readonly bool GatlingActive;
+        public readonly bool RailgunActive;
+
+        /// <summary>
+        /// Creates one immutable authored weapon visual state snapshot.
+        /// </summary>
+        /// <param name="isDefined">Whether all expected weapon mesh objects were resolved.</param>
+        /// <param name="baseGunActive">Authored Base Gun active state.</param>
+        /// <param name="cannonActive">Authored Cannon active state.</param>
+        /// <param name="gatlingActive">Authored Gatling active state.</param>
+        /// <param name="railgunActive">Authored Railgun active state.</param>
+        public WeaponVisualAuthoredState(bool isDefined,
+                                         bool baseGunActive,
+                                         bool cannonActive,
+                                         bool gatlingActive,
+                                         bool railgunActive)
+        {
+            IsDefined = isDefined;
+            BaseGunActive = baseGunActive;
+            CannonActive = cannonActive;
+            GatlingActive = gatlingActive;
+            RailgunActive = railgunActive;
+        }
+    }
     #endregion
 
     #region Methods
@@ -38,11 +85,37 @@ public static class PlayerGameplayVisualSetupUtility
     /// </summary>
     public static void ExecuteSetup()
     {
+        EnsureFlyAnimationPackLooping();
+        AnimationClip idleClip = LoadAnimationClip(FlyAnimationPackPath, "AN_FlyIdle");
+        AnimationClip moveForwardClip = LoadAnimationClip(FlyAnimationPackPath, "AN_FlyForward");
+        AnimationClip moveBackwardClip = LoadAnimationClip(FlyAnimationPackPath, "AN_FlyBackwards");
+        AnimationClip moveLeftClip = LoadAnimationClip(FlyAnimationPackPath, "AN_FlyLeft");
+        AnimationClip moveRightClip = LoadAnimationClip(FlyAnimationPackPath, "AN_FlyRight");
+        AnimationClip shootClip = LoadPrimaryAnimationClip(ShootClipPath);
+        AnimationClip aimBackwardClip = LoadPrimaryAnimationClip(AimBackwardClipPath);
+        AnimationClip aimLeftClip = LoadPrimaryAnimationClip(AimLeftClipPath);
+        AnimationClip aimRightClip = LoadPrimaryAnimationClip(AimRightClipPath);
+        EnsureAvatarMasks();
+        EnsureAnimationBindingsPreset(idleClip,
+                                      moveForwardClip,
+                                      moveBackwardClip,
+                                      moveLeftClip,
+                                      moveRightClip,
+                                      shootClip,
+                                      aimBackwardClip,
+                                      aimLeftClip,
+                                      aimRightClip);
+        EnsureAnimatorController(idleClip,
+                                 moveForwardClip,
+                                 moveBackwardClip,
+                                 moveLeftClip,
+                                 moveRightClip,
+                                 shootClip,
+                                 aimBackwardClip,
+                                 aimLeftClip,
+                                 aimRightClip);
         GameObject playerVisualPrefab = EnsurePlayerVisualPrefab();
         EnsurePlayerPrefab(playerVisualPrefab);
-        AnimationClip shootClip = LoadPrimaryAnimationClip(ShootClipPath);
-        EnsureAnimationBindingsPreset(shootClip);
-        EnsureAnimatorController(shootClip);
         AssetDatabase.SaveAssets();
     }
     #endregion
@@ -68,6 +141,7 @@ public static class PlayerGameplayVisualSetupUtility
 
         try
         {
+            WeaponVisualAuthoredState weaponVisualAuthoredState = CaptureWeaponVisualAuthoredState(prefabContentsRoot.transform);
             prefabContentsRoot.name = "PF_PlayerVisual";
             DestroyAllChildren(prefabContentsRoot.transform);
 
@@ -81,15 +155,29 @@ public static class PlayerGameplayVisualSetupUtility
             modelInstance.transform.localRotation = Quaternion.identity;
             modelInstance.transform.localScale = Vector3.one;
 
-            Transform gunMeshTransform = FindChildRecursive(modelInstance.transform, GunMeshObjectName);
+            Animator animator = modelInstance.GetComponentInChildren<Animator>(true);
+            RuntimeAnimatorController animatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(AnimatorControllerPath);
 
-            if (gunMeshTransform == null)
-                throw new InvalidOperationException(string.Format("Unable to find '{0}' inside the player model hierarchy.", GunMeshObjectName));
+            if (animator == null)
+                throw new InvalidOperationException("Player model prefab does not contain an Animator.");
+
+            if (animatorController == null)
+                throw new InvalidOperationException(string.Format("Animator controller not found at '{0}'.", AnimatorControllerPath));
+
+            animator.runtimeAnimatorController = animatorController;
+            animator.applyRootMotion = false;
+            animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            animator.updateMode = AnimatorUpdateMode.Normal;
+
+            Transform gunBarrelTransform = FindChildRecursive(modelInstance.transform, GunBarrelObjectName);
+
+            if (gunBarrelTransform == null)
+                throw new InvalidOperationException(string.Format("Unable to find '{0}' inside the player model hierarchy.", GunBarrelObjectName));
 
             GameObject muzzleAnchorObject = new GameObject(MuzzleAnchorObjectName);
             Transform muzzleAnchorTransform = muzzleAnchorObject.transform;
-            muzzleAnchorTransform.SetParent(gunMeshTransform, false);
-            muzzleAnchorTransform.localPosition = ResolveMuzzleAnchorLocalPosition(gunMeshTransform);
+            muzzleAnchorTransform.SetParent(gunBarrelTransform, false);
+            muzzleAnchorTransform.localPosition = Vector3.zero;
             muzzleAnchorTransform.localRotation = Quaternion.identity;
             muzzleAnchorTransform.localScale = Vector3.one;
 
@@ -103,6 +191,21 @@ public static class PlayerGameplayVisualSetupUtility
             forwardShotOffsetProperty.floatValue = GeneratedForwardShotOffset;
             minimumPlanarDistanceProperty.floatValue = GeneratedMinimumPlanarDistance;
             serializedMuzzleAnchor.ApplyModifiedPropertiesWithoutUndo();
+
+            PlayerWeaponVisualSet weaponVisualSet = GetOrAddComponent<PlayerWeaponVisualSet>(prefabContentsRoot);
+            Transform baseGunTransform = FindRequiredChild(modelInstance.transform, BaseGunObjectName);
+            Transform cannonTransform = FindRequiredChild(modelInstance.transform, CannonObjectName);
+            Transform gatlingTransform = FindRequiredChild(modelInstance.transform, GatlingObjectName);
+            Transform railgunTransform = FindRequiredChild(modelInstance.transform, RailgunObjectName);
+            ApplyWeaponVisualAuthoredState(baseGunTransform.gameObject,
+                                           cannonTransform.gameObject,
+                                           gatlingTransform.gameObject,
+                                           railgunTransform.gameObject,
+                                           in weaponVisualAuthoredState);
+            weaponVisualSet.Configure(baseGunTransform.gameObject,
+                                      cannonTransform.gameObject,
+                                      gatlingTransform.gameObject,
+                                      railgunTransform.gameObject);
 
             SetLayerRecursively(prefabContentsRoot, PlayerLayer);
             SetLayerRecursively(modelInstance, PlayerLayer);
@@ -255,19 +358,71 @@ public static class PlayerGameplayVisualSetupUtility
 
     #region Animation Assets
     /// <summary>
+    /// Ensures every authored fly-pack clip loops before the setup binds clips into the runtime Animator controller.
+    /// </summary>
+    private static void EnsureFlyAnimationPackLooping()
+    {
+        ModelImporter modelImporter = AssetImporter.GetAtPath(FlyAnimationPackPath) as ModelImporter;
+
+        if (modelImporter == null)
+            throw new InvalidOperationException(string.Format("Model importer not found at '{0}'.", FlyAnimationPackPath));
+
+        ModelImporterClipAnimation[] clipAnimations = modelImporter.clipAnimations;
+
+        if (clipAnimations == null || clipAnimations.Length == 0)
+            clipAnimations = modelImporter.defaultClipAnimations;
+
+        if (clipAnimations == null || clipAnimations.Length == 0)
+            throw new InvalidOperationException(string.Format("No imported animation clips found at '{0}'.", FlyAnimationPackPath));
+
+        bool requiresReimport = false;
+
+        for (int clipIndex = 0; clipIndex < clipAnimations.Length; clipIndex++)
+        {
+            ModelImporterClipAnimation clipAnimation = clipAnimations[clipIndex];
+
+            if (clipAnimation.loopTime)
+                continue;
+
+            clipAnimation.loopTime = true;
+            requiresReimport = true;
+        }
+
+        if (!requiresReimport)
+            return;
+
+        modelImporter.clipAnimations = clipAnimations;
+        modelImporter.SaveAndReimport();
+    }
+
+    /// <summary>
     /// Assigns the dedicated shoot clip into the authored animation bindings preset so tooling reflects the real setup.
     /// </summary>
     /// <param name="shootClip">Clip used by the upper-body shoot state.</param>
-    private static void EnsureAnimationBindingsPreset(AnimationClip shootClip)
+    private static void EnsureAnimationBindingsPreset(AnimationClip idleClip,
+                                                      AnimationClip moveForwardClip,
+                                                      AnimationClip moveBackwardClip,
+                                                      AnimationClip moveLeftClip,
+                                                      AnimationClip moveRightClip,
+                                                      AnimationClip shootClip,
+                                                      AnimationClip aimBackwardClip,
+                                                      AnimationClip aimLeftClip,
+                                                      AnimationClip aimRightClip)
     {
         PlayerAnimationBindingsPreset preset = AssetDatabase.LoadAssetAtPath<PlayerAnimationBindingsPreset>(AnimationBindingsPresetPath);
 
         if (preset == null)
             throw new InvalidOperationException(string.Format("Animation bindings preset not found at '{0}'.", AnimationBindingsPresetPath));
 
-        if (preset.ShootClip == shootClip)
-            return;
-
+        preset.SetClip(PlayerAnimationClipSlot.Idle, idleClip);
+        preset.SetClip(PlayerAnimationClipSlot.MoveForward, moveForwardClip);
+        preset.SetClip(PlayerAnimationClipSlot.MoveBackward, moveBackwardClip);
+        preset.SetClip(PlayerAnimationClipSlot.MoveLeft, moveLeftClip);
+        preset.SetClip(PlayerAnimationClipSlot.MoveRight, moveRightClip);
+        preset.SetClip(PlayerAnimationClipSlot.AimForward, idleClip);
+        preset.SetClip(PlayerAnimationClipSlot.AimBackward, aimBackwardClip);
+        preset.SetClip(PlayerAnimationClipSlot.AimLeft, aimLeftClip);
+        preset.SetClip(PlayerAnimationClipSlot.AimRight, aimRightClip);
         preset.SetClip(PlayerAnimationClipSlot.Shoot, shootClip);
         EditorUtility.SetDirty(preset);
     }
@@ -276,23 +431,58 @@ public static class PlayerGameplayVisualSetupUtility
     /// Adds or refreshes the upper-body shoot state and its transitions on the player animator controller.
     /// </summary>
     /// <param name="shootClip">Clip used by the upper-body shoot state.</param>
-    private static void EnsureAnimatorController(AnimationClip shootClip)
+    private static void EnsureAnimatorController(AnimationClip idleClip,
+                                                 AnimationClip moveForwardClip,
+                                                 AnimationClip moveBackwardClip,
+                                                 AnimationClip moveLeftClip,
+                                                 AnimationClip moveRightClip,
+                                                 AnimationClip shootClip,
+                                                 AnimationClip aimBackwardClip,
+                                                 AnimationClip aimLeftClip,
+                                                 AnimationClip aimRightClip)
     {
         AnimatorController animatorController = AssetDatabase.LoadAssetAtPath<AnimatorController>(AnimatorControllerPath);
 
         if (animatorController == null)
             throw new InvalidOperationException(string.Format("Animator controller not found at '{0}'.", AnimatorControllerPath));
 
+        int lowerBodyLayerIndex = FindLayerIndex(animatorController, LowerBodyLayerName);
         int upperBodyLayerIndex = FindLayerIndex(animatorController, UpperBodyLayerName);
 
-        if (upperBodyLayerIndex < 0)
-            throw new InvalidOperationException(string.Format("Animator controller is missing layer '{0}'.", UpperBodyLayerName));
+        if (lowerBodyLayerIndex < 0 || upperBodyLayerIndex < 0)
+            throw new InvalidOperationException("Animator controller is missing the required LowerBody or UpperBody layer.");
 
+        AnimatorStateMachine lowerBodyStateMachine = animatorController.layers[lowerBodyLayerIndex].stateMachine;
         AnimatorStateMachine upperBodyStateMachine = animatorController.layers[upperBodyLayerIndex].stateMachine;
+        AnimatorState lowerMoveState = FindState(lowerBodyStateMachine, LowerMoveStateName);
         AnimatorState upperAimState = FindState(upperBodyStateMachine, UpperAimStateName);
 
-        if (upperAimState == null)
-            throw new InvalidOperationException(string.Format("Animator controller is missing state '{0}' in layer '{1}'.", UpperAimStateName, UpperBodyLayerName));
+        if (lowerMoveState == null || upperAimState == null)
+            throw new InvalidOperationException("Animator controller is missing the required lower-move or upper-aim state.");
+
+        BlendTree lowerBlendTree = lowerMoveState.motion as BlendTree;
+        BlendTree upperBlendTree = upperAimState.motion as BlendTree;
+
+        if (lowerBlendTree == null || upperBlendTree == null)
+            throw new InvalidOperationException("Animator controller lower-move and upper-aim states must use blend trees.");
+
+        lowerBlendTree.blendType = BlendTreeType.SimpleDirectional2D;
+        lowerBlendTree.blendParameter = "MoveX";
+        lowerBlendTree.blendParameterY = "MoveY";
+        lowerBlendTree.children = BuildDirectionalChildren(idleClip,
+                                                           moveForwardClip,
+                                                           moveBackwardClip,
+                                                           moveLeftClip,
+                                                           moveRightClip);
+
+        upperBlendTree.blendType = BlendTreeType.SimpleDirectional2D;
+        upperBlendTree.blendParameter = "AimX";
+        upperBlendTree.blendParameterY = "AimY";
+        upperBlendTree.children = BuildDirectionalChildren(idleClip,
+                                                           idleClip,
+                                                           aimBackwardClip,
+                                                           aimLeftClip,
+                                                           aimRightClip);
 
         AnimatorState upperShootState = FindState(upperBodyStateMachine, UpperShootStateName);
 
@@ -325,6 +515,75 @@ public static class PlayerGameplayVisualSetupUtility
         toAimTransition.AddCondition(AnimatorConditionMode.IfNot, 0f, "IsShooting");
 
         EditorUtility.SetDirty(animatorController);
+        EditorUtility.SetDirty(lowerBlendTree);
+        EditorUtility.SetDirty(upperBlendTree);
+    }
+
+    private static void EnsureAvatarMasks()
+    {
+        GameObject playerModelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerModelPrefabPath);
+
+        if (playerModelPrefab == null)
+            throw new InvalidOperationException(string.Format("Player model prefab not found at '{0}'.", PlayerModelPrefabPath));
+
+        AvatarMask lowerBodyMask = AssetDatabase.LoadAssetAtPath<AvatarMask>(LowerBodyMaskPath);
+        AvatarMask upperBodyMask = AssetDatabase.LoadAssetAtPath<AvatarMask>(UpperBodyMaskPath);
+
+        if (lowerBodyMask == null || upperBodyMask == null)
+            throw new InvalidOperationException("Player upper/lower avatar mask assets are missing.");
+
+        ConfigureAvatarMask(lowerBodyMask, playerModelPrefab.transform, false);
+        ConfigureAvatarMask(upperBodyMask, playerModelPrefab.transform, true);
+    }
+
+    private static void ConfigureAvatarMask(AvatarMask mask, Transform modelRoot, bool upperBody)
+    {
+        mask.transformCount = 0;
+        mask.AddTransformPath(modelRoot, true);
+
+        for (int transformIndex = 0; transformIndex < mask.transformCount; transformIndex++)
+        {
+            string transformPath = mask.GetTransformPath(transformIndex);
+            bool isSpinePath = transformPath.StartsWith("PlayerRig/ROOT/spine", StringComparison.Ordinal);
+            bool isLowerBodyPath = transformPath.StartsWith("PlayerRig/ROOT/spine/pelvis.", StringComparison.Ordinal) ||
+                                   transformPath.StartsWith("PlayerRig/ROOT/spine/thigh.", StringComparison.Ordinal);
+            bool isRigRootPath = string.Equals(transformPath, "PlayerRig", StringComparison.Ordinal) ||
+                                 string.Equals(transformPath, "PlayerRig/ROOT", StringComparison.Ordinal);
+            bool isRootPath = string.IsNullOrEmpty(transformPath);
+            bool isActive = upperBody
+                ? isSpinePath && !isLowerBodyPath
+                : isRootPath || isRigRootPath || isLowerBodyPath;
+
+            if (transformPath.StartsWith(BaseGunObjectName, StringComparison.Ordinal) ||
+                transformPath.StartsWith(CannonObjectName, StringComparison.Ordinal) ||
+                transformPath.StartsWith(GatlingObjectName, StringComparison.Ordinal) ||
+                transformPath.StartsWith(RailgunObjectName, StringComparison.Ordinal) ||
+                transformPath.StartsWith("CH_Player", StringComparison.Ordinal))
+                isActive = false;
+
+            mask.SetTransformActive(transformIndex, isActive);
+        }
+
+        for (int bodyPartIndex = 0; bodyPartIndex < (int)AvatarMaskBodyPart.LastBodyPart; bodyPartIndex++)
+            mask.SetHumanoidBodyPartActive((AvatarMaskBodyPart)bodyPartIndex, false);
+
+        if (upperBody)
+        {
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Body, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Head, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftArm, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightArm, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftFingers, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightFingers, true);
+        }
+        else
+        {
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Root, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftLeg, true);
+            mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightLeg, true);
+        }
+
+        EditorUtility.SetDirty(mask);
     }
     #endregion
 
@@ -359,6 +618,37 @@ public static class PlayerGameplayVisualSetupUtility
         }
 
         throw new InvalidOperationException(string.Format("No animation clip found at '{0}'.", clipAssetPath));
+    }
+
+    private static AnimationClip LoadAnimationClip(string clipAssetPath, string clipName)
+    {
+        UnityEngine.Object[] subAssets = AssetDatabase.LoadAllAssetsAtPath(clipAssetPath);
+
+        for (int assetIndex = 0; assetIndex < subAssets.Length; assetIndex++)
+        {
+            AnimationClip clip = subAssets[assetIndex] as AnimationClip;
+
+            if (clip != null && string.Equals(clip.name, clipName, StringComparison.Ordinal))
+                return clip;
+        }
+
+        throw new InvalidOperationException(string.Format("Animation clip '{0}' not found at '{1}'.", clipName, clipAssetPath));
+    }
+
+    private static ChildMotion[] BuildDirectionalChildren(AnimationClip centerClip,
+                                                          AnimationClip forwardClip,
+                                                          AnimationClip backwardClip,
+                                                          AnimationClip leftClip,
+                                                          AnimationClip rightClip)
+    {
+        return new[]
+        {
+            new ChildMotion { motion = centerClip, position = Vector2.zero, timeScale = 1f },
+            new ChildMotion { motion = forwardClip, position = Vector2.up, timeScale = 1f },
+            new ChildMotion { motion = backwardClip, position = Vector2.down, timeScale = 1f },
+            new ChildMotion { motion = leftClip, position = Vector2.left, timeScale = 1f },
+            new ChildMotion { motion = rightClip, position = Vector2.right, timeScale = 1f }
+        };
     }
 
     /// <summary>
@@ -408,6 +698,76 @@ public static class PlayerGameplayVisualSetupUtility
         }
 
         return null;
+    }
+
+    private static Transform FindRequiredChild(Transform root, string targetName)
+    {
+        Transform resolvedTransform = FindChildRecursive(root, targetName);
+
+        if (resolvedTransform == null)
+            throw new InvalidOperationException(string.Format("Unable to find '{0}' inside the player model hierarchy.", targetName));
+
+        return resolvedTransform;
+    }
+
+    /// <summary>
+    /// Captures an existing visual prefab's weapon mesh active states so generated rebuilds preserve designer intent.
+    /// </summary>
+    /// <param name="visualRoot">Existing visual prefab hierarchy root.</param>
+    /// <returns>Defined authored state when every expected weapon mesh exists, otherwise an undefined state.</returns>
+    private static WeaponVisualAuthoredState CaptureWeaponVisualAuthoredState(Transform visualRoot)
+    {
+        Transform baseGunTransform = FindChildRecursive(visualRoot, BaseGunObjectName);
+        Transform cannonTransform = FindChildRecursive(visualRoot, CannonObjectName);
+        Transform gatlingTransform = FindChildRecursive(visualRoot, GatlingObjectName);
+        Transform railgunTransform = FindChildRecursive(visualRoot, RailgunObjectName);
+        bool isDefined = baseGunTransform != null &&
+                         cannonTransform != null &&
+                         gatlingTransform != null &&
+                         railgunTransform != null;
+
+        if (!isDefined)
+            return default;
+
+        return new WeaponVisualAuthoredState(true,
+                                             baseGunTransform.gameObject.activeSelf,
+                                             cannonTransform.gameObject.activeSelf,
+                                             gatlingTransform.gameObject.activeSelf,
+                                             railgunTransform.gameObject.activeSelf);
+    }
+
+    /// <summary>
+    /// Restores a previously captured authored weapon visual state onto a newly generated model hierarchy.
+    /// </summary>
+    /// <param name="baseGunObject">Generated Base Gun mesh object.</param>
+    /// <param name="cannonObject">Generated Cannon mesh object.</param>
+    /// <param name="gatlingObject">Generated Gatling mesh object.</param>
+    /// <param name="railgunObject">Generated Railgun mesh object.</param>
+    /// <param name="authoredState">Existing prefab state to preserve when defined.</param>
+    private static void ApplyWeaponVisualAuthoredState(GameObject baseGunObject,
+                                                       GameObject cannonObject,
+                                                       GameObject gatlingObject,
+                                                       GameObject railgunObject,
+                                                       in WeaponVisualAuthoredState authoredState)
+    {
+        if (!authoredState.IsDefined)
+            return;
+
+        SetActive(baseGunObject, authoredState.BaseGunActive);
+        SetActive(cannonObject, authoredState.CannonActive);
+        SetActive(gatlingObject, authoredState.GatlingActive);
+        SetActive(railgunObject, authoredState.RailgunActive);
+    }
+
+    /// <summary>
+    /// Applies one active state only when the generated target requires a change.
+    /// </summary>
+    /// <param name="targetObject">Generated mesh object to update.</param>
+    /// <param name="isActive">Desired authored active state.</param>
+    private static void SetActive(GameObject targetObject, bool isActive)
+    {
+        if (targetObject != null && targetObject.activeSelf != isActive)
+            targetObject.SetActive(isActive);
     }
 
     /// <summary>

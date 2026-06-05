@@ -226,6 +226,8 @@ public static class PlayerPowerUpPassiveBakeUtility
         LaserBeamPassiveConfig laserBeamConfig = default;
         bool hasOrbitalProjections = false;
         FixedList4096Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
+        bool hasWeaponSwitch = false;
+        PlayerWeaponVisualSlot weaponVisualSlot = PlayerWeaponVisualSlot.BaseGun;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -522,6 +524,13 @@ public static class PlayerPowerUpPassiveBakeUtility
                     laserBeamConfig.SourceShape = candidateLaserBeamConfig.SourceShape;
                     laserBeamConfig.TerminalCapShape = candidateLaserBeamConfig.TerminalCapShape;
                     break;
+                case PowerUpModuleKind.SwitchWeapon:
+                    if (payload.SwitchWeapon == null)
+                        break;
+
+                    hasWeaponSwitch = true;
+                    weaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot((float)payload.SwitchWeapon.WeaponSlot);
+                    break;
             }
         }
 
@@ -552,6 +561,8 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasBulletTime = hasBulletTime && bulletTimeEnemySlowPercent > 0f ? (byte)1 : (byte)0,
             HasLaserBeam = hasLaserBeam ? (byte)1 : (byte)0,
             HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
+            HasWeaponSwitch = hasWeaponSwitch ? (byte)1 : (byte)0,
+            WeaponVisualSlot = weaponVisualSlot,
             ProjectileSize = new ProjectileSizePassiveConfig
             {
                 SizeMultiplier = math.max(0.01f, projectileSizeMultiplier),
@@ -703,6 +714,8 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasBulletTime = 0,
             HasLaserBeam = 0,
             HasOrbitalProjections = 0,
+            HasWeaponSwitch = 0,
+            WeaponVisualSlot = PlayerWeaponVisualSlot.BaseGun,
             ProjectileSize = PlayerPowerUpPassiveConfigBuildUtility.BuildProjectileSizePassiveConfig(passiveTool.ProjectileSizeData),
             ElementalProjectiles = PlayerPowerUpPassiveConfigBuildUtility.BuildElementalProjectilesPassiveConfig(passiveTool.ElementalProjectilesData),
             PerfectCircle = PlayerPowerUpPassiveConfigBuildUtility.BuildPerfectCirclePassiveConfig(passiveTool.PerfectCircleData),

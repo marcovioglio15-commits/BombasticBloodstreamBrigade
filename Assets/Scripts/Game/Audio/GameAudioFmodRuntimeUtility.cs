@@ -27,6 +27,10 @@ public static class GameAudioFmodRuntimeUtility
     private static string lastBackgroundMusicDiagnosticKey;
     private static Transform cachedBackgroundMusicListenerTransform;
     private static float nextBackgroundMusicListenerResolveTime;
+    // Per-event-id last active instance used by single-instance bindings to steal the previous voice when a
+    // new request arrives, instead of accumulating overlapping FMOD instances for fast-cadence ticks.
+    private static readonly EventInstance[] singleInstanceByEventId = new EventInstance[byte.MaxValue + 1];
+    private static readonly bool[] singleInstanceValidByEventId = new bool[byte.MaxValue + 1];
 #endif
     private static string backgroundMusicEventPath;
     private static string backgroundMusicBankName;
@@ -37,19 +41,30 @@ public static class GameAudioFmodRuntimeUtility
 
     #region Public Methods
     /// <summary>
-    /// Plays one authored FMOD event path as a one-shot sound.
+    /// Plays one authored FMOD event path as a one-shot sound. When hasPosition is true and the authored event
+    /// is 3D, the minimum and maximum attenuation distances are overridden so the Audio Manager preset stays
+    /// authoritative about how close-vs-far playback feels at runtime. When singleInstance is true any previous
+    /// still-playing instance for the same gameplay event is stopped first so the new request replaces it.
     /// </summary>
+    /// <param name="eventId">Gameplay event id used to key the optional single-instance store.</param>
     /// <param name="eventPath">FMOD event path resolved from the Audio Manager preset.</param>
     /// <param name="position">World-space playback position.</param>
     /// <param name="hasPosition">True when the event should receive 3D attributes.</param>
     /// <param name="volume">Playback volume after binding and global multipliers.</param>
     /// <param name="pitch">Playback pitch after binding and request multipliers.</param>
+    /// <param name="minimumDistance">Resolved 3D minimum attenuation distance, in world units.</param>
+    /// <param name="maximumDistance">Resolved 3D maximum attenuation distance, in world units.</param>
+    /// <param name="singleInstance">True when the binding requires voice stealing across consecutive requests.</param>
     /// <param name="logMissingEventPath">True when empty paths should be reported in development contexts.</param>
-    public static void PlayOneShot(string eventPath,
+    public static void PlayOneShot(GameAudioEventId eventId,
+                                   string eventPath,
                                    float3 position,
                                    bool hasPosition,
                                    float volume,
                                    float pitch,
+                                   float minimumDistance,
+                                   float maximumDistance,
+                                   bool singleInstance,
                                    bool logMissingEventPath)
     {
         if (string.IsNullOrWhiteSpace(eventPath))
@@ -59,19 +74,37 @@ public static class GameAudioFmodRuntimeUtility
         }
 
 #if NASHCORE_FMOD
+        // Single-instance bindings stop and release the previous still-playing instance before creating the
+        // new one so the perceived audio stays as one continuous voice instead of stacking copies of the clip.
+        if (singleInstance)
+            StopTrackedSingleInstance(eventId);
+
         EventInstance instance = RuntimeManager.CreateInstance(eventPath);
         instance.setVolume(Mathf.Max(0f, volume));
         instance.setPitch(Mathf.Max(0.0001f, pitch));
 
         if (hasPosition)
         {
+            // Override the authored 3D attenuation bounds so the Audio Manager preset drives near/far balance
+            // consistently across every spatialized event, instead of inheriting tight FMOD-authored curves.
+            ApplyAttenuationDistances(ref instance, minimumDistance, maximumDistance);
             Vector3 unityPosition = new Vector3(position.x, position.y, position.z);
             ATTRIBUTES_3D attributes = RuntimeUtils.To3DAttributes(unityPosition);
             instance.set3DAttributes(attributes);
         }
 
         instance.start();
-        instance.release();
+
+        if (singleInstance)
+        {
+            // Keep the handle alive for the next steal request; release happens when the next single-instance
+            // request lands or when the instance finishes naturally and FMOD invalidates the handle.
+            StoreTrackedSingleInstance(eventId, instance);
+        }
+        else
+        {
+            instance.release();
+        }
 #else
         LogFmodDisabled(eventPath, logMissingEventPath);
 #endif
@@ -153,10 +186,105 @@ public static class GameAudioFmodRuntimeUtility
         ClearBackgroundMusicState();
 #endif
     }
+
+    /// <summary>
+    /// Stops the tracked single-instance voice for one gameplay event id, if any is still playing. Safe to call
+    /// even when the runtime never produced a tracked instance for the event id.
+    /// </summary>
+    /// <param name="eventId">Gameplay event id whose tracked voice should be stopped.</param>
+    public static void StopTrackedSingleInstanceById(GameAudioEventId eventId)
+    {
+#if NASHCORE_FMOD
+        StopTrackedSingleInstance(eventId);
+#endif
+    }
+
+    /// <summary>
+    /// Stops every still-playing single-instance voice tracked by gameplay events. Called when the audio
+    /// playback system is destroyed so stale FMOD handles do not survive into the next play session.
+    /// </summary>
+    public static void StopAllTrackedSingleInstances()
+    {
+#if NASHCORE_FMOD
+        for (int eventIndex = 0; eventIndex < singleInstanceValidByEventId.Length; eventIndex++)
+        {
+            if (!singleInstanceValidByEventId[eventIndex])
+                continue;
+
+            EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
+            singleInstanceValidByEventId[eventIndex] = false;
+            singleInstanceByEventId[eventIndex] = default;
+
+            if (!trackedInstance.isValid())
+                continue;
+
+            trackedInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            trackedInstance.release();
+        }
+#endif
+    }
     #endregion
 
     #region Private Methods
 #if NASHCORE_FMOD
+    /// <summary>
+    /// Stops and releases the previously tracked single-instance voice for one gameplay event id, so a fresh
+    /// request can take over without overlapping the existing playback. Safe to call when no instance was ever
+    /// stored or when the previous one has already been invalidated by FMOD.
+    /// </summary>
+    /// <param name="eventId">Gameplay event id whose tracked instance should be stolen.</param>
+    private static void StopTrackedSingleInstance(GameAudioEventId eventId)
+    {
+        int eventIndex = (byte)eventId;
+
+        if (!singleInstanceValidByEventId[eventIndex])
+            return;
+
+        EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
+        singleInstanceValidByEventId[eventIndex] = false;
+        singleInstanceByEventId[eventIndex] = default;
+
+        if (!trackedInstance.isValid())
+            return;
+
+        trackedInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+        trackedInstance.release();
+    }
+
+    /// <summary>
+    /// Stores the freshly started instance so the next single-instance request for the same gameplay event id
+    /// can steal it. Replaces any stale handle from a previous request without leaking it.
+    /// </summary>
+    /// <param name="eventId">Gameplay event id keyed into the tracking store.</param>
+    /// <param name="instance">Newly started FMOD instance to track.</param>
+    private static void StoreTrackedSingleInstance(GameAudioEventId eventId, EventInstance instance)
+    {
+        int eventIndex = (byte)eventId;
+        singleInstanceByEventId[eventIndex] = instance;
+        singleInstanceValidByEventId[eventIndex] = true;
+    }
+
+    /// <summary>
+    /// Applies the resolved minimum and maximum attenuation distances to one FMOD event instance, keeping the
+    /// authored curve shape but rescaling the near and far bounds to match the Audio Manager preset.
+    /// </summary>
+    /// <param name="instance">FMOD event instance being prepared for one-shot playback.</param>
+    /// <param name="minimumDistance">Effective 3D minimum distance, in world units. Non-positive values fall back to the authored event value.</param>
+    /// <param name="maximumDistance">Effective 3D maximum distance, in world units. Non-positive values fall back to the authored event value.</param>
+    private static void ApplyAttenuationDistances(ref EventInstance instance,
+                                                  float minimumDistance,
+                                                  float maximumDistance)
+    {
+        float safeMinimumDistance = Mathf.Max(0f, minimumDistance);
+        float safeMaximumDistance = Mathf.Max(safeMinimumDistance, maximumDistance);
+
+        if (safeMinimumDistance > 0f)
+            instance.setProperty(EVENT_PROPERTY.MINIMUM_DISTANCE, safeMinimumDistance);
+
+        if (safeMaximumDistance > 0f)
+            instance.setProperty(EVENT_PROPERTY.MAXIMUM_DISTANCE, safeMaximumDistance);
+    }
+
     /// <summary>
     /// Stops the current background music instance with the requested FMOD stop mode.
     /// </summary>

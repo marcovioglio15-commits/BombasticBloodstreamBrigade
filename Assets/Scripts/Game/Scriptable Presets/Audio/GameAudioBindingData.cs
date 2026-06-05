@@ -17,8 +17,8 @@ public sealed class GameAudioPlaybackSettings
     [Tooltip("Master scalar multiplied into every game audio event volume.")]
     [SerializeField] private float masterVolume = 1f;
 
-    [Tooltip("Fallback minimum 3D attenuation distance used when an event binding does not override it.")]
-    [SerializeField] private float defaultMinimumDistance = 1f;
+    [Tooltip("Fallback minimum 3D attenuation distance used when an event binding does not override it. Larger values keep on-screen sources at full volume and produce a gentler near-to-far falloff.")]
+    [SerializeField] private float defaultMinimumDistance = 8f;
 
     [Tooltip("Fallback maximum 3D attenuation distance used when an event binding does not override it.")]
     [SerializeField] private float defaultMaximumDistance = 45f;
@@ -342,11 +342,14 @@ public sealed class GameAudioEventBinding
     [Tooltip("When enabled and a request position is available, the event is emitted as 3D audio.")]
     [SerializeField] private bool spatialize = true;
 
-    [Tooltip("Minimum 3D attenuation distance used by FMOD for this event.")]
-    [SerializeField] private float minimumDistance = 1f;
+    [Tooltip("Minimum 3D attenuation distance used by FMOD for this event. Larger values keep on-screen sources at full volume and produce a gentler near-to-far falloff. Set to zero to inherit the global default.")]
+    [SerializeField] private float minimumDistance = 8f;
 
     [Tooltip("Maximum 3D attenuation distance used by FMOD for this event.")]
     [SerializeField] private float maximumDistance = 45f;
+
+    [Tooltip("When enabled, every new request for this event stops the previous still-playing FMOD instance so only one voice is heard at any time. Use for fast-cadence ticks whose authored clip is longer than the request interval.")]
+    [SerializeField] private bool singleInstance;
 
     [Header("Rate Limit")]
     [Tooltip("Optional per-event cap that limits dense repeated requests over a short time window.")]
@@ -433,6 +436,14 @@ public sealed class GameAudioEventBinding
         get
         {
             return maximumDistance;
+        }
+    }
+
+    public bool SingleInstance
+    {
+        get
+        {
+            return singleInstance;
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -14,6 +15,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     private const float DirectionEpsilon = 1e-6f;
     private static readonly float3 DefaultForward = new float3(0f, 0f, 1f);
     private static readonly float3 WorldUp = new float3(0f, 1f, 0f);
+    private static readonly Dictionary<int, PlayerWeaponVisualSet> WeaponVisualSetsByAnimatorId = new Dictionary<int, PlayerWeaponVisualSet>();
     private byte loggedNoAnimatorEntityWarning;
     private byte loggedMissingAnimatorComponentWarning;
     private byte loggedNullAnimatorWarning;
@@ -38,6 +40,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     {
         ManagedOutlineRendererUtility.ClearCache();
         PlayerOutlineRuntimeMaterialSyncUtility.ClearCache();
+        WeaponVisualSetsByAnimatorId.Clear();
     }
 
     public void OnUpdate(ref SystemState state)
@@ -51,6 +54,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerAnimatorControllerReference> animatorControllerLookup = SystemAPI.GetComponentLookup<PlayerAnimatorControllerReference>(true);
         ComponentLookup<PlayerAnimatorAvatarReference> animatorAvatarLookup = SystemAPI.GetComponentLookup<PlayerAnimatorAvatarReference>(true);
+        BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         EntityManager entityManager = state.EntityManager;
         float deltaTime = SystemAPI.Time.DeltaTime;
         int processedAnimatorEntities = 0;
@@ -119,6 +123,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             EnsureAnimatorRuntimeSettings(animator, ref animatorRuntimeState.ValueRW);
             PlayerOutlineRuntimeMaterialSyncUtility.ApplyFromOutlineConfig(in outlineConfig.ValueRO);
             EnsureAnimatorOutline(animator, in outlineConfig.ValueRO);
+            ApplyWeaponVisual(animator, entity, in passiveToolsStateLookup);
 
             if (!animator.enabled)
                 animator.enabled = true;
@@ -135,12 +140,13 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
 
             float3 right = math.normalize(math.cross(WorldUp, forward));
             float3 desiredLookDirection = ResolveLookDirection(lookState, forward);
-            float2 localMove = ResolveLocalMoveDirection(movementState,
-                                                         right,
-                                                         forward);
             float2 localAim = ToLocalPlanar(desiredLookDirection, right, forward);
             float moveSpeed = math.length(movementState.Velocity);
             bool isMoving = moveSpeed > math.max(0f, parameterConfig.ValueRO.MovingSpeedThreshold);
+            float2 localMove = ResolveLocalMoveDirection(movementState.Velocity,
+                                                         right,
+                                                         forward,
+                                                         isMoving);
             bool isShooting = shootingState.VisualShootingActive != 0;
             bool shootPulseThisFrame = shootingState.ShotPulseVersion != animatorRuntimeState.ValueRO.LastShotPulseVersion;
             bool isDashing = dashLookup.HasComponent(entity) && dashLookup[entity].IsDashing != 0;
@@ -150,13 +156,15 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                 resolvedParameterConfig.HasMoveX,
                                 resolvedParameterConfig.MoveXHash,
                                 localMove.x,
-                                deltaTime);
+                                deltaTime,
+                                isMoving);
             WriteFloatParameter(animator,
                                 in resolvedParameterConfig,
                                 resolvedParameterConfig.HasMoveY,
                                 resolvedParameterConfig.MoveYHash,
                                 localMove.y,
-                                deltaTime);
+                                deltaTime,
+                                isMoving);
             WriteFloatParameter(animator,
                                 in resolvedParameterConfig,
                                 resolvedParameterConfig.HasMoveSpeed,
@@ -211,6 +219,36 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Applies the aggregated Switch Weapon visual override while preserving the prefab-authored configuration when inactive.
+    /// </summary>
+    /// <param name="animator">Animator used to resolve the owning visual hierarchy.</param>
+    /// <param name="entity">Player entity whose passive-tool state drives the override.</param>
+    /// <param name="passiveToolsStateLookup">Read-only lookup containing the aggregated passive-tool state.</param>
+    private static void ApplyWeaponVisual(Animator animator,
+                                          Entity entity,
+                                          in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup)
+    {
+        if (animator == null)
+            return;
+
+        int animatorInstanceId = animator.GetInstanceID();
+        PlayerWeaponVisualSet weaponVisualSet;
+
+        if (!WeaponVisualSetsByAnimatorId.TryGetValue(animatorInstanceId, out weaponVisualSet) || weaponVisualSet == null)
+        {
+            weaponVisualSet = animator.GetComponentInParent<PlayerWeaponVisualSet>(true);
+            WeaponVisualSetsByAnimatorId[animatorInstanceId] = weaponVisualSet;
+        }
+
+        if (weaponVisualSet == null)
+            return;
+
+        PlayerPassiveToolsState passiveToolsState;
+        PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup, out passiveToolsState);
+        weaponVisualSet.Apply(passiveToolsState.HasWeaponSwitch != 0, passiveToolsState.WeaponVisualSlot);
+    }
+
     private static float3 ResolveLookDirection(in PlayerLookState lookState, float3 fallback)
     {
         float3 lookDirection = lookState.DesiredDirection;
@@ -473,21 +511,24 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                      outlineConfig.Thickness);
     }
 
-    private static float2 ResolveLocalMoveDirection(in PlayerMovementState movementState,
+    /// <summary>
+    /// Resolves the local locomotion direction from authoritative ECS velocity and returns the blend-tree center below
+    /// the configured moving threshold.
+    /// </summary>
+    /// <param name="velocity">Authoritative player velocity produced by ECS movement systems.</param>
+    /// <param name="right">Player-local planar right direction in world space.</param>
+    /// <param name="forward">Player-local planar forward direction in world space.</param>
+    /// <param name="isMoving">Whether velocity exceeds the configured moving threshold.</param>
+    /// <returns>Normalized local locomotion direction, or zero when the player is stationary.</returns>
+    private static float2 ResolveLocalMoveDirection(float3 velocity,
                                                     float3 right,
-                                                    float3 forward)
+                                                    float3 forward,
+                                                    bool isMoving)
     {
-        float2 localMove = ToLocalPlanar(movementState.DesiredDirection, right, forward);
+        if (!isMoving)
+            return float2.zero;
 
-        if (math.lengthsq(localMove) > DirectionEpsilon)
-            return localMove;
-
-        float2 velocityMove = ToLocalPlanar(movementState.Velocity, right, forward);
-
-        if (math.lengthsq(velocityMove) > DirectionEpsilon)
-            return velocityMove;
-
-        return float2.zero;
+        return ToLocalPlanar(velocity, right, forward);
     }
 
     private static void UpdateProceduralParameters(Animator animator,
@@ -567,17 +608,28 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         return math.lerp(current, target, blend);
     }
 
+    /// <summary>
+    /// Writes one Animator float parameter and optionally applies the configured damping.
+    /// </summary>
+    /// <param name="animator">Managed Animator receiving the float parameter.</param>
+    /// <param name="config">Runtime Animator parameter configuration.</param>
+    /// <param name="hasParameter">Whether the target Animator exposes the requested float parameter.</param>
+    /// <param name="parameterHash">Hash of the target float parameter.</param>
+    /// <param name="value">Float value written to the Animator.</param>
+    /// <param name="deltaTime">Presentation delta time used by optional Animator damping.</param>
+    /// <param name="allowDamping">Whether the configured damping may be used for this write.</param>
     private static void WriteFloatParameter(Animator animator,
                                             in PlayerAnimatorParameterConfig config,
                                             byte hasParameter,
                                             int parameterHash,
                                             float value,
-                                            float deltaTime)
+                                            float deltaTime,
+                                            bool allowDamping = true)
     {
         if (hasParameter == 0)
             return;
 
-        if (config.UseFloatDamping != 0)
+        if (allowDamping && config.UseFloatDamping != 0)
         {
             animator.SetFloat(parameterHash,
                               value,

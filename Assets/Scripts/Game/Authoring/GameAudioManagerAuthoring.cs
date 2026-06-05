@@ -136,7 +136,7 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
                 BackgroundMusicBankName = default,
                 MasterVolume = 0f,
                 BackgroundMusicVolume = 0f,
-                DefaultMinimumDistance = 1f,
+                DefaultMinimumDistance = 8f,
                 DefaultMaximumDistance = 45f
             };
         }
@@ -209,6 +209,7 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
             Spatialize = binding.Spatialize ? (byte)1 : (byte)0,
             MinimumDistance = math.max(0f, binding.MinimumDistance),
             MaximumDistance = math.max(binding.MinimumDistance, binding.MaximumDistance),
+            SingleInstance = binding.SingleInstance ? (byte)1 : (byte)0,
             RateLimitEnabled = rateLimit != null && rateLimit.Enabled ? (byte)1 : (byte)0,
             MaxPlaysPerWindow = rateLimit != null ? math.max(0, rateLimit.MaxPlaysPerWindow) : 0,
             WindowSeconds = rateLimit != null ? math.max(0f, rateLimit.WindowSeconds) : 0f

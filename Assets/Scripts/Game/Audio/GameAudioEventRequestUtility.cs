@@ -59,8 +59,34 @@ public static class GameAudioEventRequestUtility
             EventId = eventId,
             Position = position,
             HasPosition = hasPosition ? (byte)1 : (byte)0,
+            StopRequest = 0,
             VolumeMultiplier = volumeMultiplier,
             PitchMultiplier = pitchMultiplier
+        });
+    }
+
+    /// <summary>
+    /// Requests the playback system to stop the tracked single-instance voice for one gameplay event. Used when
+    /// a continuous gameplay source (e.g. a laser beam) ends so its FMOD instance does not linger or loop.
+    /// </summary>
+    /// <param name="requests">Mutable singleton audio request buffer.</param>
+    /// <param name="eventId">Gameplay audio event whose tracked voice should be stopped.</param>
+    public static void EnqueueStop(DynamicBuffer<GameAudioEventRequest> requests, GameAudioEventId eventId)
+    {
+        if (!requests.IsCreated)
+            return;
+
+        if (eventId == GameAudioEventId.None)
+            return;
+
+        requests.Add(new GameAudioEventRequest
+        {
+            EventId = eventId,
+            Position = float3.zero,
+            HasPosition = 0,
+            StopRequest = 1,
+            VolumeMultiplier = 1f,
+            PitchMultiplier = 1f
         });
     }
     #endregion

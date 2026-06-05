@@ -28,6 +28,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdProjectileSplit = "Module_ProjectileSplit";
     internal const string ModuleIdStackable = "Module_Stackable";
     internal const string ModuleIdLaserBeam = "Module_LaserBeam";
+    internal const string ModuleIdSwitchWeapon = "Module_SwitchWeapon";
 
     internal const string ActivePowerUpIdShotgun = "ActiveShotgun";
     internal const string ActivePowerUpIdChargeShot = "ActiveChargeShot";
@@ -173,6 +174,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdProjectileSplit, "Projectile Split", PowerUpModuleKind.ProjectileSplit, PowerUpModuleStage.Hook, "Splits projectiles based on configured trigger mode."));
         definitions.Add(CreateModuleDefinition(ModuleIdStackable, "Stackable", PowerUpModuleKind.Stackable, PowerUpModuleStage.PostExecute, "Allows milestone reacquisition up to a configured total count."));
         definitions.Add(CreateModuleDefinition(ModuleIdLaserBeam, "Laser Beam", PowerUpModuleKind.LaserBeam, PowerUpModuleStage.Hook, "Overrides base projectile spawning with one or more continuous liquid beam lanes."));
+        definitions.Add(CreateModuleDefinition(ModuleIdSwitchWeapon, "Switch Weapon", PowerUpModuleKind.SwitchWeapon, PowerUpModuleStage.Hook, "Keeps Base Gun visible and displays one selected alternate weapon mesh while the owning power-up is active."));
         return definitions;
     }
 
@@ -423,6 +425,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                 {
                     new PowerUpOrbitalProjectionDefinitionData()
                 });
+                break;
+            case PowerUpModuleKind.SwitchWeapon:
+                payload.SwitchWeapon.Configure(PlayerWeaponVisualSlot.Cannon);
                 break;
             default:
                 break;

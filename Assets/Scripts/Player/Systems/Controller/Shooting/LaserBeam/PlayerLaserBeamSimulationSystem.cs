@@ -120,12 +120,19 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots = appliedElementSlotsLookup[playerEntity];
             ElementalEffectConfig unusedElementalEffect = default;
             bool hasLaserBeam = effectivePassiveToolsState.HasLaserBeam != 0;
+            // Tracked at the very top so every deactivation path can stop the previously-tracked single-instance
+            // laser voices, preventing looped or long FMOD clips from lingering after the beam ends.
+            bool beamWasActiveBeforeUpdate = currentLaserBeamState.IsActive != 0;
 
             if (!hasLaserBeam)
             {
                 PlayerLaserBeamStateUtility.ResetBeamState(ref currentLaserBeamState, stormTickPulses);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
+
+                if (canEnqueueAudioRequests && beamWasActiveBeforeUpdate)
+                    EnqueueLaserAudioStops(audioRequests);
+
                 continue;
             }
 
@@ -159,6 +166,10 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
 
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
+
+                if (canEnqueueAudioRequests && beamWasActiveBeforeUpdate)
+                    EnqueueLaserAudioStops(audioRequests);
+
                 continue;
             }
 
@@ -173,6 +184,10 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 PlayerLaserBeamStateUtility.ClearChargeImpulse(ref currentLaserBeamState);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
+
+                if (canEnqueueAudioRequests && beamWasActiveBeforeUpdate)
+                    EnqueueLaserAudioStops(audioRequests);
+
                 continue;
             }
 
@@ -207,6 +222,10 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 PlayerLaserBeamStateUtility.ClearChargeImpulse(ref currentLaserBeamState);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
+
+                if (canEnqueueAudioRequests && beamWasActiveBeforeUpdate)
+                    EnqueueLaserAudioStops(audioRequests);
+
                 continue;
             }
 
@@ -242,6 +261,10 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 PlayerLaserBeamStateUtility.ClearStormTickPulses(stormTickPulses);
                 shootingState.ValueRW.VisualShootingActive = 0;
                 laserBeamState.ValueRW = currentLaserBeamState;
+
+                if (canEnqueueAudioRequests && beamWasActiveBeforeUpdate)
+                    EnqueueLaserAudioStops(audioRequests);
+
                 continue;
             }
 
@@ -262,6 +285,11 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
                 if (beamStartedThisFrame)
                     GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShootLaserContinuous, spawnPosition);
 
+                // LaserTick follows the authored Damage Tick Interval cadence: once on the activation frame
+                // (timer starts at zero so the first ready frame coincides with beam start) and then once per
+                // Tick Interval Seconds while the beam stays alive. Voice stealing via the SingleInstance
+                // binding flag keeps it as one continuous sting; the deactivation paths emit an explicit stop
+                // so the tracked FMOD instance never lingers after the beam ends.
                 if (beamTickReadyThisFrame)
                     GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShootLaserTick, spawnPosition);
             }
@@ -364,6 +392,18 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Enqueues stop requests for every laser-bound single-instance audio event so the tracked FMOD voices end
+    /// cleanly when the beam deactivates, instead of lingering or looping until the next laser activation.
+    /// </summary>
+    /// <param name="audioRequests">Singleton audio-request buffer used by the playback system.</param>
+    private static void EnqueueLaserAudioStops(DynamicBuffer<GameAudioEventRequest> audioRequests)
+    {
+        GameAudioEventRequestUtility.EnqueueStop(audioRequests, GameAudioEventId.PlayerShootLaserTick);
+        GameAudioEventRequestUtility.EnqueueStop(audioRequests, GameAudioEventId.PlayerShootLaserContinuous);
+        GameAudioEventRequestUtility.EnqueueStop(audioRequests, GameAudioEventId.PlayerLaserImpact);
+    }
+
     /// <summary>
     /// Resolves whether the per-player Fire Shake configuration asks the Laser Beam to skip enqueuing fire-shake
     /// pulses. Used to keep the laser's continuous tick from stacking a sustained camera kick or rumble while still

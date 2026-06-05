@@ -339,6 +339,8 @@ public struct PlayerPassiveToolConfig
     public byte HasBulletTime;
     public byte HasLaserBeam;
     public byte HasOrbitalProjections;
+    public byte HasWeaponSwitch;
+    public PlayerWeaponVisualSlot WeaponVisualSlot;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;

@@ -80,6 +80,11 @@ public sealed class PowerUpModuleData
     [Tooltip("Continuous beam settings used by LaserBeam modules.")]
     [SerializeField] private PowerUpLaserBeamModuleData laserBeam = new PowerUpLaserBeamModuleData();
 
+    [Header("Hook - Switch Weapon")]
+    [Tooltip("Alternate weapon mesh selection used by SwitchWeapon modules while Base Gun remains visible.")]
+    [SerializeField]
+    private PowerUpSwitchWeaponModuleData switchWeapon = new PowerUpSwitchWeaponModuleData();
+
     [Header("Hook - Trail Spawn")]
     [Tooltip("Trail spawn settings used by SpawnTrailSegment modules.")]
     [SerializeField] private PowerUpTrailSpawnModuleData trailSpawn = new PowerUpTrailSpawnModuleData();
@@ -232,6 +237,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpSwitchWeaponModuleData SwitchWeapon
+    {
+        get
+        {
+            return switchWeapon;
+        }
+    }
+
     public PowerUpTrailSpawnModuleData TrailSpawn
     {
         get
@@ -313,6 +326,9 @@ public sealed class PowerUpModuleData
         if (laserBeam == null)
             laserBeam = new PowerUpLaserBeamModuleData();
 
+        if (switchWeapon == null)
+            switchWeapon = new PowerUpSwitchWeaponModuleData();
+
         if (trailSpawn == null)
             trailSpawn = new PowerUpTrailSpawnModuleData();
 
@@ -337,12 +353,55 @@ public sealed class PowerUpModuleData
         projectileBounceOnWalls.Validate();
         projectileSplit.Validate();
         laserBeam.Validate();
+        switchWeapon.Validate();
         trailSpawn.Validate();
         elementalAreaTick.Validate();
         stackable.Validate();
     }
     #endregion
 
+    #endregion
+}
+
+/// <summary>
+/// Defines the alternate weapon mesh displayed beside Base Gun while a Switch Weapon module is active.
+/// </summary>
+[Serializable]
+public sealed class PowerUpSwitchWeaponModuleData
+{
+    #region Fields
+    [Tooltip("Alternate weapon mesh displayed beside Base Gun while the owning passive or toggleable active power-up is in effect.")]
+    [SerializeField]
+    private PlayerWeaponVisualSlot weaponSlot = PlayerWeaponVisualSlot.Cannon;
+    #endregion
+
+    #region Properties
+    public PlayerWeaponVisualSlot WeaponSlot
+    {
+        get
+        {
+            return weaponSlot;
+        }
+    }
+    #endregion
+
+    #region Methods
+    /// <summary>
+    /// Assigns the alternate weapon slot used by this module payload.
+    /// </summary>
+    /// <param name="weaponSlotValue">Alternate weapon slot to assign.</param>
+    public void Configure(PlayerWeaponVisualSlot weaponSlotValue)
+    {
+        weaponSlot = weaponSlotValue;
+    }
+
+    /// <summary>
+    /// Preserves authored enum values so validation can report incoherent selections without mutating preset data.
+    /// </summary>
+    public void Validate()
+    {
+        // The management tool reports invalid selections and runtime resolution provides the deterministic fallback.
+    }
     #endregion
 }
 

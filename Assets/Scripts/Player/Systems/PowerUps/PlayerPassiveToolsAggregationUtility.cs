@@ -101,6 +101,7 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.ProjectileSpeedMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeSecondsMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeRangeMultiplier = 1f;
+        passiveToolsState.WeaponVisualSlot = PlayerWeaponVisualSlot.BaseGun;
     }
 
     /// <summary>
@@ -126,6 +127,12 @@ public static class PlayerPassiveToolsAggregationUtility
     {
         if (passiveToolConfig.IsDefined == 0)
             return;
+
+        if (passiveToolConfig.HasWeaponSwitch != 0)
+        {
+            passiveToolsState.HasWeaponSwitch = 1;
+            passiveToolsState.WeaponVisualSlot = passiveToolConfig.WeaponVisualSlot;
+        }
 
         if (passiveToolConfig.HasProjectileSize != 0)
         {

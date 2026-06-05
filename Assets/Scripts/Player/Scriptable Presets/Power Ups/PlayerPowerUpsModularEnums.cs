@@ -36,7 +36,8 @@ public enum PowerUpModuleKind
     Stackable = 18,
     LaserBeam = 19,
     OrbitalProjections = 20,
-    ImpactFrame = 21
+    ImpactFrame = 21,
+    SwitchWeapon = 22
 }
 
 public enum PowerUpTriggerEventType
@@ -94,6 +95,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.BouncingProjectiles:
             case PowerUpModuleKind.ProjectileSplit:
             case PowerUpModuleKind.LaserBeam:
+            case PowerUpModuleKind.SwitchWeapon:
                 return PowerUpModuleStage.Hook;
             default:
                 return PowerUpModuleStage.Hook;

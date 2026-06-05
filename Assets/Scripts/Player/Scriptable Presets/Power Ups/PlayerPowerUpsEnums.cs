@@ -99,6 +99,17 @@ public enum PassiveToolKind
     LaserBeam = 9
 }
 
+/// <summary>
+/// Selects an authored weapon mesh; active Switch Weapon modules resolve only Cannon, Gatling, or Railgun.
+/// </summary>
+public enum PlayerWeaponVisualSlot
+{
+    BaseGun = 0,
+    Cannon = 1,
+    Gatling = 2,
+    Railgun = 3
+}
+
 public enum ProjectileOrbitPathMode
 {
     Circle = 0,

@@ -250,6 +250,8 @@ public struct PlayerPassiveToolsState
     public LaserBeamPassiveConfig LaserBeam;
     public byte HasOrbitalProjections;
     public FixedList4096Bytes<OrbitalProjectionConfig> OrbitalProjections;
+    public byte HasWeaponSwitch;
+    public PlayerWeaponVisualSlot WeaponVisualSlot;
 }
 
 /// <summary>
