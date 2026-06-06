@@ -174,6 +174,14 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
     public void OnDestroy(ref SystemState state)
     {
+        DestroyRuntimeState();
+    }
+
+    /// <summary>
+    /// Clears cached presentation state and destroys every offensive engagement billboard runtime view.
+    /// </summary>
+    public static void DestroyRuntimeState()
+    {
         cachedMainCameraTransform = null;
         nextCameraResolveTime = 0f;
         missingStealerIconWarnings.Clear();

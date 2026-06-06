@@ -85,7 +85,7 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
                              in EnemyRuntimeState runtimeState,
                              in LocalTransform enemyTransform)
         {
-            CompactSegments(segments, DeltaTime);
+            EnemyAcidTrailRuntimeUtility.CompactSegments(segments, DeltaTime);
 
             if (patternConfig.MovementKind != EnemyCompiledMovementPatternKind.WandererAcid ||
                 patternConfig.AcidTrailEnabled == 0)
@@ -145,29 +145,6 @@ public partial struct EnemyAcidTrailSpawnSystem : ISystem
                        in patternConfig);
             patternRuntimeState.AcidLastSpawnPosition = enemyPosition;
             patternRuntimeState.AcidSpawnTimer = math.max(MinimumSpawnIntervalSeconds, patternConfig.AcidTrailSpawnIntervalSeconds);
-        }
-
-        /// <summary>
-        /// Removes expired segments in place while aging active entries by the current simulation delta.
-        /// </summary>
-        /// <param name="segments">Per-enemy acid segment buffer to compact.</param>
-        /// <param name="deltaTime">Scaled enemy delta time applied to remaining lifetimes.</param>
-        private static void CompactSegments(DynamicBuffer<EnemyAcidTrailSegmentElement> segments, float deltaTime)
-        {
-            for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
-            {
-                EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
-                segment.RemainingLifetime -= deltaTime;
-
-                if (segment.RemainingLifetime <= 0f)
-                {
-                    segments.RemoveAt(segmentIndex);
-                    segmentIndex--;
-                    continue;
-                }
-
-                segments[segmentIndex] = segment;
-            }
         }
 
         /// <summary>

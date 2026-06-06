@@ -123,7 +123,8 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
         // Ensure caches exist before teardown so cleanup remains null-safe.
         EnsureCollections();
 
-        // Destroy active fallback clones first, then pooled clones, and finally clear caches.
+        // Hide direct and fallback views immediately before deferred destruction clears runtime clones.
+        HideViews(cachedViewsByEnemy.Values);
         DestroyViews(fallbackViewsByEnemy.Values);
         fallbackViewsByEnemy.Clear();
         DestroyViews(fallbackViewPool);
@@ -370,6 +371,20 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
     }
 
     /// <summary>
+    /// Hides every valid view in the supplied collection so deferred destruction cannot leave visible feedback behind.
+    /// </summary>
+    /// <param name="views">View collection that must stop rendering immediately.</param>
+    private static void HideViews(IEnumerable<EnemyOffensiveEngagementBillboardView> views)
+    {
+        if (views == null)
+            return;
+
+        foreach (EnemyOffensiveEngagementBillboardView view in views)
+            if (view != null)
+                view.Hide();
+    }
+
+    /// <summary>
     /// Destroys every view instance provided by the supplied enumerable.
     /// </summary>
     /// <param name="views">View collection that should be destroyed during shutdown.</param>
@@ -395,6 +410,7 @@ internal static class EnemyOffensiveEngagementBillboardRuntimeUtility
                 continue;
             }
 
+            view.Hide();
             Object.Destroy(billboardObject);
         }
     }

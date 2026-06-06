@@ -139,18 +139,13 @@ public struct EnemyAcidTrailSegmentElement : IBufferElementData
 }
 
 /// <summary>
-/// Stores one detached acid trail segment that must outlive its dead Acid Wanderer owner until natural expiration.
+/// Stores owner-level runtime state for Acid trail sections detached from one dead Acid Wanderer.
 /// </summary>
-public struct EnemyDetachedAcidTrailSegment : IComponentData
+public struct EnemyDetachedAcidTrailState : IComponentData
 {
-    public float3 StartPosition;
-    public float3 EndPosition;
-    public float Radius;
-    public float RemainingLifetime;
-    public float ApplyIntervalSeconds;
-    public float DamagePerTick;
     public float PlayerDamageCooldown;
     public byte PlayerOverlapping;
+    public byte SkipCurrentUpdate;
 }
 
 /// <summary>

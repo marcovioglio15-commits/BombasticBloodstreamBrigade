@@ -170,22 +170,33 @@ internal static class GameSceneTransitionExecutionUtility
 
     #region Runtime Cleanup
     /// <summary>
-    /// Clears transient gameplay entities that are not owned by scene streaming before a restart loads the new instance.
+    /// Clears transient gameplay entities that are not owned by scene streaming before entering, leaving, or reloading gameplay.
     /// </summary>
     /// <param name="entityManager">EntityManager that owns transient gameplay runtime entities.</param>
     /// <param name="cleanupComplete">True when this transition has already run the cleanup check.</param>
     /// <param name="reloadActiveScene">True when the active scene is being restarted.</param>
+    /// <param name="hasSourceScene">True when the transition resolved a source scene definition.</param>
+    /// <param name="sourceScene">Resolved source scene definition.</param>
     /// <param name="targetScene">Target scene definition for the active transition.</param>
     /// <returns>True once the cleanup gate has been consumed for this transition.</returns>
     public static bool RunPreLoadRuntimeCleanupIfNeeded(EntityManager entityManager,
                                                         bool cleanupComplete,
                                                         bool reloadActiveScene,
+                                                        bool hasSourceScene,
+                                                        GameSceneDefinitionElement sourceScene,
                                                         GameSceneDefinitionElement targetScene)
     {
         if (cleanupComplete)
             return true;
 
-        if (reloadActiveScene && GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene))
+        bool sourceIsGameplay = hasSourceScene &&
+                                GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(sourceScene);
+        bool targetIsGameplay = GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene);
+        bool preservesActiveGameplayRuntime = sourceIsGameplay &&
+                                              targetIsGameplay &&
+                                              !reloadActiveScene;
+
+        if (!preservesActiveGameplayRuntime)
             GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
 
         return true;

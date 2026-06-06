@@ -336,6 +336,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         preLoadRuntimeCleanupComplete = GameSceneTransitionExecutionUtility.RunPreLoadRuntimeCleanupIfNeeded(EntityManager,
                                                                                                             preLoadRuntimeCleanupComplete,
                                                                                                             reloadActiveScene,
+                                                                                                            hasSourceScene,
+                                                                                                            sourceScene,
                                                                                                             targetScene);
 
         if (GameScenePersistentPlayerSceneUtility.TickLoadSteps(persistentPlayerLoadScenes, ref persistentPlayerLoadIndex))

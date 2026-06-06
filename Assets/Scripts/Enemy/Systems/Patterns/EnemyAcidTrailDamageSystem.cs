@@ -14,10 +14,6 @@ using Unity.Transforms;
 [UpdateBefore(typeof(EnemyDespawnSystem))]
 public partial struct EnemyAcidTrailDamageSystem : ISystem
 {
-    #region Constants
-    private const float MinimumApplyIntervalSeconds = 0.01f;
-    #endregion
-
     #region Fields
     private EntityQuery playerQuery;
     private EntityQuery acidTrailQuery;
@@ -51,7 +47,6 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
-        ComponentLookup<PlayerDashState> dashStateLookup = SystemAPI.GetComponentLookup<PlayerDashState>(true);
         Entity playerEntity = Entity.Null;
         LocalTransform playerTransform = default;
         PlayerHealth playerHealth = default;
@@ -90,22 +85,14 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         if (!entityManager.Exists(playerEntity))
             return;
 
-        bool canApplyDamage = true;
-
-        if (dashStateLookup.HasComponent(playerEntity))
-        {
-            PlayerDashState dashState = dashStateLookup[playerEntity];
-
-            if (dashState.RemainingInvulnerability > 0f)
-                canApplyDamage = false;
-        }
-
-        if (PlayerDamageUtility.IsDamageGraceActive(in playerDamageGraceState, elapsedTime))
-            canApplyDamage = false;
-
         if (playerHealth.Current <= 0f)
             return;
 
+        bool canApplyDamage = EnemyAcidTrailRuntimeUtility.CanApplyDamage(entityManager,
+                                                                         playerEntity,
+                                                                         in playerHealth,
+                                                                         in playerDamageGraceState,
+                                                                         elapsedTime);
         float enemyTimeScale = 1f;
 
         if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
@@ -136,72 +123,17 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         if (totalDamage <= 0f)
             return;
 
-        ApplyDamage(entityManager,
-                    playerEntity,
-                    playerTransform.Position,
-                    ref playerHealth,
-                    ref playerShield,
-                    ref playerDamageGraceState,
-                    in runtimeHealthConfig,
-                    elapsedTime,
-                    totalDamage,
-                    audioRequests,
-                    canEnqueueAudioRequests);
-    }
-    #endregion
-
-    #region Damage Application
-    /// <summary>
-    /// Applies one merged flat damage tick to the player and emits the same feedback used by other enemy damage channels.
-    /// </summary>
-    /// <param name="entityManager">Runtime entity manager used to write player components and trigger feedback.</param>
-    /// <param name="playerEntity">Player entity receiving the accumulated damage.</param>
-    /// <param name="playerPosition">World-space player position used for positional audio requests.</param>
-    /// <param name="playerHealth">Mutable player health snapshot.</param>
-    /// <param name="playerShield">Mutable player shield snapshot.</param>
-    /// <param name="playerDamageGraceState">Mutable damage grace snapshot.</param>
-    /// <param name="runtimeHealthConfig">Runtime health tuning used by shared damage utility.</param>
-    /// <param name="elapsedTime">Current elapsed simulation time used for grace windows.</param>
-    /// <param name="totalDamage">Accumulated flat damage resolved from all overlapping acid segments.</param>
-    /// <param name="audioRequests">Audio event buffer used for standard player damage feedback.</param>
-    /// <param name="canEnqueueAudioRequests">True when an audio event singleton buffer is available.</param>
-    private static void ApplyDamage(EntityManager entityManager,
-                                    Entity playerEntity,
-                                    float3 playerPosition,
-                                    ref PlayerHealth playerHealth,
-                                    ref PlayerShield playerShield,
-                                    ref PlayerDamageGraceState playerDamageGraceState,
-                                    in PlayerRuntimeHealthStatisticsConfig runtimeHealthConfig,
-                                    float elapsedTime,
-                                    float totalDamage,
-                                    DynamicBuffer<GameAudioEventRequest> audioRequests,
-                                    bool canEnqueueAudioRequests)
-    {
-        float previousHealth = playerHealth.Current;
-        float previousShield = playerShield.Current;
-        bool damageApplied = PlayerDamageUtility.TryApplyFlatShieldDamage(ref playerHealth,
-                                                                          ref playerShield,
-                                                                          ref playerDamageGraceState,
-                                                                          in runtimeHealthConfig,
-                                                                          elapsedTime,
-                                                                          totalDamage);
-
-        if (!damageApplied)
-            return;
-
-        if (canEnqueueAudioRequests)
-        {
-            if (playerShield.Current < previousShield)
-                GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShieldDamage, playerPosition);
-
-            if (playerHealth.Current < previousHealth)
-                GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerHealthDamage, playerPosition);
-        }
-
-        entityManager.SetComponentData(playerEntity, playerHealth);
-        entityManager.SetComponentData(playerEntity, playerShield);
-        entityManager.SetComponentData(playerEntity, playerDamageGraceState);
-        DamageFlashRuntimeUtility.Trigger(entityManager, playerEntity);
+        EnemyAcidTrailRuntimeUtility.ApplyDamage(entityManager,
+                                                 playerEntity,
+                                                 playerTransform.Position,
+                                                 ref playerHealth,
+                                                 ref playerShield,
+                                                 ref playerDamageGraceState,
+                                                 in runtimeHealthConfig,
+                                                 elapsedTime,
+                                                 totalDamage,
+                                                 audioRequests,
+                                                 canEnqueueAudioRequests);
     }
     #endregion
 
@@ -234,68 +166,17 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
                 return;
             }
 
-            bool playerOverlapsTrail = false;
-            float damagePerTick = 0f;
-            float applyIntervalSeconds = 0f;
-
-            // Merge every section owned by this Acid Wanderer into one continuous hazard overlap.
-            for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
-            {
-                EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
-
-                if (!IsDamageSectionUsable(in segment))
-                    continue;
-
-                if (!IsPlayerOverlappingSection(PlayerPosition, in segment))
-                    continue;
-
-                playerOverlapsTrail = true;
-                damagePerTick = math.max(damagePerTick, segment.DamagePerTick);
-                applyIntervalSeconds = ResolveApplyIntervalSeconds(applyIntervalSeconds, segment.ApplyIntervalSeconds);
-            }
-
-            if (!playerOverlapsTrail)
-            {
-                ResetPlayerOverlap(ref patternRuntimeState);
-                return;
-            }
-
-            bool playerEnteredTrail = patternRuntimeState.AcidPlayerOverlapping == 0;
-            patternRuntimeState.AcidPlayerOverlapping = 1;
-
-            if (playerEnteredTrail)
-            {
-                patternRuntimeState.AcidPlayerDamageCooldown = 0f;
-                TryAccumulateReadyDamage(ref patternRuntimeState,
-                                         damagePerTick,
-                                         applyIntervalSeconds);
-                return;
-            }
-
-            patternRuntimeState.AcidPlayerDamageCooldown = math.max(0f, patternRuntimeState.AcidPlayerDamageCooldown - DeltaTime);
-            TryAccumulateReadyDamage(ref patternRuntimeState,
-                                     damagePerTick,
-                                     applyIntervalSeconds);
-        }
-
-        /// <summary>
-        /// Applies one due owner-level Acid tick and starts the next overlap cooldown when player damage is allowed.
-        /// </summary>
-        /// <param name="patternRuntimeState">Mutable owner state retaining the current Acid cooldown.</param>
-        /// <param name="damagePerTick">Resolved Acid damage for the current owner overlap.</param>
-        /// <param name="applyIntervalSeconds">Cooldown started after an accepted due damage request.</param>
-        private void TryAccumulateReadyDamage(ref EnemyPatternRuntimeState patternRuntimeState,
-                                              float damagePerTick,
-                                              float applyIntervalSeconds)
-        {
-            if (patternRuntimeState.AcidPlayerDamageCooldown > 0f)
-                return;
-
-            if (PlayerDamageAllowed == 0 || damagePerTick <= 0f)
-                return;
-
-            AccumulatedDamage.Value += math.max(0f, damagePerTick);
-            patternRuntimeState.AcidPlayerDamageCooldown = math.max(MinimumApplyIntervalSeconds, applyIntervalSeconds);
+            bool playerOverlapsTrail = EnemyAcidTrailRuntimeUtility.TryResolveOverlap(PlayerPosition,
+                                                                                      segments,
+                                                                                      out float damagePerTick,
+                                                                                      out float applyIntervalSeconds);
+            AccumulatedDamage.Value += EnemyAcidTrailRuntimeUtility.AdvanceOverlap(playerOverlapsTrail,
+                                                                                   ref patternRuntimeState.AcidPlayerOverlapping,
+                                                                                   ref patternRuntimeState.AcidPlayerDamageCooldown,
+                                                                                   DeltaTime,
+                                                                                   PlayerDamageAllowed,
+                                                                                   damagePerTick,
+                                                                                   applyIntervalSeconds);
         }
 
         /// <summary>
@@ -306,48 +187,6 @@ public partial struct EnemyAcidTrailDamageSystem : ISystem
         {
             patternRuntimeState.AcidPlayerDamageCooldown = 0f;
             patternRuntimeState.AcidPlayerOverlapping = 0;
-        }
-
-        /// <summary>
-        /// Returns whether one retained Acid section still carries a valid damage payload.
-        /// </summary>
-        /// <param name="segment">Retained Acid section being evaluated.</param>
-        /// <returns>True when the section can contribute to player overlap damage.</returns>
-        private static bool IsDamageSectionUsable(in EnemyAcidTrailSegmentElement segment)
-        {
-            return segment.RemainingLifetime > 0f &&
-                   segment.DamagePerTick > 0f &&
-                   segment.Radius > 0f;
-        }
-
-        /// <summary>
-        /// Returns whether the player point is inside the planar capsule represented by one Acid section.
-        /// </summary>
-        /// <param name="position">World-space player point evaluated on the XZ plane.</param>
-        /// <param name="segment">Retained Acid section being evaluated.</param>
-        /// <returns>True when the player point is inside the Acid section radius.</returns>
-        private static bool IsPlayerOverlappingSection(float3 position, in EnemyAcidTrailSegmentElement segment)
-        {
-            return EnemyAcidTrailGeometryUtility.IsPointOverlappingSection(position,
-                                                                           segment.StartPosition,
-                                                                           segment.EndPosition,
-                                                                           segment.Radius);
-        }
-
-        /// <summary>
-        /// Resolves the shortest retained overlap cooldown when neighboring Acid sections carry different values.
-        /// </summary>
-        /// <param name="currentIntervalSeconds">Shortest interval already found for this owner overlap.</param>
-        /// <param name="candidateIntervalSeconds">Interval copied into the currently overlapping Acid section.</param>
-        /// <returns>Shortest safe overlap cooldown in seconds.</returns>
-        private static float ResolveApplyIntervalSeconds(float currentIntervalSeconds, float candidateIntervalSeconds)
-        {
-            float safeCandidateIntervalSeconds = math.max(MinimumApplyIntervalSeconds, candidateIntervalSeconds);
-
-            if (currentIntervalSeconds <= 0f)
-                return safeCandidateIntervalSeconds;
-
-            return math.min(currentIntervalSeconds, safeCandidateIntervalSeconds);
         }
 
     }

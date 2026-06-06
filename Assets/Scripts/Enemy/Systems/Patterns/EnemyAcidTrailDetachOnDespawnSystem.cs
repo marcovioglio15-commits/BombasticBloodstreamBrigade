@@ -43,9 +43,11 @@ public partial struct EnemyAcidTrailDetachOnDespawnSystem : ISystem
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         foreach ((RefRO<EnemyPatternConfig> patternConfig,
+                  RefRO<EnemyPatternRuntimeState> patternRuntimeState,
                   DynamicBuffer<EnemyAcidTrailSegmentElement> segments,
                   DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests)
                  in SystemAPI.Query<RefRO<EnemyPatternConfig>,
+                                    RefRO<EnemyPatternRuntimeState>,
                                     DynamicBuffer<EnemyAcidTrailSegmentElement>,
                                     DynamicBuffer<PlayerPowerUpVfxSpawnRequest>>()
                              .WithAll<EnemyDespawnRequest>())
@@ -54,6 +56,8 @@ public partial struct EnemyAcidTrailDetachOnDespawnSystem : ISystem
                 continue;
 
             EnemyPatternConfig config = patternConfig.ValueRO;
+            Entity detachedEntity = Entity.Null;
+            DynamicBuffer<EnemyAcidTrailSegmentElement> detachedSegments = default;
 
             for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
             {
@@ -62,24 +66,23 @@ public partial struct EnemyAcidTrailDetachOnDespawnSystem : ISystem
                 if (!IsSegmentUsable(in segment))
                     continue;
 
-                Entity detachedEntity = commandBuffer.CreateEntity();
-                commandBuffer.AddComponent(detachedEntity, new EnemyDetachedAcidTrailSegment
+                if (detachedEntity == Entity.Null)
                 {
-                    StartPosition = segment.StartPosition,
-                    EndPosition = segment.EndPosition,
-                    Radius = math.max(0f, segment.Radius),
-                    RemainingLifetime = math.max(MinimumLifetimeSeconds, segment.RemainingLifetime),
-                    ApplyIntervalSeconds = math.max(0.01f, segment.ApplyIntervalSeconds),
-                    DamagePerTick = math.max(0f, segment.DamagePerTick),
-                    PlayerDamageCooldown = 0f,
-                    PlayerOverlapping = 0
-                });
+                    detachedEntity = commandBuffer.CreateEntity();
+                    commandBuffer.AddComponent(detachedEntity, new EnemyDetachedAcidTrailState
+                    {
+                        PlayerDamageCooldown = math.max(0f, patternRuntimeState.ValueRO.AcidPlayerDamageCooldown),
+                        PlayerOverlapping = patternRuntimeState.ValueRO.AcidPlayerOverlapping,
+                        SkipCurrentUpdate = 1
+                    });
+                    detachedSegments = commandBuffer.AddBuffer<EnemyAcidTrailSegmentElement>(detachedEntity);
+                }
+
+                detachedSegments.Add(segment);
 
                 if (segment.VfxSpawned == 0 &&
                     config.AcidTrailVfxPrefabEntity != Entity.Null)
-                {
                     vfxRequests.Add(BuildDetachedVfxRequest(in segment, in config));
-                }
             }
 
             segments.Clear();

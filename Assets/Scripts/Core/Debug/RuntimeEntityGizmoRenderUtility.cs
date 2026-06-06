@@ -154,7 +154,8 @@ public static class RuntimeEntityGizmoRenderUtility
                                                                 ComponentType.ReadOnly<ProjectileActive>());
         orbitalProjectionQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerOrbitalProjectionInstance>(),
                                                                        ComponentType.ReadOnly<LocalTransform>());
-        detachedAcidTrailQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemyDetachedAcidTrailSegment>());
+        detachedAcidTrailQuery = cachedEntityManager.CreateEntityQuery(ComponentType.ReadOnly<EnemyDetachedAcidTrailState>(),
+                                                                        ComponentType.ReadOnly<EnemyAcidTrailSegmentElement>());
         return true;
     }
 
@@ -482,27 +483,32 @@ public static class RuntimeEntityGizmoRenderUtility
         if (!RuntimeGizmoDebugState.EnemyWanderTargetEnabled || detachedAcidTrailQuery.IsEmptyIgnoreFilter)
             return;
 
-        NativeArray<EnemyDetachedAcidTrailSegment> detachedSegments = detachedAcidTrailQuery.ToComponentDataArray<EnemyDetachedAcidTrailSegment>(Allocator.Temp);
+        NativeArray<Entity> detachedTrailEntities = detachedAcidTrailQuery.ToEntityArray(Allocator.Temp);
 
         try
         {
-            // Render each surviving hazard capsule so the player can see the damage that outlives the dead owner.
-            for (int segmentIndex = 0; segmentIndex < detachedSegments.Length; segmentIndex++)
+            // Render each surviving owner-level hazard buffer with the detached trail debug color.
+            for (int detachedIndex = 0; detachedIndex < detachedTrailEntities.Length; detachedIndex++)
             {
-                EnemyDetachedAcidTrailSegment segment = detachedSegments[segmentIndex];
+                DynamicBuffer<EnemyAcidTrailSegmentElement> segments = cachedEntityManager.GetBuffer<EnemyAcidTrailSegmentElement>(detachedTrailEntities[detachedIndex], true);
 
-                if (segment.Radius <= 0f || segment.RemainingLifetime <= 0f)
-                    continue;
+                for (int segmentIndex = 0; segmentIndex < segments.Length; segmentIndex++)
+                {
+                    EnemyAcidTrailSegmentElement segment = segments[segmentIndex];
 
-                primitiveDrawer.DrawWireDisc(ToVector3(segment.StartPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
-                primitiveDrawer.DrawWireDisc(ToVector3(segment.EndPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
-                primitiveDrawer.DrawLink(ToVector3(segment.StartPosition), ToVector3(segment.EndPosition), EnemyDetachedAcidTrailSegmentColor);
+                    if (segment.Radius <= 0f || segment.RemainingLifetime <= 0f)
+                        continue;
+
+                    primitiveDrawer.DrawWireDisc(ToVector3(segment.StartPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
+                    primitiveDrawer.DrawWireDisc(ToVector3(segment.EndPosition), segment.Radius, EnemyDetachedAcidTrailSegmentColor);
+                    primitiveDrawer.DrawLink(ToVector3(segment.StartPosition), ToVector3(segment.EndPosition), EnemyDetachedAcidTrailSegmentColor);
+                }
             }
         }
         finally
         {
-            if (detachedSegments.IsCreated)
-                detachedSegments.Dispose();
+            if (detachedTrailEntities.IsCreated)
+                detachedTrailEntities.Dispose();
         }
     }
     #endregion

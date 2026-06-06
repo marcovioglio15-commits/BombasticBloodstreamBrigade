@@ -9,16 +9,11 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
 
     #region Public Methods
     /// <summary>
-    /// Destroys runtime-only gameplay entities after the old gameplay scene has been unloaded and before the new run loads.
+    /// Destroys runtime-only gameplay entities before a transition crosses a run boundary or reloads the active run.
     /// </summary>
     /// <param name="entityManager">Default world entity manager.</param>
     public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
     {
-        PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
-        EnemySpawnWarningPresentationSystem.DestroyRuntimeState();
-        EnemyOffensiveEngagementBillboardRuntimeUtility.Shutdown();
-        EnemyGroundIndicatorSyncSystem.DestroyRuntimeState();
-        PlayerDroppedPowerUpContainerViewRuntimeUtility.Shutdown();
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);
@@ -27,8 +22,17 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
         DestroyEntitiesWith<EnemyExperienceDropPoolRegistry>(entityManager);
         DestroyNonPrefabEntitiesWith<PlayerPowerUpVfxPooled>(entityManager);
         DestroyNonPrefabEntitiesWith<ElementalTrailSegment>(entityManager);
+        DestroyNonPrefabEntitiesWith<EnemyDetachedAcidTrailState>(entityManager);
+        DestroyNonPrefabEntitiesWith<EnemyBombardierBomb>(entityManager);
         DestroyNonPrefabEntitiesWith<BombFuseState>(entityManager);
+        DestroyNonPrefabEntitiesWith<PlayerOrbitalProjectionInstance>(entityManager);
         DestroyNonPrefabEntitiesWith<PlayerDroppedPowerUpContainerContent>(entityManager);
+        PlayerPowerUpManagedVfxRuntimeUtility.DestroyAll();
+        EnemySpawnWarningPresentationSystem.DestroyRuntimeState();
+        EnemyProjectileOffscreenWarningPresentationSystem.DestroyRuntimeState();
+        EnemyDamageFlashPresentationSystem.DestroyRuntimeState();
+        EnemyGroundIndicatorSyncSystem.DestroyRuntimeState();
+        PlayerDroppedPowerUpContainerViewRuntimeUtility.Shutdown();
     }
     #endregion
 
