@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -363,48 +362,6 @@ public sealed class PowerUpModuleData
     #endregion
 }
 
-/// <summary>
-/// Defines the alternate weapon mesh shown alongside Base Gun instead of the Player Visual Preset optional attachment.
-/// </summary>
-[Serializable]
-public sealed class PowerUpSwitchWeaponModuleData
-{
-    #region Fields
-    [Tooltip("Alternate weapon mesh displayed beside Base Gun while the owning passive or toggleable active power-up is in effect.")]
-    [SerializeField]
-    private PlayerWeaponVisualSlot weaponSlot = PlayerWeaponVisualSlot.Cannon;
-    #endregion
-
-    #region Properties
-    public PlayerWeaponVisualSlot WeaponSlot
-    {
-        get
-        {
-            return weaponSlot;
-        }
-    }
-    #endregion
-
-    #region Methods
-    /// <summary>
-    /// Assigns the alternate weapon slot used by this module payload.
-    /// </summary>
-    /// <param name="weaponSlotValue">Alternate weapon slot to assign.</param>
-    public void Configure(PlayerWeaponVisualSlot weaponSlotValue)
-    {
-        weaponSlot = weaponSlotValue;
-    }
-
-    /// <summary>
-    /// Preserves authored enum values so validation can report incoherent selections without mutating preset data.
-    /// </summary>
-    public void Validate()
-    {
-        // The management tool reports invalid selections and runtime resolution provides the deterministic fallback.
-    }
-    #endregion
-}
-
 [Serializable]
 public sealed class PowerUpModuleDefinition
 {
@@ -671,110 +628,4 @@ public sealed class PowerUpModuleBinding
     #endregion
 }
 
-[Serializable]
-public sealed class ModularPowerUpDefinition
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Common metadata and drop data for this composed power up.")]
-    [SerializeField] private PowerUpCommonData commonData = new PowerUpCommonData();
-
-    [Tooltip("Ordered list of module bindings composing this power up.")]
-    [SerializeField] private List<PowerUpModuleBinding> moduleBindings = new List<PowerUpModuleBinding>();
-
-    [Tooltip("When enabled, this power up cannot be replaced from runtime slots.")]
-    [SerializeField] private bool unreplaceable;
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public PowerUpCommonData CommonData
-    {
-        get
-        {
-            return commonData;
-        }
-    }
-
-    public IReadOnlyList<PowerUpModuleBinding> ModuleBindings
-    {
-        get
-        {
-            return moduleBindings;
-        }
-    }
-
-    public bool Unreplaceable
-    {
-        get
-        {
-            return unreplaceable;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Setup
-    public void Configure(PowerUpCommonData commonDataValue, bool unreplaceableValue)
-    {
-        commonData = commonDataValue;
-        unreplaceable = unreplaceableValue;
-
-        if (moduleBindings == null)
-            moduleBindings = new List<PowerUpModuleBinding>();
-    }
-
-    public void ClearBindings()
-    {
-        if (moduleBindings == null)
-            moduleBindings = new List<PowerUpModuleBinding>();
-
-        moduleBindings.Clear();
-    }
-
-    public void AddBinding(PowerUpModuleBinding binding)
-    {
-        if (binding == null)
-            return;
-
-        if (moduleBindings == null)
-            moduleBindings = new List<PowerUpModuleBinding>();
-
-        moduleBindings.Add(binding);
-    }
-    #endregion
-
-    #region Validation
-    public void Validate()
-    {
-        if (commonData == null)
-            commonData = new PowerUpCommonData();
-
-        commonData.Validate();
-
-        if (moduleBindings == null)
-            moduleBindings = new List<PowerUpModuleBinding>();
-
-        HashSet<string> visitedBindingIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        for (int index = 0; index < moduleBindings.Count; index++)
-        {
-            PowerUpModuleBinding binding = moduleBindings[index];
-
-            if (binding == null)
-                continue;
-
-            binding.Validate();
-
-            while (!visitedBindingIds.Add(binding.BindingId))
-                binding.RegenerateBindingId();
-        }
-    }
-    #endregion
-
-    #endregion
-}
 #endregion

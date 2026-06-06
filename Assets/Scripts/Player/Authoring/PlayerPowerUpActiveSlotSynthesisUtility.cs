@@ -336,6 +336,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               float holdChargeRequired,
                                               float holdChargeMaximum,
                                               float holdChargeRatePerSecond,
+                                              PlayerChargeAnimationClipSlot chargeAnimationClipSlot,
+                                              PlayerReleaseAnimationClipSlot releaseAnimationClipSlot,
                                               bool decayAfterRelease,
                                               float decayAfterReleasePercentPerSecond,
                                               bool passiveChargeGainWhileReleased,
@@ -373,6 +375,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               in PlayerPassiveToolConfig togglePassiveTool,
                                               bool hasActiveWeaponSwitch,
                                               PlayerWeaponVisualSlot activeWeaponVisualSlot,
+                                              PlayerShootAnimationClipSlot activeWeaponShootAnimationClipSlot,
                                               ActiveToolKind resolvedToolKind,
                                               out PlayerPowerUpSlotConfig slotConfig)
     {
@@ -482,6 +485,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                 RequiredCharge = chargeShotRequired,
                 MaximumCharge = chargeShotMaximum,
                 ChargeRatePerSecond = chargeShotRate,
+                ChargeAnimationClipSlot = chargeAnimationClipSlot,
+                ReleaseAnimationClipSlot = releaseAnimationClipSlot,
                 LaserDurationSeconds = math.max(0f, chargeShotLaserDurationSeconds),
                 UseChargedLaserBeam = useChargedLaserBeam ? (byte)1 : (byte)0,
                 ChargedLaserDurationSeconds = math.max(0f, chargedLaserDurationSeconds),
@@ -518,7 +523,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             TriggeredProjectilePassiveTool = triggeredProjectilePassiveTool,
             TogglePassiveTool = togglePassiveTool,
             HasActiveWeaponSwitch = hasActiveWeaponSwitch ? (byte)1 : (byte)0,
-            ActiveWeaponVisualSlot = activeWeaponVisualSlot
+            ActiveWeaponVisualSlot = activeWeaponVisualSlot,
+            ActiveWeaponShootAnimationClipSlot = activeWeaponShootAnimationClipSlot
         };
     }
 

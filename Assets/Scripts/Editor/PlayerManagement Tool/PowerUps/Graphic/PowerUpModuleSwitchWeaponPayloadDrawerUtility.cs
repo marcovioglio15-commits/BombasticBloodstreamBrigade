@@ -32,30 +32,43 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
             return;
 
         SerializedProperty weaponSlotProperty = payloadProperty.FindPropertyRelative("weaponSlot");
+        SerializedProperty shootAnimationClipSlotProperty = payloadProperty.FindPropertyRelative("shootAnimationClipSlot");
 
-        if (weaponSlotProperty == null)
+        if (weaponSlotProperty == null || shootAnimationClipSlotProperty == null)
         {
             payloadContainer.Add(new HelpBox("Switch Weapon payload fields are missing.", HelpBoxMessageType.Warning));
             return;
         }
 
         VisualElement weaponSlotField = BuildWeaponSlotField(payloadContainer, weaponSlotProperty);
+        VisualElement shootingAnimationField = PlayerScalingFieldElementFactory.CreateField(shootAnimationClipSlotProperty,
+                                                                                            shootAnimationClipSlotProperty.serializedObject.FindProperty("scalingRules"),
+                                                                                            "Shooting Animation");
+        payloadContainer.Add(shootingAnimationField);
         HelpBox behaviorBox = new HelpBox("Base Gun remains visible. Switch Weapon replaces the optional Player Visual Preset attachment with exactly one Cannon, Gatling, or Railgun mesh.",
                                           HelpBoxMessageType.Info);
-        HelpBox warningBox = new HelpBox("The selected value is outside the supported alternate weapon range. Bake and Add Scaling clamp it to Cannon, Gatling, or Railgun.",
+        HelpBox warningBox = new HelpBox(string.Empty,
                                          HelpBoxMessageType.Warning);
         payloadContainer.Add(behaviorBox);
         payloadContainer.Add(warningBox);
 
         weaponSlotField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
-            RefreshWarning(weaponSlotProperty, warningBox);
+            RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
+        });
+        shootingAnimationField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
         });
         payloadContainer.TrackPropertyValue(weaponSlotProperty, changedProperty =>
         {
-            RefreshWarning(changedProperty, warningBox);
+            RefreshWarning(changedProperty, shootAnimationClipSlotProperty, warningBox);
         });
-        RefreshWarning(weaponSlotProperty, warningBox);
+        payloadContainer.TrackPropertyValue(shootAnimationClipSlotProperty, changedProperty =>
+        {
+            RefreshWarning(weaponSlotProperty, changedProperty, warningBox);
+        });
+        RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
     }
     #endregion
 
@@ -114,14 +127,32 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
     /// </summary>
     /// <param name="weaponSlotProperty">Serialized shared weapon visual enum property.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
-    private static void RefreshWarning(SerializedProperty weaponSlotProperty, HelpBox warningBox)
+    private static void RefreshWarning(SerializedProperty weaponSlotProperty,
+                                       SerializedProperty shootAnimationClipSlotProperty,
+                                       HelpBox warningBox)
     {
         int selectedValue = weaponSlotProperty != null
             ? weaponSlotProperty.intValue
             : (int)PlayerWeaponVisualSlot.Cannon;
-        bool showWarning = selectedValue < (int)PlayerWeaponVisualSlot.Cannon ||
-                           selectedValue > (int)PlayerWeaponVisualSlot.Railgun;
-        warningBox.style.display = showWarning ? DisplayStyle.Flex : DisplayStyle.None;
+        int shootingAnimationValue = shootAnimationClipSlotProperty != null
+            ? shootAnimationClipSlotProperty.intValue
+            : (int)PlayerShootAnimationClipSlot.Automatic;
+        List<string> warningLines = new List<string>();
+
+        if (selectedValue < (int)PlayerWeaponVisualSlot.Cannon ||
+            selectedValue > (int)PlayerWeaponVisualSlot.Railgun)
+        {
+            warningLines.Add("The selected weapon value is outside the supported alternate range. Bake and Add Scaling clamp it to Cannon, Gatling, or Railgun.");
+        }
+
+        if (shootingAnimationValue < (int)PlayerShootAnimationClipSlot.Automatic ||
+            shootingAnimationValue > (int)PlayerShootAnimationClipSlot.Railgun)
+        {
+            warningLines.Add("The selected shooting animation value is outside the supported range. Bake and Add Scaling clamp it to a valid upper-body clip slot.");
+        }
+
+        warningBox.text = string.Join("\n", warningLines);
+        warningBox.style.display = warningLines.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     /// <summary>

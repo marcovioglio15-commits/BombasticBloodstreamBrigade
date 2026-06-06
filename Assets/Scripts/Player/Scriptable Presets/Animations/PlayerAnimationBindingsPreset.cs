@@ -231,10 +231,9 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
     [SerializeField]
     private AnimationClip aimRightClip;
 
-    [Tooltip("Shoot clip slot used for shoot transitions or additive overlays.")]
-    [FormerlySerializedAs("m_ShootClip")]
+    [Tooltip("Concrete upper-body shooting, charge, and release clips selected by scalable modular power-up payload enums.")]
     [SerializeField]
-    private AnimationClip shootClip;
+    private PlayerUpperBodyAnimationClipSettings upperBodyActionClips = new PlayerUpperBodyAnimationClipSettings();
 
     [Tooltip("Dash clip slot used for dash transitions.")]
     [FormerlySerializedAs("m_DashClip")]
@@ -577,11 +576,11 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
         }
     }
 
-    public AnimationClip ShootClip
+    public PlayerUpperBodyAnimationClipSettings UpperBodyActionClips
     {
         get
         {
-            return shootClip;
+            return upperBodyActionClips;
         }
     }
 
@@ -630,9 +629,6 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
             case PlayerAnimationClipSlot.AimRight:
                 aimRightClip = clip;
                 return;
-            case PlayerAnimationClipSlot.Shoot:
-                shootClip = clip;
-                return;
             case PlayerAnimationClipSlot.Dash:
                 dashClip = clip;
                 return;
@@ -650,6 +646,9 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
 
         if (scalingRules == null)
             scalingRules = new List<PlayerStatScalingRule>();
+
+        if (upperBodyActionClips == null)
+            upperBodyActionClips = new PlayerUpperBodyAnimationClipSettings();
 
         floatDampTime = Mathf.Max(0f, floatDampTime);
         movingSpeedThreshold = Mathf.Max(0f, movingSpeedThreshold);

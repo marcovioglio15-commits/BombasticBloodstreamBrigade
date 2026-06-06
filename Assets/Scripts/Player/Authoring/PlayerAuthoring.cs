@@ -542,12 +542,20 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         if (animationBindingsPreset != null)
         {
             AddComponent(entity, PlayerControllerConfigBakeUtility.BuildAnimatorParameterConfig(animationBindingsPreset));
+            AddComponent(entity, PlayerControllerConfigBakeUtility.BuildUpperBodyAnimationClipConfig(animationBindingsPreset,
+                                                                                                       visualPreset));
             AddComponent(entity, new PlayerAnimatorRuntimeState
             {
                 PreviousShooting = 0,
+                PreviousPrimaryCharging = 0,
+                PreviousSecondaryCharging = 0,
+                UpperBodyActionKind = PlayerUpperBodyAnimationActionKind.None,
+                UpperBodyActionActive = 0,
                 Initialized = 0,
                 ParametersValidated = 0,
                 BoundAnimatorInstanceId = 0,
+                UpperBodyActionElapsed = 0f,
+                UpperBodyActionDuration = 0f,
                 RecoilValue = 0f,
                 AimWeightValue = 0f,
                 LeanValue = 0f,

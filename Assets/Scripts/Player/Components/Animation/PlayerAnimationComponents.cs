@@ -57,15 +57,49 @@ public struct PlayerAnimatorRuntimeState : IComponentData
 {
     #region Fields
     public byte PreviousShooting;
+    public byte PreviousPrimaryCharging;
+    public byte PreviousSecondaryCharging;
+    public PlayerUpperBodyAnimationActionKind UpperBodyActionKind;
+    public byte UpperBodyActionActive;
     public byte Initialized;
     public byte ParametersValidated;
     public uint LastShotPulseVersion;
     public int BoundAnimatorInstanceId;
+    public float UpperBodyActionElapsed;
+    public float UpperBodyActionDuration;
     public float RecoilValue;
     public float AimWeightValue;
     public float LeanValue;
     public float LastMoveX;
     public float LastMoveY;
+    #endregion
+}
+
+/// <summary>
+/// Identifies the upper-body action currently driven by presentation without transferring gameplay authority to Animator.
+/// </summary>
+public enum PlayerUpperBodyAnimationActionKind : byte
+{
+    None = 0,
+    Shoot = 1,
+    Charge = 2,
+    Release = 3
+}
+
+/// <summary>
+/// Stores the concrete upper-body clip assets referenced by scalable power-up payload selectors.
+/// </summary>
+public struct PlayerUpperBodyAnimationClipConfig : IComponentData
+{
+    #region Fields
+    public UnityObjectRef<AnimationClip> DefaultShoot;
+    public UnityObjectRef<AnimationClip> CannonShoot;
+    public UnityObjectRef<AnimationClip> GatlingShoot;
+    public UnityObjectRef<AnimationClip> RailgunShoot;
+    public UnityObjectRef<AnimationClip> PrimaryCharge;
+    public UnityObjectRef<AnimationClip> SecondaryCharge;
+    public UnityObjectRef<AnimationClip> PrimaryRelease;
+    public UnityObjectRef<AnimationClip> SecondaryRelease;
     #endregion
 }
 

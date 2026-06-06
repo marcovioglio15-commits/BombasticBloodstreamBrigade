@@ -373,6 +373,36 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe scalable Switch Weapon shooting-animation selector.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped shooting-animation selector.</returns>
+    public static PlayerShootAnimationClipSlot ResolvePlayerShootAnimationClipSlot(float value)
+    {
+        return (PlayerShootAnimationClipSlot)ResolveEnumIndex(value, (int)PlayerShootAnimationClipSlot.Railgun);
+    }
+
+    /// <summary>
+    /// Resolves a safe scalable hold-charge animation selector.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped charge-animation selector.</returns>
+    public static PlayerChargeAnimationClipSlot ResolvePlayerChargeAnimationClipSlot(float value)
+    {
+        return (PlayerChargeAnimationClipSlot)ResolveEnumIndex(value, (int)PlayerChargeAnimationClipSlot.Secondary);
+    }
+
+    /// <summary>
+    /// Resolves a safe scalable hold-charge release animation selector.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped release-animation selector.</returns>
+    public static PlayerReleaseAnimationClipSlot ResolvePlayerReleaseAnimationClipSlot(float value)
+    {
+        return (PlayerReleaseAnimationClipSlot)ResolveEnumIndex(value, (int)PlayerReleaseAnimationClipSlot.Secondary);
+    }
+
+    /// <summary>
     /// Resolves a safe PlayerDeathAnimationEasing from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

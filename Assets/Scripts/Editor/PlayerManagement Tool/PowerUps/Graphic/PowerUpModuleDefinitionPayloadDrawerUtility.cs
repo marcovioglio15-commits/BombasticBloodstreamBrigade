@@ -323,6 +323,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty requiredChargeProperty = holdChargePayloadProperty.FindPropertyRelative("requiredCharge");
         SerializedProperty maximumChargeProperty = holdChargePayloadProperty.FindPropertyRelative("maximumCharge");
         SerializedProperty chargeRatePerSecondProperty = holdChargePayloadProperty.FindPropertyRelative("chargeRatePerSecond");
+        SerializedProperty chargeAnimationClipSlotProperty = holdChargePayloadProperty.FindPropertyRelative("chargeAnimationClipSlot");
+        SerializedProperty releaseAnimationClipSlotProperty = holdChargePayloadProperty.FindPropertyRelative("releaseAnimationClipSlot");
         SerializedProperty decayAfterReleaseProperty = holdChargePayloadProperty.FindPropertyRelative("decayAfterRelease");
         SerializedProperty decayAfterReleasePercentPerSecondProperty = holdChargePayloadProperty.FindPropertyRelative("decayAfterReleasePercentPerSecond");
         SerializedProperty passiveChargeGainWhileReleasedProperty = holdChargePayloadProperty.FindPropertyRelative("passiveChargeGainWhileReleased");
@@ -340,6 +342,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         if (requiredChargeProperty == null ||
             maximumChargeProperty == null ||
             chargeRatePerSecondProperty == null ||
+            chargeAnimationClipSlotProperty == null ||
+            releaseAnimationClipSlotProperty == null ||
             decayAfterReleaseProperty == null ||
             decayAfterReleasePercentPerSecondProperty == null ||
             passiveChargeGainWhileReleasedProperty == null ||
@@ -362,6 +366,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         AddField(payloadContainer, requiredChargeProperty, "Required Charge");
         AddField(payloadContainer, maximumChargeProperty, "Maximum Charge");
         AddField(payloadContainer, chargeRatePerSecondProperty, "Charge Rate Per Second");
+        AddField(payloadContainer, chargeAnimationClipSlotProperty, "Charge Animation");
+        AddField(payloadContainer, releaseAnimationClipSlotProperty, "Release Animation");
         AddField(payloadContainer, decayAfterReleaseProperty, "Decay After Release");
 
         VisualElement decayContainer = new VisualElement();
@@ -408,6 +414,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             RefreshHoldChargeWarnings(requiredChargeProperty,
                                       maximumChargeProperty,
                                       chargeRatePerSecondProperty,
+                                      chargeAnimationClipSlotProperty,
+                                      releaseAnimationClipSlotProperty,
                                       decayAfterReleaseProperty,
                                       decayAfterReleasePercentPerSecondProperty,
                                       passiveChargeGainWhileReleasedProperty,
@@ -448,6 +456,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                          requiredChargeProperty,
                                          maximumChargeProperty,
                                          chargeRatePerSecondProperty,
+                                         chargeAnimationClipSlotProperty,
+                                         releaseAnimationClipSlotProperty,
                                          decayAfterReleasePercentPerSecondProperty,
                                          passiveChargeGainPercentPerSecondProperty,
                                          laserDurationSecondsProperty,
@@ -1355,6 +1365,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="requiredChargeProperty">Serialized Required Charge field.</param>
     /// <param name="maximumChargeProperty">Serialized Maximum Charge field.</param>
     /// <param name="chargeRatePerSecondProperty">Serialized Charge Rate Per Second field.</param>
+    /// <param name="chargeAnimationClipSlotProperty">Serialized optional charging animation slot.</param>
+    /// <param name="releaseAnimationClipSlotProperty">Serialized optional release animation slot.</param>
     /// <param name="decayAfterReleaseProperty">Serialized Decay After Release toggle.</param>
     /// <param name="decayAfterReleasePercentPerSecondProperty">Serialized released-state decay percentage field.</param>
     /// <param name="passiveChargeGainWhileReleasedProperty">Serialized Passive Gain While Released toggle.</param>
@@ -1369,6 +1381,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     private static void RefreshHoldChargeWarnings(SerializedProperty requiredChargeProperty,
                                                   SerializedProperty maximumChargeProperty,
                                                   SerializedProperty chargeRatePerSecondProperty,
+                                                  SerializedProperty chargeAnimationClipSlotProperty,
+                                                  SerializedProperty releaseAnimationClipSlotProperty,
                                                   SerializedProperty decayAfterReleaseProperty,
                                                   SerializedProperty decayAfterReleasePercentPerSecondProperty,
                                                   SerializedProperty passiveChargeGainWhileReleasedProperty,
@@ -1394,6 +1408,20 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
 
         if (chargeRatePerSecondProperty != null && chargeRatePerSecondProperty.floatValue <= 0f)
             warningLines.Add("Charge Rate Per Second should be > 0 for a usable hold charge.");
+
+        if (chargeAnimationClipSlotProperty != null &&
+            (chargeAnimationClipSlotProperty.intValue < (int)PlayerChargeAnimationClipSlot.None ||
+             chargeAnimationClipSlotProperty.intValue > (int)PlayerChargeAnimationClipSlot.Secondary))
+        {
+            warningLines.Add("Charge Animation is outside the supported slot range and will be clamped at bake/runtime.");
+        }
+
+        if (releaseAnimationClipSlotProperty != null &&
+            (releaseAnimationClipSlotProperty.intValue < (int)PlayerReleaseAnimationClipSlot.None ||
+             releaseAnimationClipSlotProperty.intValue > (int)PlayerReleaseAnimationClipSlot.Secondary))
+        {
+            warningLines.Add("Release Animation is outside the supported slot range and will be clamped at bake/runtime.");
+        }
 
         if (laserDurationSecondsProperty != null && laserDurationSecondsProperty.floatValue < 0f)
             warningLines.Add("Laser Duration Seconds should be >= 0.");

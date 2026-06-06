@@ -229,6 +229,7 @@ public static class PlayerPowerUpPassiveBakeUtility
         bool hasWeaponSwitch = false;
         // Neutral default: only used when hasWeaponSwitch stays false, in which case downstream consumption is gated off.
         PlayerWeaponVisualSlot weaponVisualSlot = default;
+        PlayerShootAnimationClipSlot weaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -531,6 +532,7 @@ public static class PlayerPowerUpPassiveBakeUtility
 
                     hasWeaponSwitch = true;
                     weaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot((float)payload.SwitchWeapon.WeaponSlot);
+                    weaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot((float)payload.SwitchWeapon.ShootAnimationClipSlot);
                     break;
             }
         }
@@ -564,6 +566,7 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
             HasWeaponSwitch = hasWeaponSwitch ? (byte)1 : (byte)0,
             WeaponVisualSlot = weaponVisualSlot,
+            WeaponShootAnimationClipSlot = weaponShootAnimationClipSlot,
             ProjectileSize = new ProjectileSizePassiveConfig
             {
                 SizeMultiplier = math.max(0.01f, projectileSizeMultiplier),
@@ -717,6 +720,7 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasOrbitalProjections = 0,
             HasWeaponSwitch = 0,
             WeaponVisualSlot = default,
+            WeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic,
             ProjectileSize = PlayerPowerUpPassiveConfigBuildUtility.BuildProjectileSizePassiveConfig(passiveTool.ProjectileSizeData),
             ElementalProjectiles = PlayerPowerUpPassiveConfigBuildUtility.BuildElementalProjectilesPassiveConfig(passiveTool.ElementalProjectilesData),
             PerfectCircle = PlayerPowerUpPassiveConfigBuildUtility.BuildPerfectCirclePassiveConfig(passiveTool.PerfectCircleData),

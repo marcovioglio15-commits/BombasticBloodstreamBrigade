@@ -26,6 +26,7 @@ MonoBehaviour:
     gatlingReference: gatling
     railgunReference: railgun
     defaultAdditionalWeaponVisual: 2
+    defaultShootAnimationClip: {fileID: 6871692653361327980, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
   outline:
     enableOutline: 1
     outlineThickness: 5

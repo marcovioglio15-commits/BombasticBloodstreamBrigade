@@ -157,6 +157,8 @@ public static class PlayerPowerUpActiveBakeUtility
         float holdChargeRequired = 0f;
         float holdChargeMaximum = 0f;
         float holdChargeRatePerSecond = 0f;
+        PlayerChargeAnimationClipSlot chargeAnimationClipSlot = PlayerChargeAnimationClipSlot.None;
+        PlayerReleaseAnimationClipSlot releaseAnimationClipSlot = PlayerReleaseAnimationClipSlot.None;
         bool decayAfterRelease = false;
         float decayAfterReleasePercentPerSecond = 0f;
         bool passiveChargeGainWhileReleased = false;
@@ -234,6 +236,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasOrbitalProjections = false;
         bool hasActiveWeaponSwitch = false;
         PlayerWeaponVisualSlot activeWeaponVisualSlot = default;
+        PlayerShootAnimationClipSlot activeWeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -285,6 +288,17 @@ public static class PlayerPowerUpActiveBakeUtility
                     holdChargeRequired = math.max(holdChargeRequired, math.max(0f, holdChargeData.RequiredCharge));
                     holdChargeMaximum = math.max(math.max(holdChargeMaximum, holdChargeRequired), math.max(0f, holdChargeData.MaximumCharge));
                     holdChargeRatePerSecond += math.max(0f, holdChargeData.ChargeRatePerSecond);
+                    PlayerChargeAnimationClipSlot resolvedChargeAnimationClipSlot =
+                        PlayerRuntimeScalingEnumUtility.ResolvePlayerChargeAnimationClipSlot((float)holdChargeData.ChargeAnimationClipSlot);
+                    PlayerReleaseAnimationClipSlot resolvedReleaseAnimationClipSlot =
+                        PlayerRuntimeScalingEnumUtility.ResolvePlayerReleaseAnimationClipSlot((float)holdChargeData.ReleaseAnimationClipSlot);
+
+                    if (resolvedChargeAnimationClipSlot != PlayerChargeAnimationClipSlot.None)
+                        chargeAnimationClipSlot = resolvedChargeAnimationClipSlot;
+
+                    if (resolvedReleaseAnimationClipSlot != PlayerReleaseAnimationClipSlot.None)
+                        releaseAnimationClipSlot = resolvedReleaseAnimationClipSlot;
+
                     decayAfterRelease = decayAfterRelease || holdChargeData.DecayAfterRelease;
                     decayAfterReleasePercentPerSecond = math.max(decayAfterReleasePercentPerSecond,
                                                                  math.max(0f, holdChargeData.DecayAfterReleasePercentPerSecond));
@@ -463,6 +477,7 @@ public static class PlayerPowerUpActiveBakeUtility
                     // and toggle power-ups share the same persistent visual aggregation path.
                     hasActiveWeaponSwitch = true;
                     activeWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot((float)payload.SwitchWeapon.WeaponSlot);
+                    activeWeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot((float)payload.SwitchWeapon.ShootAnimationClipSlot);
                     break;
             }
         }
@@ -605,6 +620,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        holdChargeRequired,
                                                                        holdChargeMaximum,
                                                                        holdChargeRatePerSecond,
+                                                                       chargeAnimationClipSlot,
+                                                                       releaseAnimationClipSlot,
                                                                        decayAfterRelease,
                                                                        decayAfterReleasePercentPerSecond,
                                                                        passiveChargeGainWhileReleased,
@@ -642,6 +659,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        in togglePassiveTool,
                                                                        hasActiveWeaponSwitch,
                                                                        activeWeaponVisualSlot,
+                                                                       activeWeaponShootAnimationClipSlot,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
     }

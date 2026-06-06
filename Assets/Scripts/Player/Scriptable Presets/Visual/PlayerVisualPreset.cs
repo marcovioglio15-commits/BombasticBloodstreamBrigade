@@ -107,7 +107,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [SerializeField] private Vector3 runtimeVisualBridgeOffset = Vector3.zero;
 
     [Header("Weapon Visuals")]
-    [Tooltip("Scalable prefab-relative weapon mesh references and the optional attachment shown alongside the always-visible Base Gun while no equipped power-up owns Switch Weapon.")]
+    [Tooltip("Prefab-relative weapon mesh references, the optional default attachment, and the Base Gun default shooting animation clip.")]
     [SerializeField]
     private PlayerWeaponVisualSettings weaponVisuals = new PlayerWeaponVisualSettings();
 

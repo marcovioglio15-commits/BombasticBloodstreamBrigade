@@ -5,6 +5,10 @@ using System.Collections.Generic;
 /// </summary>
 internal static class PlayerPowerUpsPresetDefaultsUtility
 {
+    #region Constants
+    private const PlayerChargeAnimationClipSlot DefaultChargeAnimationClipSlot = PlayerChargeAnimationClipSlot.Primary;
+    private const PlayerReleaseAnimationClipSlot DefaultReleaseAnimationClipSlot = PlayerReleaseAnimationClipSlot.Primary;
+
     internal const string ModuleIdTriggerPress = "Module_TriggerPress";
     internal const string ModuleIdTriggerRelease = "Module_TriggerRelease";
     internal const string ModuleIdTriggerHoldCharge = "Module_TriggerHoldCharge";
@@ -42,7 +46,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string PassivePowerUpIdOrbitalProjectiles = "PassiveOrbitalProjectiles";
     internal const string PassivePowerUpIdBouncingProjectiles = "PassiveBouncingProjectiles";
     internal const string PassivePowerUpIdSplittingProjectiles = "PassiveSplittingProjectiles";
+    #endregion
 
+    #region Methods
     public static void GenerateDefaultModularSetupIfEmpty(PlayerPowerUpsPreset preset)
     {
         if (preset == null)
@@ -357,6 +363,8 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         {
             case PowerUpModuleKind.TriggerHoldCharge:
                 payload.HoldCharge.Configure(80f, 120f, 140f);
+                payload.HoldCharge.ConfigureAnimations(DefaultChargeAnimationClipSlot,
+                                                       DefaultReleaseAnimationClipSlot);
                 break;
             case PowerUpModuleKind.TriggerEvent:
                 payload.TriggerEvent.Configure(PowerUpTriggerEventType.OnEnemyKilled);
@@ -514,10 +522,21 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         return payload;
     }
 
-    private static PowerUpModuleData CreateHoldChargePayload(float requiredCharge, float maximumCharge, float chargeRatePerSecond)
+    /// <summary>
+    /// Creates the default charge-shot trigger payload with visible upper-body charge and release presentation.
+    /// </summary>
+    /// <param name="requiredCharge">Charge threshold required for a valid release.</param>
+    /// <param name="maximumCharge">Maximum charge retained by the trigger.</param>
+    /// <param name="chargeRatePerSecond">Charge accumulated per second while held.</param>
+    /// <returns>Validated hold-charge module payload used by generated base configurations.</returns>
+    private static PowerUpModuleData CreateHoldChargePayload(float requiredCharge,
+                                                             float maximumCharge,
+                                                             float chargeRatePerSecond)
     {
         PowerUpModuleData payload = new PowerUpModuleData();
         payload.HoldCharge.Configure(requiredCharge, maximumCharge, chargeRatePerSecond);
+        payload.HoldCharge.ConfigureAnimations(DefaultChargeAnimationClipSlot,
+                                               DefaultReleaseAnimationClipSlot);
         payload.Validate();
         return payload;
     }
@@ -553,4 +572,5 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         payload.Validate();
         return payload;
     }
+    #endregion
 }

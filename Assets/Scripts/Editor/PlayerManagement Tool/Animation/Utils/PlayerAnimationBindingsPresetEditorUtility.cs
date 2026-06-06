@@ -25,7 +25,6 @@ public static class PlayerAnimationBindingsPresetEditorUtility
         PlayerAnimationClipSlot.AimBackward,
         PlayerAnimationClipSlot.AimLeft,
         PlayerAnimationClipSlot.AimRight,
-        PlayerAnimationClipSlot.Shoot,
         PlayerAnimationClipSlot.Dash
     };
     #endregion
@@ -377,10 +376,6 @@ public static class PlayerAnimationBindingsPresetEditorUtility
                 if (normalized.Contains("aim"))
                     score += 8;
                 break;
-            case PlayerAnimationClipSlot.Shoot:
-                if (normalized.Contains("shoot") || normalized.Contains("fire"))
-                    score += 12;
-                break;
             case PlayerAnimationClipSlot.Dash:
                 if (normalized.Contains("dash") || normalized.Contains("roll") || normalized.Contains("evade"))
                     score += 12;
@@ -416,8 +411,6 @@ public static class PlayerAnimationBindingsPresetEditorUtility
                 return new[] { "aim", "left" };
             case PlayerAnimationClipSlot.AimRight:
                 return new[] { "aim", "right" };
-            case PlayerAnimationClipSlot.Shoot:
-                return new[] { "shoot", "fire" };
             case PlayerAnimationClipSlot.Dash:
                 return new[] { "dash", "roll", "evade" };
             default:

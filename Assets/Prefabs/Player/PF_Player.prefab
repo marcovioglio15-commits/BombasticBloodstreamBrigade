@@ -47,8 +47,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAuthoring
   masterPreset: {fileID: 11400000, guid: 2aa7920f2d0dab444bbb97e34b3f90d8, type: 2}
   powerUpsCheatPresetLibrary: {fileID: 0}
-  weaponReference: {fileID: 4550506119952220767}
-  animatorComponent: {fileID: 3008654836369372802}
+  weaponReference: {fileID: 8904011032744858401}
+  animatorComponent: {fileID: 4998931430354968223}
   runtimeVisualBridgePrefab: {fileID: 8300188409459899355, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   spawnRuntimeVisualBridgeWhenAnimatorMissing: 1
   runtimeVisualBridgeSyncRotation: 1
@@ -163,14 +163,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_Controller
-      value:
+      value: 
       objectReference: {fileID: 9100000, guid: d668587abcbd5084f96f693fed712a69, type: 2}
     - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
-      propertyPath: m_CullingMode
+      propertyPath: m_UpdateMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
-      propertyPath: m_UpdateMode
+      propertyPath: m_CullingMode
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
@@ -187,7 +187,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.059
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -195,7 +195,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.538
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6718387042578914064, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
       propertyPath: m_IsActive
@@ -232,13 +232,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1917377410754265397, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &3008654836369372802 stripped
+--- !u!95 &4998931430354968223 stripped
 Animator:
-  m_CorrespondingSourceObject: {fileID: 2474594495204849631, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 5676963877322694594, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4550506119952220767 stripped
+--- !u!4 &8904011032744858401 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: 3797027083585225474, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 8072143697857630844, guid: 116e2f926e66f6d478c1459c0950628b, type: 3}
   m_PrefabInstance: {fileID: 835247543005528413}
   m_PrefabAsset: {fileID: 0}

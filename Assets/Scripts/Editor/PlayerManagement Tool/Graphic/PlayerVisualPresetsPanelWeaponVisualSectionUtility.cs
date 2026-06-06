@@ -11,6 +11,10 @@ using UnityEngine.UIElements;
 /// </summary>
 internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
 {
+    #region Constants
+    internal const string DefaultShootAnimationClipFieldName = "player-visual-default-shoot-animation-clip-field";
+    #endregion
+
     #region Methods
 
     #region Public Methods
@@ -41,6 +45,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
         VisualElement referencesContainer = new VisualElement();
         VisualElement warningsContainer = new VisualElement();
         SerializedProperty defaultAdditionalWeaponProperty = weaponVisualsProperty.FindPropertyRelative("defaultAdditionalWeaponVisual");
+        SerializedProperty defaultShootAnimationClipProperty = weaponVisualsProperty.FindPropertyRelative("defaultShootAnimationClip");
         List<WeaponReferenceBinding> bindings = new List<WeaponReferenceBinding>
         {
             CreateReferenceBinding(panel,
@@ -77,6 +82,9 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
         behaviorLabel.style.whiteSpace = WhiteSpace.Normal;
         behaviorLabel.style.marginBottom = 6f;
         container.Add(behaviorLabel);
+        AddDefaultShootAnimationClipField(panel,
+                                          container,
+                                          defaultShootAnimationClipProperty);
         container.Add(missingPrefabBox);
         container.Add(referencesContainer);
         AddScalableField(container,
@@ -93,12 +101,14 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
             RefreshVisibility(runtimePrefabProperty, missingPrefabBox, referencesContainer);
             RefreshWarnings(runtimePrefabProperty,
                             defaultAdditionalWeaponProperty,
+                            defaultShootAnimationClipProperty,
                             bindings,
                             warningsContainer);
         };
 
         TrackProperty(container, runtimePrefabProperty, refresh);
         TrackProperty(container, defaultAdditionalWeaponProperty, refresh);
+        TrackProperty(container, defaultShootAnimationClipProperty, refresh);
 
         for (int bindingIndex = 0; bindingIndex < bindings.Count; bindingIndex++)
             TrackProperty(container, bindings[bindingIndex].SelectorProperty, refresh);
@@ -108,6 +118,40 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
     #endregion
 
     #region UI Construction
+    /// <summary>
+    /// Adds the direct Base Gun shooting clip picker and binds it to the selected visual preset.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel used to mark draft changes.</param>
+    /// <param name="parent">Container receiving the clip picker.</param>
+    /// <param name="clipProperty">Serialized direct AnimationClip reference.</param>
+    private static void AddDefaultShootAnimationClipField(PlayerVisualPresetsPanel panel,
+                                                          VisualElement parent,
+                                                          SerializedProperty clipProperty)
+    {
+        if (panel == null || parent == null)
+            return;
+
+        if (clipProperty == null)
+        {
+            parent.Add(new HelpBox("Default Shoot Animation Clip property is missing from the selected preset.",
+                                   HelpBoxMessageType.Error));
+            return;
+        }
+
+        ObjectField clipField = new ObjectField("Default Shoot Animation Clip");
+        clipField.name = DefaultShootAnimationClipFieldName;
+        clipField.objectType = typeof(AnimationClip);
+        clipField.allowSceneObjects = false;
+        clipField.tooltip = "Upper-body shooting clip used by the Base Gun and as fallback when an equipped Switch Weapon shooting-animation slot is empty.";
+        clipField.BindProperty(clipProperty);
+        clipField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            PlayerManagementDraftSession.MarkDirty();
+            panel.RefreshPresetList();
+        });
+        parent.Add(clipField);
+    }
+
     /// <summary>
     /// Creates one object reference picker and its scalable prefab-relative selector field.
     /// </summary>
@@ -239,10 +283,12 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
     /// </summary>
     /// <param name="runtimePrefabProperty">Serialized runtime visual bridge prefab property.</param>
     /// <param name="defaultAdditionalWeaponProperty">Serialized no-power-up default optional attachment property.</param>
+    /// <param name="defaultShootAnimationClipProperty">Serialized Base Gun default shooting clip.</param>
     /// <param name="bindings">Reference bindings to validate.</param>
     /// <param name="warningsContainer">Warnings container rebuilt in place.</param>
     private static void RefreshWarnings(SerializedProperty runtimePrefabProperty,
                                         SerializedProperty defaultAdditionalWeaponProperty,
+                                        SerializedProperty defaultShootAnimationClipProperty,
                                         IReadOnlyList<WeaponReferenceBinding> bindings,
                                         VisualElement warningsContainer)
     {
@@ -278,6 +324,12 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
             defaultAdditionalWeaponProperty.intValue > (int)PlayerWeaponVisualSlot.Railgun)
         {
             AddWarning(warningsContainer, "Default Additional Weapon Visual uses an unsupported enum value.");
+        }
+
+        if (defaultShootAnimationClipProperty == null ||
+            defaultShootAnimationClipProperty.objectReferenceValue == null)
+        {
+            AddWarning(warningsContainer, "Default Shoot Animation Clip is missing.");
         }
     }
 

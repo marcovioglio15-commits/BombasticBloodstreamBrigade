@@ -138,6 +138,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
             case "switchWeapon.weaponSlot":
                 activeSlotConfig.ActiveWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
                 return;
+            case "switchWeapon.shootAnimationClipSlot":
+                activeSlotConfig.ActiveWeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot(resolvedValue);
+                return;
             case "resourceGate.activationResource":
                 activeSlotConfig.ActivationResource = PlayerRuntimeScalingEnumUtility.ResolvePowerUpResourceType(resolvedValue);
                 return;
@@ -180,6 +183,12 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "holdCharge.chargeRatePerSecond":
                 activeSlotConfig.ChargeShot.ChargeRatePerSecond = math.max(0f, resolvedValue);
+                return;
+            case "holdCharge.chargeAnimationClipSlot":
+                activeSlotConfig.ChargeShot.ChargeAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerChargeAnimationClipSlot(resolvedValue);
+                return;
+            case "holdCharge.releaseAnimationClipSlot":
+                activeSlotConfig.ChargeShot.ReleaseAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerReleaseAnimationClipSlot(resolvedValue);
                 return;
             case "holdCharge.decayAfterReleasePercentPerSecond":
                 activeSlotConfig.ChargeShot.DecayAfterReleasePercentPerSecond = math.max(0f, resolvedValue);
@@ -403,6 +412,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         {
             case "switchWeapon.weaponSlot":
                 passiveToolConfig.WeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
+                return;
+            case "switchWeapon.shootAnimationClipSlot":
+                passiveToolConfig.WeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot(resolvedValue);
                 return;
             case "projectileOrbitOverride.pathMode":
                 passiveToolConfig.PerfectCircle.PathMode = PlayerRuntimeScalingEnumUtility.ResolveProjectileOrbitPathMode(resolvedValue);

@@ -10,6 +10,5 @@ public enum PlayerAnimationClipSlot
     AimBackward = 7,
     AimLeft = 8,
     AimRight = 9,
-    Shoot = 10,
     Dash = 11
 }

@@ -111,6 +111,39 @@ public enum PlayerWeaponVisualSlot
     Railgun = 3
 }
 
+/// <summary>
+/// Selects the upper-body shooting clip used while a Switch Weapon payload owns the visible attachment.
+/// Automatic resolves the clip from the selected weapon mesh, while explicit values support formula-driven overrides.
+/// </summary>
+public enum PlayerShootAnimationClipSlot
+{
+    Automatic = 0,
+    Default = 1,
+    Cannon = 2,
+    Gatling = 3,
+    Railgun = 4
+}
+
+/// <summary>
+/// Selects one optional upper-body hold-charge clip from the active animation bindings preset.
+/// </summary>
+public enum PlayerChargeAnimationClipSlot
+{
+    None = 0,
+    Primary = 1,
+    Secondary = 2
+}
+
+/// <summary>
+/// Selects one optional upper-body hold-charge release clip from the active animation bindings preset.
+/// </summary>
+public enum PlayerReleaseAnimationClipSlot
+{
+    None = 0,
+    Primary = 1,
+    Secondary = 2
+}
+
 public enum ProjectileOrbitPathMode
 {
     Circle = 0,

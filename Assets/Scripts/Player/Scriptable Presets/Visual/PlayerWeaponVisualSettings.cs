@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// Stores prefab-relative weapon visual references and the optional attachment shown while no equipped power-up owns Switch Weapon.
+/// Stores prefab-relative weapon visual references, the default attachment, and the Base Gun shooting clip.
 /// Reference selectors accept either an exact hierarchy path or a unique GameObject name inside the runtime visual bridge.
 /// </summary>
 [Serializable]
@@ -39,6 +39,10 @@ public sealed class PlayerWeaponVisualSettings
     [Tooltip("Optional Cannon, Gatling, or Railgun attachment shown alongside the always-visible Base Gun while no equipped power-up owns Switch Weapon. None keeps only Base Gun visible.")]
     [SerializeField]
     private PlayerWeaponVisualSlot defaultAdditionalWeaponVisual = PlayerWeaponVisualSlot.None;
+
+    [Tooltip("Upper-body shooting clip used by the Base Gun and as fallback when an equipped Switch Weapon shooting-animation slot is empty.")]
+    [SerializeField]
+    private AnimationClip defaultShootAnimationClip;
     #endregion
 
     #endregion
@@ -83,6 +87,14 @@ public sealed class PlayerWeaponVisualSettings
             return defaultAdditionalWeaponVisual;
         }
     }
+
+    public AnimationClip DefaultShootAnimationClip
+    {
+        get
+        {
+            return defaultShootAnimationClip;
+        }
+    }
     #endregion
 
     #region Methods
@@ -113,6 +125,12 @@ public sealed class PlayerWeaponVisualSettings
         if (HasDuplicateSelectors())
         {
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: two or more weapon slots use the same reference selector.",
+                                           ownerAssetName));
+        }
+
+        if (defaultShootAnimationClip == null)
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Shoot Animation Clip is missing.",
                                            ownerAssetName));
         }
     }

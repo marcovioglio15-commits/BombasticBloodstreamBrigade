@@ -17,6 +17,12 @@ public sealed class PowerUpHoldChargeModuleData
     [Tooltip("Charge gained per second while the trigger is held.")]
     [SerializeField] private float chargeRatePerSecond = 125f;
 
+    [Tooltip("Optional upper-body animation slot played continuously while this Trigger Hold Charge module is charging. None leaves the current upper-body presentation unchanged.")]
+    [SerializeField] private PlayerChargeAnimationClipSlot chargeAnimationClipSlot;
+
+    [Tooltip("Optional upper-body animation slot played once when this Trigger Hold Charge module is released. None skips the release animation.")]
+    [SerializeField] private PlayerReleaseAnimationClipSlot releaseAnimationClipSlot;
+
     [Tooltip("When enabled, stored charge decays over time after the trigger is released instead of resetting immediately.")]
     [SerializeField] private bool decayAfterRelease;
 
@@ -82,6 +88,22 @@ public sealed class PowerUpHoldChargeModuleData
         get
         {
             return chargeRatePerSecond;
+        }
+    }
+
+    public PlayerChargeAnimationClipSlot ChargeAnimationClipSlot
+    {
+        get
+        {
+            return chargeAnimationClipSlot;
+        }
+    }
+
+    public PlayerReleaseAnimationClipSlot ReleaseAnimationClipSlot
+    {
+        get
+        {
+            return releaseAnimationClipSlot;
         }
     }
 
@@ -208,6 +230,18 @@ public sealed class PowerUpHoldChargeModuleData
                   CreateDefaultSlowCurve());
     }
 
+    /// <summary>
+    /// Assigns the optional upper-body animation slots used while charging and on release.
+    /// </summary>
+    /// <param name="chargeAnimationClipSlotValue">Animation bindings slot played while charging.</param>
+    /// <param name="releaseAnimationClipSlotValue">Animation bindings slot played once on release.</param>
+    public void ConfigureAnimations(PlayerChargeAnimationClipSlot chargeAnimationClipSlotValue,
+                                    PlayerReleaseAnimationClipSlot releaseAnimationClipSlotValue)
+    {
+        chargeAnimationClipSlot = chargeAnimationClipSlotValue;
+        releaseAnimationClipSlot = releaseAnimationClipSlotValue;
+    }
+
     public void Configure(float requiredChargeValue,
                           float maximumChargeValue,
                           float chargeRatePerSecondValue,
@@ -316,40 +350,6 @@ public sealed class PowerUpHoldChargeModuleData
     private static AnimationCurve CreateDefaultSlowCurve()
     {
         return AnimationCurve.Linear(0f, 0f, 1f, 1f);
-    }
-    #endregion
-
-    #endregion
-}
-
-[Serializable]
-public sealed class PowerUpTriggerEventModuleData
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Runtime event that triggers execution for modules bound to this trigger.")]
-    [SerializeField] private PowerUpTriggerEventType eventType = PowerUpTriggerEventType.OnEnemyKilled;
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public PowerUpTriggerEventType EventType
-    {
-        get
-        {
-            return eventType;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Setup
-    public void Configure(PowerUpTriggerEventType eventTypeValue)
-    {
-        eventType = eventTypeValue;
     }
     #endregion
 

@@ -218,6 +218,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -487,6 +489,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -525,6 +528,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -794,6 +799,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -832,6 +838,8 @@ MonoBehaviour:
         requiredCharge: 80
         maximumCharge: 120
         chargeRatePerSecond: 140
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -1101,6 +1109,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -1139,6 +1148,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -1408,6 +1419,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -1446,6 +1458,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -1715,6 +1729,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -1753,6 +1768,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -2022,6 +2039,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2060,6 +2078,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -2329,6 +2349,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2367,6 +2388,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -2636,6 +2659,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2674,6 +2698,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -2943,6 +2969,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2981,6 +3008,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -3250,6 +3279,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3288,6 +3318,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -3557,6 +3589,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3595,6 +3628,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -3864,6 +3899,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3902,6 +3938,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -4171,6 +4209,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -4209,6 +4248,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -4478,6 +4519,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -4516,6 +4558,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -4785,6 +4829,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -4823,6 +4868,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -5092,6 +5139,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5130,6 +5178,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -5399,6 +5449,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5437,6 +5488,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -5706,6 +5759,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5744,6 +5798,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -6013,6 +6069,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6051,6 +6108,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -6320,6 +6379,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.4
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6359,6 +6419,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -6628,6 +6690,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.8
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6666,6 +6729,8 @@ MonoBehaviour:
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
         decayAfterRelease: 0
         decayAfterReleasePercentPerSecond: 25
         passiveChargeGainWhileReleased: 0
@@ -6935,6 +7000,7 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.8
       switchWeapon:
         weaponSlot: 1
+        shootAnimationClipSlot: 0
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6986,6 +7052,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -7255,6 +7323,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -7293,6 +7362,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -7562,6 +7633,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -7600,6 +7672,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -7869,6 +7943,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -7907,6 +7982,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -8176,6 +8253,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -8214,6 +8292,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -8484,6 +8564,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -8535,6 +8616,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -8804,6 +8887,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -8842,6 +8926,8 @@ MonoBehaviour:
           requiredCharge: 90
           maximumCharge: 90
           chargeRatePerSecond: 30
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 1
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -9111,6 +9197,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -9149,6 +9236,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -9418,6 +9507,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -9456,6 +9546,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -9725,6 +9817,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -9763,6 +9856,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -10036,6 +10131,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10074,6 +10170,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -10347,6 +10445,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10398,6 +10497,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -10667,6 +10768,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10705,6 +10807,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -10974,6 +11078,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11012,6 +11117,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -11281,6 +11388,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11332,6 +11440,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -11601,6 +11711,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11639,6 +11750,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -11908,6 +12021,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11946,6 +12060,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -12215,6 +12331,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -12266,6 +12383,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -12535,6 +12654,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -12573,6 +12693,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -12842,6 +12964,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -12880,6 +13003,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -13149,6 +13274,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13200,6 +13326,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -13469,6 +13597,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13507,6 +13636,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -13776,6 +13907,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13814,6 +13946,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -14083,6 +14217,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14131,6 +14266,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -14400,6 +14537,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14438,6 +14576,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -14707,6 +14847,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14745,6 +14886,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -15015,6 +15158,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -15064,6 +15208,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -15331,6 +15477,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 0
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -15369,6 +15516,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -15636,6 +15785,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 0
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -15688,6 +15838,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -15957,6 +16109,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -15995,6 +16148,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -16264,6 +16419,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16315,6 +16471,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -16584,6 +16742,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16635,6 +16794,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -16904,6 +17065,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16942,6 +17104,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -17212,6 +17376,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -17263,6 +17428,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -17532,6 +17699,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -17583,6 +17751,8 @@ MonoBehaviour:
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
@@ -17852,6 +18022,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -17900,6 +18071,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -18170,6 +18343,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -18218,6 +18392,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -18486,6 +18662,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -18524,6 +18701,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -18792,6 +18971,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -18840,6 +19020,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -19108,6 +19290,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -19146,6 +19329,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -19414,6 +19599,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -19452,6 +19638,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -19720,6 +19908,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -19768,6 +19957,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -20036,6 +20227,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -20074,6 +20266,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -20342,6 +20536,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -20390,6 +20585,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -20658,6 +20855,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -20696,6 +20894,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -20964,6 +21164,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -21012,6 +21213,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -21280,6 +21483,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -21318,6 +21522,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -21586,6 +21792,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -21634,6 +21841,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -21902,6 +22111,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -21940,6 +22150,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -22208,6 +22420,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -22256,6 +22469,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -22524,6 +22739,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -22562,6 +22778,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -22830,6 +23048,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -22879,6 +23098,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -23147,6 +23368,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -23196,6 +23418,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -23464,6 +23688,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -23513,6 +23738,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -23780,6 +24007,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -23818,6 +24046,8 @@ MonoBehaviour:
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 0
           passiveChargeGainWhileReleased: 0
@@ -24086,6 +24316,7 @@ MonoBehaviour:
           bubbleDriftSpeed: 1.4
         switchWeapon:
           weaponSlot: 1
+          shootAnimationClipSlot: 0
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0

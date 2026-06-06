@@ -73,6 +73,7 @@ public struct PlayerPowerUpSlotConfig
     // aggregation independently from one-shot, charge, or toggle activation state.
     public byte HasActiveWeaponSwitch;
     public PlayerWeaponVisualSlot ActiveWeaponVisualSlot;
+    public PlayerShootAnimationClipSlot ActiveWeaponShootAnimationClipSlot;
 }
 
 /// <summary>
@@ -194,6 +195,8 @@ public struct ChargeShotPowerUpConfig
     public float RequiredCharge;
     public float MaximumCharge;
     public float ChargeRatePerSecond;
+    public PlayerChargeAnimationClipSlot ChargeAnimationClipSlot;
+    public PlayerReleaseAnimationClipSlot ReleaseAnimationClipSlot;
     public float LaserDurationSeconds;
     public byte UseChargedLaserBeam;
     public float ChargedLaserDurationSeconds;
@@ -346,6 +349,7 @@ public struct PlayerPassiveToolConfig
     public byte HasOrbitalProjections;
     public byte HasWeaponSwitch;
     public PlayerWeaponVisualSlot WeaponVisualSlot;
+    public PlayerShootAnimationClipSlot WeaponShootAnimationClipSlot;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;

@@ -199,6 +199,34 @@ public static class PlayerControllerConfigBakeUtility
         config.ProceduralLeanSmoothing = preset != null ? math.max(0f, preset.ProceduralLeanSmoothing) : 0f;
         return config;
     }
+
+    /// <summary>
+    /// Builds the concrete upper-body clip table consumed by scalable power-up animation selectors at presentation time.
+    /// </summary>
+    /// <param name="animationBindingsPreset">Animation bindings preset containing weapon-specific, charge, and release clips.</param>
+    /// <param name="visualPreset">Visual preset containing the Base Gun default shooting clip.</param>
+    /// <returns>Runtime clip table with null entries preserved as optional animation slots.</returns>
+    public static PlayerUpperBodyAnimationClipConfig BuildUpperBodyAnimationClipConfig(PlayerAnimationBindingsPreset animationBindingsPreset,
+                                                                                       PlayerVisualPreset visualPreset)
+    {
+        if (animationBindingsPreset == null)
+            return default;
+
+        PlayerUpperBodyAnimationClipSettings actionClips = animationBindingsPreset.UpperBodyActionClips;
+        PlayerWeaponVisualSettings weaponVisuals = visualPreset != null ? visualPreset.WeaponVisuals : null;
+
+        return new PlayerUpperBodyAnimationClipConfig
+        {
+            DefaultShoot = weaponVisuals != null ? weaponVisuals.DefaultShootAnimationClip : null,
+            CannonShoot = actionClips != null ? actionClips.CannonShootClip : null,
+            GatlingShoot = actionClips != null ? actionClips.GatlingShootClip : null,
+            RailgunShoot = actionClips != null ? actionClips.RailgunShootClip : null,
+            PrimaryCharge = actionClips != null ? actionClips.PrimaryChargeClip : null,
+            SecondaryCharge = actionClips != null ? actionClips.SecondaryChargeClip : null,
+            PrimaryRelease = actionClips != null ? actionClips.PrimaryReleaseClip : null,
+            SecondaryRelease = actionClips != null ? actionClips.SecondaryReleaseClip : null
+        };
+    }
     #endregion
 
     #region Private Methods

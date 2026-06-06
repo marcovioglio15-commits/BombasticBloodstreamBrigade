@@ -47,7 +47,13 @@ public static class PlayerAnimationBindingsPresetTransferUtility
         "aimBackwardClip",
         "aimLeftClip",
         "aimRightClip",
-        "shootClip",
+        "upperBodyActionClips.cannonShootClip",
+        "upperBodyActionClips.gatlingShootClip",
+        "upperBodyActionClips.railgunShootClip",
+        "upperBodyActionClips.primaryChargeClip",
+        "upperBodyActionClips.secondaryChargeClip",
+        "upperBodyActionClips.primaryReleaseClip",
+        "upperBodyActionClips.secondaryReleaseClip",
         "dashClip"
     };
 
@@ -86,8 +92,6 @@ public static class PlayerAnimationBindingsPresetTransferUtility
                 return preset.AimLeftClip;
             case PlayerAnimationClipSlot.AimRight:
                 return preset.AimRightClip;
-            case PlayerAnimationClipSlot.Shoot:
-                return preset.ShootClip;
             case PlayerAnimationClipSlot.Dash:
                 return preset.DashClip;
         }
