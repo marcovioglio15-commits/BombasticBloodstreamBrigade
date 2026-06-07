@@ -68,6 +68,10 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
         BuildVisualBridgeBlock(detailsContainer,
                                 scalingRulesProperty,
                                 properties);
+        BuildImpactFrameBlock(detailsContainer,
+                              scalingRulesProperty,
+                              properties,
+                              out VisualElement impactFrameDetails);
 
         VisualElement warningsContainer = new VisualElement();
         warningsContainer.style.marginTop = 4f;
@@ -86,6 +90,7 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
 
             // VFX details only matter when a prefab is assigned.
             vfxDetailsContainer.style.display = properties.DespawnVfxPrefab.objectReferenceValue != null ? DisplayStyle.Flex : DisplayStyle.None;
+            impactFrameDetails.style.display = properties.ImpactFrameEnabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
 
             RefreshWarnings(warningsContainer, properties);
         };
@@ -102,6 +107,10 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
         detailsContainer.TrackPropertyValue(properties.DespawnVfxScaleMultiplier, _ => updateView());
         detailsContainer.TrackPropertyValue(properties.DespawnVfxLifetimeSeconds, _ => updateView());
         detailsContainer.TrackPropertyValue(properties.DespawnVfxSpawnNormalizedTime, _ => updateView());
+        detailsContainer.TrackPropertyValue(properties.ImpactFrameEnabled, _ => updateView());
+        detailsContainer.TrackPropertyValue(properties.ImpactFrameBuildInStartNormalizedTime, _ => updateView());
+        detailsContainer.TrackPropertyValue(properties.ImpactFrameApplyNormalizedTime, _ => updateView());
+        detailsContainer.TrackPropertyValue(properties.ImpactFrameEndNormalizedTime, _ => updateView());
         updateView();
     }
     #endregion
@@ -188,6 +197,44 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
     }
 
     /// <summary>
+    /// Builds the death-owned Impact Frame timeline markers and the full reusable Impact Frame payload editor.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the block.</param>
+    /// <param name="scalingRulesProperty">Scaling rules list used by marker fields.</param>
+    /// <param name="properties">Resolved death animation properties.</param>
+    /// <param name="detailsContainer">Outputs the details container toggled by Impact Frame Enabled.</param>
+    private static void BuildImpactFrameBlock(VisualElement parent,
+                                              SerializedProperty scalingRulesProperty,
+                                              DeathAnimationProperties properties,
+                                              out VisualElement detailsContainer)
+    {
+        parent.Add(BuildSubHeader("Impact Frame"));
+        AddScalableField(parent,
+                         properties.ImpactFrameEnabled,
+                         scalingRulesProperty,
+                         "Impact Frame Enabled",
+                         "Drives build-in and final Impact Frame effects across the death playback timeline.");
+        detailsContainer = new VisualElement();
+        parent.Add(detailsContainer);
+        AddScalableField(detailsContainer,
+                         properties.ImpactFrameBuildInStartNormalizedTime,
+                         scalingRulesProperty,
+                         "Build-In Start Normalized Time",
+                         "Normalized death playback point where build-in starts.");
+        AddScalableField(detailsContainer,
+                         properties.ImpactFrameApplyNormalizedTime,
+                         scalingRulesProperty,
+                         "Apply Normalized Time",
+                         "Normalized death playback point where the final Impact Frame activates.");
+        AddScalableField(detailsContainer,
+                         properties.ImpactFrameEndNormalizedTime,
+                         scalingRulesProperty,
+                         "End Normalized Time",
+                         "Normalized death playback point where the final Impact Frame is cleared.");
+        PowerUpImpactFramePayloadDrawerUtility.BuildImpactFramePayloadUi(detailsContainer, properties.ImpactFrame);
+    }
+
+    /// <summary>
     /// Refreshes the warning HelpBoxes for the death animation section. Warnings are emitted instead of snapping per
     /// project rule 20: the validator only clamps hard floors so designers see the issues without losing data.
     /// </summary>
@@ -213,6 +260,10 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
         float vfxScale = properties.DespawnVfxScaleMultiplier.floatValue;
         float vfxLifetime = properties.DespawnVfxLifetimeSeconds.floatValue;
         float vfxSpawnNormalizedTime = properties.DespawnVfxSpawnNormalizedTime.floatValue;
+        bool impactFrameEnabled = properties.ImpactFrameEnabled.boolValue;
+        float impactBuildInStart = properties.ImpactFrameBuildInStartNormalizedTime.floatValue;
+        float impactApply = properties.ImpactFrameApplyNormalizedTime.floatValue;
+        float impactEnd = properties.ImpactFrameEndNormalizedTime.floatValue;
 
         if (playbackDuration < 0f)
             warningsContainer.Add(new HelpBox("Payback Duration is negative; runtime clamps it to zero and the end-of-run UI appears immediately.", HelpBoxMessageType.Warning));
@@ -244,6 +295,21 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
             if (vfxSpawnNormalizedTime < 0f || vfxSpawnNormalizedTime > 1f)
                 warningsContainer.Add(new HelpBox("Despawn VFX Spawn Normalized Time is outside the [0..1] range; runtime clamps it before evaluating the spawn threshold.", HelpBoxMessageType.Warning));
         }
+
+        if (impactFrameEnabled)
+        {
+            if (impactBuildInStart < 0f || impactBuildInStart > 1f ||
+                impactApply < 0f || impactApply > 1f ||
+                impactEnd < 0f || impactEnd > 1f)
+            {
+                warningsContainer.Add(new HelpBox("Impact Frame death timeline markers should stay inside the [0..1] range.",
+                                                  HelpBoxMessageType.Warning));
+            }
+
+            if (impactBuildInStart > impactApply || impactApply > impactEnd)
+                warningsContainer.Add(new HelpBox("Impact Frame death timeline should satisfy Build-In Start <= Apply <= End.",
+                                                  HelpBoxMessageType.Warning));
+        }
     }
 
     /// <summary>
@@ -269,6 +335,11 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
         bundle.DespawnVfxSpawnNormalizedTime = deathAnimationProperty.FindPropertyRelative("despawnVfxSpawnNormalizedTime");
         bundle.DespawnVfxLifetimeSeconds = deathAnimationProperty.FindPropertyRelative("despawnVfxLifetimeSeconds");
         bundle.HidePlayerVisualOnVfxSpawn = deathAnimationProperty.FindPropertyRelative("hidePlayerVisualOnVfxSpawn");
+        bundle.ImpactFrameEnabled = deathAnimationProperty.FindPropertyRelative("impactFrameEnabled");
+        bundle.ImpactFrameBuildInStartNormalizedTime = deathAnimationProperty.FindPropertyRelative("impactFrameBuildInStartNormalizedTime");
+        bundle.ImpactFrameApplyNormalizedTime = deathAnimationProperty.FindPropertyRelative("impactFrameApplyNormalizedTime");
+        bundle.ImpactFrameEndNormalizedTime = deathAnimationProperty.FindPropertyRelative("impactFrameEndNormalizedTime");
+        bundle.ImpactFrame = deathAnimationProperty.FindPropertyRelative("impactFrame");
         return bundle;
     }
 
@@ -332,6 +403,11 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
         public SerializedProperty DespawnVfxSpawnNormalizedTime;
         public SerializedProperty DespawnVfxLifetimeSeconds;
         public SerializedProperty HidePlayerVisualOnVfxSpawn;
+        public SerializedProperty ImpactFrameEnabled;
+        public SerializedProperty ImpactFrameBuildInStartNormalizedTime;
+        public SerializedProperty ImpactFrameApplyNormalizedTime;
+        public SerializedProperty ImpactFrameEndNormalizedTime;
+        public SerializedProperty ImpactFrame;
 
         public bool IsComplete
         {
@@ -350,7 +426,12 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
                        DespawnVfxScaleMultiplier != null &&
                        DespawnVfxSpawnNormalizedTime != null &&
                        DespawnVfxLifetimeSeconds != null &&
-                       HidePlayerVisualOnVfxSpawn != null;
+                       HidePlayerVisualOnVfxSpawn != null &&
+                       ImpactFrameEnabled != null &&
+                       ImpactFrameBuildInStartNormalizedTime != null &&
+                       ImpactFrameApplyNormalizedTime != null &&
+                       ImpactFrameEndNormalizedTime != null &&
+                       ImpactFrame != null;
             }
         }
     }

@@ -129,29 +129,7 @@ public static class PlayerImpactFrameRuntimeUtility
         impactFrameState.EaseInUnscaledSeconds = math.max(0f, impactFrameConfig.EaseInUnscaledSeconds);
         impactFrameState.EaseOutUnscaledSeconds = math.max(0f, impactFrameConfig.EaseOutUnscaledSeconds);
         impactFrameState.EasingMode = impactFrameConfig.EasingMode;
-        impactFrameState.TimeSlowdownPercent = math.clamp(impactFrameConfig.TimeSlowdownPercent, 0f, 100f);
-        impactFrameState.OverlayIntensity = math.clamp(impactFrameConfig.OverlayIntensity, 0f, 1f);
-        impactFrameState.FilterTintRgba = math.saturate(impactFrameConfig.FilterTintRgba);
-        impactFrameState.DesaturationAmount = math.clamp(impactFrameConfig.DesaturationAmount, 0f, 1f);
-        impactFrameState.VignetteIntensity = math.clamp(impactFrameConfig.VignetteIntensity, 0f, 1f);
-        impactFrameState.VignetteSoftness = math.clamp(impactFrameConfig.VignetteSoftness, 0f, 1f);
-        impactFrameState.ChromaticAberration = math.max(0f, impactFrameConfig.ChromaticAberration);
-        impactFrameState.ScanlineIntensity = math.clamp(impactFrameConfig.ScanlineIntensity, 0f, 1f);
-        impactFrameState.ScanlineFrequency = math.max(0f, impactFrameConfig.ScanlineFrequency);
-        impactFrameState.FlashIntensity = math.clamp(impactFrameConfig.FlashIntensity, 0f, 1f);
-        impactFrameState.RadialDistortion = math.clamp(impactFrameConfig.RadialDistortion, 0f, 1f);
-        impactFrameState.ShockwaveIntensity = math.clamp(impactFrameConfig.ShockwaveIntensity, 0f, 1f);
-        impactFrameState.ShockwaveRadius = math.clamp(impactFrameConfig.ShockwaveRadius, 0f, 1f);
-        impactFrameState.ShockwaveThickness = math.clamp(impactFrameConfig.ShockwaveThickness, 0.001f, 1f);
-        impactFrameState.ZoomPunchIntensity = math.clamp(impactFrameConfig.ZoomPunchIntensity, 0f, 1f);
-        impactFrameState.InvertIntensity = math.clamp(impactFrameConfig.InvertIntensity, 0f, 1f);
-        impactFrameState.PosterizeIntensity = math.clamp(impactFrameConfig.PosterizeIntensity, 0f, 1f);
-        impactFrameState.PosterizeSteps = math.max(2f, impactFrameConfig.PosterizeSteps);
-        impactFrameState.EdgeInkIntensity = math.clamp(impactFrameConfig.EdgeInkIntensity, 0f, 1f);
-        impactFrameState.ScreenTearIntensity = math.clamp(impactFrameConfig.ScreenTearIntensity, 0f, 1f);
-        impactFrameState.ScreenTearFrequency = math.max(0f, impactFrameConfig.ScreenTearFrequency);
-        impactFrameState.PaletteFlashIntensity = math.clamp(impactFrameConfig.PaletteFlashIntensity, 0f, 1f);
-        impactFrameState.PaletteFlashTintRgba = math.saturate(impactFrameConfig.PaletteFlashTintRgba);
+        impactFrameState.Effect = impactFrameConfig.Effect;
         impactFrameState.TotalDurationUnscaledSeconds = math.max(ComparisonEpsilon,
                                                                  requestedDurationSeconds +
                                                                  impactFrameState.EaseInUnscaledSeconds +
@@ -173,8 +151,9 @@ public static class PlayerImpactFrameRuntimeUtility
         if (ResolveRequestedDurationSeconds(in impactFrameConfig) <= ComparisonEpsilon)
             return false;
 
-        return impactFrameConfig.TimeSlowdownPercent > ComparisonEpsilon ||
-               impactFrameConfig.OverlayIntensity > ComparisonEpsilon;
+        return impactFrameConfig.Effect.TimeSlowdownPercent > ComparisonEpsilon ||
+               impactFrameConfig.Effect.OverlayIntensity > ComparisonEpsilon ||
+               impactFrameConfig.Effect.CameraFeedback.Enabled != 0;
     }
 
     /// <summary>

@@ -49,7 +49,7 @@ internal static class PlayerRuntimeScalingDeathAnimationApplyUtility
                     continue;
                 }
 
-                ApplyBooleanValue(scalingElement.FieldId, resolvedBoolean, ref runtimeDeathAnimation);
+                ApplyBooleanValue(scalingElement.PayloadPath.ToString(), resolvedBoolean, ref runtimeDeathAnimation);
                 continue;
             }
 
@@ -62,7 +62,7 @@ internal static class PlayerRuntimeScalingDeathAnimationApplyUtility
                 continue;
             }
 
-            ApplyValue(scalingElement.FieldId, resolvedValue, ref runtimeDeathAnimation);
+            ApplyValue(scalingElement.PayloadPath.ToString(), resolvedValue, ref runtimeDeathAnimation);
         }
 
         SanitizeConfig(ref runtimeDeathAnimation);
@@ -73,28 +73,36 @@ internal static class PlayerRuntimeScalingDeathAnimationApplyUtility
     /// <summary>
     /// Applies one boolean scaling result to the runtime death-animation config.
     /// </summary>
-    /// <param name="fieldId">Target field identifier.</param>
+    /// <param name="payloadPath">Target field path relative to deathAnimation.</param>
     /// <param name="resolvedValue">Resolved boolean value.</param>
     /// <param name="runtimeDeathAnimation">Mutable runtime config.</param>
-    private static void ApplyBooleanValue(PlayerRuntimeDeathAnimationFieldId fieldId,
+    private static void ApplyBooleanValue(string payloadPath,
                                           bool resolvedValue,
                                           ref PlayerDeathAnimationConfig runtimeDeathAnimation)
     {
         byte value = resolvedValue ? (byte)1 : (byte)0;
 
-        switch (fieldId)
+        switch (payloadPath)
         {
-            case PlayerRuntimeDeathAnimationFieldId.Enabled:
+            case "enabled":
                 runtimeDeathAnimation.Enabled = value;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.CameraZoomEnabled:
+            case "cameraZoomEnabled":
                 runtimeDeathAnimation.CameraZoomEnabled = value;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.CameraPositionLerpEnabled:
+            case "cameraPositionLerpEnabled":
                 runtimeDeathAnimation.CameraPositionLerpEnabled = value;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.HidePlayerVisualOnVfxSpawn:
+            case "hidePlayerVisualOnVfxSpawn":
                 runtimeDeathAnimation.HidePlayerVisualOnVfxSpawn = value;
+                break;
+            case "impactFrameEnabled":
+                runtimeDeathAnimation.ImpactFrameEnabled = value;
+                break;
+            default:
+                PlayerRuntimePowerUpImpactFrameScalingApplyUtility.TryApplyBooleanValue(payloadPath,
+                                                                                        resolvedValue,
+                                                                                        ref runtimeDeathAnimation.ImpactFrame);
                 break;
         }
     }
@@ -102,47 +110,61 @@ internal static class PlayerRuntimeScalingDeathAnimationApplyUtility
     /// <summary>
     /// Applies one numeric scaling result to the runtime death-animation config.
     /// </summary>
-    /// <param name="fieldId">Target field identifier.</param>
+    /// <param name="payloadPath">Target field path relative to deathAnimation.</param>
     /// <param name="resolvedValue">Resolved numeric value.</param>
     /// <param name="runtimeDeathAnimation">Mutable runtime config.</param>
-    private static void ApplyValue(PlayerRuntimeDeathAnimationFieldId fieldId,
+    private static void ApplyValue(string payloadPath,
                                    float resolvedValue,
                                    ref PlayerDeathAnimationConfig runtimeDeathAnimation)
     {
-        switch (fieldId)
+        switch (payloadPath)
         {
-            case PlayerRuntimeDeathAnimationFieldId.PlaybackDurationSeconds:
+            case "playbackDurationSeconds":
                 runtimeDeathAnimation.PlaybackDurationSeconds = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.CameraTargetFovDelta:
+            case "cameraTargetFovDelta":
                 runtimeDeathAnimation.CameraTargetFovDelta = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.CameraPositionLerpAmount:
+            case "cameraPositionLerpAmount":
                 runtimeDeathAnimation.CameraPositionLerpAmount = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.CameraCompletionNormalizedTime:
+            case "cameraCompletionNormalizedTime":
                 runtimeDeathAnimation.CameraCompletionNormalizedTime = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.EasingMode:
+            case "easingMode":
                 runtimeDeathAnimation.EasingMode = PlayerRuntimeScalingEnumUtility.ResolvePlayerDeathAnimationEasing(resolvedValue);
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetX:
+            case "despawnVfxSpawnOffset.x":
                 runtimeDeathAnimation.DespawnVfxSpawnOffset.x = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetY:
+            case "despawnVfxSpawnOffset.y":
                 runtimeDeathAnimation.DespawnVfxSpawnOffset.y = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetZ:
+            case "despawnVfxSpawnOffset.z":
                 runtimeDeathAnimation.DespawnVfxSpawnOffset.z = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxScaleMultiplier:
+            case "despawnVfxScaleMultiplier":
                 runtimeDeathAnimation.DespawnVfxScaleMultiplier = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnNormalizedTime:
+            case "despawnVfxSpawnNormalizedTime":
                 runtimeDeathAnimation.DespawnVfxSpawnNormalizedTime = resolvedValue;
                 break;
-            case PlayerRuntimeDeathAnimationFieldId.DespawnVfxLifetimeSeconds:
+            case "despawnVfxLifetimeSeconds":
                 runtimeDeathAnimation.DespawnVfxLifetimeSeconds = resolvedValue;
+                break;
+            case "impactFrameBuildInStartNormalizedTime":
+                runtimeDeathAnimation.ImpactFrameBuildInStartNormalizedTime = resolvedValue;
+                break;
+            case "impactFrameApplyNormalizedTime":
+                runtimeDeathAnimation.ImpactFrameApplyNormalizedTime = resolvedValue;
+                break;
+            case "impactFrameEndNormalizedTime":
+                runtimeDeathAnimation.ImpactFrameEndNormalizedTime = resolvedValue;
+                break;
+            default:
+                PlayerRuntimePowerUpImpactFrameScalingApplyUtility.TryApplyValue(payloadPath,
+                                                                                 resolvedValue,
+                                                                                 ref runtimeDeathAnimation.ImpactFrame);
                 break;
         }
     }
@@ -159,6 +181,9 @@ internal static class PlayerRuntimeScalingDeathAnimationApplyUtility
         runtimeDeathAnimation.DespawnVfxScaleMultiplier = math.max(0f, runtimeDeathAnimation.DespawnVfxScaleMultiplier);
         runtimeDeathAnimation.DespawnVfxSpawnNormalizedTime = math.saturate(runtimeDeathAnimation.DespawnVfxSpawnNormalizedTime);
         runtimeDeathAnimation.DespawnVfxLifetimeSeconds = math.max(0f, runtimeDeathAnimation.DespawnVfxLifetimeSeconds);
+        runtimeDeathAnimation.ImpactFrameBuildInStartNormalizedTime = math.saturate(runtimeDeathAnimation.ImpactFrameBuildInStartNormalizedTime);
+        runtimeDeathAnimation.ImpactFrameApplyNormalizedTime = math.saturate(runtimeDeathAnimation.ImpactFrameApplyNormalizedTime);
+        runtimeDeathAnimation.ImpactFrameEndNormalizedTime = math.saturate(runtimeDeathAnimation.ImpactFrameEndNormalizedTime);
 
         if (runtimeDeathAnimation.Enabled != 0)
             return;

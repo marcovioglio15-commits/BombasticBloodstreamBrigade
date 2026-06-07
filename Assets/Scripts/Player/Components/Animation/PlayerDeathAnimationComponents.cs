@@ -39,6 +39,14 @@ public struct PlayerDeathAnimationConfig : IComponentData
     #region Visual Bridge
     public byte HidePlayerVisualOnVfxSpawn;
     #endregion
+
+    #region Impact Frame
+    public byte ImpactFrameEnabled;
+    public float ImpactFrameBuildInStartNormalizedTime;
+    public float ImpactFrameApplyNormalizedTime;
+    public float ImpactFrameEndNormalizedTime;
+    public ImpactFramePowerUpConfig ImpactFrame;
+    #endregion
 }
 
 /// <summary>
@@ -78,6 +86,10 @@ public struct PlayerDeathAnimationState : IComponentData
 
     // 1 once the visual bridge has been hidden for this run; cleared by reset.
     public byte VisualBridgeHidden;
+
+    // Tracks death-owned Impact Frame phase transitions independently from power-up activation.
+    public byte ImpactFrameApplied;
+    public byte ImpactFrameCompleted;
     #endregion
 
     #region Camera Baseline

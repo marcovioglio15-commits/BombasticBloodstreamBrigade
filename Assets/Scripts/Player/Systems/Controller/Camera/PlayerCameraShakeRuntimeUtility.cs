@@ -32,6 +32,13 @@ internal static class PlayerCameraShakeRuntimeUtility
     private const float FireNoiseSeedZ = 137.43f;
     private const float FireNoiseSeedRoll = 167.83f;
 
+    // Impact Frame uses a third decorrelated field and a stable authored impulse direction because its envelope is
+    // already owned by the Impact Frame timeline rather than by the trauma state.
+    private const float ImpactFrameNoiseSeedX = 191.17f;
+    private const float ImpactFrameNoiseSeedY = 223.49f;
+    private const float ImpactFrameNoiseSeedZ = 251.83f;
+    private const float ImpactFrameNoiseSeedRoll = 277.31f;
+
     // SingleImpulse path picks one direction per accepted pulse from a small palette mapped through a phase-derived
     // hash. Keeping the palette discrete (sign in {-1, 0, 1}) yields a clean jolt without drifting.
     private const float ImpulseDirectionHashPhase = 0.49283f;
@@ -130,6 +137,60 @@ internal static class PlayerCameraShakeRuntimeUtility
         state.PositionOffset = damageOffset + fireOffset;
         state.RollRadians = damageRoll + fireRoll;
         state.FovDelta = damageFov + fireFov;
+    }
+
+    /// <summary>
+    /// Layers one Impact Frame camera profile onto the damage and fire outputs already resolved for this frame.
+    /// </summary>
+    /// <param name="state">Mutable camera shake state receiving additive position, roll, and FOV output.</param>
+    /// <param name="config">Impact Frame camera feedback profile.</param>
+    /// <param name="blend">Current Impact Frame timeline or build-in blend.</param>
+    /// <param name="noiseTime">Monotonic clock used to sample continuous camera motion.</param>
+    /// <param name="cameraRight">Camera world right axis.</param>
+    /// <param name="cameraUp">Camera world up axis.</param>
+    /// <param name="cameraForward">Camera world forward axis.</param>
+    public static void AddImpactFrameOutput(ref PlayerCameraShakeState state,
+                                            in ImpactFrameCameraFeedbackConfig config,
+                                            float blend,
+                                            float noiseTime,
+                                            float3 cameraRight,
+                                            float3 cameraUp,
+                                            float3 cameraForward)
+    {
+        float magnitude = math.saturate(blend);
+
+        if (config.Enabled == 0 || magnitude <= 0f)
+            return;
+
+        ResolveAxisSamples(config.MotionMode,
+                           noiseTime * math.max(0f, config.Frequency),
+                           ImpactFrameNoiseSeedX,
+                           ImpactFrameNoiseSeedY,
+                           ImpactFrameNoiseSeedZ,
+                           ImpactFrameNoiseSeedRoll,
+                           new float3(1f, -1f, 1f),
+                           1f,
+                           out float sampleRight,
+                           out float sampleUp,
+                           out float sampleForward,
+                           out float sampleRoll);
+
+        float planarAmplitude = math.max(0f, config.PositionalAmplitude) * magnitude;
+        float depthAmplitude = math.max(0f, config.ForwardAmplitude) * magnitude;
+
+        if (config.AxisRightEnabled != 0)
+            state.PositionOffset += cameraRight * (sampleRight * planarAmplitude);
+
+        if (config.AxisUpEnabled != 0)
+            state.PositionOffset += cameraUp * (sampleUp * planarAmplitude);
+
+        if (config.AxisForwardEnabled != 0)
+            state.PositionOffset += cameraForward * (sampleForward * depthAmplitude);
+
+        state.RollRadians += math.radians(math.max(0f, config.RotationalAmplitude) * magnitude * sampleRoll);
+
+        if (config.ZoomEnabled != 0)
+            state.FovDelta += config.ZoomFovDelta * magnitude;
     }
 
     /// <summary>

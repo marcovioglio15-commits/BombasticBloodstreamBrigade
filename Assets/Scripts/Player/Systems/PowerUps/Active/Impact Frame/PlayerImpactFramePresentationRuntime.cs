@@ -8,11 +8,18 @@ public readonly struct PlayerImpactFramePresentationSnapshot
 {
     #region Fields
     public readonly float Blend;
+    public readonly ImpactFramePresentationScope PresentationScope;
     public readonly float OverlayIntensity;
     public readonly float4 FilterTintRgba;
     public readonly float DesaturationAmount;
     public readonly float VignetteIntensity;
     public readonly float VignetteSoftness;
+    public readonly float VignetteExtent;
+    public readonly float4 VignetteTintRgba;
+    public readonly float RadialVignetteIntensity;
+    public readonly float RadialVignetteRadius;
+    public readonly float RadialVignetteSoftness;
+    public readonly float4 RadialVignetteTintRgba;
     public readonly float ChromaticAberration;
     public readonly float ScanlineIntensity;
     public readonly float ScanlineFrequency;
@@ -40,11 +47,18 @@ public readonly struct PlayerImpactFramePresentationSnapshot
     /// Creates one presentation snapshot from the active ECS Impact Frame state.
     /// </summary>
     /// <param name="blend">Current normalized effect blend.</param>
+    /// <param name="presentationScope">Latest camera-stack stage receiving the effect.</param>
     /// <param name="overlayIntensity">Master overlay intensity.</param>
     /// <param name="filterTintRgba">Tint color and tint alpha.</param>
     /// <param name="desaturationAmount">Screen desaturation amount.</param>
-    /// <param name="vignetteIntensity">Vignette intensity.</param>
-    /// <param name="vignetteSoftness">Vignette softness.</param>
+    /// <param name="vignetteIntensity">Screen-border vignette intensity.</param>
+    /// <param name="vignetteSoftness">Screen-border vignette softness.</param>
+    /// <param name="vignetteExtent">Screen-border vignette inward extent.</param>
+    /// <param name="vignetteTintRgba">Screen-border vignette color.</param>
+    /// <param name="radialVignetteIntensity">Tinted radial-ring vignette intensity.</param>
+    /// <param name="radialVignetteRadius">Tinted radial-ring vignette radius.</param>
+    /// <param name="radialVignetteSoftness">Tinted radial-ring vignette softness.</param>
+    /// <param name="radialVignetteTintRgba">Tinted radial-ring vignette color.</param>
     /// <param name="chromaticAberration">Chromatic aberration offset.</param>
     /// <param name="scanlineIntensity">Scanline opacity.</param>
     /// <param name="scanlineFrequency">Scanline frequency in vertical lines.</param>
@@ -66,11 +80,18 @@ public readonly struct PlayerImpactFramePresentationSnapshot
     /// <param name="effectOriginWorldPosition">World position used by spatial effects.</param>
     /// <param name="hasWorldOrigin">One when effectOriginWorldPosition should be projected by the camera.</param>
     public PlayerImpactFramePresentationSnapshot(float blend,
+                                                 ImpactFramePresentationScope presentationScope,
                                                  float overlayIntensity,
                                                  float4 filterTintRgba,
                                                  float desaturationAmount,
                                                  float vignetteIntensity,
                                                  float vignetteSoftness,
+                                                 float vignetteExtent,
+                                                 float4 vignetteTintRgba,
+                                                 float radialVignetteIntensity,
+                                                 float radialVignetteRadius,
+                                                 float radialVignetteSoftness,
+                                                 float4 radialVignetteTintRgba,
                                                  float chromaticAberration,
                                                  float scanlineIntensity,
                                                  float scanlineFrequency,
@@ -93,11 +114,18 @@ public readonly struct PlayerImpactFramePresentationSnapshot
                                                  byte hasWorldOrigin)
     {
         Blend = blend;
+        PresentationScope = presentationScope;
         OverlayIntensity = overlayIntensity;
         FilterTintRgba = filterTintRgba;
         DesaturationAmount = desaturationAmount;
         VignetteIntensity = vignetteIntensity;
         VignetteSoftness = vignetteSoftness;
+        VignetteExtent = vignetteExtent;
+        VignetteTintRgba = vignetteTintRgba;
+        RadialVignetteIntensity = radialVignetteIntensity;
+        RadialVignetteRadius = radialVignetteRadius;
+        RadialVignetteSoftness = radialVignetteSoftness;
+        RadialVignetteTintRgba = radialVignetteTintRgba;
         ChromaticAberration = chromaticAberration;
         ScanlineIntensity = scanlineIntensity;
         ScanlineFrequency = scanlineFrequency;
@@ -139,6 +167,12 @@ internal static class PlayerImpactFramePresentationRuntime
     private static readonly int desaturationAmountId = Shader.PropertyToID("_DesaturationAmount");
     private static readonly int vignetteIntensityId = Shader.PropertyToID("_VignetteIntensity");
     private static readonly int vignetteSoftnessId = Shader.PropertyToID("_VignetteSoftness");
+    private static readonly int vignetteExtentId = Shader.PropertyToID("_VignetteExtent");
+    private static readonly int vignetteTintId = Shader.PropertyToID("_VignetteTint");
+    private static readonly int radialVignetteIntensityId = Shader.PropertyToID("_RadialVignetteIntensity");
+    private static readonly int radialVignetteRadiusId = Shader.PropertyToID("_RadialVignetteRadius");
+    private static readonly int radialVignetteSoftnessId = Shader.PropertyToID("_RadialVignetteSoftness");
+    private static readonly int radialVignetteTintId = Shader.PropertyToID("_RadialVignetteTint");
     private static readonly int chromaticAberrationId = Shader.PropertyToID("_ChromaticAberration");
     private static readonly int scanlineIntensityId = Shader.PropertyToID("_ScanlineIntensity");
     private static readonly int scanlineFrequencyId = Shader.PropertyToID("_ScanlineFrequency");
@@ -249,7 +283,32 @@ internal static class PlayerImpactFramePresentationRuntime
         if (camera.pixelWidth <= 0 || camera.pixelHeight <= 0)
             return false;
 
-        return true;
+        return ShouldRenderForScope(camera, snapshot.PresentationScope);
+    }
+
+    /// <summary>
+    /// Filters the fullscreen pass by cumulative camera-stack scope. Environment-only effects stop before gameplay
+    /// overlays, while gameplay-scoped effects stop before UI overlays.
+    /// </summary>
+    /// <param name="camera">Camera currently evaluated by URP.</param>
+    /// <param name="presentationScope">Latest camera-stack stage allowed to receive the pass.</param>
+    /// <returns>True when this camera is the latest allowed stage for the requested scope.</returns>
+    private static bool ShouldRenderForScope(Camera camera, ImpactFramePresentationScope presentationScope)
+    {
+        int uiMask = GameSceneCameraLayerUtility.DefaultUiCullingMask;
+        int environmentMask = GameSceneCameraLayerUtility.DefaultEnvironmentCullingMask;
+        bool rendersUi = (camera.cullingMask & uiMask) != 0;
+        bool rendersEnvironment = (camera.cullingMask & environmentMask) != 0;
+
+        switch (presentationScope)
+        {
+            case ImpactFramePresentationScope.EnvironmentOnly:
+                return rendersEnvironment && !rendersUi;
+            case ImpactFramePresentationScope.EnvironmentAndGameplay:
+                return !rendersUi && !rendersEnvironment;
+            default:
+                return rendersUi;
+        }
     }
     #endregion
 
@@ -302,6 +361,8 @@ internal static class PlayerImpactFramePresentationRuntime
         float overlayIntensity = math.saturate(snapshot.OverlayIntensity);
         float4 tint = math.saturate(snapshot.FilterTintRgba);
         float4 paletteTint = math.saturate(snapshot.PaletteFlashTintRgba);
+        float4 vignetteTint = math.saturate(snapshot.VignetteTintRgba);
+        float4 radialVignetteTint = math.saturate(snapshot.RadialVignetteTintRgba);
         Vector2 effectCenter = ResolveEffectCenter(camera);
         material.SetFloat(blendId, blend);
         material.SetFloat(overlayIntensityId, overlayIntensity);
@@ -309,6 +370,18 @@ internal static class PlayerImpactFramePresentationRuntime
         material.SetFloat(desaturationAmountId, math.saturate(snapshot.DesaturationAmount));
         material.SetFloat(vignetteIntensityId, math.saturate(snapshot.VignetteIntensity));
         material.SetFloat(vignetteSoftnessId, math.saturate(snapshot.VignetteSoftness));
+        material.SetFloat(vignetteExtentId, math.saturate(snapshot.VignetteExtent));
+        material.SetVector(vignetteTintId, new Vector4(vignetteTint.x,
+                                                      vignetteTint.y,
+                                                      vignetteTint.z,
+                                                      vignetteTint.w));
+        material.SetFloat(radialVignetteIntensityId, math.saturate(snapshot.RadialVignetteIntensity));
+        material.SetFloat(radialVignetteRadiusId, math.saturate(snapshot.RadialVignetteRadius));
+        material.SetFloat(radialVignetteSoftnessId, math.clamp(snapshot.RadialVignetteSoftness, 0.001f, 1f));
+        material.SetVector(radialVignetteTintId, new Vector4(radialVignetteTint.x,
+                                                            radialVignetteTint.y,
+                                                            radialVignetteTint.z,
+                                                            radialVignetteTint.w));
         material.SetFloat(chromaticAberrationId, math.max(0f, snapshot.ChromaticAberration));
         material.SetFloat(scanlineIntensityId, math.saturate(snapshot.ScanlineIntensity));
         material.SetFloat(scanlineFrequencyId, math.max(0f, snapshot.ScanlineFrequency));

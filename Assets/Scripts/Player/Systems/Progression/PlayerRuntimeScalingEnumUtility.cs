@@ -279,6 +279,18 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves an Impact Frame presentation scope from one numeric formula result.
+    /// </summary>
+    /// <param name="value">Numeric enum value produced by the unified formula system.</param>
+    /// <returns>Closest supported Impact Frame presentation scope.</returns>
+    public static ImpactFramePresentationScope ResolveImpactFramePresentationScope(float value)
+    {
+        return (ImpactFramePresentationScope)math.clamp((int)math.round(value),
+                                                        (int)ImpactFramePresentationScope.EnvironmentOnly,
+                                                        (int)ImpactFramePresentationScope.EverythingIncludingUi);
+    }
+
+    /// <summary>
     /// Resolves a safe PlayerComboDamageBreakMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

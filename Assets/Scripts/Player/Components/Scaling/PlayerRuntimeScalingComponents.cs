@@ -496,36 +496,13 @@ public struct PlayerRuntimePowerUpScalingElement : IBufferElementData
 }
 
 /// <summary>
-/// Identifies one player visual death-animation field that can be rewritten from a runtime scaling formula.
-/// none.
-/// </summary>
-public enum PlayerRuntimeDeathAnimationFieldId : byte
-{
-    Enabled = 0,
-    PlaybackDurationSeconds = 1,
-    CameraZoomEnabled = 2,
-    CameraTargetFovDelta = 3,
-    CameraPositionLerpEnabled = 4,
-    CameraPositionLerpAmount = 5,
-    CameraCompletionNormalizedTime = 6,
-    EasingMode = 7,
-    DespawnVfxSpawnOffsetX = 8,
-    DespawnVfxSpawnOffsetY = 9,
-    DespawnVfxSpawnOffsetZ = 10,
-    DespawnVfxScaleMultiplier = 11,
-    DespawnVfxSpawnNormalizedTime = 12,
-    DespawnVfxLifetimeSeconds = 13,
-    HidePlayerVisualOnVfxSpawn = 14
-}
-
-/// <summary>
 /// Stores one death-animation visual scaling entry baked from Add Scaling authoring data.
 /// none.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerRuntimeDeathAnimationScalingElement : IBufferElementData
 {
-    public PlayerRuntimeDeathAnimationFieldId FieldId;
+    public FixedString128Bytes PayloadPath;
     public byte ValueType;
     public float BaseValue;
     public byte BaseBooleanValue;

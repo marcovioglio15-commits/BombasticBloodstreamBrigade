@@ -41,7 +41,14 @@ public sealed class PowerUpImpactFrameModuleData
     [Tooltip("When enabled, repeated activations refresh remaining duration whenever the new request is shorter than what is left.")]
     [SerializeField] private bool refreshOnShorterRequest;
 
-    [Header("Screen Filter")]
+    [Header("Presentation Scope And Camera")]
+    [Tooltip("Latest camera-stack stage receiving the fullscreen filter. Environment Only excludes gameplay entities and UI; Environment And Gameplay excludes UI.")]
+    [SerializeField] private ImpactFramePresentationScope presentationScope = ImpactFramePresentationScope.EnvironmentAndGameplay;
+
+    [Tooltip("Camera position, roll and FOV motion multiplied by the active Impact Frame blend.")]
+    [SerializeField] private PowerUpImpactFrameCameraFeedbackData cameraFeedback = new PowerUpImpactFrameCameraFeedbackData();
+
+    [Header("Screen Effects")]
     [Tooltip("Master overlay intensity expressed as a 0-1 fraction. 0 disables the overlay, 1 uses the authored parameters at full strength.")]
     [SerializeField] private float overlayIntensity = 1f;
 
@@ -51,11 +58,29 @@ public sealed class PowerUpImpactFrameModuleData
     [Tooltip("Color desaturation amount applied to the screen, 0 keeps the original color, 1 fully drains color.")]
     [SerializeField] private float desaturationAmount = 0.65f;
 
-    [Tooltip("Vignette darkening intensity applied at the screen border, 0 disables the vignette.")]
+    [Tooltip("Screen-border vignette intensity. 0 disables the perimetral tint.")]
     [SerializeField] private float vignetteIntensity = 0.55f;
 
-    [Tooltip("Vignette inner softness, 0 keeps a hard ring, 1 fades smoothly toward the center.")]
+    [Tooltip("Screen-border vignette softness. 0 creates a sharp inner edge, while 1 fades across the full authored extent.")]
     [SerializeField] private float vignetteSoftness = 0.6f;
+
+    [Tooltip("Normalized distance reached inward from every screen edge by the screen-border vignette. 0 keeps it at the edge, while 1 reaches the viewport center.")]
+    [SerializeField] private float vignetteExtent = 0.35f;
+
+    [Tooltip("RGBA tint applied along the screen-border vignette. W controls maximum border strength in addition to Vignette Intensity; every channel supports Add Scaling.")]
+    [SerializeField] private Vector4 vignetteTint = new Vector4(0f, 0f, 0f, 1f);
+
+    [Tooltip("Tinted radial-ring vignette intensity. 0 disables the ring.")]
+    [SerializeField] private float radialVignetteIntensity;
+
+    [Tooltip("Normalized viewport radius at the center of the tinted radial vignette ring.")]
+    [SerializeField] private float radialVignetteRadius = 0.55f;
+
+    [Tooltip("Normalized softness controlling the tinted radial vignette ring thickness.")]
+    [SerializeField] private float radialVignetteSoftness = 0.12f;
+
+    [Tooltip("Tint applied to the radial vignette ring. Alpha controls maximum ring strength.")]
+    [SerializeField] private Color radialVignetteTint = new Color(0.1f, 0f, 0.2f, 0.8f);
 
     [Tooltip("Chromatic aberration shift expressed in normalized screen units. 0 disables the effect.")]
     [SerializeField] private float chromaticAberration = 0.012f;
@@ -72,7 +97,7 @@ public sealed class PowerUpImpactFrameModuleData
     [Tooltip("Time warp ring radial distortion applied to the screen center, 0 disables the distortion.")]
     [SerializeField] private float radialDistortion = 0.22f;
 
-    [Header("Advanced Screen Effects")]
+    [Header("Screen Effects - Advanced")]
     [Tooltip("Expanding shockwave ring intensity. 0 disables the ring; values near 1 create a strong displacement pulse.")]
     [SerializeField] private float shockwaveIntensity = 0.35f;
 
@@ -108,6 +133,10 @@ public sealed class PowerUpImpactFrameModuleData
 
     [Tooltip("Palette flash tint. Alpha controls maximum flash strength in addition to Palette Flash Intensity.")]
     [SerializeField] private Color paletteFlashTint = new Color(1f, 0.9f, 0.45f, 0.7f);
+
+    [Header("Trigger Hold Charge Build-In")]
+    [Tooltip("Optional gradual pre-impact effect driven by a paired Trigger Hold Charge module.")]
+    [SerializeField] private PowerUpImpactFrameBuildInData buildIn = new PowerUpImpactFrameBuildInData();
     #endregion
 
     #endregion
@@ -185,6 +214,10 @@ public sealed class PowerUpImpactFrameModuleData
         }
     }
 
+    public ImpactFramePresentationScope PresentationScope => presentationScope;
+
+    public PowerUpImpactFrameCameraFeedbackData CameraFeedback => cameraFeedback;
+
     public float OverlayIntensity
     {
         get
@@ -224,6 +257,18 @@ public sealed class PowerUpImpactFrameModuleData
             return vignetteSoftness;
         }
     }
+
+    public float VignetteExtent => vignetteExtent;
+
+    public Color VignetteTint => new Color(vignetteTint.x, vignetteTint.y, vignetteTint.z, vignetteTint.w);
+
+    public float RadialVignetteIntensity => radialVignetteIntensity;
+
+    public float RadialVignetteRadius => radialVignetteRadius;
+
+    public float RadialVignetteSoftness => radialVignetteSoftness;
+
+    public Color RadialVignetteTint => radialVignetteTint;
 
     public float ChromaticAberration
     {
@@ -360,6 +405,8 @@ public sealed class PowerUpImpactFrameModuleData
             return paletteFlashTint;
         }
     }
+
+    public PowerUpImpactFrameBuildInData BuildIn => buildIn;
     #endregion
 
     #region Methods
@@ -382,6 +429,8 @@ public sealed class PowerUpImpactFrameModuleData
     /// <param name="desaturationAmountValue">Authored desaturation amount.</param>
     /// <param name="vignetteIntensityValue">Authored vignette intensity.</param>
     /// <param name="vignetteSoftnessValue">Authored vignette softness.</param>
+    /// <param name="vignetteExtentValue">Authored screen-border vignette extent.</param>
+    /// <param name="vignetteTintValue">Authored screen-border vignette tint.</param>
     /// <param name="chromaticAberrationValue">Authored chromatic aberration amount.</param>
     /// <param name="scanlineIntensityValue">Authored scanline intensity.</param>
     /// <param name="scanlineFrequencyValue">Authored scanline frequency.</param>
@@ -413,6 +462,8 @@ public sealed class PowerUpImpactFrameModuleData
                           float desaturationAmountValue,
                           float vignetteIntensityValue,
                           float vignetteSoftnessValue,
+                          float vignetteExtentValue,
+                          Color vignetteTintValue,
                           float chromaticAberrationValue,
                           float scanlineIntensityValue,
                           float scanlineFrequencyValue,
@@ -440,11 +491,22 @@ public sealed class PowerUpImpactFrameModuleData
         easingMode = easingModeValue;
         timeSlowdownPercent = timeSlowdownPercentValue;
         refreshOnShorterRequest = refreshOnShorterRequestValue;
+        presentationScope = ImpactFramePresentationScope.EnvironmentAndGameplay;
+        cameraFeedback = new PowerUpImpactFrameCameraFeedbackData();
         overlayIntensity = overlayIntensityValue;
         filterTint = filterTintValue;
         desaturationAmount = desaturationAmountValue;
         vignetteIntensity = vignetteIntensityValue;
         vignetteSoftness = vignetteSoftnessValue;
+        vignetteExtent = vignetteExtentValue;
+        vignetteTint = new Vector4(vignetteTintValue.r,
+                                   vignetteTintValue.g,
+                                   vignetteTintValue.b,
+                                   vignetteTintValue.a);
+        radialVignetteIntensity = 0f;
+        radialVignetteRadius = 0.55f;
+        radialVignetteSoftness = 0.12f;
+        radialVignetteTint = new Color(0.1f, 0f, 0.2f, 0.8f);
         chromaticAberration = chromaticAberrationValue;
         scanlineIntensity = scanlineIntensityValue;
         scanlineFrequency = scanlineFrequencyValue;
@@ -462,6 +524,7 @@ public sealed class PowerUpImpactFrameModuleData
         screenTearFrequency = screenTearFrequencyValue;
         paletteFlashIntensity = paletteFlashIntensityValue;
         paletteFlashTint = paletteFlashTintValue;
+        buildIn = new PowerUpImpactFrameBuildInData();
     }
     #endregion
 
@@ -471,6 +534,13 @@ public sealed class PowerUpImpactFrameModuleData
     /// </summary>
     public void Validate()
     {
+        if (cameraFeedback == null)
+            cameraFeedback = new PowerUpImpactFrameCameraFeedbackData();
+
+        if (buildIn == null)
+            buildIn = new PowerUpImpactFrameBuildInData();
+
+        buildIn.Validate();
     }
     #endregion
 

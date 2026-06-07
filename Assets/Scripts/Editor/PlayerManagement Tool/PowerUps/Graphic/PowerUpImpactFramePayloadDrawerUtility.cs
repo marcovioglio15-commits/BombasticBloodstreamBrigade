@@ -36,6 +36,8 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         SerializedProperty desaturationAmountProperty = impactFramePayloadProperty.FindPropertyRelative("desaturationAmount");
         SerializedProperty vignetteIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("vignetteIntensity");
         SerializedProperty vignetteSoftnessProperty = impactFramePayloadProperty.FindPropertyRelative("vignetteSoftness");
+        SerializedProperty vignetteExtentProperty = impactFramePayloadProperty.FindPropertyRelative("vignetteExtent");
+        SerializedProperty vignetteTintProperty = impactFramePayloadProperty.FindPropertyRelative("vignetteTint");
         SerializedProperty chromaticAberrationProperty = impactFramePayloadProperty.FindPropertyRelative("chromaticAberration");
         SerializedProperty scanlineIntensityProperty = impactFramePayloadProperty.FindPropertyRelative("scanlineIntensity");
         SerializedProperty scanlineFrequencyProperty = impactFramePayloadProperty.FindPropertyRelative("scanlineFrequency");
@@ -68,6 +70,8 @@ public static class PowerUpImpactFramePayloadDrawerUtility
             desaturationAmountProperty == null ||
             vignetteIntensityProperty == null ||
             vignetteSoftnessProperty == null ||
+            vignetteExtentProperty == null ||
+            vignetteTintProperty == null ||
             chromaticAberrationProperty == null ||
             scanlineIntensityProperty == null ||
             scanlineFrequencyProperty == null ||
@@ -93,13 +97,11 @@ public static class PowerUpImpactFramePayloadDrawerUtility
 
         Foldout timingFoldout = CreatePayloadFoldout("Timing", true);
         Foldout timeScaleFoldout = CreatePayloadFoldout("Time Scale", true);
-        Foldout filterFoldout = CreatePayloadFoldout("Screen Filter", true);
-        Foldout advancedEffectsFoldout = CreatePayloadFoldout("Advanced Screen Effects", false);
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         payloadContainer.Add(timingFoldout);
         payloadContainer.Add(timeScaleFoldout);
-        payloadContainer.Add(filterFoldout);
-        payloadContainer.Add(advancedEffectsFoldout);
+        PowerUpImpactFrameScreenEffectsDrawerUtility.Build(payloadContainer, impactFramePayloadProperty, true);
+        PowerUpImpactFrameExtendedPayloadDrawerUtility.Build(payloadContainer, impactFramePayloadProperty);
         payloadContainer.Add(warningBox);
 
         VisualElement durationModeField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(timingFoldout, durationModeProperty, "Duration Mode");
@@ -113,30 +115,6 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         VisualElement timeSlowdownPercentField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(timeScaleFoldout, timeSlowdownPercentProperty, "Time Slowdown Percent");
         VisualElement refreshOnShorterRequestField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(timeScaleFoldout, refreshOnShorterRequestProperty, "Refresh On Shorter Request");
 
-        VisualElement overlayIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, overlayIntensityProperty, "Overlay Intensity");
-        VisualElement filterTintField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, filterTintProperty, "Filter Tint");
-        VisualElement desaturationAmountField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, desaturationAmountProperty, "Desaturation Amount");
-        VisualElement vignetteIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, vignetteIntensityProperty, "Vignette Intensity");
-        VisualElement vignetteSoftnessField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, vignetteSoftnessProperty, "Vignette Softness");
-        VisualElement chromaticAberrationField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, chromaticAberrationProperty, "Chromatic Aberration");
-        VisualElement scanlineIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, scanlineIntensityProperty, "Scanline Intensity");
-        VisualElement scanlineFrequencyField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, scanlineFrequencyProperty, "Scanline Frequency");
-        VisualElement flashIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, flashIntensityProperty, "Flash Intensity");
-        VisualElement radialDistortionField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(filterFoldout, radialDistortionProperty, "Radial Distortion");
-
-        VisualElement shockwaveIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveIntensityProperty, "Shockwave Intensity");
-        VisualElement shockwaveRadiusField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveRadiusProperty, "Shockwave Radius");
-        VisualElement shockwaveThicknessField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, shockwaveThicknessProperty, "Shockwave Thickness");
-        VisualElement zoomPunchIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, zoomPunchIntensityProperty, "Zoom Punch Intensity");
-        VisualElement invertIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, invertIntensityProperty, "Invert Intensity");
-        VisualElement posterizeIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, posterizeIntensityProperty, "Posterize Intensity");
-        VisualElement posterizeStepsField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, posterizeStepsProperty, "Posterize Steps");
-        VisualElement edgeInkIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, edgeInkIntensityProperty, "Edge Ink Intensity");
-        VisualElement screenTearIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, screenTearIntensityProperty, "Screen Tear Intensity");
-        VisualElement screenTearFrequencyField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, screenTearFrequencyProperty, "Screen Tear Frequency");
-        VisualElement paletteFlashIntensityField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, paletteFlashIntensityProperty, "Palette Flash Intensity");
-        VisualElement paletteFlashTintField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(advancedEffectsFoldout, paletteFlashTintProperty, "Palette Flash Tint");
-
         Action refreshView = () =>
         {
             ImpactFrameDurationMode durationMode = ResolveDurationMode(durationModeProperty);
@@ -145,13 +123,6 @@ public static class PowerUpImpactFramePayloadDrawerUtility
             SetDisplay(durationFramesField, showFrameFields);
             SetDisplay(referenceFrameRateField, showFrameFields);
             SetDisplay(maximumUnscaledDurationSecondsField, showDurationSeconds);
-            SetDisplay(vignetteSoftnessField, HasPositiveFloat(vignetteIntensityProperty));
-            SetDisplay(scanlineFrequencyField, HasPositiveFloat(scanlineIntensityProperty));
-            SetDisplay(shockwaveRadiusField, HasPositiveFloat(shockwaveIntensityProperty));
-            SetDisplay(shockwaveThicknessField, HasPositiveFloat(shockwaveIntensityProperty));
-            SetDisplay(posterizeStepsField, HasPositiveFloat(posterizeIntensityProperty));
-            SetDisplay(screenTearFrequencyField, HasPositiveFloat(screenTearIntensityProperty));
-            SetDisplay(paletteFlashTintField, HasPositiveFloat(paletteFlashIntensityProperty));
             RefreshWarnings(durationModeProperty,
                             durationFramesProperty,
                             referenceFrameRateProperty,
@@ -163,6 +134,8 @@ public static class PowerUpImpactFramePayloadDrawerUtility
                             desaturationAmountProperty,
                             vignetteIntensityProperty,
                             vignetteSoftnessProperty,
+                            vignetteExtentProperty,
+                            vignetteTintProperty,
                             chromaticAberrationProperty,
                             scanlineIntensityProperty,
                             scanlineFrequencyProperty,
@@ -191,28 +164,7 @@ public static class PowerUpImpactFramePayloadDrawerUtility
         RegisterRefreshCallback(easingModeField, refreshView);
         RegisterRefreshCallback(timeSlowdownPercentField, refreshView);
         RegisterRefreshCallback(refreshOnShorterRequestField, refreshView);
-        RegisterRefreshCallback(overlayIntensityField, refreshView);
-        RegisterRefreshCallback(filterTintField, refreshView);
-        RegisterRefreshCallback(desaturationAmountField, refreshView);
-        RegisterRefreshCallback(vignetteIntensityField, refreshView);
-        RegisterRefreshCallback(vignetteSoftnessField, refreshView);
-        RegisterRefreshCallback(chromaticAberrationField, refreshView);
-        RegisterRefreshCallback(scanlineIntensityField, refreshView);
-        RegisterRefreshCallback(scanlineFrequencyField, refreshView);
-        RegisterRefreshCallback(flashIntensityField, refreshView);
-        RegisterRefreshCallback(radialDistortionField, refreshView);
-        RegisterRefreshCallback(shockwaveIntensityField, refreshView);
-        RegisterRefreshCallback(shockwaveRadiusField, refreshView);
-        RegisterRefreshCallback(shockwaveThicknessField, refreshView);
-        RegisterRefreshCallback(zoomPunchIntensityField, refreshView);
-        RegisterRefreshCallback(invertIntensityField, refreshView);
-        RegisterRefreshCallback(posterizeIntensityField, refreshView);
-        RegisterRefreshCallback(posterizeStepsField, refreshView);
-        RegisterRefreshCallback(edgeInkIntensityField, refreshView);
-        RegisterRefreshCallback(screenTearIntensityField, refreshView);
-        RegisterRefreshCallback(screenTearFrequencyField, refreshView);
-        RegisterRefreshCallback(paletteFlashIntensityField, refreshView);
-        RegisterRefreshCallback(paletteFlashTintField, refreshView);
+        payloadContainer.RegisterCallback<SerializedPropertyChangeEvent>(_ => refreshView());
         refreshView();
     }
     #endregion
@@ -263,16 +215,6 @@ public static class PowerUpImpactFramePayloadDrawerUtility
     }
 
     /// <summary>
-    /// Resolves whether a numeric serialized field currently enables a dependent option row.
-    /// </summary>
-    /// <param name="property">Serialized float property used as an intensity or enable amount.</param>
-    /// <returns>True when the property exists and its value is greater than zero.</returns>
-    private static bool HasPositiveFloat(SerializedProperty property)
-    {
-        return property != null && property.floatValue > 0f;
-    }
-
-    /// <summary>
     /// Reads the authored duration mode from one serialized enum property.
     /// </summary>
     /// <param name="durationModeProperty">Serialized duration mode property.</param>
@@ -307,6 +249,8 @@ public static class PowerUpImpactFramePayloadDrawerUtility
     /// <param name="desaturationAmountProperty">Serialized desaturation property.</param>
     /// <param name="vignetteIntensityProperty">Serialized vignette intensity property.</param>
     /// <param name="vignetteSoftnessProperty">Serialized vignette softness property.</param>
+    /// <param name="vignetteExtentProperty">Serialized screen-border vignette extent property.</param>
+    /// <param name="vignetteTintProperty">Serialized scalable screen-border vignette RGBA property.</param>
     /// <param name="chromaticAberrationProperty">Serialized chromatic aberration property.</param>
     /// <param name="scanlineIntensityProperty">Serialized scanline intensity property.</param>
     /// <param name="scanlineFrequencyProperty">Serialized scanline frequency property.</param>
@@ -335,6 +279,8 @@ public static class PowerUpImpactFramePayloadDrawerUtility
                                         SerializedProperty desaturationAmountProperty,
                                         SerializedProperty vignetteIntensityProperty,
                                         SerializedProperty vignetteSoftnessProperty,
+                                        SerializedProperty vignetteExtentProperty,
+                                        SerializedProperty vignetteTintProperty,
                                         SerializedProperty chromaticAberrationProperty,
                                         SerializedProperty scanlineIntensityProperty,
                                         SerializedProperty scanlineFrequencyProperty,
@@ -378,8 +324,13 @@ public static class PowerUpImpactFramePayloadDrawerUtility
 
         AddUnitRangeWarning(warnings, overlayIntensityProperty, "Overlay Intensity");
         AddUnitRangeWarning(warnings, desaturationAmountProperty, "Desaturation Amount");
-        AddUnitRangeWarning(warnings, vignetteIntensityProperty, "Vignette Intensity");
-        AddUnitRangeWarning(warnings, vignetteSoftnessProperty, "Vignette Softness");
+        AddUnitRangeWarning(warnings, vignetteIntensityProperty, "Screen Border Vignette Intensity");
+        AddUnitRangeWarning(warnings, vignetteSoftnessProperty, "Screen Border Vignette Softness");
+        AddUnitRangeWarning(warnings, vignetteExtentProperty, "Screen Border Vignette Extent");
+        AddUnitRangeWarning(warnings, vignetteTintProperty.FindPropertyRelative("x"), "Screen Border Vignette Tint R");
+        AddUnitRangeWarning(warnings, vignetteTintProperty.FindPropertyRelative("y"), "Screen Border Vignette Tint G");
+        AddUnitRangeWarning(warnings, vignetteTintProperty.FindPropertyRelative("z"), "Screen Border Vignette Tint B");
+        AddUnitRangeWarning(warnings, vignetteTintProperty.FindPropertyRelative("w"), "Screen Border Vignette Tint A");
         AddUnitRangeWarning(warnings, scanlineIntensityProperty, "Scanline Intensity");
         AddUnitRangeWarning(warnings, flashIntensityProperty, "Flash Intensity");
         AddUnitRangeWarning(warnings, radialDistortionProperty, "Radial Distortion");

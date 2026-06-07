@@ -121,6 +121,19 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     }
 
     /// <summary>
+    /// Adds PlayerImpactFrameBuildInState to entities missing the charge-driven pre-impact state.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingImpactFrameBuildInStateQuery">Query selecting entities without PlayerImpactFrameBuildInState.</param>
+    public static void AddMissingImpactFrameBuildInState(ref EntityCommandBuffer commandBuffer,
+                                                         in EntityQuery missingImpactFrameBuildInStateQuery)
+    {
+        PlayerImpactFrameBuildInState initialState = default;
+
+        AddComponentForEntities(ref commandBuffer, in missingImpactFrameBuildInStateQuery, initialState);
+    }
+
+    /// <summary>
     /// Adds PlayerHealOverTimeState to entities missing it.
     /// </summary>
     /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>

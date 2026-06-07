@@ -50,6 +50,18 @@ public enum PowerUpTriggerEventType
     OnProjectileDespawned = 5
 }
 
+/// <summary>
+/// Selects the latest camera-stack stage that receives the Impact Frame fullscreen presentation.
+/// Later stages include every earlier stage because URP overlay cameras render on top of the accumulated color target.
+/// </summary>
+[Serializable]
+public enum ImpactFramePresentationScope : byte
+{
+    EnvironmentOnly = 0,
+    EnvironmentAndGameplay = 1,
+    EverythingIncludingUi = 2
+}
+
 public enum ProjectilePenetrationMode
 {
     None = 0,

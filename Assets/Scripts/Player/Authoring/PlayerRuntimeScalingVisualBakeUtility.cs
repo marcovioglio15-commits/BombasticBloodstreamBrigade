@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -40,7 +41,9 @@ internal static class PlayerRuntimeScalingVisualBakeUtility
             if (string.IsNullOrWhiteSpace(scalingRule.Formula))
                 continue;
 
-            if (!TryMapDeathAnimationFieldId(scalingRule.StatKey, out PlayerRuntimeDeathAnimationFieldId fieldId))
+            string normalizedStatKey = PlayerScalingStatKeyUtility.NormalizeStatKey(scalingRule.StatKey);
+
+            if (!normalizedStatKey.StartsWith("deathAnimation.", StringComparison.Ordinal))
                 continue;
 
             if (!PlayerScalingStatKeyUtility.TryFindPropertyByStatKey(serializedPreset, scalingRule.StatKey, out SerializedProperty property))
@@ -57,7 +60,7 @@ internal static class PlayerRuntimeScalingVisualBakeUtility
 
             scalingBuffer.Add(new PlayerRuntimeDeathAnimationScalingElement
             {
-                FieldId = fieldId,
+                PayloadPath = new FixedString128Bytes(normalizedStatKey.Substring("deathAnimation.".Length)),
                 ValueType = valueType,
                 BaseValue = baseValue,
                 BaseBooleanValue = baseBooleanValue,
@@ -70,70 +73,6 @@ internal static class PlayerRuntimeScalingVisualBakeUtility
     }
     #endregion
 
-    #region Private Methods
-    /// <summary>
-    /// Maps normalized visual preset stat keys to runtime death-animation fields.
-    /// </summary>
-    /// <param name="statKey">Raw Add Scaling stat key.</param>
-    /// <param name="fieldId">Resolved runtime field identifier.</param>
-    /// <returns>True when the key targets a death-animation field supported by runtime scaling.</returns>
-    private static bool TryMapDeathAnimationFieldId(string statKey, out PlayerRuntimeDeathAnimationFieldId fieldId)
-    {
-        fieldId = default;
-        string normalizedStatKey = PlayerScalingStatKeyUtility.NormalizeStatKey(statKey);
-
-        switch (normalizedStatKey)
-        {
-            case "deathAnimation.enabled":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.Enabled;
-                return true;
-            case "deathAnimation.playbackDurationSeconds":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.PlaybackDurationSeconds;
-                return true;
-            case "deathAnimation.cameraZoomEnabled":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.CameraZoomEnabled;
-                return true;
-            case "deathAnimation.cameraTargetFovDelta":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.CameraTargetFovDelta;
-                return true;
-            case "deathAnimation.cameraPositionLerpEnabled":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.CameraPositionLerpEnabled;
-                return true;
-            case "deathAnimation.cameraPositionLerpAmount":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.CameraPositionLerpAmount;
-                return true;
-            case "deathAnimation.cameraCompletionNormalizedTime":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.CameraCompletionNormalizedTime;
-                return true;
-            case "deathAnimation.easingMode":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.EasingMode;
-                return true;
-            case "deathAnimation.despawnVfxSpawnOffset.x":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetX;
-                return true;
-            case "deathAnimation.despawnVfxSpawnOffset.y":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetY;
-                return true;
-            case "deathAnimation.despawnVfxSpawnOffset.z":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnOffsetZ;
-                return true;
-            case "deathAnimation.despawnVfxScaleMultiplier":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxScaleMultiplier;
-                return true;
-            case "deathAnimation.despawnVfxSpawnNormalizedTime":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxSpawnNormalizedTime;
-                return true;
-            case "deathAnimation.despawnVfxLifetimeSeconds":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.DespawnVfxLifetimeSeconds;
-                return true;
-            case "deathAnimation.hidePlayerVisualOnVfxSpawn":
-                fieldId = PlayerRuntimeDeathAnimationFieldId.HidePlayerVisualOnVfxSpawn;
-                return true;
-            default:
-                return false;
-        }
-    }
-    #endregion
 #endif
 
     #endregion

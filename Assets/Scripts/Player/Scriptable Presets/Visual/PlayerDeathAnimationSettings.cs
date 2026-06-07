@@ -78,6 +78,26 @@ public sealed class PlayerDeathAnimationSettings
     [SerializeField] private float despawnVfxLifetimeSeconds = 1.5f;
     #endregion
 
+    #region Serialized Fields - Impact Frame
+    [Tooltip("When enabled, the death sequence drives the nested Impact Frame profile across the configured normalized playback window.")]
+    [SerializeField] private bool impactFrameEnabled;
+
+    [Tooltip("Normalized death playback point where the optional Impact Frame build-in starts progressing toward its peak.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float impactFrameBuildInStartNormalizedTime;
+
+    [Tooltip("Normalized death playback point where build-in reaches its peak and the final Impact Frame activates.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float impactFrameApplyNormalizedTime = 0.45f;
+
+    [Tooltip("Normalized death playback point where the final Impact Frame is forced to complete.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float impactFrameEndNormalizedTime = 0.85f;
+
+    [Tooltip("Full Impact Frame profile used by the death sequence, including build-in, camera feedback, scope and radial vignette.")]
+    [SerializeField] private PowerUpImpactFrameModuleData impactFrame = new PowerUpImpactFrameModuleData();
+    #endregion
+
     #region Serialized Fields - Visual Bridge
     [Tooltip("When enabled, the runtime visual bridge GameObject (the visible player rig) is hidden the first frame the despawn VFX spawns so the VFX visually replaces the player. The bridge is restored when a new run starts.")]
     [SerializeField] private bool hidePlayerVisualOnVfxSpawn = true;
@@ -190,6 +210,16 @@ public sealed class PlayerDeathAnimationSettings
         }
     }
 
+    public bool ImpactFrameEnabled => impactFrameEnabled;
+
+    public float ImpactFrameBuildInStartNormalizedTime => impactFrameBuildInStartNormalizedTime;
+
+    public float ImpactFrameApplyNormalizedTime => impactFrameApplyNormalizedTime;
+
+    public float ImpactFrameEndNormalizedTime => impactFrameEndNormalizedTime;
+
+    public PowerUpImpactFrameModuleData ImpactFrame => impactFrame;
+
     public bool HidePlayerVisualOnVfxSpawn
     {
         get
@@ -208,7 +238,10 @@ public sealed class PlayerDeathAnimationSettings
     /// </summary>
     public void Validate()
     {
-        // Intentionally no-op: warnings report invalid authored values without mutating preset data.
+        if (impactFrame == null)
+            impactFrame = new PowerUpImpactFrameModuleData();
+
+        impactFrame.Validate();
     }
     #endregion
 

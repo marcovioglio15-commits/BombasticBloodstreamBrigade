@@ -7,8 +7,14 @@ Shader "Hidden/NashCore/PlayerImpactFrame"
         _OverlayIntensity ("Overlay Intensity", Range(0, 1)) = 1
         _FilterTint ("Filter Tint", Color) = (0.96, 0.78, 0.55, 0.45)
         _DesaturationAmount ("Desaturation Amount", Range(0, 1)) = 0.65
-        _VignetteIntensity ("Vignette Intensity", Range(0, 1)) = 0.55
-        _VignetteSoftness ("Vignette Softness", Range(0, 1)) = 0.6
+        _VignetteIntensity ("Screen Border Vignette Intensity", Range(0, 1)) = 0.55
+        _VignetteSoftness ("Screen Border Vignette Softness", Range(0, 1)) = 0.6
+        _VignetteExtent ("Screen Border Vignette Extent", Range(0, 1)) = 0.35
+        _VignetteTint ("Screen Border Vignette Tint", Color) = (0, 0, 0, 1)
+        _RadialVignetteIntensity ("Radial Vignette Intensity", Range(0, 1)) = 0
+        _RadialVignetteRadius ("Radial Vignette Radius", Range(0, 1)) = 0.55
+        _RadialVignetteSoftness ("Radial Vignette Softness", Range(0.001, 1)) = 0.12
+        _RadialVignetteTint ("Radial Vignette Tint", Color) = (0.1, 0, 0.2, 0.8)
         _ChromaticAberration ("Chromatic Aberration", Float) = 0.012
         _ScanlineIntensity ("Scanline Intensity", Range(0, 1)) = 0.18
         _ScanlineFrequency ("Scanline Frequency", Float) = 320
@@ -60,6 +66,12 @@ Shader "Hidden/NashCore/PlayerImpactFrame"
                 float _DesaturationAmount;
                 float _VignetteIntensity;
                 float _VignetteSoftness;
+                float _VignetteExtent;
+                float4 _VignetteTint;
+                float _RadialVignetteIntensity;
+                float _RadialVignetteRadius;
+                float _RadialVignetteSoftness;
+                float4 _RadialVignetteTint;
                 float _ChromaticAberration;
                 float _ScanlineIntensity;
                 float _ScanlineFrequency;
@@ -134,9 +146,18 @@ Shader "Hidden/NashCore/PlayerImpactFrame"
                 float3 posterizedColor = floor(saturate(color) * (posterizeSteps - 1.0) + 0.5) / max(1.0, posterizeSteps - 1.0);
                 color = lerp(color, posterizedColor, saturate(_PosterizeIntensity) * blend);
 
-                float softness = lerp(0.02, 0.65, saturate(_VignetteSoftness));
-                float vignette = smoothstep(1.0 - softness, 1.0, radialDistance);
-                color *= 1.0 - vignette * saturate(_VignetteIntensity) * blend;
+                float2 borderUv = saturate(input.texcoord.xy);
+                float borderDistance = min(min(borderUv.x, 1.0 - borderUv.x), min(borderUv.y, 1.0 - borderUv.y));
+                float borderExtent = max(0.0001, saturate(_VignetteExtent) * 0.5);
+                float borderFeather = max(0.0001, borderExtent * saturate(_VignetteSoftness));
+                float borderVignette = 1.0 - smoothstep(max(0.0, borderExtent - borderFeather), borderExtent, borderDistance);
+                float borderVignetteBlend = borderVignette * saturate(_VignetteIntensity) * saturate(_VignetteTint.a) * blend;
+                color = lerp(color, _VignetteTint.rgb, borderVignetteBlend);
+
+                float radialVignetteDistance = abs(radialDistance - saturate(_RadialVignetteRadius));
+                float radialVignetteRing = 1.0 - smoothstep(0.0, max(0.001, _RadialVignetteSoftness), radialVignetteDistance);
+                float radialVignetteBlend = radialVignetteRing * saturate(_RadialVignetteIntensity) * saturate(_RadialVignetteTint.a) * blend;
+                color = lerp(color, _RadialVignetteTint.rgb, radialVignetteBlend);
 
                 float scanline = sin(screenUv.y * max(1.0, _ScanlineFrequency) * 6.2831853);
                 float scanlineMask = 0.5 + scanline * 0.5;

@@ -60,6 +60,108 @@ MonoBehaviour:
     despawnVfxScaleMultiplier: 2
     despawnVfxSpawnNormalizedTime: 0.6
     despawnVfxLifetimeSeconds: 1.5
+    impactFrameEnabled: 1
+    impactFrameBuildInStartNormalizedTime: 0
+    impactFrameApplyNormalizedTime: 0.6
+    impactFrameEndNormalizedTime: 1
+    impactFrame:
+      durationMode: 0
+      durationFrames: 6
+      referenceFrameRate: 60
+      maximumUnscaledDurationSeconds: 0.12
+      easeInUnscaledSeconds: 0.02
+      easeOutUnscaledSeconds: 0.08
+      easingMode: 2
+      timeSlowdownPercent: 0
+      refreshOnShorterRequest: 0
+      presentationScope: 0
+      cameraFeedback:
+        enabled: 0
+        motionMode: 1
+        axisRightEnabled: 1
+        axisUpEnabled: 1
+        axisForwardEnabled: 0
+        positionalAmplitude: 0.35
+        forwardAmplitude: 0.12
+        rotationalAmplitude: 1.25
+        frequency: 18
+        zoomEnabled: 0
+        zoomFovDelta: -2
+      overlayIntensity: 1
+      filterTint: {r: 0, g: 0, b: 0, a: 0}
+      desaturationAmount: 1
+      vignetteIntensity: 1
+      vignetteSoftness: 1
+      vignetteExtent: 0.35
+      vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+      radialVignetteIntensity: 0
+      radialVignetteRadius: 0.55
+      radialVignetteSoftness: 0.12
+      radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+      chromaticAberration: 0
+      scanlineIntensity: 0
+      scanlineFrequency: 320
+      flashIntensity: 0
+      radialDistortion: 0
+      shockwaveIntensity: 0
+      shockwaveRadius: 0.65
+      shockwaveThickness: 0.12
+      zoomPunchIntensity: 0
+      invertIntensity: 0
+      posterizeIntensity: 0
+      posterizeSteps: 6
+      edgeInkIntensity: 0
+      screenTearIntensity: 0
+      screenTearFrequency: 24
+      paletteFlashIntensity: 0
+      paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+      buildIn:
+        enabled: 1
+        releaseUnscaledSeconds: 0.06
+        easingMode: 1
+        effect:
+          presentationScope: 0
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 1
+          filterTint: {r: 0, g: 0, b: 0, a: 0}
+          desaturationAmount: 1
+          vignetteIntensity: 1
+          vignetteSoftness: 1
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0.1
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
     hidePlayerVisualOnVfxSpawn: 1
   elementalTrailAttachedVfxPrefab: {fileID: 5127294714520930670, guid: f9f4969fbeb739b4ab67598bba82a55e, type: 3}
   elementalTrailAttachedVfxScaleMultiplier: 1

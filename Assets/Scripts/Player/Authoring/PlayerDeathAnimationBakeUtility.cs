@@ -33,6 +33,10 @@ public static class PlayerDeathAnimationBakeUtility
         Vector3 vfxOffset = settings.DespawnVfxSpawnOffset;
         bool animationEnabled = settings.Enabled;
         float playbackDurationSeconds = animationEnabled ? math.max(0f, settings.PlaybackDurationSeconds) : 0f;
+        ImpactFramePowerUpConfig impactFrameConfig = default;
+        bool hasValidImpactFrame = PlayerPowerUpImpactFrameBakeUtility.TryBuildConfig(settings.ImpactFrame,
+                                                                                      out impactFrameConfig);
+        bool hasImpactFrame = animationEnabled && settings.ImpactFrameEnabled && hasValidImpactFrame;
         config = new PlayerDeathAnimationConfig
         {
             Enabled = animationEnabled ? (byte)1 : (byte)0,
@@ -48,7 +52,12 @@ public static class PlayerDeathAnimationBakeUtility
             DespawnVfxScaleMultiplier = math.max(0f, settings.DespawnVfxScaleMultiplier),
             DespawnVfxSpawnNormalizedTime = math.saturate(settings.DespawnVfxSpawnNormalizedTime),
             DespawnVfxLifetimeSeconds = math.max(0f, settings.DespawnVfxLifetimeSeconds),
-            HidePlayerVisualOnVfxSpawn = settings.HidePlayerVisualOnVfxSpawn ? (byte)1 : (byte)0
+            HidePlayerVisualOnVfxSpawn = settings.HidePlayerVisualOnVfxSpawn ? (byte)1 : (byte)0,
+            ImpactFrameEnabled = hasImpactFrame ? (byte)1 : (byte)0,
+            ImpactFrameBuildInStartNormalizedTime = math.saturate(settings.ImpactFrameBuildInStartNormalizedTime),
+            ImpactFrameApplyNormalizedTime = math.saturate(settings.ImpactFrameApplyNormalizedTime),
+            ImpactFrameEndNormalizedTime = math.saturate(settings.ImpactFrameEndNormalizedTime),
+            ImpactFrame = impactFrameConfig
         };
     }
 
@@ -80,6 +89,8 @@ public static class PlayerDeathAnimationBakeUtility
             Active = 0,
             VfxSpawned = 0,
             VisualBridgeHidden = 0,
+            ImpactFrameApplied = 0,
+            ImpactFrameCompleted = 0,
             BaseCameraFov = 0f,
             BaseCameraPosition = float3.zero,
             CurrentFovDelta = 0f,

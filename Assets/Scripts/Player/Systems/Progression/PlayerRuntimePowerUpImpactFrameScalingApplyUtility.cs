@@ -1,10 +1,16 @@
+using System;
 using Unity.Mathematics;
 
 /// <summary>
-/// Applies runtime Add Scaling payload values that target Impact Frame active-tool settings.
+/// Applies runtime Add Scaling payload values that target final-impact or charge build-in Impact Frame settings.
 /// </summary>
 internal static class PlayerRuntimePowerUpImpactFrameScalingApplyUtility
 {
+    #region Constants
+    private const string MainEffectPrefix = "impactFrame.";
+    private const string BuildInEffectPrefix = "impactFrame.buildIn.effect.";
+    #endregion
+
     #region Methods
 
     #region Public Methods
@@ -40,96 +46,21 @@ internal static class PlayerRuntimePowerUpImpactFrameScalingApplyUtility
             case "impactFrame.easingMode":
                 impactFrameConfig.EasingMode = PlayerRuntimeScalingEnumUtility.ResolveImpactFrameEasingMode(resolvedValue);
                 return true;
-            case "impactFrame.timeSlowdownPercent":
-                impactFrameConfig.TimeSlowdownPercent = math.clamp(resolvedValue, 0f, 100f);
+            case "impactFrame.buildIn.releaseUnscaledSeconds":
+                impactFrameConfig.BuildIn.ReleaseUnscaledSeconds = math.max(0f, resolvedValue);
                 return true;
-            case "impactFrame.overlayIntensity":
-                impactFrameConfig.OverlayIntensity = math.clamp(resolvedValue, 0f, 1f);
+            case "impactFrame.buildIn.easingMode":
+                impactFrameConfig.BuildIn.EasingMode = PlayerRuntimeScalingEnumUtility.ResolveImpactFrameEasingMode(resolvedValue);
                 return true;
-            case "impactFrame.filterTint.r":
-                impactFrameConfig.FilterTintRgba.x = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.filterTint.g":
-                impactFrameConfig.FilterTintRgba.y = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.filterTint.b":
-                impactFrameConfig.FilterTintRgba.z = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.filterTint.a":
-                impactFrameConfig.FilterTintRgba.w = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.desaturationAmount":
-                impactFrameConfig.DesaturationAmount = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.vignetteIntensity":
-                impactFrameConfig.VignetteIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.vignetteSoftness":
-                impactFrameConfig.VignetteSoftness = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.chromaticAberration":
-                impactFrameConfig.ChromaticAberration = math.max(0f, resolvedValue);
-                return true;
-            case "impactFrame.scanlineIntensity":
-                impactFrameConfig.ScanlineIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.scanlineFrequency":
-                impactFrameConfig.ScanlineFrequency = math.max(0f, resolvedValue);
-                return true;
-            case "impactFrame.flashIntensity":
-                impactFrameConfig.FlashIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.radialDistortion":
-                impactFrameConfig.RadialDistortion = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.shockwaveIntensity":
-                impactFrameConfig.ShockwaveIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.shockwaveRadius":
-                impactFrameConfig.ShockwaveRadius = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.shockwaveThickness":
-                impactFrameConfig.ShockwaveThickness = math.clamp(resolvedValue, 0.001f, 1f);
-                return true;
-            case "impactFrame.zoomPunchIntensity":
-                impactFrameConfig.ZoomPunchIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.invertIntensity":
-                impactFrameConfig.InvertIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.posterizeIntensity":
-                impactFrameConfig.PosterizeIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.posterizeSteps":
-                impactFrameConfig.PosterizeSteps = math.max(2f, resolvedValue);
-                return true;
-            case "impactFrame.edgeInkIntensity":
-                impactFrameConfig.EdgeInkIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.screenTearIntensity":
-                impactFrameConfig.ScreenTearIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.screenTearFrequency":
-                impactFrameConfig.ScreenTearFrequency = math.max(0f, resolvedValue);
-                return true;
-            case "impactFrame.paletteFlashIntensity":
-                impactFrameConfig.PaletteFlashIntensity = math.clamp(resolvedValue, 0f, 1f);
-                return true;
-            case "impactFrame.paletteFlashTint.r":
-                impactFrameConfig.PaletteFlashTintRgba.x = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.paletteFlashTint.g":
-                impactFrameConfig.PaletteFlashTintRgba.y = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.paletteFlashTint.b":
-                impactFrameConfig.PaletteFlashTintRgba.z = math.saturate(resolvedValue);
-                return true;
-            case "impactFrame.paletteFlashTint.a":
-                impactFrameConfig.PaletteFlashTintRgba.w = math.saturate(resolvedValue);
-                return true;
-            default:
-                return false;
         }
+
+        if (payloadPath.StartsWith(BuildInEffectPrefix, StringComparison.Ordinal))
+        {
+            string normalizedEffectPath = MainEffectPrefix + payloadPath.Substring(BuildInEffectPrefix.Length);
+            return TryApplyEffectValue(normalizedEffectPath, resolvedValue, ref impactFrameConfig.BuildIn.Effect);
+        }
+
+        return TryApplyEffectValue(payloadPath, resolvedValue, ref impactFrameConfig.Effect);
     }
 
     /// <summary>
@@ -145,6 +76,210 @@ internal static class PlayerRuntimePowerUpImpactFrameScalingApplyUtility
         {
             case "impactFrame.refreshOnShorterRequest":
                 impactFrameConfig.RefreshOnShorterRequest = resolvedValue ? (byte)1 : (byte)0;
+                return true;
+            case "impactFrame.buildIn.enabled":
+                impactFrameConfig.BuildIn.Enabled = resolvedValue ? (byte)1 : (byte)0;
+                return true;
+        }
+
+        if (payloadPath.StartsWith(BuildInEffectPrefix, StringComparison.Ordinal))
+        {
+            string normalizedEffectPath = MainEffectPrefix + payloadPath.Substring(BuildInEffectPrefix.Length);
+            return TryApplyEffectBooleanValue(normalizedEffectPath, resolvedValue, ref impactFrameConfig.BuildIn.Effect);
+        }
+
+        return TryApplyEffectBooleanValue(payloadPath, resolvedValue, ref impactFrameConfig.Effect);
+    }
+    #endregion
+
+    #region Effect Values
+    /// <summary>
+    /// Applies one normalized effect payload value to the requested runtime effect profile.
+    /// </summary>
+    /// <param name="payloadPath">Normalized path beginning with impactFrame.</param>
+    /// <param name="resolvedValue">Resolved numeric or enum-like value.</param>
+    /// <param name="effect">Mutable runtime effect profile.</param>
+    /// <returns>True when the path targeted a supported effect field.</returns>
+    private static bool TryApplyEffectValue(string payloadPath, float resolvedValue, ref ImpactFrameEffectConfig effect)
+    {
+        switch (payloadPath)
+        {
+            case "impactFrame.presentationScope":
+                effect.PresentationScope = PlayerRuntimeScalingEnumUtility.ResolveImpactFramePresentationScope(resolvedValue);
+                return true;
+            case "impactFrame.timeSlowdownPercent":
+                effect.TimeSlowdownPercent = math.clamp(resolvedValue, 0f, 100f);
+                return true;
+            case "impactFrame.cameraFeedback.motionMode":
+                effect.CameraFeedback.MotionMode = PlayerRuntimeScalingEnumUtility.ResolveCameraShakeMotionMode(resolvedValue);
+                return true;
+            case "impactFrame.cameraFeedback.positionalAmplitude":
+                effect.CameraFeedback.PositionalAmplitude = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.cameraFeedback.forwardAmplitude":
+                effect.CameraFeedback.ForwardAmplitude = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.cameraFeedback.rotationalAmplitude":
+                effect.CameraFeedback.RotationalAmplitude = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.cameraFeedback.frequency":
+                effect.CameraFeedback.Frequency = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.cameraFeedback.zoomFovDelta":
+                effect.CameraFeedback.ZoomFovDelta = resolvedValue;
+                return true;
+            case "impactFrame.overlayIntensity":
+                effect.OverlayIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.filterTint.r":
+                effect.FilterTintRgba.x = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.filterTint.g":
+                effect.FilterTintRgba.y = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.filterTint.b":
+                effect.FilterTintRgba.z = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.filterTint.a":
+                effect.FilterTintRgba.w = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.desaturationAmount":
+                effect.DesaturationAmount = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteIntensity":
+                effect.VignetteIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteSoftness":
+                effect.VignetteSoftness = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteExtent":
+                effect.VignetteExtent = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteTint.x":
+                effect.VignetteTintRgba.x = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteTint.y":
+                effect.VignetteTintRgba.y = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteTint.z":
+                effect.VignetteTintRgba.z = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.vignetteTint.w":
+                effect.VignetteTintRgba.w = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteIntensity":
+                effect.RadialVignetteIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteRadius":
+                effect.RadialVignetteRadius = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteSoftness":
+                effect.RadialVignetteSoftness = math.clamp(resolvedValue, 0.001f, 1f);
+                return true;
+            case "impactFrame.radialVignetteTint.r":
+                effect.RadialVignetteTintRgba.x = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteTint.g":
+                effect.RadialVignetteTintRgba.y = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteTint.b":
+                effect.RadialVignetteTintRgba.z = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialVignetteTint.a":
+                effect.RadialVignetteTintRgba.w = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.chromaticAberration":
+                effect.ChromaticAberration = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.scanlineIntensity":
+                effect.ScanlineIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.scanlineFrequency":
+                effect.ScanlineFrequency = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.flashIntensity":
+                effect.FlashIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.radialDistortion":
+                effect.RadialDistortion = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.shockwaveIntensity":
+                effect.ShockwaveIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.shockwaveRadius":
+                effect.ShockwaveRadius = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.shockwaveThickness":
+                effect.ShockwaveThickness = math.clamp(resolvedValue, 0.001f, 1f);
+                return true;
+            case "impactFrame.zoomPunchIntensity":
+                effect.ZoomPunchIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.invertIntensity":
+                effect.InvertIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.posterizeIntensity":
+                effect.PosterizeIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.posterizeSteps":
+                effect.PosterizeSteps = math.max(2f, resolvedValue);
+                return true;
+            case "impactFrame.edgeInkIntensity":
+                effect.EdgeInkIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.screenTearIntensity":
+                effect.ScreenTearIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.screenTearFrequency":
+                effect.ScreenTearFrequency = math.max(0f, resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashIntensity":
+                effect.PaletteFlashIntensity = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.r":
+                effect.PaletteFlashTintRgba.x = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.g":
+                effect.PaletteFlashTintRgba.y = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.b":
+                effect.PaletteFlashTintRgba.z = math.saturate(resolvedValue);
+                return true;
+            case "impactFrame.paletteFlashTint.a":
+                effect.PaletteFlashTintRgba.w = math.saturate(resolvedValue);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Applies one normalized effect boolean payload value to the requested runtime effect profile.
+    /// </summary>
+    /// <param name="payloadPath">Normalized path beginning with impactFrame.</param>
+    /// <param name="resolvedValue">Resolved boolean value.</param>
+    /// <param name="effect">Mutable runtime effect profile.</param>
+    /// <returns>True when the path targeted a supported boolean effect field.</returns>
+    private static bool TryApplyEffectBooleanValue(string payloadPath, bool resolvedValue, ref ImpactFrameEffectConfig effect)
+    {
+        byte value = resolvedValue ? (byte)1 : (byte)0;
+
+        switch (payloadPath)
+        {
+            case "impactFrame.cameraFeedback.enabled":
+                effect.CameraFeedback.Enabled = value;
+                return true;
+            case "impactFrame.cameraFeedback.axisRightEnabled":
+                effect.CameraFeedback.AxisRightEnabled = value;
+                return true;
+            case "impactFrame.cameraFeedback.axisUpEnabled":
+                effect.CameraFeedback.AxisUpEnabled = value;
+                return true;
+            case "impactFrame.cameraFeedback.axisForwardEnabled":
+                effect.CameraFeedback.AxisForwardEnabled = value;
+                return true;
+            case "impactFrame.cameraFeedback.zoomEnabled":
+                effect.CameraFeedback.ZoomEnabled = value;
                 return true;
             default:
                 return false;

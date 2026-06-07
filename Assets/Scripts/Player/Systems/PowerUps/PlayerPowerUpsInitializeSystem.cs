@@ -13,6 +13,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingDashQuery;
     private EntityQuery missingBulletTimeStateQuery;
     private EntityQuery missingImpactFrameStateQuery;
+    private EntityQuery missingImpactFrameBuildInStateQuery;
     private EntityQuery missingHealOverTimeStateQuery;
     private EntityQuery missingPassiveExplosionStateQuery;
     private EntityQuery missingPassiveHealStateQuery;
@@ -79,6 +80,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingImpactFrameStateQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerImpactFrameState>()
+            .Build();
+
+        missingImpactFrameBuildInStateQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerImpactFrameBuildInState>()
             .Build();
 
         missingHealOverTimeStateQuery = SystemAPI.QueryBuilder()
@@ -271,13 +277,15 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         bool hasMissingOrbitalProjectionLostBuffer = !missingOrbitalProjectionLostBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingImpactFrameState = !missingImpactFrameStateQuery.IsEmptyIgnoreFilter;
+        bool hasMissingImpactFrameBuildInState = !missingImpactFrameBuildInStateQuery.IsEmptyIgnoreFilter;
 
         if (!missingFlags.HasAnyMissing &&
             !hasMissingOrbitalProjectionRequestBuffer &&
             !hasMissingOrbitalProjectionPrefabBindingBuffer &&
             !hasMissingOrbitalProjectionLostBuffer &&
             !hasMissingLaserBeamStormTickPulseBuffer &&
-            !hasMissingImpactFrameState)
+            !hasMissingImpactFrameState &&
+            !hasMissingImpactFrameBuildInState)
         {
             return;
         }
@@ -319,6 +327,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (hasMissingImpactFrameState)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingImpactFrameState(ref commandBuffer, in missingImpactFrameStateQuery);
+        }
+
+        if (hasMissingImpactFrameBuildInState)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingImpactFrameBuildInState(ref commandBuffer, in missingImpactFrameBuildInStateQuery);
         }
 
         if (missingFlags.HasMissingHealOverTimeState)

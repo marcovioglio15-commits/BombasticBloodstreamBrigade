@@ -137,13 +137,30 @@ public struct ImpactFramePowerUpConfig
     public float EaseInUnscaledSeconds;
     public float EaseOutUnscaledSeconds;
     public ImpactFrameEasingMode EasingMode;
-    public float TimeSlowdownPercent;
     public byte RefreshOnShorterRequest;
+    public ImpactFrameEffectConfig Effect;
+    public ImpactFrameBuildInConfig BuildIn;
+}
+
+/// <summary>
+/// Stores one reusable Impact Frame effect profile independent from activation timing.
+/// </summary>
+public struct ImpactFrameEffectConfig
+{
+    public ImpactFramePresentationScope PresentationScope;
+    public float TimeSlowdownPercent;
+    public ImpactFrameCameraFeedbackConfig CameraFeedback;
     public float OverlayIntensity;
     public float4 FilterTintRgba;
     public float DesaturationAmount;
     public float VignetteIntensity;
     public float VignetteSoftness;
+    public float VignetteExtent;
+    public float4 VignetteTintRgba;
+    public float RadialVignetteIntensity;
+    public float RadialVignetteRadius;
+    public float RadialVignetteSoftness;
+    public float4 RadialVignetteTintRgba;
     public float ChromaticAberration;
     public float ScanlineIntensity;
     public float ScanlineFrequency;
@@ -161,6 +178,35 @@ public struct ImpactFramePowerUpConfig
     public float ScreenTearFrequency;
     public float PaletteFlashIntensity;
     public float4 PaletteFlashTintRgba;
+}
+
+/// <summary>
+/// Stores camera motion authored for one Impact Frame effect profile.
+/// </summary>
+public struct ImpactFrameCameraFeedbackConfig
+{
+    public byte Enabled;
+    public CameraShakeMotionMode MotionMode;
+    public byte AxisRightEnabled;
+    public byte AxisUpEnabled;
+    public byte AxisForwardEnabled;
+    public float PositionalAmplitude;
+    public float ForwardAmplitude;
+    public float RotationalAmplitude;
+    public float Frequency;
+    public byte ZoomEnabled;
+    public float ZoomFovDelta;
+}
+
+/// <summary>
+/// Stores charge-driven pre-impact presentation and rapid release tuning.
+/// </summary>
+public struct ImpactFrameBuildInConfig
+{
+    public byte Enabled;
+    public float ReleaseUnscaledSeconds;
+    public ImpactFrameEasingMode EasingMode;
+    public ImpactFrameEffectConfig Effect;
 }
 
 /// <summary>

@@ -73,6 +73,8 @@ public partial struct PlayerCameraFollowSystem : ISystem
         ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(true);
         ComponentLookup<PlayerShield> shieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(true);
         ComponentLookup<PlayerDamageGraceState> damageGraceLookup = SystemAPI.GetComponentLookup<PlayerDamageGraceState>(true);
+        ComponentLookup<PlayerImpactFrameState> impactFrameLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameState>(true);
+        ComponentLookup<PlayerImpactFrameBuildInState> impactFrameBuildInLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameBuildInState>(true);
         float shakeNoiseTime = (float)SystemAPI.Time.ElapsedTime;
         int cameraInstanceId = camera.GetInstanceID();
 
@@ -114,6 +116,31 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                                            camera.transform.right,
                                                            camera.transform.up,
                                                            camera.transform.forward);
+
+                if (impactFrameLookup.HasComponent(entity) && impactFrameLookup[entity].IsActive != 0)
+                {
+                    PlayerImpactFrameState impactFrameState = impactFrameLookup[entity];
+                    PlayerCameraShakeRuntimeUtility.AddImpactFrameOutput(ref shakeState,
+                                                                        in impactFrameState.Effect.CameraFeedback,
+                                                                        impactFrameState.CurrentBlend,
+                                                                        shakeNoiseTime,
+                                                                        camera.transform.right,
+                                                                        camera.transform.up,
+                                                                        camera.transform.forward);
+                }
+
+                if (impactFrameBuildInLookup.HasComponent(entity) && impactFrameBuildInLookup[entity].IsActive != 0)
+                {
+                    PlayerImpactFrameBuildInState buildInState = impactFrameBuildInLookup[entity];
+                    PlayerCameraShakeRuntimeUtility.AddImpactFrameOutput(ref shakeState,
+                                                                        in buildInState.Effect.CameraFeedback,
+                                                                        buildInState.CurrentBlend,
+                                                                        shakeNoiseTime,
+                                                                        camera.transform.right,
+                                                                        camera.transform.up,
+                                                                        camera.transform.forward);
+                }
+
                 shakeStateLookup[entity] = shakeState;
                 PlayerCameraShakeRuntimeUtility.ApplyFovToCamera(camera, in shakeState);
             }

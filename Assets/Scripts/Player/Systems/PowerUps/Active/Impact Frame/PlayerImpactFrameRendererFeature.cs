@@ -11,7 +11,8 @@ public sealed class PlayerImpactFrameRendererFeature : ScriptableRendererFeature
 {
     #region Constants
     private const string PassName = "Player Impact Frame";
-    private const string TemporaryColorName = "_PlayerImpactFrameColor";
+    private const string CopyPassName = "Player Impact Frame Color Copy";
+    private const string TemporaryColorName = "_PlayerImpactFrameSourceColor";
     #endregion
 
     #region Serialized Fields
@@ -124,7 +125,8 @@ public sealed class PlayerImpactFrameRendererFeature : ScriptableRendererFeature
 
         #region RenderGraph
         /// <summary>
-        /// Records the RenderGraph fullscreen blit and swaps the active camera color texture for downstream passes.
+        /// Records a source-color copy followed by a fullscreen blit back into the active camera target. Copying first
+        /// keeps the pass valid for URP overlay cameras whose active target can already be the final backbuffer.
         /// </summary>
         /// <param name="renderGraph">URP RenderGraph builder for the current camera.</param>
         /// <param name="frameData">URP frame data containing active color and camera resources.</param>
@@ -135,21 +137,25 @@ public sealed class PlayerImpactFrameRendererFeature : ScriptableRendererFeature
 
             UniversalResourceData resourceData = frameData.Get<UniversalResourceData>();
 
-            if (resourceData.isActiveTargetBackBuffer)
+            TextureHandle target = resourceData.activeColorTexture;
+
+            if (!target.IsValid())
                 return;
 
-            TextureHandle source = resourceData.activeColorTexture;
-
-            if (!source.IsValid())
-                return;
-
-            TextureDesc destinationDescriptor = renderGraph.GetTextureDesc(source);
-            destinationDescriptor.name = TemporaryColorName;
-            destinationDescriptor.clearBuffer = false;
-            TextureHandle destination = renderGraph.CreateTexture(destinationDescriptor);
-            RenderGraphUtils.BlitMaterialParameters blitParameters = new RenderGraphUtils.BlitMaterialParameters(source, destination, material, 0);
+            TextureDesc sourceDescriptor = renderGraph.GetTextureDesc(resourceData.cameraColor);
+            sourceDescriptor.name = TemporaryColorName;
+            sourceDescriptor.clearBuffer = false;
+            TextureHandle source = renderGraph.CreateTexture(sourceDescriptor);
+            renderGraph.AddBlitPass(target,
+                                    source,
+                                    Vector2.one,
+                                    Vector2.zero,
+                                    passName: CopyPassName);
+            RenderGraphUtils.BlitMaterialParameters blitParameters = new RenderGraphUtils.BlitMaterialParameters(source,
+                                                                                                                  target,
+                                                                                                                  material,
+                                                                                                                  0);
             renderGraph.AddBlitPass(blitParameters, PassName);
-            resourceData.cameraColor = destination;
         }
         #endregion
 
