@@ -14,6 +14,7 @@ public sealed class PlayerControllerPresetsPanel
     #region Constants
     private const float LeftPaneWidth = 280f;
     internal const string ActiveSectionStateKey = "NashCore.PlayerManagement.Controller.ActiveSection";
+    internal const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.Controller.DetailsScroll";
     #endregion
 
     #region Fields
@@ -210,6 +211,17 @@ public sealed class PlayerControllerPresetsPanel
         if (index < 0)
             return;
 
+        // External sync: when the preset is already the current one keep the detail subtree intact and
+        // only fix listView selection. Otherwise route through SelectPreset (which builds detail UI).
+        if (selectedPreset == preset && presetSerializedObject != null && presetSerializedObject.targetObject == preset)
+        {
+            if (listView != null && listView.selectedIndex != index)
+                listView.SetSelectionWithoutNotify(new int[] { index });
+
+            presetSerializedObject.UpdateIfRequiredOrScript();
+            return;
+        }
+
         if (listView == null)
         {
             SelectPreset(preset);
@@ -248,7 +260,12 @@ public sealed class PlayerControllerPresetsPanel
         if (listView != null)
             listView.SetSelectionWithoutNotify(new int[] { presetIndex });
 
-        SelectPreset(previouslySelectedPreset);
+        // Soft-refresh when the selection still points to the same live asset: this keeps the detail
+        // subtree (and any open dropdowns/scroll offsets) intact across Apply/Discard/Undo flows.
+        if (selectedPreset == previouslySelectedPreset && presetSerializedObject != null && presetSerializedObject.targetObject == previouslySelectedPreset)
+            presetSerializedObject.UpdateIfRequiredOrScript();
+        else
+            SelectPreset(previouslySelectedPreset);
     }
     #endregion
 

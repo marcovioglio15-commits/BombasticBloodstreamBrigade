@@ -13,6 +13,8 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     private const string OpenPanelsStateKey = "NashCore.EnemyManagement.Master.OpenPanels";
     private const string ActiveDetailsSectionStateKey = "NashCore.EnemyManagement.Master.ActiveDetailsSection";
     private const string SelectedPrefabPathStateKey = "NashCore.EnemyManagement.Master.SelectedPrefabPath";
+    internal const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.Master.SelectedPresetPath";
+    internal const string DetailsScrollOffsetStateKey = "NashCore.EnemyManagement.Master.DetailsScroll";
     private static readonly Color ActiveTabColor = new Color(0.18f, 0.18f, 0.18f, 0.6f);
     #endregion
 
@@ -542,6 +544,28 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
 
         ManagementToolStateUtility.SaveAssetPath(SelectedPrefabPathStateKey, panel.SelectedEnemyPrefab);
     }
+
+    /// <summary>
+    /// Persists the currently selected enemy master preset reference so the panel can re-select it on reopen.
+    /// </summary>
+    /// <param name="panel">Owning panel that stores selected preset state.</param>
+    public static void SaveSelectedPresetState(EnemyMasterPresetsPanel panel)
+    {
+        if (panel == null)
+            return;
+
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, panel.SelectedPreset);
+    }
+
+    /// <summary>
+    /// Loads the last persisted enemy master preset reference, or null when the asset no longer exists.
+    /// </summary>
+    /// <returns>Returns the resolved master preset asset, or null.</returns>
+    public static EnemyMasterPreset LoadPersistedSelectedPreset()
+    {
+        return ManagementToolStateUtility.LoadAsset<EnemyMasterPreset>(SelectedPresetPathStateKey);
+    }
+
     #endregion
 
     #endregion

@@ -331,8 +331,15 @@ public sealed class GameMasterPresetsPanel
         library = GameMasterPresetLibraryUtility.GetOrCreateLibrary();
         RefreshPresetList();
 
+        // Soft-refresh when the selection still points to the same live asset: this keeps the detail
+        // subtree (and any open dropdowns/scroll offsets) intact across Apply/Discard/Undo flows.
         if (previousSelection != null && filteredPresets.Contains(previousSelection))
-            SelectPreset(previousSelection);
+        {
+            if (selectedPreset == previousSelection && presetSerializedObject != null && presetSerializedObject.targetObject == previousSelection)
+                presetSerializedObject.UpdateIfRequiredOrScript();
+            else
+                SelectPreset(previousSelection);
+        }
 
         RefreshOpenSidePanels();
     }

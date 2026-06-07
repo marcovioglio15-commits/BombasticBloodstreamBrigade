@@ -309,11 +309,17 @@ internal static class GameAudioManagerPresetsPanelPresetUtility
             if (preset == null)
                 continue;
 
+            // Re-fired selectionChanged events (e.g. after ListView.Rebuild) would otherwise tear down
+            // the detail subtree even when the selection did not actually change.
+            if (panel.SelectedPreset == preset)
+                return;
+
             panel.SelectPreset(preset);
             return;
         }
 
-        panel.SelectPreset(null);
+        if (panel.SelectedPreset != null)
+            panel.SelectPreset(null);
     }
 
     /// <summary>

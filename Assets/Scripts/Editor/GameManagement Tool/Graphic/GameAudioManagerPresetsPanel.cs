@@ -190,8 +190,15 @@ public sealed class GameAudioManagerPresetsPanel
         library = GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
         RefreshPresetList();
 
+        // Soft-refresh when the selection still points to the same live asset: this keeps the detail
+        // subtree (and any open dropdowns/scroll offsets) intact across Apply/Discard/Undo flows.
         if (previousSelection != null && filteredPresets.Contains(previousSelection))
-            SelectPreset(previousSelection);
+        {
+            if (selectedPreset == previousSelection && presetSerializedObject != null && presetSerializedObject.targetObject == previousSelection)
+                presetSerializedObject.UpdateIfRequiredOrScript();
+            else
+                SelectPreset(previousSelection);
+        }
     }
 
     /// <summary>
@@ -205,6 +212,13 @@ public sealed class GameAudioManagerPresetsPanel
 
         if (!filteredPresets.Contains(preset))
             RefreshPresetList();
+
+        // External sync: skip detail rebuild when the preset is already active so dropdowns/scroll stay.
+        if (selectedPreset == preset && presetSerializedObject != null && presetSerializedObject.targetObject == preset)
+        {
+            presetSerializedObject.UpdateIfRequiredOrScript();
+            return;
+        }
 
         SelectPreset(preset);
     }

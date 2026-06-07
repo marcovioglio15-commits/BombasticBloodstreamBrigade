@@ -13,6 +13,8 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
     private const string OpenPanelsStateKey = "NashCore.PlayerManagement.Master.OpenPanels";
     internal const string ActiveDetailsSectionStateKey = "NashCore.PlayerManagement.Master.ActiveDetailsSection";
     private const string SelectedPrefabPathStateKey = "NashCore.PlayerManagement.Master.SelectedPrefabPath";
+    internal const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.Master.SelectedPresetPath";
+    internal const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.Master.DetailsScroll";
     private static readonly Color ActiveTabColor = new Color(0.18f, 0.18f, 0.18f, 0.6f);
     #endregion
 
@@ -187,6 +189,28 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
 
         ManagementToolStateUtility.SaveAssetPath(SelectedPrefabPathStateKey, panel.SelectedPlayerPrefab);
     }
+
+    /// <summary>
+    /// Persists the currently selected master preset reference so the panel can re-select it on reopen.
+    /// </summary>
+    /// <param name="panel">Owning panel that stores selected preset state.</param>
+    public static void SaveSelectedPresetState(PlayerMasterPresetsPanel panel)
+    {
+        if (panel == null)
+            return;
+
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, panel.SelectedPreset);
+    }
+
+    /// <summary>
+    /// Loads the last persisted master preset reference, or null when the asset no longer exists.
+    /// </summary>
+    /// <returns>Returns the resolved master preset asset, or null.</returns>
+    public static PlayerMasterPreset LoadPersistedSelectedPreset()
+    {
+        return ManagementToolStateUtility.LoadAsset<PlayerMasterPreset>(SelectedPresetPathStateKey);
+    }
+
     #endregion
 
     #region Private Methods

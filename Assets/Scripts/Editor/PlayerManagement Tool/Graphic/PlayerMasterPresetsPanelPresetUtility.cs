@@ -106,6 +106,7 @@ internal static class PlayerMasterPresetsPanelPresetUtility
         detailsRoot.style.flexGrow = 1f;
         rightPane.Add(detailsRoot);
         panel.DetailsRoot = detailsRoot;
+        ManagementToolScrollStateUtility.Attach(detailsRoot, PlayerMasterPresetsPanelSidePanelUtility.DetailsScrollOffsetStateKey);
         return rightPane;
     }
 
@@ -181,14 +182,21 @@ internal static class PlayerMasterPresetsPanelPresetUtility
         {
             PlayerMasterPreset preset = item as PlayerMasterPreset;
 
-            if (preset != null)
-            {
-                panel.SelectPreset(preset);
+            if (preset == null)
+                continue;
+
+            // Re-fired selectionChanged events (e.g. after ListView.Rebuild) would otherwise tear down
+            // the detail subtree even when the selection did not actually change: short-circuit them
+            // so scroll/dropdown state survives Apply/Discard refreshes.
+            if (panel.SelectedPreset == preset)
                 return;
-            }
+
+            panel.SelectPreset(preset);
+            return;
         }
 
-        panel.SelectPreset(null);
+        if (panel.SelectedPreset != null)
+            panel.SelectPreset(null);
     }
 
     /// <summary>
@@ -230,10 +238,17 @@ internal static class PlayerMasterPresetsPanelPresetUtility
 
         if (panel.SelectedPreset == null || !panel.FilteredPresets.Contains(panel.SelectedPreset))
         {
-            panel.SelectPreset(panel.FilteredPresets[0]);
+            // Prefer the last persisted preset so reopening the tool resumes the previous workspace.
+            PlayerMasterPreset restoredPreset = PlayerMasterPresetsPanelSidePanelUtility.LoadPersistedSelectedPreset();
+            PlayerMasterPreset initialPreset = restoredPreset != null && panel.FilteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : panel.FilteredPresets[0];
+            panel.SelectPreset(initialPreset);
 
-            if (panel.PresetListView != null)
-                panel.PresetListView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = panel.FilteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && panel.PresetListView != null)
+                panel.PresetListView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 

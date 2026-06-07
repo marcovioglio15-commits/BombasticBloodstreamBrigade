@@ -253,6 +253,8 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
             return;
 
         panel.SelectedPreset = preset;
+        // Persist the selection so close/reopen lands on the same preset.
+        EnemyMasterPresetsPanelSidePanelUtility.SaveSelectedPresetState(panel);
         panel.DetailsRoot.Clear();
         panel.DetailSectionButtonsRoot = null;
         panel.DetailSectionContentRoot = null;

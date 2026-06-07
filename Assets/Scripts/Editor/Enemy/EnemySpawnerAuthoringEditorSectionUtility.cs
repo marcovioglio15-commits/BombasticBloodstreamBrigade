@@ -102,6 +102,45 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     }
 
     /// <summary>
+    /// Draws the shared paint-brush controls inside the wave selected by the designer.
+    /// </summary>
+    /// <param name="brushMasterPreset">Enemy master preset assigned while painting.</param>
+    /// <param name="brushEnemyCount">Enemy count assigned while painting.</param>
+    /// <param name="brushDistributionCurve">Distribution curve copied into painted cells.</param>
+    /// <param name="eraseMode">True when painting removes existing cells.</param>
+    public static void DrawPainterSection(ref EnemyMasterPreset brushMasterPreset,
+                                          ref int brushEnemyCount,
+                                          ref AnimationCurve brushDistributionCurve,
+                                          ref bool eraseMode)
+    {
+        brushMasterPreset = EditorGUILayout.ObjectField(new GUIContent("Brush Master Preset",
+                                                                       "Enemy master preset painted by left click."),
+                                                        brushMasterPreset,
+                                                        typeof(EnemyMasterPreset),
+                                                        false) as EnemyMasterPreset;
+        brushEnemyCount = EditorGUILayout.IntField(new GUIContent("Brush Enemy Count",
+                                                                  "Enemy count assigned when painting a new cell."),
+                                                   Mathf.Max(1, brushEnemyCount));
+        brushDistributionCurve = EditorGUILayout.CurveField(new GUIContent("Brush Curve",
+                                                                           "Curve copied as a local override into newly painted or repainted cells."),
+                                                            brushDistributionCurve == null ? EnemySpawnerWaveBakeUtility.CreateDefaultDistributionCurve() : brushDistributionCurve);
+        eraseMode = EditorGUILayout.Toggle(new GUIContent("Erase Mode",
+                                                          "When enabled, left click removes painted cells instead of painting them."),
+                                           eraseMode);
+
+        Rect colorRect = EditorGUILayout.GetControlRect(false, 18f);
+        Color resolvedPaintColor = EnemySpawnerWaveBakeUtility.ResolvePaintColor(brushMasterPreset);
+        EditorGUI.PrefixLabel(colorRect, new GUIContent("Resolved Paint Color",
+                                                        "Color preview resolved from the current brush visual preset."));
+        Rect swatchRect = new Rect(colorRect.x + EditorGUIUtility.labelWidth, colorRect.y + 2f, 48f, colorRect.height - 4f);
+        EditorGUI.DrawRect(swatchRect, resolvedPaintColor);
+
+        if (GUILayout.Button(new GUIContent("Open Enemy Management Tool",
+                                            "Open the Enemy Management Tool to edit master, visual and brain presets.")))
+            EnemyManagementWindow.ShowWindow();
+    }
+
+    /// <summary>
     /// Draws the selected-cell inspector when a painted cell is currently selected.
     /// </summary>
     /// <param name="wavePresetSerializedObject">Serialized object that owns the edited wave preset.</param>
@@ -109,7 +148,8 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     /// <param name="wavesProperty">Serialized wave list property.</param>
     /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
     /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
-    public static void DrawSelectedCellSection(SerializedObject wavePresetSerializedObject,
+    /// <returns>Returns true when the selected cell was removed during this draw pass.</returns>
+    public static bool DrawSelectedCellSection(SerializedObject wavePresetSerializedObject,
                                                EnemyWavePreset cachedWavePreset,
                                                SerializedProperty wavesProperty,
                                                ref int selectedWaveIndex,
@@ -120,13 +160,13 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
         if (wavesProperty == null)
         {
             EditorGUILayout.HelpBox("No EnemyWavePreset is assigned.", MessageType.Info);
-            return;
+            return false;
         }
 
         if (selectedWaveIndex < 0)
         {
             EditorGUILayout.HelpBox("Right click a painted cell in any wave grid to inspect and edit it.", MessageType.Info);
-            return;
+            return false;
         }
 
         SerializedProperty cellProperty = EnemySpawnerAuthoringEditorWaveUtility.FindCellProperty(wavesProperty,
@@ -136,15 +176,15 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
         if (cellProperty == null)
         {
             EditorGUILayout.HelpBox("The selected cell no longer exists.", MessageType.Info);
-            return;
+            return false;
         }
 
-        DrawSelectedCellFields(wavePresetSerializedObject,
-                               cachedWavePreset,
-                               wavesProperty,
-                               cellProperty,
-                               ref selectedWaveIndex,
-                               ref selectedCellCoordinate);
+        return DrawSelectedCellFields(wavePresetSerializedObject,
+                                      cachedWavePreset,
+                                      wavesProperty,
+                                      cellProperty,
+                                      ref selectedWaveIndex,
+                                      ref selectedCellCoordinate);
     }
 
     /// <summary>
@@ -174,7 +214,8 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     /// <param name="cellProperty">Serialized selected cell property.</param>
     /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
     /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
-    private static void DrawSelectedCellFields(SerializedObject wavePresetSerializedObject,
+    /// <returns>Returns true when the selected cell was removed during this draw pass.</returns>
+    private static bool DrawSelectedCellFields(SerializedObject wavePresetSerializedObject,
                                                EnemyWavePreset cachedWavePreset,
                                                SerializedProperty wavesProperty,
                                                SerializedProperty cellProperty,
@@ -202,11 +243,11 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
         DrawSelectedCellCurve(defaultDistributionCurveProperty,
                               useWaveDefaultDistributionProperty,
                               distributionCurveOverrideProperty);
-        DrawSelectedCellActions(wavePresetSerializedObject,
-                                cachedWavePreset,
-                                wavesProperty,
-                                ref selectedWaveIndex,
-                                ref selectedCellCoordinate);
+        return DrawSelectedCellActions(wavePresetSerializedObject,
+                                       cachedWavePreset,
+                                       wavesProperty,
+                                       ref selectedWaveIndex,
+                                       ref selectedCellCoordinate);
     }
 
     /// <summary>
@@ -250,7 +291,8 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     /// <param name="wavesProperty">Serialized wave list property.</param>
     /// <param name="selectedWaveIndex">Selected wave index, updated when the cell is removed.</param>
     /// <param name="selectedCellCoordinate">Selected cell coordinate, updated when the cell is removed.</param>
-    private static void DrawSelectedCellActions(SerializedObject wavePresetSerializedObject,
+    /// <returns>Returns true when the selected cell was removed.</returns>
+    private static bool DrawSelectedCellActions(SerializedObject wavePresetSerializedObject,
                                                 EnemyWavePreset cachedWavePreset,
                                                 SerializedProperty wavesProperty,
                                                 ref int selectedWaveIndex,
@@ -258,16 +300,15 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     {
         if (!GUILayout.Button(new GUIContent("Remove Cell",
                                              "Delete the currently selected painted cell from the wave.")))
-            return;
+            return false;
 
-        EnemySpawnerAuthoringEditorWaveUtility.RemoveCell(wavePresetSerializedObject,
-                                                          cachedWavePreset,
-                                                          wavesProperty,
-                                                          selectedWaveIndex,
-                                                          selectedCellCoordinate,
-                                                          ref selectedWaveIndex,
-                                                          ref selectedCellCoordinate);
-        GUIUtility.ExitGUI();
+        return EnemySpawnerAuthoringEditorWaveUtility.RemoveCell(wavePresetSerializedObject,
+                                                                 cachedWavePreset,
+                                                                 wavesProperty,
+                                                                 selectedWaveIndex,
+                                                                 selectedCellCoordinate,
+                                                                 ref selectedWaveIndex,
+                                                                 ref selectedCellCoordinate);
     }
     #endregion
 

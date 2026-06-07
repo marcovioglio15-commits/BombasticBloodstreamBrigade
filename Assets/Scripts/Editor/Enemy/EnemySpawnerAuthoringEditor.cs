@@ -3,7 +3,10 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Custom editor that provides wave-based grid painting for EnemySpawnerAuthoring.
+/// Custom editor that provides wave-based grid painting for EnemySpawnerAuthoring. Per-wave scroll
+/// positions and pending paint-exits are tracked so that mutations performed from inside the grid
+/// never tear down IMGUI layout groups mid-frame, which is what previously caused the visible
+/// "scroll resets to top" behavior on every edit.
 /// </summary>
 [CustomEditor(typeof(EnemySpawnerAuthoring))]
 public sealed class EnemySpawnerAuthoringEditor : Editor
@@ -14,7 +17,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     #endregion
 
     #region Fields
-    private readonly Dictionary<int, bool> waveFoldoutState = new Dictionary<int, bool>();
+    private readonly EnemySpawnerAuthoringEditorState editorState = new EnemySpawnerAuthoringEditorState();
 
     private SerializedProperty spawnerEnabledProperty;
     private SerializedProperty gridSizeXProperty;
@@ -40,18 +43,17 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     private SerializedProperty drawCellCountsProperty;
     private SerializedObject wavePresetSerializedObject;
     private EnemyWavePreset cachedWavePreset;
-
     private EnemyMasterPreset brushMasterPreset;
     private int brushEnemyCount = 1;
     private AnimationCurve brushDistributionCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     private bool eraseMode;
     private float gridZoom = 1f;
-    private Vector2 gridScrollPosition;
     private int selectedWaveIndex = -1;
     private Vector2Int selectedCellCoordinate = new Vector2Int(-1, -1);
     private bool paintDragActive;
     private int paintDragWaveIndex = -1;
     private Vector2Int lastPaintedCoordinate = new Vector2Int(int.MinValue, int.MinValue);
+    private bool pendingExitGui;
     private GUIStyle gridCoordinateLabelStyle;
     private GUIStyle gridCountLabelStyle;
     #endregion
@@ -60,7 +62,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
 
     #region Unity Methods
     /// <summary>
-    /// Caches serialized property handles when the editor becomes active.
+    /// Caches serialized property handles and restores per-instance wave foldout/scroll state when the editor becomes active.
     /// </summary>
     private void OnEnable()
     {
@@ -88,46 +90,47 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         gridCoordinateLabelStyle = null;
         gridCountLabelStyle = null;
         RefreshWavePresetBinding();
+        editorState.Reset(target != null ? target.GetInstanceID() : 0);
 
         if (brushDistributionCurve == null)
             brushDistributionCurve = EnemySpawnerWaveBakeUtility.CreateDefaultDistributionCurve();
     }
 
     /// <summary>
-    /// Draws the complete custom inspector layout.
+    /// Draws the complete custom inspector layout. All paint-time GUI exits are deferred until after every
+    /// layout group has closed cleanly to avoid the IMGUI scroll/state corruption seen on previous versions.
     /// </summary>
-	    public override void OnInspectorGUI()
-	    {
-	        serializedObject.Update();
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawActivationSection(spawnerEnabledProperty);
-	        EditorGUILayout.Space(6f);
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawGridSection(gridSizeXProperty,
-	                                                                  gridSizeZProperty,
-	                                                                  cellSizeProperty,
-	                                                                  originOffsetProperty,
-	                                                                  spawnHeightOffsetProperty);
-	        EditorGUILayout.Space(6f);
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawPoolSection(initialPoolCapacityPerPrefabProperty,
-	                                                                  expandBatchPerPrefabProperty);
-	        EditorGUILayout.Space(6f);
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawLifecycleSection(despawnDistanceProperty);
-	        EditorGUILayout.Space(6f);
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawSpawnWarningSection(enableSpawnWarningProperty,
-	                                                                          spawnWarningLeadTimeSecondsProperty,
-	                                                                          spawnWarningRadiusScaleProperty,
-	                                                                          spawnWarningRingWidthProperty,
-	                                                                          spawnWarningHeightOffsetProperty,
-	                                                                          spawnWarningMaximumAlphaProperty,
-	                                                                          spawnWarningFadeOutSecondsProperty,
-	                                                                          spawnWarningColorProperty);
-	        EditorGUILayout.Space(6f);
-	        DrawWavePresetSection();
-	        EditorGUILayout.Space(6f);
-	        DrawPainterSection();
-	        EditorGUILayout.Space(6f);
-	        EnemySpawnerAuthoringEditorSectionUtility.DrawDebugSection(drawGridGizmosProperty,
-	                                                                   drawCellCoordinatesProperty,
-	                                                                   drawCellCountsProperty);
+    public override void OnInspectorGUI()
+    {
+        pendingExitGui = false;
+        serializedObject.Update();
+        EnemySpawnerAuthoringEditorSectionUtility.DrawActivationSection(spawnerEnabledProperty);
+        EditorGUILayout.Space(6f);
+        EnemySpawnerAuthoringEditorSectionUtility.DrawGridSection(gridSizeXProperty,
+                                                                  gridSizeZProperty,
+                                                                  cellSizeProperty,
+                                                                  originOffsetProperty,
+                                                                  spawnHeightOffsetProperty);
+        EditorGUILayout.Space(6f);
+        EnemySpawnerAuthoringEditorSectionUtility.DrawPoolSection(initialPoolCapacityPerPrefabProperty,
+                                                                  expandBatchPerPrefabProperty);
+        EditorGUILayout.Space(6f);
+        EnemySpawnerAuthoringEditorSectionUtility.DrawLifecycleSection(despawnDistanceProperty);
+        EditorGUILayout.Space(6f);
+        EnemySpawnerAuthoringEditorSectionUtility.DrawSpawnWarningSection(enableSpawnWarningProperty,
+                                                                          spawnWarningLeadTimeSecondsProperty,
+                                                                          spawnWarningRadiusScaleProperty,
+                                                                          spawnWarningRingWidthProperty,
+                                                                          spawnWarningHeightOffsetProperty,
+                                                                          spawnWarningMaximumAlphaProperty,
+                                                                          spawnWarningFadeOutSecondsProperty,
+                                                                          spawnWarningColorProperty);
+        EditorGUILayout.Space(6f);
+        DrawWavePresetSection();
+        EditorGUILayout.Space(6f);
+        EnemySpawnerAuthoringEditorSectionUtility.DrawDebugSection(drawGridGizmosProperty,
+                                                                   drawCellCoordinatesProperty,
+                                                                   drawCellCountsProperty);
         EditorGUILayout.Space(6f);
         serializedObject.ApplyModifiedProperties();
         RefreshWavePresetBinding();
@@ -141,8 +144,12 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         if (wavePresetSerializedObject != null)
             wavePresetSerializedObject.ApplyModifiedProperties();
 
-        if (GUI.changed)
-            Repaint();
+        // Deferred exit: all BeginScrollView/BeginVertical scopes are now balanced at the GUI root.
+        if (pendingExitGui)
+        {
+            pendingExitGui = false;
+            GUIUtility.ExitGUI();
+        }
     }
 
     /// <summary>
@@ -190,16 +197,14 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                             "Create a new EnemyWavePreset asset and assign it to this spawner.")))
         {
             CreateAndAssignWavePreset();
-            GUIUtility.ExitGUI();
+            pendingExitGui = true;
         }
 
         using (new EditorGUI.DisabledScope(wavePresetProperty.objectReferenceValue == null))
         {
             if (GUILayout.Button(new GUIContent("Ping Preset",
                                                 "Ping the currently assigned EnemyWavePreset asset in the Project window.")))
-            {
                 EditorGUIUtility.PingObject(wavePresetProperty.objectReferenceValue);
-            }
         }
 
         EditorGUILayout.EndHorizontal();
@@ -209,40 +214,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     }
 
     /// <summary>
-    /// Draws the current paint brush controls.
-    /// </summary>
-    private void DrawPainterSection()
-    {
-        EditorGUILayout.LabelField("Painter", EditorStyles.boldLabel);
-        brushMasterPreset = EditorGUILayout.ObjectField(new GUIContent("Brush Master Preset",
-                                                                       "Enemy master preset painted by left click."),
-                                                        brushMasterPreset,
-                                                        typeof(EnemyMasterPreset),
-                                                        false) as EnemyMasterPreset;
-        brushEnemyCount = EditorGUILayout.IntField(new GUIContent("Brush Enemy Count",
-                                                                  "Enemy count assigned when painting a new cell."),
-                                                   Mathf.Max(1, brushEnemyCount));
-        brushDistributionCurve = EditorGUILayout.CurveField(new GUIContent("Brush Curve",
-                                                                           "Curve copied as a local override into newly painted or repainted cells."),
-                                                            brushDistributionCurve == null ? EnemySpawnerWaveBakeUtility.CreateDefaultDistributionCurve() : brushDistributionCurve);
-        eraseMode = EditorGUILayout.Toggle(new GUIContent("Erase Mode",
-                                                          "When enabled, left click removes painted cells instead of painting them."),
-                                           eraseMode);
-
-        Rect colorRect = EditorGUILayout.GetControlRect(false, 18f);
-        Color resolvedPaintColor = EnemySpawnerWaveBakeUtility.ResolvePaintColor(brushMasterPreset);
-        EditorGUI.PrefixLabel(colorRect, new GUIContent("Resolved Paint Color",
-                                                        "Color preview resolved from the current brush visual preset."));
-        Rect swatchRect = new Rect(colorRect.x + EditorGUIUtility.labelWidth, colorRect.y + 2f, 48f, colorRect.height - 4f);
-        EditorGUI.DrawRect(swatchRect, resolvedPaintColor);
-
-        if (GUILayout.Button(new GUIContent("Open Enemy Management Tool",
-                                            "Open the Enemy Management Tool to edit master, visual and brain presets.")))
-            EnemyManagementWindow.ShowWindow();
-    }
-
-    /// <summary>
-    /// Draws the authored waves section including grid painters for each wave.
+    /// Draws the authored waves section including grid painters for each wave. The selected-cell editor
+    /// is rendered once after the wave list so changing the active painted cell cannot alter layout above
+    /// the wave currently being edited and shift the inspector scroll position.
     /// </summary>
     private void DrawWavesSection()
     {
@@ -253,21 +227,23 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
             EditorGUILayout.HelpBox("No EnemyWavePreset is assigned. Create or assign one to edit waves.", MessageType.Info);
             return;
         }
-        
+
         DrawGridZoomSection();
 
         for (int waveIndex = 0; waveIndex < wavesProperty.arraySize; waveIndex++)
-        {
             DrawWaveElement(waveIndex, wavesProperty.GetArrayElementAtIndex(waveIndex));
-	            EnemySpawnerAuthoringEditorSectionUtility.DrawSelectedCellSection(wavePresetSerializedObject,
-	                                                                              cachedWavePreset,
-	                                                                              wavesProperty,
-	                                                                              ref selectedWaveIndex,
-	                                                                              ref selectedCellCoordinate);
-        }
 
         EditorGUILayout.Space(6f);
+        bool removedSelectedCell = EnemySpawnerAuthoringEditorSectionUtility.DrawSelectedCellSection(wavePresetSerializedObject,
+                                                                                                      cachedWavePreset,
+                                                                                                      wavesProperty,
+                                                                                                      ref selectedWaveIndex,
+                                                                                                      ref selectedCellCoordinate);
+        EditorGUILayout.Space(6f);
         DrawWaveToolbar();
+
+        if (removedSelectedCell)
+            pendingExitGui = true;
 
         EnemySpawnerAuthoringEditorWaveUtility.HandlePaintDragTermination(Event.current,
                                                                           ref paintDragActive,
@@ -290,9 +266,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         {
             EnemySpawnerAuthoringEditorWaveUtility.AddWave(wavePresetSerializedObject,
                                                            cachedWavePreset,
-                                                           wavesProperty,
-                                                           waveFoldoutState);
-            GUIUtility.ExitGUI();
+                                                           wavesProperty);
+            editorState.SetWaveFoldoutState(wavesProperty.arraySize - 1, true);
+            pendingExitGui = true;
         }
 
         EditorGUILayout.EndHorizontal();
@@ -326,17 +302,38 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         if (waveProperty == null)
             return;
 
-        bool isExpanded = GetWaveFoldoutState(waveIndex);
+        bool isExpanded = editorState.GetWaveFoldoutState(waveIndex);
         SerializedProperty waveLabelProperty = waveProperty.FindPropertyRelative("waveLabel");
         string waveLabel = string.IsNullOrWhiteSpace(waveLabelProperty.stringValue) ? "Wave " + (waveIndex + 1) : waveLabelProperty.stringValue;
         Rect headerRect = EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-        isExpanded = EditorGUILayout.Foldout(isExpanded, waveLabel, true);
-        SetWaveFoldoutState(waveIndex, isExpanded);
+        bool nextExpanded = EditorGUILayout.Foldout(isExpanded, waveLabel, true);
 
-        if (!isExpanded)
+        if (nextExpanded != isExpanded)
+            editorState.SetWaveFoldoutState(waveIndex, nextExpanded);
+
+        if (!nextExpanded)
         {
             EditorGUILayout.EndVertical();
             return;
+        }
+
+        bool showPainter = editorState.GetWavePainterVisibility(waveIndex);
+        bool nextShowPainter = EditorGUILayout.Toggle(new GUIContent("Show Painter",
+                                                                     "Show the shared paint-brush controls at the beginning of this wave."),
+                                                      showPainter);
+
+        if (nextShowPainter != showPainter)
+            editorState.SetWavePainterVisibility(waveIndex, nextShowPainter);
+
+        if (nextShowPainter)
+        {
+            EditorGUI.indentLevel++;
+            EnemySpawnerAuthoringEditorSectionUtility.DrawPainterSection(ref brushMasterPreset,
+                                                                         ref brushEnemyCount,
+                                                                         ref brushDistributionCurve,
+                                                                         ref eraseMode);
+            EditorGUI.indentLevel--;
+            EditorGUILayout.Space(4f);
         }
 
         EditorGUILayout.PropertyField(waveLabelProperty);
@@ -392,7 +389,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     }
 
     /// <summary>
-    /// Draws per-wave action buttons.
+    /// Draws per-wave action buttons. All mutations defer GUI exit to the end of OnInspectorGUI.
     /// </summary>
     /// <param name="waveIndex">Index of the wave receiving the actions.</param>
     private void DrawWaveActionButtons(int waveIndex)
@@ -406,7 +403,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                                                   cachedWavePreset,
                                                                   wavesProperty,
                                                                   waveIndex);
-            GUIUtility.ExitGUI();
+            pendingExitGui = true;
         }
 
         if (GUILayout.Button(new GUIContent("Clear Cells",
@@ -418,26 +415,29 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                                                   waveIndex,
                                                                   ref selectedWaveIndex,
                                                                   ref selectedCellCoordinate);
-            GUIUtility.ExitGUI();
+            pendingExitGui = true;
         }
 
         if (GUILayout.Button(new GUIContent("Delete Wave",
                                             "Delete this wave from the spawner.")))
         {
+            int previousWaveCount = wavesProperty.arraySize;
             EnemySpawnerAuthoringEditorWaveUtility.DeleteWave(wavePresetSerializedObject,
                                                               cachedWavePreset,
                                                               wavesProperty,
                                                               waveIndex,
                                                               ref selectedWaveIndex,
                                                               ref selectedCellCoordinate);
-            GUIUtility.ExitGUI();
+            editorState.ClearWaveStateFrom(waveIndex, previousWaveCount);
+            pendingExitGui = true;
         }
 
         EditorGUILayout.EndHorizontal();
     }
 
     /// <summary>
-    /// Draws the paintable button grid for one wave and handles left/right mouse interaction.
+    /// Draws the paintable button grid for one wave and handles left/right mouse interaction. Each wave
+    /// has its own scroll position to keep multiple expanded waves independent.
     /// </summary>
     /// <param name="waveIndex">Wave index currently being edited.</param>
     /// <param name="waveProperty">Serialized property representing the wave.</param>
@@ -453,10 +453,15 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
             return;
 
         Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> cellPreviewByCoordinate = EnemySpawnerAuthoringEditorWaveUtility.BuildCellPreviewMap(paintedCellsProperty);
-	        EnemySpawnerAuthoringEditorStyleUtility.SyncGridLabelStyles(ref gridCoordinateLabelStyle,
-	                                                                    ref gridCountLabelStyle,
-	                                                                    gridZoom);
-        gridScrollPosition = EditorGUILayout.BeginScrollView(gridScrollPosition, true, true, GUILayout.Height(Mathf.Min(520f, gridSizeZ * (buttonSize + buttonSpacing) + 12f)));
+        EnemySpawnerAuthoringEditorStyleUtility.SyncGridLabelStyles(ref gridCoordinateLabelStyle,
+                                                                    ref gridCountLabelStyle,
+                                                                    gridZoom);
+
+        Vector2 scrollPosition = editorState.GetWaveScrollPosition(waveIndex);
+        Vector2 nextScrollPosition = EditorGUILayout.BeginScrollView(scrollPosition,
+                                                                     true,
+                                                                     true,
+                                                                     GUILayout.Height(Mathf.Min(520f, gridSizeZ * (buttonSize + buttonSpacing) + 12f)));
 
         for (int row = gridSizeZ - 1; row >= 0; row--)
         {
@@ -475,15 +480,17 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         }
 
         EditorGUILayout.EndScrollView();
+        editorState.SetWaveScrollPosition(waveIndex, nextScrollPosition);
     }
 
     /// <summary>
-    /// Draws one button cell and handles mouse painting logic.
+    /// Draws one button cell and handles mouse painting logic. Paint mutations only flag a pending GUI
+    /// exit; the inspector consumes it at the very end of OnInspectorGUI so layout groups stay balanced.
     /// </summary>
     /// <param name="cellRect">Screen-space rect of the button.</param>
     /// <param name="waveIndex">Wave index owning the cell.</param>
     /// <param name="coordinate">Grid coordinate represented by the rect.</param>
-    /// <param name="cellPropertyByCoordinate">Lookup of existing painted cells for the current wave.</param>
+    /// <param name="cellPreviewByCoordinate">Lookup of existing painted cells for the current wave.</param>
     private void DrawGridCellButton(Rect cellRect,
                                     int waveIndex,
                                     Vector2Int coordinate,
@@ -523,97 +530,93 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         if (!cellRect.Contains(currentEvent.mousePosition))
             return;
 
-        if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
+        switch (currentEvent.type)
         {
-            bool didChange = EnemySpawnerAuthoringEditorWaveUtility.PaintCell(wavePresetSerializedObject,
-                                                                              cachedWavePreset,
-                                                                              wavesProperty,
-                                                                              waveIndex,
-                                                                              coordinate,
-                                                                              eraseMode,
-                                                                              brushMasterPreset,
-                                                                              brushEnemyCount,
-                                                                              brushDistributionCurve,
-                                                                              ref selectedWaveIndex,
-                                                                              ref selectedCellCoordinate);
-            paintDragActive = true;
-            paintDragWaveIndex = waveIndex;
-            lastPaintedCoordinate = coordinate;
-            currentEvent.Use();
-
-            if (didChange)
-            {
+            case EventType.MouseDown when currentEvent.button == 0:
+                HandlePaintMouseDown(waveIndex, coordinate, currentEvent);
+                return;
+            case EventType.MouseDrag when currentEvent.button == 0:
+                HandlePaintMouseDrag(waveIndex, coordinate, currentEvent);
+                return;
+            case EventType.MouseDown when currentEvent.button == 1:
+                EnemySpawnerAuthoringEditorWaveUtility.SelectCell(wavesProperty,
+                                                                  waveIndex,
+                                                                  coordinate,
+                                                                  ref selectedWaveIndex,
+                                                                  ref selectedCellCoordinate);
                 Repaint();
-                GUIUtility.ExitGUI();
-            }
-
-            return;
-        }
-
-        if (currentEvent.type == EventType.MouseDrag && paintDragActive && paintDragWaveIndex == waveIndex && coordinate != lastPaintedCoordinate)
-        {
-            bool didChange = EnemySpawnerAuthoringEditorWaveUtility.PaintCell(wavePresetSerializedObject,
-                                                                              cachedWavePreset,
-                                                                              wavesProperty,
-                                                                              waveIndex,
-                                                                              coordinate,
-                                                                              eraseMode,
-                                                                              brushMasterPreset,
-                                                                              brushEnemyCount,
-                                                                              brushDistributionCurve,
-                                                                              ref selectedWaveIndex,
-                                                                              ref selectedCellCoordinate);
-            lastPaintedCoordinate = coordinate;
-            currentEvent.Use();
-
-            if (didChange)
-            {
-                Repaint();
-                GUIUtility.ExitGUI();
-            }
-
-            return;
-        }
-
-        if (currentEvent.type == EventType.MouseDown && currentEvent.button == 1)
-        {
-            EnemySpawnerAuthoringEditorWaveUtility.SelectCell(wavesProperty,
-                                                              waveIndex,
-                                                              coordinate,
-                                                              ref selectedWaveIndex,
-                                                              ref selectedCellCoordinate);
-            Repaint();
-            currentEvent.Use();
+                currentEvent.Use();
+                return;
         }
     }
     #endregion
 
+    #region Paint Interaction
+    /// <summary>
+    /// Performs an initial paint operation on the targeted cell and starts a drag session.
+    /// </summary>
+    /// <param name="waveIndex">Wave index targeted by the paint operation.</param>
+    /// <param name="coordinate">Grid coordinate being painted.</param>
+    /// <param name="currentEvent">Active IMGUI event consumed when painting succeeds.</param>
+    private void HandlePaintMouseDown(int waveIndex, Vector2Int coordinate, Event currentEvent)
+    {
+        bool didChange = EnemySpawnerAuthoringEditorWaveUtility.PaintCell(wavePresetSerializedObject,
+                                                                          cachedWavePreset,
+                                                                          wavesProperty,
+                                                                          waveIndex,
+                                                                          coordinate,
+                                                                          eraseMode,
+                                                                          brushMasterPreset,
+                                                                          brushEnemyCount,
+                                                                          brushDistributionCurve,
+                                                                          ref selectedWaveIndex,
+                                                                          ref selectedCellCoordinate);
+        paintDragActive = true;
+        paintDragWaveIndex = waveIndex;
+        lastPaintedCoordinate = coordinate;
+        currentEvent.Use();
+
+        if (!didChange)
+            return;
+
+        Repaint();
+        pendingExitGui = true;
+    }
+
+    /// <summary>
+    /// Continues an ongoing paint-drag while the cursor moves between cells of the same wave.
+    /// </summary>
+    /// <param name="waveIndex">Wave index targeted by the drag.</param>
+    /// <param name="coordinate">Grid coordinate currently under the cursor.</param>
+    /// <param name="currentEvent">Active IMGUI event consumed when painting succeeds.</param>
+    private void HandlePaintMouseDrag(int waveIndex, Vector2Int coordinate, Event currentEvent)
+    {
+        if (!paintDragActive || paintDragWaveIndex != waveIndex || coordinate == lastPaintedCoordinate)
+            return;
+
+        bool didChange = EnemySpawnerAuthoringEditorWaveUtility.PaintCell(wavePresetSerializedObject,
+                                                                          cachedWavePreset,
+                                                                          wavesProperty,
+                                                                          waveIndex,
+                                                                          coordinate,
+                                                                          eraseMode,
+                                                                          brushMasterPreset,
+                                                                          brushEnemyCount,
+                                                                          brushDistributionCurve,
+                                                                          ref selectedWaveIndex,
+                                                                          ref selectedCellCoordinate);
+        lastPaintedCoordinate = coordinate;
+        currentEvent.Use();
+
+        if (!didChange)
+            return;
+
+        Repaint();
+        pendingExitGui = true;
+    }
+    #endregion
+
     #region Local Utility Methods
-    /// <summary>
-    /// Returns the persisted foldout state of one wave.
-    /// </summary>
-    /// <param name="waveIndex">Wave index to inspect.</param>
-    /// <returns>True when the foldout is expanded, otherwise false.</returns>
-    private bool GetWaveFoldoutState(int waveIndex)
-    {
-        bool isExpanded;
-
-        if (waveFoldoutState.TryGetValue(waveIndex, out isExpanded))
-            return isExpanded;
-
-        return true;
-    }
-
-    /// <summary>
-    /// Stores the foldout state of one wave.
-    /// </summary>
-    /// <param name="waveIndex">Wave index to update.</param>
-    /// <param name="isExpanded">New foldout state.</param>
-    private void SetWaveFoldoutState(int waveIndex, bool isExpanded)
-    {
-        waveFoldoutState[waveIndex] = isExpanded;
-    }
-
     /// <summary>
     /// Enforces the single-preview rule after toggling a preview checkbox manually.
     /// </summary>

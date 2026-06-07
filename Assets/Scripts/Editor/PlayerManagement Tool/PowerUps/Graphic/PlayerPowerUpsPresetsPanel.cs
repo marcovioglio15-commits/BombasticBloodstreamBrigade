@@ -16,6 +16,7 @@ public sealed class PlayerPowerUpsPresetsPanel
     #region Constants
     private const float LeftPaneWidth = 280f;
     private const string ActiveSectionStateKey = "NashCore.PlayerManagement.PowerUps.ActiveSection";
+    private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.PowerUps.DetailsScroll";
     #endregion
 
     #region Fields
@@ -29,7 +30,7 @@ public sealed class PlayerPowerUpsPresetsPanel
 
     private ListView listView;
     private ToolbarSearchField searchField;
-    private VisualElement detailsRoot;
+    private ScrollView detailsRoot;
     internal VisualElement sectionButtonsRoot;
     internal VisualElement sectionContentRoot;
 
@@ -87,6 +88,16 @@ public sealed class PlayerPowerUpsPresetsPanel
         if (presetIndex < 0)
             return;
 
+        // External sync: skip detail rebuild when the preset is already active so dropdowns/scroll stay.
+        if (selectedPreset == preset && presetSerializedObject != null && presetSerializedObject.targetObject == preset)
+        {
+            if (listView != null && listView.selectedIndex != presetIndex)
+                listView.SetSelectionWithoutNotify(new int[] { presetIndex });
+
+            presetSerializedObject.UpdateIfRequiredOrScript();
+            return;
+        }
+
         if (listView == null)
         {
             SelectPreset(preset);
@@ -118,7 +129,12 @@ public sealed class PlayerPowerUpsPresetsPanel
         if (listView != null)
             listView.SetSelectionWithoutNotify(new int[] { presetIndex });
 
-        SelectPreset(previouslySelectedPreset);
+        // Soft-refresh when the selection still points to the same live asset: this keeps the detail
+        // subtree (and any open dropdowns/scroll offsets) intact across Apply/Discard/Undo flows.
+        if (selectedPreset == previouslySelectedPreset && presetSerializedObject != null && presetSerializedObject.targetObject == previouslySelectedPreset)
+            presetSerializedObject.UpdateIfRequiredOrScript();
+        else
+            SelectPreset(previouslySelectedPreset);
     }
     #endregion
 
@@ -194,6 +210,7 @@ public sealed class PlayerPowerUpsPresetsPanel
         detailsRoot = new ScrollView();
         detailsRoot.style.flexGrow = 1f;
         rightPane.Add(detailsRoot);
+        ManagementToolScrollStateUtility.Attach(detailsRoot, DetailsScrollOffsetStateKey);
 
         return rightPane;
     }
@@ -257,11 +274,17 @@ public sealed class PlayerPowerUpsPresetsPanel
             if (preset == null)
                 continue;
 
+            // Re-fired selectionChanged events (e.g. after ListView.Rebuild) would otherwise tear down
+            // the detail subtree even when the selection did not actually change.
+            if (selectedPreset == preset)
+                return;
+
             SelectPreset(preset);
             return;
         }
 
-        SelectPreset(null);
+        if (selectedPreset != null)
+            SelectPreset(null);
     }
 
     internal void RefreshPresetList()

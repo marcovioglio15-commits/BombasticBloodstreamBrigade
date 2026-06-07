@@ -309,11 +309,9 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
     /// <param name="serializedObject">Serialized object backing the editor.</param>
     /// <param name="targetObject">Unity object marked dirty after mutation.</param>
     /// <param name="wavesProperty">Serialized waves array.</param>
-    /// <param name="waveFoldoutState">Foldout-state cache updated for the new wave.</param>
     public static void AddWave(SerializedObject serializedObject,
                                Object targetObject,
-                               SerializedProperty wavesProperty,
-                               Dictionary<int, bool> waveFoldoutState)
+                               SerializedProperty wavesProperty)
     {
         if (wavesProperty == null)
             return;
@@ -331,7 +329,6 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
         newWaveProperty.FindPropertyRelative("defaultDistributionCurve").animationCurveValue = EnemySpawnerWaveBakeUtility.CreateDefaultDistributionCurve();
         SerializedProperty paintedCellsProperty = newWaveProperty.FindPropertyRelative("paintedCells");
         paintedCellsProperty.ClearArray();
-        waveFoldoutState[newWaveIndex] = true;
         serializedObject.ApplyModifiedProperties();
         EditorUtility.SetDirty(targetObject);
     }
@@ -449,6 +446,182 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
         paintDragActive = false;
         paintDragWaveIndex = -1;
         lastPaintedCoordinate = new Vector2Int(int.MinValue, int.MinValue);
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Stores per-spawner inspector state for wave foldouts, painter visibility and grid scroll positions.
+/// </summary>
+internal sealed class EnemySpawnerAuthoringEditorState
+{
+    #region Constants
+    private const string WaveScrollSessionPrefix = "NashCore.EnemySpawnerAuthoringEditor.WaveScroll.";
+    private const string FoldoutSessionPrefix = "NashCore.EnemySpawnerAuthoringEditor.WaveFoldout.";
+    private const string PainterVisibilitySessionPrefix = "NashCore.EnemySpawnerAuthoringEditor.PainterVisibility.";
+    #endregion
+
+    #region Fields
+    private readonly Dictionary<int, bool> waveFoldoutState = new Dictionary<int, bool>();
+    private readonly Dictionary<int, Vector2> waveGridScrollPositions = new Dictionary<int, Vector2>();
+    private readonly Dictionary<int, bool> wavePainterVisibilityState = new Dictionary<int, bool>();
+    private int spawnerInstanceId;
+    #endregion
+
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Rebinds state to one spawner instance and clears in-memory caches before lazy SessionState hydration.
+    /// </summary>
+    /// <param name="instanceId">Unity instance identifier of the inspected spawner.</param>
+    public void Reset(int instanceId)
+    {
+        spawnerInstanceId = instanceId;
+        waveFoldoutState.Clear();
+        waveGridScrollPositions.Clear();
+        wavePainterVisibilityState.Clear();
+    }
+
+    /// <summary>
+    /// Returns the persisted foldout state of one wave, defaulting to expanded when never seen before.
+    /// </summary>
+    /// <param name="waveIndex">Wave index to inspect.</param>
+    /// <returns>True when the foldout is expanded.</returns>
+    public bool GetWaveFoldoutState(int waveIndex)
+    {
+        if (waveFoldoutState.TryGetValue(waveIndex, out bool isExpanded))
+            return isExpanded;
+
+        bool sessionExpanded = SessionState.GetBool(BuildFoldoutKey(waveIndex), true);
+        waveFoldoutState[waveIndex] = sessionExpanded;
+        return sessionExpanded;
+    }
+
+    /// <summary>
+    /// Stores the foldout state of one wave both in memory and SessionState.
+    /// </summary>
+    /// <param name="waveIndex">Wave index to update.</param>
+    /// <param name="isExpanded">New foldout state.</param>
+    public void SetWaveFoldoutState(int waveIndex, bool isExpanded)
+    {
+        waveFoldoutState[waveIndex] = isExpanded;
+        SessionState.SetBool(BuildFoldoutKey(waveIndex), isExpanded);
+    }
+
+    /// <summary>
+    /// Returns the cached scroll position for one wave grid, hydrating from SessionState on first read.
+    /// </summary>
+    /// <param name="waveIndex">Wave index owning the scroll position.</param>
+    /// <returns>Current scroll position.</returns>
+    public Vector2 GetWaveScrollPosition(int waveIndex)
+    {
+        if (waveGridScrollPositions.TryGetValue(waveIndex, out Vector2 cachedPosition))
+            return cachedPosition;
+
+        string sessionKey = BuildScrollKey(waveIndex);
+        Vector2 hydratedPosition = new Vector2(SessionState.GetFloat(sessionKey + ".x", 0f),
+                                               SessionState.GetFloat(sessionKey + ".y", 0f));
+        waveGridScrollPositions[waveIndex] = hydratedPosition;
+        return hydratedPosition;
+    }
+
+    /// <summary>
+    /// Stores the latest scroll position for one wave grid and skips unchanged SessionState writes.
+    /// </summary>
+    /// <param name="waveIndex">Wave index owning the scroll position.</param>
+    /// <param name="scrollPosition">Latest scroll position emitted by BeginScrollView.</param>
+    public void SetWaveScrollPosition(int waveIndex, Vector2 scrollPosition)
+    {
+        bool hadPrevious = waveGridScrollPositions.TryGetValue(waveIndex, out Vector2 previousPosition);
+        waveGridScrollPositions[waveIndex] = scrollPosition;
+
+        if (hadPrevious && previousPosition == scrollPosition)
+            return;
+
+        string sessionKey = BuildScrollKey(waveIndex);
+        SessionState.SetFloat(sessionKey + ".x", scrollPosition.x);
+        SessionState.SetFloat(sessionKey + ".y", scrollPosition.y);
+    }
+
+    /// <summary>
+    /// Returns whether the shared painter controls are visible inside one wave foldout.
+    /// </summary>
+    /// <param name="waveIndex">Wave index whose painter visibility is requested.</param>
+    /// <returns>True when the painter controls should be drawn.</returns>
+    public bool GetWavePainterVisibility(int waveIndex)
+    {
+        if (wavePainterVisibilityState.TryGetValue(waveIndex, out bool isVisible))
+            return isVisible;
+
+        bool sessionVisibility = SessionState.GetBool(BuildPainterVisibilityKey(waveIndex), false);
+        wavePainterVisibilityState[waveIndex] = sessionVisibility;
+        return sessionVisibility;
+    }
+
+    /// <summary>
+    /// Stores whether the shared painter controls are visible inside one wave foldout.
+    /// </summary>
+    /// <param name="waveIndex">Wave index whose painter visibility is updated.</param>
+    /// <param name="isVisible">New painter visibility.</param>
+    public void SetWavePainterVisibility(int waveIndex, bool isVisible)
+    {
+        wavePainterVisibilityState[waveIndex] = isVisible;
+        SessionState.SetBool(BuildPainterVisibilityKey(waveIndex), isVisible);
+    }
+
+    /// <summary>
+    /// Clears state at and after a deleted wave index so shifted waves cannot inherit unrelated editor state.
+    /// </summary>
+    /// <param name="firstWaveIndex">First invalidated wave index.</param>
+    /// <param name="previousWaveCount">Wave count before deletion.</param>
+    public void ClearWaveStateFrom(int firstWaveIndex, int previousWaveCount)
+    {
+        for (int waveIndex = firstWaveIndex; waveIndex < previousWaveCount; waveIndex++)
+        {
+            waveGridScrollPositions.Remove(waveIndex);
+            waveFoldoutState.Remove(waveIndex);
+            wavePainterVisibilityState.Remove(waveIndex);
+            string scrollKey = BuildScrollKey(waveIndex);
+            SessionState.EraseFloat(scrollKey + ".x");
+            SessionState.EraseFloat(scrollKey + ".y");
+            SessionState.EraseBool(BuildFoldoutKey(waveIndex));
+            SessionState.EraseBool(BuildPainterVisibilityKey(waveIndex));
+        }
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Builds the SessionState key used to persist one wave grid scroll position.
+    /// </summary>
+    /// <param name="waveIndex">Wave index part of the key.</param>
+    /// <returns>SessionState key string.</returns>
+    private string BuildScrollKey(int waveIndex)
+    {
+        return WaveScrollSessionPrefix + spawnerInstanceId.ToString() + "." + waveIndex.ToString();
+    }
+
+    /// <summary>
+    /// Builds the SessionState key used to persist one wave foldout state.
+    /// </summary>
+    /// <param name="waveIndex">Wave index part of the key.</param>
+    /// <returns>SessionState key string.</returns>
+    private string BuildFoldoutKey(int waveIndex)
+    {
+        return FoldoutSessionPrefix + spawnerInstanceId.ToString() + "." + waveIndex.ToString();
+    }
+
+    /// <summary>
+    /// Builds the SessionState key used to persist one wave painter visibility toggle.
+    /// </summary>
+    /// <param name="waveIndex">Wave index part of the key.</param>
+    /// <returns>SessionState key string.</returns>
+    private string BuildPainterVisibilityKey(int waveIndex)
+    {
+        return PainterVisibilitySessionPrefix + spawnerInstanceId.ToString() + "." + waveIndex.ToString();
     }
     #endregion
 

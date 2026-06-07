@@ -298,6 +298,8 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
             return;
 
         panel.SelectedPreset = preset;
+        // Persist the selection so close/reopen lands on the same preset.
+        PlayerMasterPresetsPanelSidePanelUtility.SaveSelectedPresetState(panel);
         PlayerManagementSelectionContext.SetActiveMasterPreset(panel.SelectedPreset);
         panel.DetailsRoot.Clear();
         panel.DetailSectionButtonsRoot = null;

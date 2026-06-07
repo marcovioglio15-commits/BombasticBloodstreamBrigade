@@ -257,6 +257,71 @@ public static class ManagementToolStateUtility
 
         return AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
     }
+
+    /// <summary>
+    /// Loads a typed asset reference from EditorPrefs by reading its persisted asset path. Used by panels
+    /// to restore the last-edited preset on reopen so the user lands exactly where they left off.
+    /// </summary>
+    /// <typeparam name="TAsset">Concrete asset type expected at the persisted path.</typeparam>
+    /// <param name="stateKey">EditorPrefs key holding the asset path.</param>
+    /// <returns>Returns the loaded asset, or null if the path is missing or invalid.</returns>
+    public static TAsset LoadAsset<TAsset>(string stateKey) where TAsset : UnityEngine.Object
+    {
+        if (string.IsNullOrWhiteSpace(stateKey))
+            return null;
+
+        string assetPath = EditorPrefs.GetString(stateKey, string.Empty);
+
+        if (string.IsNullOrWhiteSpace(assetPath))
+            return null;
+
+        return AssetDatabase.LoadAssetAtPath<TAsset>(assetPath);
+    }
+    #endregion
+
+    #region Scroll State
+    /// <summary>
+    /// Persists one scroll offset as a Vector2 component pair. Used by management-tool panels so the
+    /// detail scroll position survives Apply/Discard refreshes and tool close/reopen cycles.
+    /// </summary>
+    /// <param name="stateKey">EditorPrefs base key (x/y suffixes are appended internally).</param>
+    /// <param name="scrollOffset">Scroll offset to persist.</param>
+    public static void SaveScrollOffset(string stateKey, Vector2 scrollOffset)
+    {
+        if (string.IsNullOrWhiteSpace(stateKey))
+            return;
+
+        EditorPrefs.SetFloat(stateKey + ".x", scrollOffset.x);
+        EditorPrefs.SetFloat(stateKey + ".y", scrollOffset.y);
+    }
+
+    /// <summary>
+    /// Loads a persisted scroll offset. Defaults to Vector2.zero when no value is recorded yet.
+    /// </summary>
+    /// <param name="stateKey">EditorPrefs base key whose x/y suffixes are read.</param>
+    /// <returns>Returns the restored scroll offset.</returns>
+    public static Vector2 LoadScrollOffset(string stateKey)
+    {
+        if (string.IsNullOrWhiteSpace(stateKey))
+            return Vector2.zero;
+
+        float scrollX = EditorPrefs.GetFloat(stateKey + ".x", 0f);
+        float scrollY = EditorPrefs.GetFloat(stateKey + ".y", 0f);
+        return new Vector2(scrollX, scrollY);
+    }
+
+    /// <summary>
+    /// Checks whether a persisted scroll offset exists for the provided state key.
+    /// </summary>
+    /// <param name="stateKey">EditorPrefs base key whose x/y suffixes are checked.</param>
+    /// <returns>Returns true when at least one scroll component has persisted state.</returns>
+    public static bool HasScrollOffset(string stateKey)
+    {
+        if (string.IsNullOrWhiteSpace(stateKey))
+            return false;
+
+        return EditorPrefs.HasKey(stateKey + ".x") || EditorPrefs.HasKey(stateKey + ".y");
+    }
     #endregion
 
     #region Serialization Helpers

@@ -106,6 +106,7 @@ internal static class PlayerControllerPresetsPanelPresetUtility
         detailsRoot.style.flexGrow = 1f;
         rightPane.Add(detailsRoot);
         panel.DetailsRoot = detailsRoot;
+        ManagementToolScrollStateUtility.Attach(detailsRoot, PlayerControllerPresetsPanel.DetailsScrollOffsetStateKey);
         return rightPane;
     }
 
@@ -181,14 +182,20 @@ internal static class PlayerControllerPresetsPanelPresetUtility
         {
             PlayerControllerPreset preset = item as PlayerControllerPreset;
 
-            if (preset != null)
-            {
-                panel.SelectPreset(preset);
+            if (preset == null)
+                continue;
+
+            // Re-fired selectionChanged events (e.g. after ListView.Rebuild) would otherwise tear down
+            // the detail subtree even when the selection did not actually change: short-circuit them.
+            if (panel.SelectedPreset == preset)
                 return;
-            }
+
+            panel.SelectPreset(preset);
+            return;
         }
 
-        panel.SelectPreset(null);
+        if (panel.SelectedPreset != null)
+            panel.SelectPreset(null);
     }
 
     /// <summary>

@@ -12,6 +12,7 @@ using UnityEngine.UIElements;
 public sealed class PlayerAnimationBindingsPresetsPanel
 {
     #region Constants
+    private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.AnimationBindings.DetailsScroll";
     private const float LeftPaneWidth = 280f;
     #endregion
 
@@ -66,6 +67,17 @@ public sealed class PlayerAnimationBindingsPresetsPanel
         if (presetIndex < 0)
             return;
 
+        // External sync: when the preset is already selected keep the detail subtree intact and only
+        // fix listView selection — avoids destroying open dropdowns/scroll on Apply syncs.
+        if (selectedPreset == preset && selectedPresetSerializedObject != null && selectedPresetSerializedObject.targetObject == preset)
+        {
+            if (listView != null && listView.selectedIndex != presetIndex)
+                listView.SetSelectionWithoutNotify(new int[] { presetIndex });
+
+            selectedPresetSerializedObject.UpdateIfRequiredOrScript();
+            return;
+        }
+
         if (listView == null)
         {
             SelectPreset(preset);
@@ -97,7 +109,12 @@ public sealed class PlayerAnimationBindingsPresetsPanel
         if (listView != null)
             listView.SetSelectionWithoutNotify(new int[] { presetIndex });
 
-        SelectPreset(previouslySelectedPreset);
+        // Soft-refresh when the selection still points to the same live asset: this keeps the detail
+        // subtree (and any open dropdowns/scroll offsets) intact across Apply/Discard/Undo flows.
+        if (selectedPreset == previouslySelectedPreset && selectedPresetSerializedObject != null && selectedPresetSerializedObject.targetObject == previouslySelectedPreset)
+            selectedPresetSerializedObject.UpdateIfRequiredOrScript();
+        else
+            SelectPreset(previouslySelectedPreset);
     }
     #endregion
 
@@ -167,6 +184,7 @@ public sealed class PlayerAnimationBindingsPresetsPanel
         detailsRoot = new ScrollView();
         detailsRoot.style.flexGrow = 1f;
         rightPane.Add(detailsRoot);
+        ManagementToolScrollStateUtility.Attach(detailsRoot, DetailsScrollOffsetStateKey);
 
         return rightPane;
     }
@@ -230,11 +248,17 @@ public sealed class PlayerAnimationBindingsPresetsPanel
             if (preset == null)
                 continue;
 
+            // Re-fired selectionChanged events (e.g. after ListView.Rebuild) would otherwise tear down
+            // the detail subtree even when the selection did not actually change.
+            if (selectedPreset == preset)
+                return;
+
             SelectPreset(preset);
             return;
         }
 
-        SelectPreset(null);
+        if (selectedPreset != null)
+            SelectPreset(null);
     }
 
     private void RefreshPresetList()

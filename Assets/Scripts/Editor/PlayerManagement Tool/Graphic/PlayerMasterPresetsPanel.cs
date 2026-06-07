@@ -293,10 +293,12 @@ public sealed class PlayerMasterPresetsPanel
 
     #region Public Methods
     /// <summary>
-    /// Refreshes library-driven UI after external asset changes and restores valid selection when possible.
+    /// Refreshes library-driven UI after external asset changes (Apply, Undo, Discard) and restores
+    /// the previously selected preset when still valid. When the selection itself did not change and the
+    /// SerializedObject still points to a live asset the detail subtree is kept intact and only its
+    /// bindings are refreshed; this avoids tearing down ObjectField popups, ScrollView offsets and any
+    /// other focused control that the user is currently interacting with.
     /// </summary>
-    /// <param name="None">No parameters.</param>
-
     public void RefreshFromSessionChange()
     {
         PlayerMasterPreset previouslySelectedPreset = selectedPreset;
@@ -307,16 +309,34 @@ public sealed class PlayerMasterPresetsPanel
         {
             int presetIndex = filteredPresets.IndexOf(previouslySelectedPreset);
 
+            // If the previously selected preset is still alive and reachable, keep the rebuilt detail
+            // subtree (which RefreshPresetList may have left in place) untouched and just refresh bindings.
             if (presetIndex >= 0)
             {
                 if (listView != null)
                     listView.SetSelectionWithoutNotify(new int[] { presetIndex });
 
-                SelectPreset(previouslySelectedPreset);
+                if (selectedPreset == previouslySelectedPreset && presetSerializedObject != null && presetSerializedObject.targetObject == previouslySelectedPreset)
+                    SoftRefreshSelectedPresetBindings();
+                else
+                    SelectPreset(previouslySelectedPreset);
             }
         }
 
         RefreshOpenSidePanels();
+    }
+
+    /// <summary>
+    /// Refreshes the bindings of the currently selected preset without destroying its UI subtree. Used
+    /// by RefreshFromSessionChange to preserve scroll offsets and open dropdown popups during Apply.
+    /// </summary>
+    internal void SoftRefreshSelectedPresetBindings()
+    {
+        if (presetSerializedObject == null || presetSerializedObject.targetObject == null)
+            return;
+
+        presetSerializedObject.UpdateIfRequiredOrScript();
+        RefreshActiveStatus();
     }
     #endregion
 
