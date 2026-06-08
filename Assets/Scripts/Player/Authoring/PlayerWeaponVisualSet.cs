@@ -4,7 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
-/// Resolves designer-defined weapon visual IDs against the runtime mountable-weapons buffer. Base Gun remains
+/// Resolves defined weapon visual IDs against the runtime mountable-weapons buffer. Base Gun remains
 /// visible while at most one valid default or Switch Weapon attachment is shown.
 /// </summary>
 public sealed class PlayerWeaponVisualSet : MonoBehaviour
@@ -85,7 +85,7 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
     /// <param name="additionalWeapons">Current ECS mountable-weapons table.</param>
     /// <param name="weaponVisualRevision">Revision derived from runtime weapon-visual scaling state.</param>
     /// <param name="hasWeaponSwitch">Whether an equipped Switch Weapon module currently owns the visual.</param>
-    /// <param name="weaponId">Designer-defined Weapon Id requested by Switch Weapon.</param>
+    /// <param name="weaponId">defined Weapon Id requested by Switch Weapon.</param>
     public void Apply(in PlayerVisualRuntimeBridgeConfig visualConfig,
                       in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeapons,
                       uint weaponVisualRevision,
@@ -175,7 +175,7 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
     /// </summary>
     /// <param name="visualConfig">Current ECS runtime visual bridge configuration.</param>
     /// <param name="hasWeaponSwitch">Whether an equipped Switch Weapon module currently owns the visual.</param>
-    /// <param name="weaponId">Designer-defined Weapon Id requested by Switch Weapon.</param>
+    /// <param name="weaponId">defined Weapon Id requested by Switch Weapon.</param>
     /// <returns>Available attachment ID, or an empty ID when only Base Gun should remain visible.</returns>
     private FixedString64Bytes ResolveDesiredWeaponId(in PlayerVisualRuntimeBridgeConfig visualConfig,
                                                       bool hasWeaponSwitch,
@@ -191,7 +191,7 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
     }
 
     /// <summary>
-    /// Checks whether one designer-defined ID resolves to a mountable weapon GameObject.
+    /// Checks whether one defined ID resolves to a mountable weapon GameObject.
     /// </summary>
     /// <param name="weaponId">Runtime Weapon Id to inspect.</param>
     /// <returns>True when one resolved mountable weapon owns the ID.</returns>

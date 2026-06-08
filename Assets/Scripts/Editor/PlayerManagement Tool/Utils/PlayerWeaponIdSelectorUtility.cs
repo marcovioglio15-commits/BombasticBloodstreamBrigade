@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds enum-like editor selectors for designer-defined Weapon Id string fields. The serialized value remains
+/// Builds enum-like editor selectors for defined Weapon Id string fields. The serialized value remains
 /// a scalable token, while designers select authored options without typing IDs manually.
 /// </summary>
 internal static class PlayerWeaponIdSelectorUtility
@@ -28,7 +28,7 @@ internal static class PlayerWeaponIdSelectorUtility
     /// <param name="label">Popup label shown to designers.</param>
     /// <param name="tooltip">Explanatory popup and scalable-field tooltip.</param>
     /// <param name="emptyLabel">Display label mapped to an empty serialized Weapon Id.</param>
-    /// <param name="optionsProvider">Callback rebuilding the currently available designer-defined IDs.</param>
+    /// <param name="optionsProvider">Callback rebuilding the currently available defined IDs.</param>
     /// <returns>Scalable selector root ready for insertion into the tool.</returns>
     public static VisualElement CreateScalableSelector(SerializedProperty weaponIdProperty,
                                                        SerializedProperty scalingRulesProperty,
@@ -125,7 +125,7 @@ internal static class PlayerWeaponIdSelectorUtility
     /// Master Preset. When no matching Master scope exists, merges registered Visual Preset IDs deterministically.
     /// </summary>
     /// <param name="weaponIdProperty">Serialized Switch Weapon ID used to resolve the owning Power-Ups preset.</param>
-    /// <returns>Unique designer-defined Weapon Id options available to Switch Weapon.</returns>
+    /// <returns>Unique defined Weapon Id options available to Switch Weapon.</returns>
     public static List<string> BuildScopedSwitchWeaponOptions(SerializedProperty weaponIdProperty)
     {
         List<string> options = new List<string>();
@@ -160,8 +160,8 @@ internal static class PlayerWeaponIdSelectorUtility
     /// <summary>
     /// Checks whether a normalized Weapon Id exists in an already resolved option list.
     /// </summary>
-    /// <param name="options">Resolved designer-defined Weapon Id options.</param>
-    /// <param name="weaponId">Normalized designer-defined Weapon Id.</param>
+    /// <param name="options">Resolved defined Weapon Id options.</param>
+    /// <param name="weaponId">Normalized defined Weapon Id.</param>
     /// <returns>True when the ID is available in the supplied option list.</returns>
     public static bool ContainsWeaponId(IReadOnlyList<string> options, string weaponId)
     {

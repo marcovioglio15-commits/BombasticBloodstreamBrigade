@@ -1,4 +1,5 @@
 using System;
+using Unity.Entities;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
@@ -44,7 +45,7 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
             serializedAnimationPreset.FindProperty("upperBodyActionClips.secondaryReleaseClip").objectReferenceValue = releaseClip;
             serializedAnimationPreset.ApplyModifiedPropertiesWithoutUndo();
 
-            // Author one mountable entry and pin its designer-defined ID as the default.
+            // Author one mountable entry and pin its defined ID as the default.
             SerializedObject serializedVisualPreset = new SerializedObject(visualPreset);
             serializedVisualPreset.Update();
             SerializedProperty additionalWeaponsProperty = serializedVisualPreset.FindProperty("weaponVisuals.additionalWeapons");
@@ -106,6 +107,86 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
             throw new Exception("The manually sampled upper-body action state contains outgoing transitions.");
 
         AssertNoTransitionsToState(upperBodyStateMachine, actionState);
+    }
+
+    /// <summary>
+    /// Asserts that inactive Animator suspension consumes gameplay edges and resets presentation-only action state.
+    /// </summary>
+    public static void ValidateInactiveAnimatorSuspension()
+    {
+        PlayerPowerUpsState powerUpsState = new PlayerPowerUpsState
+        {
+            PrimaryIsCharging = 1,
+            SecondaryIsCharging = 0
+        };
+        PlayerAnimatorRuntimeState runtimeState = new PlayerAnimatorRuntimeState
+        {
+            PreviousShooting = 1,
+            PreviousPrimaryCharging = 0,
+            PreviousSecondaryCharging = 1,
+            UpperBodyActionKind = PlayerUpperBodyAnimationActionKind.Shoot,
+            UpperBodyActionActive = 1,
+            Initialized = 1,
+            LastShotPulseVersion = 2,
+            UpperBodyActionElapsed = 0.25f,
+            UpperBodyActionDuration = 0.5f
+        };
+
+        PlayerUpperBodyAnimationPresentationUtility.SuspendForInactiveAnimator(in powerUpsState,
+                                                                               7,
+                                                                               ref runtimeState);
+
+        if (runtimeState.PreviousShooting != 0 ||
+            runtimeState.PreviousPrimaryCharging != 1 ||
+            runtimeState.PreviousSecondaryCharging != 0 ||
+            runtimeState.UpperBodyActionKind != PlayerUpperBodyAnimationActionKind.None ||
+            runtimeState.UpperBodyActionActive != 0 ||
+            runtimeState.Initialized != 0 ||
+            runtimeState.LastShotPulseVersion != 7 ||
+            runtimeState.UpperBodyActionElapsed != 0f ||
+            runtimeState.UpperBodyActionDuration != 0f)
+            throw new Exception("Inactive Animator suspension did not reset presentation state or consume gameplay edges.");
+    }
+
+    /// <summary>
+    /// Asserts that the upper-body update does not issue Animator playback commands while its hierarchy is inactive.
+    /// </summary>
+    /// <param name="additionalWeaponVisuals">Temporary runtime weapon table satisfying the update contract.</param>
+    public static void ValidateInactiveAnimatorUpdate(in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals)
+    {
+        GameObject animatorObject = new GameObject("InactiveAnimatorSmokeTest");
+        Animator animator = animatorObject.AddComponent<Animator>();
+        PlayerAnimatorRuntimeState runtimeState = new PlayerAnimatorRuntimeState
+        {
+            UpperBodyActionKind = PlayerUpperBodyAnimationActionKind.Shoot,
+            UpperBodyActionActive = 1,
+            UpperBodyActionElapsed = 0.25f,
+            UpperBodyActionDuration = 0.5f
+        };
+
+        try
+        {
+            animatorObject.SetActive(false);
+            bool actionActive = PlayerUpperBodyAnimationPresentationUtility.Update(animator,
+                                                                                    default,
+                                                                                    default,
+                                                                                    default,
+                                                                                    default,
+                                                                                    default,
+                                                                                    in additionalWeaponVisuals,
+                                                                                    default,
+                                                                                    true,
+                                                                                    0.016f,
+                                                                                    ref runtimeState,
+                                                                                    out bool drivesUpperBody);
+
+            if (actionActive || drivesUpperBody || runtimeState.UpperBodyActionActive != 0)
+                throw new Exception("Inactive Animator update did not suspend upper-body presentation.");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(animatorObject);
+        }
     }
     #endregion
 

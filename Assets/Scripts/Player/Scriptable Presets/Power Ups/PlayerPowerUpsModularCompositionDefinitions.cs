@@ -5,7 +5,7 @@ using UnityEngine;
 #region Modular Composition Definitions
 /// <summary>
 /// Defines the mountable weapon shown alongside Base Gun while the owning passive or toggleable active power-up
-/// is in effect. The designer-defined Weapon Id must match one entry on the active Player Visual Preset; the
+/// is in effect. The defined Weapon Id must match one entry on the active Player Visual Preset; the
 /// matching shooting animation is then sourced from that entry, so no per-module animation override exists.
 /// </summary>
 [Serializable]
@@ -14,7 +14,7 @@ public sealed class PowerUpSwitchWeaponModuleData
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Designer-defined Weapon Id of the mountable mesh shown beside Base Gun while the owning passive or toggleable active power-up is in effect. Must match one Weapon Id authored on the Player Visual Preset.")]
+    [Tooltip("defined Weapon Id of the mountable mesh shown beside Base Gun while the owning passive or toggleable active power-up is in effect. Must match one Weapon Id authored on the Player Visual Preset.")]
     [SerializeField]
     private string weaponId = string.Empty;
     #endregion
@@ -38,7 +38,7 @@ public sealed class PowerUpSwitchWeaponModuleData
     /// Assigns the Weapon Id targeted by this Switch Weapon module. Used by the defaults utility to pre-populate
     /// a freshly created payload before designer edits.
     /// </summary>
-    /// <param name="weaponIdValue">Designer-defined Weapon Id to assign.</param>
+    /// <param name="weaponIdValue">defined Weapon Id to assign.</param>
     public void Configure(string weaponIdValue)
     {
         weaponId = weaponIdValue;

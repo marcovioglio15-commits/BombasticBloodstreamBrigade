@@ -302,7 +302,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
 
     #region Validation
     /// <summary>
-    /// Keeps authored reference fields usable without changing designer-authored numeric values.
+    /// Keeps authored reference fields usable without changing authored numeric values.
     /// </summary>
     public void Validate()
     {

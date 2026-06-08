@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Drives upper-body shooting, charge, and release clips from ECS presentation state without giving Animator gameplay authority.
 /// </summary>
-internal static class PlayerUpperBodyAnimationPresentationUtility
+public static class PlayerUpperBodyAnimationPresentationUtility
 {
     #region Constants
     private const string UpperBodyLayerName = "UpperBody";
@@ -42,6 +42,24 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
         missingClipWarnings.Clear();
 #endif
     }
+
+    /// <summary>
+    /// Suspends upper-body presentation while the managed Animator hierarchy is inactive. Synchronizes consumed
+    /// gameplay edges so stale shots or charge releases are not replayed when the visual hierarchy becomes active.
+    /// </summary>
+    /// <param name="powerUpsState">Current authoritative charge state used to synchronize release-edge history.</param>
+    /// <param name="shotPulseVersion">Current authoritative shot-pulse version marked as consumed.</param>
+    /// <param name="runtimeState">Mutable Animator presentation state reset for a clean reactivation.</param>
+    public static void SuspendForInactiveAnimator(in PlayerPowerUpsState powerUpsState,
+                                                  uint shotPulseVersion,
+                                                  ref PlayerAnimatorRuntimeState runtimeState)
+    {
+        ResetActionState(ref runtimeState);
+        UpdatePreviousChargeState(in powerUpsState, ref runtimeState);
+        runtimeState.PreviousShooting = 0;
+        runtimeState.LastShotPulseVersion = shotPulseVersion;
+        runtimeState.Initialized = 0;
+    }
     #endregion
 
     #region Playback
@@ -54,7 +72,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// <param name="powerUpsConfig">Current active-slot payloads containing charge animation selectors.</param>
     /// <param name="powerUpsState">Current active-slot charge state and release edges.</param>
     /// <param name="passiveToolsState">Aggregated Switch Weapon selection containing the active shooting animation selector.</param>
-    /// <param name="additionalWeaponVisuals">Runtime table binding designer-defined weapon IDs to shooting clips.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table binding defined weapon IDs to shooting clips.</param>
     /// <param name="defaultAdditionalWeaponId">Scalable default weapon ID used when no Switch Weapon owns the visual.</param>
     /// <param name="shootPulseThisFrame">True when ECS spawned at least one new player shot since the previous presentation update.</param>
     /// <param name="deltaTime">Presentation delta time used to advance sampled upper-body actions.</param>
@@ -235,7 +253,10 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
                                        float duration,
                                        ref PlayerAnimatorRuntimeState runtimeState)
     {
-        if (binding == null || clip == null)
+        if (!CanDriveAnimator(binding))
+            return false;
+
+        if (clip == null)
         {
             LogMissingClip(binding, actionKind);
             return false;
@@ -258,7 +279,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     private static void DriveCurrentAction(PlayerUpperBodyAnimatorBinding binding,
                                            ref PlayerAnimatorRuntimeState runtimeState)
     {
-        if (binding == null || runtimeState.UpperBodyActionActive == 0 || binding.AppliedClip == null)
+        if (!CanDriveAnimator(binding) || runtimeState.UpperBodyActionActive == 0 || binding.AppliedClip == null)
             return;
 
         float clipLength = math.max(MinimumDurationSeconds, binding.AppliedClip.length);
@@ -292,7 +313,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     {
         ResetActionState(ref runtimeState);
 
-        if (animator != null)
+        if (animator != null && animator.isActiveAndEnabled)
             animator.CrossFadeInFixedTime(UpperBodyIdleStateHash, IdleTransitionSeconds, upperBodyLayerIndex);
     }
 
@@ -315,7 +336,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="animator">Animator requiring an upper-body runtime binding.</param>
     /// <param name="clipConfig">Baked clip table containing every valid upper-body action motion.</param>
-    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing defined shooting clips.</param>
     /// <param name="binding">Resolved valid binding.</param>
     /// <returns>True when the Animator contains the required layer, states, controller, and one configured action override key.</returns>
     private static bool TryGetBinding(Animator animator,
@@ -325,7 +346,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     {
         binding = null;
 
-        if (animator == null || animator.runtimeAnimatorController == null)
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
             return false;
 
         int animatorId = animator.GetInstanceID();
@@ -384,7 +405,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="overrideController">Animator override controller exposing authored clip keys.</param>
     /// <param name="clipConfig">Baked concrete action clips accepted as the action-state anchor.</param>
-    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing defined shooting clips.</param>
     /// <param name="actionOverrideKey">Resolved original controller clip that may be overridden safely.</param>
     /// <returns>True when one configured action clip is an authored controller key.</returns>
     private static bool TryResolveActionOverrideKey(AnimatorOverrideController overrideController,
@@ -424,7 +445,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="clip">Authored controller key being classified.</param>
     /// <param name="clipConfig">Baked concrete action clips accepted by the presentation driver.</param>
-    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing defined shooting clips.</param>
     /// <returns>True when the clip is configured for shoot, charge, or release presentation.</returns>
     private static bool IsConfiguredActionClip(AnimationClip clip,
                                                in PlayerUpperBodyAnimationClipConfig clipConfig,
@@ -464,6 +485,18 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
         binding.OverrideController[binding.ActionOverrideKey] = clip;
         binding.AppliedClip = clip;
     }
+
+    /// <summary>
+    /// Checks whether one cached binding can safely receive Animator playback commands.
+    /// </summary>
+    /// <param name="binding">Cached Animator binding to inspect.</param>
+    /// <returns>True when its Animator component and hierarchy are active.</returns>
+    private static bool CanDriveAnimator(PlayerUpperBodyAnimatorBinding binding)
+    {
+        return binding != null &&
+               binding.AnimatorComponent != null &&
+               binding.AnimatorComponent.isActiveAndEnabled;
+    }
     #endregion
 
     #region Resolution
@@ -500,12 +533,12 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
 
     /// <summary>
     /// Resolves the concrete shooting clip from the aggregated passive-tools snapshot. When an equipped Switch
-    /// Weapon module owns the visible attachment, its designer-defined ID drives the matching clip; otherwise
+    /// Weapon module owns the visible attachment, its defined ID drives the matching clip; otherwise
     /// the scalable default ID is used. Missing clips degrade gracefully to the baked default.
     /// </summary>
     /// <param name="clipConfig">Baked concrete clip table sourced from the visual preset entries.</param>
     /// <param name="passiveToolsState">Aggregated weapon visual selection containing the active Switch Weapon hook.</param>
-    /// <param name="additionalWeaponVisuals">Runtime table binding designer-defined weapon IDs to shooting clips.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table binding defined weapon IDs to shooting clips.</param>
     /// <param name="defaultAdditionalWeaponId">Scalable default attachment ID.</param>
     /// <returns>Selected concrete clip or Default Shoot fallback.</returns>
     private static AnimationClip ResolveShootClip(in PlayerUpperBodyAnimationClipConfig clipConfig,

@@ -205,7 +205,7 @@ public sealed class BombToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -322,7 +322,7 @@ public sealed class DashToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -381,7 +381,7 @@ public sealed class BulletTimeToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {

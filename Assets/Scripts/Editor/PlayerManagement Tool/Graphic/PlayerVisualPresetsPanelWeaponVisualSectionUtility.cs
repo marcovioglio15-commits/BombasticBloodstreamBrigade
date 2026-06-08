@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the Player Visual Preset Weapon Visuals subsection. Renders scalable runtime references, designer-defined
+/// Builds the Player Visual Preset Weapon Visuals subsection. Renders scalable runtime references, defined
 /// Weapon Ids, animation pickers, and visibility refreshes while keeping validation separate from UI composition.
 /// </summary>
 internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
@@ -66,14 +66,14 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
         VisualElement additionalWeaponsContainer = new VisualElement();
         VisualElement warningsContainer = new VisualElement();
 
-        Label intro = BuildSubsectionHeader("Base Gun is always visible. At most one optional mountable weapon is shown alongside it. Designer-defined Weapon Ids connect this table, the default attachment, and Switch Weapon modules without requiring enum updates.");
+        Label intro = BuildSubsectionHeader("Base Gun is always visible. At most one optional mountable weapon is shown alongside it. defined Weapon Ids connect this table, the default attachment, and Switch Weapon modules without requiring enum updates.");
         container.Add(intro);
         container.Add(BuildSectionTitle("Base Gun"));
         container.Add(baseGunContainer);
         container.Add(missingPrefabBox);
         container.Add(BuildSectionTitle("Mountable Weapons"));
         container.Add(additionalWeaponsContainer);
-        string defaultWeaponTooltip = "Selects the designer-defined Weapon Id shown by default alongside Base Gun while no equipped power-up owns Switch Weapon. <None> keeps only Base Gun visible. Add Scaling token formulas remain supported.";
+        string defaultWeaponTooltip = "Selects the defined Weapon Id shown by default alongside Base Gun while no equipped power-up owns Switch Weapon. <None> keeps only Base Gun visible. Add Scaling token formulas remain supported.";
         container.Add(PlayerWeaponIdSelectorUtility.CreateScalableSelector(defaultAdditionalWeaponProperty,
                                                                             scalingRulesProperty,
                                                                             "Default Additional Weapon Id",
@@ -187,7 +187,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
 
         Button addButton = new Button(() => AddAdditionalWeaponEntry(panel, additionalWeaponsProperty));
         addButton.text = "Add Mountable Weapon";
-        addButton.tooltip = "Append one mountable weapon entry with a unique designer-editable Weapon Id.";
+        addButton.tooltip = "Append one mountable weapon entry with a unique editable Weapon Id.";
         addButton.style.marginTop = 4f;
         container.Add(addButton);
     }
@@ -247,7 +247,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
                          weaponIdProperty,
                          scalingRulesProperty,
                          "Weapon Id",
-                         "Unique designer-defined identifier used by the default attachment and Switch Weapon modules. Token formulas can swap the ID without runtime reflection.",
+                         "Unique defined identifier used by the default attachment and Switch Weapon modules. Token formulas can swap the ID without runtime reflection.",
                          true);
         row.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
@@ -470,7 +470,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
     /// Resolves a deterministic unique Weapon Id for a newly appended entry.
     /// </summary>
     /// <param name="additionalWeaponsProperty">Serialized mountable weapons array.</param>
-    /// <returns>Unique designer-editable Weapon Id.</returns>
+    /// <returns>Unique editable Weapon Id.</returns>
     private static string ResolveUniqueWeaponId(SerializedProperty additionalWeaponsProperty)
     {
         const string idPrefix = "Weapon_";

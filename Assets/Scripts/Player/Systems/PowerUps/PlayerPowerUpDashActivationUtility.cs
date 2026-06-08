@@ -121,7 +121,7 @@ public static class PlayerPowerUpDashActivationUtility
     /// <summary>
     /// Resolves the dash direction requested by the slot config, including movement/look inversion modes.
     /// </summary>
-    /// <param name="directionMode">Designer-selected source and sign for dash direction.</param>
+    /// <param name="directionMode">selected source and sign for dash direction.</param>
     /// <param name="lookState">Current player look direction state.</param>
     /// <param name="movementState">Current player movement state.</param>
     /// <param name="runtimeMovementConfig">Movement config used when resolving movement-input directions.</param>

@@ -64,7 +64,7 @@ public static class PlayerScalingFormulaEditorUtility
     /// <summary>
     /// Normalizes one formula so enum-member bracket tokens become numeric constants for the current enum target.
     /// </summary>
-    /// <param name="formula">Raw designer-authored formula.</param>
+    /// <param name="formula">Raw authored formula.</param>
     /// <param name="targetProperty">Serialized property currently receiving Add Scaling.</param>
     /// <param name="allowedVariables">Known scalable-stat variables that must keep bracket syntax.</param>
     /// <returns>Formula normalized for validation and bake-time/runtime evaluation.</returns>

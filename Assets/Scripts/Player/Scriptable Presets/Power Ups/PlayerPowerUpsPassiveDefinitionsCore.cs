@@ -73,7 +73,7 @@ public sealed class ProjectileSizePassiveToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -266,7 +266,7 @@ public sealed class ElementalEffectDefinitionData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -519,7 +519,7 @@ public sealed class PerfectCirclePassiveToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {

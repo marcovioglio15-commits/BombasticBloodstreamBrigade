@@ -42,7 +42,7 @@ public static class PlayerLaserBeamVisualDefaultsUtility
     }
 
     /// <summary>
-    /// Validates authored Laser Beam visual preset entries without rewriting designer-authored IDs or names.
+    /// Validates authored Laser Beam visual preset entries without rewriting authored IDs or names.
     /// </summary>
     /// <param name="visualPresetDefinitions">Mutable preset list authored on the visual preset.</param>
     public static void ValidateVisualPresetDefinitions(List<PlayerLaserBeamVisualPresetDefinition> visualPresetDefinitions)
@@ -65,7 +65,7 @@ public static class PlayerLaserBeamVisualDefaultsUtility
     /// Resolves the default label and colors used when no authored visual preset matches the requested stable ID.
     /// </summary>
     /// <param name="stableId">Stable numeric preset ID.</param>
-    /// <param name="displayName">Default designer-facing preset name.</param>
+    /// <param name="displayName">Default facing preset name.</param>
     /// <param name="coreColor">White-hot core color.</param>
     /// <param name="flowColor">Primary beam flow color.</param>
     /// <param name="stormColor">Electrical storm color.</param>

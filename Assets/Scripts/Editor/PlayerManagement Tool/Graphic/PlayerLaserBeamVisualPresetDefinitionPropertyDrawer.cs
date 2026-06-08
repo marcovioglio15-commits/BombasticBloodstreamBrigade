@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Renders one Laser Beam visual preset definition entry with a compact, designer-facing layout.
+/// Renders one Laser Beam visual preset definition entry with a compact, facing layout.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerLaserBeamVisualPresetDefinition))]
 public sealed class PlayerLaserBeamVisualPresetDefinitionPropertyDrawer : PropertyDrawer

@@ -23,7 +23,7 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
     /// Creates one editor-facing option entry.
     /// </summary>
     /// <param name="stableId">Stable numeric preset ID.</param>
-    /// <param name="displayName">Designer-facing preset label.</param>
+    /// <param name="displayName">facing preset label.</param>
     public PlayerLaserBeamVisualPresetEditorOption(int stableId, string displayName)
     {
         StableId = Mathf.Max(0, stableId);
@@ -34,7 +34,7 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
     }
 
     /// <summary>
-    /// Builds the popup label shown to designers inside selector fields.
+    /// Builds the popup label shown inside selector fields.
     /// </summary>
     /// <returns>User-facing popup label.</returns>
     public string BuildDisplayLabel()
@@ -45,9 +45,9 @@ public readonly struct PlayerLaserBeamVisualPresetEditorOption
 
     #region Private Methods
     /// <summary>
-    /// Builds one compact formula token from the designer-facing preset name.
+    /// Builds one compact formula token from the facing preset name.
     /// </summary>
-    /// <param name="displayName">Designer-facing preset name.</param>
+    /// <param name="displayName">facing preset name.</param>
     /// <param name="stableId">Stable numeric preset ID.</param>
     /// <returns>Sanitized token suitable for bracket-based formula constants.</returns>
     private static string BuildFormulaToken(string displayName, int stableId)
@@ -213,7 +213,7 @@ public static class PlayerLaserBeamVisualPresetEditorUtility
     /// <summary>
     /// Normalizes bracket tokens such as [ElectricAzure] into stable numeric IDs for Laser Beam visual preset selector formulas.
     /// </summary>
-    /// <param name="formula">Raw designer-authored formula.</param>
+    /// <param name="formula">Raw authored formula.</param>
     /// <param name="property">Serialized selector property.</param>
     /// <param name="allowedVariables">Known scalable-stat variables that must preserve bracket syntax.</param>
     /// <returns>Formula normalized for validation and bake-time/runtime evaluation.</returns>

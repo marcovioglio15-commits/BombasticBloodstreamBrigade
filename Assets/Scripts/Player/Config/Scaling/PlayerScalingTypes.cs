@@ -109,7 +109,7 @@ public sealed class PlayerScalableStatDefinition
 
     #region Validation
     /// <summary>
-    /// Sanitizes the scalable stat entry while preserving designer-authored values.
+    /// Sanitizes the scalable stat entry while preserving authored values.
     /// </summary>
     /// <param name="fallbackName">Fallback name used when the current stat name is invalid.</param>
     /// <returns>True when at least one field was modified during validation.</returns>

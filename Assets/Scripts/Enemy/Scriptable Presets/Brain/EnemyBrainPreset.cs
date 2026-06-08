@@ -275,7 +275,7 @@ public sealed class EnemyBrainSteeringSettings
     /// <summary>
     /// Resolves one authored axis scale into a safe body hit radius without mutating the source asset.
     /// </summary>
-    /// <param name="scale">Designer-authored axis scale applied to the base body radius.</param>
+    /// <param name="scale">authored axis scale applied to the base body radius.</param>
     /// <returns>Scaled radius, or the base body radius when the scale is not finite.</returns>
     private float ResolveScaledBodyRadius(float scale)
     {

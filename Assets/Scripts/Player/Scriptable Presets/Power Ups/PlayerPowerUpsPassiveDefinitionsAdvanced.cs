@@ -62,7 +62,7 @@ public sealed class BouncingProjectilesPassiveToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -316,7 +316,7 @@ public sealed class ExplosionPassiveToolData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {

@@ -116,6 +116,19 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                 loggedMissingStateWarning = 1;
             }
 
+            PlayerPowerUpsState currentPowerUpsState = powerUpsStateLookup.HasComponent(entity)
+                ? powerUpsStateLookup[entity]
+                : default;
+
+            if (SuspendIfAnimatorHierarchyInactive(animator,
+                                                   in currentPowerUpsState,
+                                                   shootingState.ShotPulseVersion,
+                                                   ref animatorRuntimeState.ValueRW))
+                continue;
+
+            if (!animator.enabled)
+                animator.enabled = true;
+
             EnsureAnimatorBindings(animator,
                                    entity,
                                    in animatorControllerLookup,
@@ -145,8 +158,11 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                               out PlayerPassiveToolsState passiveToolsState,
                               out DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals);
 
-            if (!animator.enabled)
-                animator.enabled = true;
+            if (SuspendIfAnimatorHierarchyInactive(animator,
+                                                   in powerUpsState,
+                                                   shootingState.ShotPulseVersion,
+                                                   ref animatorRuntimeState.ValueRW))
+                continue;
 
             if (parameterConfig.ValueRO.DisableRootMotion != 0 && animator.applyRootMotion)
                 animator.applyRootMotion = false;
@@ -255,6 +271,28 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     #endregion
     #region Helpers
     /// <summary>
+    /// Suspends managed animation writes while the Animator GameObject or one of its parents is inactive.
+    /// </summary>
+    /// <param name="animator">Managed Animator whose hierarchy state is inspected.</param>
+    /// <param name="powerUpsState">Current authoritative charge state synchronized before suspension.</param>
+    /// <param name="shotPulseVersion">Current authoritative shot-pulse version consumed before suspension.</param>
+    /// <param name="runtimeState">Mutable presentation state prepared for clean reactivation.</param>
+    /// <returns>True when the Animator hierarchy is inactive and the caller must skip remaining writes.</returns>
+    private static bool SuspendIfAnimatorHierarchyInactive(Animator animator,
+                                                           in PlayerPowerUpsState powerUpsState,
+                                                           uint shotPulseVersion,
+                                                           ref PlayerAnimatorRuntimeState runtimeState)
+    {
+        if (animator != null && animator.gameObject.activeInHierarchy)
+            return false;
+
+        PlayerUpperBodyAnimationPresentationUtility.SuspendForInactiveAnimator(in powerUpsState,
+                                                                               shotPulseVersion,
+                                                                               ref runtimeState);
+        return true;
+    }
+
+    /// <summary>
     /// Keeps Base Gun visible and resolves the equipped Switch Weapon attachment or scalable preset default attachment.
     /// </summary>
     /// <param name="animator">Animator used to resolve the owning visual hierarchy.</param>
@@ -263,7 +301,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     /// <param name="powerUpsConfigLookup">Read-only lookup containing equipped active-slot configs.</param>
     /// <param name="powerUpsStateLookup">Read-only lookup containing active-slot equip-order metadata.</param>
     /// <param name="passiveToolsStateLookup">Read-only lookup containing the aggregated passive-tool state.</param>
-    /// <param name="additionalWeaponVisualLookup">Read-only lookup containing designer-defined weapon visual entries.</param>
+    /// <param name="additionalWeaponVisualLookup">Read-only lookup containing weapon visual entries.</param>
     /// <param name="weaponVisualScalingStateLookup">Read-only lookup providing the weapon visual rebuild revision.</param>
     /// <param name="powerUpsConfig">Resolved active-slot configs reused by upper-body presentation.</param>
     /// <param name="powerUpsState">Resolved active-slot runtime state reused by upper-body presentation.</param>

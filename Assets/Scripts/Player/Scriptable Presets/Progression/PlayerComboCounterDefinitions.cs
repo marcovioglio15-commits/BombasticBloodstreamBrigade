@@ -310,7 +310,7 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinition
 
     #region Validation
     /// <summary>
-    /// Trims the authored passive PowerUpId while preserving designer-authored enablement.
+    /// Trims the authored passive PowerUpId while preserving authored enablement.
     /// </summary>
     public void Validate()
     {

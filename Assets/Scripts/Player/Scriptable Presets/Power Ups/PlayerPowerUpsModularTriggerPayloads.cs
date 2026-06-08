@@ -331,7 +331,7 @@ public sealed class PowerUpHoldChargeModuleData
 
     #region Validation
     /// <summary>
-    /// Keeps reference payloads allocated without snapping designer-authored numeric values.
+    /// Keeps reference payloads allocated without snapping authored numeric values.
     /// </summary>
     public void Validate()
     {
@@ -579,7 +579,7 @@ public sealed class PowerUpResourceGateModuleData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {
@@ -622,7 +622,7 @@ public sealed class PowerUpCooldownGateModuleData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {

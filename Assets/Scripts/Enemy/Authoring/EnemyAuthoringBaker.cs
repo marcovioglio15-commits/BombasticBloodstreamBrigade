@@ -1798,7 +1798,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
-    /// Converts a designer-authored string into a FixedString64Bytes value used by managed VFX color filtering.
+    /// Converts a authored string into a FixedString64Bytes value used by managed VFX color filtering.
     /// </summary>
     /// <param name="value">Source string from the visual preset.</param>
     /// <returns>Trimmed fixed string, or empty when no child-name filter is configured.</returns>

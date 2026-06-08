@@ -530,7 +530,7 @@ public sealed class PowerUpImpactFrameModuleData
 
     #region Validation
     /// <summary>
-    /// Keeps the payload callable from shared validation paths without snapping designer-authored values.
+    /// Keeps the payload callable from shared validation paths without snapping authored values.
     /// </summary>
     public void Validate()
     {

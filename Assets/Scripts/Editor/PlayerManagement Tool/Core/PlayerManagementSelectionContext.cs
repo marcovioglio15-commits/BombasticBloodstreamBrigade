@@ -106,7 +106,7 @@ public static class PlayerManagementSelectionContext
     }
 
     /// <summary>
-    /// Broadcasts that designer-defined Visual Preset data changed and dependent editor selectors should refresh.
+    /// Broadcasts that defined Visual Preset data changed and dependent editor selectors should refresh.
     /// </summary>
     public static void NotifyVisualPresetContentChanged()
     {

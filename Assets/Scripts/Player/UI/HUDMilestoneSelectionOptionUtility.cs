@@ -355,7 +355,7 @@ public static class HUDMilestoneSelectionOptionUtility
 
     #region Formatting
     /// <summary>
-    /// Builds the milestone panel header from the designer-authored text template.
+    /// Builds the milestone panel header from the authored text template.
     /// </summary>
     /// <param name="headerTemplate">Template read from the LevelUpTitle text object.</param>
     /// <param name="currentPlayerLevel">Current player level used to replace the supported token.</param>

@@ -6,7 +6,7 @@ using UnityEngine;
 #region Mountable Weapon Entry
 /// <summary>
 /// Authoring data for one mountable weapon attachment shown alongside Base Gun. Each entry is identified by a
-/// designer-defined string ID that is also referenced by the Default Additional Weapon ID on the visual preset
+/// defined string ID that is also referenced by the Default Additional Weapon ID on the visual preset
 /// and by every Switch Weapon module that wants to swap to this mountable weapon at runtime.
 /// </summary>
 [Serializable]
@@ -15,7 +15,7 @@ public sealed class PlayerAdditionalWeaponVisualEntry
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Designer-defined weapon identifier. Referenced by the visual preset Default Additional Weapon Id and by Switch Weapon modules. Must be unique inside the array and stay within the ECS FixedString64 capacity.")]
+    [Tooltip("defined weapon identifier. Referenced by the visual preset Default Additional Weapon Id and by Switch Weapon modules. Must be unique inside the array and stay within the ECS FixedString64 capacity.")]
     [SerializeField]
     private string weaponId = string.Empty;
 
@@ -60,10 +60,10 @@ public sealed class PlayerAdditionalWeaponVisualEntry
 
     #region Setup
     /// <summary>
-    /// Assigns designer-defined weapon ID, runtime selector, and the matching upper-body shooting clip in one
+    /// Assigns defined weapon ID, runtime selector, and the matching upper-body shooting clip in one
     /// call. Used by editor helpers and the defaults utility when creating a pre-populated entry.
     /// </summary>
-    /// <param name="weaponIdValue">Designer-defined weapon identifier.</param>
+    /// <param name="weaponIdValue">defined weapon identifier.</param>
     /// <param name="runtimeReferenceValue">Prefab-relative selector resolving the weapon mesh.</param>
     /// <param name="shootAnimationClipValue">Upper-body shooting clip played while the entry is visible.</param>
     public void Configure(string weaponIdValue,
@@ -111,7 +111,7 @@ public sealed class PlayerWeaponVisualSettings
     [SerializeField]
     private List<PlayerAdditionalWeaponVisualEntry> additionalWeapons = new List<PlayerAdditionalWeaponVisualEntry>();
 
-    [Tooltip("Designer-defined weapon ID of the mountable attachment shown by default alongside Base Gun while no equipped power-up owns Switch Weapon. Must match one Weapon Id from the array above. An empty value keeps only Base Gun visible.")]
+    [Tooltip("defined weapon ID of the mountable attachment shown by default alongside Base Gun while no equipped power-up owns Switch Weapon. Must match one Weapon Id from the array above. An empty value keeps only Base Gun visible.")]
     [SerializeField]
     private string defaultAdditionalWeaponId = string.Empty;
     #endregion
@@ -153,7 +153,7 @@ public sealed class PlayerWeaponVisualSettings
     /// Resolves the prefab-relative selector authored for one weapon ID. Returns an empty string when no entry
     /// owns the ID. Used by bake to populate ECS reference fields and by the runtime visual bridge.
     /// </summary>
-    /// <param name="weaponId">Designer-defined weapon ID to query.</param>
+    /// <param name="weaponId">defined weapon ID to query.</param>
     /// <returns>Authored selector string, or empty when no matching entry exists.</returns>
     public string ResolveRuntimeReference(string weaponId)
     {
@@ -166,7 +166,7 @@ public sealed class PlayerWeaponVisualSettings
     /// or the entry has no clip. Used by bake to derive the implicit default shoot clip and to populate the
     /// runtime additional-weapons buffer consumed by upper-body presentation.
     /// </summary>
-    /// <param name="weaponId">Designer-defined weapon ID to query.</param>
+    /// <param name="weaponId">defined weapon ID to query.</param>
     /// <returns>Authored shooting clip, or null when no matching entry exists.</returns>
     public AnimationClip ResolveShootClip(string weaponId)
     {
@@ -178,7 +178,7 @@ public sealed class PlayerWeaponVisualSettings
     /// Resolves the mountable entry stored for the supplied weapon ID, or null when the ID is empty or unknown.
     /// Comparison is ordinal and trims authored whitespace so designers can format the field freely.
     /// </summary>
-    /// <param name="weaponId">Designer-defined weapon ID to look up.</param>
+    /// <param name="weaponId">defined weapon ID to look up.</param>
     /// <returns>Authored entry matching the ID, or null when not present.</returns>
     public PlayerAdditionalWeaponVisualEntry ResolveEntry(string weaponId)
     {
@@ -306,7 +306,7 @@ public sealed class PlayerWeaponVisualSettings
     }
 
     /// <summary>
-    /// Reports empty, oversized, or duplicated weapon IDs without mutating designer-authored data. Empty IDs
+    /// Reports empty, oversized, or duplicated weapon IDs without mutating authored data. Empty IDs
     /// prevent the entry from being referenced by the default attachment or by any Switch Weapon module.
     /// </summary>
     /// <param name="weaponId">Authored weapon identifier.</param>

@@ -390,7 +390,7 @@ public sealed class HUDMilestoneSelectionSection
     }
 
     /// <summary>
-    /// Caches the designer-authored LevelUpTitle text so runtime token replacement does not overwrite the template.
+    /// Caches the authored LevelUpTitle text so runtime token replacement does not overwrite the template.
     /// </summary>
     private void CacheHeaderTextTemplate()
     {

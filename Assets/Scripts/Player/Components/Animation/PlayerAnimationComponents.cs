@@ -105,7 +105,7 @@ public struct PlayerUpperBodyAnimationClipConfig : IComponentData
 /// <summary>
 /// Runtime configuration used to spawn and sync an external GameObject visual bridge when no companion Animator
 /// is available. Per-weapon references live on <see cref="PlayerAdditionalWeaponVisualElement"/> buffer entries
-/// so the bridge layout stays flexible across designer-defined weapon IDs.
+/// so the bridge layout stays flexible across weapon IDs.
 /// </summary>
 public struct PlayerVisualRuntimeBridgeConfig : IComponentData
 {
@@ -121,7 +121,7 @@ public struct PlayerVisualRuntimeBridgeConfig : IComponentData
 
 /// <summary>
 /// Runtime mountable-weapon entry baked from <see cref="PlayerWeaponVisualSettings.AdditionalWeapons"/>. Each
-/// entry binds one designer-defined Weapon Id to its prefab-relative runtime reference and the upper-body shoot
+/// entry binds one Weapon Id to its prefab-relative runtime reference and the upper-body shoot
 /// clip used while the weapon is the visible attachment.
 /// </summary>
 [InternalBufferCapacity(0)]

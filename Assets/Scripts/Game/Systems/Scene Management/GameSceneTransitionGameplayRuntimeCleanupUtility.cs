@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 
 /// <summary>
@@ -79,20 +80,53 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     }
 
     /// <summary>
-    /// Executes and disposes one cleanup query.
+    /// Executes and disposes one cleanup query. LinkedEntityGroup roots are destroyed first through individual
+    /// entity destruction so DOTS can include every linked child even when the marker query only selects the root.
     /// </summary>
     /// <param name="entityManager">Entity manager used for destruction.</param>
     /// <param name="query">Query selecting cleanup candidates.</param>
     private static void DestroyQuery(EntityManager entityManager, EntityQuery query)
     {
+        NativeArray<Entity> candidates = default;
+
         try
         {
-            if (!query.IsEmptyIgnoreFilter)
-                entityManager.DestroyEntity(query);
+            candidates = query.ToEntityArray(Allocator.Temp);
+            DestroyCandidates(entityManager, in candidates, true);
+            DestroyCandidates(entityManager, in candidates, false);
         }
         finally
         {
+            if (candidates.IsCreated)
+                candidates.Dispose();
+
             query.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Destroys existing cleanup candidates individually. The first pass targets LinkedEntityGroup roots so their
+    /// complete groups disappear before a later pass handles standalone entities or surviving marker children.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used for existence checks and destruction.</param>
+    /// <param name="candidates">Snapshot of entities selected by one transient marker query.</param>
+    /// <param name="linkedGroupRootsOnly">True for the root-first pass; false for all remaining candidates.</param>
+    private static void DestroyCandidates(EntityManager entityManager,
+                                          in NativeArray<Entity> candidates,
+                                          bool linkedGroupRootsOnly)
+    {
+        // Process the captured snapshot without issuing a partial linked-group query destruction.
+        for (int candidateIndex = 0; candidateIndex < candidates.Length; candidateIndex++)
+        {
+            Entity candidate = candidates[candidateIndex];
+
+            if (!entityManager.Exists(candidate))
+                continue;
+
+            if (linkedGroupRootsOnly && !entityManager.HasBuffer<LinkedEntityGroup>(candidate))
+                continue;
+
+            entityManager.DestroyEntity(candidate);
         }
     }
     #endregion

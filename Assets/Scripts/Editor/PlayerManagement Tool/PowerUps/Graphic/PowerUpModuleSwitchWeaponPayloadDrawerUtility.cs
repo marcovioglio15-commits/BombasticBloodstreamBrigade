@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the scaling-aware Switch Weapon payload editor for designer-defined Weapon Id tokens.
+/// Builds the scaling-aware Switch Weapon payload editor for defined Weapon Id tokens.
 /// </summary>
 internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
 {
@@ -33,7 +33,7 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
         SerializedProperty scalingRulesProperty = weaponIdProperty.serializedObject != null
             ? weaponIdProperty.serializedObject.FindProperty("scalingRules")
             : null;
-        string weaponIdTooltip = "Selects a designer-defined Weapon Id from the scoped Player Visual Preset. <Use Visual Default> keeps the preset default attachment. Add Scaling token formulas remain supported.";
+        string weaponIdTooltip = "Selects a defined Weapon Id from the scoped Player Visual Preset. <Use Visual Default> keeps the preset default attachment. Add Scaling token formulas remain supported.";
         VisualElement weaponIdField = PlayerWeaponIdSelectorUtility.CreateScalableSelector(weaponIdProperty,
                                                                                            scalingRulesProperty,
                                                                                            "Weapon Id",
@@ -58,9 +58,9 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
 
     #region Validation
     /// <summary>
-    /// Shows warnings for empty and oversized Weapon Id values without mutating designer-authored data.
+    /// Shows warnings for empty and oversized Weapon Id values without mutating authored data.
     /// </summary>
-    /// <param name="weaponIdProperty">Serialized designer-defined Weapon Id.</param>
+    /// <param name="weaponIdProperty">Serialized defined Weapon Id.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
     private static void RefreshWarning(SerializedProperty weaponIdProperty, HelpBox warningBox)
     {

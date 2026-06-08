@@ -76,7 +76,7 @@ public sealed class PlayerGamePhaseDefinition
 
     #region Public Methods
     /// <summary>
-    /// Ensures nested authoring collections exist without changing designer-authored scalar values or Phase IDs.
+    /// Ensures nested authoring collections exist without changing authored scalar values or Phase IDs.
     /// none
     /// </summary>
     public void EnsureAuthoringCollections()
@@ -302,7 +302,7 @@ public sealed class PlayerLevelUpMilestoneDefinition
 
     #region Public Methods
     /// <summary>
-    /// Ensures nested authoring collections exist without changing designer-authored milestone thresholds or requirements.
+    /// Ensures nested authoring collections exist without changing authored milestone thresholds or requirements.
     /// none
     /// </summary>
     public void EnsureAuthoringCollections()

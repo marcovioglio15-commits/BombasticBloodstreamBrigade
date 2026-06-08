@@ -7,7 +7,7 @@ using UnityEditor;
 #endif
 
 /// <summary>
-/// Stores one designer-authored Laser Beam visual preset resolved by stable numeric ID at runtime.
+/// Stores one authored Laser Beam visual preset resolved by stable numeric ID at runtime.
 /// </summary>
 [Serializable]
 public sealed class PlayerLaserBeamVisualPresetDefinition
@@ -18,7 +18,7 @@ public sealed class PlayerLaserBeamVisualPresetDefinition
     [Tooltip("Stable numeric ID used by gameplay configs and Add Scaling formulas to select this visual preset at runtime.")]
     [SerializeField] private int stableId;
 
-    [Tooltip("Designer-facing name shown in Player Management Tool selectors and helper labels.")]
+    [Tooltip("Facing name shown in Player Management Tool selectors and helper labels.")]
     [SerializeField] private string displayName = "Electric Azure";
 
     [Tooltip("White-hot core color used by the innermost plasma filament of the beam.")]
@@ -93,7 +93,7 @@ public sealed class PlayerLaserBeamVisualPresetDefinition
     /// Overwrites this visual preset definition with one complete authored assignment.
     /// </summary>
     /// <param name="stableIdValue">Stable numeric ID.</param>
-    /// <param name="displayNameValue">Designer-facing preset name.</param>
+    /// <param name="displayNameValue">facing preset name.</param>
     /// <param name="coreColorValue">White-hot core color.</param>
     /// <param name="flowColorValue">Primary beam flow color.</param>
     /// <param name="stormColorValue">Electrical storm color.</param>
@@ -156,7 +156,7 @@ public sealed class PlayerLaserBeamVisualSettings
     [Tooltip("Minimum rendered segment length used by the pooled Laser Beam body visuals.")]
     [SerializeField] private float minimumSegmentLength = PlayerLaserBeamVisualDefaultsUtility.DefaultMinimumSegmentLength;
 
-    [Tooltip("Designer-defined Laser Beam visual presets resolved by stable numeric ID. Each preset owns a core, flow, storm, and contact color.")]
+    [Tooltip("defined Laser Beam visual presets resolved by stable numeric ID. Each preset owns a core, flow, storm, and contact color.")]
     [SerializeField] private List<PlayerLaserBeamVisualPresetDefinition> visualPresets = new List<PlayerLaserBeamVisualPresetDefinition>
     {
         PlayerLaserBeamVisualDefaultsUtility.CreateDefaultVisualPresetDefinition()

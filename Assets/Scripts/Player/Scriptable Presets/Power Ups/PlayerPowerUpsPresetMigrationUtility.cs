@@ -97,7 +97,7 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Switch Weapon",
                                                                                              PowerUpModuleKind.SwitchWeapon,
                                                                                              PowerUpModuleStage.Hook,
-                                                                                             "Keeps Base Gun visible and replaces the configured optional attachment with the mountable mesh identified by a designer-defined Weapon Id while the owning power-up is equipped."));
+                                                                                             "Keeps Base Gun visible and replaces the configured optional attachment with the mountable mesh identified by a defined Weapon Id while the owning power-up is equipped."));
         }
 
         ApplyUnifiedBindings(preset.ActivePowerUpsMutable, moduleDefinitions);

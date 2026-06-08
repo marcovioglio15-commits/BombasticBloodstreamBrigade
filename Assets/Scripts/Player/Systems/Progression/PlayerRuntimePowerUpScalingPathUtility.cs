@@ -114,7 +114,7 @@ public static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
-    /// Applies token Add Scaling values to active-slot fields that store designer-defined string IDs. Returns
+    /// Applies token Add Scaling values to active-slot fields that store defined string IDs. Returns
     /// true when the path matched so callers can short-circuit downstream token application stages.
     /// </summary>
     /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
@@ -135,7 +135,7 @@ public static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
-    /// Applies token Add Scaling values to passive-tool fields that store designer-defined string IDs.
+    /// Applies token Add Scaling values to passive-tool fields that store defined string IDs.
     /// </summary>
     /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
     /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>

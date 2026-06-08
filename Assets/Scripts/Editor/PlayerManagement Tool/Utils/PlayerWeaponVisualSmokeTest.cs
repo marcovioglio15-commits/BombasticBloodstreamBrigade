@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Runs deterministic editor checks for designer-defined weapon IDs, permanent Base Gun visibility, exclusive
+/// Runs deterministic editor checks for defined weapon IDs, permanent Base Gun visibility, exclusive
 /// attachment visibility, scalable token propagation, and project preset coherence.
 /// </summary>
 public static class PlayerWeaponVisualSmokeTest
@@ -74,6 +74,8 @@ public static class PlayerWeaponVisualSmokeTest
             ValidateWeaponIdSelectorSources();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateAnimationClipBakePipeline();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateUpperBodyAnimatorController();
+            PlayerUpperBodyAnimationSmokeTestUtility.ValidateInactiveAnimatorSuspension();
+            PlayerUpperBodyAnimationSmokeTestUtility.ValidateInactiveAnimatorUpdate(in weapons);
             ValidateProjectVisualPreset(world.EntityManager);
             Debug.Log("[PlayerWeaponVisualSmokeTest] All weapon visual checks passed.");
         }
@@ -114,7 +116,7 @@ public static class PlayerWeaponVisualSmokeTest
     /// Appends one runtime mountable weapon entry to the supplied ECS buffer.
     /// </summary>
     /// <param name="weapons">Runtime mountable-weapons buffer.</param>
-    /// <param name="weaponId">Designer-defined weapon ID.</param>
+    /// <param name="weaponId">defined weapon ID.</param>
     /// <param name="runtimeReference">Prefab-relative mesh selector.</param>
     private static void AddWeapon(DynamicBuffer<PlayerAdditionalWeaponVisualElement> weapons,
                                   string weaponId,
@@ -144,7 +146,7 @@ public static class PlayerWeaponVisualSmokeTest
 
     #region Validation
     /// <summary>
-    /// Asserts Base Gun visibility and exclusive selection of one designer-defined attachment.
+    /// Asserts Base Gun visibility and exclusive selection of one defined attachment.
     /// </summary>
     /// <param name="expectedId">Expected attachment ID, or empty for Base Gun only.</param>
     /// <param name="baseGun">Base Gun object.</param>
@@ -331,7 +333,7 @@ public static class PlayerWeaponVisualSmokeTest
                 rawWeaponIdField == null ||
                 rawWeaponIdField.style.display.value != DisplayStyle.None ||
                 !string.Equals(popup.value, CannonId, StringComparison.Ordinal))
-                throw new Exception("Weapon Id enum-like popup did not select the current designer-defined ID.");
+                throw new Exception("Weapon Id enum-like popup did not select the current defined ID.");
         }
         finally
         {
@@ -343,7 +345,7 @@ public static class PlayerWeaponVisualSmokeTest
     /// Writes one temporary mountable weapon entry used by stable stat-key smoke checks.
     /// </summary>
     /// <param name="entryProperty">Serialized mountable weapon entry.</param>
-    /// <param name="weaponId">Designer-defined stable ID.</param>
+    /// <param name="weaponId">defined stable ID.</param>
     /// <param name="runtimeReference">Prefab-relative runtime selector.</param>
     private static void ConfigureWeaponEntry(SerializedProperty entryProperty,
                                              string weaponId,
@@ -387,7 +389,7 @@ public static class PlayerWeaponVisualSmokeTest
     }
 
     /// <summary>
-    /// Validates the project visual preset, its prefab references, and its default designer-defined ID.
+    /// Validates the project visual preset, its prefab references, and its default defined ID.
     /// </summary>
     /// <param name="entityManager">Temporary EntityManager used to create the runtime weapon buffer.</param>
     private static void ValidateProjectVisualPreset(EntityManager entityManager)
@@ -429,7 +431,7 @@ public static class PlayerWeaponVisualSmokeTest
     /// <summary>
     /// Asserts one runtime FixedString Weapon Id.
     /// </summary>
-    /// <param name="expected">Expected designer-defined ID.</param>
+    /// <param name="expected">Expected defined ID.</param>
     /// <param name="actual">Actual runtime ID.</param>
     /// <param name="stage">Pipeline stage included in failure details.</param>
     private static void AssertId(string expected, FixedString64Bytes actual, string stage)
