@@ -61,7 +61,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
         VisualElement entriesContainer = new VisualElement();
         foldout.Add(entriesContainer);
         Button addButton = new Button(() => AppendEntry(entriesProperty, entriesContainer, scalingRulesProperty));
-        addButton.text = "+ Add Conditional Weapon Switch";
+        addButton.text = "Add Conditional Weapon Switch";
         addButton.tooltip = "Adds one conditional entry below the existing list. Authored order breaks ties between entries with equal priority.";
         addButton.style.marginTop = 4f;
         foldout.Add(addButton);
@@ -233,7 +233,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
         VisualElement conditionsContainer = new VisualElement();
         conditionsFoldout.Add(conditionsContainer);
         Button addConditionButton = new Button(() => AppendCondition(conditionsProperty, conditionsContainer, scalingRulesProperty));
-        addConditionButton.text = "+ Add Condition";
+        addConditionButton.text = "Add Condition";
         addConditionButton.tooltip = "Adds one new range condition. Each condition compares a scalable stat against an inclusive numeric range.";
         addConditionButton.style.marginTop = 4f;
         conditionsFoldout.Add(addConditionButton);
