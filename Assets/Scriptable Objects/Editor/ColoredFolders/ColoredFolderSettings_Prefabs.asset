@@ -30,6 +30,7 @@ MonoBehaviour:
   - Assets/Prefabs/HealthPacks
   - Assets/Prefabs/Orbital Projections
   - Assets/Prefabs/Enemies/Projectiles
+  - Assets/Prefabs/Enemies/Puddle
   folderColors:
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
@@ -48,5 +49,6 @@ MonoBehaviour:
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
-  folderApplyModes: 0100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  folderApplyModes: 010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
   autoInheritColors: 1
