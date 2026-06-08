@@ -53,9 +53,6 @@ MonoBehaviour:
   aimLeftClip: {fileID: 6487320471808982551, guid: 42c00185f23dbaf4d9b02d1deea7d8d7, type: 3}
   aimRightClip: {fileID: -1092795981883647802, guid: 84d9d54e9b6dcf64191882c1c1fc5465, type: 3}
   upperBodyActionClips:
-    cannonShootClip: {fileID: 1432227648329410435, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
-    gatlingShootClip: {fileID: 6871692653361327980, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
-    railgunShootClip: {fileID: -6429685982451697434, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
     primaryChargeClip: {fileID: -3032364377312887484, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
     secondaryChargeClip: {fileID: -3032364377312887484, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
     primaryReleaseClip: {fileID: 9018837957137237288, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}

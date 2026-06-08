@@ -4,7 +4,9 @@ using UnityEditor.Animations;
 using UnityEngine;
 
 /// <summary>
-/// Validates the upper-body clip bake contract and the manually sampled Animator state machine.
+/// Validates the upper-body clip bake contract and the manually sampled Animator state machine. Per-weapon
+/// shooting clips and the implicit default shoot clip now come from the visual preset's mountable weapons
+/// array; only charge and release clips remain on the animation bindings preset.
 /// </summary>
 internal static class PlayerUpperBodyAnimationSmokeTestUtility
 {
@@ -21,42 +23,48 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
 
     #region Public Methods
     /// <summary>
-    /// Asserts that the visual default shoot clip and Animation Bindings action clips propagate into the ECS bake config.
+    /// Asserts that the visual preset's mountable weapon entries and the animation bindings preset's charge/release
+    /// clips propagate into the ECS bake clip table, with the implicit default shoot clip derived from the
+    /// entry matching <see cref="PlayerWeaponVisualSettings.DefaultAdditionalWeaponId"/>.
     /// </summary>
     public static void ValidateAnimationClipBakePipeline()
     {
         PlayerAnimationBindingsPreset animationPreset = ScriptableObject.CreateInstance<PlayerAnimationBindingsPreset>();
         PlayerVisualPreset visualPreset = ScriptableObject.CreateInstance<PlayerVisualPreset>();
-        AnimationClip defaultShoot = new AnimationClip();
         AnimationClip cannonShoot = new AnimationClip();
         AnimationClip chargeClip = new AnimationClip();
         AnimationClip releaseClip = new AnimationClip();
 
         try
         {
+            // Author charge/release clips on the animation bindings preset.
             SerializedObject serializedAnimationPreset = new SerializedObject(animationPreset);
             serializedAnimationPreset.Update();
-            serializedAnimationPreset.FindProperty("upperBodyActionClips.cannonShootClip").objectReferenceValue = cannonShoot;
             serializedAnimationPreset.FindProperty("upperBodyActionClips.primaryChargeClip").objectReferenceValue = chargeClip;
             serializedAnimationPreset.FindProperty("upperBodyActionClips.secondaryReleaseClip").objectReferenceValue = releaseClip;
             serializedAnimationPreset.ApplyModifiedPropertiesWithoutUndo();
 
+            // Author one mountable entry and pin its designer-defined ID as the default.
             SerializedObject serializedVisualPreset = new SerializedObject(visualPreset);
             serializedVisualPreset.Update();
-            serializedVisualPreset.FindProperty("weaponVisuals.defaultShootAnimationClip").objectReferenceValue = defaultShoot;
+            SerializedProperty additionalWeaponsProperty = serializedVisualPreset.FindProperty("weaponVisuals.additionalWeapons");
+            additionalWeaponsProperty.arraySize = 1;
+            SerializedProperty entryProperty = additionalWeaponsProperty.GetArrayElementAtIndex(0);
+            entryProperty.FindPropertyRelative("weaponId").stringValue = "Cannon";
+            entryProperty.FindPropertyRelative("runtimeReference").stringValue = "cannon";
+            entryProperty.FindPropertyRelative("shootAnimationClip").objectReferenceValue = cannonShoot;
+            serializedVisualPreset.FindProperty("weaponVisuals.defaultAdditionalWeaponId").stringValue = "Cannon";
             serializedVisualPreset.ApplyModifiedPropertiesWithoutUndo();
 
             PlayerUpperBodyAnimationClipConfig clipConfig =
                 PlayerControllerConfigBakeUtility.BuildUpperBodyAnimationClipConfig(animationPreset,
                                                                                      visualPreset);
-            AssertClip(defaultShoot, clipConfig.DefaultShoot.Value, "Default shooting clip bake");
-            AssertClip(cannonShoot, clipConfig.CannonShoot.Value, "Cannon shooting clip bake");
+            AssertClip(cannonShoot, clipConfig.DefaultShoot.Value, "Default shooting clip bake (derived from default entry)");
             AssertClip(chargeClip, clipConfig.PrimaryCharge.Value, "Primary charge clip bake");
             AssertClip(releaseClip, clipConfig.SecondaryRelease.Value, "Secondary release clip bake");
         }
         finally
         {
-            UnityEngine.Object.DestroyImmediate(defaultShoot);
             UnityEngine.Object.DestroyImmediate(cannonShoot);
             UnityEngine.Object.DestroyImmediate(chargeClip);
             UnityEngine.Object.DestroyImmediate(releaseClip);
@@ -66,7 +74,9 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
     }
 
     /// <summary>
-    /// Asserts that the simplified upper-body state machine exposes an idle state and one manually driven action state.
+    /// Asserts that the simplified upper-body state machine exposes an idle state and one manually driven action
+    /// state. The action-state motion must match either the implicit default shoot clip, one of the per-slot
+    /// shoot clips from the visual preset, or one of the charge/release clips from the animation bindings preset.
     /// </summary>
     public static void ValidateUpperBodyAnimatorController()
     {
@@ -90,7 +100,7 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
         if (!IsConfiguredUpperBodyActionClip(actionState.motion as AnimationClip,
                                              animationPreset,
                                              visualPreset))
-            throw new Exception("ST_Upper_Shoot must use the visual default shoot clip or one configured Animation Bindings action clip.");
+            throw new Exception("ST_Upper_Shoot must use the implicit default shoot clip, one configured mountable weapon shoot clip, or one charge/release clip.");
 
         if (actionState.transitions.Length != 0)
             throw new Exception("The manually sampled upper-body action state contains outgoing transitions.");
@@ -113,11 +123,12 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
     }
 
     /// <summary>
-    /// Checks whether one authored action-state motion belongs to the visual default or Animation Bindings action table.
+    /// Checks whether one authored action-state motion belongs to the visual preset entries (implicit default
+    /// or per-slot shoot) or the animation bindings preset charge/release table.
     /// </summary>
     /// <param name="clip">Action-state motion being validated.</param>
-    /// <param name="animationPreset">Animation Bindings preset containing valid runtime action clips.</param>
-    /// <param name="visualPreset">Visual preset containing the Base Gun default shooting clip.</param>
+    /// <param name="animationPreset">Animation Bindings preset containing valid runtime charge/release clips.</param>
+    /// <param name="visualPreset">Visual preset containing the mountable weapons array and the derived default clip.</param>
     /// <returns>True when the action state can be overridden without identifying an unrelated controller motion.</returns>
     private static bool IsConfiguredUpperBodyActionClip(AnimationClip clip,
                                                         PlayerAnimationBindingsPreset animationPreset,
@@ -128,18 +139,26 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
 
         PlayerWeaponVisualSettings weaponVisuals = visualPreset.WeaponVisuals;
 
-        if (weaponVisuals != null && clip == weaponVisuals.DefaultShootAnimationClip)
-            return true;
+        if (weaponVisuals != null)
+        {
+            if (clip == PlayerWeaponVisualBakeUtility.ResolveDefaultShootClip(visualPreset))
+                return true;
+
+            for (int entryIndex = 0; entryIndex < weaponVisuals.AdditionalWeapons.Count; entryIndex++)
+            {
+                PlayerAdditionalWeaponVisualEntry entry = weaponVisuals.AdditionalWeapons[entryIndex];
+
+                if (entry != null && clip == entry.ShootAnimationClip)
+                    return true;
+            }
+        }
 
         PlayerUpperBodyAnimationClipSettings clips = animationPreset.UpperBodyActionClips;
 
         if (clips == null)
             return false;
 
-        return clip == clips.CannonShootClip ||
-               clip == clips.GatlingShootClip ||
-               clip == clips.RailgunShootClip ||
-               clip == clips.PrimaryChargeClip ||
+        return clip == clips.PrimaryChargeClip ||
                clip == clips.SecondaryChargeClip ||
                clip == clips.PrimaryReleaseClip ||
                clip == clips.SecondaryReleaseClip;

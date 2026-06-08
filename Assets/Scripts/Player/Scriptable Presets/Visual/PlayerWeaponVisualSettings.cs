@@ -1,48 +1,121 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+#region Mountable Weapon Entry
 /// <summary>
-/// Stores prefab-relative weapon visual references, the default attachment, and the Base Gun shooting clip.
-/// Reference selectors accept either an exact hierarchy path or a unique GameObject name inside the runtime visual bridge.
+/// Authoring data for one mountable weapon attachment shown alongside Base Gun. Each entry is identified by a
+/// designer-defined string ID that is also referenced by the Default Additional Weapon ID on the visual preset
+/// and by every Switch Weapon module that wants to swap to this mountable weapon at runtime.
+/// </summary>
+[Serializable]
+public sealed class PlayerAdditionalWeaponVisualEntry
+{
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Designer-defined weapon identifier. Referenced by the visual preset Default Additional Weapon Id and by Switch Weapon modules. Must be unique inside the array and stay within the ECS FixedString64 capacity.")]
+    [SerializeField]
+    private string weaponId = string.Empty;
+
+    [Tooltip("Prefab-relative path or unique GameObject name resolving this mountable weapon mesh inside the runtime visual bridge.")]
+    [SerializeField]
+    private string runtimeReference = string.Empty;
+
+    [Tooltip("Upper-body shooting clip played while this mountable weapon is the visible attachment. Used as the default-shot animation when this entry matches the visual preset Default Additional Weapon Id.")]
+    [SerializeField]
+    private AnimationClip shootAnimationClip;
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public string WeaponId
+    {
+        get
+        {
+            return weaponId;
+        }
+    }
+
+    public string RuntimeReference
+    {
+        get
+        {
+            return runtimeReference;
+        }
+    }
+
+    public AnimationClip ShootAnimationClip
+    {
+        get
+        {
+            return shootAnimationClip;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Setup
+    /// <summary>
+    /// Assigns designer-defined weapon ID, runtime selector, and the matching upper-body shooting clip in one
+    /// call. Used by editor helpers and the defaults utility when creating a pre-populated entry.
+    /// </summary>
+    /// <param name="weaponIdValue">Designer-defined weapon identifier.</param>
+    /// <param name="runtimeReferenceValue">Prefab-relative selector resolving the weapon mesh.</param>
+    /// <param name="shootAnimationClipValue">Upper-body shooting clip played while the entry is visible.</param>
+    public void Configure(string weaponIdValue,
+                          string runtimeReferenceValue,
+                          AnimationClip shootAnimationClipValue)
+    {
+        weaponId = weaponIdValue;
+        runtimeReference = runtimeReferenceValue;
+        shootAnimationClip = shootAnimationClipValue;
+    }
+    #endregion
+
+    #endregion
+}
+#endregion
+
+#region Weapon Visual Settings
+/// <summary>
+/// Stores Base Gun authoring data and the array of mountable weapon attachments. Base Gun is permanently visible
+/// and carries no shoot animation; mountable weapons are mutually exclusive and contribute their own shooting
+/// clip. The Default Additional Weapon ID selects which array entry remains active while no equipped Switch
+/// Weapon module owns the visual, and the bound shoot clip becomes the implicit Base Gun shooting clip.
 /// </summary>
 [Serializable]
 public sealed class PlayerWeaponVisualSettings
 {
     #region Constants
     public const int MaximumReferenceSelectorUtf8Bytes = 125;
+    public const int MaximumWeaponIdUtf8Bytes = 60;
     public const string DefaultBaseGunSelector = "base gun";
-    public const string DefaultCannonSelector = "cannon";
-    public const string DefaultGatlingSelector = "gatling";
-    public const string DefaultRailgunSelector = "railgun";
     #endregion
 
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Prefab-relative path or unique GameObject name resolving the Base Gun mesh object inside the runtime visual bridge.")]
+
+    #region Base Gun
+    [Tooltip("Prefab-relative path or unique GameObject name resolving the Base Gun mesh. Always kept active beside the optional mountable weapon and never plays a shooting animation of its own.")]
     [SerializeField]
     private string baseGunReference = DefaultBaseGunSelector;
+    #endregion
 
-    [Tooltip("Prefab-relative path or unique GameObject name resolving the Cannon mesh object inside the runtime visual bridge.")]
+    #region Mountable Weapons
+    [Tooltip("Array of mountable weapon attachments. At most one entry is visible at runtime alongside Base Gun: the default below, or the entry whose ID is owned by an equipped Switch Weapon module. Each entry carries its own runtime reference and shooting animation.")]
     [SerializeField]
-    private string cannonReference = DefaultCannonSelector;
+    private List<PlayerAdditionalWeaponVisualEntry> additionalWeapons = new List<PlayerAdditionalWeaponVisualEntry>();
 
-    [Tooltip("Prefab-relative path or unique GameObject name resolving the Gatling mesh object inside the runtime visual bridge.")]
+    [Tooltip("Designer-defined weapon ID of the mountable attachment shown by default alongside Base Gun while no equipped power-up owns Switch Weapon. Must match one Weapon Id from the array above. An empty value keeps only Base Gun visible.")]
     [SerializeField]
-    private string gatlingReference = DefaultGatlingSelector;
+    private string defaultAdditionalWeaponId = string.Empty;
+    #endregion
 
-    [Tooltip("Prefab-relative path or unique GameObject name resolving the Railgun mesh object inside the runtime visual bridge.")]
-    [SerializeField]
-    private string railgunReference = DefaultRailgunSelector;
-
-    [Tooltip("Optional Cannon, Gatling, or Railgun attachment shown alongside the always-visible Base Gun while no equipped power-up owns Switch Weapon. None keeps only Base Gun visible.")]
-    [SerializeField]
-    private PlayerWeaponVisualSlot defaultAdditionalWeaponVisual = PlayerWeaponVisualSlot.None;
-
-    [Tooltip("Upper-body shooting clip used by the Base Gun and as fallback when an equipped Switch Weapon shooting-animation slot is empty.")]
-    [SerializeField]
-    private AnimationClip defaultShootAnimationClip;
     #endregion
 
     #endregion
@@ -56,90 +129,147 @@ public sealed class PlayerWeaponVisualSettings
         }
     }
 
-    public string CannonReference
+    public IReadOnlyList<PlayerAdditionalWeaponVisualEntry> AdditionalWeapons
     {
         get
         {
-            return cannonReference;
+            return additionalWeapons;
         }
     }
 
-    public string GatlingReference
+    public string DefaultAdditionalWeaponId
     {
         get
         {
-            return gatlingReference;
-        }
-    }
-
-    public string RailgunReference
-    {
-        get
-        {
-            return railgunReference;
-        }
-    }
-
-    public PlayerWeaponVisualSlot DefaultAdditionalWeaponVisual
-    {
-        get
-        {
-            return defaultAdditionalWeaponVisual;
-        }
-    }
-
-    public AnimationClip DefaultShootAnimationClip
-    {
-        get
-        {
-            return defaultShootAnimationClip;
+            return defaultAdditionalWeaponId;
         }
     }
     #endregion
 
     #region Methods
 
+    #region Public Methods
+    /// <summary>
+    /// Resolves the prefab-relative selector authored for one weapon ID. Returns an empty string when no entry
+    /// owns the ID. Used by bake to populate ECS reference fields and by the runtime visual bridge.
+    /// </summary>
+    /// <param name="weaponId">Designer-defined weapon ID to query.</param>
+    /// <returns>Authored selector string, or empty when no matching entry exists.</returns>
+    public string ResolveRuntimeReference(string weaponId)
+    {
+        PlayerAdditionalWeaponVisualEntry entry = ResolveEntry(weaponId);
+        return entry != null ? entry.RuntimeReference : string.Empty;
+    }
+
+    /// <summary>
+    /// Resolves the upper-body shooting clip authored for one weapon ID. Returns null when no entry owns the ID
+    /// or the entry has no clip. Used by bake to derive the implicit default shoot clip and to populate the
+    /// runtime additional-weapons buffer consumed by upper-body presentation.
+    /// </summary>
+    /// <param name="weaponId">Designer-defined weapon ID to query.</param>
+    /// <returns>Authored shooting clip, or null when no matching entry exists.</returns>
+    public AnimationClip ResolveShootClip(string weaponId)
+    {
+        PlayerAdditionalWeaponVisualEntry entry = ResolveEntry(weaponId);
+        return entry != null ? entry.ShootAnimationClip : null;
+    }
+
+    /// <summary>
+    /// Resolves the mountable entry stored for the supplied weapon ID, or null when the ID is empty or unknown.
+    /// Comparison is ordinal and trims authored whitespace so designers can format the field freely.
+    /// </summary>
+    /// <param name="weaponId">Designer-defined weapon ID to look up.</param>
+    /// <returns>Authored entry matching the ID, or null when not present.</returns>
+    public PlayerAdditionalWeaponVisualEntry ResolveEntry(string weaponId)
+    {
+        if (string.IsNullOrWhiteSpace(weaponId) || additionalWeapons == null)
+            return null;
+
+        string normalizedId = weaponId.Trim();
+
+        for (int entryIndex = 0; entryIndex < additionalWeapons.Count; entryIndex++)
+        {
+            PlayerAdditionalWeaponVisualEntry entry = additionalWeapons[entryIndex];
+
+            if (entry == null || string.IsNullOrWhiteSpace(entry.WeaponId))
+                continue;
+
+            if (string.Equals(entry.WeaponId.Trim(), normalizedId, StringComparison.Ordinal))
+                return entry;
+        }
+
+        return null;
+    }
+    #endregion
+
     #region Validation
     /// <summary>
-    /// Reports invalid weapon reference selectors without modifying designer-authored values.
+    /// Reports invalid Base Gun selector, malformed mountable entries, duplicate IDs/selectors, oversized
+    /// references, unresolved selectors, and incoherent default-attachment selections without mutating data.
     /// </summary>
     /// <param name="runtimeVisualBridgePrefab">Runtime visual bridge prefab used to resolve selectors.</param>
     /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
     public void Validate(GameObject runtimeVisualBridgePrefab, string ownerAssetName)
     {
         ValidateSelector(baseGunReference, "Base Gun", runtimeVisualBridgePrefab, ownerAssetName);
-        ValidateSelector(cannonReference, "Cannon", runtimeVisualBridgePrefab, ownerAssetName);
-        ValidateSelector(gatlingReference, "Gatling", runtimeVisualBridgePrefab, ownerAssetName);
-        ValidateSelector(railgunReference, "Railgun", runtimeVisualBridgePrefab, ownerAssetName);
 
-        int defaultWeaponValue = (int)defaultAdditionalWeaponVisual;
-
-        if (defaultWeaponValue < (int)PlayerWeaponVisualSlot.None ||
-            defaultWeaponValue > (int)PlayerWeaponVisualSlot.Railgun)
+        if (additionalWeapons == null)
         {
-            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Additional Weapon Visual uses unsupported value {1}.",
-                                           ownerAssetName,
-                                           defaultWeaponValue));
-        }
-
-        if (HasDuplicateSelectors())
-        {
-            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: two or more weapon slots use the same reference selector.",
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: mountable weapons collection is missing.",
                                            ownerAssetName));
+            return;
         }
 
-        if (defaultShootAnimationClip == null)
+        HashSet<string> seenIds = new HashSet<string>(StringComparer.Ordinal);
+        HashSet<string> seenSelectors = new HashSet<string>(StringComparer.Ordinal);
+
+        if (!string.IsNullOrWhiteSpace(baseGunReference))
+            seenSelectors.Add(baseGunReference.Trim());
+
+        for (int entryIndex = 0; entryIndex < additionalWeapons.Count; entryIndex++)
         {
-            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Shoot Animation Clip is missing.",
-                                           ownerAssetName));
+            PlayerAdditionalWeaponVisualEntry entry = additionalWeapons[entryIndex];
+
+            if (entry == null)
+            {
+                Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: mountable weapon entry at index {1} is null.",
+                                               ownerAssetName,
+                                               entryIndex));
+                continue;
+            }
+
+            string entryLabel = BuildEntryLabel(entry.WeaponId, entryIndex);
+
+            // Per-entry validation: weapon ID + runtime reference + animation clip.
+            ValidateWeaponId(entry.WeaponId, entryLabel, seenIds, ownerAssetName);
+            ValidateSelector(entry.RuntimeReference, entryLabel, runtimeVisualBridgePrefab, ownerAssetName);
+
+            if (!string.IsNullOrWhiteSpace(entry.RuntimeReference) &&
+                !seenSelectors.Add(entry.RuntimeReference.Trim()))
+            {
+                Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: {1} reference '{2}' is duplicated across multiple entries.",
+                                               ownerAssetName,
+                                               entryLabel,
+                                               entry.RuntimeReference));
+            }
+
+            if (entry.ShootAnimationClip == null)
+            {
+                Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: {1} has no shoot animation clip assigned.",
+                                               ownerAssetName,
+                                               entryLabel));
+            }
         }
+
+        ValidateDefaultAdditionalWeapon(ownerAssetName);
     }
 
     /// <summary>
-    /// Reports one empty, oversized, or unresolved weapon reference selector.
+    /// Reports one empty, oversized, or unresolved selector without mutating the authored value. Shared between
+    /// Base Gun and each mountable entry to keep messages consistent.
     /// </summary>
     /// <param name="selector">Authored prefab-relative path or unique object name.</param>
-    /// <param name="slotLabel">Human-readable weapon slot label.</param>
+    /// <param name="slotLabel">Human-readable label included in the warning text.</param>
     /// <param name="runtimeVisualBridgePrefab">Runtime visual bridge prefab used to resolve the selector.</param>
     /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
     private static void ValidateSelector(string selector,
@@ -176,40 +306,106 @@ public sealed class PlayerWeaponVisualSettings
     }
 
     /// <summary>
-    /// Checks whether two or more authored selectors address the same path or object name.
+    /// Reports empty, oversized, or duplicated weapon IDs without mutating designer-authored data. Empty IDs
+    /// prevent the entry from being referenced by the default attachment or by any Switch Weapon module.
     /// </summary>
-    /// <returns>True when at least one non-empty selector is duplicated.</returns>
-    private bool HasDuplicateSelectors()
+    /// <param name="weaponId">Authored weapon identifier.</param>
+    /// <param name="entryLabel">Compact entry label included in the warning text.</param>
+    /// <param name="seenIds">Set used to detect cross-entry duplicates.</param>
+    /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
+    private static void ValidateWeaponId(string weaponId,
+                                          string entryLabel,
+                                          HashSet<string> seenIds,
+                                          string ownerAssetName)
     {
-        string[] selectors =
+        if (string.IsNullOrWhiteSpace(weaponId))
         {
-            baseGunReference,
-            cannonReference,
-            gatlingReference,
-            railgunReference
-        };
-
-        for (int leftIndex = 0; leftIndex < selectors.Length; leftIndex++)
-        {
-            if (string.IsNullOrWhiteSpace(selectors[leftIndex]))
-                continue;
-
-            for (int rightIndex = leftIndex + 1; rightIndex < selectors.Length; rightIndex++)
-            {
-                if (string.Equals(selectors[leftIndex], selectors[rightIndex], StringComparison.Ordinal))
-                    return true;
-            }
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: {1} has no Weapon Id; default attachment and Switch Weapon modules cannot reference it.",
+                                           ownerAssetName,
+                                           entryLabel));
+            return;
         }
 
-        return false;
+        string normalizedId = weaponId.Trim();
+
+        if (Encoding.UTF8.GetByteCount(normalizedId) > MaximumWeaponIdUtf8Bytes)
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: {1} Weapon Id exceeds {2} UTF-8 bytes and cannot be baked into ECS.",
+                                           ownerAssetName,
+                                           entryLabel,
+                                           MaximumWeaponIdUtf8Bytes));
+            return;
+        }
+
+        if (!seenIds.Add(normalizedId))
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Weapon Id '{1}' is duplicated across multiple entries.",
+                                           ownerAssetName,
+                                           normalizedId));
+        }
+    }
+
+    /// <summary>
+    /// Validates the Default Additional Weapon Id against the authored entries. Reports unknown IDs and a
+    /// missing shoot animation clip on the matching entry so designers can fix incoherent setups.
+    /// </summary>
+    /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
+    private void ValidateDefaultAdditionalWeapon(string ownerAssetName)
+    {
+        if (string.IsNullOrWhiteSpace(defaultAdditionalWeaponId))
+            return;
+
+        string normalizedId = defaultAdditionalWeaponId.Trim();
+
+        if (Encoding.UTF8.GetByteCount(normalizedId) > MaximumWeaponIdUtf8Bytes)
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Additional Weapon Id exceeds {1} UTF-8 bytes and cannot be baked into ECS.",
+                                           ownerAssetName,
+                                           MaximumWeaponIdUtf8Bytes));
+            return;
+        }
+
+        PlayerAdditionalWeaponVisualEntry defaultEntry = ResolveEntry(normalizedId);
+
+        if (defaultEntry == null)
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Additional Weapon Id '{1}' does not match any authored mountable entry.",
+                                           ownerAssetName,
+                                           normalizedId));
+            return;
+        }
+
+        if (defaultEntry.ShootAnimationClip == null)
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Weapon Visuals: Default Additional Weapon Id '{1}' resolves but its entry has no shoot animation clip; the implicit Base Gun shoot clip stays unassigned.",
+                                           ownerAssetName,
+                                           normalizedId));
+        }
+    }
+
+    /// <summary>
+    /// Builds a stable label used by validation and editor warnings for one entry. Falls back to a numeric
+    /// label when the weapon ID is empty so error messages remain readable while designers are authoring.
+    /// </summary>
+    /// <param name="weaponId">Weapon ID authored on the entry.</param>
+    /// <param name="entryIndex">Authored array index of the entry.</param>
+    /// <returns>Compact label suitable for warning logs and HelpBoxes.</returns>
+    public static string BuildEntryLabel(string weaponId, int entryIndex)
+    {
+        return string.IsNullOrWhiteSpace(weaponId)
+            ? string.Format("Mountable Weapon [{0}]", entryIndex)
+            : string.Format("'{0}'", weaponId.Trim());
     }
     #endregion
 
     #endregion
 }
+#endregion
 
+#region Reference Resolution Utility
 /// <summary>
-/// Resolves scalable prefab-relative weapon selectors without runtime reflection.
+/// Resolves scalable prefab-relative weapon selectors without runtime reflection. Shared by the visual preset
+/// validation, the editor warnings, and the runtime <see cref="PlayerWeaponVisualSet"/> presentation.
 /// </summary>
 public static class PlayerWeaponVisualReferenceUtility
 {
@@ -217,9 +413,10 @@ public static class PlayerWeaponVisualReferenceUtility
 
     #region Public Methods
     /// <summary>
-    /// Resolves an exact hierarchy path first, then falls back to a recursive exact-name lookup.
+    /// Resolves an exact hierarchy path first, then falls back to a recursive exact-name lookup. Returns false
+    /// without allocating when no child matches.
     /// </summary>
-    /// <param name="root">Runtime visual bridge root.</param>
+    /// <param name="root">Runtime visual bridge root used as resolution origin.</param>
     /// <param name="selector">Prefab-relative path or unique GameObject name.</param>
     /// <param name="resolvedTransform">Resolved transform when found.</param>
     /// <returns>True when the selector resolves inside the supplied root.</returns>
@@ -241,7 +438,8 @@ public static class PlayerWeaponVisualReferenceUtility
     }
 
     /// <summary>
-    /// Builds a stable hierarchy path from one runtime visual bridge root to a selected child object.
+    /// Builds a stable hierarchy path from one runtime visual bridge root to a selected child object. Editor
+    /// object pickers use the path as a scalable selector without storing direct scene-object references.
     /// </summary>
     /// <param name="root">Runtime visual bridge root.</param>
     /// <param name="target">Selected child transform.</param>
@@ -273,7 +471,7 @@ public static class PlayerWeaponVisualReferenceUtility
 
     #region Helpers
     /// <summary>
-    /// Finds the first child whose name exactly matches the supplied selector.
+    /// Finds the first child whose name exactly matches the supplied selector. Walks the hierarchy depth-first.
     /// </summary>
     /// <param name="root">Current hierarchy root.</param>
     /// <param name="targetName">Exact target object name.</param>
@@ -297,3 +495,4 @@ public static class PlayerWeaponVisualReferenceUtility
 
     #endregion
 }
+#endregion

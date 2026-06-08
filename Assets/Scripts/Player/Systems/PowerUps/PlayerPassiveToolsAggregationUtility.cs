@@ -101,9 +101,8 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.ProjectileSpeedMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeSecondsMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeRangeMultiplier = 1f;
-        // The HasWeaponSwitch flag gates downstream consumption, so the neutral default needs no defined enum value.
-        passiveToolsState.WeaponVisualSlot = default;
-        passiveToolsState.WeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
+        // The HasWeaponSwitch flag gates downstream consumption, so the neutral default needs no defined ID.
+        passiveToolsState.WeaponId = default;
     }
 
     /// <summary>
@@ -133,8 +132,7 @@ public static class PlayerPassiveToolsAggregationUtility
         if (passiveToolConfig.HasWeaponSwitch != 0)
         {
             passiveToolsState.HasWeaponSwitch = 1;
-            passiveToolsState.WeaponVisualSlot = passiveToolConfig.WeaponVisualSlot;
-            passiveToolsState.WeaponShootAnimationClipSlot = passiveToolConfig.WeaponShootAnimationClipSlot;
+            passiveToolsState.WeaponId = passiveToolConfig.WeaponId;
         }
 
         if (passiveToolConfig.HasProjectileSize != 0)
@@ -464,8 +462,7 @@ public static class PlayerPassiveToolsAggregationUtility
             ? powerUpsConfig.SecondarySlot
             : powerUpsConfig.PrimarySlot;
         passiveToolsState.HasWeaponSwitch = 1;
-        passiveToolsState.WeaponVisualSlot = selectedSlot.ActiveWeaponVisualSlot;
-        passiveToolsState.WeaponShootAnimationClipSlot = selectedSlot.ActiveWeaponShootAnimationClipSlot;
+        passiveToolsState.WeaponId = selectedSlot.ActiveWeaponId;
     }
     #endregion
 

@@ -12,6 +12,7 @@ public static class PlayerManagementSelectionContext
     #region Events
     public static event System.Action ContextChanged;
     public static event System.Action PowerUpsPresetContentChanged;
+    public static event System.Action VisualPresetContentChanged;
     #endregion
 
     #region Properties
@@ -97,6 +98,19 @@ public static class PlayerManagementSelectionContext
     public static void NotifyPowerUpsPresetContentChanged()
     {
         System.Action changedHandler = PowerUpsPresetContentChanged;
+
+        if (changedHandler == null)
+            return;
+
+        changedHandler.Invoke();
+    }
+
+    /// <summary>
+    /// Broadcasts that designer-defined Visual Preset data changed and dependent editor selectors should refresh.
+    /// </summary>
+    public static void NotifyVisualPresetContentChanged()
+    {
+        System.Action changedHandler = VisualPresetContentChanged;
 
         if (changedHandler == null)
             return;

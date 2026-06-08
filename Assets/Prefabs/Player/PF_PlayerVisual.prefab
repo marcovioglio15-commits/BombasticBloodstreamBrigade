@@ -123,10 +123,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerWeaponVisualSet
   baseGun: {fileID: 3576886628135318285}
-  cannon: {fileID: 8435973821146918647}
-  gatling: {fileID: 4672802226272288340}
-  railgun: {fileID: 4694044022058343090}
-  fallbackDefaultAdditionalWeaponVisual: 0
 --- !u!1001 &2279442878005224019
 PrefabInstance:
   m_ObjectHideFlags: 0

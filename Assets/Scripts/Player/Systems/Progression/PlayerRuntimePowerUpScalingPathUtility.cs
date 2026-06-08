@@ -100,13 +100,58 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         switch (unlockKind)
         {
             case PlayerPowerUpUnlockKind.Active:
+                if (ApplyActiveTokenValue(payloadPath, resolvedValue, ref activeSlotConfig))
+                    return;
                 ApplyTriggeredProjectilePassiveTokenValue(payloadPath, resolvedValue, ref activeSlotConfig);
                 ApplyEmbeddedTogglePassiveTokenValue(payloadPath, resolvedValue, ref activeSlotConfig);
                 return;
             case PlayerPowerUpUnlockKind.Passive:
+                if (ApplyPassiveSwitchWeaponTokenValue(payloadPath, resolvedValue, ref passiveToolConfig))
+                    return;
                 ApplyPassiveTokenValue(payloadPath, resolvedValue, ref passiveToolConfig);
                 return;
         }
+    }
+
+    /// <summary>
+    /// Applies token Add Scaling values to active-slot fields that store designer-defined string IDs. Returns
+    /// true when the path matched so callers can short-circuit downstream token application stages.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="activeSlotConfig">Mutable active slot config rebuilt from immutable baselines.</param>
+    /// <returns>True when the payload path targeted an active-slot string field.</returns>
+    private static bool ApplyActiveTokenValue(string payloadPath,
+                                               string resolvedValue,
+                                               ref PlayerPowerUpSlotConfig activeSlotConfig)
+    {
+        if (!string.Equals(payloadPath, "switchWeapon.weaponId", System.StringComparison.Ordinal))
+            return false;
+
+        if (TryBuildFixedString64(resolvedValue, out FixedString64Bytes resolvedId))
+            activeSlotConfig.ActiveWeaponId = resolvedId;
+
+        return true;
+    }
+
+    /// <summary>
+    /// Applies token Add Scaling values to passive-tool fields that store designer-defined string IDs.
+    /// </summary>
+    /// <param name="payloadPath">Modular payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula token result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="passiveToolConfig">Mutable passive tool config rebuilt from immutable baselines.</param>
+    /// <returns>True when the payload path targeted a passive-tool string field.</returns>
+    private static bool ApplyPassiveSwitchWeaponTokenValue(string payloadPath,
+                                                            string resolvedValue,
+                                                            ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (!string.Equals(payloadPath, "switchWeapon.weaponId", System.StringComparison.Ordinal))
+            return false;
+
+        if (TryBuildFixedString64(resolvedValue, out FixedString64Bytes resolvedId))
+            passiveToolConfig.WeaponId = resolvedId;
+
+        return true;
     }
     #endregion
 
@@ -135,12 +180,6 @@ public static class PlayerRuntimePowerUpScalingPathUtility
 
         switch (payloadPath)
         {
-            case "switchWeapon.weaponSlot":
-                activeSlotConfig.ActiveWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
-                return;
-            case "switchWeapon.shootAnimationClipSlot":
-                activeSlotConfig.ActiveWeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot(resolvedValue);
-                return;
             case "resourceGate.activationResource":
                 activeSlotConfig.ActivationResource = PlayerRuntimeScalingEnumUtility.ResolvePowerUpResourceType(resolvedValue);
                 return;
@@ -410,12 +449,6 @@ public static class PlayerRuntimePowerUpScalingPathUtility
 
         switch (payloadPath)
         {
-            case "switchWeapon.weaponSlot":
-                passiveToolConfig.WeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot(resolvedValue);
-                return;
-            case "switchWeapon.shootAnimationClipSlot":
-                passiveToolConfig.WeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot(resolvedValue);
-                return;
             case "projectileOrbitOverride.pathMode":
                 passiveToolConfig.PerfectCircle.PathMode = PlayerRuntimeScalingEnumUtility.ResolveProjectileOrbitPathMode(resolvedValue);
                 return;

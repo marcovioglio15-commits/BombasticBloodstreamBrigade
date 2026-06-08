@@ -9,17 +9,16 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Runs deterministic editor checks for player weapon reference resolution, permanent Base Gun visibility, and exclusive
-/// optional attachment visibility.
+/// Runs deterministic editor checks for designer-defined weapon IDs, permanent Base Gun visibility, exclusive
+/// attachment visibility, scalable token propagation, and project preset coherence.
 /// </summary>
 public static class PlayerWeaponVisualSmokeTest
 {
     #region Constants
     private const string DefaultVisualPresetPath = "Assets/Scriptable Objects/Player/Visual/PlayerVisualPreset_A.asset";
-    private const string PowerUpsPresetPath = "Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset";
-    private const string DefaultChargeShotPowerUpId = "ActiveChargeShot";
-    private const string VisualActiveSectionStateKey = "NashCore.PlayerManagement.Visual.ActiveSection";
-    private const string VisualActiveSubSectionStateKey = "NashCore.PlayerManagement.Visual.ActiveSubSection";
+    private const string CannonId = "Cannon";
+    private const string GatlingId = "Gatling";
+    private const string PlasmaId = "Plasma";
     #endregion
 
     #region Methods
@@ -31,6 +30,7 @@ public static class PlayerWeaponVisualSmokeTest
     public static void Run()
     {
         GameObject root = new GameObject("PlayerVisualRoot");
+        World world = new World("PlayerWeaponVisualSmokeTest");
 
         try
         {
@@ -38,128 +38,61 @@ public static class PlayerWeaponVisualSmokeTest
             GameObject baseGun = CreateChild(weaponRoot.transform, "base gun");
             GameObject cannon = CreateChild(weaponRoot.transform, "cannon");
             GameObject gatling = CreateChild(weaponRoot.transform, "gatling");
-            GameObject railgun = CreateChild(weaponRoot.transform, "railgun");
+            GameObject plasma = CreateChild(weaponRoot.transform, "plasma");
             GameObject scaledBaseGun = CreateChild(weaponRoot.transform, "base gun scaled");
             PlayerWeaponVisualSet visualSet = root.AddComponent<PlayerWeaponVisualSet>();
+            visualSet.Configure(baseGun);
 
-            visualSet.Configure(baseGun, cannon, gatling, railgun);
-            AssertVisualState(PlayerWeaponVisualSlot.None, baseGun, cannon, gatling, railgun);
+            Entity entity = world.EntityManager.CreateEntity();
+            DynamicBuffer<PlayerAdditionalWeaponVisualElement> weapons = world.EntityManager.AddBuffer<PlayerAdditionalWeaponVisualElement>(entity);
+            AddWeapon(weapons, CannonId, "Weapons/cannon");
+            AddWeapon(weapons, GatlingId, "Weapons/gatling");
+            AddWeapon(weapons, PlasmaId, "Weapons/plasma");
 
-            PlayerVisualRuntimeBridgeConfig visualConfig = CreateConfig(PlayerWeaponVisualSlot.None);
+            PlayerVisualRuntimeBridgeConfig visualConfig = CreateConfig(string.Empty);
+            visualSet.Apply(in visualConfig, in weapons, 1u, false, new FixedString64Bytes(CannonId));
+            AssertVisualState(string.Empty, baseGun, cannon, gatling, plasma);
 
-            // Validate the configured default and each Switch Weapon attachment while Base Gun remains visible.
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Cannon);
-            AssertVisualState(PlayerWeaponVisualSlot.None, baseGun, cannon, gatling, railgun);
-            visualSet.Apply(in visualConfig, true, PlayerWeaponVisualSlot.Cannon);
-            AssertVisualState(PlayerWeaponVisualSlot.Cannon, baseGun, cannon, gatling, railgun);
-            visualSet.Apply(in visualConfig, true, PlayerWeaponVisualSlot.Gatling);
-            AssertVisualState(PlayerWeaponVisualSlot.Gatling, baseGun, cannon, gatling, railgun);
-            visualSet.Apply(in visualConfig, true, PlayerWeaponVisualSlot.Railgun);
-            AssertVisualState(PlayerWeaponVisualSlot.Railgun, baseGun, cannon, gatling, railgun);
+            visualSet.Apply(in visualConfig, in weapons, 1u, true, new FixedString64Bytes(CannonId));
+            AssertVisualState(CannonId, baseGun, cannon, gatling, plasma);
+            visualSet.Apply(in visualConfig, in weapons, 1u, true, new FixedString64Bytes(PlasmaId));
+            AssertVisualState(PlasmaId, baseGun, cannon, gatling, plasma);
 
-            // Validate return to no attachment, a scalable default attachment, and Base Gun recovery.
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Railgun);
-            AssertVisualState(PlayerWeaponVisualSlot.None, baseGun, cannon, gatling, railgun);
-            visualConfig.DefaultAdditionalWeaponVisual = PlayerWeaponVisualSlot.Railgun;
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Cannon);
-            AssertVisualState(PlayerWeaponVisualSlot.Railgun, baseGun, cannon, gatling, railgun);
-            baseGun.SetActive(false);
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Cannon);
-            AssertVisualState(PlayerWeaponVisualSlot.Railgun, baseGun, cannon, gatling, railgun);
+            visualConfig.DefaultAdditionalWeaponId = new FixedString64Bytes(GatlingId);
+            visualSet.Apply(in visualConfig, in weapons, 2u, false, default);
+            AssertVisualState(GatlingId, baseGun, cannon, gatling, plasma);
 
-            // Validate scalable reference changes without leaving the previous Base Gun mesh visible.
             visualConfig.BaseGunReference = new FixedString128Bytes("Weapons/base gun scaled");
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Cannon);
+            visualSet.Apply(in visualConfig, in weapons, 3u, false, default);
             AssertActiveState(baseGun, false);
             AssertActiveState(scaledBaseGun, true);
-            AssertActiveState(railgun, true);
-            visualConfig.BaseGunReference = new FixedString128Bytes("Weapons/base gun");
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.Cannon);
-            AssertVisualState(PlayerWeaponVisualSlot.Railgun, baseGun, cannon, gatling, railgun);
-            AssertActiveState(scaledBaseGun, false);
+            AssertActiveState(gatling, true);
 
-            // Validate relative-path authoring and exact-name fallback resolution.
-            ValidateReferenceResolution(root.transform, weaponRoot.transform, railgun.transform);
+            ValidateReferenceResolution(root.transform, plasma.transform);
             ValidatePowerUpPipeline();
-            ValidateProjectPowerUpAnimationPayloads();
+            ValidateVisualScalingMetadata(world.EntityManager);
+            ValidateWeaponIdSelectorSources();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateAnimationClipBakePipeline();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateUpperBodyAnimatorController();
-            ValidateManagementToolDefaultShootClipField();
-            ValidateProjectVisualPreset();
-
+            ValidateProjectVisualPreset(world.EntityManager);
             Debug.Log("[PlayerWeaponVisualSmokeTest] All weapon visual checks passed.");
         }
         finally
         {
+            world.Dispose();
             UnityEngine.Object.DestroyImmediate(root);
         }
     }
 
     /// <summary>
-    /// Executes the isolated Switch Weapon and Trigger Hold Charge animation-selector pipeline checks.
+    /// Executes the isolated Switch Weapon and upper-body animation pipeline checks.
     /// </summary>
     public static void RunUpperBodyAnimationPipeline()
     {
         ValidatePowerUpPipeline();
-        ValidateProjectPowerUpAnimationPayloads();
         PlayerUpperBodyAnimationSmokeTestUtility.ValidateAnimationClipBakePipeline();
         PlayerUpperBodyAnimationSmokeTestUtility.ValidateUpperBodyAnimatorController();
         Debug.Log("[PlayerWeaponVisualSmokeTest] Upper-body animation pipeline checks passed.");
-    }
-    #endregion
-
-    #region Management Tool UI
-    /// <summary>
-    /// Verifies that Visual Presets exposes the direct default shooting clip picker in Weapon Visuals.
-    /// </summary>
-    private static void ValidateManagementToolDefaultShootClipField()
-    {
-        bool hadActiveSection = EditorPrefs.HasKey(VisualActiveSectionStateKey);
-        bool hadActiveSubSection = EditorPrefs.HasKey(VisualActiveSubSectionStateKey);
-        int previousActiveSection = EditorPrefs.GetInt(VisualActiveSectionStateKey);
-        int previousActiveSubSection = EditorPrefs.GetInt(VisualActiveSubSectionStateKey);
-
-        try
-        {
-            // Select Visual > Weapon Visuals before constructing the panel.
-            EditorPrefs.SetInt(VisualActiveSectionStateKey, 1);
-            EditorPrefs.SetInt(VisualActiveSubSectionStateKey, 1);
-            PlayerVisualPresetsPanel panel = new PlayerVisualPresetsPanel();
-            ObjectField clipField = panel.Root.Q<ObjectField>(PlayerVisualPresetsPanelWeaponVisualSectionUtility.DefaultShootAnimationClipFieldName);
-
-            if (clipField == null)
-                throw new InvalidOperationException("Player Visual Presets does not expose Default Shoot Animation Clip in Weapon Visuals.");
-
-            if (clipField.objectType != typeof(AnimationClip))
-                throw new InvalidOperationException("Default Shoot Animation Clip picker does not restrict assignments to AnimationClip assets.");
-        }
-        finally
-        {
-            // Restore the user's previous section selection.
-            RestoreEditorPreference(VisualActiveSectionStateKey,
-                                    hadActiveSection,
-                                    previousActiveSection);
-            RestoreEditorPreference(VisualActiveSubSectionStateKey,
-                                    hadActiveSubSection,
-                                    previousActiveSubSection);
-        }
-    }
-
-    /// <summary>
-    /// Restores one integer EditorPrefs value or removes the key when it did not previously exist.
-    /// </summary>
-    /// <param name="key">EditorPrefs key to restore.</param>
-    /// <param name="hadValue">True when the key existed before the smoke check.</param>
-    /// <param name="previousValue">Previous integer value to restore.</param>
-    private static void RestoreEditorPreference(string key, bool hadValue, int previousValue)
-    {
-        if (hadValue)
-        {
-            EditorPrefs.SetInt(key, previousValue);
-            return;
-        }
-
-        EditorPrefs.DeleteKey(key);
     }
     #endregion
 
@@ -178,370 +111,286 @@ public static class PlayerWeaponVisualSmokeTest
     }
 
     /// <summary>
+    /// Appends one runtime mountable weapon entry to the supplied ECS buffer.
+    /// </summary>
+    /// <param name="weapons">Runtime mountable-weapons buffer.</param>
+    /// <param name="weaponId">Designer-defined weapon ID.</param>
+    /// <param name="runtimeReference">Prefab-relative mesh selector.</param>
+    private static void AddWeapon(DynamicBuffer<PlayerAdditionalWeaponVisualElement> weapons,
+                                  string weaponId,
+                                  string runtimeReference)
+    {
+        weapons.Add(new PlayerAdditionalWeaponVisualElement
+        {
+            WeaponId = new FixedString64Bytes(weaponId),
+            RuntimeReference = new FixedString128Bytes(runtimeReference)
+        });
+    }
+
+    /// <summary>
     /// Creates a runtime visual configuration using deterministic prefab-relative selectors.
     /// </summary>
-    /// <param name="defaultAdditionalWeaponVisual">Optional attachment shown without an equipped Switch Weapon module.</param>
+    /// <param name="defaultAdditionalWeaponId">Optional default attachment ID.</param>
     /// <returns>Runtime visual bridge configuration used by the smoke suite.</returns>
-    private static PlayerVisualRuntimeBridgeConfig CreateConfig(PlayerWeaponVisualSlot defaultAdditionalWeaponVisual)
+    private static PlayerVisualRuntimeBridgeConfig CreateConfig(string defaultAdditionalWeaponId)
     {
         return new PlayerVisualRuntimeBridgeConfig
         {
             BaseGunReference = new FixedString128Bytes("Weapons/base gun"),
-            CannonReference = new FixedString128Bytes("Weapons/cannon"),
-            GatlingReference = new FixedString128Bytes("Weapons/gatling"),
-            RailgunReference = new FixedString128Bytes("Weapons/railgun"),
-            DefaultAdditionalWeaponVisual = defaultAdditionalWeaponVisual
+            DefaultAdditionalWeaponId = new FixedString64Bytes(defaultAdditionalWeaponId)
         };
     }
     #endregion
 
-    #region Assertions
+    #region Validation
     /// <summary>
-    /// Asserts that Base Gun and only the requested optional attachment are active.
+    /// Asserts Base Gun visibility and exclusive selection of one designer-defined attachment.
     /// </summary>
-    /// <param name="expectedAdditionalSlot">Optional attachment expected alongside Base Gun.</param>
-    /// <param name="baseGun">Base Gun visual object.</param>
-    /// <param name="cannon">Cannon visual object.</param>
-    /// <param name="gatling">Gatling visual object.</param>
-    /// <param name="railgun">Railgun visual object.</param>
-    private static void AssertVisualState(PlayerWeaponVisualSlot expectedAdditionalSlot,
+    /// <param name="expectedId">Expected attachment ID, or empty for Base Gun only.</param>
+    /// <param name="baseGun">Base Gun object.</param>
+    /// <param name="cannon">Cannon test object.</param>
+    /// <param name="gatling">Gatling test object.</param>
+    /// <param name="plasma">Custom Plasma test object.</param>
+    private static void AssertVisualState(string expectedId,
                                           GameObject baseGun,
                                           GameObject cannon,
                                           GameObject gatling,
-                                          GameObject railgun)
+                                          GameObject plasma)
     {
         AssertActiveState(baseGun, true);
-        AssertActiveState(cannon, expectedAdditionalSlot == PlayerWeaponVisualSlot.Cannon);
-        AssertActiveState(gatling, expectedAdditionalSlot == PlayerWeaponVisualSlot.Gatling);
-        AssertActiveState(railgun, expectedAdditionalSlot == PlayerWeaponVisualSlot.Railgun);
+        AssertActiveState(cannon, string.Equals(expectedId, CannonId, StringComparison.Ordinal));
+        AssertActiveState(gatling, string.Equals(expectedId, GatlingId, StringComparison.Ordinal));
+        AssertActiveState(plasma, string.Equals(expectedId, PlasmaId, StringComparison.Ordinal));
     }
 
     /// <summary>
-    /// Asserts one GameObject active state and reports the mismatching visual name.
+    /// Asserts one GameObject active state.
     /// </summary>
-    /// <param name="target">Weapon visual object to inspect.</param>
+    /// <param name="target">GameObject to inspect.</param>
     /// <param name="expectedActive">Expected active state.</param>
     private static void AssertActiveState(GameObject target, bool expectedActive)
     {
         if (target.activeSelf != expectedActive)
-            throw new Exception(string.Format("Weapon visual '{0}' active state mismatch. Expected: {1}, Actual: {2}.",
-                                              target.name,
-                                              expectedActive,
-                                              target.activeSelf));
+            throw new Exception(string.Format("Weapon visual '{0}' active state mismatch.", target.name));
     }
 
     /// <summary>
-    /// Asserts one resolved weapon visual slot and reports the pipeline stage that produced it.
+    /// Validates exact hierarchy-path authoring and exact-name fallback resolution.
     /// </summary>
-    /// <param name="expected">Expected weapon visual slot.</param>
-    /// <param name="actual">Actual weapon visual slot.</param>
-    /// <param name="stage">Pipeline stage included in failure details.</param>
-    private static void AssertWeaponVisualSlot(PlayerWeaponVisualSlot expected,
-                                               PlayerWeaponVisualSlot actual,
-                                               string stage)
+    /// <param name="root">Visual hierarchy root.</param>
+    /// <param name="plasma">Custom weapon transform used by the check.</param>
+    private static void ValidateReferenceResolution(Transform root, Transform plasma)
     {
-        if (actual != expected)
-            throw new Exception(string.Format("{0} mismatch. Expected: {1}, Actual: {2}.",
-                                              stage,
-                                              expected,
-                                              actual));
-    }
-
-    /// <summary>
-    /// Asserts authoring path construction, exact path resolution, and exact-name fallback resolution.
-    /// </summary>
-    /// <param name="root">Runtime visual bridge root.</param>
-    /// <param name="weaponRoot">Intermediate weapon hierarchy root.</param>
-    /// <param name="railgun">Railgun visual transform.</param>
-    private static void ValidateReferenceResolution(Transform root, Transform weaponRoot, Transform railgun)
-    {
-        if (!PlayerWeaponVisualReferenceUtility.TryBuildRelativePath(root, railgun, out string relativePath) ||
-            !string.Equals(relativePath, "Weapons/railgun", StringComparison.Ordinal))
+        if (!PlayerWeaponVisualReferenceUtility.TryBuildRelativePath(root, plasma, out string relativePath) ||
+            !string.Equals(relativePath, "Weapons/plasma", StringComparison.Ordinal))
             throw new Exception("Weapon visual relative-path construction failed.");
 
-        if (!PlayerWeaponVisualReferenceUtility.TryResolve(root, relativePath, out Transform pathResolved) ||
-            pathResolved != railgun)
-            throw new Exception("Weapon visual exact-path resolution failed.");
-
-        if (!PlayerWeaponVisualReferenceUtility.TryResolve(weaponRoot, "railgun", out Transform nameResolved) ||
-            nameResolved != railgun)
-            throw new Exception("Weapon visual exact-name resolution failed.");
+        if (!PlayerWeaponVisualReferenceUtility.TryResolve(root, relativePath, out Transform resolved) ||
+            resolved != plasma)
+            throw new Exception("Weapon visual relative-path resolution failed.");
     }
 
     /// <summary>
-    /// Asserts equipped-active aggregation precedence and active/passive Add Scaling propagation for Switch Weapon.
+    /// Validates active/passive aggregation precedence and token Add Scaling propagation for Switch Weapon.
     /// </summary>
     private static void ValidatePowerUpPipeline()
     {
-        PlayerPowerUpsConfig powerUpsConfig = new PlayerPowerUpsConfig
+        PlayerPowerUpsConfig config = new PlayerPowerUpsConfig
         {
             PrimarySlot = new PlayerPowerUpSlotConfig
             {
                 IsDefined = 1,
                 HasActiveWeaponSwitch = 1,
-                ActiveWeaponVisualSlot = PlayerWeaponVisualSlot.Cannon,
-                ActiveWeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Cannon
+                ActiveWeaponId = new FixedString64Bytes(CannonId)
             },
             SecondarySlot = new PlayerPowerUpSlotConfig
             {
                 IsDefined = 1,
                 HasActiveWeaponSwitch = 1,
-                ActiveWeaponVisualSlot = PlayerWeaponVisualSlot.Railgun,
-                ActiveWeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Railgun
+                ActiveWeaponId = new FixedString64Bytes(PlasmaId)
             }
         };
-        PlayerPassiveToolsState passiveToolsState = new PlayerPassiveToolsState
-        {
-            HasWeaponSwitch = 1,
-            WeaponVisualSlot = PlayerWeaponVisualSlot.Gatling,
-            WeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Gatling
-        };
+        PlayerPassiveToolsAggregationUtility.CreateDefaultState(out PlayerPassiveToolsState passiveToolsState);
+        PlayerPassiveToolsAggregationUtility.AccumulateEquippedActiveWeaponSwitch(in config, 1, 2, ref passiveToolsState);
+        AssertId(PlasmaId, passiveToolsState.WeaponId, "active Switch Weapon precedence");
 
-        // Active Switch Weapon overrides passive selection, and the newest equipped active wins conflicts.
-        PlayerPassiveToolsAggregationUtility.AccumulateEquippedActiveWeaponSwitch(in powerUpsConfig,
-                                                                                   1,
-                                                                                   2,
-                                                                                   ref passiveToolsState);
-        AssertWeaponVisualSlot(PlayerWeaponVisualSlot.Railgun,
-                               passiveToolsState.WeaponVisualSlot,
-                               "Newest equipped active Switch Weapon");
-        AssertEnumValue(PlayerShootAnimationClipSlot.Railgun,
-                        passiveToolsState.WeaponShootAnimationClipSlot,
-                        "Newest equipped active Switch Weapon shooting animation");
-        PlayerPassiveToolsAggregationUtility.AccumulateEquippedActiveWeaponSwitch(in powerUpsConfig,
-                                                                                   3,
-                                                                                   2,
-                                                                                   ref passiveToolsState);
-        AssertWeaponVisualSlot(PlayerWeaponVisualSlot.Cannon,
-                               passiveToolsState.WeaponVisualSlot,
-                               "Primary equipped active Switch Weapon");
-        AssertEnumValue(PlayerShootAnimationClipSlot.Cannon,
-                        passiveToolsState.WeaponShootAnimationClipSlot,
-                        "Primary equipped active Switch Weapon shooting animation");
-
-        // Unified formulas must update the active hook directly and the passive payload through its native path.
-        PlayerPowerUpSlotConfig activeSlotConfig = powerUpsConfig.PrimarySlot;
-        PlayerPassiveToolConfig passiveToolConfig = new PlayerPassiveToolConfig
-        {
-            IsDefined = 1,
-            HasWeaponSwitch = 1,
-            WeaponVisualSlot = PlayerWeaponVisualSlot.Cannon,
-            WeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Cannon
-        };
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("switchWeapon.weaponSlot",
-                                                          PlayerPowerUpUnlockKind.Active,
-                                                          (float)PlayerWeaponVisualSlot.Gatling,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertWeaponVisualSlot(PlayerWeaponVisualSlot.Gatling,
-                               activeSlotConfig.ActiveWeaponVisualSlot,
-                               "Active Switch Weapon Add Scaling");
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("switchWeapon.weaponSlot",
-                                                          PlayerPowerUpUnlockKind.Passive,
-                                                          (float)PlayerWeaponVisualSlot.Railgun,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertWeaponVisualSlot(PlayerWeaponVisualSlot.Railgun,
-                               passiveToolConfig.WeaponVisualSlot,
-                               "Passive Switch Weapon Add Scaling");
-
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("switchWeapon.shootAnimationClipSlot",
-                                                          PlayerPowerUpUnlockKind.Active,
-                                                          (float)PlayerShootAnimationClipSlot.Gatling,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertEnumValue(PlayerShootAnimationClipSlot.Gatling,
-                        activeSlotConfig.ActiveWeaponShootAnimationClipSlot,
-                        "Active Switch Weapon shooting animation Add Scaling");
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("switchWeapon.shootAnimationClipSlot",
-                                                          PlayerPowerUpUnlockKind.Passive,
-                                                          (float)PlayerShootAnimationClipSlot.Railgun,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertEnumValue(PlayerShootAnimationClipSlot.Railgun,
-                        passiveToolConfig.WeaponShootAnimationClipSlot,
-                        "Passive Switch Weapon shooting animation Add Scaling");
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("holdCharge.chargeAnimationClipSlot",
-                                                          PlayerPowerUpUnlockKind.Active,
-                                                          (float)PlayerChargeAnimationClipSlot.Secondary,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertEnumValue(PlayerChargeAnimationClipSlot.Secondary,
-                        activeSlotConfig.ChargeShot.ChargeAnimationClipSlot,
-                        "Trigger Hold Charge animation Add Scaling");
-        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("holdCharge.releaseAnimationClipSlot",
-                                                          PlayerPowerUpUnlockKind.Active,
-                                                          100f,
-                                                          ref activeSlotConfig,
-                                                          ref passiveToolConfig);
-        AssertEnumValue(PlayerReleaseAnimationClipSlot.Secondary,
-                        activeSlotConfig.ChargeShot.ReleaseAnimationClipSlot,
-                        "Trigger Hold Charge release animation enum clamp");
+        PlayerPowerUpSlotConfig activeSlotConfig = config.PrimarySlot;
+        PlayerPassiveToolConfig passiveToolConfig = new PlayerPassiveToolConfig();
+        PlayerRuntimePowerUpScalingPathUtility.ApplyTokenValue("switchWeapon.weaponId",
+                                                               PlayerPowerUpUnlockKind.Active,
+                                                               GatlingId,
+                                                               ref activeSlotConfig,
+                                                               ref passiveToolConfig);
+        AssertId(GatlingId, activeSlotConfig.ActiveWeaponId, "active Switch Weapon Add Scaling");
+        PlayerRuntimePowerUpScalingPathUtility.ApplyTokenValue("switchWeapon.weaponId",
+                                                               PlayerPowerUpUnlockKind.Passive,
+                                                               PlasmaId,
+                                                               ref activeSlotConfig,
+                                                               ref passiveToolConfig);
+        AssertId(PlasmaId, passiveToolConfig.WeaponId, "passive Switch Weapon Add Scaling");
     }
 
     /// <summary>
-    /// Asserts that configured project payload selectors survive modular active-slot bake without manual runtime hooks.
+    /// Validates stable per-entry stat keys and weapon-visual scaling metadata before and after an authored array
+    /// reorder. This protects formulas from silently targeting a different mountable weapon.
     /// </summary>
-    private static void ValidateProjectPowerUpAnimationPayloads()
+    /// <param name="entityManager">Temporary EntityManager used to allocate the metadata buffer.</param>
+    private static void ValidateVisualScalingMetadata(EntityManager entityManager)
     {
-        PlayerPowerUpsPreset preset = AssetDatabase.LoadAssetAtPath<PlayerPowerUpsPreset>(PowerUpsPresetPath);
+        PlayerVisualPreset visualPreset = ScriptableObject.CreateInstance<PlayerVisualPreset>();
+        Entity entity = entityManager.CreateEntity();
 
-        if (preset == null)
-            throw new Exception("Project power-up animation validation requires the default Player Power-Ups preset.");
-
-        bool foundConfiguredHoldCharge = false;
-        bool foundConfiguredDefaultChargeShot = false;
-        bool foundConfiguredSwitchWeapon = false;
-        IReadOnlyList<ModularPowerUpDefinition> activePowerUps = preset.ActivePowerUps;
-
-        for (int powerUpIndex = 0; powerUpIndex < activePowerUps.Count; powerUpIndex++)
+        try
         {
-            ModularPowerUpDefinition powerUp = activePowerUps[powerUpIndex];
+            SerializedObject serializedPreset = new SerializedObject(visualPreset);
+            SerializedProperty weaponsProperty = serializedPreset.FindProperty("weaponVisuals.additionalWeapons");
+            weaponsProperty.arraySize = 2;
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(0), PlasmaId, "Weapons/plasma");
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(1), GatlingId, "Weapons/gatling");
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+            serializedPreset.Update();
 
-            if (powerUp == null)
-                continue;
+            SerializedProperty plasmaEntry = weaponsProperty.GetArrayElementAtIndex(0);
+            string plasmaIdStatKey = PlayerScalingStatKeyUtility.BuildStatKey(plasmaEntry.FindPropertyRelative("weaponId"));
+            string plasmaReferenceStatKey = PlayerScalingStatKeyUtility.BuildStatKey(plasmaEntry.FindPropertyRelative("runtimeReference"));
 
-            PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(null,
-                                                                             preset,
-                                                                             powerUp,
-                                                                             ResolveNullEntity,
-                                                                             out PlayerPowerUpSlotConfig slotConfig);
-            IReadOnlyList<PowerUpModuleBinding> bindings = powerUp.ModuleBindings;
+            if (!plasmaIdStatKey.Contains("data[0|weaponId:Plasma]", StringComparison.Ordinal))
+                throw new Exception("Weapon visual Add Scaling stat key does not use the designer Weapon Id as stable token.");
 
-            for (int bindingIndex = 0; bindingIndex < bindings.Count; bindingIndex++)
-            {
-                PowerUpModuleBinding binding = bindings[bindingIndex];
+            SerializedProperty scalingRulesProperty = serializedPreset.FindProperty("scalingRules");
+            scalingRulesProperty.arraySize = 2;
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(0), plasmaIdStatKey, "[this]");
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(1), plasmaReferenceStatKey, "[this]");
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
 
-                if (binding == null || !binding.IsEnabled)
-                    continue;
+            DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> metadata = entityManager.AddBuffer<PlayerRuntimeWeaponVisualScalingElement>(entity);
+            PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(visualPreset, metadata);
+            AssertVisualScalingMetadata(metadata, 0);
 
-                PowerUpModuleDefinition moduleDefinition =
-                    PlayerPowerUpBakeSharedUtility.ResolveModuleDefinitionById(preset, binding.ModuleId);
-                PowerUpModuleData payload = binding.ResolvePayload(moduleDefinition);
+            serializedPreset.Update();
+            weaponsProperty.MoveArrayElement(0, 1);
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+            PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(visualPreset, metadata);
+            AssertVisualScalingMetadata(metadata, 1);
 
-                if (moduleDefinition == null || payload == null)
-                    continue;
-
-                switch (moduleDefinition.ModuleKind)
-                {
-                    case PowerUpModuleKind.TriggerHoldCharge:
-                        bool configuredHoldCharge = ValidateBakedHoldChargeSelectors(payload.HoldCharge,
-                                                                                     in slotConfig);
-                        foundConfiguredHoldCharge |= configuredHoldCharge;
-
-                        if (powerUp.CommonData != null &&
-                            string.Equals(powerUp.CommonData.PowerUpId,
-                                          DefaultChargeShotPowerUpId,
-                                          StringComparison.Ordinal))
-                        {
-                            AssertEnumValue(PlayerChargeAnimationClipSlot.Primary,
-                                            payload.HoldCharge.ChargeAnimationClipSlot,
-                                            "Default Charge Shot charge-animation payload");
-                            AssertEnumValue(PlayerReleaseAnimationClipSlot.Primary,
-                                            payload.HoldCharge.ReleaseAnimationClipSlot,
-                                            "Default Charge Shot release-animation payload");
-                            foundConfiguredDefaultChargeShot = true;
-                        }
-                        break;
-                    case PowerUpModuleKind.SwitchWeapon:
-                        foundConfiguredSwitchWeapon |= ValidateBakedSwitchWeaponSelector(payload.SwitchWeapon,
-                                                                                         in slotConfig);
-                        break;
-                }
-            }
+            serializedPreset.Update();
+            PlayerScalingRuleStatKeyRefreshUtility.RefreshStatKeys(serializedPreset);
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+            PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(visualPreset, metadata);
+            AssertVisualScalingMetadata(metadata, 1);
         }
-
-        if (!foundConfiguredHoldCharge)
-            throw new Exception("The project preset does not contain an enabled Trigger Hold Charge payload with configured animation selectors.");
-
-        if (!foundConfiguredDefaultChargeShot)
-            throw new Exception("The project preset does not contain the default Charge Shot with Primary charge and release animation selectors.");
-
-        if (!foundConfiguredSwitchWeapon)
-            throw new Exception("The project preset does not contain an enabled Switch Weapon payload for automatic or explicit shooting-animation selection.");
+        finally
+        {
+            entityManager.DestroyEntity(entity);
+            UnityEngine.Object.DestroyImmediate(visualPreset);
+        }
     }
 
     /// <summary>
-    /// Asserts one configured Trigger Hold Charge payload against its baked active-slot animation selectors.
+    /// Validates that enum-like editor selectors preserve authored Weapon Id order while excluding invalid
+    /// empty and duplicate definitions.
     /// </summary>
-    /// <param name="holdCharge">Resolved hold-charge payload.</param>
-    /// <param name="slotConfig">Baked active-slot config produced from the owning modular power-up.</param>
-    /// <returns>True when the payload configures at least one optional upper-body animation.</returns>
-    private static bool ValidateBakedHoldChargeSelectors(PowerUpHoldChargeModuleData holdCharge,
-                                                         in PlayerPowerUpSlotConfig slotConfig)
+    private static void ValidateWeaponIdSelectorSources()
     {
-        if (holdCharge == null)
-            return false;
+        PlayerVisualPreset visualPreset = ScriptableObject.CreateInstance<PlayerVisualPreset>();
 
-        if (holdCharge.ChargeAnimationClipSlot == PlayerChargeAnimationClipSlot.None &&
-            holdCharge.ReleaseAnimationClipSlot == PlayerReleaseAnimationClipSlot.None)
-            return false;
+        try
+        {
+            SerializedObject serializedPreset = new SerializedObject(visualPreset);
+            SerializedProperty weaponsProperty = serializedPreset.FindProperty("weaponVisuals.additionalWeapons");
+            weaponsProperty.arraySize = 4;
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(0), PlasmaId, "Weapons/plasma");
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(1), CannonId, "Weapons/cannon");
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(2), PlasmaId, "Weapons/plasma duplicate");
+            ConfigureWeaponEntry(weaponsProperty.GetArrayElementAtIndex(3), string.Empty, "Weapons/empty");
 
-        AssertEnumValue(ActiveToolKind.ChargeShot, slotConfig.ToolKind, "Trigger Hold Charge active tool bake");
-        AssertEnumValue(holdCharge.ChargeAnimationClipSlot,
-                        slotConfig.ChargeShot.ChargeAnimationClipSlot,
-                        "Trigger Hold Charge animation selector bake");
-        AssertEnumValue(holdCharge.ReleaseAnimationClipSlot,
-                        slotConfig.ChargeShot.ReleaseAnimationClipSlot,
-                        "Trigger Hold Charge release selector bake");
-        return true;
+            List<string> options = PlayerWeaponIdSelectorUtility.BuildOptions(weaponsProperty);
+
+            if (options.Count != 2 ||
+                !string.Equals(options[0], PlasmaId, StringComparison.Ordinal) ||
+                !string.Equals(options[1], CannonId, StringComparison.Ordinal))
+                throw new Exception("Weapon Id selector options do not preserve unique authored definitions.");
+
+            if (!PlayerWeaponIdSelectorUtility.ContainsWeaponId(options, CannonId) ||
+                PlayerWeaponIdSelectorUtility.ContainsWeaponId(options, GatlingId))
+                throw new Exception("Weapon Id selector option matching failed.");
+
+            SerializedProperty defaultWeaponIdProperty = serializedPreset.FindProperty("weaponVisuals.defaultAdditionalWeaponId");
+            SerializedProperty scalingRulesProperty = serializedPreset.FindProperty("scalingRules");
+            defaultWeaponIdProperty.stringValue = CannonId;
+            VisualElement selector = PlayerWeaponIdSelectorUtility.CreateScalableSelector(defaultWeaponIdProperty,
+                                                                                           scalingRulesProperty,
+                                                                                           "Weapon Id",
+                                                                                           "Smoke test selector.",
+                                                                                           PlayerWeaponIdSelectorUtility.NoneLabel,
+                                                                                           () => PlayerWeaponIdSelectorUtility.BuildOptions(weaponsProperty));
+            PopupField<string> popup = selector.Q<PopupField<string>>();
+            PropertyField rawWeaponIdField = selector.Q<PropertyField>();
+
+            if (popup == null ||
+                rawWeaponIdField == null ||
+                rawWeaponIdField.style.display.value != DisplayStyle.None ||
+                !string.Equals(popup.value, CannonId, StringComparison.Ordinal))
+                throw new Exception("Weapon Id enum-like popup did not select the current designer-defined ID.");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(visualPreset);
+        }
     }
 
     /// <summary>
-    /// Asserts one Switch Weapon payload against its baked active-slot visual and shooting-animation selectors.
+    /// Writes one temporary mountable weapon entry used by stable stat-key smoke checks.
     /// </summary>
-    /// <param name="switchWeapon">Resolved Switch Weapon payload.</param>
-    /// <param name="slotConfig">Baked active-slot config produced from the owning modular power-up.</param>
-    /// <returns>True when a Switch Weapon payload was validated.</returns>
-    private static bool ValidateBakedSwitchWeaponSelector(PowerUpSwitchWeaponModuleData switchWeapon,
-                                                          in PlayerPowerUpSlotConfig slotConfig)
+    /// <param name="entryProperty">Serialized mountable weapon entry.</param>
+    /// <param name="weaponId">Designer-defined stable ID.</param>
+    /// <param name="runtimeReference">Prefab-relative runtime selector.</param>
+    private static void ConfigureWeaponEntry(SerializedProperty entryProperty,
+                                             string weaponId,
+                                             string runtimeReference)
     {
-        if (switchWeapon == null)
-            return false;
-
-        AssertEnumValue(switchWeapon.WeaponSlot,
-                        slotConfig.ActiveWeaponVisualSlot,
-                        "Switch Weapon visual selector bake");
-        AssertEnumValue(switchWeapon.ShootAnimationClipSlot,
-                        slotConfig.ActiveWeaponShootAnimationClipSlot,
-                        "Switch Weapon shooting-animation selector bake");
-
-        if (slotConfig.HasActiveWeaponSwitch == 0)
-            throw new Exception("Switch Weapon active-slot bake did not enable its runtime hook.");
-
-        return true;
+        entryProperty.FindPropertyRelative("weaponId").stringValue = weaponId;
+        entryProperty.FindPropertyRelative("runtimeReference").stringValue = runtimeReference;
     }
 
     /// <summary>
-    /// Resolves optional prefab references to null entities for deterministic selector-only bake validation.
+    /// Writes one enabled token formula into a temporary visual-preset scaling rule.
     /// </summary>
-    /// <param name="prefab">Ignored optional prefab reference.</param>
-    /// <returns>Null entity because animation-selector validation does not require prefab baking.</returns>
-    private static Entity ResolveNullEntity(GameObject prefab)
+    /// <param name="ruleProperty">Serialized scaling rule element.</param>
+    /// <param name="statKey">Stable target stat key.</param>
+    /// <param name="formula">Unified token formula.</param>
+    private static void ConfigureScalingRule(SerializedProperty ruleProperty, string statKey, string formula)
     {
-        return Entity.Null;
+        ruleProperty.FindPropertyRelative("statKey").stringValue = statKey;
+        ruleProperty.FindPropertyRelative("addScaling").boolValue = true;
+        ruleProperty.FindPropertyRelative("formula").stringValue = formula;
     }
 
     /// <summary>
-    /// Asserts one enum pipeline value and reports the stage that produced it.
+    /// Asserts both per-entry scalable fields remain bound to the expected authored array index.
     /// </summary>
-    /// <param name="expected">Expected enum value.</param>
-    /// <param name="actual">Actual enum value.</param>
-    /// <param name="stage">Pipeline stage included in failure details.</param>
-    private static void AssertEnumValue<TEnum>(TEnum expected, TEnum actual, string stage)
-        where TEnum : struct, Enum
+    /// <param name="metadata">Baked weapon-visual scaling metadata.</param>
+    /// <param name="expectedEntryIndex">Expected authored array index after structural mutations.</param>
+    private static void AssertVisualScalingMetadata(DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> metadata,
+                                                    int expectedEntryIndex)
     {
-        if (!expected.Equals(actual))
-            throw new Exception(string.Format("{0} mismatch. Expected: {1}, Actual: {2}.",
-                                              stage,
-                                              expected,
-                                              actual));
+        if (metadata.Length != 2)
+            throw new Exception("Weapon visual Add Scaling metadata count mismatch.");
+
+        for (int metadataIndex = 0; metadataIndex < metadata.Length; metadataIndex++)
+        {
+            PlayerRuntimeWeaponVisualScalingElement element = metadata[metadataIndex];
+
+            if (element.TargetEntryIndex != expectedEntryIndex)
+                throw new Exception("Weapon visual Add Scaling metadata targeted the wrong mountable entry.");
+        }
     }
 
     /// <summary>
-    /// Asserts that the project's default visual preset resolves every weapon selector and owns complete prefab fallbacks.
+    /// Validates the project visual preset, its prefab references, and its default designer-defined ID.
     /// </summary>
-    private static void ValidateProjectVisualPreset()
+    /// <param name="entityManager">Temporary EntityManager used to create the runtime weapon buffer.</param>
+    private static void ValidateProjectVisualPreset(EntityManager entityManager)
     {
         PlayerVisualPreset visualPreset = AssetDatabase.LoadAssetAtPath<PlayerVisualPreset>(DefaultVisualPresetPath);
 
@@ -550,59 +399,43 @@ public static class PlayerWeaponVisualSmokeTest
 
         PlayerWeaponVisualSettings settings = visualPreset.WeaponVisuals;
 
-        if (settings.DefaultShootAnimationClip == null)
-            throw new Exception("The project default Player Visual Preset is missing its Base Gun default shoot animation clip.");
+        if (!string.IsNullOrWhiteSpace(settings.DefaultAdditionalWeaponId) &&
+            settings.ResolveEntry(settings.DefaultAdditionalWeaponId) == null)
+            throw new Exception("The project default Weapon Id does not resolve to a mountable entry.");
 
         GameObject visualInstance = UnityEngine.Object.Instantiate(visualPreset.RuntimeVisualBridgePrefab);
+        Entity entity = entityManager.CreateEntity();
 
         try
         {
-            Transform visualRoot = visualInstance.transform;
-            Transform baseGun = ResolveReference(visualRoot, settings.BaseGunReference, "Base Gun");
-            Transform cannon = ResolveReference(visualRoot, settings.CannonReference, "Cannon");
-            Transform gatling = ResolveReference(visualRoot, settings.GatlingReference, "Gatling");
-            Transform railgun = ResolveReference(visualRoot, settings.RailgunReference, "Railgun");
             PlayerWeaponVisualSet visualSet = visualInstance.GetComponent<PlayerWeaponVisualSet>();
 
-            if (visualSet == null || !visualSet.HasCompleteWeaponSet)
-                throw new Exception("The project runtime visual bridge prefab does not contain a complete PlayerWeaponVisualSet.");
+            if (visualSet == null || !visualSet.HasBaseGunFallback)
+                throw new Exception("The project runtime visual bridge prefab has no valid PlayerWeaponVisualSet Base Gun fallback.");
 
-            PlayerVisualRuntimeBridgeConfig visualConfig = new PlayerVisualRuntimeBridgeConfig
-            {
-                BaseGunReference = new FixedString128Bytes(settings.BaseGunReference),
-                CannonReference = new FixedString128Bytes(settings.CannonReference),
-                GatlingReference = new FixedString128Bytes(settings.GatlingReference),
-                RailgunReference = new FixedString128Bytes(settings.RailgunReference),
-                DefaultAdditionalWeaponVisual = settings.DefaultAdditionalWeaponVisual
-            };
-            visualSet.Apply(in visualConfig, false, PlayerWeaponVisualSlot.None);
-            AssertVisualState(settings.DefaultAdditionalWeaponVisual,
-                              baseGun.gameObject,
-                              cannon.gameObject,
-                              gatling.gameObject,
-                              railgun.gameObject);
+            DynamicBuffer<PlayerAdditionalWeaponVisualElement> weapons = entityManager.AddBuffer<PlayerAdditionalWeaponVisualElement>(entity);
+            PlayerWeaponVisualBakeUtility.PopulateAdditionalWeaponsBuffer(visualPreset, weapons);
+            PlayerVisualRuntimeBridgeConfig visualConfig = default;
+            PlayerWeaponVisualBakeUtility.ApplyRuntimeConfig(visualPreset, ref visualConfig);
+            visualSet.Apply(in visualConfig, in weapons, 1u, false, default);
         }
         finally
         {
+            entityManager.DestroyEntity(entity);
             UnityEngine.Object.DestroyImmediate(visualInstance);
         }
     }
 
     /// <summary>
-    /// Resolves one authored selector inside the supplied runtime visual bridge root.
+    /// Asserts one runtime FixedString Weapon Id.
     /// </summary>
-    /// <param name="visualRoot">Runtime visual bridge prefab root.</param>
-    /// <param name="selector">Authored prefab-relative path or unique object name.</param>
-    /// <param name="slotLabel">Weapon slot label included in failure details.</param>
-    /// <returns>Resolved weapon visual transform.</returns>
-    private static Transform ResolveReference(Transform visualRoot, string selector, string slotLabel)
+    /// <param name="expected">Expected designer-defined ID.</param>
+    /// <param name="actual">Actual runtime ID.</param>
+    /// <param name="stage">Pipeline stage included in failure details.</param>
+    private static void AssertId(string expected, FixedString64Bytes actual, string stage)
     {
-        if (!PlayerWeaponVisualReferenceUtility.TryResolve(visualRoot, selector, out Transform resolvedTransform))
-            throw new Exception(string.Format("{0} selector '{1}' does not resolve inside the project runtime visual bridge prefab.",
-                                              slotLabel,
-                                              selector));
-
-        return resolvedTransform;
+        if (!string.Equals(expected, actual.ToString(), StringComparison.Ordinal))
+            throw new Exception(string.Format("{0} Weapon Id mismatch.", stage));
     }
     #endregion
 

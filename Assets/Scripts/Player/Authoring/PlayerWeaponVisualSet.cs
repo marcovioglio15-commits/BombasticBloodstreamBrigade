@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
-/// Resolves the four player weapon mesh objects once per runtime visual configuration change. Base Gun remains visible,
-/// while the configured default or Switch Weapon selects at most one Cannon, Gatling, or Railgun attachment.
+/// Resolves designer-defined weapon visual IDs against the runtime mountable-weapons buffer. Base Gun remains
+/// visible while at most one valid default or Switch Weapon attachment is shown.
 /// </summary>
 public sealed class PlayerWeaponVisualSet : MonoBehaviour
 {
@@ -11,50 +13,29 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
 
     #region Serialized Fields
     [Header("Weapon Mesh Fallbacks")]
-    [Tooltip("Base Gun mesh fallback used when the active Player Visual Preset reference cannot be resolved.")]
+    [Tooltip("Base Gun mesh fallback used before ECS applies the active Player Visual Preset or when its scalable runtime reference cannot be resolved.")]
     [SerializeField]
     private GameObject baseGun;
-
-    [Tooltip("Cannon mesh fallback used when the active Player Visual Preset reference cannot be resolved.")]
-    [SerializeField]
-    private GameObject cannon;
-
-    [Tooltip("Gatling mesh fallback used when the active Player Visual Preset reference cannot be resolved.")]
-    [SerializeField]
-    private GameObject gatling;
-
-    [Tooltip("Railgun mesh fallback used when the active Player Visual Preset reference cannot be resolved.")]
-    [SerializeField]
-    private GameObject railgun;
-
-    [Header("Fallback Default")]
-    [Tooltip("Optional weapon attachment shown alongside Base Gun before ECS applies the active Player Visual Preset configuration.")]
-    [SerializeField]
-    private PlayerWeaponVisualSlot fallbackDefaultAdditionalWeaponVisual = PlayerWeaponVisualSlot.None;
     #endregion
 
     #region Runtime State
+    private readonly List<ResolvedWeaponVisual> resolvedAdditionalWeapons = new List<ResolvedWeaponVisual>(4);
     private GameObject resolvedBaseGun;
-    private GameObject resolvedCannon;
-    private GameObject resolvedGatling;
-    private GameObject resolvedRailgun;
     private FixedString128Bytes appliedBaseGunReference;
-    private FixedString128Bytes appliedCannonReference;
-    private FixedString128Bytes appliedGatlingReference;
-    private FixedString128Bytes appliedRailgunReference;
-    private PlayerWeaponVisualSlot appliedDefaultAdditionalWeaponVisual;
-    private PlayerWeaponVisualSlot appliedAdditionalSlot;
+    private FixedString64Bytes appliedDefaultAdditionalWeaponId;
+    private FixedString64Bytes appliedAdditionalWeaponId;
+    private uint appliedRevision;
     private byte hasAppliedConfiguration;
     #endregion
 
     #endregion
 
     #region Properties
-    public bool HasCompleteWeaponSet
+    public bool HasBaseGunFallback
     {
         get
         {
-            return baseGun != null && cannon != null && gatling != null && railgun != null;
+            return baseGun != null;
         }
     }
     #endregion
@@ -63,12 +44,12 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
 
     #region Lifecycle
     /// <summary>
-    /// Keeps Base Gun visible and applies the serialized fallback attachment before ECS presentation provides configuration.
+    /// Shows only the serialized Base Gun fallback until ECS presentation supplies the active weapon table.
     /// </summary>
     private void Awake()
     {
-        ResolveFallbackReferences();
-        ShowBaseGunAndOnlyAdditional(ResolveAvailableAdditionalSlot(fallbackDefaultAdditionalWeaponVisual));
+        resolvedBaseGun = baseGun;
+        ApplyVisibility(default);
     }
 
     /// <summary>
@@ -82,93 +63,104 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
 
     #region Configuration
     /// <summary>
-    /// Assigns generated prefab fallback references and invalidates runtime presentation caches.
+    /// Assigns the generated Base Gun fallback and invalidates runtime presentation caches.
     /// </summary>
     /// <param name="baseGunValue">Generated Base Gun mesh object.</param>
-    /// <param name="cannonValue">Generated Cannon mesh object.</param>
-    /// <param name="gatlingValue">Generated Gatling mesh object.</param>
-    /// <param name="railgunValue">Generated Railgun mesh object.</param>
-    public void Configure(GameObject baseGunValue,
-                          GameObject cannonValue,
-                          GameObject gatlingValue,
-                          GameObject railgunValue)
+    public void Configure(GameObject baseGunValue)
     {
         HideResolvedWeaponVisuals();
         baseGun = baseGunValue;
-        cannon = cannonValue;
-        gatling = gatlingValue;
-        railgun = railgunValue;
-        ResolveFallbackReferences();
-        ShowBaseGunAndOnlyAdditional(ResolveAvailableAdditionalSlot(fallbackDefaultAdditionalWeaponVisual));
+        resolvedBaseGun = baseGun;
+        ApplyVisibility(default);
         ResetAppliedState();
     }
     #endregion
 
     #region Runtime Application
     /// <summary>
-    /// Keeps Base Gun visible and applies the configured default attachment or one equipped Switch Weapon replacement.
-    /// Reference selectors are resolved only when the ECS visual configuration changes.
+    /// Keeps Base Gun visible and applies the configured default attachment or one equipped Switch Weapon
+    /// replacement. Prefab selectors are resolved only when the scalable weapon-visual revision changes.
     /// </summary>
     /// <param name="visualConfig">Current ECS runtime visual bridge configuration.</param>
+    /// <param name="additionalWeapons">Current ECS mountable-weapons table.</param>
+    /// <param name="weaponVisualRevision">Revision derived from runtime weapon-visual scaling state.</param>
     /// <param name="hasWeaponSwitch">Whether an equipped Switch Weapon module currently owns the visual.</param>
-    /// <param name="weaponVisualSlot">Requested Cannon, Gatling, or Railgun replacement.</param>
+    /// <param name="weaponId">Designer-defined Weapon Id requested by Switch Weapon.</param>
     public void Apply(in PlayerVisualRuntimeBridgeConfig visualConfig,
+                      in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeapons,
+                      uint weaponVisualRevision,
                       bool hasWeaponSwitch,
-                      PlayerWeaponVisualSlot weaponVisualSlot)
+                      FixedString64Bytes weaponId)
     {
-        EnsureRuntimeConfiguration(in visualConfig);
-        bool useSwitchWeapon = hasWeaponSwitch && IsAlternateSlot(weaponVisualSlot) && IsSlotAvailable(weaponVisualSlot);
-        PlayerWeaponVisualSlot desiredAdditionalSlot = useSwitchWeapon
-            ? weaponVisualSlot
-            : ResolveAvailableAdditionalSlot(visualConfig.DefaultAdditionalWeaponVisual);
+        EnsureRuntimeConfiguration(in visualConfig, in additionalWeapons, weaponVisualRevision);
+        FixedString64Bytes desiredWeaponId = ResolveDesiredWeaponId(in visualConfig,
+                                                                    hasWeaponSwitch,
+                                                                    weaponId);
 
-        if (appliedAdditionalSlot == desiredAdditionalSlot &&
+        if (appliedAdditionalWeaponId.Equals(desiredWeaponId) &&
             (resolvedBaseGun == null || resolvedBaseGun.activeSelf))
-        {
             return;
-        }
 
-        ShowBaseGunAndOnlyAdditional(desiredAdditionalSlot);
-        appliedAdditionalSlot = desiredAdditionalSlot;
+        ApplyVisibility(desiredWeaponId);
+        appliedAdditionalWeaponId = desiredWeaponId;
     }
     #endregion
 
     #region Reference Resolution
     /// <summary>
-    /// Resolves changed prefab-relative selectors and keeps serialized component references as deterministic fallbacks.
+    /// Rebuilds resolved GameObject references when scalable configuration changes.
     /// </summary>
     /// <param name="visualConfig">Current ECS runtime visual bridge configuration.</param>
-    private void EnsureRuntimeConfiguration(in PlayerVisualRuntimeBridgeConfig visualConfig)
+    /// <param name="additionalWeapons">Current ECS mountable-weapons table.</param>
+    /// <param name="weaponVisualRevision">Revision derived from runtime weapon-visual scaling state.</param>
+    private void EnsureRuntimeConfiguration(in PlayerVisualRuntimeBridgeConfig visualConfig,
+                                            in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeapons,
+                                            uint weaponVisualRevision)
     {
         if (hasAppliedConfiguration != 0 &&
-            appliedBaseGunReference == visualConfig.BaseGunReference &&
-            appliedCannonReference == visualConfig.CannonReference &&
-            appliedGatlingReference == visualConfig.GatlingReference &&
-            appliedRailgunReference == visualConfig.RailgunReference &&
-            appliedDefaultAdditionalWeaponVisual == visualConfig.DefaultAdditionalWeaponVisual)
-        {
+            appliedRevision == weaponVisualRevision &&
+            appliedBaseGunReference.Equals(visualConfig.BaseGunReference) &&
+            appliedDefaultAdditionalWeaponId.Equals(visualConfig.DefaultAdditionalWeaponId))
             return;
-        }
 
         HideResolvedWeaponVisuals();
+        resolvedAdditionalWeapons.Clear();
         resolvedBaseGun = ResolveReference(visualConfig.BaseGunReference, baseGun);
-        resolvedCannon = ResolveReference(visualConfig.CannonReference, cannon);
-        resolvedGatling = ResolveReference(visualConfig.GatlingReference, gatling);
-        resolvedRailgun = ResolveReference(visualConfig.RailgunReference, railgun);
+
+        if (additionalWeapons.IsCreated)
+        {
+            for (int entryIndex = 0; entryIndex < additionalWeapons.Length; entryIndex++)
+            {
+                PlayerAdditionalWeaponVisualElement entry = additionalWeapons[entryIndex];
+
+                if (entry.WeaponId.Length <= 0)
+                    continue;
+
+                GameObject resolvedWeapon = ResolveReference(entry.RuntimeReference, null);
+
+                if (resolvedWeapon == null)
+                    continue;
+
+                resolvedAdditionalWeapons.Add(new ResolvedWeaponVisual
+                {
+                    WeaponId = entry.WeaponId,
+                    Target = resolvedWeapon
+                });
+            }
+        }
+
         appliedBaseGunReference = visualConfig.BaseGunReference;
-        appliedCannonReference = visualConfig.CannonReference;
-        appliedGatlingReference = visualConfig.GatlingReference;
-        appliedRailgunReference = visualConfig.RailgunReference;
-        appliedDefaultAdditionalWeaponVisual = visualConfig.DefaultAdditionalWeaponVisual;
+        appliedDefaultAdditionalWeaponId = visualConfig.DefaultAdditionalWeaponId;
+        appliedRevision = weaponVisualRevision;
         hasAppliedConfiguration = 1;
-        appliedAdditionalSlot = (PlayerWeaponVisualSlot)(-1);
+        appliedAdditionalWeaponId = default;
     }
 
     /// <summary>
-    /// Resolves one prefab-relative selector and returns its serialized fallback when unresolved.
+    /// Resolves one prefab-relative selector and returns its optional serialized fallback when unresolved.
     /// </summary>
     /// <param name="reference">Prefab-relative path or unique GameObject name.</param>
-    /// <param name="fallback">Serialized fallback mesh object.</param>
+    /// <param name="fallback">Optional serialized fallback mesh object.</param>
     /// <returns>Resolved runtime mesh object or the supplied fallback.</returns>
     private GameObject ResolveReference(FixedString128Bytes reference, GameObject fallback)
     {
@@ -179,82 +171,77 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
     }
 
     /// <summary>
-    /// Restores runtime resolved references from the generated prefab fallback fields.
+    /// Chooses the equipped Switch Weapon ID when it resolves, otherwise the scalable preset default.
     /// </summary>
-    private void ResolveFallbackReferences()
+    /// <param name="visualConfig">Current ECS runtime visual bridge configuration.</param>
+    /// <param name="hasWeaponSwitch">Whether an equipped Switch Weapon module currently owns the visual.</param>
+    /// <param name="weaponId">Designer-defined Weapon Id requested by Switch Weapon.</param>
+    /// <returns>Available attachment ID, or an empty ID when only Base Gun should remain visible.</returns>
+    private FixedString64Bytes ResolveDesiredWeaponId(in PlayerVisualRuntimeBridgeConfig visualConfig,
+                                                      bool hasWeaponSwitch,
+                                                      FixedString64Bytes weaponId)
     {
-        resolvedBaseGun = baseGun;
-        resolvedCannon = cannon;
-        resolvedGatling = gatling;
-        resolvedRailgun = railgun;
+        if (hasWeaponSwitch && ContainsWeaponId(weaponId))
+            return weaponId;
+
+        if (ContainsWeaponId(visualConfig.DefaultAdditionalWeaponId))
+            return visualConfig.DefaultAdditionalWeaponId;
+
+        return default;
+    }
+
+    /// <summary>
+    /// Checks whether one designer-defined ID resolves to a mountable weapon GameObject.
+    /// </summary>
+    /// <param name="weaponId">Runtime Weapon Id to inspect.</param>
+    /// <returns>True when one resolved mountable weapon owns the ID.</returns>
+    private bool ContainsWeaponId(FixedString64Bytes weaponId)
+    {
+        if (weaponId.Length <= 0)
+            return false;
+
+        for (int entryIndex = 0; entryIndex < resolvedAdditionalWeapons.Count; entryIndex++)
+        {
+            if (resolvedAdditionalWeapons[entryIndex].WeaponId.Equals(weaponId))
+                return true;
+        }
+
+        return false;
     }
     #endregion
 
     #region Visibility
     /// <summary>
-    /// Keeps Base Gun visible and displays at most one resolved optional weapon attachment.
+    /// Keeps Base Gun visible and displays only the first resolved attachment matching the requested ID.
     /// </summary>
-    /// <param name="additionalSlot">Optional Cannon, Gatling, or Railgun attachment that should remain visible.</param>
-    private void ShowBaseGunAndOnlyAdditional(PlayerWeaponVisualSlot additionalSlot)
+    /// <param name="additionalWeaponId">Optional mountable Weapon Id that should remain visible.</param>
+    private void ApplyVisibility(FixedString64Bytes additionalWeaponId)
     {
-        SetActive(resolvedCannon, additionalSlot == PlayerWeaponVisualSlot.Cannon);
-        SetActive(resolvedGatling, additionalSlot == PlayerWeaponVisualSlot.Gatling);
-        SetActive(resolvedRailgun, additionalSlot == PlayerWeaponVisualSlot.Railgun);
+        bool matchedWeapon = false;
+
+        for (int entryIndex = 0; entryIndex < resolvedAdditionalWeapons.Count; entryIndex++)
+        {
+            ResolvedWeaponVisual entry = resolvedAdditionalWeapons[entryIndex];
+            bool shouldShow = !matchedWeapon &&
+                              additionalWeaponId.Length > 0 &&
+                              entry.WeaponId.Equals(additionalWeaponId);
+            SetActive(entry.Target, shouldShow);
+            matchedWeapon |= shouldShow;
+        }
+
         SetActive(resolvedBaseGun, true);
     }
 
     /// <summary>
-    /// Hides previously resolved references before a configuration change so scalable selectors cannot leave stale meshes visible.
+    /// Hides previously resolved references before a configuration change so scalable selectors cannot leave
+    /// stale meshes visible.
     /// </summary>
     private void HideResolvedWeaponVisuals()
     {
-        SetActive(resolvedCannon, false);
-        SetActive(resolvedGatling, false);
-        SetActive(resolvedRailgun, false);
+        for (int entryIndex = 0; entryIndex < resolvedAdditionalWeapons.Count; entryIndex++)
+            SetActive(resolvedAdditionalWeapons[entryIndex].Target, false);
+
         SetActive(resolvedBaseGun, false);
-    }
-
-    /// <summary>
-    /// Resolves the requested optional attachment and falls back to no attachment when it is unavailable.
-    /// </summary>
-    /// <param name="requestedSlot">Requested no-power-up optional attachment.</param>
-    /// <returns>Available optional attachment or None.</returns>
-    private PlayerWeaponVisualSlot ResolveAvailableAdditionalSlot(PlayerWeaponVisualSlot requestedSlot)
-    {
-        if (IsAlternateSlot(requestedSlot) && IsSlotAvailable(requestedSlot))
-            return requestedSlot;
-
-        return PlayerWeaponVisualSlot.None;
-    }
-
-    /// <summary>
-    /// Checks whether one weapon slot has a resolved mesh object.
-    /// </summary>
-    /// <param name="slot">Weapon slot to inspect.</param>
-    /// <returns>True when the slot has a resolved mesh object.</returns>
-    private bool IsSlotAvailable(PlayerWeaponVisualSlot slot)
-    {
-        switch (slot)
-        {
-            case PlayerWeaponVisualSlot.Cannon:
-                return resolvedCannon != null;
-            case PlayerWeaponVisualSlot.Gatling:
-                return resolvedGatling != null;
-            case PlayerWeaponVisualSlot.Railgun:
-                return resolvedRailgun != null;
-            default:
-                return false;
-        }
-    }
-
-    /// <summary>
-    /// Checks whether one slot can be selected by a Switch Weapon module.
-    /// </summary>
-    /// <param name="slot">Weapon visual slot to inspect.</param>
-    /// <returns>True for Cannon, Gatling, or Railgun.</returns>
-    private static bool IsAlternateSlot(PlayerWeaponVisualSlot slot)
-    {
-        return slot >= PlayerWeaponVisualSlot.Cannon && slot <= PlayerWeaponVisualSlot.Railgun;
     }
 
     /// <summary>
@@ -271,14 +258,23 @@ public sealed class PlayerWeaponVisualSet : MonoBehaviour
 
     #region Cache
     /// <summary>
-    /// Clears runtime application caches so the next ECS presentation update reapplies the active visual configuration.
+    /// Clears runtime application caches so the next ECS presentation update reapplies the active visual
+    /// configuration.
     /// </summary>
     private void ResetAppliedState()
     {
-        appliedAdditionalSlot = (PlayerWeaponVisualSlot)(-1);
+        appliedAdditionalWeaponId = default;
         hasAppliedConfiguration = 0;
     }
     #endregion
 
+    #endregion
+
+    #region Nested Types
+    private struct ResolvedWeaponVisual
+    {
+        public FixedString64Bytes WeaponId;
+        public GameObject Target;
+    }
     #endregion
 }

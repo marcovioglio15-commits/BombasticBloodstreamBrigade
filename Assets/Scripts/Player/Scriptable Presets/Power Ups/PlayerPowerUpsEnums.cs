@@ -100,31 +100,6 @@ public enum PassiveToolKind
 }
 
 /// <summary>
-/// Selects one optional player weapon attachment shown alongside the permanently visible Base Gun. Visual presets may
-/// use None as their no-power-up default, while Switch Weapon modules expose only Cannon, Gatling, and Railgun.
-/// </summary>
-public enum PlayerWeaponVisualSlot
-{
-    None = 0,
-    Cannon = 1,
-    Gatling = 2,
-    Railgun = 3
-}
-
-/// <summary>
-/// Selects the upper-body shooting clip used while a Switch Weapon payload owns the visible attachment.
-/// Automatic resolves the clip from the selected weapon mesh, while explicit values support formula-driven overrides.
-/// </summary>
-public enum PlayerShootAnimationClipSlot
-{
-    Automatic = 0,
-    Default = 1,
-    Cannon = 2,
-    Gatling = 3,
-    Railgun = 4
-}
-
-/// <summary>
 /// Selects one optional upper-body hold-charge clip from the active animation bindings preset.
 /// </summary>
 public enum PlayerChargeAnimationClipSlot

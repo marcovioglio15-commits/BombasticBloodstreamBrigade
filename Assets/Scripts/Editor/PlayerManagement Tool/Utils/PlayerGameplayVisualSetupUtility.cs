@@ -118,13 +118,7 @@ public static class PlayerGameplayVisualSetupUtility
 
             PlayerWeaponVisualSet weaponVisualSet = GetOrAddComponent<PlayerWeaponVisualSet>(prefabContentsRoot);
             Transform baseGunTransform = FindRequiredChild(modelInstance.transform, BaseGunObjectName);
-            Transform cannonTransform = FindRequiredChild(modelInstance.transform, CannonObjectName);
-            Transform gatlingTransform = FindRequiredChild(modelInstance.transform, GatlingObjectName);
-            Transform railgunTransform = FindRequiredChild(modelInstance.transform, RailgunObjectName);
-            weaponVisualSet.Configure(baseGunTransform.gameObject,
-                                      cannonTransform.gameObject,
-                                      gatlingTransform.gameObject,
-                                      railgunTransform.gameObject);
+            weaponVisualSet.Configure(baseGunTransform.gameObject);
 
             SetLayerRecursively(prefabContentsRoot, PlayerLayer);
             SetLayerRecursively(modelInstance, PlayerLayer);

@@ -4,7 +4,9 @@ using UnityEngine;
 
 #region Modular Composition Definitions
 /// <summary>
-/// Defines the alternate weapon mesh shown alongside Base Gun and its scalable upper-body shooting animation selector.
+/// Defines the mountable weapon shown alongside Base Gun while the owning passive or toggleable active power-up
+/// is in effect. The designer-defined Weapon Id must match one entry on the active Player Visual Preset; the
+/// matching shooting animation is then sourced from that entry, so no per-module animation override exists.
 /// </summary>
 [Serializable]
 public sealed class PowerUpSwitchWeaponModuleData
@@ -12,31 +14,19 @@ public sealed class PowerUpSwitchWeaponModuleData
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Alternate weapon mesh displayed beside Base Gun while the owning passive or toggleable active power-up is in effect.")]
+    [Tooltip("Designer-defined Weapon Id of the mountable mesh shown beside Base Gun while the owning passive or toggleable active power-up is in effect. Must match one Weapon Id authored on the Player Visual Preset.")]
     [SerializeField]
-    private PlayerWeaponVisualSlot weaponSlot = PlayerWeaponVisualSlot.Cannon;
-
-    [Tooltip("Upper-body shooting animation selected while this Switch Weapon payload owns the visible attachment. Automatic resolves the matching weapon-specific clip.")]
-    [SerializeField]
-    private PlayerShootAnimationClipSlot shootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
+    private string weaponId = string.Empty;
     #endregion
 
     #endregion
 
     #region Properties
-    public PlayerWeaponVisualSlot WeaponSlot
+    public string WeaponId
     {
         get
         {
-            return weaponSlot;
-        }
-    }
-
-    public PlayerShootAnimationClipSlot ShootAnimationClipSlot
-    {
-        get
-        {
-            return shootAnimationClipSlot;
+            return weaponId;
         }
     }
     #endregion
@@ -45,35 +35,23 @@ public sealed class PowerUpSwitchWeaponModuleData
 
     #region Setup
     /// <summary>
-    /// Assigns the alternate weapon slot and restores automatic animation selection for default payload creation.
+    /// Assigns the Weapon Id targeted by this Switch Weapon module. Used by the defaults utility to pre-populate
+    /// a freshly created payload before designer edits.
     /// </summary>
-    /// <param name="weaponSlotValue">Alternate weapon slot to assign.</param>
-    public void Configure(PlayerWeaponVisualSlot weaponSlotValue)
+    /// <param name="weaponIdValue">Designer-defined Weapon Id to assign.</param>
+    public void Configure(string weaponIdValue)
     {
-        weaponSlot = weaponSlotValue;
-        shootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
-    }
-
-    /// <summary>
-    /// Assigns the alternate weapon slot and explicit upper-body shooting animation selection.
-    /// </summary>
-    /// <param name="weaponSlotValue">Alternate weapon slot to assign.</param>
-    /// <param name="shootAnimationClipSlotValue">Shooting animation slot selected while this module owns the weapon visual.</param>
-    public void Configure(PlayerWeaponVisualSlot weaponSlotValue,
-                          PlayerShootAnimationClipSlot shootAnimationClipSlotValue)
-    {
-        weaponSlot = weaponSlotValue;
-        shootAnimationClipSlot = shootAnimationClipSlotValue;
+        weaponId = weaponIdValue;
     }
     #endregion
 
     #region Validation
     /// <summary>
-    /// Preserves authored enum values so validation can report incoherent selections without mutating preset data.
+    /// Preserves authored values so validation can report incoherent selections without mutating preset data.
     /// </summary>
     public void Validate()
     {
-        // The management tool reports invalid selections and runtime resolution provides the deterministic fallback.
+        // The management tool reports unknown IDs; runtime presentation falls back to the visual preset default.
     }
     #endregion
 

@@ -235,8 +235,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool applyCharacterTuningOnActiveTrigger = false;
         bool hasOrbitalProjections = false;
         bool hasActiveWeaponSwitch = false;
-        PlayerWeaponVisualSlot activeWeaponVisualSlot = default;
-        PlayerShootAnimationClipSlot activeWeaponShootAnimationClipSlot = PlayerShootAnimationClipSlot.Automatic;
+        FixedString64Bytes activeWeaponId = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
         if (moduleBindings == null || moduleBindings.Count == 0)
@@ -473,11 +472,11 @@ public static class PlayerPowerUpActiveBakeUtility
                     if (payload.SwitchWeapon == null)
                         break;
 
-                    // Capture the alternate mesh selection directly on the active slot so equipped charge, one-shot,
-                    // and toggle power-ups share the same persistent visual aggregation path.
+                    // Capture the mountable mesh selection directly on the active slot so equipped charge, one-shot,
+                    // and toggle power-ups share the same persistent visual aggregation path. The matching shoot
+                    // clip is resolved from the visual preset entry that owns this Weapon Id at presentation time.
                     hasActiveWeaponSwitch = true;
-                    activeWeaponVisualSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerWeaponVisualSlot((float)payload.SwitchWeapon.WeaponSlot);
-                    activeWeaponShootAnimationClipSlot = PlayerRuntimeScalingEnumUtility.ResolvePlayerShootAnimationClipSlot((float)payload.SwitchWeapon.ShootAnimationClipSlot);
+                    activeWeaponId = PlayerWeaponVisualBakeUtility.BuildWeaponIdFixedString(payload.SwitchWeapon.WeaponId);
                     break;
             }
         }
@@ -658,8 +657,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        in triggeredProjectilePassiveTool,
                                                                        in togglePassiveTool,
                                                                        hasActiveWeaponSwitch,
-                                                                       activeWeaponVisualSlot,
-                                                                       activeWeaponShootAnimationClipSlot,
+                                                                       activeWeaponId,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
     }

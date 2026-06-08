@@ -361,40 +361,6 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
-    /// Resolves a safe PlayerWeaponVisualSlot from one numeric Add Scaling result.
-    /// </summary>
-    /// <param name="value">Resolved numeric formula result.</param>
-    /// <returns>Clamped enum value.</returns>
-    public static PlayerWeaponVisualSlot ResolvePlayerWeaponVisualSlot(float value)
-    {
-        return (PlayerWeaponVisualSlot)math.clamp((int)math.round(value),
-                                                  (int)PlayerWeaponVisualSlot.Cannon,
-                                                  (int)PlayerWeaponVisualSlot.Railgun);
-    }
-
-    /// <summary>
-    /// Resolves a safe default optional player weapon attachment from one numeric Add Scaling result.
-    /// </summary>
-    /// <param name="value">Resolved numeric formula result.</param>
-    /// <returns>Clamped optional attachment including None.</returns>
-    public static PlayerWeaponVisualSlot ResolvePlayerDefaultAdditionalWeaponVisualSlot(float value)
-    {
-        return (PlayerWeaponVisualSlot)math.clamp((int)math.round(value),
-                                                  (int)PlayerWeaponVisualSlot.None,
-                                                  (int)PlayerWeaponVisualSlot.Railgun);
-    }
-
-    /// <summary>
-    /// Resolves a safe scalable Switch Weapon shooting-animation selector.
-    /// </summary>
-    /// <param name="value">Resolved numeric formula result.</param>
-    /// <returns>Clamped shooting-animation selector.</returns>
-    public static PlayerShootAnimationClipSlot ResolvePlayerShootAnimationClipSlot(float value)
-    {
-        return (PlayerShootAnimationClipSlot)ResolveEnumIndex(value, (int)PlayerShootAnimationClipSlot.Railgun);
-    }
-
-    /// <summary>
     /// Resolves a safe scalable hold-charge animation selector.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

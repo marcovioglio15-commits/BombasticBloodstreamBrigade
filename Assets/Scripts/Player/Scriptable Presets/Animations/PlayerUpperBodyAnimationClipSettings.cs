@@ -2,7 +2,9 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Stores concrete upper-body action clips selected by scalable modular power-up payload enums.
+/// Stores concrete upper-body charge and release clips selected by scalable modular power-up payload enums.
+/// Per-weapon shooting clips moved to <see cref="PlayerWeaponVisualSettings"/>; the implicit Base Gun
+/// shooting clip is derived from the visual preset Default Additional Weapon Visual.
 /// </summary>
 [Serializable]
 public sealed class PlayerUpperBodyAnimationClipSettings
@@ -10,18 +12,6 @@ public sealed class PlayerUpperBodyAnimationClipSettings
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Upper-body shooting clip used when a Switch Weapon payload selects the Cannon animation slot.")]
-    [SerializeField]
-    private AnimationClip cannonShootClip;
-
-    [Tooltip("Upper-body shooting clip used when a Switch Weapon payload selects the Gatling animation slot.")]
-    [SerializeField]
-    private AnimationClip gatlingShootClip;
-
-    [Tooltip("Upper-body shooting clip used when a Switch Weapon payload selects the Railgun animation slot.")]
-    [SerializeField]
-    private AnimationClip railgunShootClip;
-
     [Tooltip("Primary optional upper-body animation played while a Trigger Hold Charge module is charging.")]
     [SerializeField]
     private AnimationClip primaryChargeClip;
@@ -42,30 +32,6 @@ public sealed class PlayerUpperBodyAnimationClipSettings
     #endregion
 
     #region Properties
-    public AnimationClip CannonShootClip
-    {
-        get
-        {
-            return cannonShootClip;
-        }
-    }
-
-    public AnimationClip GatlingShootClip
-    {
-        get
-        {
-            return gatlingShootClip;
-        }
-    }
-
-    public AnimationClip RailgunShootClip
-    {
-        get
-        {
-            return railgunShootClip;
-        }
-    }
-
     public AnimationClip PrimaryChargeClip
     {
         get

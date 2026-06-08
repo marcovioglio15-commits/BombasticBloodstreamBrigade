@@ -157,7 +157,7 @@ MonoBehaviour:
     formula: '[Damage]*0.8'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[2|powerUpId:ActiveGigaLaser].moduleBindings.Array.data[6|moduleId:Module_SwitchWeapon].overridePayload.switchWeapon.weaponSlot
+  - statKey: activePowerUps.Array.data[2|powerUpId:ActiveGigaLaser].moduleBindings.Array.data[6|moduleId:Module_SwitchWeapon].overridePayload.switchWeapon.weaponId
     addScaling: 0
     formula: 
     debugInConsole: 0
@@ -615,8 +615,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -991,8 +990,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -1367,8 +1365,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -1743,8 +1740,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2119,8 +2115,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2495,8 +2490,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -2871,8 +2865,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3247,8 +3240,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3623,8 +3615,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -3999,8 +3990,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -4375,8 +4365,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -4751,8 +4740,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5127,8 +5115,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5503,8 +5490,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -5879,8 +5865,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6255,8 +6240,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -6631,8 +6615,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -7007,8 +6990,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -7383,8 +7365,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.05
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -7759,8 +7740,7 @@ MonoBehaviour:
         wobbleAmplitude: 1
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -8159,8 +8139,7 @@ MonoBehaviour:
         wobbleAmplitude: 1
         bubbleDriftSpeed: 1.4
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -8536,8 +8515,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.08
         bubbleDriftSpeed: 1.8
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -8912,8 +8890,7 @@ MonoBehaviour:
         wobbleAmplitude: 0.08
         bubbleDriftSpeed: 1.8
       switchWeapon:
-        weaponSlot: 1
-        shootAnimationClipSlot: 0
+        weaponId: Cannon
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -9302,8 +9279,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -9678,8 +9654,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10054,8 +10029,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10430,8 +10404,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -10807,8 +10780,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11184,8 +11156,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11574,8 +11545,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -11950,8 +11920,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -12326,8 +12295,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -12706,8 +12674,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13086,8 +13053,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13466,8 +13432,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -13846,8 +13811,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 2
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14235,8 +14199,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14611,8 +14574,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -14987,8 +14949,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -15363,8 +15324,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -15740,8 +15700,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16117,8 +16076,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16494,8 +16452,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 3
-          shootAnimationClipSlot: 0
+          weaponId: Railgun
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -16883,8 +16840,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -17259,8 +17215,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -17635,8 +17590,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -18011,8 +17965,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -18401,8 +18354,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -18777,8 +18729,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -19153,8 +19104,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -19542,8 +19492,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -19918,8 +19867,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -20294,8 +20242,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -20683,8 +20630,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -21059,8 +21005,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -21435,8 +21380,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -21821,8 +21765,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -22197,8 +22140,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -22574,8 +22516,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -22965,8 +22906,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.25
@@ -23341,8 +23281,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -23730,8 +23669,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -24119,8 +24057,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -24496,8 +24433,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -24885,8 +24821,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -25274,8 +25209,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 1.5
           trailSpawnDistance: 0.6
@@ -25663,8 +25597,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -26052,8 +25985,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -26437,8 +26369,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -26812,8 +26743,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -27198,8 +27128,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -27573,8 +27502,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -27948,8 +27876,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -28333,8 +28260,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -28708,8 +28634,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -29093,8 +29018,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -29468,8 +29392,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -29853,8 +29776,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -30228,8 +30150,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -30613,8 +30534,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -30988,8 +30908,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -31373,8 +31292,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -31748,8 +31666,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -32133,8 +32050,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -32508,8 +32424,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -32894,8 +32809,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -33280,8 +33194,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.05
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -33665,8 +33578,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 1
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -34040,8 +33952,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.3
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -34415,8 +34326,7 @@ MonoBehaviour:
           wobbleAmplitude: 0.3
           bubbleDriftSpeed: 1.4
         switchWeapon:
-          weaponSlot: 3
-          shootAnimationClipSlot: 0
+          weaponId: Railgun
         trailSpawn:
           trailSegmentLifetimeSeconds: 0.05
           trailSpawnDistance: 0
@@ -34806,8 +34716,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0
           trailSpawnDistance: 0
@@ -35197,8 +35106,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0
           trailSpawnDistance: 0
@@ -35612,8 +35520,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0
           trailSpawnDistance: 0
@@ -36003,8 +35910,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0
           trailSpawnDistance: 0
@@ -36383,8 +36289,7 @@ MonoBehaviour:
           wobbleAmplitude: 0
           bubbleDriftSpeed: 0
         switchWeapon:
-          weaponSlot: 1
-          shootAnimationClipSlot: 0
+          weaponId: Cannon
         trailSpawn:
           trailSegmentLifetimeSeconds: 0
           trailSpawnDistance: 0
@@ -36414,7 +36319,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 3
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveChargeShot
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:

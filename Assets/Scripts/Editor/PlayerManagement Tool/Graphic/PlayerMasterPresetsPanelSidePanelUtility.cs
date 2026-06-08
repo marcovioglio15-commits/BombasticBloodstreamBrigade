@@ -146,6 +146,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         }
 
         SyncOpenSidePanels(panel);
+        PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
     }
 
     /// <summary>

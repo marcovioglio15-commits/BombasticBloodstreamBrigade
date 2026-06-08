@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 #region Controller Runtime Components
 /// <summary>
@@ -217,15 +218,26 @@ public struct PlayerRuntimeScalingState : IComponentData
 }
 
 /// <summary>
-/// Stores the immutable weapon visual baseline used to rebuild scalable reference selectors and default attachment selection.
+/// Stores the immutable weapon visual baseline used to rebuild scalable reference selectors and default
+/// attachment selection. Per-weapon references live on <see cref="PlayerBaseAdditionalWeaponVisualElement"/>
+/// baseline buffer entries.
 /// </summary>
 public struct PlayerBaseWeaponVisualConfig : IComponentData
 {
     public FixedString128Bytes BaseGunReference;
-    public FixedString128Bytes CannonReference;
-    public FixedString128Bytes GatlingReference;
-    public FixedString128Bytes RailgunReference;
-    public PlayerWeaponVisualSlot DefaultAdditionalWeaponVisual;
+    public FixedString64Bytes DefaultAdditionalWeaponId;
+}
+
+/// <summary>
+/// Immutable baseline mountable-weapon entry used to rebuild the runtime <see cref="PlayerAdditionalWeaponVisualElement"/>
+/// buffer when the scalable-stat hash changes. Mirrors the runtime element schema.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerBaseAdditionalWeaponVisualElement : IBufferElementData
+{
+    public FixedString64Bytes WeaponId;
+    public FixedString128Bytes RuntimeReference;
+    public UnityObjectRef<AnimationClip> ShootAnimationClip;
 }
 
 /// <summary>
@@ -511,24 +523,26 @@ public struct PlayerRuntimeDeathAnimationScalingElement : IBufferElementData
 }
 
 /// <summary>
-/// Identifies one scalable weapon visual field stored on the runtime visual bridge configuration.
+/// Identifies one scalable weapon visual field stored on the runtime visual bridge configuration. Fields
+/// targeting a specific mountable entry use the baked array index stored by the scaling element.
 /// </summary>
 public enum PlayerRuntimeWeaponVisualFieldId : byte
 {
     BaseGunReference = 0,
-    CannonReference = 1,
-    GatlingReference = 2,
-    RailgunReference = 3,
-    DefaultAdditionalWeaponVisual = 4
+    DefaultAdditionalWeaponId = 1,
+    AdditionalWeaponRuntimeReference = 2,
+    AdditionalWeaponWeaponId = 3
 }
 
 /// <summary>
-/// Stores one weapon visual scaling rule baked from the Player Visual Preset.
+/// Stores one weapon visual scaling rule baked from the Player Visual Preset. Per-entry rules carry their baked
+/// array index so Weapon Id formulas can rename the entry without breaking later rules targeting the same entry.
 /// </summary>
 [InternalBufferCapacity(0)]
 public struct PlayerRuntimeWeaponVisualScalingElement : IBufferElementData
 {
     public PlayerRuntimeWeaponVisualFieldId FieldId;
+    public int TargetEntryIndex;
     public byte ValueType;
     public float BaseValue;
     public byte IsInteger;

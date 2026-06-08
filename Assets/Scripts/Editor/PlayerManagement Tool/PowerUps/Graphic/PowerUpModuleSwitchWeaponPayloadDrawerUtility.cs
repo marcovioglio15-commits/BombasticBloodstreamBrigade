@@ -1,28 +1,19 @@
 using System.Collections.Generic;
+using System.Text;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the scaling-aware Switch Weapon payload editor while limiting direct selection to alternate weapon visuals.
+/// Builds the scaling-aware Switch Weapon payload editor for designer-defined Weapon Id tokens.
 /// </summary>
 internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
 {
-    #region Fields
-    private static readonly List<string> AlternateOptions = new List<string>
-    {
-        "Cannon",
-        "Gatling",
-        "Railgun"
-    };
-    #endregion
-
     #region Methods
 
     #region Public Methods
     /// <summary>
-    /// Builds the alternate-weapon selector and reports unsupported direct values without mutating authored data.
+    /// Builds the Weapon Id token field and coherent fixed-string validation warnings.
     /// </summary>
     /// <param name="payloadContainer">Container receiving the Switch Weapon controls and warnings.</param>
     /// <param name="payloadProperty">Serialized Switch Weapon payload property.</param>
@@ -31,142 +22,90 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
         if (payloadContainer == null || payloadProperty == null)
             return;
 
-        SerializedProperty weaponSlotProperty = payloadProperty.FindPropertyRelative("weaponSlot");
-        SerializedProperty shootAnimationClipSlotProperty = payloadProperty.FindPropertyRelative("shootAnimationClipSlot");
+        SerializedProperty weaponIdProperty = payloadProperty.FindPropertyRelative("weaponId");
 
-        if (weaponSlotProperty == null || shootAnimationClipSlotProperty == null)
+        if (weaponIdProperty == null)
         {
-            payloadContainer.Add(new HelpBox("Switch Weapon payload fields are missing.", HelpBoxMessageType.Warning));
+            payloadContainer.Add(new HelpBox("Switch Weapon Weapon Id field is missing.", HelpBoxMessageType.Warning));
             return;
         }
 
-        VisualElement weaponSlotField = BuildWeaponSlotField(payloadContainer, weaponSlotProperty);
-        VisualElement shootingAnimationField = PlayerScalingFieldElementFactory.CreateField(shootAnimationClipSlotProperty,
-                                                                                            shootAnimationClipSlotProperty.serializedObject.FindProperty("scalingRules"),
-                                                                                            "Shooting Animation");
-        payloadContainer.Add(shootingAnimationField);
-        HelpBox behaviorBox = new HelpBox("Base Gun remains visible. Switch Weapon replaces the optional Player Visual Preset attachment with exactly one Cannon, Gatling, or Railgun mesh.",
+        SerializedProperty scalingRulesProperty = weaponIdProperty.serializedObject != null
+            ? weaponIdProperty.serializedObject.FindProperty("scalingRules")
+            : null;
+        string weaponIdTooltip = "Selects a designer-defined Weapon Id from the scoped Player Visual Preset. <Use Visual Default> keeps the preset default attachment. Add Scaling token formulas remain supported.";
+        VisualElement weaponIdField = PlayerWeaponIdSelectorUtility.CreateScalableSelector(weaponIdProperty,
+                                                                                           scalingRulesProperty,
+                                                                                           "Weapon Id",
+                                                                                           weaponIdTooltip,
+                                                                                           PlayerWeaponIdSelectorUtility.UseVisualDefaultLabel,
+                                                                                           () => PlayerWeaponIdSelectorUtility.BuildScopedSwitchWeaponOptions(weaponIdProperty));
+        payloadContainer.Add(weaponIdField);
+
+        HelpBox behaviorBox = new HelpBox("Base Gun remains visible. Switch Weapon selects the mountable visual and shoot animation owned by the matching Weapon Id on the active Player Visual Preset.",
                                           HelpBoxMessageType.Info);
-        HelpBox warningBox = new HelpBox(string.Empty,
-                                         HelpBoxMessageType.Warning);
+        HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         payloadContainer.Add(behaviorBox);
         payloadContainer.Add(warningBox);
 
-        weaponSlotField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        payloadContainer.TrackPropertyValue(weaponIdProperty, changedProperty =>
         {
-            RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
+            RefreshWarning(changedProperty, warningBox);
         });
-        shootingAnimationField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
-        {
-            RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
-        });
-        payloadContainer.TrackPropertyValue(weaponSlotProperty, changedProperty =>
-        {
-            RefreshWarning(changedProperty, shootAnimationClipSlotProperty, warningBox);
-        });
-        payloadContainer.TrackPropertyValue(shootAnimationClipSlotProperty, changedProperty =>
-        {
-            RefreshWarning(weaponSlotProperty, changedProperty, warningBox);
-        });
-        RefreshWarning(weaponSlotProperty, shootAnimationClipSlotProperty, warningBox);
-    }
-    #endregion
-
-    #region UI Construction
-    /// <summary>
-    /// Builds a selector limited to Cannon, Gatling, and Railgun while preserving shared Add Scaling controls.
-    /// </summary>
-    /// <param name="payloadContainer">Container receiving the selector.</param>
-    /// <param name="weaponSlotProperty">Serialized shared weapon visual enum property.</param>
-    /// <returns>Scaling-aware field root used by warning refresh callbacks.</returns>
-    private static VisualElement BuildWeaponSlotField(VisualElement payloadContainer,
-                                                      SerializedProperty weaponSlotProperty)
-    {
-        SerializedProperty scalingRulesProperty = weaponSlotProperty.serializedObject != null
-            ? weaponSlotProperty.serializedObject.FindProperty("scalingRules")
-            : null;
-        VisualElement fieldRoot = PlayerScalingFieldElementFactory.CreateField(weaponSlotProperty,
-                                                                               scalingRulesProperty,
-                                                                               "Alternate Weapon Mesh");
-        PropertyField generatedPropertyField = fieldRoot.Q<PropertyField>();
-
-        if (generatedPropertyField != null)
-            generatedPropertyField.style.display = DisplayStyle.None;
-
-        PopupField<string> alternateSelector = new PopupField<string>("Alternate Weapon Mesh",
-                                                                      AlternateOptions,
-                                                                      ResolveOptionIndex(weaponSlotProperty));
-        alternateSelector.tooltip = "Selects the single Cannon, Gatling, or Railgun mesh shown while the owning power-up is equipped.";
-        alternateSelector.RegisterValueChangedCallback(evt =>
-        {
-            int selectedIndex = AlternateOptions.IndexOf(evt.newValue);
-
-            if (selectedIndex < 0)
-                return;
-
-            weaponSlotProperty.serializedObject.Update();
-            weaponSlotProperty.intValue = (int)PlayerWeaponVisualSlot.Cannon + selectedIndex;
-            weaponSlotProperty.serializedObject.ApplyModifiedProperties();
-            PlayerManagementDraftSession.MarkDirty();
-        });
-        fieldRoot.Insert(0, alternateSelector);
-        payloadContainer.Add(fieldRoot);
-
-        weaponSlotProperty.serializedObject.Update();
-        fieldRoot.TrackPropertyValue(weaponSlotProperty, changedProperty =>
-        {
-            alternateSelector.SetValueWithoutNotify(AlternateOptions[ResolveOptionIndex(changedProperty)]);
-        });
-        return fieldRoot;
+        RefreshWarning(weaponIdProperty, warningBox);
     }
     #endregion
 
     #region Validation
     /// <summary>
-    /// Shows a warning when direct serialized data falls outside the alternate weapon range.
+    /// Shows warnings for empty and oversized Weapon Id values without mutating designer-authored data.
     /// </summary>
-    /// <param name="weaponSlotProperty">Serialized shared weapon visual enum property.</param>
+    /// <param name="weaponIdProperty">Serialized designer-defined Weapon Id.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
-    private static void RefreshWarning(SerializedProperty weaponSlotProperty,
-                                       SerializedProperty shootAnimationClipSlotProperty,
-                                       HelpBox warningBox)
+    private static void RefreshWarning(SerializedProperty weaponIdProperty, HelpBox warningBox)
     {
-        int selectedValue = weaponSlotProperty != null
-            ? weaponSlotProperty.intValue
-            : (int)PlayerWeaponVisualSlot.Cannon;
-        int shootingAnimationValue = shootAnimationClipSlotProperty != null
-            ? shootAnimationClipSlotProperty.intValue
-            : (int)PlayerShootAnimationClipSlot.Automatic;
-        List<string> warningLines = new List<string>();
+        string weaponId = weaponIdProperty != null ? weaponIdProperty.stringValue : string.Empty;
 
-        if (selectedValue < (int)PlayerWeaponVisualSlot.Cannon ||
-            selectedValue > (int)PlayerWeaponVisualSlot.Railgun)
+        List<string> availableWeaponIds = PlayerWeaponIdSelectorUtility.BuildScopedSwitchWeaponOptions(weaponIdProperty);
+
+        if (availableWeaponIds.Count <= 0)
         {
-            warningLines.Add("The selected weapon value is outside the supported alternate range. Bake and Add Scaling clamp it to Cannon, Gatling, or Railgun.");
+            ShowWarning(warningBox, "No mountable Weapon Id is available from the scoped or registered Player Visual Presets.");
+            return;
         }
 
-        if (shootingAnimationValue < (int)PlayerShootAnimationClipSlot.Automatic ||
-            shootingAnimationValue > (int)PlayerShootAnimationClipSlot.Railgun)
+        if (string.IsNullOrWhiteSpace(weaponId))
         {
-            warningLines.Add("The selected shooting animation value is outside the supported range. Bake and Add Scaling clamp it to a valid upper-body clip slot.");
+            warningBox.text = string.Empty;
+            warningBox.style.display = DisplayStyle.None;
+            return;
         }
 
-        warningBox.text = string.Join("\n", warningLines);
-        warningBox.style.display = warningLines.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+        if (Encoding.UTF8.GetByteCount(weaponId.Trim()) > PlayerWeaponVisualSettings.MaximumWeaponIdUtf8Bytes)
+        {
+            ShowWarning(warningBox, "Weapon Id exceeds the ECS fixed-string capacity and cannot be baked.");
+            return;
+        }
+
+        if (!PlayerWeaponIdSelectorUtility.ContainsWeaponId(availableWeaponIds, weaponId.Trim()))
+        {
+            ShowWarning(warningBox, "Weapon Id does not match any mountable entry in the registered Player Visual Presets.");
+            return;
+        }
+
+        warningBox.text = string.Empty;
+        warningBox.style.display = DisplayStyle.None;
     }
 
     /// <summary>
-    /// Resolves the alternate selector index from the shared weapon visual enum and falls back to Cannon.
+    /// Displays one warning message in the reusable payload HelpBox.
     /// </summary>
-    /// <param name="weaponSlotProperty">Serialized shared weapon visual enum property.</param>
-    /// <returns>Zero-based alternate selector index.</returns>
-    private static int ResolveOptionIndex(SerializedProperty weaponSlotProperty)
+    /// <param name="warningBox">Warning box updated in place.</param>
+    /// <param name="message">Warning text shown to designers.</param>
+    private static void ShowWarning(HelpBox warningBox, string message)
     {
-        if (weaponSlotProperty == null)
-            return 0;
-
-        int optionIndex = weaponSlotProperty.intValue - (int)PlayerWeaponVisualSlot.Cannon;
-        return Mathf.Clamp(optionIndex, 0, AlternateOptions.Count - 1);
+        warningBox.text = message;
+        warningBox.style.display = DisplayStyle.Flex;
     }
     #endregion
 

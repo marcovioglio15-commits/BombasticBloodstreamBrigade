@@ -20,7 +20,8 @@ public static class PlayerScalingStatKeyUtility
         "scheduleId",
         "phaseID",
         "rankId",
-        "passivePowerUpId"
+        "passivePowerUpId",
+        "weaponId"
     };
 
     private static readonly string[] StableNestedStringIdPropertyPaths =

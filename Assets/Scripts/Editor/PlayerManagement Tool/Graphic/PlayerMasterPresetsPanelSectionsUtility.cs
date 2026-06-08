@@ -560,6 +560,10 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         property.objectReferenceValue = preset;
         panel.PresetSerializedObject.ApplyModifiedProperties();
         PlayerManagementDraftSession.MarkDirty();
+
+        if (string.Equals(propertyName, "visualPreset", StringComparison.Ordinal))
+            PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
+
         PlayerMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
     #endregion
@@ -593,6 +597,9 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         presetField.RegisterValueChangedCallback(evt =>
         {
             PlayerManagementDraftSession.MarkDirty();
+
+            if (panelType == PlayerManagementWindow.PanelType.PlayerVisualPresets)
+                PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
 
             switch (panelType)
             {

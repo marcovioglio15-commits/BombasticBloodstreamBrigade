@@ -201,10 +201,13 @@ public static class PlayerControllerConfigBakeUtility
     }
 
     /// <summary>
-    /// Builds the concrete upper-body clip table consumed by scalable power-up animation selectors at presentation time.
+    /// Builds the concrete upper-body clip table consumed by scalable power-up animation selectors at
+    /// presentation time. The implicit Base Gun default clip is sourced from the visual preset's default
+    /// mountable entry; charge and release clips come from the animation bindings preset. Per-weapon shoot
+    /// clips live on the runtime additional-weapons buffer.
     /// </summary>
-    /// <param name="animationBindingsPreset">Animation bindings preset containing weapon-specific, charge, and release clips.</param>
-    /// <param name="visualPreset">Visual preset containing the Base Gun default shooting clip.</param>
+    /// <param name="animationBindingsPreset">Animation bindings preset containing charge and release clips.</param>
+    /// <param name="visualPreset">Visual preset whose default mountable entry contributes the default shoot clip.</param>
     /// <returns>Runtime clip table with null entries preserved as optional animation slots.</returns>
     public static PlayerUpperBodyAnimationClipConfig BuildUpperBodyAnimationClipConfig(PlayerAnimationBindingsPreset animationBindingsPreset,
                                                                                        PlayerVisualPreset visualPreset)
@@ -213,14 +216,10 @@ public static class PlayerControllerConfigBakeUtility
             return default;
 
         PlayerUpperBodyAnimationClipSettings actionClips = animationBindingsPreset.UpperBodyActionClips;
-        PlayerWeaponVisualSettings weaponVisuals = visualPreset != null ? visualPreset.WeaponVisuals : null;
 
         return new PlayerUpperBodyAnimationClipConfig
         {
-            DefaultShoot = weaponVisuals != null ? weaponVisuals.DefaultShootAnimationClip : null,
-            CannonShoot = actionClips != null ? actionClips.CannonShootClip : null,
-            GatlingShoot = actionClips != null ? actionClips.GatlingShootClip : null,
-            RailgunShoot = actionClips != null ? actionClips.RailgunShootClip : null,
+            DefaultShoot = PlayerWeaponVisualBakeUtility.ResolveDefaultShootClip(visualPreset),
             PrimaryCharge = actionClips != null ? actionClips.PrimaryChargeClip : null,
             SecondaryCharge = actionClips != null ? actionClips.SecondaryChargeClip : null,
             PrimaryRelease = actionClips != null ? actionClips.PrimaryReleaseClip : null,

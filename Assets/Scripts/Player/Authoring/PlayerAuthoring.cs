@@ -578,6 +578,14 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         AddComponent(entity, visualRuntimeBridgeConfig);
         AddComponent(entity, PlayerWeaponVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
         AddComponent(entity, new PlayerWeaponVisualScalingState());
+
+        // Runtime + baseline mountable-weapons buffers. Runtime entries are mutated by Add Scaling rebuilds when
+        // the unified scalable-stat hash changes; the baseline is the cloned source-of-truth for that rebuild.
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponsBuffer = AddBuffer<PlayerAdditionalWeaponVisualElement>(entity);
+        PlayerWeaponVisualBakeUtility.PopulateAdditionalWeaponsBuffer(visualPreset, additionalWeaponsBuffer);
+        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseAdditionalWeaponsBuffer = AddBuffer<PlayerBaseAdditionalWeaponVisualElement>(entity);
+        PlayerWeaponVisualBakeUtility.PopulateBaseAdditionalWeaponsBuffer(sourceVisualPreset, baseAdditionalWeaponsBuffer);
+
         DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> weaponVisualScalingBuffer = AddBuffer<PlayerRuntimeWeaponVisualScalingElement>(entity);
 #if UNITY_EDITOR
         PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(sourceVisualPreset, weaponVisualScalingBuffer);

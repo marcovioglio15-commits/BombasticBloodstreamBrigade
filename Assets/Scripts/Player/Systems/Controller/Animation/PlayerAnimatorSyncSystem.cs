@@ -58,6 +58,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
+        BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponVisualLookup = SystemAPI.GetBufferLookup<PlayerAdditionalWeaponVisualElement>(true);
+        ComponentLookup<PlayerWeaponVisualScalingState> weaponVisualScalingStateLookup = SystemAPI.GetComponentLookup<PlayerWeaponVisualScalingState>(true);
         EntityManager entityManager = state.EntityManager;
         float deltaTime = SystemAPI.Time.DeltaTime;
         int processedAnimatorEntities = 0;
@@ -136,9 +138,12 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                               in powerUpsConfigLookup,
                               in powerUpsStateLookup,
                               in passiveToolsStateLookup,
+                              in additionalWeaponVisualLookup,
+                              in weaponVisualScalingStateLookup,
                               out PlayerPowerUpsConfig powerUpsConfig,
                               out PlayerPowerUpsState powerUpsState,
-                              out PlayerPassiveToolsState passiveToolsState);
+                              out PlayerPassiveToolsState passiveToolsState,
+                              out DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals);
 
             if (!animator.enabled)
                 animator.enabled = true;
@@ -174,6 +179,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                                                             in powerUpsConfig,
                                                                                             in powerUpsState,
                                                                                             in passiveToolsState,
+                                                                                            in additionalWeaponVisuals,
+                                                                                            visualBridgeConfig.ValueRO.DefaultAdditionalWeaponId,
                                                                                             shootPulseThisFrame,
                                                                                             deltaTime,
                                                                                             ref animatorRuntimeState.ValueRW,
@@ -256,22 +263,29 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     /// <param name="powerUpsConfigLookup">Read-only lookup containing equipped active-slot configs.</param>
     /// <param name="powerUpsStateLookup">Read-only lookup containing active-slot equip-order metadata.</param>
     /// <param name="passiveToolsStateLookup">Read-only lookup containing the aggregated passive-tool state.</param>
+    /// <param name="additionalWeaponVisualLookup">Read-only lookup containing designer-defined weapon visual entries.</param>
+    /// <param name="weaponVisualScalingStateLookup">Read-only lookup providing the weapon visual rebuild revision.</param>
     /// <param name="powerUpsConfig">Resolved active-slot configs reused by upper-body presentation.</param>
     /// <param name="powerUpsState">Resolved active-slot runtime state reused by upper-body presentation.</param>
     /// <param name="passiveToolsState">Resolved aggregate containing the selected weapon visual and shooting animation.</param>
+    /// <param name="additionalWeaponVisuals">Resolved runtime weapon visual table reused by upper-body presentation.</param>
     private static void ApplyWeaponVisual(Animator animator,
                                           Entity entity,
                                           in PlayerVisualRuntimeBridgeConfig visualBridgeConfig,
                                           in BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
                                           in ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
                                           in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup,
+                                          in BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponVisualLookup,
+                                          in ComponentLookup<PlayerWeaponVisualScalingState> weaponVisualScalingStateLookup,
                                           out PlayerPowerUpsConfig powerUpsConfig,
                                           out PlayerPowerUpsState powerUpsState,
-                                          out PlayerPassiveToolsState passiveToolsState)
+                                          out PlayerPassiveToolsState passiveToolsState,
+                                          out DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals)
     {
         powerUpsConfig = default;
         powerUpsState = default;
         passiveToolsState = default;
+        additionalWeaponVisuals = default;
         PlayerPassiveToolsAggregationUtility.ResetToDefault(ref passiveToolsState);
         if (animator == null)
             return;
@@ -286,6 +300,9 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                                                    powerUpsState.SecondaryEquipOrder,
                                                                                    ref passiveToolsState);
 
+        if (additionalWeaponVisualLookup.HasBuffer(entity))
+            additionalWeaponVisuals = additionalWeaponVisualLookup[entity];
+
         int animatorInstanceId = animator.GetInstanceID();
         PlayerWeaponVisualSet weaponVisualSet;
 
@@ -295,12 +312,18 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             WeaponVisualSetsByAnimatorId[animatorInstanceId] = weaponVisualSet;
         }
 
-        if (weaponVisualSet == null)
+        if (weaponVisualSet == null || !additionalWeaponVisuals.IsCreated)
             return;
 
+        uint weaponVisualRevision = weaponVisualScalingStateLookup.HasComponent(entity) &&
+                                    weaponVisualScalingStateLookup[entity].Initialized != 0
+            ? weaponVisualScalingStateLookup[entity].LastScalableStatsHash
+            : uint.MaxValue;
         weaponVisualSet.Apply(in visualBridgeConfig,
+                              in additionalWeaponVisuals,
+                              weaponVisualRevision,
                               passiveToolsState.HasWeaponSwitch != 0,
-                              passiveToolsState.WeaponVisualSlot);
+                              passiveToolsState.WeaponId);
     }
 
     private static float3 ResolveLookDirection(in PlayerLookState lookState, float3 fallback)

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -52,6 +54,8 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// <param name="powerUpsConfig">Current active-slot payloads containing charge animation selectors.</param>
     /// <param name="powerUpsState">Current active-slot charge state and release edges.</param>
     /// <param name="passiveToolsState">Aggregated Switch Weapon selection containing the active shooting animation selector.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table binding designer-defined weapon IDs to shooting clips.</param>
+    /// <param name="defaultAdditionalWeaponId">Scalable default weapon ID used when no Switch Weapon owns the visual.</param>
     /// <param name="shootPulseThisFrame">True when ECS spawned at least one new player shot since the previous presentation update.</param>
     /// <param name="deltaTime">Presentation delta time used to advance sampled upper-body actions.</param>
     /// <param name="runtimeState">Mutable Animator presentation state persisted on the player entity.</param>
@@ -63,12 +67,17 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
                               in PlayerPowerUpsConfig powerUpsConfig,
                               in PlayerPowerUpsState powerUpsState,
                               in PlayerPassiveToolsState passiveToolsState,
+                              in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals,
+                              FixedString64Bytes defaultAdditionalWeaponId,
                               bool shootPulseThisFrame,
                               float deltaTime,
                               ref PlayerAnimatorRuntimeState runtimeState,
                               out bool drivesUpperBody)
     {
-        drivesUpperBody = TryGetBinding(animator, in clipConfig, out PlayerUpperBodyAnimatorBinding binding);
+        drivesUpperBody = TryGetBinding(animator,
+                                        in clipConfig,
+                                        in additionalWeaponVisuals,
+                                        out PlayerUpperBodyAnimatorBinding binding);
 
         if (!drivesUpperBody)
         {
@@ -138,7 +147,9 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
             PrepareShootPulse(binding, ref runtimeState))
         {
             AnimationClip shootClip = ResolveShootClip(in clipConfig,
-                                                       ResolveShootAnimationSlot(in passiveToolsState));
+                                                       in passiveToolsState,
+                                                       in additionalWeaponVisuals,
+                                                       defaultAdditionalWeaponId);
             startedAction = TryStartAction(binding,
                                            PlayerUpperBodyAnimationActionKind.Shoot,
                                            shootClip,
@@ -304,10 +315,12 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="animator">Animator requiring an upper-body runtime binding.</param>
     /// <param name="clipConfig">Baked clip table containing every valid upper-body action motion.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
     /// <param name="binding">Resolved valid binding.</param>
     /// <returns>True when the Animator contains the required layer, states, controller, and one configured action override key.</returns>
     private static bool TryGetBinding(Animator animator,
                                       in PlayerUpperBodyAnimationClipConfig clipConfig,
+                                      in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals,
                                       out PlayerUpperBodyAnimatorBinding binding)
     {
         binding = null;
@@ -347,6 +360,7 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
 
         if (!TryResolveActionOverrideKey(overrideController,
                                          in clipConfig,
+                                         in additionalWeaponVisuals,
                                          out AnimationClip actionOverrideKey))
         {
             LogInvalidAnimator(animator);
@@ -370,10 +384,12 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="overrideController">Animator override controller exposing authored clip keys.</param>
     /// <param name="clipConfig">Baked concrete action clips accepted as the action-state anchor.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
     /// <param name="actionOverrideKey">Resolved original controller clip that may be overridden safely.</param>
     /// <returns>True when one configured action clip is an authored controller key.</returns>
     private static bool TryResolveActionOverrideKey(AnimatorOverrideController overrideController,
                                                     in PlayerUpperBodyAnimationClipConfig clipConfig,
+                                                    in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals,
                                                     out AnimationClip actionOverrideKey)
     {
         actionOverrideKey = null;
@@ -395,7 +411,8 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
                 return true;
             }
 
-            if (actionOverrideKey == null && IsConfiguredActionClip(key, in clipConfig))
+            if (actionOverrideKey == null &&
+                IsConfiguredActionClip(key, in clipConfig, in additionalWeaponVisuals))
                 actionOverrideKey = key;
         }
 
@@ -407,20 +424,31 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     /// </summary>
     /// <param name="clip">Authored controller key being classified.</param>
     /// <param name="clipConfig">Baked concrete action clips accepted by the presentation driver.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table contributing designer-defined shooting clips.</param>
     /// <returns>True when the clip is configured for shoot, charge, or release presentation.</returns>
     private static bool IsConfiguredActionClip(AnimationClip clip,
-                                               in PlayerUpperBodyAnimationClipConfig clipConfig)
+                                               in PlayerUpperBodyAnimationClipConfig clipConfig,
+                                               in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals)
     {
         if (clip == null)
             return false;
 
-        return clip == clipConfig.CannonShoot.Value ||
-               clip == clipConfig.GatlingShoot.Value ||
-               clip == clipConfig.RailgunShoot.Value ||
-               clip == clipConfig.PrimaryCharge.Value ||
+        if (clip == clipConfig.PrimaryCharge.Value ||
                clip == clipConfig.SecondaryCharge.Value ||
                clip == clipConfig.PrimaryRelease.Value ||
-               clip == clipConfig.SecondaryRelease.Value;
+               clip == clipConfig.SecondaryRelease.Value)
+            return true;
+
+        if (!additionalWeaponVisuals.IsCreated)
+            return false;
+
+        for (int entryIndex = 0; entryIndex < additionalWeaponVisuals.Length; entryIndex++)
+        {
+            if (clip == additionalWeaponVisuals[entryIndex].ShootAnimationClip.Value)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -471,59 +499,39 @@ internal static class PlayerUpperBodyAnimationPresentationUtility
     }
 
     /// <summary>
-    /// Resolves the effective shooting animation selector from the equipped Switch Weapon hook.
+    /// Resolves the concrete shooting clip from the aggregated passive-tools snapshot. When an equipped Switch
+    /// Weapon module owns the visible attachment, its designer-defined ID drives the matching clip; otherwise
+    /// the scalable default ID is used. Missing clips degrade gracefully to the baked default.
     /// </summary>
-    /// <param name="passiveToolsState">Aggregated weapon visual and animation selection.</param>
-    /// <returns>Concrete shooting animation selector with Automatic resolved from the visible weapon mesh.</returns>
-    private static PlayerShootAnimationClipSlot ResolveShootAnimationSlot(in PlayerPassiveToolsState passiveToolsState)
-    {
-        if (passiveToolsState.HasWeaponSwitch == 0)
-            return PlayerShootAnimationClipSlot.Default;
-
-        if (passiveToolsState.WeaponShootAnimationClipSlot != PlayerShootAnimationClipSlot.Automatic)
-            return passiveToolsState.WeaponShootAnimationClipSlot;
-
-        switch (passiveToolsState.WeaponVisualSlot)
-        {
-            case PlayerWeaponVisualSlot.Cannon:
-                return PlayerShootAnimationClipSlot.Cannon;
-            case PlayerWeaponVisualSlot.Gatling:
-                return PlayerShootAnimationClipSlot.Gatling;
-            case PlayerWeaponVisualSlot.Railgun:
-                return PlayerShootAnimationClipSlot.Railgun;
-            default:
-                return PlayerShootAnimationClipSlot.Default;
-        }
-    }
-
-    /// <summary>
-    /// Resolves one concrete shooting clip and falls back to Default Shoot when an optional weapon slot is unassigned.
-    /// </summary>
-    /// <param name="clipConfig">Baked concrete clip table.</param>
-    /// <param name="slot">Resolved shooting animation selector.</param>
+    /// <param name="clipConfig">Baked concrete clip table sourced from the visual preset entries.</param>
+    /// <param name="passiveToolsState">Aggregated weapon visual selection containing the active Switch Weapon hook.</param>
+    /// <param name="additionalWeaponVisuals">Runtime table binding designer-defined weapon IDs to shooting clips.</param>
+    /// <param name="defaultAdditionalWeaponId">Scalable default attachment ID.</param>
     /// <returns>Selected concrete clip or Default Shoot fallback.</returns>
     private static AnimationClip ResolveShootClip(in PlayerUpperBodyAnimationClipConfig clipConfig,
-                                                  PlayerShootAnimationClipSlot slot)
+                                                  in PlayerPassiveToolsState passiveToolsState,
+                                                  in DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponVisuals,
+                                                  FixedString64Bytes defaultAdditionalWeaponId)
     {
-        AnimationClip selectedClip;
+        FixedString64Bytes selectedWeaponId = passiveToolsState.HasWeaponSwitch != 0
+            ? passiveToolsState.WeaponId
+            : defaultAdditionalWeaponId;
 
-        switch (slot)
+        if (selectedWeaponId.Length > 0 && additionalWeaponVisuals.IsCreated)
         {
-            case PlayerShootAnimationClipSlot.Cannon:
-                selectedClip = clipConfig.CannonShoot.Value;
-                break;
-            case PlayerShootAnimationClipSlot.Gatling:
-                selectedClip = clipConfig.GatlingShoot.Value;
-                break;
-            case PlayerShootAnimationClipSlot.Railgun:
-                selectedClip = clipConfig.RailgunShoot.Value;
-                break;
-            default:
-                selectedClip = clipConfig.DefaultShoot.Value;
-                break;
+            for (int entryIndex = 0; entryIndex < additionalWeaponVisuals.Length; entryIndex++)
+            {
+                PlayerAdditionalWeaponVisualElement entry = additionalWeaponVisuals[entryIndex];
+
+                if (!entry.WeaponId.Equals(selectedWeaponId))
+                    continue;
+
+                AnimationClip selectedClip = entry.ShootAnimationClip.Value;
+                return selectedClip != null ? selectedClip : clipConfig.DefaultShoot.Value;
+            }
         }
 
-        return selectedClip != null ? selectedClip : clipConfig.DefaultShoot.Value;
+        return clipConfig.DefaultShoot.Value;
     }
 
     /// <summary>

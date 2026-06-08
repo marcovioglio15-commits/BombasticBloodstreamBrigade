@@ -87,15 +87,14 @@ public enum PlayerUpperBodyAnimationActionKind : byte
 }
 
 /// <summary>
-/// Stores the concrete upper-body clip assets referenced by scalable power-up payload selectors.
+/// Stores the implicit Base Gun shoot clip and the upper-body charge / release clips selected by scalable
+/// power-up payload selectors. Per-weapon shoot clips live on <see cref="PlayerAdditionalWeaponVisualElement"/>
+/// buffer entries so each weapon ID can carry its own clip end-to-end.
 /// </summary>
 public struct PlayerUpperBodyAnimationClipConfig : IComponentData
 {
     #region Fields
     public UnityObjectRef<AnimationClip> DefaultShoot;
-    public UnityObjectRef<AnimationClip> CannonShoot;
-    public UnityObjectRef<AnimationClip> GatlingShoot;
-    public UnityObjectRef<AnimationClip> RailgunShoot;
     public UnityObjectRef<AnimationClip> PrimaryCharge;
     public UnityObjectRef<AnimationClip> SecondaryCharge;
     public UnityObjectRef<AnimationClip> PrimaryRelease;
@@ -104,7 +103,9 @@ public struct PlayerUpperBodyAnimationClipConfig : IComponentData
 }
 
 /// <summary>
-/// Runtime configuration used to spawn and sync an external GameObject visual bridge when no companion Animator is available.
+/// Runtime configuration used to spawn and sync an external GameObject visual bridge when no companion Animator
+/// is available. Per-weapon references live on <see cref="PlayerAdditionalWeaponVisualElement"/> buffer entries
+/// so the bridge layout stays flexible across designer-defined weapon IDs.
 /// </summary>
 public struct PlayerVisualRuntimeBridgeConfig : IComponentData
 {
@@ -112,12 +113,24 @@ public struct PlayerVisualRuntimeBridgeConfig : IComponentData
     public UnityObjectRef<GameObject> VisualPrefab;
     public float3 PositionOffset;
     public FixedString128Bytes BaseGunReference;
-    public FixedString128Bytes CannonReference;
-    public FixedString128Bytes GatlingReference;
-    public FixedString128Bytes RailgunReference;
-    public PlayerWeaponVisualSlot DefaultAdditionalWeaponVisual;
+    public FixedString64Bytes DefaultAdditionalWeaponId;
     public byte SyncRotation;
     public byte SpawnWhenAnimatorMissing;
+    #endregion
+}
+
+/// <summary>
+/// Runtime mountable-weapon entry baked from <see cref="PlayerWeaponVisualSettings.AdditionalWeapons"/>. Each
+/// entry binds one designer-defined Weapon Id to its prefab-relative runtime reference and the upper-body shoot
+/// clip used while the weapon is the visible attachment.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerAdditionalWeaponVisualElement : IBufferElementData
+{
+    #region Fields
+    public FixedString64Bytes WeaponId;
+    public FixedString128Bytes RuntimeReference;
+    public UnityObjectRef<AnimationClip> ShootAnimationClip;
     #endregion
 }
 

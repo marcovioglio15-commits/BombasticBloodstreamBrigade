@@ -374,8 +374,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               in PlayerPassiveToolConfig triggeredProjectilePassiveTool,
                                               in PlayerPassiveToolConfig togglePassiveTool,
                                               bool hasActiveWeaponSwitch,
-                                              PlayerWeaponVisualSlot activeWeaponVisualSlot,
-                                              PlayerShootAnimationClipSlot activeWeaponShootAnimationClipSlot,
+                                              FixedString64Bytes activeWeaponId,
                                               ActiveToolKind resolvedToolKind,
                                               out PlayerPowerUpSlotConfig slotConfig)
     {
@@ -523,8 +522,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             TriggeredProjectilePassiveTool = triggeredProjectilePassiveTool,
             TogglePassiveTool = togglePassiveTool,
             HasActiveWeaponSwitch = hasActiveWeaponSwitch ? (byte)1 : (byte)0,
-            ActiveWeaponVisualSlot = activeWeaponVisualSlot,
-            ActiveWeaponShootAnimationClipSlot = activeWeaponShootAnimationClipSlot
+            ActiveWeaponId = activeWeaponId
         };
     }
 

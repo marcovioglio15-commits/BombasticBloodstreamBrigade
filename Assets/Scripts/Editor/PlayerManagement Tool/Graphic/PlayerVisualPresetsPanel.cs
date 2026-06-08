@@ -415,6 +415,7 @@ public sealed class PlayerVisualPresetsPanel
         PlayerManagementDraftSession.MarkDirty();
         RefreshPresetList();
         SelectPreset(newPreset);
+        PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
 
         int index = filteredPresets.IndexOf(newPreset);
 
@@ -475,6 +476,7 @@ public sealed class PlayerVisualPresetsPanel
         PlayerManagementDraftSession.MarkDirty();
         RefreshPresetList();
         SelectPreset(duplicatedPreset);
+        PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
 
         int index = filteredPresets.IndexOf(duplicatedPreset);
 
@@ -502,6 +504,7 @@ public sealed class PlayerVisualPresetsPanel
         EditorUtility.SetDirty(library);
         PlayerManagementDraftSession.StageDeleteAsset(preset);
         RefreshPresetList();
+        PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
     }
     #endregion
 

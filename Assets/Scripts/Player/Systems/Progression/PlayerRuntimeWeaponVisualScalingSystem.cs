@@ -4,8 +4,9 @@ using Unity.Collections;
 using Unity.Entities;
 
 /// <summary>
-/// Rebuilds scalable weapon visual references and the default optional attachment only when the unified runtime scaling
-/// hash changes. Presentation resolves changed references once and keeps all per-frame weapon toggles allocation-free.
+/// Rebuilds the scalable weapon visual references, the Default Additional Weapon Id, and the per-weapon runtime
+/// buffer when the unified runtime scaling hash changes. Combo-rank-dependent Character Tuning re-applications
+/// flow through this system; per-frame weapon toggles consume the rebuilt state allocation-free.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerRuntimeScalingSyncSystem))]
@@ -20,7 +21,8 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
 
     #region Lifecycle
     /// <summary>
-    /// Declares the runtime data required to rebuild scalable weapon visual configuration.
+    /// Declares the runtime data required to rebuild scalable weapon visual configuration. The system runs only
+    /// on player entities that own both the bridge config and the additional-weapons buffer.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
@@ -40,6 +42,8 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
         BufferLookup<PlayerRuntimeWeaponVisualScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeWeaponVisualScalingElement>(true);
+        BufferLookup<PlayerBaseAdditionalWeaponVisualElement> baseAdditionalWeaponsLookup = SystemAPI.GetBufferLookup<PlayerBaseAdditionalWeaponVisualElement>(true);
+        BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup = SystemAPI.GetBufferLookup<PlayerAdditionalWeaponVisualElement>(false);
         ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
         ComponentLookup<PlayerComboCounterState> comboStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(true);
         BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboRankElement>(true);
@@ -67,6 +71,7 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
             }
 
             ApplyBaseConfig(in baseConfig.ValueRO, ref runtimeConfig.ValueRW);
+            RebuildAdditionalWeaponsBuffer(entity, in baseAdditionalWeaponsLookup, ref additionalWeaponsLookup);
             FillVariableContext(entity,
                                 in scalableStatsLookup,
                                 in comboConfigLookup,
@@ -75,7 +80,10 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
                                 in characterTuningLookup);
 
             if (scalingLookup.HasBuffer(entity))
-                ApplyScaling(scalingLookup[entity], ref runtimeConfig.ValueRW);
+                ApplyScaling(scalingLookup[entity],
+                              ref runtimeConfig.ValueRW,
+                              ref additionalWeaponsLookup,
+                              entity);
 
             weaponScalingState.ValueRW.Initialized = 1;
             weaponScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.ValueRO.LastScalableStatsHash;
@@ -131,81 +139,123 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     }
 
     /// <summary>
-    /// Applies all weapon visual Add Scaling formulas to a freshly rebuilt runtime configuration.
+    /// Applies all weapon visual Add Scaling formulas to the freshly rebuilt runtime configuration. Bridge-level
+    /// fields are written directly; per-entry rules look up the matching runtime buffer slot by Weapon Id.
     /// </summary>
     /// <param name="scalingBuffer">Runtime weapon visual scaling metadata.</param>
     /// <param name="runtimeConfig">Mutable runtime visual bridge configuration.</param>
+    /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
+    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
     private static void ApplyScaling(DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> scalingBuffer,
-                                     ref PlayerVisualRuntimeBridgeConfig runtimeConfig)
+                                     ref PlayerVisualRuntimeBridgeConfig runtimeConfig,
+                                     ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
+                                     Entity entity)
     {
         for (int scalingIndex = 0; scalingIndex < scalingBuffer.Length; scalingIndex++)
         {
             PlayerRuntimeWeaponVisualScalingElement scalingElement = scalingBuffer[scalingIndex];
 
-            if ((PlayerFormulaValueType)scalingElement.ValueType == PlayerFormulaValueType.Token)
-            {
-                if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateTokenValue(scalingElement.Formula.ToString(),
-                                                                                        scalingElement.BaseTokenValue.ToString(),
-                                                                                        VariableContext,
-                                                                                        out string resolvedToken))
-                {
-                    continue;
-                }
-
-                ApplyToken(scalingElement.FieldId, resolvedToken, ref runtimeConfig);
+            // Every weapon-visual scalable field is a string token; numeric paths are no longer used.
+            if ((PlayerFormulaValueType)scalingElement.ValueType != PlayerFormulaValueType.Token)
                 continue;
-            }
 
-            if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(scalingElement.Formula.ToString(),
-                                                                                      scalingElement.BaseValue,
-                                                                                      scalingElement.IsInteger != 0,
-                                                                                      VariableContext,
-                                                                                      out float resolvedValue))
-            {
+            if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateTokenValue(scalingElement.Formula.ToString(),
+                                                                                    scalingElement.BaseTokenValue.ToString(),
+                                                                                    VariableContext,
+                                                                                    out string resolvedToken))
                 continue;
-            }
 
-            if (scalingElement.FieldId == PlayerRuntimeWeaponVisualFieldId.DefaultAdditionalWeaponVisual)
-                runtimeConfig.DefaultAdditionalWeaponVisual = PlayerRuntimeScalingEnumUtility.ResolvePlayerDefaultAdditionalWeaponVisualSlot(resolvedValue);
+            ApplyTokenToField(scalingElement.FieldId,
+                              scalingElement.TargetEntryIndex,
+                              resolvedToken,
+                              ref runtimeConfig,
+                              ref additionalWeaponsLookup,
+                              entity);
         }
     }
 
     /// <summary>
-    /// Applies one token reference selector when it fits the ECS fixed-size storage contract.
+    /// Applies one resolved token to the field identified by <paramref name="fieldId"/>. Per-entry fields write
+    /// into the runtime buffer element at <paramref name="targetEntryIndex"/>.
     /// </summary>
-    /// <param name="fieldId">Target weapon visual field.</param>
-    /// <param name="resolvedToken">Resolved token formula result.</param>
+    /// <param name="fieldId">Target runtime field identifier.</param>
+    /// <param name="targetEntryIndex">Per-entry array index captured at bake time.</param>
+    /// <param name="resolvedToken">Formula-resolved token text.</param>
     /// <param name="runtimeConfig">Mutable runtime visual bridge configuration.</param>
-    private static void ApplyToken(PlayerRuntimeWeaponVisualFieldId fieldId,
-                                   string resolvedToken,
-                                   ref PlayerVisualRuntimeBridgeConfig runtimeConfig)
+    /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
+    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
+    private static void ApplyTokenToField(PlayerRuntimeWeaponVisualFieldId fieldId,
+                                           int targetEntryIndex,
+                                           string resolvedToken,
+                                           ref PlayerVisualRuntimeBridgeConfig runtimeConfig,
+                                           ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
+                                           Entity entity)
     {
         string normalizedToken = string.IsNullOrWhiteSpace(resolvedToken) ? string.Empty : resolvedToken.Trim();
-
-        if (Encoding.UTF8.GetByteCount(normalizedToken) > PlayerWeaponVisualSettings.MaximumReferenceSelectorUtf8Bytes)
-            return;
-
-        FixedString128Bytes reference = new FixedString128Bytes(normalizedToken);
 
         switch (fieldId)
         {
             case PlayerRuntimeWeaponVisualFieldId.BaseGunReference:
-                runtimeConfig.BaseGunReference = reference;
-                break;
-            case PlayerRuntimeWeaponVisualFieldId.CannonReference:
-                runtimeConfig.CannonReference = reference;
-                break;
-            case PlayerRuntimeWeaponVisualFieldId.GatlingReference:
-                runtimeConfig.GatlingReference = reference;
-                break;
-            case PlayerRuntimeWeaponVisualFieldId.RailgunReference:
-                runtimeConfig.RailgunReference = reference;
-                break;
+                if (Encoding.UTF8.GetByteCount(normalizedToken) <= PlayerWeaponVisualSettings.MaximumReferenceSelectorUtf8Bytes)
+                    runtimeConfig.BaseGunReference = new FixedString128Bytes(normalizedToken);
+                return;
+            case PlayerRuntimeWeaponVisualFieldId.DefaultAdditionalWeaponId:
+                if (Encoding.UTF8.GetByteCount(normalizedToken) <= PlayerWeaponVisualSettings.MaximumWeaponIdUtf8Bytes)
+                    runtimeConfig.DefaultAdditionalWeaponId = new FixedString64Bytes(normalizedToken);
+                return;
+            case PlayerRuntimeWeaponVisualFieldId.AdditionalWeaponRuntimeReference:
+            case PlayerRuntimeWeaponVisualFieldId.AdditionalWeaponWeaponId:
+                ApplyTokenToAdditionalWeapon(fieldId,
+                                              targetEntryIndex,
+                                              normalizedToken,
+                                              ref additionalWeaponsLookup,
+                                              entity);
+                return;
         }
     }
 
     /// <summary>
-    /// Restores all scalable weapon visual fields from the immutable baseline.
+    /// Writes one resolved token into the runtime additional-weapons buffer element at the bake-resolved array
+    /// index. This keeps all rules targeting the entry valid even when one rule changes its Weapon Id.
+    /// </summary>
+    /// <param name="fieldId">Per-entry field identifier (runtime reference or Weapon Id).</param>
+    /// <param name="targetEntryIndex">Bake-resolved target array index.</param>
+    /// <param name="normalizedToken">Trimmed token result ready for capacity checks.</param>
+    /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
+    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
+    private static void ApplyTokenToAdditionalWeapon(PlayerRuntimeWeaponVisualFieldId fieldId,
+                                                      int targetEntryIndex,
+                                                      string normalizedToken,
+                                                      ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
+                                                      Entity entity)
+    {
+        if (!additionalWeaponsLookup.HasBuffer(entity))
+            return;
+
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> buffer = additionalWeaponsLookup[entity];
+
+        if (targetEntryIndex < 0 || targetEntryIndex >= buffer.Length)
+            return;
+
+        PlayerAdditionalWeaponVisualElement element = buffer[targetEntryIndex];
+
+        switch (fieldId)
+        {
+            case PlayerRuntimeWeaponVisualFieldId.AdditionalWeaponRuntimeReference:
+                if (Encoding.UTF8.GetByteCount(normalizedToken) <= PlayerWeaponVisualSettings.MaximumReferenceSelectorUtf8Bytes)
+                    element.RuntimeReference = new FixedString128Bytes(normalizedToken);
+                break;
+            case PlayerRuntimeWeaponVisualFieldId.AdditionalWeaponWeaponId:
+                if (Encoding.UTF8.GetByteCount(normalizedToken) <= PlayerWeaponVisualSettings.MaximumWeaponIdUtf8Bytes)
+                    element.WeaponId = new FixedString64Bytes(normalizedToken);
+                break;
+        }
+
+        buffer[targetEntryIndex] = element;
+    }
+
+    /// <summary>
+    /// Restores all scalable weapon visual bridge fields from the immutable baseline before formulas are applied.
     /// </summary>
     /// <param name="baseConfig">Immutable weapon visual baseline.</param>
     /// <param name="runtimeConfig">Mutable runtime visual bridge configuration.</param>
@@ -213,10 +263,37 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
                                         ref PlayerVisualRuntimeBridgeConfig runtimeConfig)
     {
         runtimeConfig.BaseGunReference = baseConfig.BaseGunReference;
-        runtimeConfig.CannonReference = baseConfig.CannonReference;
-        runtimeConfig.GatlingReference = baseConfig.GatlingReference;
-        runtimeConfig.RailgunReference = baseConfig.RailgunReference;
-        runtimeConfig.DefaultAdditionalWeaponVisual = baseConfig.DefaultAdditionalWeaponVisual;
+        runtimeConfig.DefaultAdditionalWeaponId = baseConfig.DefaultAdditionalWeaponId;
+    }
+
+    /// <summary>
+    /// Rebuilds the runtime additional-weapons buffer from the immutable baseline buffer. Called once per scaling
+    /// hash change so the next rule pass writes into deterministic per-entry slots.
+    /// </summary>
+    /// <param name="entity">Player entity owning both buffers.</param>
+    /// <param name="baseLookup">Read-only baseline buffer lookup.</param>
+    /// <param name="runtimeLookup">Mutable runtime buffer lookup rebuilt in place.</param>
+    private static void RebuildAdditionalWeaponsBuffer(Entity entity,
+                                                       in BufferLookup<PlayerBaseAdditionalWeaponVisualElement> baseLookup,
+                                                       ref BufferLookup<PlayerAdditionalWeaponVisualElement> runtimeLookup)
+    {
+        if (!baseLookup.HasBuffer(entity) || !runtimeLookup.HasBuffer(entity))
+            return;
+
+        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseBuffer = baseLookup[entity];
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> runtimeBuffer = runtimeLookup[entity];
+        runtimeBuffer.Clear();
+
+        for (int entryIndex = 0; entryIndex < baseBuffer.Length; entryIndex++)
+        {
+            PlayerBaseAdditionalWeaponVisualElement baseElement = baseBuffer[entryIndex];
+            runtimeBuffer.Add(new PlayerAdditionalWeaponVisualElement
+            {
+                WeaponId = baseElement.WeaponId,
+                RuntimeReference = baseElement.RuntimeReference,
+                ShootAnimationClip = baseElement.ShootAnimationClip
+            });
+        }
     }
     #endregion
 

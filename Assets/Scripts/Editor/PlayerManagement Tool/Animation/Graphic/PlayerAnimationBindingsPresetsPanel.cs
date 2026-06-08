@@ -409,7 +409,7 @@ public sealed class PlayerAnimationBindingsPresetsPanel
     private void BuildClipSlotsSection()
     {
         VisualElement section = PlayerAnimationBindingsPanelUtility.CreateSection(detailsRoot, "Clip Slots");
-        HelpBox upperBodyInfoBox = new HelpBox("Switch Weapon and Trigger Hold Charge payloads select the weapon, charge, and release slots below through fully scalable enum fields. UpperBody.ST_Upper_Shoot must use one of these action clips as its authored override anchor. Empty optional shoot slots fall back to Player Visual Preset > Weapon Visuals > Default Shoot Animation Clip.",
+        HelpBox upperBodyInfoBox = new HelpBox("Trigger Hold Charge payloads select the charge and release slots below through fully scalable enum fields. Per-weapon shooting clips and the implicit Base Gun default clip live on Player Visual Preset > Weapon Visuals; UpperBody.ST_Upper_Shoot must use one of those clips (or one of the charge/release clips below) as its authored override anchor.",
                                                HelpBoxMessageType.Info);
         section.Add(upperBodyInfoBox);
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "idleClip", "Idle"));
@@ -421,9 +421,6 @@ public sealed class PlayerAnimationBindingsPresetsPanel
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "aimBackwardClip", "Aim Backward"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "aimLeftClip", "Aim Left"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "aimRightClip", "Aim Right"));
-        section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.cannonShootClip", "Shoot Cannon"));
-        section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.gatlingShootClip", "Shoot Gatling"));
-        section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.railgunShootClip", "Shoot Railgun"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.primaryChargeClip", "Charge Primary"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.secondaryChargeClip", "Charge Secondary"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyActionClips.primaryReleaseClip", "Release Primary"));

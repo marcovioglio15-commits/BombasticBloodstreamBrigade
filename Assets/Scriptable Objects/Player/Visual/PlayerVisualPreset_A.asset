@@ -22,11 +22,17 @@ MonoBehaviour:
   runtimeVisualBridgeOffset: {x: 0, y: 0, z: 0}
   weaponVisuals:
     baseGunReference: base gun
-    cannonReference: cannon
-    gatlingReference: gatling
-    railgunReference: railgun
-    defaultAdditionalWeaponVisual: 2
-    defaultShootAnimationClip: {fileID: 6871692653361327980, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
+    additionalWeapons:
+    - weaponId: Cannon
+      runtimeReference: cannon
+      shootAnimationClip: {fileID: 1432227648329410435, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
+    - weaponId: Gatling
+      runtimeReference: gatling
+      shootAnimationClip: {fileID: 6871692653361327980, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
+    - weaponId: Railgun
+      runtimeReference: railgun
+      shootAnimationClip: {fileID: -6429685982451697434, guid: 5b674c6efdb598f4db21695d370eee21, type: 3}
+    defaultAdditionalWeaponId: Gatling
   outline:
     enableOutline: 1
     outlineThickness: 5

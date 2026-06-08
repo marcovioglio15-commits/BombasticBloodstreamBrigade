@@ -70,10 +70,11 @@ public struct PlayerPowerUpSlotConfig
     public PlayerPassiveToolConfig TogglePassiveTool;
 
     // Switch Weapon hook captured from any active power-up. Equipped active slots participate in the final visual
-    // aggregation independently from one-shot, charge, or toggle activation state.
+    // aggregation independently from one-shot, charge, or toggle activation state. The matching shoot clip is
+    // resolved from the visual preset entry that owns this Weapon Id at presentation time, so no per-module
+    // animation override is stored beside the slot.
     public byte HasActiveWeaponSwitch;
-    public PlayerWeaponVisualSlot ActiveWeaponVisualSlot;
-    public PlayerShootAnimationClipSlot ActiveWeaponShootAnimationClipSlot;
+    public FixedString64Bytes ActiveWeaponId;
 }
 
 /// <summary>
@@ -394,8 +395,7 @@ public struct PlayerPassiveToolConfig
     public byte HasLaserBeam;
     public byte HasOrbitalProjections;
     public byte HasWeaponSwitch;
-    public PlayerWeaponVisualSlot WeaponVisualSlot;
-    public PlayerShootAnimationClipSlot WeaponShootAnimationClipSlot;
+    public FixedString64Bytes WeaponId;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;
