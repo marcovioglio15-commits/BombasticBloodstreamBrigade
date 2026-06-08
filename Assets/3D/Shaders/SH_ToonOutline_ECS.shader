@@ -5,6 +5,9 @@ Shader "Cel Shader/Toon Outline ECS"
     {
         _OutlineThickness("Outline Thickness", Range(0,10)) = 1
         _OutlineColor("Outline Color", Color) = (0, 0, 0, 1)
+        [HideInInspector] _ElasticHitDirection("Runtime Elastic Hit Direction", Vector) = (0,0,1,0)
+        [HideInInspector] _ElasticHitTiming("Runtime Elastic Hit Timing", Vector) = (0,0,0,0)
+        [HideInInspector] _ElasticHitMotion("Runtime Elastic Hit Motion", Vector) = (0,0,0,0)
         // Hidden property used by DOTS deformation path (ignored for classic GameObjects)
         [HideInInspector] _ComputeMeshIndex("Compute Mesh Buffer Index Offset", Float) = 0
     }
@@ -40,11 +43,15 @@ Shader "Cel Shader/Toon Outline ECS"
 
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Assets/3D/Shaders/Includes/SH_EnemyElasticHitDeformation.hlsl"
 
             // SRP Batcher requirement: all material properties must live inside UnityPerMaterial.
             CBUFFER_START(UnityPerMaterial)
                 float4 _OutlineColor;
                 float _OutlineThickness;
+                float4 _ElasticHitDirection;
+                float4 _ElasticHitTiming;
+                float4 _ElasticHitMotion;
                 float _ComputeMeshIndex;
             CBUFFER_END
 
@@ -53,6 +60,9 @@ Shader "Cel Shader/Toon Outline ECS"
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _ComputeMeshIndex)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _OutlineColor)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _OutlineThickness)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _ElasticHitDirection)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _ElasticHitTiming)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _ElasticHitMotion)
             UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
             #define UNITY_ACCESS_HYBRID_INSTANCED_PROP(var, type) UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT(type, var)
             #else
@@ -104,6 +114,13 @@ Shader "Cel Shader/Toon Outline ECS"
                     }
                 #endif
 
+                float3 elasticDirectionWS = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_ElasticHitDirection, float4).xyz;
+                float3 elasticDirectionOS = TransformWorldToObjectDir(elasticDirectionWS, true);
+                ApplyEnemyElasticHitDeformation(positionOS,
+                                                normalOS,
+                                                elasticDirectionOS,
+                                                UNITY_ACCESS_HYBRID_INSTANCED_PROP(_ElasticHitTiming, float4),
+                                                UNITY_ACCESS_HYBRID_INSTANCED_PROP(_ElasticHitMotion, float4));
                 float outlineThickness = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_OutlineThickness, float) / 250.0;
                 float3 normalDirection = SafeNormalize(normalOS);
                 float3 extrudedPositionOS = positionOS + normalDirection * outlineThickness;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
@@ -11,6 +12,9 @@ public static class ManagedDamageFlashRendererUtility
     private static readonly int ColorPropertyId = Shader.PropertyToID("_Color");
     private static readonly int FlashColorPropertyId = Shader.PropertyToID("_HitFlashColor");
     private static readonly int FlashBlendPropertyId = Shader.PropertyToID("_HitFlashBlend");
+    private static readonly int ElasticDirectionPropertyId = Shader.PropertyToID("_ElasticHitDirection");
+    private static readonly int ElasticTimingPropertyId = Shader.PropertyToID("_ElasticHitTiming");
+    private static readonly int ElasticMotionPropertyId = Shader.PropertyToID("_ElasticHitMotion");
     #endregion
 
     #region Fields
@@ -44,6 +48,42 @@ public static class ManagedDamageFlashRendererUtility
 
             ApplyEntry(entry, flashColor, clampedBlend);
         }
+    }
+
+    /// <summary>
+    /// Applies one shader-driven elastic hit response to every compatible renderer under an animator hierarchy.
+    /// </summary>
+    /// <param name="animator">Root animator whose child renderers receive elastic material properties.</param>
+    /// <param name="direction">World-space impact direction.</param>
+    /// <param name="timing">Trigger time, duration, compression and volume compensation.</param>
+    /// <param name="motion">Oscillation count, damping, directionality and ground anchoring.</param>
+    public static void ApplyElasticToAnimator(Animator animator,
+                                              float4 direction,
+                                              float4 timing,
+                                              float4 motion)
+    {
+        if (animator == null)
+            return;
+
+        CachedRendererSet rendererSet = GetOrCreateRendererSet(animator.GetInstanceID(), animator);
+
+        for (int rendererIndex = 0; rendererIndex < rendererSet.Entries.Count; rendererIndex++)
+        {
+            CachedRendererEntry entry = rendererSet.Entries[rendererIndex];
+
+            if (entry.Renderer == null)
+                continue;
+
+            ApplyElasticEntry(entry, direction, timing, motion);
+        }
+    }
+
+    /// <summary>
+    /// Clears cached renderer references during world or scene presentation cleanup.
+    /// </summary>
+    public static void ClearCache()
+    {
+        cacheByAnimatorInstanceId.Clear();
     }
     #endregion
 
@@ -127,6 +167,15 @@ public static class ManagedDamageFlashRendererUtility
 
             if (!entry.HasFlashBlend && sharedMaterial.HasProperty(FlashBlendPropertyId))
                 entry.HasFlashBlend = true;
+
+            if (!entry.HasElasticDirection && sharedMaterial.HasProperty(ElasticDirectionPropertyId))
+                entry.HasElasticDirection = true;
+
+            if (!entry.HasElasticTiming && sharedMaterial.HasProperty(ElasticTimingPropertyId))
+                entry.HasElasticTiming = true;
+
+            if (!entry.HasElasticMotion && sharedMaterial.HasProperty(ElasticMotionPropertyId))
+                entry.HasElasticMotion = true;
         }
 
         return entry;
@@ -153,6 +202,44 @@ public static class ManagedDamageFlashRendererUtility
             propertyBlock.SetFloat(FlashBlendPropertyId, blend);
 
         renderer.SetPropertyBlock(propertyBlock);
+    }
+
+    /// <summary>
+    /// Writes elastic hit properties into one cached renderer property block.
+    /// </summary>
+    /// <param name="entry">Cached renderer entry receiving the properties.</param>
+    /// <param name="direction">World-space impact direction.</param>
+    /// <param name="timing">Elastic response timing values.</param>
+    /// <param name="motion">Elastic response motion values.</param>
+    private static void ApplyElasticEntry(CachedRendererEntry entry,
+                                          float4 direction,
+                                          float4 timing,
+                                          float4 motion)
+    {
+        Renderer renderer = entry.Renderer;
+        MaterialPropertyBlock propertyBlock = entry.PropertyBlock;
+        renderer.GetPropertyBlock(propertyBlock);
+
+        if (entry.HasElasticDirection)
+            propertyBlock.SetVector(ElasticDirectionPropertyId, ToVector4(direction));
+
+        if (entry.HasElasticTiming)
+            propertyBlock.SetVector(ElasticTimingPropertyId, ToVector4(timing));
+
+        if (entry.HasElasticMotion)
+            propertyBlock.SetVector(ElasticMotionPropertyId, ToVector4(motion));
+
+        renderer.SetPropertyBlock(propertyBlock);
+    }
+
+    /// <summary>
+    /// Converts one math float4 into a managed shader vector.
+    /// </summary>
+    /// <param name="value">Math vector to convert.</param>
+    /// <returns>Managed vector with matching components.</returns>
+    private static Vector4 ToVector4(float4 value)
+    {
+        return new Vector4(value.x, value.y, value.z, value.w);
     }
     #endregion
 
@@ -197,6 +284,9 @@ public static class ManagedDamageFlashRendererUtility
         public bool HasColor;
         public bool HasFlashColor;
         public bool HasFlashBlend;
+        public bool HasElasticDirection;
+        public bool HasElasticTiming;
+        public bool HasElasticMotion;
         #endregion
     }
     #endregion

@@ -64,6 +64,21 @@ public static class EnemyPoolVisualUtility
         if (!entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
             entityManager.AddComponentData(enemyEntity, CreateDefaultVisualFlashPresentationState());
 
+        if (!entityManager.HasComponent<EnemyElasticHitConfig>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, default(EnemyElasticHitConfig));
+
+        if (!entityManager.HasComponent<EnemyDeathPuddleConfig>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, default(EnemyDeathPuddleConfig));
+
+        if (!entityManager.HasComponent<EnemyElasticHitState>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, CreateDefaultElasticHitState());
+
+        if (!entityManager.HasComponent<EnemyElasticHitActive>(enemyEntity))
+        {
+            entityManager.AddComponent<EnemyElasticHitActive>(enemyEntity);
+            entityManager.SetComponentEnabled<EnemyElasticHitActive>(enemyEntity, false);
+        }
+
         if (!entityManager.HasBuffer<DamageFlashRenderTargetElement>(enemyEntity))
             entityManager.AddBuffer<DamageFlashRenderTargetElement>(enemyEntity);
     }
@@ -151,13 +166,26 @@ public static class EnemyPoolVisualUtility
             entityManager.SetComponentData(enemyEntity, CreateDefaultBossPatternChangeFeedbackState());
 
         EnemyDamageFlashRenderUtility.ResetGpuFlash(entityManager, enemyEntity);
+        EnemyElasticHitRenderUtility.ResetGpuElasticHit(entityManager, enemyEntity);
+
+        if (entityManager.HasComponent<EnemyElasticHitState>(enemyEntity))
+            entityManager.SetComponentData(enemyEntity, CreateDefaultElasticHitState());
+
+        if (entityManager.HasComponent<EnemyElasticHitActive>(enemyEntity))
+            entityManager.SetComponentEnabled<EnemyElasticHitActive>(enemyEntity, false);
 
         if (entityManager.HasComponent<Animator>(enemyEntity))
         {
             Animator animator = entityManager.GetComponentObject<Animator>(enemyEntity);
 
             if (animator != null)
+            {
                 ManagedDamageFlashRendererUtility.ApplyToAnimator(animator, Color.white, 0f);
+                ManagedDamageFlashRendererUtility.ApplyElasticToAnimator(animator,
+                                                                         new float4(0f, 0f, 1f, 0f),
+                                                                         float4.zero,
+                                                                         float4.zero);
+            }
         }
 
         if (entityManager.HasComponent<EnemyOffensiveEngagementBillboardView>(enemyEntity))
@@ -200,6 +228,20 @@ public static class EnemyPoolVisualUtility
             DisplayedBlend = 0f,
             DisplayedColor = float4.zero,
             FadeOutSeconds = 0f
+        };
+    }
+
+    /// <summary>
+    /// Creates a neutral elastic hit runtime state used by pooled enemy activation and recycle.
+    /// </summary>
+    /// <returns>Neutral elastic hit runtime state.</returns>
+    private static EnemyElasticHitState CreateDefaultElasticHitState()
+    {
+        return new EnemyElasticHitState
+        {
+            RemainingSeconds = 0f,
+            LastTriggerTime = -1000f,
+            DirectionWorld = new float3(0f, 0f, 1f)
         };
     }
     #endregion

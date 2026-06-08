@@ -84,6 +84,11 @@ public partial struct EnemyElementalEffectsSystem : ISystem
             enemyRuntimeState.ValueRW = nextRuntimeState;
             enemyHealth.ValueRW = nextHealth;
             DamageFlashRuntimeUtility.Trigger(state.EntityManager, enemyEntity);
+            EnemyElasticHitRuntimeUtility.Trigger(state.EntityManager,
+                                                  enemyEntity,
+                                                  in nextHealth,
+                                                  float3.zero,
+                                                  false);
 
             if (nextHealth.Current > 0f)
                 continue;

@@ -19,6 +19,10 @@ public partial struct PlayerBombExplosionSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Creates cached bomb and enemy queries used by the explosion resolution pass.
+    /// </summary>
+    /// <param name="state">Mutable system state used to build and require runtime queries.</param>
     public void OnCreate(ref SystemState state)
     {
         bombQuery = SystemAPI.QueryBuilder()
@@ -33,6 +37,10 @@ public partial struct PlayerBombExplosionSystem : ISystem
         state.RequireForUpdate(bombQuery);
     }
 
+    /// <summary>
+    /// Resolves every requested bomb explosion, commits enemy damage feedback and retires consumed bomb entities.
+    /// </summary>
+    /// <param name="state">Mutable system state used to read and commit bomb explosion results.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -54,6 +62,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
         NativeArray<EnemyRuntimeState> enemyRuntimeArray = default;
         NativeArray<LocalTransform> enemyTransforms = default;
         NativeArray<float3> enemyPositions = default;
+        NativeArray<float3> enemyElasticHitDirections = default;
         NativeArray<float> enemyBodyRadii = default;
         NativeArray<byte> enemyDirtyFlags = default;
         NativeParallelMultiHashMap<int, int> enemyCellMap = default;
@@ -68,6 +77,9 @@ public partial struct PlayerBombExplosionSystem : ISystem
             enemyRuntimeArray = enemyQuery.ToComponentDataArray<EnemyRuntimeState>(frameAllocator);
             enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(frameAllocator);
             enemyPositions = CollectionHelper.CreateNativeArray<float3>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+            enemyElasticHitDirections = CollectionHelper.CreateNativeArray<float3>(enemyCount,
+                                                                                    frameAllocator,
+                                                                                    NativeArrayOptions.ClearMemory);
             enemyBodyRadii = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             enemyDirtyFlags = CollectionHelper.CreateNativeArray<byte>(enemyCount, frameAllocator, NativeArrayOptions.ClearMemory);
             enemyCellMap = new NativeParallelMultiHashMap<int, int>(enemyCount, frameAllocator);
@@ -105,6 +117,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
                                         in enemyPositions,
                                         in enemyBodyRadii,
                                         ref enemyDirtyFlags,
+                                        ref enemyElasticHitDirections,
                                         in enemyCellMap,
                                         inverseCellSize,
                                         maximumEnemyRadius,
@@ -131,10 +144,16 @@ public partial struct PlayerBombExplosionSystem : ISystem
                     continue;
 
                 EnemyRuntimeState enemyRuntimeState = enemyRuntimeArray[enemyIndex];
+                EnemyHealth enemyHealth = enemyHealthArray[enemyIndex];
                 EnemyExtraComboPointsRuntimeUtility.MarkEnemyDamaged(ref enemyRuntimeState);
                 entityManager.SetComponentData(enemyEntity, enemyRuntimeState);
-                entityManager.SetComponentData(enemyEntity, enemyHealthArray[enemyIndex]);
+                entityManager.SetComponentData(enemyEntity, enemyHealth);
                 DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+                EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                                      enemyEntity,
+                                                      in enemyHealth,
+                                                      enemyElasticHitDirections[enemyIndex],
+                                                      true);
             }
         }
 
@@ -212,6 +231,22 @@ public partial struct PlayerBombExplosionSystem : ISystem
         });
     }
 
+    /// <summary>
+    /// Resolves one bomb against spatially relevant enemies and records direct elastic hit directions for damaged targets.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to reject stale enemy entities.</param>
+    /// <param name="fuseState">Resolved bomb explosion payload.</param>
+    /// <param name="enemyCount">Number of cached active enemies.</param>
+    /// <param name="enemyEntities">Cached active enemy entities.</param>
+    /// <param name="enemyHealthArray">Mutable projected health per enemy.</param>
+    /// <param name="enemyPositions">Cached enemy world positions.</param>
+    /// <param name="enemyBodyRadii">Cached enemy collision radii.</param>
+    /// <param name="enemyDirtyFlags">Mutable flags marking enemies whose health changed.</param>
+    /// <param name="enemyElasticHitDirections">Mutable last explosion direction per damaged enemy.</param>
+    /// <param name="enemyCellMap">Spatial hash containing active enemy indices.</param>
+    /// <param name="inverseCellSize">Inverse spatial-hash cell size.</param>
+    /// <param name="maximumEnemyRadius">Largest cached enemy radius.</param>
+    /// <param name="commandBuffer">Command buffer receiving killed-enemy despawn requests.</param>
     private static void ApplyExplosionToEnemies(EntityManager entityManager,
                                                 in BombFuseState fuseState,
                                                 int enemyCount,
@@ -220,6 +255,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
                                                 in NativeArray<float3> enemyPositions,
                                                 in NativeArray<float> enemyBodyRadii,
                                                 ref NativeArray<byte> enemyDirtyFlags,
+                                                ref NativeArray<float3> enemyElasticHitDirections,
                                                 in NativeParallelMultiHashMap<int, int> enemyCellMap,
                                                 float inverseCellSize,
                                                 float maximumEnemyRadius,
@@ -269,6 +305,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
                                                     in enemyPositions,
                                                     in enemyBodyRadii,
                                                     ref enemyDirtyFlags,
+                                                    ref enemyElasticHitDirections,
                                                     ref commandBuffer);
                     }
                     while (enemyCellMap.TryGetNextValue(out enemyIndex, ref iterator));
@@ -338,9 +375,25 @@ public partial struct PlayerBombExplosionSystem : ISystem
                                     in enemyPositions,
                                     in enemyBodyRadii,
                                     ref enemyDirtyFlags,
+                                    ref enemyElasticHitDirections,
                                     ref commandBuffer);
     }
 
+    /// <summary>
+    /// Applies one validated bomb damage packet and stores its horizontal direct-impact direction.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to reject stale enemy entities.</param>
+    /// <param name="fuseState">Resolved bomb explosion payload.</param>
+    /// <param name="enemyIndex">Target index inside cached enemy arrays.</param>
+    /// <param name="explosionRadiusSquared">Squared bomb radius.</param>
+    /// <param name="explosionDamage">Sanitized bomb damage.</param>
+    /// <param name="enemyEntities">Cached active enemy entities.</param>
+    /// <param name="enemyHealthArray">Mutable projected health per enemy.</param>
+    /// <param name="enemyPositions">Cached enemy world positions.</param>
+    /// <param name="enemyBodyRadii">Cached enemy collision radii.</param>
+    /// <param name="enemyDirtyFlags">Mutable flags marking enemies whose health changed.</param>
+    /// <param name="enemyElasticHitDirections">Mutable last explosion direction per damaged enemy.</param>
+    /// <param name="commandBuffer">Command buffer receiving killed-enemy despawn requests.</param>
     private static void ApplyExplosionDamageToEnemy(EntityManager entityManager,
                                                     in BombFuseState fuseState,
                                                     int enemyIndex,
@@ -351,6 +404,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
                                                     in NativeArray<float3> enemyPositions,
                                                     in NativeArray<float> enemyBodyRadii,
                                                     ref NativeArray<byte> enemyDirtyFlags,
+                                                    ref NativeArray<float3> enemyElasticHitDirections,
                                                     ref EntityCommandBuffer commandBuffer)
     {
         Entity enemyEntity = enemyEntities[enemyIndex];
@@ -380,6 +434,7 @@ public partial struct PlayerBombExplosionSystem : ISystem
 
         enemyHealthArray[enemyIndex] = enemyHealth;
         enemyDirtyFlags[enemyIndex] = 1;
+        enemyElasticHitDirections[enemyIndex] = delta;
 
         if (enemyHealth.Current > 0f)
             return;

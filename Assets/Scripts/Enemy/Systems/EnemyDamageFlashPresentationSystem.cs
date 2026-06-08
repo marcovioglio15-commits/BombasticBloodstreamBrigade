@@ -185,6 +185,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         cachedMainCameraTransform = null;
         nextCameraResolveTime = 0f;
         missingStealerIconWarnings.Clear();
+        ManagedDamageFlashRendererUtility.ClearCache();
         EnemyOffensiveEngagementBillboardRuntimeUtility.Shutdown();
     }
     #endregion

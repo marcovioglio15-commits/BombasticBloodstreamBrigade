@@ -18,6 +18,10 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Creates the cached enemy query and requires passive explosion requests before updating.
+    /// </summary>
+    /// <param name="state">Mutable system state used to build and require runtime queries.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerExplosionRequest>();
@@ -28,6 +32,10 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
             .Build();
     }
 
+    /// <summary>
+    /// Resolves queued passive explosions and commits enemy damage, direct elastic feedback, VFX and audio.
+    /// </summary>
+    /// <param name="state">Mutable system state used to read and commit passive explosion results.</param>
     public void OnUpdate(ref SystemState state)
     {
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
@@ -48,6 +56,9 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
         NativeArray<EnemyRuntimeState> enemyRuntimeArray = enemyQuery.ToComponentDataArray<EnemyRuntimeState>(frameAllocator);
         NativeArray<LocalTransform> enemyTransforms = enemyQuery.ToComponentDataArray<LocalTransform>(frameAllocator);
         NativeArray<float3> enemyPositions = CollectionHelper.CreateNativeArray<float3>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        NativeArray<float3> enemyElasticHitDirections = CollectionHelper.CreateNativeArray<float3>(enemyCount,
+                                                                                                    frameAllocator,
+                                                                                                    NativeArrayOptions.ClearMemory);
         NativeArray<float> enemyBodyRadii = CollectionHelper.CreateNativeArray<float>(enemyCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
         NativeArray<byte> enemyDirtyFlags = CollectionHelper.CreateNativeArray<byte>(enemyCount, frameAllocator, NativeArrayOptions.ClearMemory);
         ComponentLookup<EnemyDespawnRequest> despawnRequestLookup = SystemAPI.GetComponentLookup<EnemyDespawnRequest>(true);
@@ -86,6 +97,7 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                                       in enemyPositions,
                                       in enemyBodyRadii,
                                       ref enemyDirtyFlags,
+                                      ref enemyElasticHitDirections,
                                       in enemyCellMap,
                                       inverseCellSize,
                                       maximumEnemyRadius,
@@ -108,10 +120,16 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                 continue;
 
             EnemyRuntimeState enemyRuntimeState = enemyRuntimeArray[enemyIndex];
+            EnemyHealth enemyHealth = enemyHealthArray[enemyIndex];
             EnemyExtraComboPointsRuntimeUtility.MarkEnemyDamaged(ref enemyRuntimeState);
             entityManager.SetComponentData(enemyEntity, enemyRuntimeState);
-            entityManager.SetComponentData(enemyEntity, enemyHealthArray[enemyIndex]);
+            entityManager.SetComponentData(enemyEntity, enemyHealth);
             DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+            EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                                  enemyEntity,
+                                                  in enemyHealth,
+                                                  enemyElasticHitDirections[enemyIndex],
+                                                  true);
         }
 
         commandBuffer.Playback(entityManager);
@@ -147,6 +165,22 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
         }
     }
 
+    /// <summary>
+    /// Resolves one passive explosion against spatially relevant enemies and records direct hit directions.
+    /// </summary>
+    /// <param name="explosionRequest">Passive explosion payload being resolved.</param>
+    /// <param name="enemyCount">Number of cached active enemies.</param>
+    /// <param name="enemyEntities">Cached active enemy entities.</param>
+    /// <param name="enemyHealthArray">Mutable projected health per enemy.</param>
+    /// <param name="enemyPositions">Cached enemy world positions.</param>
+    /// <param name="enemyBodyRadii">Cached enemy collision radii.</param>
+    /// <param name="enemyDirtyFlags">Mutable flags marking enemies whose health changed.</param>
+    /// <param name="enemyElasticHitDirections">Mutable last explosion direction per damaged enemy.</param>
+    /// <param name="enemyCellMap">Spatial hash containing active enemy indices.</param>
+    /// <param name="inverseCellSize">Inverse spatial-hash cell size.</param>
+    /// <param name="maximumEnemyRadius">Largest cached enemy radius.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate killed-enemy requests.</param>
+    /// <param name="commandBuffer">Command buffer receiving killed-enemy despawn requests.</param>
     private static void ApplyExplosionRequest(in PlayerExplosionRequest explosionRequest,
                                               int enemyCount,
                                               in NativeArray<Entity> enemyEntities,
@@ -154,6 +188,7 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                                               in NativeArray<float3> enemyPositions,
                                               in NativeArray<float> enemyBodyRadii,
                                               ref NativeArray<byte> enemyDirtyFlags,
+                                              ref NativeArray<float3> enemyElasticHitDirections,
                                               in NativeParallelMultiHashMap<int, int> enemyCellMap,
                                               float inverseCellSize,
                                               float maximumEnemyRadius,
@@ -204,6 +239,7 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                                        in enemyPositions,
                                        in enemyBodyRadii,
                                        ref enemyDirtyFlags,
+                                       ref enemyElasticHitDirections,
                                        in despawnRequestLookup,
                                        ref commandBuffer);
                     }
@@ -273,10 +309,26 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                        in enemyPositions,
                        in enemyBodyRadii,
                        ref enemyDirtyFlags,
+                       ref enemyElasticHitDirections,
                        in despawnRequestLookup,
                        ref commandBuffer);
     }
 
+    /// <summary>
+    /// Applies one validated passive explosion damage packet and stores its horizontal direct-impact direction.
+    /// </summary>
+    /// <param name="enemyIndex">Target index inside cached enemy arrays.</param>
+    /// <param name="radiusSquared">Squared explosion radius.</param>
+    /// <param name="damage">Sanitized explosion damage.</param>
+    /// <param name="explosionPosition">World-space explosion origin.</param>
+    /// <param name="enemyEntities">Cached active enemy entities.</param>
+    /// <param name="enemyHealthArray">Mutable projected health per enemy.</param>
+    /// <param name="enemyPositions">Cached enemy world positions.</param>
+    /// <param name="enemyBodyRadii">Cached enemy collision radii.</param>
+    /// <param name="enemyDirtyFlags">Mutable flags marking enemies whose health changed.</param>
+    /// <param name="enemyElasticHitDirections">Mutable last explosion direction per damaged enemy.</param>
+    /// <param name="despawnRequestLookup">Lookup used to avoid duplicate killed-enemy requests.</param>
+    /// <param name="commandBuffer">Command buffer receiving killed-enemy despawn requests.</param>
     private static void TryDamageEnemy(int enemyIndex,
                                        float radiusSquared,
                                        float damage,
@@ -286,6 +338,7 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
                                        in NativeArray<float3> enemyPositions,
                                        in NativeArray<float> enemyBodyRadii,
                                        ref NativeArray<byte> enemyDirtyFlags,
+                                       ref NativeArray<float3> enemyElasticHitDirections,
                                        in ComponentLookup<EnemyDespawnRequest> despawnRequestLookup,
                                        ref EntityCommandBuffer commandBuffer)
     {
@@ -312,6 +365,7 @@ public partial struct PlayerPassiveExplosionResolveSystem : ISystem
 
         enemyHealthArray[enemyIndex] = enemyHealth;
         enemyDirtyFlags[enemyIndex] = 1;
+        enemyElasticHitDirections[enemyIndex] = delta;
 
         if (enemyHealth.Current > 0f)
             return;

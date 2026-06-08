@@ -29,6 +29,7 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
             return container;
 
         SerializedProperty prefabsProperty = panel.PresetSerializedObject.FindProperty("prefabs");
+        SerializedProperty deathPuddleProperty = panel.PresetSerializedObject.FindProperty("deathPuddle");
 
         if (prefabsProperty == null)
             return container;
@@ -38,6 +39,9 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         container.Add(BuildHitVfxFoldout(panel, prefabsProperty));
         container.Add(BuildSpawnVfxFoldout(panel, prefabsProperty));
         container.Add(BuildDeathVfxFoldout(panel, prefabsProperty));
+        container.Add(EnemyVisualPresetsPanelDeathPuddleSectionUtility.Build(panel,
+                                                                             deathPuddleProperty,
+                                                                             prefabsProperty));
         container.Add(BuildPaintMetadataFoldout(panel, prefabsProperty));
         return container;
     }
@@ -315,38 +319,16 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
                                                    VisualElement detailsContainer,
                                                    SerializedProperty prefabsProperty)
     {
-        SerializedProperty useEnemyBaseColorProperty = prefabsProperty.FindPropertyRelative("useEnemyBaseColorForDeathDebris");
         SerializedProperty childNameProperty = prefabsProperty.FindPropertyRelative("deathDebrisParticleChildName");
-        VisualElement fallbackColorContainer = new VisualElement();
-
-        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                detailsContainer,
-                                                                prefabsProperty,
-                                                                "useEnemyBaseColorForDeathDebris",
-                                                                "Use Enemy Visual Palette For Death Debris",
-                                                                "When enabled, death debris particles use a compact palette sampled from this enemy prefab's visible body renderers at bake time.");
-        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
-                                                                fallbackColorContainer,
-                                                                prefabsProperty,
-                                                                "deathDebrisFallbackColor",
-                                                                "Death Debris Fallback Color",
-                                                                "Fallback debris particle color used when visual palette extraction is disabled or no usable enemy body color can be sampled.");
+        EnemyVisualPresetsPanelPaletteControlsUtility.AddDeathPaletteControls(panel,
+                                                                              detailsContainer,
+                                                                              prefabsProperty);
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 detailsContainer,
                                                                 prefabsProperty,
                                                                 "deathDebrisParticleChildName",
                                                                 "Death Debris Particle Child Name",
                                                                 "Particle-system child object name that receives the death debris color override.");
-        detailsContainer.Add(fallbackColorContainer);
-        RefreshDeathDebrisFallbackVisibility(useEnemyBaseColorProperty, fallbackColorContainer);
-
-        if (useEnemyBaseColorProperty != null)
-        {
-            detailsContainer.TrackPropertyValue(useEnemyBaseColorProperty, changedProperty =>
-            {
-                RefreshDeathDebrisFallbackVisibility(changedProperty, fallbackColorContainer);
-            });
-        }
 
         if (childNameProperty == null)
             return;
@@ -358,21 +340,6 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         {
             RefreshDeathDebrisChildNameWarning(changedProperty, childNameWarning);
         });
-    }
-
-    /// <summary>
-    /// Shows fallback color only when renderer-derived debris color is disabled.
-    /// </summary>
-    /// <param name="useEnemyBaseColorProperty">Boolean property controlling renderer-derived debris colors.</param>
-    /// <param name="fallbackColorContainer">Container holding fallback color controls.</param>
-    private static void RefreshDeathDebrisFallbackVisibility(SerializedProperty useEnemyBaseColorProperty,
-                                                             VisualElement fallbackColorContainer)
-    {
-        if (fallbackColorContainer == null)
-            return;
-
-        bool usesEnemyBaseColor = useEnemyBaseColorProperty != null && useEnemyBaseColorProperty.boolValue;
-        fallbackColorContainer.style.display = usesEnemyBaseColor ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     /// <summary>

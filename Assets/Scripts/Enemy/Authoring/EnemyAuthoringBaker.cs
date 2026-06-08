@@ -277,6 +277,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                deathVfxPrefabEntity,
                                authoring.DeathVfxPrefab);
 
+        Entity deathPuddlePrefabEntity = ResolveDeathPuddlePrefabEntity(authoring);
+        AddComponent(entity, EnemyVisualFeedbackBakeUtility.BuildDeathPuddleConfig(authoring.DeathPuddleSettings,
+                                                                                    deathPuddlePrefabEntity,
+                                                                                    in deathDebrisPalette));
+
         AddComponent(entity, BuildProjectileOffscreenWarningConfig(authoring));
         TryBakeProjectileOffscreenWarningManagedConfig(authoring, entity);
 
@@ -292,6 +297,15 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             RemainingSeconds = 0f,
             AppliedBlend = 0f
         });
+        AddComponent(entity, EnemyVisualFeedbackBakeUtility.BuildElasticHitConfig(authoring.ElasticHitSettings));
+        AddComponent(entity, new EnemyElasticHitState
+        {
+            RemainingSeconds = 0f,
+            LastTriggerTime = -1000f,
+            DirectionWorld = new float3(0f, 0f, 1f)
+        });
+        AddComponent<EnemyElasticHitActive>(entity);
+        SetComponentEnabled<EnemyElasticHitActive>(entity, false);
         AddComponent(entity, new EnemyVisualFlashPresentationState
         {
             AppliedBlend = 0f,
@@ -1576,6 +1590,40 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return Entity.Null;
 
         return ResolveRuntimeVfxPrefabEntity(authoring, authoring.DeathVfxPrefab, "enemy death VFX");
+    }
+
+    /// <summary>
+    /// Resolves the optional custom or shared standard death puddle prefab into an ECS prefab entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <returns>Resolved puddle prefab entity, or Entity.Null when death puddles are disabled or no valid prefab exists.</returns>
+    private Entity ResolveDeathPuddlePrefabEntity(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return Entity.Null;
+
+        EnemyVisualDeathPuddleSettings settings = authoring.DeathPuddleSettings;
+
+        if (settings == null || !settings.Enabled)
+            return Entity.Null;
+
+        GameObject puddlePrefab = settings.PuddlePrefab;
+
+        if (puddlePrefab == null)
+            puddlePrefab = Resources.Load<GameObject>("PF_EnemyDeathPuddle");
+
+        if (puddlePrefab != null && puddlePrefab.GetComponent<EnemyDeathPuddlePrefabAuthoring>() == null)
+        {
+#if UNITY_EDITOR
+            Debug.LogWarning(string.Format("[EnemyAuthoringBaker] Invalid enemy death puddle prefab '{0}' on '{1}'. The prefab root must contain EnemyDeathPuddlePrefabAuthoring.",
+                                           puddlePrefab.name,
+                                           authoring.name),
+                             authoring);
+#endif
+            return Entity.Null;
+        }
+
+        return ResolveRuntimeVfxPrefabEntity(authoring, puddlePrefab, "enemy death puddle");
     }
 
     /// <summary>

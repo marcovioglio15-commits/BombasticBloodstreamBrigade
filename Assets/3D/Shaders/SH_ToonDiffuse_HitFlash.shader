@@ -14,6 +14,9 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
         _ShadowRangeMax("Shadow Range Max", Range(-2,2)) = -0.4
         _HitFlashColor("Hit Flash Color", Color) = (1,0.15,0.15,1)
         _HitFlashBlend("Hit Flash Blend", Range(0,1)) = 0
+        [HideInInspector] _ElasticHitDirection("Runtime Elastic Hit Direction", Vector) = (0,0,1,0)
+        [HideInInspector] _ElasticHitTiming("Runtime Elastic Hit Timing", Vector) = (0,0,0,0)
+        [HideInInspector] _ElasticHitMotion("Runtime Elastic Hit Motion", Vector) = (0,0,0,0)
         _OutlineThickness("Outline Thickness", Range(0,10)) = 1
         _OutlineColor("Outline Color", Color) = (0,0,0,1)
     }
@@ -38,6 +41,7 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
 
             #include "UnityCG.cginc"
             #include "Lighting.cginc"
+            #include "Assets/3D/Shaders/Includes/SH_EnemyElasticHitDeformation.hlsl"
 
             struct appdata
             {
@@ -74,6 +78,9 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             float _ShadowRangeMax;
             float4 _HitFlashColor;
             float _HitFlashBlend;
+            float4 _ElasticHitDirection;
+            float4 _ElasticHitTiming;
+            float4 _ElasticHitMotion;
             float4 _OutlineColor;
             float _OutlineThickness;
 
@@ -89,6 +96,15 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             v2f vert(appdata inputValue)
             {
                 v2f outputValue;
+                float3 positionOS = inputValue.vertex.xyz;
+                float3 normalOS = inputValue.normal;
+                ApplyEnemyElasticHitDeformation(positionOS,
+                                                normalOS,
+                                                UnityWorldToObjectDir(_ElasticHitDirection.xyz),
+                                                _ElasticHitTiming,
+                                                _ElasticHitMotion);
+                inputValue.vertex.xyz = positionOS;
+                inputValue.normal = normalOS;
                 outputValue.vertex = UnityObjectToClipPos(inputValue.vertex);
                 outputValue.uv = TRANSFORM_TEX(inputValue.uv, _MainTex);
                 outputValue.normal = normalize(UnityObjectToWorldNormal(inputValue.normal));
@@ -154,6 +170,7 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             #pragma fragment OutlineFragment
 
             #include "UnityCG.cginc"
+            #include "Assets/3D/Shaders/Includes/SH_EnemyElasticHitDeformation.hlsl"
 
             struct OutlineAppData
             {
@@ -168,10 +185,22 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
 
             float4 _OutlineColor;
             float _OutlineThickness;
+            float4 _ElasticHitDirection;
+            float4 _ElasticHitTiming;
+            float4 _ElasticHitMotion;
 
             OutlineVaryings OutlineVertex(OutlineAppData inputValue)
             {
                 OutlineVaryings outputValue;
+                float3 positionOS = inputValue.vertex.xyz;
+                float3 normalOS = inputValue.normal;
+                ApplyEnemyElasticHitDeformation(positionOS,
+                                                normalOS,
+                                                UnityWorldToObjectDir(_ElasticHitDirection.xyz),
+                                                _ElasticHitTiming,
+                                                _ElasticHitMotion);
+                inputValue.vertex.xyz = positionOS;
+                inputValue.normal = normalOS;
                 float outlineThickness = _OutlineThickness / 250.0;
                 float3 normalDirection = normalize(inputValue.normal);
                 float4 extrudedPosition = inputValue.vertex + float4(normalDirection * outlineThickness, 0.0);

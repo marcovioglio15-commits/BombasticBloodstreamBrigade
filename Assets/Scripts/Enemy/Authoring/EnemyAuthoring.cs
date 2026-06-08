@@ -839,6 +839,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public EnemyVisualDeathPuddleSettings DeathPuddleSettings
+    {
+        get
+        {
+            EnemyVisualPreset resolvedVisualPreset = EnemyAuthoringPresetResolverUtility.ResolveVisualPreset(masterPreset, visualPreset);
+
+            if (resolvedVisualPreset == null)
+                return null;
+
+            return resolvedVisualPreset.DeathPuddle;
+        }
+    }
+
     public bool EnableOutline
     {
         get
@@ -1190,6 +1203,19 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public EnemyVisualElasticHitSettings ElasticHitSettings
+    {
+        get
+        {
+            EnemyVisualPreset resolvedVisualPreset = EnemyAuthoringPresetResolverUtility.ResolveVisualPreset(masterPreset, visualPreset);
+
+            if (resolvedVisualPreset == null)
+                return null;
+
+            return resolvedVisualPreset.ElasticHit;
+        }
+    }
+
     public EnemyOffensiveEngagementFeedbackSettings OffensiveEngagementFeedbackSettings
     {
         get
@@ -1283,6 +1309,8 @@ public sealed class EnemyAuthoring : MonoBehaviour
     /// </summary>
     private void OnDrawGizmosSelected()
     {
+        DrawDeathPuddleGizmo();
+
         // Resolve world position from the same local hit-center offset used by baking. The shadow source
         // is the contact damage radius, not the body radius used for enemy-vs-enemy steering.
         Transform selfTransform = transform;
@@ -1328,6 +1356,41 @@ public sealed class EnemyAuthoring : MonoBehaviour
         float shieldOuter = shieldInner + ringThickness;
         Gizmos.color = new Color(0.25f, 0.85f, 1f, 0.85f);
         DrawRingArcGizmo(origin, shieldInner, shieldOuter, ringArcDegrees, ringArcCenterAngleRadians);
+    }
+
+    /// <summary>
+    /// Draws initial and final Death Puddle footprints using authored settings without sampling renderer colors.
+    /// </summary>
+    private void DrawDeathPuddleGizmo()
+    {
+        EnemyVisualDeathPuddleSettings settings = DeathPuddleSettings;
+
+        if (settings == null || !settings.Enabled)
+            return;
+
+        Vector3 origin = transform.position + Vector3.up * settings.GroundOffset;
+        float radiusX;
+        float radiusZ;
+
+        switch (settings.SizeMode)
+        {
+            case EnemyDeathPuddleSizeMode.FixedWorldSize:
+                radiusX = math.max(0.001f, settings.FixedWorldSize.x * 0.5f);
+                radiusZ = math.max(0.001f, settings.FixedWorldSize.y * 0.5f);
+                break;
+
+            default:
+                radiusX = math.max(0.001f, BodyRadiusX * settings.FootprintScaleMultiplier);
+                radiusZ = math.max(0.001f, BodyRadiusZ * settings.FootprintScaleMultiplier);
+                break;
+        }
+
+        Gizmos.color = new Color(0.35f, 0.95f, 0.55f, 0.8f);
+        DrawEllipseGizmo(origin, radiusX, radiusZ);
+        Gizmos.color = new Color(0.35f, 0.95f, 0.55f, 0.35f);
+        DrawEllipseGizmo(origin,
+                         radiusX * math.saturate(settings.FinalScaleRatio),
+                         radiusZ * math.saturate(settings.FinalScaleRatio));
     }
 
     /// <summary>

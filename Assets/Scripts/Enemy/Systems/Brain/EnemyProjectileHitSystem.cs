@@ -34,6 +34,10 @@ public partial struct EnemyProjectileHitSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Creates cached enemy and projectile queries required by the spatial hit-resolution pass.
+    /// </summary>
+    /// <param name="state">Mutable system state used to build and require runtime queries.</param>
     public void OnCreate(ref SystemState state)
     {
         enemyQuery = SystemAPI.QueryBuilder()
@@ -49,6 +53,10 @@ public partial struct EnemyProjectileHitSystem : ISystem
         state.RequireForUpdate(projectileQuery);
     }
 
+    /// <summary>
+    /// Resolves projectile overlaps, applies projected damage and payloads, then commits enemy feedback once per frame.
+    /// </summary>
+    /// <param name="state">Mutable system state used to read and commit projectile hit results.</param>
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
@@ -164,6 +172,9 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
         NativeArray<EnemyHealth> projectedEnemyHealth = CollectionHelper.CreateNativeArray<EnemyHealth>(enemyHealthArray, frameAllocator);
         NativeArray<EnemyKnockbackState> projectedEnemyKnockback = CollectionHelper.CreateNativeArray<EnemyKnockbackState>(enemyKnockbackArray, frameAllocator);
+        NativeArray<float3> enemyElasticHitDirections = CollectionHelper.CreateNativeArray<float3>(enemyCount,
+                                                                                                   frameAllocator,
+                                                                                                   NativeArrayOptions.ClearMemory);
         BufferLookup<ProjectilePoolElement> projectilePoolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
         BufferLookup<ShootRequest> shootRequestLookup = SystemAPI.GetBufferLookup<ShootRequest>(false);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
@@ -284,6 +295,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          enemyRuntimeArray,
                                          enemyDataArray,
                                          ref projectedEnemyKnockback,
+                                         ref enemyElasticHitDirections,
                                          in elementalVfxConfigLookup,
                                          in elementalVfxAnchorLookup,
                                          in enemyHitVfxConfigLookup,
@@ -323,6 +335,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          enemyRuntimeArray,
                                          enemyDataArray,
                                          ref projectedEnemyKnockback,
+                                         ref enemyElasticHitDirections,
                                          in elementalVfxConfigLookup,
                                          in elementalVfxAnchorLookup,
                                          in enemyHitVfxConfigLookup,
@@ -371,6 +384,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          enemyRuntimeArray,
                                          enemyDataArray,
                                          ref projectedEnemyKnockback,
+                                         ref enemyElasticHitDirections,
                                          in elementalVfxConfigLookup,
                                          in elementalVfxAnchorLookup,
                                          in enemyHitVfxConfigLookup,
@@ -422,6 +436,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          enemyRuntimeArray,
                                          enemyDataArray,
                                          ref projectedEnemyKnockback,
+                                         ref enemyElasticHitDirections,
                                          in elementalVfxConfigLookup,
                                          in elementalVfxAnchorLookup,
                                          in enemyHitVfxConfigLookup,
@@ -513,6 +528,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
             entityManager.SetComponentData(enemyEntity, enemyRuntimeState);
             entityManager.SetComponentData(enemyEntity, enemyHealth);
             DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+            EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                                  enemyEntity,
+                                                  in enemyHealth,
+                                                  enemyElasticHitDirections[enemyIndex],
+                                                  true);
 
             if (enemyHealth.Current <= 0f)
             {
@@ -742,6 +762,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
     /// <param name="enemyRuntimeArray">Active enemy runtime state array.</param>
     /// <param name="enemyDataArray">Active enemy immutable data array.</param>
     /// <param name="projectedEnemyKnockback">Mutable projected knockback state array.</param>
+    /// <param name="enemyElasticHitDirections">Mutable last direct impact direction per enemy.</param>
     /// <param name="elementalVfxConfigLookup">Lookup used to resolve player elemental VFX configuration.</param>
     /// <param name="elementalVfxAnchorLookup">Lookup used to resolve enemy elemental VFX anchors.</param>
     /// <param name="enemyHitVfxConfigLookup">Lookup used to resolve enemy hit VFX configuration.</param>
@@ -759,6 +780,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          NativeArray<EnemyRuntimeState> enemyRuntimeArray,
                                          NativeArray<EnemyData> enemyDataArray,
                                          ref NativeArray<EnemyKnockbackState> projectedEnemyKnockback,
+                                         ref NativeArray<float3> enemyElasticHitDirections,
                                          in ComponentLookup<PlayerElementalVfxConfig> elementalVfxConfigLookup,
                                          in ComponentLookup<EnemyElementalVfxAnchor> elementalVfxAnchorLookup,
                                          in ComponentLookup<EnemyHitVfxConfig> enemyHitVfxConfigLookup,
@@ -768,6 +790,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                          ref BufferLookup<EnemyElementStackElement> elementalStackLookup)
     {
         float3 impactPosition = enemyPositions[enemyIndex];
+        enemyElasticHitDirections[enemyIndex] = impactPosition - projectileTransform.Position;
         EnemyHitPayloadRuntimeUtility.ApplyEnemyHitPayloads(enemyIndex,
                                                             shooterEntity,
                                                             impactPosition,

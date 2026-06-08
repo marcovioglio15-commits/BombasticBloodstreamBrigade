@@ -1,4 +1,4 @@
-Shader "Hidden/NashCore/PlayerImpactFrame"
+Shader "Hidden/BombasticBloodstreamBrigade/PlayerImpactFrame"
 {
     Properties
     {

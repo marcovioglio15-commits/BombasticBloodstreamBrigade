@@ -81,7 +81,8 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
                                  enemyEntity,
                                  ref mutableEnemyHealth,
                                  ref mutableEnemyRuntimeState,
-                                 instance.Config.ContactDamage);
+                                 instance.Config.ContactDamage,
+                                 enemyTransform.ValueRO.Position - projectionTransform.ValueRO.Position);
 
                 enemyHealth.ValueRW = mutableEnemyHealth;
                 enemyRuntimeState.ValueRW = mutableEnemyRuntimeState;
@@ -126,12 +127,14 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
     /// <param name="enemyHealth">Mutable enemy health.</param>
     /// <param name="enemyRuntimeState">Mutable enemy runtime state used for combo timing.</param>
     /// <param name="damage">Flat damage amount applied to shield then health.</param>
+    /// <param name="impactDirectionWorld">World-space direction from the projection toward the enemy.</param>
     private static void ApplyEnemyDamage(EntityManager entityManager,
                                          ref EntityCommandBuffer commandBuffer,
                                          Entity enemyEntity,
                                          ref EnemyHealth enemyHealth,
                                          ref EnemyRuntimeState enemyRuntimeState,
-                                         float damage)
+                                         float damage,
+                                         float3 impactDirectionWorld)
     {
         if (enemyHealth.Current <= 0f)
             return;
@@ -141,6 +144,11 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
 
         EnemyExtraComboPointsRuntimeUtility.MarkEnemyDamaged(ref enemyRuntimeState);
         DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+        EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                              enemyEntity,
+                                              in enemyHealth,
+                                              impactDirectionWorld,
+                                              true);
 
         if (enemyHealth.Current > 0f)
             return;

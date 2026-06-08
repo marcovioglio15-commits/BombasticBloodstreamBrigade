@@ -156,7 +156,7 @@ public readonly struct PlayerImpactFramePresentationSnapshot
 internal static class PlayerImpactFramePresentationRuntime
 {
     #region Constants
-    private const string ShaderName = "Hidden/NashCore/PlayerImpactFrame";
+    private const string ShaderName = "Hidden/BombasticBloodstreamBrigade/PlayerImpactFrame";
     private const float ComparisonEpsilon = 0.0001f;
     #endregion
 

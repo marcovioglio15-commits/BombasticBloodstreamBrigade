@@ -57,7 +57,10 @@ public partial struct EnemyKilledEventsSystem : ISystem
         BufferLookup<EnemyExtraComboPointsConditionElement> extraComboPointsConditionLookup = SystemAPI.GetBufferLookup<EnemyExtraComboPointsConditionElement>(true);
         BufferLookup<EnemyDropItemsModuleSelectionElement> dropItemsSelectionModuleLookup = SystemAPI.GetBufferLookup<EnemyDropItemsModuleSelectionElement>(true);
         ComponentLookup<EnemyDeathVfxConfig> deathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyDeathVfxConfig>(true);
+        ComponentLookup<EnemyDeathPuddleConfig> deathPuddleConfigLookup = SystemAPI.GetComponentLookup<EnemyDeathPuddleConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
+        DynamicBuffer<EnemyDeathPuddleSpawnRequest> deathPuddleRequests = default;
+        bool canQueueDeathPuddles = SystemAPI.TryGetSingletonBuffer(out deathPuddleRequests);
 
         foreach ((RefRO<EnemyDespawnRequest> despawnRequest,
                   RefRO<EnemyData> enemyData,
@@ -91,6 +94,13 @@ public partial struct EnemyKilledEventsSystem : ISystem
                           killedEventPosition,
                           in deathVfxConfigLookup,
                           vfxRequestLookup);
+            QueueDeathPuddle(enemyEntity,
+                             enemyTransform.ValueRO.Position,
+                             in enemyData.ValueRO,
+                             killedEventIndex,
+                             in deathPuddleConfigLookup,
+                             canQueueDeathPuddles,
+                             deathPuddleRequests);
         }
     }
 
@@ -156,6 +166,78 @@ public partial struct EnemyKilledEventsSystem : ISystem
             ColorOverrideCount = config.DebrisColorCount,
             ColorOverrideChildName = config.DebrisParticleChildName
         });
+    }
+
+    /// <summary>
+    /// Queues one detached render-only puddle from a confirmed killed enemy before pooled despawn clears its data.
+    /// </summary>
+    /// <param name="enemyEntity">Killed enemy entity used to build a deterministic instance seed.</param>
+    /// <param name="enemyPosition">Ground-level enemy transform position captured before recycle.</param>
+    /// <param name="enemyData">Enemy footprint data used by footprint-relative puddle sizing.</param>
+    /// <param name="killedEventIndex">Current-frame killed event index used to diversify deterministic seeds.</param>
+    /// <param name="configLookup">Lookup containing optional baked puddle configs.</param>
+    /// <param name="canQueueDeathPuddles">True when the global request buffer exists.</param>
+    /// <param name="requests">Global request buffer receiving the resolved puddle instance.</param>
+    private static void QueueDeathPuddle(Entity enemyEntity,
+                                         float3 enemyPosition,
+                                         in EnemyData enemyData,
+                                         int killedEventIndex,
+                                         in ComponentLookup<EnemyDeathPuddleConfig> configLookup,
+                                         bool canQueueDeathPuddles,
+                                         DynamicBuffer<EnemyDeathPuddleSpawnRequest> requests)
+    {
+        if (!canQueueDeathPuddles || !configLookup.HasComponent(enemyEntity))
+            return;
+
+        EnemyDeathPuddleConfig config = configLookup[enemyEntity];
+
+        if (config.Enabled == 0 || config.PrefabEntity == Entity.Null)
+            return;
+
+        uint seed = math.hash(new uint3((uint)enemyEntity.Index,
+                                        (uint)enemyEntity.Version,
+                                        (uint)math.max(1, killedEventIndex + 1)));
+        float variation = 1f + (HashToSignedUnitFloat(seed) * config.RandomSizeVariation);
+        float2 worldSize = config.SizeMode == EnemyDeathPuddleSizeMode.FixedWorldSize
+            ? config.FixedWorldSize
+            : new float2(math.max(0.05f, enemyData.BodyRadiusX) * 2f,
+                         math.max(0.05f, enemyData.BodyRadiusZ) * 2f) * config.FootprintScaleMultiplier;
+        float3 spawnPosition = enemyPosition;
+        spawnPosition.y += config.GroundOffset;
+
+        requests.Add(new EnemyDeathPuddleSpawnRequest
+        {
+            PrefabEntity = config.PrefabEntity,
+            Position = spawnPosition,
+            WorldSize = math.max(new float2(0.05f, 0.05f), worldSize * math.max(0.01f, variation)),
+            LifetimeSeconds = config.LifetimeSeconds,
+            StableFraction = config.StableFraction,
+            FinalScaleRatio = config.FinalScaleRatio,
+            EdgeIrregularity = config.EdgeIrregularity,
+            BorderWidth = config.BorderWidth,
+            EdgeFeather = config.EdgeFeather,
+            SecondaryPaletteBlend = config.SecondaryPaletteBlend,
+            FlowSpeed = config.FlowSpeed,
+            Viscosity = config.Viscosity,
+            SurfaceDistortion = config.SurfaceDistortion,
+            HighlightStrength = config.HighlightStrength,
+            PrimaryColor = config.PrimaryColor,
+            SecondaryColor = config.SecondaryColor,
+            Seed = seed,
+            EvaporationCurve = config.EvaporationCurve,
+            RandomRotation = config.RandomRotation
+        });
+    }
+
+    /// <summary>
+    /// Converts a deterministic uint seed into a signed normalized variation.
+    /// </summary>
+    /// <param name="seed">Source deterministic seed.</param>
+    /// <returns>Signed normalized value in the [-1, 1] range.</returns>
+    private static float HashToSignedUnitFloat(uint seed)
+    {
+        uint hashedValue = math.hash(new uint2(seed, 0xC2B2AE35u)) & 0x00FFFFFFu;
+        return (hashedValue / 16777215f) * 2f - 1f;
     }
 
     /// <summary>

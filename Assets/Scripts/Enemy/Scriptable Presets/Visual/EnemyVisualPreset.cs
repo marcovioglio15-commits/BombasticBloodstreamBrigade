@@ -31,6 +31,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [Tooltip("Damage feedback settings block.")]
     [SerializeField] private EnemyVisualDamageFeedbackSettings damageFeedback = new EnemyVisualDamageFeedbackSettings();
 
+    [Tooltip("Shader-driven non-lethal elastic hit deformation settings block.")]
+    [SerializeField] private EnemyVisualElasticHitSettings elasticHit = new EnemyVisualElasticHitSettings();
+
     [Tooltip("Outline settings block.")]
     [SerializeField] private EnemyVisualOutlineSettings outline = new EnemyVisualOutlineSettings();
 
@@ -46,6 +49,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
 
     [Tooltip("Prefab and paint metadata block.")]
     [SerializeField] private EnemyVisualPrefabSettings prefabs = new EnemyVisualPrefabSettings();
+
+    [Tooltip("Pooled ECS render-only death puddle settings block.")]
+    [SerializeField] private EnemyVisualDeathPuddleSettings deathPuddle = new EnemyVisualDeathPuddleSettings();
 
     [Tooltip("Enemy-type overrides for spawner-dependent spawn offset and spawn warning settings.")]
     [SerializeField] private EnemyVisualSpawnOverridesSettings spawnOverrides = new EnemyVisualSpawnOverridesSettings();
@@ -116,11 +122,27 @@ public sealed class EnemyVisualPreset : ScriptableObject
         }
     }
 
+    public EnemyVisualElasticHitSettings ElasticHit
+    {
+        get
+        {
+            return elasticHit;
+        }
+    }
+
     public EnemyVisualOutlineSettings Outline
     {
         get
         {
             return outline;
+        }
+    }
+
+    public EnemyVisualDeathPuddleSettings DeathPuddle
+    {
+        get
+        {
+            return deathPuddle;
         }
     }
 
@@ -190,6 +212,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
         if (damageFeedback == null)
             damageFeedback = new EnemyVisualDamageFeedbackSettings();
 
+        if (elasticHit == null)
+            elasticHit = new EnemyVisualElasticHitSettings();
+
         if (outline == null)
             outline = new EnemyVisualOutlineSettings();
 
@@ -205,6 +230,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
         if (prefabs == null)
             prefabs = new EnemyVisualPrefabSettings();
 
+        if (deathPuddle == null)
+            deathPuddle = new EnemyVisualDeathPuddleSettings();
+
         if (spawnOverrides == null)
             spawnOverrides = new EnemyVisualSpawnOverridesSettings();
 
@@ -216,11 +244,13 @@ public sealed class EnemyVisualPreset : ScriptableObject
 
         visibility.Validate();
         damageFeedback.Validate();
+        elasticHit.Validate();
         outline.Validate();
         footprint.Validate();
         offensiveEngagementFeedback.Validate();
         bossPatternChangeFeedback.Validate();
         prefabs.Validate();
+        deathPuddle.Validate();
         spawnOverrides.Validate();
         projectileOffscreenWarning.Validate();
         bossUi.Validate();

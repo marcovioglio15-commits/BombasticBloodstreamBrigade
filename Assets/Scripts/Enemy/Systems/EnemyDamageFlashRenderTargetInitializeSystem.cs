@@ -76,6 +76,9 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
                                                                             renderTarget.Value,
                                                                             outlineColor,
                                                                             outlineThickness);
+                    EnemyElasticHitRenderUtility.EnsureGpuComponents(entityManager,
+                                                                     entityCommandBuffer,
+                                                                     renderTarget.Value);
                 }
 
                 entityCommandBuffer.AddComponent<EnemyDamageFlashRenderTargetsInitialized>(enemyEntity);

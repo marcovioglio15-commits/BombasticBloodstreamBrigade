@@ -376,6 +376,8 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         AddPropertyField(panel, container, damageFeedbackProperty, "flashColor", "Flash Color", "Tint color applied during the brief damage flash.");
         AddPropertyField(panel, container, damageFeedbackProperty, "flashDurationSeconds", "Flash Duration Seconds", "Flash duration in seconds. Use very small values for a 1-3 frame reaction.");
         AddPropertyField(panel, container, damageFeedbackProperty, "flashMaximumBlend", "Flash Maximum Blend", "Maximum overlay strength reached immediately after a valid hit.");
+        container.Add(EnemyVisualPresetsPanelElasticHitSectionUtility.Build(panel,
+                                                                            panel.PresetSerializedObject.FindProperty("elasticHit")));
         return container;
     }
 

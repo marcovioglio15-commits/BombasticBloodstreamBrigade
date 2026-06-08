@@ -27,6 +27,18 @@ MonoBehaviour:
     flashColor: {r: 0.8666667, g: 0.57254905, b: 0.16862746, a: 1}
     flashDurationSeconds: 0.3
     flashMaximumBlend: 0.8
+  elasticHit:
+    enabled: 1
+    triggerMode: 1
+    durationSeconds: 0.7
+    maximumCompression: 0.5
+    volumeCompensation: 0.75
+    oscillationCount: 1.25
+    damping: 5.5
+    directionality: 0.85
+    anchorToGround: 1
+    minimumRetriggerInterval: 0.035
+    retriggerMode: 0
   outline:
     enableOutline: 1
     outlineThickness: 6
@@ -102,6 +114,27 @@ MonoBehaviour:
     deathDebrisFallbackColor: {r: 0.49019608, g: 0, b: 0.92156863, a: 1}
     deathDebrisParticleChildName: VFX_Debris
     spawnPaintColor: {r: 0.49019608, g: 0, b: 0.92156863, a: 1}
+  deathPuddle:
+    enabled: 1
+    puddlePrefab: {fileID: 4595589246624639381, guid: 18aab18312155164faf7c073936073d5, type: 3}
+    lifetimeSeconds: 4
+    stableFraction: 0.2
+    finalScaleRatio: 0.08
+    evaporationCurve: 0
+    sizeMode: 0
+    footprintScaleMultiplier: 1.1
+    fixedWorldSize: {x: 1, y: 1}
+    randomSizeVariation: 0.12
+    randomRotation: 1
+    groundOffset: 0.012
+    edgeIrregularity: 1
+    borderWidth: 0.1
+    edgeFeather: 0.04
+    secondaryPaletteBlend: 0.55
+    flowSpeed: 3
+    viscosity: 1
+    surfaceDistortion: 0.35
+    highlightStrength: 1
   spawnOverrides:
     overrideSpawnOffset: 1
     spawnOffset: {x: 0, y: 1, z: 0}

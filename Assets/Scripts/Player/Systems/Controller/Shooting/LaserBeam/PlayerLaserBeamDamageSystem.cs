@@ -362,7 +362,15 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
             if (enemyDirtyFlags[enemyIndex] == 0)
             {
                 if (enemyFlashDirtyFlags[enemyIndex] != 0)
+                {
+                    EnemyHealth projectedHealthForFeedback = projectedEnemyHealth[enemyIndex];
                     DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+                    EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                                          enemyEntity,
+                                                          in projectedHealthForFeedback,
+                                                          projectedEnemyKnockback[enemyIndex].Velocity,
+                                                          true);
+                }
 
                 continue;
             }
@@ -371,12 +379,20 @@ public partial struct PlayerLaserBeamDamageSystem : ISystem
                 GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerLaserImpact, enemyTransforms[enemyIndex].Position);
 
             EnemyRuntimeState enemyRuntimeState = enemyRuntimeArray[enemyIndex];
+            EnemyHealth projectedHealthForDamage = projectedEnemyHealth[enemyIndex];
             EnemyExtraComboPointsRuntimeUtility.MarkEnemyDamaged(ref enemyRuntimeState);
             entityManager.SetComponentData(enemyEntity, enemyRuntimeState);
-            entityManager.SetComponentData(enemyEntity, projectedEnemyHealth[enemyIndex]);
+            entityManager.SetComponentData(enemyEntity, projectedHealthForDamage);
 
             if (enemyFlashDirtyFlags[enemyIndex] != 0)
+            {
                 DamageFlashRuntimeUtility.Trigger(entityManager, enemyEntity);
+                EnemyElasticHitRuntimeUtility.Trigger(entityManager,
+                                                      enemyEntity,
+                                                      in projectedHealthForDamage,
+                                                      projectedEnemyKnockback[enemyIndex].Velocity,
+                                                      true);
+            }
         }
 
         commandBuffer.Playback(entityManager);

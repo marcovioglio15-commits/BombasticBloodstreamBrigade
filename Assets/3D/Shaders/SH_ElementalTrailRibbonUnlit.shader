@@ -1,4 +1,4 @@
-Shader "NashCore/VFX/Elemental Trail Ribbon Unlit"
+Shader "BombasticBloodstreamBrigade/VFX/Elemental Trail Ribbon Unlit"
 {
     Properties
     {
