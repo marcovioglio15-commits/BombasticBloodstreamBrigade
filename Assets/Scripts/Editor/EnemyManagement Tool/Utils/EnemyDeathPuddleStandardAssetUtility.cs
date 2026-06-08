@@ -19,7 +19,7 @@ public static class EnemyDeathPuddleStandardAssetUtility
     /// <summary>
     /// Rebuilds the shared death puddle assets while preserving the material asset identity when it already exists.
     /// </summary>
-    [MenuItem("Tools/Enemy Management/Rebuild Standard Death Puddle Assets")]
+    //[MenuItem("Tools/Enemy Management/Rebuild Standard Death Puddle Assets")]
     public static void BuildStandardAssets()
     {
         Shader shader = Shader.Find(ShaderName);

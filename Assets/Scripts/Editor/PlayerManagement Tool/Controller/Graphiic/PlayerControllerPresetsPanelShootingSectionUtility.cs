@@ -32,6 +32,7 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
         SerializedProperty projectilePrefabProperty = shootingProperty.FindPropertyRelative("projectilePrefab");
         SerializedProperty shootOffsetProperty = shootingProperty.FindPropertyRelative("shootOffset");
         SerializedProperty valuesProperty = shootingProperty.FindPropertyRelative("values");
+        SerializedProperty conditionalWeaponSwitchesProperty = shootingProperty.FindPropertyRelative("conditionalWeaponSwitches");
         SerializedProperty initialPoolCapacityProperty = shootingProperty.FindPropertyRelative("initialPoolCapacity");
         SerializedProperty poolExpandBatchProperty = shootingProperty.FindPropertyRelative("poolExpandBatch");
         SerializedProperty scalingRulesProperty = panel.PresetSerializedObject.FindProperty("scalingRules");
@@ -63,6 +64,7 @@ internal static class PlayerControllerPresetsPanelShootingSectionUtility
                                                                                                 InputActionSelectionElement.SelectionMode.Shooting);
         section.Add(bindingsFoldout);
         section.Add(BuildValuesFoldout(valuesProperty, scalingRulesProperty));
+        section.Add(PlayerControllerPresetsPanelConditionalWeaponSwitchSectionUtility.Build(conditionalWeaponSwitchesProperty, scalingRulesProperty));
         section.Add(PlayerControllerPresetsPanelElementBulletSectionUtility.BuildElementBulletSettingsFoldout(valuesProperty, scalingRulesProperty));
         section.Add(BuildObjectPoolFoldout(initialPoolCapacityProperty, poolExpandBatchProperty, scalingRulesProperty));
     }

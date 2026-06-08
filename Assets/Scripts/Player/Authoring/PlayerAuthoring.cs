@@ -590,6 +590,35 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #if UNITY_EDITOR
         PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(sourceVisualPreset, weaponVisualScalingBuffer);
 #endif
+
+        // Conditional weapon switches authored in the controller preset are baked into a dedicated ECS table.
+        // The dedicated system evaluates the table against the player's scalable stats and writes the winning
+        // entry into PlayerConditionalWeaponSwitchState so the animator presentation pipeline can override the
+        // equipped Switch Weapon power-up when an authored entry opts in.
+        PlayerConditionalWeaponSwitchSettings conditionalWeaponSwitchSettings = controllerPreset != null && controllerPreset.ShootingSettings != null
+            ? controllerPreset.ShootingSettings.ConditionalWeaponSwitches
+            : null;
+        PlayerConditionalWeaponSwitchSettings sourceConditionalWeaponSwitchSettings = sourceControllerPreset != null &&
+                                                                                       sourceControllerPreset.ShootingSettings != null
+            ? sourceControllerPreset.ShootingSettings.ConditionalWeaponSwitches
+            : null;
+        AddComponent(entity, PlayerConditionalWeaponSwitchBakeUtility.BuildConfig(conditionalWeaponSwitchSettings));
+        AddComponent(entity, PlayerConditionalWeaponSwitchBakeUtility.BuildInitialState());
+        AddComponent(entity, new PlayerConditionalWeaponSwitchScalingState());
+        DynamicBuffer<PlayerConditionalWeaponSwitchEntryElement> conditionalEntryBuffer = AddBuffer<PlayerConditionalWeaponSwitchEntryElement>(entity);
+        DynamicBuffer<PlayerConditionalWeaponSwitchConditionElement> conditionalConditionBuffer = AddBuffer<PlayerConditionalWeaponSwitchConditionElement>(entity);
+        DynamicBuffer<PlayerBaseConditionalWeaponSwitchEntryElement> baseConditionalEntryBuffer = AddBuffer<PlayerBaseConditionalWeaponSwitchEntryElement>(entity);
+        DynamicBuffer<PlayerBaseConditionalWeaponSwitchConditionElement> baseConditionalConditionBuffer = AddBuffer<PlayerBaseConditionalWeaponSwitchConditionElement>(entity);
+        DynamicBuffer<PlayerRuntimeConditionalWeaponSwitchScalingElement> conditionalScalingBuffer = AddBuffer<PlayerRuntimeConditionalWeaponSwitchScalingElement>(entity);
+        PlayerConditionalWeaponSwitchBakeUtility.PopulateBuffers(conditionalWeaponSwitchSettings,
+                                                                  conditionalEntryBuffer,
+                                                                  conditionalConditionBuffer);
+        PlayerConditionalWeaponSwitchBakeUtility.PopulateBaseBuffers(sourceConditionalWeaponSwitchSettings,
+                                                                      baseConditionalEntryBuffer,
+                                                                      baseConditionalConditionBuffer);
+#if UNITY_EDITOR
+        PlayerConditionalWeaponSwitchBakeUtility.PopulateScalingMetadata(sourceControllerPreset, conditionalScalingBuffer);
+#endif
         AddComponent(entity, new OutlineVisualConfig
         {
             Enabled = authoring.EnableOutline ? (byte)1 : (byte)0,

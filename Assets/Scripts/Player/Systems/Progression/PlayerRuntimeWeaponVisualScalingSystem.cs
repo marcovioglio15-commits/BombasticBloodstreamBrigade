@@ -72,12 +72,14 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
 
             ApplyBaseConfig(in baseConfig.ValueRO, ref runtimeConfig.ValueRW);
             RebuildAdditionalWeaponsBuffer(entity, in baseAdditionalWeaponsLookup, ref additionalWeaponsLookup);
-            FillVariableContext(entity,
-                                in scalableStatsLookup,
-                                in comboConfigLookup,
-                                in comboStateLookup,
-                                in comboRanksLookup,
-                                in characterTuningLookup);
+            PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
+                                                           in scalableStatsLookup,
+                                                           in comboConfigLookup,
+                                                           in comboStateLookup,
+                                                           in comboRanksLookup,
+                                                           in characterTuningLookup,
+                                                           EffectiveScalableStats,
+                                                           VariableContext);
 
             if (scalingLookup.HasBuffer(entity))
                 ApplyScaling(scalingLookup[entity],
@@ -92,52 +94,6 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     #endregion
 
     #region Scaling
-    /// <summary>
-    /// Rebuilds the shared typed formula context including active combo-rank Character Tuning bonuses.
-    /// </summary>
-    /// <param name="entity">Player entity owning the current scaling state.</param>
-    /// <param name="scalableStatsLookup">Read-only base scalable-stat lookup.</param>
-    /// <param name="comboConfigLookup">Read-only runtime combo config lookup.</param>
-    /// <param name="comboStateLookup">Read-only combo state lookup.</param>
-    /// <param name="comboRanksLookup">Read-only runtime combo-rank lookup.</param>
-    /// <param name="characterTuningLookup">Read-only Character Tuning formula lookup.</param>
-    private static void FillVariableContext(Entity entity,
-                                            in BufferLookup<PlayerScalableStatElement> scalableStatsLookup,
-                                            in ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup,
-                                            in ComponentLookup<PlayerComboCounterState> comboStateLookup,
-                                            in BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup,
-                                            in BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningLookup)
-    {
-        VariableContext.Clear();
-        EffectiveScalableStats.Clear();
-
-        if (!scalableStatsLookup.HasBuffer(entity))
-            return;
-
-        DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
-        PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats, EffectiveScalableStats);
-
-        if (comboConfigLookup.HasComponent(entity) &&
-            comboStateLookup.HasComponent(entity) &&
-            comboRanksLookup.HasBuffer(entity) &&
-            characterTuningLookup.HasBuffer(entity))
-        {
-            PlayerComboCounterState comboState = comboStateLookup[entity];
-            PlayerRuntimeComboCounterConfig comboConfig = comboConfigLookup[entity];
-            DynamicBuffer<PlayerRuntimeComboRankElement> comboRanks = comboRanksLookup[entity];
-            int activeRankIndex = PlayerComboCounterRuntimeUtility.ResolveActiveRankIndex(comboState.CurrentValue,
-                                                                                          in comboConfig,
-                                                                                          comboRanks);
-            PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(activeRankIndex,
-                                                                              comboState.CurrentValue,
-                                                                              comboRanks,
-                                                                              characterTuningLookup[entity],
-                                                                              EffectiveScalableStats);
-        }
-
-        PlayerScalingRuntimeFormulaUtility.FillVariableContext(EffectiveScalableStats, VariableContext);
-    }
-
     /// <summary>
     /// Applies all weapon visual Add Scaling formulas to the freshly rebuilt runtime configuration. Bridge-level
     /// fields are written directly; per-entry rules look up the matching runtime buffer slot by Weapon Id.

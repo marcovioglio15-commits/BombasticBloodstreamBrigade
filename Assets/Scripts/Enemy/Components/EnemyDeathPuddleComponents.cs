@@ -101,7 +101,7 @@ public struct MaterialDeathPuddleTiming : IComponentData
 }
 
 /// <summary>
-/// Per-instance irregularity, border width, edge feather and deterministic seed.
+/// Per-instance irregularity, border width, edge feather and normalized deterministic seed.
 /// </summary>
 [MaterialProperty("_PuddleShape")]
 public struct MaterialDeathPuddleShape : IComponentData

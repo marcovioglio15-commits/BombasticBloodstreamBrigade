@@ -30,6 +30,10 @@ public sealed class ShootingSettings
     [Tooltip("Numeric shooting tuning values.")]
     [SerializeField] private ShootingValues values = new ShootingValues();
 
+    [Header("Conditional Weapon Switches")]
+    [Tooltip("Stat-driven weapon switch entries evaluated independently from the Switch Weapon power-up. Designers can opt one or more entries above the equipped power-up per-entry.")]
+    [SerializeField] private PlayerConditionalWeaponSwitchSettings conditionalWeaponSwitches = new PlayerConditionalWeaponSwitchSettings();
+
     [Header("Object Pool")]
     [Tooltip("Number of projectiles pre-created when the shooter pool initializes.")]
     [SerializeField] private int initialPoolCapacity = 512;
@@ -81,6 +85,14 @@ public sealed class ShootingSettings
         }
     }
 
+    public PlayerConditionalWeaponSwitchSettings ConditionalWeaponSwitches
+    {
+        get
+        {
+            return conditionalWeaponSwitches;
+        }
+    }
+
     public int InitialPoolCapacity
     {
         get
@@ -109,7 +121,11 @@ public sealed class ShootingSettings
         if (values == null)
             values = new ShootingValues();
 
+        if (conditionalWeaponSwitches == null)
+            conditionalWeaponSwitches = new PlayerConditionalWeaponSwitchSettings();
+
         values.Validate();
+        conditionalWeaponSwitches.Validate();
 
         if (initialPoolCapacity < 0)
             initialPoolCapacity = 0;

@@ -23,7 +23,7 @@ public static class EnemyVisualFeedbackSmokeTest
     /// <summary>
     /// Executes the enemy visual feedback smoke suite from Unity batch mode via -executeMethod.
     /// </summary>
-    [MenuItem("Tools/Enemy Management/Run Enemy Visual Feedback Smoke Test")]
+    //[MenuItem("Tools/Enemy Management/Run Enemy Visual Feedback Smoke Test")]
     public static void Run()
     {
         ValidateStandardPuddleAssets();
@@ -147,7 +147,9 @@ public static class EnemyVisualFeedbackSmokeTest
     }
 
     /// <summary>
-    /// Validates one detached puddle request instantiates and activates through the dedicated ECS pool system.
+    /// Validates one detached puddle request instantiates and activates through the dedicated ECS pool system,
+    /// and that each per-instance material override is recovered when missing from the source prefab so the
+    /// shader OVERRIDE_SUPPORTED fallback can never silently apply material defaults to authored values.
     /// </summary>
     private static void ValidateDeathPuddleSpawnRuntime()
     {
@@ -156,16 +158,22 @@ public static class EnemyVisualFeedbackSmokeTest
         try
         {
             EntityManager entityManager = world.EntityManager;
+            // Deliberately omit every per-instance material override so the spawn system has to recover them all.
             Entity prefabEntity = entityManager.CreateEntity(typeof(Prefab),
                                                               typeof(LocalTransform),
                                                               typeof(EnemyDeathPuddleRuntimeState),
-                                                              typeof(EnemyDeathPuddleActive),
-                                                              typeof(MaterialDeathPuddlePrimaryColor),
-                                                              typeof(MaterialDeathPuddleSecondaryColor),
-                                                              typeof(MaterialDeathPuddleTiming),
-                                                              typeof(MaterialDeathPuddleShape),
-                                                              typeof(MaterialDeathPuddleStyle));
+                                                              typeof(EnemyDeathPuddleActive));
             entityManager.SetComponentEnabled<EnemyDeathPuddleActive>(prefabEntity, false);
+            float4 expectedPrimaryColor = new float4(1f, 0f, 0f, 1f);
+            float4 expectedSecondaryColor = new float4(0.5f, 0f, 0f, 1f);
+            const float expectedEdgeIrregularity = 0.81f;
+            const float expectedBorderWidth = 0.27f;
+            const float expectedEdgeFeather = 0.13f;
+            const float expectedSecondaryPaletteBlend = 0.42f;
+            const float expectedFlowSpeed = 1.7f;
+            const float expectedViscosity = 0.33f;
+            const float expectedSurfaceDistortion = 0.21f;
+            const float expectedHighlightStrength = 0.62f;
             Entity requestEntity = entityManager.CreateEntity();
             DynamicBuffer<EnemyDeathPuddleSpawnRequest> requests = entityManager.AddBuffer<EnemyDeathPuddleSpawnRequest>(requestEntity);
             requests.Add(new EnemyDeathPuddleSpawnRequest
@@ -176,16 +184,16 @@ public static class EnemyVisualFeedbackSmokeTest
                 LifetimeSeconds = 4f,
                 StableFraction = 0.2f,
                 FinalScaleRatio = 0.08f,
-                EdgeIrregularity = 0.25f,
-                BorderWidth = 0.1f,
-                EdgeFeather = 0.04f,
-                SecondaryPaletteBlend = 0.5f,
-                FlowSpeed = 0.35f,
-                Viscosity = 0.7f,
-                SurfaceDistortion = 0.08f,
-                HighlightStrength = 0.18f,
-                PrimaryColor = new float4(1f, 0f, 0f, 1f),
-                SecondaryColor = new float4(0.5f, 0f, 0f, 1f),
+                EdgeIrregularity = expectedEdgeIrregularity,
+                BorderWidth = expectedBorderWidth,
+                EdgeFeather = expectedEdgeFeather,
+                SecondaryPaletteBlend = expectedSecondaryPaletteBlend,
+                FlowSpeed = expectedFlowSpeed,
+                Viscosity = expectedViscosity,
+                SurfaceDistortion = expectedSurfaceDistortion,
+                HighlightStrength = expectedHighlightStrength,
+                PrimaryColor = expectedPrimaryColor,
+                SecondaryColor = expectedSecondaryColor,
                 Seed = 17u,
                 EvaporationCurve = EnemyDeathPuddleEvaporationCurve.SmoothStep,
                 RandomRotation = 1
@@ -213,17 +221,94 @@ public static class EnemyVisualFeedbackSmokeTest
             NativeArray<Entity> activePuddleEntities = activePuddles.ToEntityArray(Allocator.Temp);
             Entity activePuddle = activePuddleEntities[0];
             activePuddleEntities.Dispose();
+            RequireRecoveredComponent<PostTransformMatrix>(entityManager, activePuddle, nameof(PostTransformMatrix));
+            RequireRecoveredComponent<MaterialDeathPuddlePrimaryColor>(entityManager, activePuddle, nameof(MaterialDeathPuddlePrimaryColor));
+            RequireRecoveredComponent<MaterialDeathPuddleSecondaryColor>(entityManager, activePuddle, nameof(MaterialDeathPuddleSecondaryColor));
+            RequireRecoveredComponent<MaterialDeathPuddleTiming>(entityManager, activePuddle, nameof(MaterialDeathPuddleTiming));
+            RequireRecoveredComponent<MaterialDeathPuddleShape>(entityManager, activePuddle, nameof(MaterialDeathPuddleShape));
+            RequireRecoveredComponent<MaterialDeathPuddleStyle>(entityManager, activePuddle, nameof(MaterialDeathPuddleStyle));
+            RequireRecoveredComponent<MaterialDeathPuddleFluid>(entityManager, activePuddle, nameof(MaterialDeathPuddleFluid));
 
-            if (!entityManager.HasComponent<PostTransformMatrix>(activePuddle))
-                throw new InvalidOperationException("The death puddle ECS pool did not recover a missing PostTransformMatrix.");
+            // Confirm authored shape values land on the per-instance component instead of leaking the material default.
+            float4 appliedShape = entityManager.GetComponentData<MaterialDeathPuddleShape>(activePuddle).Value;
 
-            if (!entityManager.HasComponent<MaterialDeathPuddleFluid>(activePuddle))
-                throw new InvalidOperationException("The death puddle ECS pool did not recover a missing fluid material property.");
+            if (!math.all(appliedShape.xyz == new float3(expectedEdgeIrregularity, expectedBorderWidth, expectedEdgeFeather)))
+                throw new InvalidOperationException("The death puddle ECS pool did not propagate authored shape values to the per-instance material override.");
+
+            float4 appliedFluid = entityManager.GetComponentData<MaterialDeathPuddleFluid>(activePuddle).Value;
+
+            if (!math.all(appliedFluid == new float4(expectedFlowSpeed, expectedViscosity, expectedSurfaceDistortion, expectedHighlightStrength)))
+                throw new InvalidOperationException("The death puddle ECS pool did not propagate authored fluid values to the per-instance material override.");
+
+            // Force the same entity through the inactive pool and confirm a later preset cannot inherit stale shape data.
+            entityManager.SetComponentEnabled<EnemyDeathPuddleActive>(activePuddle, false);
+            const float reusedEdgeIrregularity = 0.07f;
+            const float reusedBorderWidth = 0.04f;
+            const float reusedEdgeFeather = 0.02f;
+            DynamicBuffer<EnemyDeathPuddleSpawnRequest> reuseRequests = entityManager.GetBuffer<EnemyDeathPuddleSpawnRequest>(requestEntity);
+            EnemyDeathPuddleSpawnRequest reuseRequest = new EnemyDeathPuddleSpawnRequest
+            {
+                PrefabEntity = prefabEntity,
+                Position = new float3(4f, 0.02f, 5f),
+                WorldSize = new float2(0.75f, 0.9f),
+                LifetimeSeconds = 2f,
+                StableFraction = 0.1f,
+                FinalScaleRatio = 0.03f,
+                EdgeIrregularity = reusedEdgeIrregularity,
+                BorderWidth = reusedBorderWidth,
+                EdgeFeather = reusedEdgeFeather,
+                SecondaryPaletteBlend = 0.2f,
+                FlowSpeed = 0.1f,
+                Viscosity = 0.9f,
+                SurfaceDistortion = 0.03f,
+                HighlightStrength = 0.1f,
+                PrimaryColor = expectedPrimaryColor,
+                SecondaryColor = expectedSecondaryColor,
+                Seed = 41u,
+                EvaporationCurve = EnemyDeathPuddleEvaporationCurve.Linear,
+                RandomRotation = 0
+            };
+            reuseRequests.Add(reuseRequest);
+            spawnSystem.Update(world.Unmanaged);
+
+            if (activePuddles.CalculateEntityCount() != 1)
+                throw new InvalidOperationException("The death puddle ECS pool did not reactivate exactly one reused entity.");
+
+            NativeArray<Entity> reusedPuddleEntities = activePuddles.ToEntityArray(Allocator.Temp);
+            Entity reusedPuddle = reusedPuddleEntities[0];
+            reusedPuddleEntities.Dispose();
+
+            if (reusedPuddle != activePuddle)
+                throw new InvalidOperationException("The death puddle ECS pool did not reuse the expected inactive entity.");
+
+            float4 reusedShape = entityManager.GetComponentData<MaterialDeathPuddleShape>(reusedPuddle).Value;
+
+            if (!math.all(reusedShape.xyz == new float3(reusedEdgeIrregularity, reusedBorderWidth, reusedEdgeFeather)) ||
+                reusedShape.w < 0f ||
+                reusedShape.w > 1f)
+            {
+                throw new InvalidOperationException("The death puddle ECS pool leaked stale shape data or an imprecise raw seed during reuse.");
+            }
         }
         finally
         {
             world.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Asserts one per-instance material override has been recovered on the activated puddle so the shader's
+    /// override-supported fallback never has to use the material default in production.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the activated puddle.</param>
+    /// <param name="puddleEntity">Activated puddle entity being inspected.</param>
+    /// <param name="componentLabel">Human-readable component label used in the failure message.</param>
+    private static void RequireRecoveredComponent<TComponent>(EntityManager entityManager,
+                                                              Entity puddleEntity,
+                                                              string componentLabel) where TComponent : unmanaged, IComponentData
+    {
+        if (!entityManager.HasComponent<TComponent>(puddleEntity))
+            throw new InvalidOperationException("The death puddle ECS pool did not recover a missing " + componentLabel + " material override.");
     }
 
     /// <summary>

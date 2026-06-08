@@ -247,6 +247,8 @@ MonoBehaviour:
         durationSeconds: 0.2
         directionMode: 0
         stackingMode: 0
+    conditionalWeaponSwitches:
+      entries: []
     initialPoolCapacity: 1500
     poolExpandBatch: 1500
   healthStatistics:

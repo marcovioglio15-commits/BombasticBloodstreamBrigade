@@ -464,6 +464,29 @@ public static class PlayerPassiveToolsAggregationUtility
         passiveToolsState.HasWeaponSwitch = 1;
         passiveToolsState.WeaponId = selectedSlot.ActiveWeaponId;
     }
+
+    /// <summary>
+    /// Folds the resolved conditional weapon switch state into the aggregated passive snapshot. Power-up
+    /// switches keep priority by default, mirroring the documented contract: an authored conditional entry can
+    /// only beat the equipped Switch Weapon power-up when its Override Power Up Switch flag is enabled.
+    /// Conditional matches are always honored when no power-up switch is currently active so designers can use
+    /// the conditional pipeline as a stat-driven default without flipping the override toggle on every entry.
+    /// </summary>
+    /// <param name="conditionalState">Resolved conditional weapon switch state produced by the dedicated system.</param>
+    /// <param name="passiveToolsState">Aggregated passive state mutated in place.</param>
+    public static void AccumulateConditionalWeaponSwitch(in PlayerConditionalWeaponSwitchState conditionalState,
+                                                         ref PlayerPassiveToolsState passiveToolsState)
+    {
+        if (conditionalState.HasMatch == 0 || conditionalState.WeaponId.Length <= 0)
+            return;
+
+        // Conditional pipeline yields to the equipped power-up switch unless the authored entry opts to override.
+        if (passiveToolsState.HasWeaponSwitch != 0 && conditionalState.OverridesPowerUpSwitch == 0)
+            return;
+
+        passiveToolsState.HasWeaponSwitch = 1;
+        passiveToolsState.WeaponId = conditionalState.WeaponId;
+    }
     #endregion
 
     #region Private Methods

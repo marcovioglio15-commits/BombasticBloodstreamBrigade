@@ -134,7 +134,7 @@ MonoBehaviour:
     flowSpeed: 3
     viscosity: 1
     surfaceDistortion: 0.35
-    highlightStrength: 1
+    highlightStrength: 0.1
   spawnOverrides:
     overrideSpawnOffset: 1
     spawnOffset: {x: 0, y: -0.3, z: 0}

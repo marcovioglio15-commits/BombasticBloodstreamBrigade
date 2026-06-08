@@ -60,6 +60,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponVisualLookup = SystemAPI.GetBufferLookup<PlayerAdditionalWeaponVisualElement>(true);
         ComponentLookup<PlayerWeaponVisualScalingState> weaponVisualScalingStateLookup = SystemAPI.GetComponentLookup<PlayerWeaponVisualScalingState>(true);
+        ComponentLookup<PlayerConditionalWeaponSwitchState> conditionalWeaponSwitchStateLookup = SystemAPI.GetComponentLookup<PlayerConditionalWeaponSwitchState>(true);
         EntityManager entityManager = state.EntityManager;
         float deltaTime = SystemAPI.Time.DeltaTime;
         int processedAnimatorEntities = 0;
@@ -153,6 +154,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                               in passiveToolsStateLookup,
                               in additionalWeaponVisualLookup,
                               in weaponVisualScalingStateLookup,
+                              in conditionalWeaponSwitchStateLookup,
                               out PlayerPowerUpsConfig powerUpsConfig,
                               out PlayerPowerUpsState powerUpsState,
                               out PlayerPassiveToolsState passiveToolsState,
@@ -303,6 +305,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     /// <param name="passiveToolsStateLookup">Read-only lookup containing the aggregated passive-tool state.</param>
     /// <param name="additionalWeaponVisualLookup">Read-only lookup containing weapon visual entries.</param>
     /// <param name="weaponVisualScalingStateLookup">Read-only lookup providing the weapon visual rebuild revision.</param>
+    /// <param name="conditionalWeaponSwitchStateLookup">Read-only lookup providing the resolved conditional weapon switch state used to override the power-up selection when authored entries opt in.</param>
     /// <param name="powerUpsConfig">Resolved active-slot configs reused by upper-body presentation.</param>
     /// <param name="powerUpsState">Resolved active-slot runtime state reused by upper-body presentation.</param>
     /// <param name="passiveToolsState">Resolved aggregate containing the selected weapon visual and shooting animation.</param>
@@ -315,6 +318,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                           in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsStateLookup,
                                           in BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponVisualLookup,
                                           in ComponentLookup<PlayerWeaponVisualScalingState> weaponVisualScalingStateLookup,
+                                          in ComponentLookup<PlayerConditionalWeaponSwitchState> conditionalWeaponSwitchStateLookup,
                                           out PlayerPowerUpsConfig powerUpsConfig,
                                           out PlayerPowerUpsState powerUpsState,
                                           out PlayerPassiveToolsState passiveToolsState,
@@ -337,6 +341,14 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                                                    powerUpsState.PrimaryEquipOrder,
                                                                                    powerUpsState.SecondaryEquipOrder,
                                                                                    ref passiveToolsState);
+
+        // Conditional weapon switches honor power-up selections unless an entry opts to override.
+        if (conditionalWeaponSwitchStateLookup.HasComponent(entity))
+        {
+            PlayerConditionalWeaponSwitchState conditionalState = conditionalWeaponSwitchStateLookup[entity];
+            PlayerPassiveToolsAggregationUtility.AccumulateConditionalWeaponSwitch(in conditionalState,
+                                                                                    ref passiveToolsState);
+        }
 
         if (additionalWeaponVisualLookup.HasBuffer(entity))
             additionalWeaponVisuals = additionalWeaponVisualLookup[entity];

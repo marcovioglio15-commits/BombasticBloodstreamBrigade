@@ -71,6 +71,7 @@ public static class PlayerWeaponVisualSmokeTest
             ValidateReferenceResolution(root.transform, plasma.transform);
             ValidatePowerUpPipeline();
             ValidateVisualScalingMetadata(world.EntityManager);
+            ValidateConditionalWeaponSwitchScaling(world);
             ValidateWeaponIdSelectorSources();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateAnimationClipBakePipeline();
             PlayerUpperBodyAnimationSmokeTestUtility.ValidateUpperBodyAnimatorController();
@@ -285,6 +286,146 @@ public static class PlayerWeaponVisualSmokeTest
         {
             entityManager.DestroyEntity(entity);
             UnityEngine.Object.DestroyImmediate(visualPreset);
+        }
+    }
+
+    /// <summary>
+    /// Validates nested conditional weapon switch Add Scaling metadata and hash-driven baseline rebuild behavior.
+    /// </summary>
+    /// <param name="world">Temporary world used to execute the runtime scaling system.</param>
+    private static void ValidateConditionalWeaponSwitchScaling(World world)
+    {
+        PlayerControllerPreset controllerPreset = ScriptableObject.CreateInstance<PlayerControllerPreset>();
+        EntityManager entityManager = world.EntityManager;
+        Entity entity = entityManager.CreateEntity();
+
+        try
+        {
+            SerializedObject serializedPreset = new SerializedObject(controllerPreset);
+            SerializedProperty entriesProperty = serializedPreset.FindProperty("shootingSettings.conditionalWeaponSwitches.entries");
+            entriesProperty.arraySize = 1;
+            SerializedProperty entryProperty = entriesProperty.GetArrayElementAtIndex(0);
+            entryProperty.FindPropertyRelative("weaponId").stringValue = CannonId;
+            entryProperty.FindPropertyRelative("priority").intValue = 2;
+            entryProperty.FindPropertyRelative("overridePowerUpSwitch").boolValue = false;
+            SerializedProperty conditionsProperty = entryProperty.FindPropertyRelative("conditions");
+            conditionsProperty.arraySize = 1;
+            SerializedProperty conditionProperty = conditionsProperty.GetArrayElementAtIndex(0);
+            conditionProperty.FindPropertyRelative("statName").stringValue = "Level";
+            conditionProperty.FindPropertyRelative("minimumValue").floatValue = 0f;
+            conditionProperty.FindPropertyRelative("maximumValue").floatValue = 1f;
+            conditionProperty.FindPropertyRelative("requirement").enumValueIndex = (int)PlayerConditionalWeaponSwitchConditionRequirement.NecessaryAndSufficient;
+            SerializedProperty scalingRulesProperty = serializedPreset.FindProperty("scalingRules");
+            scalingRulesProperty.arraySize = 5;
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(0),
+                                 PlayerScalingStatKeyUtility.BuildStatKey(entryProperty.FindPropertyRelative("weaponId")),
+                                 "switch([Level], 3:\"Plasma\", 6:\"Plasma\", [this])");
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(1),
+                                 PlayerScalingStatKeyUtility.BuildStatKey(entryProperty.FindPropertyRelative("priority")),
+                                 "[this] + [Level]");
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(2),
+                                 PlayerScalingStatKeyUtility.BuildStatKey(entryProperty.FindPropertyRelative("overridePowerUpSwitch")),
+                                 "[Level] > 0");
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(3),
+                                 PlayerScalingStatKeyUtility.BuildStatKey(conditionProperty.FindPropertyRelative("minimumValue")),
+                                 "[this] + [Level]");
+            ConfigureScalingRule(scalingRulesProperty.GetArrayElementAtIndex(4),
+                                 PlayerScalingStatKeyUtility.BuildStatKey(conditionProperty.FindPropertyRelative("maximumValue")),
+                                 "[this] + [Level]");
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+
+            PlayerConditionalWeaponSwitchSettings settings = controllerPreset.ShootingSettings.ConditionalWeaponSwitches;
+            entityManager.AddBuffer<PlayerBaseConditionalWeaponSwitchEntryElement>(entity);
+            entityManager.AddBuffer<PlayerBaseConditionalWeaponSwitchConditionElement>(entity);
+            entityManager.AddBuffer<PlayerConditionalWeaponSwitchEntryElement>(entity);
+            entityManager.AddBuffer<PlayerConditionalWeaponSwitchConditionElement>(entity);
+            entityManager.AddBuffer<PlayerRuntimeConditionalWeaponSwitchScalingElement>(entity);
+            entityManager.AddBuffer<PlayerScalableStatElement>(entity);
+            entityManager.AddComponentData(entity, new PlayerRuntimeScalingState
+            {
+                Initialized = 1,
+                LastScalableStatsHash = 1u
+            });
+            entityManager.AddComponentData(entity, new PlayerConditionalWeaponSwitchScalingState());
+            DynamicBuffer<PlayerBaseConditionalWeaponSwitchEntryElement> baseEntries = entityManager.GetBuffer<PlayerBaseConditionalWeaponSwitchEntryElement>(entity);
+            DynamicBuffer<PlayerBaseConditionalWeaponSwitchConditionElement> baseConditions = entityManager.GetBuffer<PlayerBaseConditionalWeaponSwitchConditionElement>(entity);
+            DynamicBuffer<PlayerConditionalWeaponSwitchEntryElement> runtimeEntries = entityManager.GetBuffer<PlayerConditionalWeaponSwitchEntryElement>(entity);
+            DynamicBuffer<PlayerConditionalWeaponSwitchConditionElement> runtimeConditions = entityManager.GetBuffer<PlayerConditionalWeaponSwitchConditionElement>(entity);
+            DynamicBuffer<PlayerRuntimeConditionalWeaponSwitchScalingElement> scalingMetadata = entityManager.GetBuffer<PlayerRuntimeConditionalWeaponSwitchScalingElement>(entity);
+            DynamicBuffer<PlayerScalableStatElement> scalableStats = entityManager.GetBuffer<PlayerScalableStatElement>(entity);
+            PlayerConditionalWeaponSwitchBakeUtility.PopulateBaseBuffers(settings, baseEntries, baseConditions);
+            PlayerConditionalWeaponSwitchBakeUtility.PopulateBuffers(settings, runtimeEntries, runtimeConditions);
+            PlayerConditionalWeaponSwitchBakeUtility.PopulateScalingMetadata(controllerPreset, scalingMetadata);
+            scalableStats.Add(new PlayerScalableStatElement
+            {
+                Name = new FixedString64Bytes("Level"),
+                Type = (byte)PlayerScalableStatType.Integer,
+                MinimumValue = 0f,
+                MaximumValue = 100f,
+                Value = 3f
+            });
+
+            if (scalingMetadata.Length != 5)
+                throw new Exception("Conditional weapon switch Add Scaling metadata count mismatch.");
+
+            SystemHandle scalingSystem = world.GetOrCreateSystem<PlayerRuntimeConditionalWeaponSwitchScalingSystem>();
+            scalingSystem.Update(world.Unmanaged);
+            AssertConditionalWeaponSwitchScaling(entityManager, entity, PlasmaId, 5, 3f, 4f);
+
+            PlayerScalableStatElement levelStat = scalableStats[0];
+            levelStat.Value = 6f;
+            scalableStats[0] = levelStat;
+            entityManager.SetComponentData(entity, new PlayerRuntimeScalingState
+            {
+                Initialized = 1,
+                LastScalableStatsHash = 2u
+            });
+            scalingSystem.Update(world.Unmanaged);
+            AssertConditionalWeaponSwitchScaling(entityManager, entity, PlasmaId, 8, 6f, 7f);
+        }
+        finally
+        {
+            entityManager.DestroyEntity(entity);
+            UnityEngine.Object.DestroyImmediate(controllerPreset);
+        }
+    }
+
+    /// <summary>
+    /// Asserts one scaled conditional weapon switch entry and its first condition match expected rebuilt values.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the runtime buffers.</param>
+    /// <param name="entity">Player entity under test.</param>
+    /// <param name="expectedWeaponId">Expected scaled Weapon Id.</param>
+    /// <param name="expectedPriority">Expected scaled priority.</param>
+    /// <param name="expectedMinimum">Expected scaled condition minimum.</param>
+    /// <param name="expectedMaximum">Expected scaled condition maximum.</param>
+    private static void AssertConditionalWeaponSwitchScaling(EntityManager entityManager,
+                                                             Entity entity,
+                                                             string expectedWeaponId,
+                                                             int expectedPriority,
+                                                             float expectedMinimum,
+                                                             float expectedMaximum)
+    {
+        DynamicBuffer<PlayerConditionalWeaponSwitchEntryElement> entries = entityManager.GetBuffer<PlayerConditionalWeaponSwitchEntryElement>(entity);
+        DynamicBuffer<PlayerConditionalWeaponSwitchConditionElement> conditions = entityManager.GetBuffer<PlayerConditionalWeaponSwitchConditionElement>(entity);
+
+        if (entries.Length != 1 ||
+            conditions.Length != 1 ||
+            !entries[0].WeaponId.Equals(new FixedString64Bytes(expectedWeaponId)) ||
+            entries[0].Priority != expectedPriority ||
+            entries[0].OverridePowerUpSwitch == 0 ||
+            !Mathf.Approximately(conditions[0].MinimumValue, expectedMinimum) ||
+            !Mathf.Approximately(conditions[0].MaximumValue, expectedMaximum))
+        {
+            throw new Exception(string.Format("Conditional weapon switch runtime buffers did not rebuild from baseline scaling metadata. " +
+                                              "Entries={0}, Conditions={1}, WeaponId={2}, Priority={3}, Override={4}, Minimum={5}, Maximum={6}.",
+                                              entries.Length,
+                                              conditions.Length,
+                                              entries.Length > 0 ? entries[0].WeaponId.ToString() : "<missing>",
+                                              entries.Length > 0 ? entries[0].Priority : int.MinValue,
+                                              entries.Length > 0 ? entries[0].OverridePowerUpSwitch : (byte)0,
+                                              conditions.Length > 0 ? conditions[0].MinimumValue : float.NaN,
+                                              conditions.Length > 0 ? conditions[0].MaximumValue : float.NaN));
         }
     }
 

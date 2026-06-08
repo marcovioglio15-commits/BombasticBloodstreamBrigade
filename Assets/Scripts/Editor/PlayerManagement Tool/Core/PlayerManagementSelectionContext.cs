@@ -13,6 +13,7 @@ public static class PlayerManagementSelectionContext
     public static event System.Action ContextChanged;
     public static event System.Action PowerUpsPresetContentChanged;
     public static event System.Action VisualPresetContentChanged;
+    public static event System.Action ProgressionPresetContentChanged;
     #endregion
 
     #region Properties
@@ -111,6 +112,20 @@ public static class PlayerManagementSelectionContext
     public static void NotifyVisualPresetContentChanged()
     {
         System.Action changedHandler = VisualPresetContentChanged;
+
+        if (changedHandler == null)
+            return;
+
+        changedHandler.Invoke();
+    }
+
+    /// <summary>
+    /// Broadcasts that scalable-stat data declared in a Progression Preset changed and dependent editor
+    /// selectors (e.g. the conditional weapon switch stat picker) should refresh.
+    /// </summary>
+    public static void NotifyProgressionPresetContentChanged()
+    {
+        System.Action changedHandler = ProgressionPresetContentChanged;
 
         if (changedHandler == null)
             return;

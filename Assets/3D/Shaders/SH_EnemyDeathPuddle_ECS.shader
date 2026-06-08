@@ -125,7 +125,7 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
                 float evaporation = ResolveEvaporationProgress(normalizedTime, saturate(timing.z), style.y);
                 float footprintScale = lerp(1.0, saturate(timing.w), evaporation);
                 float2 centeredUv = (input.uv * 2.0 - 1.0) / max(0.001, footprintScale);
-                float seed = shape.w * 0.0137;
+                float seed = saturate(shape.w) * 6.28318530718;
                 float viscosity = saturate(fluid.y);
                 float flowTime = (_Time.y - timing.x) * max(0.0, fluid.x) * lerp(1.6, 0.3, viscosity);
                 float waveFrequency = lerp(9.0, 4.0, viscosity);
@@ -138,15 +138,18 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
                 float waveA = sin(dot(centeredUv, flowAxis) * waveFrequency + flowTime + seed);
                 float waveB = sin(dot(centeredUv, crossAxis) * waveFrequency * 0.73 - flowTime * 0.63 - seed * 1.7);
                 float motionEnvelope = saturate(1.0 - length(centeredUv) * 0.55);
-                float2 distortedUv = centeredUv +
-                                     (flowAxis * waveA + crossAxis * waveB) *
+                float2 fluidOffset = (flowAxis * waveA + crossAxis * waveB) *
                                      saturate(fluid.z) *
                                      0.5 *
                                      motionEnvelope;
-                float radius = length(distortedUv);
-                float angle = atan2(distortedUv.y, distortedUv.x);
+                float2 distortedUv = centeredUv + fluidOffset;
+                float2 silhouetteUv = centeredUv + fluidOffset * saturate(shape.x);
+                float radius = length(silhouetteUv);
+                float angle = atan2(silhouetteUv.y, silhouetteUv.x);
                 float lobes = sin(angle * 5.0 + seed) * 0.55 + sin(angle * 9.0 - seed * 1.7) * 0.3;
-                float noise = Hash21(floor(distortedUv * 5.0 + seed)) - 0.5;
+                float noise = Hash21(floor(silhouetteUv * 5.0 + seed)) - 0.5;
+                float internalRadius = length(distortedUv);
+                float internalNoise = Hash21(floor(distortedUv * 5.0 + seed)) - 0.5;
                 float irregularRadius = 1.0 + (lobes * 0.12 + noise * 0.09) * saturate(shape.x);
                 float edgeFeather = max(0.001, shape.z);
                 float outerMask = smoothstep(irregularRadius, irregularRadius - edgeFeather, radius);
@@ -154,7 +157,7 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
                 float innerMask = smoothstep(irregularRadius - borderWidth,
                                              irregularRadius - borderWidth - edgeFeather,
                                              radius);
-                float band = step(0.48 + noise * 0.08, radius);
+                float band = step(0.48 + internalNoise * 0.08, internalRadius);
                 float3 bodyColor = lerp(primaryColor.rgb,
                                         secondaryColor.rgb,
                                         band * saturate(style.x));

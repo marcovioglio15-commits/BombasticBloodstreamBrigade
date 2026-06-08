@@ -166,7 +166,10 @@ public partial struct EnemyDeathPuddleSpawnSystem : ISystem
     }
 
     /// <summary>
-    /// Writes all transform, lifetime and material values required by one acquired puddle.
+    /// Writes all transform, lifetime and material values required by one acquired puddle. Every per-instance
+    /// material component is upserted with HasComponent-checked fallback so a legacy or partially baked pooled
+    /// entity cannot silently fall back to the material default (which mirrors the field defaults and produced
+    /// the "puddle ignores Visual Preset settings" symptom for at least one missing override).
     /// </summary>
     /// <param name="entityManager">Entity manager used to mutate the pooled puddle.</param>
     /// <param name="puddleEntity">Acquired puddle entity.</param>
@@ -177,6 +180,7 @@ public partial struct EnemyDeathPuddleSpawnSystem : ISystem
                                        in EnemyDeathPuddleSpawnRequest request,
                                        float shaderTime)
     {
+        // Random world-Y spin is consumed by the X +90 plane orientation so puddles always lie flat on the floor.
         float rotationRadians = request.RandomRotation != 0
             ? HashToUnitFloat(request.Seed ^ 0x9E3779B9u) * math.PI * 2f
             : 0f;
@@ -186,64 +190,70 @@ public partial struct EnemyDeathPuddleSpawnSystem : ISystem
                                                                                 math.mul(quaternion.RotateY(rotationRadians),
                                                                                          quaternion.RotateX(math.radians(90f))),
                                                                                 1f));
-        PostTransformMatrix postTransform = new PostTransformMatrix
+        UpsertComponentData(entityManager, puddleEntity, new PostTransformMatrix
         {
             Value = float4x4.Scale(new float3(request.WorldSize.x, request.WorldSize.y, 1f))
-        };
-
-        if (entityManager.HasComponent<PostTransformMatrix>(puddleEntity))
-            entityManager.SetComponentData(puddleEntity, postTransform);
-        else
-            entityManager.AddComponentData(puddleEntity, postTransform);
-
-        entityManager.SetComponentData(puddleEntity, new EnemyDeathPuddleRuntimeState
+        });
+        UpsertComponentData(entityManager, puddleEntity, new EnemyDeathPuddleRuntimeState
         {
             PrefabEntity = request.PrefabEntity,
             RemainingSeconds = request.LifetimeSeconds
         });
-        entityManager.SetComponentData(puddleEntity, new MaterialDeathPuddlePrimaryColor
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddlePrimaryColor
         {
             Value = request.PrimaryColor
         });
-        entityManager.SetComponentData(puddleEntity, new MaterialDeathPuddleSecondaryColor
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddleSecondaryColor
         {
             Value = request.SecondaryColor
         });
-        entityManager.SetComponentData(puddleEntity, new MaterialDeathPuddleTiming
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddleTiming
         {
             Value = new float4(shaderTime,
                                request.LifetimeSeconds,
                                request.StableFraction,
                                request.FinalScaleRatio)
         });
-        entityManager.SetComponentData(puddleEntity, new MaterialDeathPuddleShape
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddleShape
         {
             Value = new float4(request.EdgeIrregularity,
                                request.BorderWidth,
                                request.EdgeFeather,
-                               request.Seed)
+                               HashToUnitFloat(request.Seed))
         });
-        entityManager.SetComponentData(puddleEntity, new MaterialDeathPuddleStyle
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddleStyle
         {
             Value = new float4(request.SecondaryPaletteBlend,
                                (float)request.EvaporationCurve,
                                0f,
                                0f)
         });
-        MaterialDeathPuddleFluid fluid = new MaterialDeathPuddleFluid
+        UpsertComponentData(entityManager, puddleEntity, new MaterialDeathPuddleFluid
         {
             Value = new float4(request.FlowSpeed,
                                request.Viscosity,
                                request.SurfaceDistortion,
                                request.HighlightStrength)
-        };
-
-        if (entityManager.HasComponent<MaterialDeathPuddleFluid>(puddleEntity))
-            entityManager.SetComponentData(puddleEntity, fluid);
-        else
-            entityManager.AddComponentData(puddleEntity, fluid);
-
+        });
         entityManager.SetComponentEnabled<EnemyDeathPuddleActive>(puddleEntity, true);
+    }
+
+    /// <summary>
+    /// Writes one IComponentData value, recovering the component archetype-side when missing. Required because
+    /// the shader uses UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED which silently falls back to the material
+    /// default when the per-instance component is absent on a pooled entity, ignoring the Visual Preset value.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to mutate the pooled puddle.</param>
+    /// <param name="puddleEntity">Pooled puddle entity receiving the value.</param>
+    /// <param name="value">Per-instance component value resolved from the spawn request.</param>
+    private static void UpsertComponentData<TComponent>(EntityManager entityManager,
+                                                        Entity puddleEntity,
+                                                        TComponent value) where TComponent : unmanaged, IComponentData
+    {
+        if (entityManager.HasComponent<TComponent>(puddleEntity))
+            entityManager.SetComponentData(puddleEntity, value);
+        else
+            entityManager.AddComponentData(puddleEntity, value);
     }
 
     /// <summary>
