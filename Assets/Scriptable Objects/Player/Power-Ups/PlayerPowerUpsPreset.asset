@@ -24609,7 +24609,7 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
-          - formula: '[ShotRange]=[ShotRange]+0.15'
+          - formula: '[ShotRange]=[ShotRange]+0.01'
           - formula: '[BulletBounces]=[BulletBounces]+1'
         bomb:
           bombPrefab: {fileID: 0}
@@ -34168,8 +34168,8 @@ MonoBehaviour:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
           - formula: '[Health]=[Health]+1'
-          - formula: '[MovementSpeed]=[MovementSpeed]+0.15'
-          - formula: '[FireRate]=[FireRate]+0.15'
+          - formula: '[MovementSpeed]=[MovementSpeed]+0.5'
+          - formula: '[FireRate]=[FireRate]+0.2'
           - formula: '[GatheringRadius]=[GatheringRadius]+1'
         bomb:
           bombPrefab: {fileID: 0}
@@ -34538,8 +34538,8 @@ MonoBehaviour:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
           - formula: '[Shield]=[Shield]+1'
-          - formula: '[ShotRange]=[ShotRange]+0.15'
-          - formula: '[Damage]=[Damage]+0.15'
+          - formula: '[ShotRange]=[ShotRange]+0.01'
+          - formula: '[Damage]=[Damage]+0.2'
           - formula: '[Luck]=[Luck]+1'
         bomb:
           bombPrefab: {fileID: 0}
@@ -34907,8 +34907,8 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
-          - formula: '[Damage]=[Damage]+0.15'
-          - formula: '[ShotRange]=[ShotRange]+0.15'
+          - formula: '[Damage]=[Damage]+0.2'
+          - formula: '[ShotRange]=[ShotRange]+0.01'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
@@ -35643,8 +35643,8 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
-          - formula: '[FireRate]=[FireRate]+0.15'
-          - formula: '[MovementSpeed]=[MovementSpeed]+0.15'
+          - formula: '[FireRate]=[FireRate]+0.2'
+          - formula: '[MovementSpeed]=[MovementSpeed]+0.5'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
@@ -36011,7 +36011,7 @@ MonoBehaviour:
         characterTuning:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
-          - formula: '[Damage]=[Damage]+0.15'
+          - formula: '[Damage]=[Damage]+0.3'
           - formula: '[BulletPenetration]=[BulletPenetration]+1'
         bomb:
           bombPrefab: {fileID: 0}
@@ -36629,8 +36629,7 @@ MonoBehaviour:
     unreplaceable: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - PassiveBouncingProjectiles
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
