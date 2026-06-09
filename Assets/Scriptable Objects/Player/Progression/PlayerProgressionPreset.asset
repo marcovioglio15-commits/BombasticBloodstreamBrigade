@@ -73,9 +73,23 @@ MonoBehaviour:
     maximumValue: 100
     defaultBooleanValue: 0
     defaultTokenValue: 
+  - statName: BulletBounces
+    statType: 1
+    defaultValue: 0
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
   - statName: BulletPenetration
     statType: 1
     defaultValue: 0
+    minimumValue: -1000000
+    maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: InfinitePenetration
+    statType: 2
+    defaultValue: 1
     minimumValue: -1000000
     maximumValue: 1000000
     defaultBooleanValue: 0
@@ -89,13 +103,6 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: BulletSizeMultiplier
     statType: 0
-    defaultValue: 1
-    minimumValue: -1000000
-    maximumValue: 1000000
-    defaultBooleanValue: 0
-    defaultTokenValue: 
-  - statName: InfinitePenetration
-    statType: 2
     defaultValue: 1
     minimumValue: -1000000
     maximumValue: 1000000
