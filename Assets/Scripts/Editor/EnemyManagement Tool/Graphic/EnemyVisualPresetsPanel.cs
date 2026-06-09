@@ -16,6 +16,7 @@ public sealed class EnemyVisualPresetsPanel
     private const string ActiveSectionStateKey = "NashCore.EnemyManagement.Visual.ActiveSection";
     private const string ActiveSubSectionStateKey = "NashCore.EnemyManagement.Visual.ActiveSubSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.EnemyManagement.Visual.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.Visual.SelectedPreset";
     #endregion
 
     #region Fields
@@ -368,10 +369,18 @@ public sealed class EnemyVisualPresetsPanel
 
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
-            SelectPreset(filteredPresets[0]);
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            EnemyVisualPreset restoredPreset = ManagementToolStateUtility.LoadAsset<EnemyVisualPreset>(SelectedPresetPathStateKey);
+            EnemyVisualPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            SelectPreset(initialPreset);
 
-            if (listView != null)
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 
@@ -500,6 +509,9 @@ public sealed class EnemyVisualPresetsPanel
     private void SelectPreset(EnemyVisualPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
         detailsRoot.Clear();
         detailsSectionButtonsRoot = null;
         detailsSectionContentRoot = null;

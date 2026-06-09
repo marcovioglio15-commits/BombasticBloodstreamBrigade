@@ -13,6 +13,7 @@ public sealed class PlayerAnimationBindingsPresetsPanel
 {
     #region Constants
     private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.AnimationBindings.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.AnimationBindings.SelectedPreset";
     private const float LeftPaneWidth = 280f;
     #endregion
 
@@ -285,14 +286,24 @@ public sealed class PlayerAnimationBindingsPresetsPanel
 
         if (selectedPreset == null)
         {
-            if (filteredPresets.Count > 0 && listView != null)
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
-
-            if (filteredPresets.Count > 0)
-                SelectPreset(filteredPresets[0]);
-            else
+            if (filteredPresets.Count <= 0)
+            {
                 SelectPreset(null);
+                return;
+            }
 
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            PlayerAnimationBindingsPreset restoredPreset = ManagementToolStateUtility.LoadAsset<PlayerAnimationBindingsPreset>(SelectedPresetPathStateKey);
+            PlayerAnimationBindingsPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
+
+            SelectPreset(initialPreset);
             return;
         }
 
@@ -317,6 +328,9 @@ public sealed class PlayerAnimationBindingsPresetsPanel
     private void SelectPreset(PlayerAnimationBindingsPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
 
         if (selectedPreset == null)
         {

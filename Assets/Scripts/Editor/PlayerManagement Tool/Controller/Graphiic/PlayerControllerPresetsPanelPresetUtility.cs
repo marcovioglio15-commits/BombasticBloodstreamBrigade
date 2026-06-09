@@ -237,10 +237,18 @@ internal static class PlayerControllerPresetsPanelPresetUtility
 
         if (panel.SelectedPreset == null || !panel.FilteredPresets.Contains(panel.SelectedPreset))
         {
-            panel.SelectPreset(panel.FilteredPresets[0]);
+            // Prefer this side panel's own persisted preset so navigation state survives close/reopen
+            // independently from the master preset's referenced sub-preset.
+            PlayerControllerPreset restoredPreset = ManagementToolStateUtility.LoadAsset<PlayerControllerPreset>(PlayerControllerPresetsPanel.SelectedPresetPathStateKey);
+            PlayerControllerPreset initialPreset = restoredPreset != null && panel.FilteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : panel.FilteredPresets[0];
+            panel.SelectPreset(initialPreset);
 
-            if (panel.PresetListView != null)
-                panel.PresetListView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = panel.FilteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && panel.PresetListView != null)
+                panel.PresetListView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 

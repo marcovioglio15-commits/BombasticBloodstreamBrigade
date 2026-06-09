@@ -32,6 +32,8 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
         if (panel == null)
             return;
 
+        // Side panels no longer auto-route to the master preset's referenced sub-preset; they keep
+        // whatever the user last navigated to (restored from their own persisted selection key).
         if (panel.SidePanels.ContainsKey(panelType))
         {
             EnemyMasterPresetsPanel.SidePanelEntry existingEntry = panel.SidePanels[panelType];
@@ -39,7 +41,6 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
             if (existingEntry != null)
                 SetActivePanel(panel, panelType);
 
-            SyncSidePanelSelection(panel, panelType, existingEntry);
             return;
         }
 
@@ -54,7 +55,6 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
 
         AddTab(panel, panelType, GetPanelTitle(panelType), content, brainPanel, visualPanel, advancedPatternPanel, bossPatternPanel);
         SetActivePanel(panel, panelType);
-        SyncSidePanelSelection(panel, panelType, panel.SidePanels[panelType]);
     }
 
     /// <summary>
@@ -135,6 +135,10 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
         panel.Root.Add(tabBar);
         panel.Root.Add(contentHost);
 
+        // The intended active panel may be reassigned by RestoreOpenSidePanels (each restored side
+        // panel calls SetActivePanel), so capture it up front and re-apply at the end.
+        EnemyManagementWindow.PanelType intendedActivePanel = panel.ActivePanel;
+
         panel.SuppressStateWrite = true;
         AddTab(panel,
                EnemyManagementWindow.PanelType.EnemyMasterPresets,
@@ -146,12 +150,16 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
                null);
         RestoreOpenSidePanels(panel);
 
-        if (!panel.SidePanels.ContainsKey(panel.ActivePanel))
-            panel.ActivePanel = EnemyManagementWindow.PanelType.EnemyMasterPresets;
+        if (!panel.SidePanels.ContainsKey(intendedActivePanel))
+            intendedActivePanel = EnemyManagementWindow.PanelType.EnemyMasterPresets;
 
-        SetActivePanel(panel, panel.ActivePanel);
+        panel.ActivePanel = intendedActivePanel;
+        SetActivePanel(panel, intendedActivePanel);
         panel.SuppressStateWrite = false;
-        SaveOpenPanelsState(panel);
+        // Do NOT re-save OpenPanelsStateKey here. The persisted set was the source of truth for
+        // restoration; if a transient failure dropped a panel, we want the original set preserved
+        // so the next reopen can retry that panel cleanly. The user-driven AddTab/CloseSidePanel
+        // calls are the only legitimate writers to that key.
         ManagementToolStateUtility.SaveEnumValue(ActivePanelStateKey, panel.ActivePanel);
     }
 
@@ -288,97 +296,8 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     }
 
     /// <summary>
-    /// Synchronizes one side panel selection with the currently selected master preset.
-    /// </summary>
-    /// <param name="panel">Owning panel that provides the selected master preset.</param>
-    /// <param name="panelType">Side panel type to synchronize.</param>
-    /// <param name="entry">Resolved side panel entry.</param>
-
-    public static void SyncSidePanelSelection(EnemyMasterPresetsPanel panel,
-                                              EnemyManagementWindow.PanelType panelType,
-                                              EnemyMasterPresetsPanel.SidePanelEntry entry)
-    {
-        if (panel == null)
-            return;
-
-        if (entry == null)
-            return;
-
-        if (panel.SelectedPreset == null)
-            return;
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyBrainPresets)
-        {
-            if (entry.BrainPanel == null)
-                return;
-
-            EnemyBrainPreset brainPreset = panel.SelectedPreset.BrainPreset;
-
-            if (brainPreset == null)
-                return;
-
-            entry.BrainPanel.SelectPresetFromExternal(brainPreset);
-            return;
-        }
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyVisualPresets)
-        {
-            if (entry.VisualPanel == null)
-                return;
-
-            EnemyVisualPreset visualPreset = panel.SelectedPreset.VisualPreset;
-
-            if (visualPreset == null)
-                return;
-
-            entry.VisualPanel.SelectPresetFromExternal(visualPreset);
-            return;
-        }
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets)
-        {
-            if (entry.AdvancedPatternPanel == null)
-                return;
-
-            EnemyAdvancedPatternPreset advancedPatternPreset = panel.SelectedPreset.AdvancedPatternPreset;
-
-            if (advancedPatternPreset == null)
-                return;
-
-            entry.AdvancedPatternPanel.SelectPresetFromExternal(advancedPatternPreset);
-            return;
-        }
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyBossPatternPresets)
-        {
-            if (entry.BossPatternPanel == null)
-                return;
-
-            EnemyBossPatternPreset bossPatternPreset = panel.SelectedPreset.BossPatternPreset;
-
-            if (bossPatternPreset == null)
-                return;
-
-            entry.BossPatternPanel.SelectPresetFromExternal(bossPatternPreset);
-        }
-    }
-
-    /// <summary>
-    /// Synchronizes all currently open side panel selections.
-    /// </summary>
-    /// <param name="panel">Owning panel that stores side panel entries.</param>
-
-    public static void SyncOpenSidePanels(EnemyMasterPresetsPanel panel)
-    {
-        if (panel == null)
-            return;
-
-        foreach (KeyValuePair<EnemyManagementWindow.PanelType, EnemyMasterPresetsPanel.SidePanelEntry> sidePanelEntry in panel.SidePanels)
-            SyncSidePanelSelection(panel, sidePanelEntry.Key, sidePanelEntry.Value);
-    }
-
-    /// <summary>
-    /// Refreshes all open side panels after library/session changes and then resynchronizes the selections.
+    /// Refreshes all open side panels after library/session changes. Side panels keep their own
+    /// persisted selection and are no longer rerouted to the master preset's referenced sub-preset.
     /// </summary>
     /// <param name="panel">Owning panel that stores side panel entries.</param>
 
@@ -406,8 +325,6 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
             if (entry.BossPatternPanel != null)
                 entry.BossPatternPanel.RefreshFromSessionChange();
         }
-
-        SyncOpenSidePanels(panel);
     }
 
     /// <summary>
@@ -497,7 +414,16 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
             if (openPanel == EnemyManagementWindow.PanelType.EnemyMasterPresets)
                 continue;
 
-            OpenSidePanel(panel, openPanel);
+            // Isolate per-panel failures: one panel that throws while constructing must not stop
+            // the rest of the persisted tabs from coming back.
+            try
+            {
+                OpenSidePanel(panel, openPanel);
+            }
+            catch (System.Exception sidePanelException)
+            {
+                UnityEngine.Debug.LogException(sidePanelException);
+            }
         }
     }
 

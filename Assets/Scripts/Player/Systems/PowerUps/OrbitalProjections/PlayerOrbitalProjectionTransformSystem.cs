@@ -12,7 +12,6 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 {
     #region Constants
     private const float DegreesToRadians = math.PI / 180f;
-    private const float RadiansToDegrees = 180f / math.PI;
     private const float IndependentOrbitLayoutBlendSeconds = 0.35f;
     private const float MinimumBounceSectorDegrees = 0.01f;
     #endregion
@@ -135,20 +134,67 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
                                      deltaTime);
                 break;
             case OrbitalProjectionMotionMode.FollowPlayerLook:
-                float targetAngle = ResolveLookAngleDegrees(in lookState) + instance.Config.AngleOffsetDegrees;
-                float followDelay = math.max(0f, instance.Config.LookFollowDelaySeconds);
-
-                if (followDelay <= 0f)
-                    instance.FollowAngleDegrees = targetAngle;
-                else
-                    instance.FollowAngleDegrees += ResolveSignedAngleDelta(instance.FollowAngleDegrees, targetAngle) * math.saturate(deltaTime / followDelay);
-
-                instance.AngleDegrees = instance.FollowAngleDegrees;
+                TickFollowPlayerLook(ref instance,
+                                     projectionInstances,
+                                     in lookState,
+                                     deltaTime);
                 break;
             default:
                 instance.AngleDegrees = instance.Config.AngleOffsetDegrees;
                 break;
         }
+    }
+
+    /// <summary>
+    /// Advances one Follow Player Look projection, applying ring slot distribution when more than
+    /// one Follow Player Look projection shares the same orbit so they spread evenly around the
+    /// player's look direction instead of overlapping.
+    /// </summary>
+    /// <param name="instance">Projection instance being updated.</param>
+    /// <param name="projectionInstances">Snapshot of projection instance data captured before this update.</param>
+    /// <param name="lookState">Owner look state providing the live look angle.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    private static void TickFollowPlayerLook(ref PlayerOrbitalProjectionInstance instance,
+                                             NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
+                                             in PlayerLookState lookState,
+                                             float deltaTime)
+    {
+        float currentLookAngleDegrees = PlayerOrbitalProjectionStableLayoutUtility.ResolveLookAngleDegrees(in lookState);
+        float targetAngle;
+
+        // Reuse the shared ring resolver: returns false when this projection is alone on its ring,
+        // in which case the authored offset is the only term to apply.
+        if (!PlayerOrbitalProjectionStableLayoutUtility.TryResolveLiveRingTargetAngle(in instance,
+                                                                                       currentLookAngleDegrees,
+                                                                                       projectionInstances,
+                                                                                       out targetAngle))
+        {
+            targetAngle = currentLookAngleDegrees + instance.Config.AngleOffsetDegrees;
+        }
+
+        float followDelay = math.max(0f, instance.Config.LookFollowDelaySeconds);
+
+        if (followDelay <= 0f)
+        {
+            instance.FollowAngleDegrees = targetAngle;
+            instance.FollowAngularVelocityDegrees = 0f;
+        }
+        else
+        {
+            // Critically damped spring smoothing keeps angular velocity continuous when the ring
+            // lattice slips one slot under fast spins (the target jumps a full step there), so
+            // formation re-alignments read as soft turn-arounds instead of instant velocity flips.
+            float unwrappedTargetDegrees = instance.FollowAngleDegrees + ResolveSignedAngleDelta(instance.FollowAngleDegrees, targetAngle);
+            float angularVelocityDegrees = instance.FollowAngularVelocityDegrees;
+            instance.FollowAngleDegrees = SmoothDampAngle(instance.FollowAngleDegrees,
+                                                          unwrappedTargetDegrees,
+                                                          ref angularVelocityDegrees,
+                                                          followDelay,
+                                                          deltaTime);
+            instance.FollowAngularVelocityDegrees = angularVelocityDegrees;
+        }
+
+        instance.AngleDegrees = instance.FollowAngleDegrees;
     }
 
     /// <summary>
@@ -466,16 +512,40 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 
     #region Angle Helpers
     /// <summary>
-    /// Resolves the owner's current look angle in the XZ plane.
+    /// Advances one angle toward an unwrapped target with a critically damped spring, mirroring
+    /// UnityEngine.Mathf.SmoothDamp in Burst-compatible form. The persistent velocity state keeps
+    /// motion velocity-continuous across target discontinuities (ring lattice slips), which is what
+    /// removes the visible stutter a plain exponential filter produces at those moments.
     /// </summary>
-    /// <param name="lookState">Owner look state.</param>
-    /// <returns>Angle in degrees using +Z as zero degrees.</returns>
-    private static float ResolveLookAngleDegrees(in PlayerLookState lookState)
+    /// <param name="currentDegrees">Current angle in degrees.</param>
+    /// <param name="targetDegrees">Target angle already unwrapped near the current angle.</param>
+    /// <param name="angularVelocityDegrees">Persistent angular velocity state, updated in place.</param>
+    /// <param name="smoothTimeSeconds">Approximate time to reach the target.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    /// <returns>New smoothed angle for this frame.</returns>
+    private static float SmoothDampAngle(float currentDegrees,
+                                         float targetDegrees,
+                                         ref float angularVelocityDegrees,
+                                         float smoothTimeSeconds,
+                                         float deltaTime)
     {
-        float3 direction = math.lengthsq(lookState.CurrentDirection) > 0.0001f
-            ? lookState.CurrentDirection
-            : new float3(0f, 0f, 1f);
-        return math.atan2(direction.x, direction.z) * RadiansToDegrees;
+        float omega = 2f / math.max(0.0001f, smoothTimeSeconds);
+        float x = omega * deltaTime;
+        float exponential = 1f / (1f + x + 0.48f * x * x + 0.235f * x * x * x);
+        float change = currentDegrees - targetDegrees;
+        float temp = (angularVelocityDegrees + omega * change) * deltaTime;
+        float smoothedDegrees = targetDegrees + (change + temp) * exponential;
+
+        angularVelocityDegrees = (angularVelocityDegrees - omega * temp) * exponential;
+
+        // Clamp discretization overshoot so the spring can never oscillate around the target.
+        if (targetDegrees - currentDegrees > 0f == smoothedDegrees > targetDegrees)
+        {
+            smoothedDegrees = targetDegrees;
+            angularVelocityDegrees = 0f;
+        }
+
+        return smoothedDegrees;
     }
 
     /// <summary>

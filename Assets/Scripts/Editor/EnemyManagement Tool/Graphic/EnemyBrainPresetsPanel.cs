@@ -16,6 +16,7 @@ public sealed class EnemyBrainPresetsPanel
     private const string ActiveSectionStateKey = "NashCore.EnemyManagement.Brain.ActiveSection";
     private const string ActiveSubSectionStateKey = "NashCore.EnemyManagement.Brain.ActiveSubSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.EnemyManagement.Brain.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.Brain.SelectedPreset";
     #endregion
 
     #region Fields
@@ -374,10 +375,18 @@ public sealed class EnemyBrainPresetsPanel
 
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
-            SelectPreset(filteredPresets[0]);
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            EnemyBrainPreset restoredPreset = ManagementToolStateUtility.LoadAsset<EnemyBrainPreset>(SelectedPresetPathStateKey);
+            EnemyBrainPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            SelectPreset(initialPreset);
 
-            if (listView != null)
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 
@@ -505,6 +514,9 @@ public sealed class EnemyBrainPresetsPanel
     private void SelectPreset(EnemyBrainPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
         detailsRoot.Clear();
         detailsSectionButtonsRoot = null;
         detailsSectionContentRoot = null;

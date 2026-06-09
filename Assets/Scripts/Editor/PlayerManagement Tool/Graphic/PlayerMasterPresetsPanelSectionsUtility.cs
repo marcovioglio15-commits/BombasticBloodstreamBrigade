@@ -325,7 +325,6 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         BuildActiveDetailsSection(panel);
         ManagementToolInteractiveElementColorUtility.RefreshRegisteredSubtree(panel.DetailsRoot);
         panel.RefreshActiveStatus();
-        PlayerMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
 
     /// <summary>
@@ -563,8 +562,6 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
 
         if (string.Equals(propertyName, "visualPreset", StringComparison.Ordinal))
             PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
-
-        PlayerMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
     #endregion
 
@@ -600,17 +597,6 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
 
             if (panelType == PlayerManagementWindow.PanelType.PlayerVisualPresets)
                 PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
-
-            switch (panelType)
-            {
-                case PlayerManagementWindow.PanelType.PlayerControllerPresets:
-                case PlayerManagementWindow.PanelType.LevelUpProgression:
-                case PlayerManagementWindow.PanelType.PowerUps:
-                case PlayerManagementWindow.PanelType.PlayerVisualPresets:
-                case PlayerManagementWindow.PanelType.AnimationBindings:
-                    PlayerMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
-                    break;
-            }
         });
         container.Add(presetField);
 

@@ -45,7 +45,6 @@ internal static class GameMasterPresetsPanelSectionsUtility
         panel.DetailsRoot.Add(panel.DetailSectionButtonsRoot);
         panel.DetailsRoot.Add(panel.DetailSectionContentRoot);
         BuildActiveDetailsSection(panel);
-        GameMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
 
     /// <summary>
@@ -148,7 +147,6 @@ internal static class GameMasterPresetsPanelSectionsUtility
         property.objectReferenceValue = preset;
         panel.PresetSerializedObject.ApplyModifiedProperties();
         GameManagementDraftSession.MarkDirty();
-        GameMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
         BuildActiveDetailsSection(panel);
     }
     #endregion
@@ -345,7 +343,6 @@ internal static class GameMasterPresetsPanelSectionsUtility
         objectField.RegisterValueChangedCallback(evt =>
         {
             GameManagementDraftSession.MarkDirty();
-            GameMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
         });
         section.Add(objectField);
 

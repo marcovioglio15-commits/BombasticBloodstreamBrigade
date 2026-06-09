@@ -56,24 +56,33 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
     }
 
     /// <summary>
-    /// Creates one orbital projection entity at the player position.
+    /// Creates one orbital projection entity at the player position. Reserves the monotonic stable
+    /// order key first and uses it together with the current look angle to compute a slot-aligned
+    /// initial angle when the projection joins an existing Independent Orbit or Follow Player Look
+    /// ring, so respawned projections do not force the ring into a violent layout snap. FollowPlayer
+    /// Look projections also seed FollowAngleDegrees with the initial target so no blend swing
+    /// occurs when the player is mid-turn at respawn time.
     /// </summary>
     /// <param name="entityManager">Entity manager used for prefab component checks.</param>
     /// <param name="commandBuffer">Command buffer receiving the spawn.</param>
     /// <param name="playerEntity">Owner player entity.</param>
     /// <param name="playerPosition">World-space spawn origin.</param>
+    /// <param name="currentLookAngleDegrees">Player's current look angle in degrees at spawn time.</param>
     /// <param name="powerUpId">Source power-up identifier.</param>
     /// <param name="sourceInstanceId">Source instance id used for persistent matching.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="projectionInstances">Live projection snapshot used to slot the new projection.</param>
     /// <param name="projectionConfig">Projection config baked from the module payload.</param>
     /// <param name="persistent">True for passive and toggle-owned projections.</param>
     public static void SpawnProjection(EntityManager entityManager,
                                        ref EntityCommandBuffer commandBuffer,
                                        Entity playerEntity,
                                        float3 playerPosition,
+                                       float currentLookAngleDegrees,
                                        FixedString64Bytes powerUpId,
                                        int sourceInstanceId,
                                        DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                       NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
                                        in OrbitalProjectionConfig projectionConfig,
                                        bool persistent)
     {
@@ -83,6 +92,18 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
             : commandBuffer.CreateEntity();
         OrbitalProjectionConfig runtimeProjectionConfig = projectionConfig;
         LocalTransform spawnTransform = LocalTransform.FromPosition(playerPosition);
+        int stableOrderKey = PlayerOrbitalProjectionStableLayoutUtility.ReserveNextStableOrderKey();
+        float initialAngleDegrees = PlayerOrbitalProjectionStableLayoutUtility.ResolveInitialAngleDegrees(in projectionConfig,
+                                                                                                          stableOrderKey,
+                                                                                                          playerEntity,
+                                                                                                          currentLookAngleDegrees,
+                                                                                                          projectionInstances);
+        // FollowPlayerLook reads FollowAngleDegrees as the smoothed value before applying it to the
+        // visible AngleDegrees, so seeding it to the slot-aligned initial value avoids the otherwise
+        // visible swing from AngleOffsetDegrees toward the live target.
+        float initialFollowAngleDegrees = projectionConfig.MotionMode == OrbitalProjectionMotionMode.FollowPlayerLook
+            ? initialAngleDegrees
+            : projectionConfig.AngleOffsetDegrees;
 
         runtimeProjectionConfig.PrefabEntity = prefabEntity;
 
@@ -97,15 +118,15 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
             PowerUpId = powerUpId,
             ProjectionIndex = projectionConfig.ProjectionIndex,
             SourceInstanceId = sourceInstanceId,
+            StableOrderKey = stableOrderKey,
             Persistent = persistent ? (byte)1 : (byte)0,
             Phase = PlayerOrbitalProjectionPhase.Spawning,
             Config = runtimeProjectionConfig,
             RemainingLifetimeSeconds = persistent ? 0f : math.max(0.05f, projectionConfig.ActiveDurationSeconds),
             CurrentHealth = projectionConfig.HasHealth != 0 ? math.max(0.01f, projectionConfig.MaximumHealth) : float.MaxValue,
-            AngleDegrees = projectionConfig.BounceInsideOrbitCone != 0
-                ? projectionConfig.OrbitConeCenterAngleDegrees
-                : projectionConfig.AngleOffsetDegrees,
-            FollowAngleDegrees = projectionConfig.AngleOffsetDegrees,
+            AngleDegrees = initialAngleDegrees,
+            FollowAngleDegrees = initialFollowAngleDegrees,
+            FollowAngularVelocityDegrees = 0f,
             OrbitBounceDirection = projectionConfig.OrbitSpeedDegreesPerSecond < 0f ? (sbyte)-1 : (sbyte)1,
             PhaseElapsedSeconds = 0f,
             DespawnStartPosition = playerPosition

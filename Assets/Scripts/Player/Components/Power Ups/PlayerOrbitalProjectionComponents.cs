@@ -47,7 +47,11 @@ public struct PlayerOrbitalProjectionLostElement : IBufferElementData
 }
 
 /// <summary>
-/// Runtime state stored on one orbital projection entity.
+/// Runtime state stored on one orbital projection entity. The StableOrderKey field is the deterministic,
+/// spawn-time identifier used by shared ring layouts to assign slots without relying on the volatile
+/// Entity.Index, so that the ordering survives stealer-driven despawn/respawn cycles intact. The
+/// FollowAngularVelocityDegrees field carries the spring-smoothing velocity across frames so Follow
+/// Player Look formation re-alignments stay velocity-continuous (no visible stutter on lattice slips).
 /// </summary>
 public struct PlayerOrbitalProjectionInstance : IComponentData
 {
@@ -55,6 +59,7 @@ public struct PlayerOrbitalProjectionInstance : IComponentData
     public FixedString64Bytes PowerUpId;
     public int ProjectionIndex;
     public int SourceInstanceId;
+    public int StableOrderKey;
     public byte Persistent;
     public PlayerOrbitalProjectionPhase Phase;
     public OrbitalProjectionConfig Config;
@@ -62,6 +67,7 @@ public struct PlayerOrbitalProjectionInstance : IComponentData
     public float CurrentHealth;
     public float AngleDegrees;
     public float FollowAngleDegrees;
+    public float FollowAngularVelocityDegrees;
     public sbyte OrbitBounceDirection;
     public float PhaseElapsedSeconds;
     public float3 DespawnStartPosition;

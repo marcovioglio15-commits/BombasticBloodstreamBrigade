@@ -10,6 +10,7 @@ public sealed class GameSceneManagerPresetsPanel
 {
     #region Constants
     private const float LeftPaneWidth = 280f;
+    internal const string SelectedPresetPathStateKey = "NashCore.GameManagement.SceneManager.SelectedPreset";
     #endregion
 
     #region Fields

@@ -15,6 +15,7 @@ public sealed class PlayerProgressionPresetsPanel
     private const float LeftPaneWidth = 280f;
     private const string ActiveSectionStateKey = "NashCore.PlayerManagement.Progression.ActiveSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.Progression.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.Progression.SelectedPreset";
     private static readonly HashSet<string> MilestonesExcludedRootPropertyNames = new HashSet<string>(StringComparer.Ordinal)
     {
         "presetId",
@@ -356,11 +357,19 @@ public sealed class PlayerProgressionPresetsPanel
 
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
-            SelectPreset(filteredPresets[0]);
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            PlayerProgressionPreset restoredPreset = ManagementToolStateUtility.LoadAsset<PlayerProgressionPreset>(SelectedPresetPathStateKey);
+            PlayerProgressionPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            SelectPreset(initialPreset);
 
-            if (listView != null)
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
             {
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
             }
         }
     }
@@ -519,6 +528,9 @@ public sealed class PlayerProgressionPresetsPanel
     private void SelectPreset(PlayerProgressionPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
         PlayerManagementSelectionContext.SetActiveProgressionPreset(selectedPreset);
         detailsRoot.Clear();
         sectionButtonsRoot = null;

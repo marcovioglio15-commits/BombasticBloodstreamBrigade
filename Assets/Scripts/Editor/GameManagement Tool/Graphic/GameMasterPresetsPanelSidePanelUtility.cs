@@ -61,21 +61,46 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         panel.Root.Add(tabBar);
         panel.Root.Add(contentHost);
 
+        // The intended active panel may be reassigned by the restore calls below, so capture it up
+        // front and re-apply at the end.
+        GameManagementWindow.PanelType intendedActivePanel = panel.ActivePanel;
+
         panel.SuppressStateWrite = true;
         AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null);
 
-        if (panel.ActivePanel == GameManagementWindow.PanelType.AudioManager)
-            OpenSidePanel(panel, GameManagementWindow.PanelType.AudioManager);
+        // Isolate per-panel failures: one panel that throws while constructing must not stop the
+        // master tab from displaying.
+        if (intendedActivePanel == GameManagementWindow.PanelType.AudioManager)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.AudioManager);
 
-        if (panel.ActivePanel == GameManagementWindow.PanelType.SceneManager)
-            OpenSidePanel(panel, GameManagementWindow.PanelType.SceneManager);
+        if (intendedActivePanel == GameManagementWindow.PanelType.SceneManager)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.SceneManager);
 
-        if (!panel.SidePanels.ContainsKey(panel.ActivePanel))
-            panel.ActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
+        if (!panel.SidePanels.ContainsKey(intendedActivePanel))
+            intendedActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
 
-        SetActivePanel(panel, panel.ActivePanel);
+        panel.ActivePanel = intendedActivePanel;
+        SetActivePanel(panel, intendedActivePanel);
         panel.SuppressStateWrite = false;
         ManagementToolStateUtility.SaveEnumValue(ActivePanelStateKey, panel.ActivePanel);
+    }
+
+    /// <summary>
+    /// Calls OpenSidePanel inside a try/catch so a transient asset failure for one side panel does
+    /// not prevent the rest of the master tab from coming up.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type to open.</param>
+    private static void TryOpenSidePanelSafe(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
+    {
+        try
+        {
+            OpenSidePanel(panel, panelType);
+        }
+        catch (System.Exception sidePanelException)
+        {
+            UnityEngine.Debug.LogException(sidePanelException);
+        }
     }
 
     /// <summary>
@@ -88,10 +113,11 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         if (panel == null)
             return;
 
+        // Side panels no longer auto-route to the master preset's referenced sub-preset; they keep
+        // whatever the user last navigated to (restored from their own persisted selection key).
         if (panel.SidePanels.ContainsKey(panelType))
         {
             SetActivePanel(panel, panelType);
-            SyncSidePanelSelection(panel, panelType, panel.SidePanels[panelType]);
             return;
         }
 
@@ -108,11 +134,11 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         }
 
         SetActivePanel(panel, panelType);
-        SyncSidePanelSelection(panel, panelType, panel.SidePanels[panelType]);
     }
 
     /// <summary>
-    /// Refreshes every open side panel after session changes.
+    /// Refreshes every open side panel after session changes. Side panels keep their own persisted
+    /// selection and are no longer rerouted to the master preset's referenced sub-preset.
     /// </summary>
     /// <param name="panel">Owning panel with opened side panel controllers.</param>
     public static void RefreshOpenSidePanels(GameMasterPresetsPanel panel)
@@ -133,21 +159,6 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             if (entry.ScenePanel != null)
                 entry.ScenePanel.RefreshFromSessionChange();
         }
-
-        SyncOpenSidePanels(panel);
-    }
-
-    /// <summary>
-    /// Synchronizes all open side panel selections with the selected master preset references.
-    /// </summary>
-    /// <param name="panel">Owning panel with selected master preset context.</param>
-    public static void SyncOpenSidePanels(GameMasterPresetsPanel panel)
-    {
-        if (panel == null)
-            return;
-
-        foreach (KeyValuePair<GameManagementWindow.PanelType, GameMasterPresetsPanel.SidePanelEntry> entry in panel.SidePanels)
-            SyncSidePanelSelection(panel, entry.Key, entry.Value);
     }
 
     /// <summary>
@@ -328,35 +339,6 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
         if (panel.ActivePanel == panelType)
             SetActivePanel(panel, GameManagementWindow.PanelType.GameMasterPresets);
-    }
-
-    /// <summary>
-    /// Synchronizes one side panel selection with the selected master preset.
-    /// </summary>
-    /// <param name="panel">Owning panel with selected master preset context.</param>
-    /// <param name="panelType">Side panel type.</param>
-    /// <param name="entry">Side panel entry.</param>
-    private static void SyncSidePanelSelection(GameMasterPresetsPanel panel,
-                                               GameManagementWindow.PanelType panelType,
-                                               GameMasterPresetsPanel.SidePanelEntry entry)
-    {
-        if (panel.SelectedPreset == null || entry == null)
-            return;
-
-        if (panelType == GameManagementWindow.PanelType.AudioManager &&
-            entry.AudioPanel != null &&
-            panel.SelectedPreset.AudioManagerPreset != null)
-        {
-            entry.AudioPanel.SelectPresetFromExternal(panel.SelectedPreset.AudioManagerPreset);
-            return;
-        }
-
-        if (panelType == GameManagementWindow.PanelType.SceneManager &&
-            entry.ScenePanel != null &&
-            panel.SelectedPreset.SceneManagerPreset != null)
-        {
-            entry.ScenePanel.SelectPresetFromExternal(panel.SelectedPreset.SceneManagerPreset);
-        }
     }
 
     /// <summary>

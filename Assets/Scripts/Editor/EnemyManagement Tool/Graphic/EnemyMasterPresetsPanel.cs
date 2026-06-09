@@ -593,11 +593,6 @@ public sealed class EnemyMasterPresetsPanel
     #endregion
 
     #region Helpers
-    private void SyncOpenSidePanels()
-    {
-        EnemyMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(this);
-    }
-
     private void RefreshOpenSidePanels()
     {
         EnemyMasterPresetsPanelSidePanelUtility.RefreshOpenSidePanels(this);

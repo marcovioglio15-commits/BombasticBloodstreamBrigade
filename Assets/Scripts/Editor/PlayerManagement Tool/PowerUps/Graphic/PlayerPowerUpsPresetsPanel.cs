@@ -17,6 +17,7 @@ public sealed class PlayerPowerUpsPresetsPanel
     private const float LeftPaneWidth = 280f;
     private const string ActiveSectionStateKey = "NashCore.PlayerManagement.PowerUps.ActiveSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.PowerUps.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.PowerUps.SelectedPreset";
     #endregion
 
     #region Fields
@@ -321,10 +322,18 @@ public sealed class PlayerPowerUpsPresetsPanel
 
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
-            SelectPreset(filteredPresets[0]);
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            PlayerPowerUpsPreset restoredPreset = ManagementToolStateUtility.LoadAsset<PlayerPowerUpsPreset>(SelectedPresetPathStateKey);
+            PlayerPowerUpsPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            SelectPreset(initialPreset);
 
-            if (listView != null)
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 
@@ -487,6 +496,9 @@ public sealed class PlayerPowerUpsPresetsPanel
     private void SelectPreset(PlayerPowerUpsPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
         PlayerManagementSelectionContext.SetActivePowerUpsPreset(selectedPreset);
         sectionButtonsRoot = null;
         sectionContentRoot = null;

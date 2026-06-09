@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10910fec561694a45ad2b09a5ad9bbba, type: 3}
-  m_Name: PlayerPowerUpsPreset_ShieldPool
+  m_Name: PlayerPowerUpsPreset_MegaProjectilesPool
   m_EditorClassIdentifier: Assembly-CSharp::PlayerPowerUpsPreset
-  presetId: c802aa62d0bf4531a56d907b3c6ab522
-  presetName: PlayerPowerUpsPreset_ShieldPool
+  presetId: 54a71f19187647a28bf2e86a6d1e54d9
+  presetName: PlayerPowerUpsPreset_MegaProjectilesPool
   description: 
   version: 1.0.0
   scalingRules:
@@ -205,7 +205,7 @@ MonoBehaviour:
       selectionWeight: 1
     - entryKind: 1
       powerUpId: Passive_MegaProjectiles
-      selectionWeight: 1
+      selectionWeight: 80
     - entryKind: 1
       powerUpId: Passive_MicroProjectiles
       selectionWeight: 1
@@ -223,7 +223,7 @@ MonoBehaviour:
       selectionWeight: 1
     - entryKind: 1
       powerUpId: Passive_OrbitalShield
-      selectionWeight: 80
+      selectionWeight: 1
     - entryKind: 1
       powerUpId: Passive_OrbitalSpear
       selectionWeight: 1

@@ -32,6 +32,8 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         if (panel == null)
             return;
 
+        // Side panels no longer auto-route to the master preset's referenced sub-preset; they keep
+        // whatever the user last navigated to (restored from their own persisted selection key).
         if (panel.SidePanels.ContainsKey(panelType))
         {
             PlayerMasterPresetsPanel.SidePanelEntry existingEntry = panel.SidePanels[panelType];
@@ -39,7 +41,6 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
             if (existingEntry != null)
                 SetActivePanel(panel, panelType);
 
-            SyncSidePanelSelection(panel, panelType, existingEntry);
             return;
         }
 
@@ -61,7 +62,6 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
 
         AddTab(panel, panelType, GetPanelTitle(panelType), content, controllerPanel, progressionPanel, powerUpsPanel, visualPanel, animationPanel);
         SetActivePanel(panel, panelType);
-        SyncSidePanelSelection(panel, panelType, panel.SidePanels[panelType]);
     }
 
     /// <summary>
@@ -91,6 +91,10 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         panel.Root.Add(tabBar);
         panel.Root.Add(contentHost);
 
+        // The intended active panel may be reassigned by RestoreOpenSidePanels (each restored side
+        // panel calls SetActivePanel), so capture it up front and re-apply at the end.
+        PlayerManagementWindow.PanelType intendedActivePanel = panel.ActivePanel;
+
         panel.SuppressStateWrite = true;
         AddTab(panel,
                PlayerManagementWindow.PanelType.PlayerMasterPresets,
@@ -103,17 +107,22 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                null);
         RestoreOpenSidePanels(panel);
 
-        if (!panel.SidePanels.ContainsKey(panel.ActivePanel))
-            panel.ActivePanel = PlayerManagementWindow.PanelType.PlayerMasterPresets;
+        if (!panel.SidePanels.ContainsKey(intendedActivePanel))
+            intendedActivePanel = PlayerManagementWindow.PanelType.PlayerMasterPresets;
 
-        SetActivePanel(panel, panel.ActivePanel);
+        panel.ActivePanel = intendedActivePanel;
+        SetActivePanel(panel, intendedActivePanel);
         panel.SuppressStateWrite = false;
-        SaveOpenPanelsState(panel);
+        // Do NOT re-save OpenPanelsStateKey here. The persisted set was the source of truth for
+        // restoration; if a transient failure dropped a panel, we want the original set preserved
+        // so the next reopen can retry that panel cleanly. The user-driven AddTab/CloseSidePanel
+        // calls are the only legitimate writers to that key.
         ManagementToolStateUtility.SaveEnumValue(ActivePanelStateKey, panel.ActivePanel);
     }
 
     /// <summary>
-    /// Refreshes all opened side panels after external asset changes and then re-synchronizes selections.
+    /// Refreshes all opened side panels after external asset changes. Side panels keep their own
+    /// persisted selection and are no longer rerouted to the master preset's referenced sub-preset.
     /// </summary>
     /// <param name="panel">Owning panel that stores opened side panel controllers.</param>
 
@@ -122,6 +131,9 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         if (panel == null)
             return;
 
+        // Refresh-only: rebind each side panel to its live draft session state. The master preset no
+        // longer drives the selected sub-preset of each side panel; persisted side-panel selections
+        // are restored independently when the panel reopens.
         foreach (KeyValuePair<PlayerManagementWindow.PanelType, PlayerMasterPresetsPanel.SidePanelEntry> panelEntry in panel.SidePanels)
         {
             PlayerMasterPresetsPanel.SidePanelEntry entry = panelEntry.Value;
@@ -145,22 +157,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                 entry.AnimationPanel.RefreshFromSessionChange();
         }
 
-        SyncOpenSidePanels(panel);
         PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
-    }
-
-    /// <summary>
-    /// Synchronizes all opened side panels with the currently selected master preset references.
-    /// </summary>
-    /// <param name="panel">Owning panel that stores side panel entries.</param>
-
-    public static void SyncOpenSidePanels(PlayerMasterPresetsPanel panel)
-    {
-        if (panel == null)
-            return;
-
-        foreach (KeyValuePair<PlayerManagementWindow.PanelType, PlayerMasterPresetsPanel.SidePanelEntry> entry in panel.SidePanels)
-            SyncSidePanelSelection(panel, entry.Key, entry.Value);
     }
 
     /// <summary>
@@ -398,45 +395,6 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
     }
 
     /// <summary>
-    /// Synchronizes one side panel selection with the currently selected master preset.
-    /// </summary>
-    /// <param name="panel">Owning panel that provides the selected master preset.</param>
-    /// <param name="panelType">Side panel type to synchronize.</param>
-    /// <param name="entry">Resolved side panel entry.</param>
-
-    private static void SyncSidePanelSelection(PlayerMasterPresetsPanel panel,
-                                               PlayerManagementWindow.PanelType panelType,
-                                               PlayerMasterPresetsPanel.SidePanelEntry entry)
-    {
-        if (panel == null || entry == null || panel.SelectedPreset == null)
-            return;
-
-        switch (panelType)
-        {
-            case PlayerManagementWindow.PanelType.PlayerControllerPresets:
-                if (entry.ControllerPanel != null && panel.SelectedPreset.ControllerPreset != null)
-                    entry.ControllerPanel.SelectPresetFromExternal(panel.SelectedPreset.ControllerPreset);
-                return;
-            case PlayerManagementWindow.PanelType.LevelUpProgression:
-                if (entry.ProgressionPanel != null && panel.SelectedPreset.ProgressionPreset != null)
-                    entry.ProgressionPanel.SelectPresetFromExternal(panel.SelectedPreset.ProgressionPreset);
-                return;
-            case PlayerManagementWindow.PanelType.PowerUps:
-                if (entry.PowerUpsPanel != null && panel.SelectedPreset.PowerUpsPreset != null)
-                    entry.PowerUpsPanel.SelectPresetFromExternal(panel.SelectedPreset.PowerUpsPreset);
-                return;
-            case PlayerManagementWindow.PanelType.PlayerVisualPresets:
-                if (entry.VisualPanel != null && panel.SelectedPreset.VisualPreset != null)
-                    entry.VisualPanel.SelectPresetFromExternal(panel.SelectedPreset.VisualPreset);
-                return;
-            case PlayerManagementWindow.PanelType.AnimationBindings:
-                if (entry.AnimationPanel != null && panel.SelectedPreset.AnimationBindingsPreset != null)
-                    entry.AnimationPanel.SelectPresetFromExternal(panel.SelectedPreset.AnimationBindingsPreset);
-                return;
-        }
-    }
-
-    /// <summary>
     /// Activates one panel tab, persists selection and swaps visible content.
     /// </summary>
     /// <param name="panel">Owning panel that stores active tab state.</param>
@@ -506,7 +464,16 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
             if (openPanel == PlayerManagementWindow.PanelType.PlayerMasterPresets)
                 continue;
 
-            OpenSidePanel(panel, openPanel);
+            // Isolate per-panel failures: one panel that throws while constructing must not stop
+            // the rest of the persisted tabs from coming back.
+            try
+            {
+                OpenSidePanel(panel, openPanel);
+            }
+            catch (System.Exception sidePanelException)
+            {
+                UnityEngine.Debug.LogException(sidePanelException);
+            }
         }
     }
 

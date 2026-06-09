@@ -27,6 +27,9 @@ internal static class PlayerControllerPresetsPanelSectionsUtility
             return;
 
         panel.SelectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen resumes the same preset without
+        // needing the master preset to drive it.
+        ManagementToolStateUtility.SaveAssetPath(PlayerControllerPresetsPanel.SelectedPresetPathStateKey, preset);
         panel.DetailsRoot.Clear();
         panel.SectionButtonsRoot = null;
         panel.SectionContentRoot = null;

@@ -163,6 +163,27 @@ public static class PlayerScalingFieldElementFactory
             ClearActiveFormulaField(fieldKey);
         });
 
+        // Revalidate against the refreshed master scope whenever the cross-panel selection context
+        // changes: side panels are no longer rebuilt on master selection, so a stale metadata cache
+        // would otherwise keep false "unknown scalable stat" warnings (or stale helper text) alive
+        // until the section is manually switched. The attach handler also re-syncs immediately,
+        // because sections can be built while detached (window reopen, inactive tabs) and miss
+        // context changes that happened before they joined the live panel hierarchy.
+        Action contextChangedHandler = () =>
+        {
+            formulaMetadataResolved = false;
+            RefreshFromSerializedState();
+        };
+        root.RegisterCallback<AttachToPanelEvent>(evt =>
+        {
+            PlayerManagementSelectionContext.ContextChanged += contextChangedHandler;
+            contextChangedHandler();
+        });
+        root.RegisterCallback<DetachFromPanelEvent>(evt =>
+        {
+            PlayerManagementSelectionContext.ContextChanged -= contextChangedHandler;
+        });
+
         RefreshFromSerializedState();
 
         addScalingToggle.RegisterValueChangedCallback(evt =>

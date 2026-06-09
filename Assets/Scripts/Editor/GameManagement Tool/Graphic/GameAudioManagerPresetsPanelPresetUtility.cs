@@ -53,7 +53,15 @@ internal static class GameAudioManagerPresetsPanelPresetUtility
         }
 
         if (panel.SelectedPreset == null || !panel.FilteredPresets.Contains(panel.SelectedPreset))
-            panel.SelectPreset(panel.FilteredPresets[0]);
+        {
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            GameAudioManagerPreset restoredPreset = ManagementToolStateUtility.LoadAsset<GameAudioManagerPreset>(GameAudioManagerPresetsPanel.SelectedPresetPathStateKey);
+            GameAudioManagerPreset initialPreset = restoredPreset != null && panel.FilteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : panel.FilteredPresets[0];
+            panel.SelectPreset(initialPreset);
+        }
     }
 
     /// <summary>

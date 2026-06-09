@@ -242,7 +242,12 @@ MonoBehaviour:
     maxShieldAdjustmentMode: 0
     graceTimeSeconds: 0
     legacyHealthMigrated: 0
-  scalingRules: []
+  scalingRules:
+  - statKey: 'shootingSettings.values.appliedElements.Array.data[0]'
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   elementalPayloadScalingMigrated: 1
   moveActionId: 351f2ccd-1f9f-44bf-9bec-d62ac5c5f408
   lookActionId: 6b444451-8a00-4d00-a97e-f47457f736a8

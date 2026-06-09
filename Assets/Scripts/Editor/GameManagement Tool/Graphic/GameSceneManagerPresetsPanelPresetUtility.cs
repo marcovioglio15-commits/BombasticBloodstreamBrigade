@@ -53,7 +53,15 @@ internal static class GameSceneManagerPresetsPanelPresetUtility
         }
 
         if (panel.SelectedPreset == null || !panel.FilteredPresets.Contains(panel.SelectedPreset))
-            panel.SelectPreset(panel.FilteredPresets[0]);
+        {
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            GameSceneManagerPreset restoredPreset = ManagementToolStateUtility.LoadAsset<GameSceneManagerPreset>(GameSceneManagerPresetsPanel.SelectedPresetPathStateKey);
+            GameSceneManagerPreset initialPreset = restoredPreset != null && panel.FilteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : panel.FilteredPresets[0];
+            panel.SelectPreset(initialPreset);
+        }
     }
 
     /// <summary>

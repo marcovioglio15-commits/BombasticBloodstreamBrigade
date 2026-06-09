@@ -279,7 +279,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         BuildActiveDetailsSection(panel);
         ManagementToolInteractiveElementColorUtility.RefreshRegisteredSubtree(panel.DetailsRoot);
         panel.RefreshActiveStatus();
-        EnemyMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
 
     /// <summary>
@@ -489,7 +488,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         property.objectReferenceValue = preset;
         panel.PresetSerializedObject.ApplyModifiedProperties();
         EnemyManagementDraftSession.MarkDirty();
-        EnemyMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
     }
     #endregion
 
@@ -560,9 +558,6 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
             panel.PresetSerializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(panel.SelectedPreset);
             EnemyManagementDraftSession.MarkDirty();
-
-            if (panelType != EnemyManagementWindow.PanelType.EnemyMasterPresets)
-                EnemyMasterPresetsPanelSidePanelUtility.SyncOpenSidePanels(panel);
         });
         container.Add(presetField);
 

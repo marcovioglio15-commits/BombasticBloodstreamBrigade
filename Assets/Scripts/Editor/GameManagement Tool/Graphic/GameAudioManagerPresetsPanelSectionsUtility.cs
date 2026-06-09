@@ -39,6 +39,9 @@ internal static class GameAudioManagerPresetsPanelSectionsUtility
             return;
 
         panel.SelectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(GameAudioManagerPresetsPanel.SelectedPresetPathStateKey, preset);
         panel.DetailsRoot.Clear();
 
         if (panel.PresetListView != null && panel.SelectedPreset != null)

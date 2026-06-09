@@ -15,6 +15,7 @@ public sealed class PlayerControllerPresetsPanel
     private const float LeftPaneWidth = 280f;
     internal const string ActiveSectionStateKey = "NashCore.PlayerManagement.Controller.ActiveSection";
     internal const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.Controller.DetailsScroll";
+    internal const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.Controller.SelectedPreset";
     #endregion
 
     #region Fields

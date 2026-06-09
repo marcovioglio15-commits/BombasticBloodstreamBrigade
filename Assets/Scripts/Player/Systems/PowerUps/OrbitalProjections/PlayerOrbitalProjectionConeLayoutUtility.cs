@@ -102,16 +102,17 @@ internal static class PlayerOrbitalProjectionConeLayoutUtility
     }
 
     /// <summary>
-    /// Resolves a deterministic ordering key for orbital projection layout slots on the same ring.
+    /// Resolves the deterministic ordering key for one orbital projection layout slot on a shared ring.
+    /// The stable key is assigned at spawn (monotonic counter) so that despawn/respawn cycles caused by
+    /// Stealer enemies preserve the original slot ordering and avoid violent layout snaps.
     /// </summary>
-    /// <param name="projectionEntity">Projection entity used as the final ordering tie-breaker.</param>
-    /// <param name="instance">Projection instance carrying source metadata.</param>
+    /// <param name="projectionEntity">Unused entity reference kept for parity with previous call sites.</param>
+    /// <param name="instance">Projection instance carrying its stable ordering key.</param>
     /// <returns>Stable integer key for one live projection.</returns>
     public static int ResolveSortKey(Entity projectionEntity, in PlayerOrbitalProjectionInstance instance)
     {
-        int sourceKey = instance.SourceInstanceId + 2048;
-        int projectionKey = instance.ProjectionIndex + 2048;
-        return sourceKey * 1_000_000 + projectionKey * 1_000 + projectionEntity.Index;
+        _ = projectionEntity;
+        return instance.StableOrderKey;
     }
     #endregion
 

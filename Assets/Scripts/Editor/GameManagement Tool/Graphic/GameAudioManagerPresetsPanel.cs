@@ -10,6 +10,7 @@ public sealed class GameAudioManagerPresetsPanel
 {
     #region Constants
     private const float LeftPaneWidth = 280f;
+    internal const string SelectedPresetPathStateKey = "NashCore.GameManagement.AudioManager.SelectedPreset";
     #endregion
 
     #region Fields

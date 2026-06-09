@@ -284,6 +284,12 @@ public sealed class PlayerMasterPresetsPanel
         library = PlayerMasterPresetLibraryUtility.GetOrCreateLibrary();
         PlayerMasterPresetsPanelSidePanelUtility.RestorePersistedState(this);
 
+        // Seed the cross-panel selection context BEFORE side panels are restored: their Add Scaling
+        // sections validate formulas against the master-scoped scalable-stat set at build time, and
+        // a still-null context would flag every referenced variable as an unknown scalable stat
+        // until the section is manually rebuilt.
+        PlayerManagementSelectionContext.SetActiveMasterPreset(PlayerMasterPresetsPanelSidePanelUtility.LoadPersistedSelectedPreset());
+
         BuildUI();
         RefreshPresetList();
     }

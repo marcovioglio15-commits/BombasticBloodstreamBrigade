@@ -45,6 +45,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        ComponentLookup<PlayerLookState> lookStateLookup = SystemAPI.GetComponentLookup<PlayerLookState>(true);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         BufferLookup<PlayerOrbitalProjectionPrefabElement> prefabBindingsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionPrefabElement>(true);
@@ -66,6 +67,12 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
             PlayerPowerUpsState powerUpsState = powerUpsStateLookup.HasComponent(playerEntity)
                 ? powerUpsStateLookup[playerEntity]
                 : default;
+            // FollowPlayerLook respawns slot-align against the player's live look angle so they
+            // don't visibly swing from the authored offset toward the current look target.
+            PlayerLookState lookState = lookStateLookup.HasComponent(playerEntity)
+                ? lookStateLookup[playerEntity]
+                : default;
+            float currentLookAngleDegrees = PlayerOrbitalProjectionStableLayoutUtility.ResolveLookAngleDegrees(in lookState);
             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup.HasBuffer(playerEntity)
                 ? equippedPassiveToolsLookup[playerEntity]
                 : default;
@@ -83,6 +90,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                         projectionInstances,
                                         playerEntity,
                                         playerTransform.ValueRO.Position,
+                                        currentLookAngleDegrees,
                                         equippedPassiveTools,
                                         prefabBindings,
                                         lostProjections,
@@ -100,6 +108,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                      projectionInstances,
                                      playerEntity,
                                      playerTransform.ValueRO.Position,
+                                     currentLookAngleDegrees,
                                      prefabBindings,
                                      lostProjections,
                                      spawnRequests);
@@ -124,6 +133,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="projectionInstances">Snapshot of projection instance data aligned with projectionEntities.</param>
     /// <param name="playerEntity">Player entity owning the persistent projection sources.</param>
     /// <param name="playerPosition">Current player world position used as spawn origin.</param>
+    /// <param name="currentLookAngleDegrees">Player's current look angle in degrees, propagated for FollowPlayerLook slot alignment.</param>
     /// <param name="equippedPassiveTools">Equipped passive tool buffer.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
     /// <param name="lostProjections">Player-owned permanent loss markers for health-based projections.</param>
@@ -136,6 +146,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                     NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
                                                     Entity playerEntity,
                                                     float3 playerPosition,
+                                                    float currentLookAngleDegrees,
                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                     DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
                                                     DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
@@ -154,6 +165,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                               projectionInstances,
                                               playerEntity,
                                               playerPosition,
+                                              currentLookAngleDegrees,
                                               passiveTool.PowerUpId,
                                               passiveIndex,
                                               prefabBindings,
@@ -173,6 +185,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           projectionInstances,
                                           playerEntity,
                                           playerPosition,
+                                          currentLookAngleDegrees,
                                           powerUpsConfig.PrimarySlot.PowerUpId,
                                           -1,
                                           prefabBindings,
@@ -190,6 +203,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           projectionInstances,
                                           playerEntity,
                                           playerPosition,
+                                          currentLookAngleDegrees,
                                           powerUpsConfig.SecondarySlot.PowerUpId,
                                           -2,
                                           prefabBindings,
@@ -219,6 +233,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="projectionInstances">Snapshot of projection instance data aligned with projectionEntities.</param>
     /// <param name="playerEntity">Player entity owning the projection.</param>
     /// <param name="playerPosition">Current player world position used as spawn origin.</param>
+    /// <param name="currentLookAngleDegrees">Player's current look angle in degrees, propagated for FollowPlayerLook slot alignment.</param>
     /// <param name="powerUpId">Source power-up identifier used for replacement policy.</param>
     /// <param name="sourceInstanceId">Stable source instance id for the current passive or toggle source.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
@@ -234,6 +249,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                       NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
                                                       Entity playerEntity,
                                                       float3 playerPosition,
+                                                      float currentLookAngleDegrees,
                                                       FixedString64Bytes powerUpId,
                                                       int sourceInstanceId,
                                                       DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
@@ -296,9 +312,11 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                                        ref commandBuffer,
                                                                        playerEntity,
                                                                        playerPosition,
+                                                                       currentLookAngleDegrees,
                                                                        powerUpId,
                                                                        sourceInstanceId,
                                                                        prefabBindings,
+                                                                       projectionInstances,
                                                                        projectionConfig,
                                                                        true);
         }
@@ -551,6 +569,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="projectionInstances">Snapshot of projection instance data aligned with projectionEntities.</param>
     /// <param name="playerEntity">Player entity that owns the request buffer.</param>
     /// <param name="playerPosition">Current player world position used as spawn origin.</param>
+    /// <param name="currentLookAngleDegrees">Player's current look angle in degrees, propagated for FollowPlayerLook slot alignment.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
     /// <param name="lostProjections">Player-owned permanent loss markers for persistent health-based projections.</param>
     /// <param name="spawnRequests">Mutable spawn request buffer.</param>
@@ -561,6 +580,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                              NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
                                              Entity playerEntity,
                                              float3 playerPosition,
+                                             float currentLookAngleDegrees,
                                              DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
                                              DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                              DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> spawnRequests)
@@ -601,9 +621,11 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                                            ref commandBuffer,
                                                                            ownerEntity,
                                                                            playerPosition,
+                                                                           currentLookAngleDegrees,
                                                                            request.PowerUpId,
                                                                            request.SourceInstanceId,
                                                                            prefabBindings,
+                                                                           projectionInstances,
                                                                            projectionConfig,
                                                                            request.Persistent != 0);
             }

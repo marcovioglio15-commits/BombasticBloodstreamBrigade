@@ -248,7 +248,23 @@ MonoBehaviour:
         directionMode: 0
         stackingMode: 0
     conditionalWeaponSwitches:
-      entries: []
+      entries:
+      - weaponId: Cannon
+        priority: 0
+        overridePowerUpSwitch: 1
+        conditions:
+        - statName: BulletSizeMultiplier
+          minimumValue: 2
+          maximumValue: 5
+          requirement: 2
+      - weaponId: Gatling
+        priority: 0
+        overridePowerUpSwitch: 1
+        conditions:
+        - statName: BulletSizeMultiplier
+          minimumValue: 0
+          maximumValue: 1
+          requirement: 2
     initialPoolCapacity: 1500
     poolExpandBatch: 1500
   healthStatistics:
@@ -312,8 +328,8 @@ MonoBehaviour:
   - statKey: shootingSettings.values.projectileSizeMultiplier
     addScaling: 1
     formula: '[this] * [BulletSizeMultiplier]'
-    debugInConsole: 0
-    debugColor: {r: 1, g: 0.1254902, b: 0.015686275, a: 1}
+    debugInConsole: 1
+    debugColor: {r: 1, g: 0.927939, b: 0.015686274, a: 1}
   - statKey: shootingSettings.values.explosionRadius
     addScaling: 1
     formula: '[this] * [BulletSizeMultiplier]'

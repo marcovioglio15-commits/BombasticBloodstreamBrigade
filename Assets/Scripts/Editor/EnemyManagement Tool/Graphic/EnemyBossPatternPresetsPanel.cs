@@ -14,6 +14,7 @@ public sealed class EnemyBossPatternPresetsPanel
     private const float LeftPaneWidth = 280f;
     private const string ActiveSectionStateKey = "NashCore.EnemyManagement.BossPattern.ActiveSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.EnemyManagement.BossPattern.DetailsScroll";
+    private const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.BossPattern.SelectedPreset";
     #endregion
 
     #region Fields
@@ -387,10 +388,18 @@ public sealed class EnemyBossPatternPresetsPanel
 
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
-            SelectPreset(filteredPresets[0]);
+            // Prefer this side panel's own persisted preset so close/reopen lands on the same record
+            // independently from the master preset's referenced sub-preset.
+            EnemyBossPatternPreset restoredPreset = ManagementToolStateUtility.LoadAsset<EnemyBossPatternPreset>(SelectedPresetPathStateKey);
+            EnemyBossPatternPreset initialPreset = restoredPreset != null && filteredPresets.Contains(restoredPreset)
+                ? restoredPreset
+                : filteredPresets[0];
+            SelectPreset(initialPreset);
 
-            if (listView != null)
-                listView.SetSelectionWithoutNotify(new int[] { 0 });
+            int initialIndex = filteredPresets.IndexOf(initialPreset);
+
+            if (initialIndex >= 0 && listView != null)
+                listView.SetSelectionWithoutNotify(new int[] { initialIndex });
         }
     }
 
@@ -475,6 +484,9 @@ public sealed class EnemyBossPatternPresetsPanel
     internal void SelectPresetInternal(EnemyBossPatternPreset preset)
     {
         selectedPreset = preset;
+        // Persist this side panel's own selection so close/reopen lands on the same preset
+        // independently from the master preset that drove the previous workflow.
+        ManagementToolStateUtility.SaveAssetPath(SelectedPresetPathStateKey, preset);
         detailsRoot.Clear();
         detailsSectionButtonsRoot = null;
         detailsSectionContentRoot = null;
