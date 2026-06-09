@@ -117,7 +117,7 @@ MonoBehaviour:
   deathPuddle:
     enabled: 1
     puddlePrefab: {fileID: 4595589246624639381, guid: 18aab18312155164faf7c073936073d5, type: 3}
-    lifetimeSeconds: 4
+    lifetimeSeconds: 1.5
     stableFraction: 0.2
     finalScaleRatio: 0.08
     evaporationCurve: 0
