@@ -111,9 +111,9 @@ MonoBehaviour:
     deathVfxLifetimeSeconds: 0.75
     deathVfxScaleMultiplier: 1
     useEnemyBaseColorForDeathDebris: 0
-    deathDebrisFallbackColor: {r: 0.64705884, g: 0.15686275, b: 0.92156863, a: 1}
+    deathDebrisFallbackColor: {r: 0.5372549, g: 0.06666667, b: 0.8117647, a: 1}
     deathDebrisParticleChildName: VFX_Debris
-    spawnPaintColor: {r: 0.64705884, g: 0.15686275, b: 0.92156863, a: 1}
+    spawnPaintColor: {r: 0.5372549, g: 0.06666667, b: 0.8117647, a: 1}
   deathPuddle:
     enabled: 1
     puddlePrefab: {fileID: 4595589246624639381, guid: 18aab18312155164faf7c073936073d5, type: 3}
