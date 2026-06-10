@@ -60,8 +60,8 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
     /// order key first and uses it together with the current look angle to compute a slot-aligned
     /// initial angle when the projection joins an existing Independent Orbit or Follow Player Look
     /// ring, so respawned projections do not force the ring into a violent layout snap. FollowPlayer
-    /// Look projections also seed FollowAngleDegrees with the initial target so no blend swing
-    /// occurs when the player is mid-turn at respawn time.
+    /// Look projections also seed their visible and continuously unwrapped look angles so no blend
+    /// swing or first-frame wrap correction occurs when the player is mid-turn at respawn time.
     /// </summary>
     /// <param name="entityManager">Entity manager used for prefab component checks.</param>
     /// <param name="commandBuffer">Command buffer receiving the spawn.</param>
@@ -159,6 +159,7 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
             CurrentHealth = projectionConfig.HasHealth != 0 ? math.max(0.01f, projectionConfig.MaximumHealth) : float.MaxValue,
             AngleDegrees = initialAngleDegrees,
             FollowAngleDegrees = initialFollowAngleDegrees,
+            FollowLookAngleDegrees = currentLookAngleDegrees,
             FollowAngularVelocityDegrees = 0f,
             OrbitBounceDirection = projectionConfig.OrbitSpeedDegreesPerSecond < 0f ? (sbyte)-1 : (sbyte)1,
             PhaseElapsedSeconds = 0f,

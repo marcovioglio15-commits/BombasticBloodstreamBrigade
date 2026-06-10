@@ -165,16 +165,18 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
                                              float deltaTime)
     {
         float currentLookAngleDegrees = PlayerOrbitalProjectionStableLayoutUtility.ResolveLookAngleDegrees(in lookState);
+        instance.FollowLookAngleDegrees += ResolveSignedAngleDelta(instance.FollowLookAngleDegrees,
+                                                                  currentLookAngleDegrees);
         float targetAngle;
 
-        // Reuse the shared ring resolver: returns false when this projection is alone on its ring,
-        // in which case the authored offset is the only term to apply.
+        // Resolve targets from the continuous look angle rather than the lagging visible angle.
+        // This prevents shortest-path direction flips while the player spins faster than the follow spring.
         if (!PlayerOrbitalProjectionStableLayoutUtility.TryResolveLiveRingTargetAngle(in instance,
-                                                                                       currentLookAngleDegrees,
+                                                                                       instance.FollowLookAngleDegrees,
                                                                                        projectionInstances,
                                                                                        out targetAngle))
         {
-            targetAngle = currentLookAngleDegrees + instance.Config.AngleOffsetDegrees;
+            targetAngle = instance.FollowLookAngleDegrees + instance.Config.AngleOffsetDegrees;
         }
 
         float followDelay = math.max(0f, instance.Config.LookFollowDelaySeconds);
@@ -186,13 +188,9 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
         }
         else
         {
-            // Critically damped spring smoothing keeps angular velocity continuous when the ring
-            // lattice slips one slot under fast spins (the target jumps a full step there), so
-            // formation re-alignments read as soft turn-arounds instead of instant velocity flips.
-            float unwrappedTargetDegrees = instance.FollowAngleDegrees + ResolveSignedAngleDelta(instance.FollowAngleDegrees, targetAngle);
             float angularVelocityDegrees = instance.FollowAngularVelocityDegrees;
             instance.FollowAngleDegrees = SmoothDampAngle(instance.FollowAngleDegrees,
-                                                          unwrappedTargetDegrees,
+                                                          targetAngle,
                                                           ref angularVelocityDegrees,
                                                           followDelay,
                                                           deltaTime);
@@ -517,10 +515,9 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 
     #region Angle Helpers
     /// <summary>
-    /// Advances one angle toward an unwrapped target with a critically damped spring, mirroring
-    /// UnityEngine.Mathf.SmoothDamp in Burst-compatible form. The persistent velocity state keeps
-    /// motion velocity-continuous across target discontinuities (ring lattice slips), which is what
-    /// removes the visible stutter a plain exponential filter produces at those moments.
+    /// Advances one angle toward a continuously unwrapped target with a critically damped spring,
+    /// mirroring UnityEngine.Mathf.SmoothDamp in Burst-compatible form. Persistent velocity keeps
+    /// follow motion continuous while the target moves rapidly through multiple rotations.
     /// </summary>
     /// <param name="currentDegrees">Current angle in degrees.</param>
     /// <param name="targetDegrees">Target angle already unwrapped near the current angle.</param>
