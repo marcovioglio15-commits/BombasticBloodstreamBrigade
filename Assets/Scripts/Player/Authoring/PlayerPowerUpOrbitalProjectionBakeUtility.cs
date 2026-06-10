@@ -147,6 +147,7 @@ public static class PlayerPowerUpOrbitalProjectionBakeUtility
             OrbitConeAngleDegrees = math.clamp(projection.OrbitConeAngleDegrees, 0f, 360f),
             FullOrbitConeResponse = projection.FullOrbitConeResponse,
             LookFollowDelaySeconds = math.max(0f, projection.LookFollowDelaySeconds),
+            FaceOrbitOutward = projection.FaceOrbitOutward ? (byte)1 : (byte)0,
             CollisionRadius = math.max(0.01f, projection.CollisionRadius),
             AdaptCollisionToModel = ResolveAdaptCollisionToModel(authoring, projection, prefabEntity),
             ModelCollisionBoundingRadius = 0f,

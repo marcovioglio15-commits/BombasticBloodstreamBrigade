@@ -71,6 +71,16 @@ public static class RuntimeEntityOrbitalProjectionGizmoUtility
                 if (!TryDrawCollisionHull(primitiveDrawer, entityManager, projectionEntity, in projection, in transform))
                     primitiveDrawer.DrawWireDisc(projectionPosition, radius, CollisionRadiusColor);
 
+                // Outward-facing projections also show their current forward axis.
+                if (projection.Config.FaceOrbitOutward != 0)
+                {
+                    float3 forward = math.mul(transform.Rotation, new float3(0f, 0f, 1f));
+                    primitiveDrawer.DrawDirection(projectionPosition,
+                                                  new Vector3(forward.x, forward.y, forward.z),
+                                                  radius,
+                                                  CollisionRadiusColor);
+                }
+
                 if (RuntimeGizmoDebugState.ShowLabels && labelCount < MaximumLabelCount)
                 {
                     primitiveDrawer.DrawLabel(projectionPosition, "Orbital Projection");

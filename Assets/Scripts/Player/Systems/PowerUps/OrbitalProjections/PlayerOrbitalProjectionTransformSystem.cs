@@ -97,6 +97,11 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
                 TickSpawnOrActive(ref instance, ref transform.ValueRW, ownerTransform.Position, deltaTime);
             }
 
+            // Face Orbit Outward keeps the projection's forward axis pointing away from the player;
+            // the same yaw also rotates the model collision silhouette in the contact systems.
+            if (instance.Config.FaceOrbitOutward != 0)
+                transform.ValueRW.Rotation = quaternion.RotateY(instance.AngleDegrees * DegreesToRadians);
+
             projection.ValueRW = instance;
         }
 

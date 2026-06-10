@@ -35,6 +35,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         SerializedProperty hasHealthProperty = property.FindPropertyRelative("hasHealth");
         SerializedProperty projectionPrefabProperty = property.FindPropertyRelative("projectionPrefab");
         SerializedProperty adaptCollisionToModelProperty = property.FindPropertyRelative("adaptCollisionToModel");
+        SerializedProperty faceOrbitOutwardProperty = property.FindPropertyRelative("faceOrbitOutward");
         HelpBox warningsBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         Foldout identityFoldout = CreateFoldout("Identity");
         Foldout motionFoldout = CreateFoldout("Motion");
@@ -46,6 +47,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         VisualElement orbitConeBoundsContainer = new VisualElement();
         VisualElement fullOrbitConeResponseContainer = new VisualElement();
         VisualElement lookDelayContainer = new VisualElement();
+        VisualElement faceOutwardContainer = new VisualElement();
         VisualElement adaptCollisionContainer = new VisualElement();
         VisualElement collisionRadiusContainer = new VisualElement();
         VisualElement damageContainer = new VisualElement();
@@ -77,12 +79,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         orbitConeBoundsContainer.Add(orbitConePreviewChart);
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(fullOrbitConeResponseContainer, fullOrbitConeResponseProperty, "Full Orbit Cone Response");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(lookDelayContainer, property.FindPropertyRelative("lookFollowDelaySeconds"), "Look Follow Delay Seconds");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(faceOutwardContainer, faceOrbitOutwardProperty, "Face Orbit Outward");
         motionFoldout.Add(angleOffsetContainer);
         motionFoldout.Add(orbitSpeedContainer);
         motionFoldout.Add(orbitConeModeContainer);
         motionFoldout.Add(orbitConeBoundsContainer);
         motionFoldout.Add(fullOrbitConeResponseContainer);
         motionFoldout.Add(lookDelayContainer);
+        motionFoldout.Add(faceOutwardContainer);
 
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(adaptCollisionContainer, adaptCollisionToModelProperty, "Adapt Collision To Model");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(collisionRadiusContainer, property.FindPropertyRelative("collisionRadius"), "Collision Radius");
@@ -120,12 +124,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
                                                                      hasHealthProperty,
                                                                      projectionPrefabProperty,
                                                                      adaptCollisionToModelProperty,
+                                                                     faceOrbitOutwardProperty,
                                                                      angleOffsetContainer,
                                                                      orbitSpeedContainer,
                                                                      orbitConeModeContainer,
                                                                      orbitConeBoundsContainer,
                                                                      fullOrbitConeResponseContainer,
                                                                      lookDelayContainer,
+                                                                     faceOutwardContainer,
                                                                      adaptCollisionContainer,
                                                                      collisionRadiusContainer,
                                                                      damageContainer,
@@ -150,6 +156,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         Track(root, bounceInsideOrbitConeProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, projectionPrefabProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, adaptCollisionToModelProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, faceOrbitOutwardProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, property.FindPropertyRelative("orbitDistance"), changedProperty => RefreshWarnings(warningsBox, property));
         Track(root,
               orbitConeCenterAngleDegreesProperty,
@@ -218,12 +225,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
     /// <param name="hasHealthProperty">Projection health toggle property.</param>
     /// <param name="projectionPrefabProperty">Projection prefab reference property.</param>
     /// <param name="adaptCollisionToModelProperty">Model-shaped collision toggle property.</param>
+    /// <param name="faceOrbitOutwardProperty">Outward-facing orientation toggle property.</param>
     /// <param name="angleOffsetContainer">Angle-offset field container.</param>
     /// <param name="orbitSpeedContainer">Orbit-speed field container.</param>
     /// <param name="orbitConeModeContainer">Cone motion-mode toggle container.</param>
     /// <param name="orbitConeBoundsContainer">Cone bounds field and preview container.</param>
     /// <param name="fullOrbitConeResponseContainer">Full-orbit response field container.</param>
     /// <param name="lookDelayContainer">Look-delay field container.</param>
+    /// <param name="faceOutwardContainer">Outward-facing orientation toggle container.</param>
     /// <param name="adaptCollisionContainer">Model-shaped collision toggle container.</param>
     /// <param name="collisionRadiusContainer">Plain collision radius field container.</param>
     /// <param name="damageContainer">Enemy damage field container.</param>
@@ -238,12 +247,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
                                           SerializedProperty hasHealthProperty,
                                           SerializedProperty projectionPrefabProperty,
                                           SerializedProperty adaptCollisionToModelProperty,
+                                          SerializedProperty faceOrbitOutwardProperty,
                                           VisualElement angleOffsetContainer,
                                           VisualElement orbitSpeedContainer,
                                           VisualElement orbitConeModeContainer,
                                           VisualElement orbitConeBoundsContainer,
                                           VisualElement fullOrbitConeResponseContainer,
                                           VisualElement lookDelayContainer,
+                                          VisualElement faceOutwardContainer,
                                           VisualElement adaptCollisionContainer,
                                           VisualElement collisionRadiusContainer,
                                           VisualElement damageContainer,
@@ -262,6 +273,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         bool isIndependentOrbit = motionMode == OrbitalProjectionMotionMode.IndependentOrbit;
         bool hasProjectionPrefab = projectionPrefabProperty != null && projectionPrefabProperty.objectReferenceValue != null;
         bool adaptCollisionToModel = adaptCollisionToModelProperty != null && adaptCollisionToModelProperty.boolValue;
+        bool faceOrbitOutward = faceOrbitOutwardProperty != null && faceOrbitOutwardProperty.boolValue;
 
         SetVisible(angleOffsetContainer, !isIndependentOrbit);
         SetVisible(orbitSpeedContainer, isIndependentOrbit);
@@ -269,8 +281,9 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         SetVisible(orbitConeBoundsContainer, isIndependentOrbit && bounceInsideOrbitCone);
         SetVisible(fullOrbitConeResponseContainer, isIndependentOrbit && !bounceInsideOrbitCone);
         SetVisible(lookDelayContainer, motionMode == OrbitalProjectionMotionMode.FollowPlayerLook);
-        // Model-shaped collision needs a prefab to bake a silhouette; the toggle stays visible while
-        // enabled without one so the warning can be acknowledged and the option turned off.
+        // Prefab-dependent toggles need a prefab to have any visible effect; they stay visible while
+        // enabled without one so their warning can be acknowledged and the option turned off.
+        SetVisible(faceOutwardContainer, hasProjectionPrefab || faceOrbitOutward);
         SetVisible(adaptCollisionContainer, hasProjectionPrefab || adaptCollisionToModel);
         SetVisible(collisionRadiusContainer, !(adaptCollisionToModel && hasProjectionPrefab));
         SetVisible(damageContainer, damageEnemies);
@@ -303,6 +316,11 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
 
         if (adaptCollisionToModel && !hasProjectionPrefab)
             warnings.Add("Adapt Collision To Model requires a Projection Prefab; the plain Collision Radius is used as fallback at runtime.");
+
+        SerializedProperty faceOrbitOutwardProperty = property.FindPropertyRelative("faceOrbitOutward");
+
+        if (faceOrbitOutwardProperty != null && faceOrbitOutwardProperty.boolValue && !hasProjectionPrefab)
+            warnings.Add("Face Orbit Outward has no visible effect without a Projection Prefab.");
 
         SerializedProperty motionModeProperty = property.FindPropertyRelative("motionMode");
         SerializedProperty bounceInsideOrbitConeProperty = property.FindPropertyRelative("bounceInsideOrbitCone");

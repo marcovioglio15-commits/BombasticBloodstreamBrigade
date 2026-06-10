@@ -1204,6 +1204,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
             case "adaptCollisionToModel":
                 projectionConfig.AdaptCollisionToModel = value;
                 break;
+            case "faceOrbitOutward":
+                projectionConfig.FaceOrbitOutward = value;
+                break;
             case "hasHealth":
                 projectionConfig.HasHealth = value;
                 break;

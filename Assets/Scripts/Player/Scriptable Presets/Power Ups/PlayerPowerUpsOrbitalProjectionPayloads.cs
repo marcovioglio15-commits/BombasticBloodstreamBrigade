@@ -55,6 +55,10 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
     [Tooltip("Seconds used by Follow Player Look mode to catch up to the current look angle.")]
     [SerializeField] private float lookFollowDelaySeconds = 0.12f;
 
+    [Tooltip("When enabled, the projection rotates while orbiting so its forward axis always points outward, away from the player. Also rotates the model collision silhouette when Adapt Collision To Model is active.")]
+    [SerializeField]
+    private bool faceOrbitOutward;
+
     [Tooltip("Collision radius used for enemy, projectile, and bomb interception checks. Ignored when Adapt Collision To Model succeeds, but kept as runtime fallback when the prefab has no usable mesh.")]
     [SerializeField] private float collisionRadius = 0.35f;
 
@@ -213,6 +217,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
         get
         {
             return adaptCollisionToModel;
+        }
+    }
+
+    public bool FaceOrbitOutward
+    {
+        get
+        {
+            return faceOrbitOutward;
         }
     }
 
