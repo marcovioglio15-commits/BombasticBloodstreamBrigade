@@ -2293,7 +2293,7 @@ MonoBehaviour:
           projectileDamage: 2
           projectileRange: 28
           projectileLifetime: 4
-          projectileExplosionRadius: 0
+          projectileExplosionRadius: 0.7
           projectileScaleMultiplier: 1
           penetrationMode: 0
           maxPenetrations: 0
@@ -13908,7 +13908,7 @@ MonoBehaviour:
               projectileDamage: 1
               projectileRange: 28
               projectileLifetime: 4
-              projectileExplosionRadius: 0
+              projectileExplosionRadius: 0.7
               projectileScaleMultiplier: 1
               penetrationMode: 0
               maxPenetrations: 0
