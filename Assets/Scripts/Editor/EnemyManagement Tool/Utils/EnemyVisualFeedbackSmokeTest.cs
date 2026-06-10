@@ -41,7 +41,7 @@ public static class EnemyVisualFeedbackSmokeTest
     /// <summary>
     /// Executes only the shared enemy-face flipbook asset and shader contract checks from Unity batch mode.
     /// </summary>
-    [MenuItem("Tools/Enemy Management/Run Enemy Face Flipbook Smoke Test")]
+    //[MenuItem("Tools/Enemy Management/Run Enemy Face Flipbook Smoke Test")]
     public static void RunFaceFlipbook()
     {
         ValidateFaceFlipbookAssets();
