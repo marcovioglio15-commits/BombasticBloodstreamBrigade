@@ -52,11 +52,11 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
     [SerializeField]
     private OrbitalProjectionFullOrbitConeResponse fullOrbitConeResponse = OrbitalProjectionFullOrbitConeResponse.IgnoreCones;
 
-    [Tooltip("Seconds used by Follow Player Look mode to catch up to the current look angle.")]
+    [Tooltip("Perceived response time used by the lightly underdamped Follow Player Look spring. Higher values create a softer and more visible angular phase lag; arrival uses a small controlled overshoot for a springier result.")]
     [SerializeField]
     private float lookFollowDelaySeconds = 0.12f;
 
-    [Tooltip("Maximum autonomous catch-up speed used by Follow Player Look mode. Player-driven rotation is inherited immediately and does not consume this limit. Values at or below zero use the safe runtime fallback of 540 degrees per second.")]
+    [Tooltip("Maximum autonomous catch-up speed used by smoothed Follow Player Look motion. Active player rotation may exceed this value so the projection remains responsive; together with Look Follow Delay Seconds, it limits spring chase distance without velocity discontinuities. Values at or below zero use the safe runtime fallback of 540 degrees per second.")]
     [SerializeField]
     private float maximumLookFollowSpeedDegreesPerSecond = 540f;
 

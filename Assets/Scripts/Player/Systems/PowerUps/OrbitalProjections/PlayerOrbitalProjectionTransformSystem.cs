@@ -14,8 +14,6 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 {
     #region Constants
     private const float DegreesToRadians = math.PI / 180f;
-    private const float DefaultMaximumLookFollowSpeedDegreesPerSecond = 540f;
-    private const float FollowAlignmentToleranceDegrees = 0.01f;
     private const float FullCircleDegrees = 360f;
     private const float IndependentOrbitLayoutBlendSeconds = 0.35f;
     private const float MinimumBounceSectorDegrees = 0.01f;
@@ -194,13 +192,13 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
         }
         else
         {
-            targetAngle = DiscardCompletedFollowTurns(ref instance, targetAngle);
-            AdvanceLocalFollow(ref instance,
-                               targetAngle,
-                               lookRotationDeltaDegrees,
-                               followDelay,
-                               ResolveMaximumLookFollowSpeedDegreesPerSecond(in instance.Config),
-                               deltaTime);
+            targetAngle = PlayerOrbitalProjectionFollowMotionUtility.DiscardCompletedTurns(ref instance,
+                                                                                           targetAngle);
+            PlayerOrbitalProjectionFollowMotionUtility.Advance(ref instance,
+                                                               targetAngle,
+                                                               followDelay,
+                                                               PlayerOrbitalProjectionFollowMotionUtility.ResolveMaximumCatchUpSpeedDegreesPerSecond(in instance.Config),
+                                                               deltaTime);
         }
 
         instance.AngleDegrees = instance.FollowAngleDegrees;
@@ -520,93 +518,6 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
     #endregion
 
     #region Angle Helpers
-    /// <summary>
-    /// Removes completed full-turn backlog while preserving the remaining signed lag and physical
-    /// target orientation, preventing long delayed spins without changing catch-up direction.
-    /// </summary>
-    /// <param name="instance">Projection whose continuous look domain is rebased in place.</param>
-    /// <param name="targetDegrees">Current continuously unwrapped follow target.</param>
-    /// <returns>Physically equivalent target with less than one full turn of signed backlog.</returns>
-    private static float DiscardCompletedFollowTurns(ref PlayerOrbitalProjectionInstance instance,
-                                                     float targetDegrees)
-    {
-        float targetLagDegrees = targetDegrees - instance.FollowAngleDegrees;
-
-        if (math.abs(targetLagDegrees) < FullCircleDegrees)
-            return targetDegrees;
-
-        float discardedDegrees = math.trunc(targetLagDegrees / FullCircleDegrees) * FullCircleDegrees;
-        instance.FollowLookAngleDegrees -= discardedDegrees;
-        return targetDegrees - discardedDegrees;
-    }
-
-    /// <summary>
-    /// Advances visible Follow Player Look motion using uncapped player-turn inheritance plus
-    /// independently limited exponential catch-up. Contradictory catch-up is removed without
-    /// suppressing the player's current rotation, keeping sustained turns and reversals responsive.
-    /// </summary>
-    /// <param name="instance">Projection visible follow state updated in place.</param>
-    /// <param name="targetDegrees">Continuous target with completed full-turn backlog removed.</param>
-    /// <param name="lookRotationDeltaDegrees">Signed player look rotation observed this frame.</param>
-    /// <param name="followDelaySeconds">Authored exponential follow response time.</param>
-    /// <param name="maximumCatchUpSpeedDegreesPerSecond">Maximum autonomous catch-up angular speed.</param>
-    /// <param name="deltaTime">Current frame delta time.</param>
-    private static void AdvanceLocalFollow(ref PlayerOrbitalProjectionInstance instance,
-                                           float targetDegrees,
-                                           float lookRotationDeltaDegrees,
-                                           float followDelaySeconds,
-                                           float maximumCatchUpSpeedDegreesPerSecond,
-                                           float deltaTime)
-    {
-        float remainingDegrees = targetDegrees - instance.FollowAngleDegrees;
-
-        if (math.abs(remainingDegrees) <= FollowAlignmentToleranceDegrees)
-        {
-            instance.FollowAngleDegrees = targetDegrees;
-            instance.FollowAngularVelocityDegrees = 0f;
-            return;
-        }
-
-        float response = 1f - math.exp(-deltaTime / math.max(0.0001f, followDelaySeconds));
-        float maximumCatchUpStepDegrees = math.max(0f, maximumCatchUpSpeedDegreesPerSecond) * deltaTime;
-        float catchUpStepDegrees = math.clamp(remainingDegrees * response,
-                                              -maximumCatchUpStepDegrees,
-                                              maximumCatchUpStepDegrees);
-
-        // Discard contradictory catch-up during active input so it cannot attenuate or reverse the
-        // player's current visible turn response.
-        if (math.abs(lookRotationDeltaDegrees) > FollowAlignmentToleranceDegrees &&
-            catchUpStepDegrees * lookRotationDeltaDegrees < 0f)
-            catchUpStepDegrees = 0f;
-
-        float signedStepDegrees = lookRotationDeltaDegrees + catchUpStepDegrees;
-
-        // Do not overshoot a target that lies along the selected step direction.
-        if (signedStepDegrees * remainingDegrees > 0f &&
-            math.abs(signedStepDegrees) > math.abs(remainingDegrees))
-        {
-            signedStepDegrees = remainingDegrees;
-        }
-
-        instance.FollowAngleDegrees += signedStepDegrees;
-        instance.FollowAngularVelocityDegrees = deltaTime > 0f
-            ? signedStepDegrees / deltaTime
-            : 0f;
-    }
-
-    /// <summary>
-    /// Resolves the authored Follow Player Look catch-up speed cap, using a safe fallback for
-    /// existing presets and formula results that do not provide a positive value.
-    /// </summary>
-    /// <param name="config">Projection runtime configuration containing the authored speed cap.</param>
-    /// <returns>Positive maximum autonomous catch-up speed in degrees per second.</returns>
-    private static float ResolveMaximumLookFollowSpeedDegreesPerSecond(in OrbitalProjectionConfig config)
-    {
-        return config.MaximumLookFollowSpeedDegreesPerSecond > 0f
-            ? config.MaximumLookFollowSpeedDegreesPerSecond
-            : DefaultMaximumLookFollowSpeedDegreesPerSecond;
-    }
-
     /// <summary>
     /// Resolves the shortest signed delta between two angles.
     /// </summary>

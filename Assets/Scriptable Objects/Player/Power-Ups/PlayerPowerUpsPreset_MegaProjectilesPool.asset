@@ -9260,6 +9260,7 @@ MonoBehaviour:
           orbitConeAngleDegrees: 90
           fullOrbitConeResponse: 0
           lookFollowDelaySeconds: 0
+          maximumLookFollowSpeedDegreesPerSecond: 540
           faceOrbitOutward: 0
           collisionRadius: 1
           adaptCollisionToModel: 0
@@ -24081,6 +24082,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 1
             adaptCollisionToModel: 0
@@ -24519,6 +24521,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 1
             adaptCollisionToModel: 0
@@ -24968,6 +24971,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.5
             adaptCollisionToModel: 0
@@ -25406,6 +25410,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 1
             adaptCollisionToModel: 0
@@ -38997,6 +39002,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0
@@ -39446,6 +39452,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0
@@ -39895,6 +39902,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0
@@ -39921,6 +39929,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0
@@ -40370,6 +40379,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0
@@ -40808,6 +40818,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            maximumLookFollowSpeedDegreesPerSecond: 540
             faceOrbitOutward: 0
             collisionRadius: 0.7
             adaptCollisionToModel: 0

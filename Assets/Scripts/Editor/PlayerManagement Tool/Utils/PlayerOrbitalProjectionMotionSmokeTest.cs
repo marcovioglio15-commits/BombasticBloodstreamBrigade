@@ -5,18 +5,13 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using static PlayerOrbitalProjectionMotionSmokeTestUtility;
 
 /// <summary>
 /// Runs deterministic ECS checks for continuous Follow Player Look motion and stable shared-ring slots.
 /// </summary>
 public static class PlayerOrbitalProjectionMotionSmokeTest
 {
-    #region Constants
-    private const float DeltaTime = 1f / 60f;
-    private const float AngleToleranceDegrees = 0.01f;
-    private const float MaximumFollowSpeedDegreesPerSecond = 540f;
-    #endregion
-
     #region Methods
 
     #region Public Methods
@@ -26,10 +21,12 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
     public static void Run()
     {
         ValidateFastTurnContinuity();
-        ValidateActiveTurnFeedForward();
-        ValidateRapidDirectionChanges();
+        ValidateContradictoryCatchUpConvergence();
+        ValidateRapidJitterAttenuation();
+        ValidateSmoothVelocityProfile();
+        ValidateSpringyArrival();
         ValidateSmallRotationStability();
-        ValidateProlongedFastTurnAlignment();
+        ValidateProlongedFastTurnBoundedLag();
         ValidateBoundedCatchUp();
         ValidateOwnerTranslationTracking();
         ValidateStableSharedRingSlots();
@@ -39,8 +36,8 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
 
     #region Continuity Checks
     /// <summary>
-    /// Verifies a projection inherits one continuous fast turn through wrapped look angles without
-    /// accumulating player-driven lag.
+    /// Verifies a delayed projection follows one continuous fast turn through wrapped look angles
+    /// without reversing or accumulating unbounded lag.
     /// </summary>
     private static void ValidateFastTurnContinuity()
     {
@@ -59,6 +56,7 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
             SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
             float[] wrappedLookAngles = { 100f, -160f, -60f, 40f, 140f, -120f, -20f, 80f };
             double elapsedTime = 0d;
+            float previousVisibleAngle = 0f;
 
             // Cross the signed-angle boundary repeatedly while preserving one clockwise input trajectory.
             for (int angleIndex = 0; angleIndex < wrappedLookAngles.Length; angleIndex++)
@@ -71,12 +69,17 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
                 AssertEquivalentAngle(instance.FollowLookAngleDegrees,
                                       expectedUnwrappedLookAngle,
                                       "Fast-turn look target stopped being continuous.");
-                AssertApproximately(instance.FollowAngleDegrees,
-                                    expectedUnwrappedLookAngle,
-                                    "Fast-turn rotation was not inherited immediately.");
+                AssertFiniteFollowLag(in instance, instance.FollowLookAngleDegrees);
 
-                if (instance.FollowAngularVelocityDegrees <= 0f)
+                if (instance.FollowAngleDegrees <= previousVisibleAngle ||
+                    instance.FollowAngularVelocityDegrees <= 0f)
                     throw new InvalidOperationException("Fast-turn follow motion reversed while the player kept rotating clockwise.");
+
+                if (angleIndex == 0 &&
+                    instance.FollowAngleDegrees >= expectedUnwrappedLookAngle - AngleToleranceDegrees)
+                    throw new InvalidOperationException("Follow Player Look delay was not visible during a fast turn.");
+
+                previousVisibleAngle = instance.FollowAngleDegrees;
             }
         }
         finally
@@ -86,11 +89,12 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
     }
 
     /// <summary>
-    /// Verifies contradictory catch-up cannot suppress the player's current visible turn response.
+    /// Verifies contradictory catch-up converges directly toward the nearby local target through
+    /// the spring, without detouring past its starting angle in the direction of the latest input.
     /// </summary>
-    private static void ValidateActiveTurnFeedForward()
+    private static void ValidateContradictoryCatchUpConvergence()
     {
-        World world = new World("PlayerOrbitalProjectionActiveTurnFeedForwardSmokeTest");
+        World world = new World("PlayerOrbitalProjectionContradictoryCatchUpSmokeTest");
 
         try
         {
@@ -104,15 +108,28 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
                                                        MaximumFollowSpeedDegreesPerSecond);
             SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
             double elapsedTime = 0d;
+            float previousVisibleAngle = 2f;
 
-            // Catch-up points backward, but the current player turn must still move the projection forward.
+            // The projection sits ahead of the new look target: catch-up must travel back smoothly.
             SetLookAngle(entityManager, playerEntity, 1f);
-            Update(world, transformSystem, ref elapsedTime);
-            PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
 
-            AssertApproximately(instance.FollowAngleDegrees,
-                                3f,
-                                "Contradictory catch-up attenuated the player's active turn response.");
+            for (int settleIndex = 0; settleIndex < 240; settleIndex++)
+            {
+                Update(world, transformSystem, ref elapsedTime);
+                PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
+                AssertMaximumCatchUpStep(previousVisibleAngle,
+                                         instance.FollowAngleDegrees,
+                                         MaximumFollowSpeedDegreesPerSecond);
+
+                if (instance.FollowAngleDegrees > 2f + AngleToleranceDegrees)
+                    throw new InvalidOperationException("Contradictory catch-up detoured past its starting angle.");
+
+                previousVisibleAngle = instance.FollowAngleDegrees;
+            }
+
+            AssertApproximately(previousVisibleAngle,
+                                1f,
+                                "Contradictory catch-up did not settle on the local target.");
         }
         finally
         {
@@ -121,12 +138,13 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
     }
 
     /// <summary>
-    /// Verifies rapid alternating player turns produce immediate full response in the matching
-    /// direction without catch-up attenuation.
+    /// Verifies frame-alternating look jitter is absorbed by the follow spring: the projection must
+    /// stay inside the jitter band with strongly attenuated ripple instead of mirroring every input
+    /// inversion with hard steps.
     /// </summary>
-    private static void ValidateRapidDirectionChanges()
+    private static void ValidateRapidJitterAttenuation()
     {
-        World world = new World("PlayerOrbitalProjectionRapidDirectionChangesSmokeTest");
+        World world = new World("PlayerOrbitalProjectionRapidJitterAttenuationSmokeTest");
 
         try
         {
@@ -139,28 +157,82 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
                                                        0.25f,
                                                        MaximumFollowSpeedDegreesPerSecond);
             SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
-            float[] lookAngles = { 4f, 0f, 4f, 0f, 4f, 0f, 4f, 0f };
             double elapsedTime = 0d;
-            float previousLookAngle = 0f;
             float previousVisibleAngle = 0f;
+            float rippleMinimumDegrees = float.MaxValue;
+            float rippleMaximumDegrees = float.MinValue;
 
-            // Every input inversion must receive an immediate visible response in the same direction.
-            for (int angleIndex = 0; angleIndex < lookAngles.Length; angleIndex++)
+            // Toggle the look every frame and require low-pass behavior instead of hard mirroring.
+            for (int frameIndex = 0; frameIndex < 180; frameIndex++)
             {
-                SetLookAngle(entityManager, playerEntity, lookAngles[angleIndex]);
+                SetLookAngle(entityManager, playerEntity, frameIndex % 2 == 0 ? 4f : 0f);
                 Update(world, transformSystem, ref elapsedTime);
                 PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
-                float lookDeltaDegrees = lookAngles[angleIndex] - previousLookAngle;
-                float visibleDeltaDegrees = instance.FollowAngleDegrees - previousVisibleAngle;
 
-                if (visibleDeltaDegrees * lookDeltaDegrees <= 0f)
-                    throw new InvalidOperationException("Rapid player turn inversion did not receive an immediate matching projection response.");
+                if (math.abs(instance.FollowAngleDegrees - previousVisibleAngle) >= 4f)
+                    throw new InvalidOperationException("Rapid look jitter produced an unsmoothed follow step.");
 
-                AssertApproximately(visibleDeltaDegrees,
-                                    lookDeltaDegrees,
-                                    "Rapid player turn inversion was attenuated by follow catch-up.");
-                previousLookAngle = lookAngles[angleIndex];
+                if (instance.FollowAngleDegrees < -AngleToleranceDegrees ||
+                    instance.FollowAngleDegrees > 4f + AngleToleranceDegrees)
+                    throw new InvalidOperationException("Rapid look jitter pushed the projection outside the input band.");
+
+                if (frameIndex >= 120)
+                {
+                    rippleMinimumDegrees = math.min(rippleMinimumDegrees, instance.FollowAngleDegrees);
+                    rippleMaximumDegrees = math.max(rippleMaximumDegrees, instance.FollowAngleDegrees);
+                }
+
                 previousVisibleAngle = instance.FollowAngleDegrees;
+            }
+
+            if (rippleMaximumDegrees - rippleMinimumDegrees > 1f)
+                throw new InvalidOperationException("Rapid look jitter was not attenuated by the follow spring.");
+        }
+        finally
+        {
+            world.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Verifies Follow Player Look accelerates through a velocity-continuous spring profile instead
+    /// of applying a first-order full correction step immediately.
+    /// </summary>
+    private static void ValidateSmoothVelocityProfile()
+    {
+        World world = new World("PlayerOrbitalProjectionSmoothVelocityProfileSmokeTest");
+
+        try
+        {
+            EntityManager entityManager = world.EntityManager;
+            Entity playerEntity = CreatePlayer(entityManager, 0f);
+            Entity projectionEntity = CreateProjection(entityManager,
+                                                       playerEntity,
+                                                       10,
+                                                       -90f,
+                                                       0.25f,
+                                                       MaximumFollowSpeedDegreesPerSecond);
+            SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
+            double elapsedTime = 0d;
+            float previousVelocityDegrees = 0f;
+
+            // Initial autonomous spring frames must accelerate smoothly toward the stationary target.
+            for (int sampleIndex = 0; sampleIndex < 4; sampleIndex++)
+            {
+                Update(world, transformSystem, ref elapsedTime);
+                PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
+
+                if (instance.FollowAngularVelocityDegrees < previousVelocityDegrees - AngleToleranceDegrees)
+                    throw new InvalidOperationException("Follow Player Look spring did not accelerate smoothly from rest.");
+
+                if (instance.FollowAngularVelocityDegrees > MaximumFollowSpeedDegreesPerSecond + AngleToleranceDegrees)
+                    throw new InvalidOperationException("Follow Player Look spring exceeded its autonomous speed limit.");
+
+                if (sampleIndex == 0 &&
+                    instance.FollowAngularVelocityDegrees >= MaximumFollowSpeedDegreesPerSecond - AngleToleranceDegrees)
+                    throw new InvalidOperationException("Follow Player Look spring reached its speed limit without a smooth ramp.");
+
+                previousVelocityDegrees = instance.FollowAngularVelocityDegrees;
             }
         }
         finally
@@ -170,8 +242,68 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
     }
 
     /// <summary>
-    /// Verifies a minimal player rotation keeps a nearby projection on a short local path while
-    /// immediate input response and delayed catch-up settle.
+    /// Verifies stationary-target arrival produces a small controlled overshoot before settling,
+    /// without exceeding autonomous catch-up speed or replaying a full revolution.
+    /// </summary>
+    private static void ValidateSpringyArrival()
+    {
+        World world = new World("PlayerOrbitalProjectionSpringyArrivalSmokeTest");
+
+        try
+        {
+            EntityManager entityManager = world.EntityManager;
+            Entity playerEntity = CreatePlayer(entityManager, 0f);
+            Entity projectionEntity = CreateProjection(entityManager,
+                                                       playerEntity,
+                                                       10,
+                                                       -30f,
+                                                       0.25f,
+                                                       MaximumFollowSpeedDegreesPerSecond);
+            SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
+            double elapsedTime = 0d;
+            float previousVisibleAngle = -30f;
+            float maximumOvershootDegrees = 0f;
+            bool returnedAfterOvershoot = false;
+
+            // Observe one complete controlled overshoot and return toward the stationary target.
+            for (int settleIndex = 0; settleIndex < 240; settleIndex++)
+            {
+                Update(world, transformSystem, ref elapsedTime);
+                PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
+                AssertMaximumCatchUpStep(previousVisibleAngle,
+                                         instance.FollowAngleDegrees,
+                                         MaximumFollowSpeedDegreesPerSecond);
+                maximumOvershootDegrees = math.max(maximumOvershootDegrees, instance.FollowAngleDegrees);
+
+                if (maximumOvershootDegrees > AngleToleranceDegrees &&
+                    instance.FollowAngularVelocityDegrees < 0f)
+                    returnedAfterOvershoot = true;
+
+                previousVisibleAngle = instance.FollowAngleDegrees;
+            }
+
+            if (maximumOvershootDegrees <= AngleToleranceDegrees)
+                throw new InvalidOperationException("Follow Player Look arrival did not produce the requested spring overshoot.");
+
+            if (maximumOvershootDegrees > 3f)
+                throw new InvalidOperationException("Follow Player Look arrival overshoot exceeded the controlled spring range.");
+
+            if (!returnedAfterOvershoot)
+                throw new InvalidOperationException("Follow Player Look spring did not return after arrival overshoot.");
+
+            AssertApproximately(previousVisibleAngle,
+                                0f,
+                                "Follow Player Look spring did not settle after controlled arrival overshoot.");
+        }
+        finally
+        {
+            world.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Verifies a minimal player rotation keeps a nearby projection on a short local path that
+    /// heads straight toward the local target and settles without excessive correction travel.
     /// </summary>
     private static void ValidateSmallRotationStability()
     {
@@ -196,10 +328,10 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
             Update(world, transformSystem, ref elapsedTime);
             PlayerOrbitalProjectionInstance firstResponse = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
             traveledDegrees += math.abs(firstResponse.FollowAngleDegrees - previousVisibleAngle);
-            AssertMaximumCatchUpStep(previousVisibleAngle,
-                                     firstResponse.FollowAngleDegrees,
-                                     1f,
-                                     MaximumFollowSpeedDegreesPerSecond);
+
+            if (firstResponse.FollowAngleDegrees >= previousVisibleAngle)
+                throw new InvalidOperationException("Minimal active turn did not start moving toward its local target.");
+
             previousVisibleAngle = firstResponse.FollowAngleDegrees;
 
             // Hold the new direction and measure actual path length until local settling completes.
@@ -210,7 +342,6 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
                 traveledDegrees += math.abs(instance.FollowAngleDegrees - previousVisibleAngle);
                 AssertMaximumCatchUpStep(previousVisibleAngle,
                                          instance.FollowAngleDegrees,
-                                         0f,
                                          MaximumFollowSpeedDegreesPerSecond);
 
                 previousVisibleAngle = instance.FollowAngleDegrees;
@@ -230,12 +361,12 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
     }
 
     /// <summary>
-    /// Verifies sustained rotations faster than the catch-up cap remain aligned and leave no
-    /// delayed motion after player input stops.
+    /// Verifies sustained rotations faster than the catch-up cap retain a visible bounded phase
+    /// lag, begin settling immediately on release, and leave no long-running backlog.
     /// </summary>
-    private static void ValidateProlongedFastTurnAlignment()
+    private static void ValidateProlongedFastTurnBoundedLag()
     {
-        World world = new World("PlayerOrbitalProjectionProlongedFastTurnAlignmentSmokeTest");
+        World world = new World("PlayerOrbitalProjectionProlongedFastTurnBoundedLagSmokeTest");
 
         try
         {
@@ -250,6 +381,7 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
             SystemHandle transformSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionTransformSystem>();
             double elapsedTime = 0d;
             float finalLookAngleDegrees = 0f;
+            float previousVisibleAngle = 0f;
 
             // Sustain a turn far faster than the autonomous catch-up speed cap.
             for (int turnIndex = 1; turnIndex <= 40; turnIndex++)
@@ -260,20 +392,41 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
                 PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
                 float expectedUnwrappedAngleDegrees = turnIndex * 100f;
 
-                AssertApproximately(instance.FollowAngleDegrees,
-                                    expectedUnwrappedAngleDegrees,
-                                    "Sustained fast rotation accumulated visible follow lag.");
-                AssertApproximately(instance.FollowLookAngleDegrees,
-                                    expectedUnwrappedAngleDegrees,
-                                    "Sustained fast rotation accumulated target follow lag.");
+                AssertEquivalentAngle(instance.FollowLookAngleDegrees,
+                                      expectedUnwrappedAngleDegrees,
+                                      "Sustained fast rotation lost the physical look target.");
+                AssertFiniteFollowLag(in instance, instance.FollowLookAngleDegrees);
+
+                if (instance.FollowAngleDegrees <= previousVisibleAngle)
+                    throw new InvalidOperationException("Sustained fast rotation reversed delayed follow motion.");
+
+                previousVisibleAngle = instance.FollowAngleDegrees;
             }
 
             SetLookAngle(entityManager, playerEntity, finalLookAngleDegrees);
             Update(world, transformSystem, ref elapsedTime);
             PlayerOrbitalProjectionInstance releasedInstance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
-            AssertApproximately(releasedInstance.FollowAngleDegrees,
-                                4000f,
-                                "Follow Player Look moved after a sustained fast rotation stopped.");
+
+            if (releasedInstance.FollowAngleDegrees <= previousVisibleAngle)
+                throw new InvalidOperationException("Follow Player Look waited before settling after sustained rotation stopped.");
+
+            previousVisibleAngle = releasedInstance.FollowAngleDegrees;
+
+            // The bounded local lag may overshoot locally but must settle without replaying completed revolutions.
+            for (int settleIndex = 0; settleIndex < 240; settleIndex++)
+            {
+                Update(world, transformSystem, ref elapsedTime);
+                PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
+                AssertMaximumCatchUpStep(previousVisibleAngle,
+                                         instance.FollowAngleDegrees,
+                                         MaximumFollowSpeedDegreesPerSecond);
+                AssertFiniteFollowLag(in instance, instance.FollowLookAngleDegrees);
+                previousVisibleAngle = instance.FollowAngleDegrees;
+            }
+
+            AssertEquivalentAngle(previousVisibleAngle,
+                                  4000f,
+                                  "Follow Player Look retained delayed backlog after sustained rotation stopped.");
         }
         finally
         {
@@ -311,11 +464,7 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
 
                 AssertMaximumCatchUpStep(previousVisibleAngle,
                                          instance.FollowAngleDegrees,
-                                         0f,
                                          MaximumFollowSpeedDegreesPerSecond);
-
-                if (instance.FollowAngleDegrees < previousVisibleAngle - AngleToleranceDegrees)
-                    throw new InvalidOperationException("Autonomous Follow Player Look catch-up reversed away from its stationary target.");
 
                 previousVisibleAngle = instance.FollowAngleDegrees;
             }
@@ -489,105 +638,6 @@ public static class PlayerOrbitalProjectionMotionSmokeTest
         LocalTransform playerTransform = entityManager.GetComponentData<LocalTransform>(playerEntity);
         playerTransform.Position = position;
         entityManager.SetComponentData(playerEntity, playerTransform);
-    }
-    #endregion
-
-    #region Assertions
-    /// <summary>
-    /// Normalizes one angle into the signed range used by the player look state.
-    /// </summary>
-    /// <param name="angleDegrees">Unwrapped source angle.</param>
-    /// <returns>Equivalent angle in the -180 to 180 range.</returns>
-    private static float NormalizeSignedAngle(float angleDegrees)
-    {
-        return math.fmod(angleDegrees + 540f, 360f) - 180f;
-    }
-
-    /// <summary>
-    /// Advances the isolated transform system by one deterministic frame.
-    /// </summary>
-    /// <param name="world">World containing the smoke-test entities.</param>
-    /// <param name="transformSystem">Orbital projection transform system handle.</param>
-    /// <param name="elapsedTime">Accumulated world time updated in place.</param>
-    private static void Update(World world, SystemHandle transformSystem, ref double elapsedTime)
-    {
-        elapsedTime += DeltaTime;
-        world.SetTime(new TimeData(elapsedTime, DeltaTime));
-        transformSystem.Update(world.Unmanaged);
-    }
-
-    /// <summary>
-    /// Asserts one projection reached the expected continuously unwrapped angle.
-    /// </summary>
-    /// <param name="entityManager">Entity manager owning the projection.</param>
-    /// <param name="projectionEntity">Projection entity being inspected.</param>
-    /// <param name="expectedAngleDegrees">Expected angle in degrees.</param>
-    private static void AssertProjectionAngle(EntityManager entityManager,
-                                              Entity projectionEntity,
-                                              float expectedAngleDegrees)
-    {
-        PlayerOrbitalProjectionInstance instance = entityManager.GetComponentData<PlayerOrbitalProjectionInstance>(projectionEntity);
-        AssertApproximately(instance.AngleDegrees,
-                            expectedAngleDegrees,
-                            "Shared-ring projection changed its stable slot.");
-    }
-
-    /// <summary>
-    /// Asserts one visible follow update applies no more than the configured autonomous catch-up
-    /// step in addition to the inherited player rotation.
-    /// </summary>
-    /// <param name="previousAngleDegrees">Visible angle before the update.</param>
-    /// <param name="currentAngleDegrees">Visible angle after the update.</param>
-    /// <param name="inheritedLookDeltaDegrees">Player-driven angular step inherited by the projection.</param>
-    /// <param name="maximumCatchUpSpeedDegreesPerSecond">Configured autonomous catch-up speed cap.</param>
-    private static void AssertMaximumCatchUpStep(float previousAngleDegrees,
-                                                 float currentAngleDegrees,
-                                                 float inheritedLookDeltaDegrees,
-                                                 float maximumCatchUpSpeedDegreesPerSecond)
-    {
-        float catchUpStepDegrees = currentAngleDegrees - previousAngleDegrees - inheritedLookDeltaDegrees;
-        float maximumCatchUpStepDegrees = maximumCatchUpSpeedDegreesPerSecond * DeltaTime + AngleToleranceDegrees;
-
-        if (math.abs(catchUpStepDegrees) > maximumCatchUpStepDegrees)
-            throw new InvalidOperationException("Follow Player Look exceeded its maximum autonomous catch-up speed.");
-    }
-
-    /// <summary>
-    /// Asserts two angular values match within the smoke-test tolerance.
-    /// </summary>
-    /// <param name="actual">Observed value.</param>
-    /// <param name="expected">Expected value.</param>
-    /// <param name="message">Failure context.</param>
-    private static void AssertApproximately(float actual, float expected, string message)
-    {
-        if (math.abs(actual - expected) > AngleToleranceDegrees)
-            throw new InvalidOperationException(message + " Expected: " + expected + ", Actual: " + actual + ".");
-    }
-
-    /// <summary>
-    /// Asserts two world positions match within the smoke-test tolerance.
-    /// </summary>
-    /// <param name="actual">Observed world position.</param>
-    /// <param name="expected">Expected world position.</param>
-    /// <param name="message">Failure context.</param>
-    private static void AssertApproximately(float3 actual, float3 expected, string message)
-    {
-        if (math.lengthsq(actual - expected) > AngleToleranceDegrees * AngleToleranceDegrees)
-            throw new InvalidOperationException(message + " Expected: " + expected + ", Actual: " + actual + ".");
-    }
-
-    /// <summary>
-    /// Asserts two angles represent the same physical orientation within the smoke-test tolerance.
-    /// </summary>
-    /// <param name="actual">Observed angle in any unwrapped domain.</param>
-    /// <param name="expected">Expected angle in any unwrapped domain.</param>
-    /// <param name="message">Failure context.</param>
-    private static void AssertEquivalentAngle(float actual, float expected, string message)
-    {
-        float deltaDegrees = math.fmod(actual - expected, 360f);
-
-        if (math.abs(deltaDegrees) > AngleToleranceDegrees)
-            throw new InvalidOperationException(message + " Expected: " + expected + ", Actual: " + actual + ".");
     }
     #endregion
 
