@@ -9282,7 +9282,9 @@ MonoBehaviour:
           orbitConeAngleDegrees: 90
           fullOrbitConeResponse: 0
           lookFollowDelaySeconds: 0
+          faceOrbitOutward: 0
           collisionRadius: 1
+          adaptCollisionToModel: 0
           damageEnemies: 0
           contactDamage: 0
           damageTickIntervalSeconds: 0
@@ -38096,7 +38098,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38543,7 +38547,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38990,7 +38996,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39014,7 +39022,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39461,7 +39471,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
@@ -39897,7 +39909,9 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
+            faceOrbitOutward: 0
             collisionRadius: 0.7
+            adaptCollisionToModel: 0
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
