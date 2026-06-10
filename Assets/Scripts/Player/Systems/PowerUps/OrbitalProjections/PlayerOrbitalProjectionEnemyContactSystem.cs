@@ -37,10 +37,12 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
 
         foreach ((RefRW<PlayerOrbitalProjectionInstance> projection,
                   RefRO<LocalTransform> projectionTransform,
-                  DynamicBuffer<PlayerOrbitalProjectionEnemyContactElement> contactBuffer)
+                  DynamicBuffer<PlayerOrbitalProjectionEnemyContactElement> contactBuffer,
+                  DynamicBuffer<PlayerOrbitalProjectionCollisionVertexElement> hullVertices)
                  in SystemAPI.Query<RefRW<PlayerOrbitalProjectionInstance>,
                                     RefRO<LocalTransform>,
-                                    DynamicBuffer<PlayerOrbitalProjectionEnemyContactElement>>())
+                                    DynamicBuffer<PlayerOrbitalProjectionEnemyContactElement>,
+                                    DynamicBuffer<PlayerOrbitalProjectionCollisionVertexElement>>())
         {
             PlayerOrbitalProjectionInstance instance = projection.ValueRO;
 
@@ -62,10 +64,11 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
                                  .WithNone<EnemyDespawnRequest, EnemySpawnInactivityLock>()
                                  .WithEntityAccess())
             {
-                if (!IsOverlapping(projectionTransform.ValueRO.Position,
-                                   instance.Config.CollisionRadius,
-                                   enemyTransform.ValueRO.Position,
-                                   enemyData.ValueRO.BodyRadius))
+                if (!PlayerOrbitalProjectionCollisionShapeRuntimeUtility.OverlapsCircle(in instance.Config,
+                                                                                        projectionTransform.ValueRO,
+                                                                                        hullVertices,
+                                                                                        enemyTransform.ValueRO.Position,
+                                                                                        enemyData.ValueRO.BodyRadius))
                 {
                     continue;
                 }
@@ -115,7 +118,7 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
         return instance.Phase != PlayerOrbitalProjectionPhase.Despawning &&
                instance.Config.DamageEnemies != 0 &&
                instance.Config.ContactDamage > 0f &&
-               instance.Config.CollisionRadius > 0f;
+               PlayerOrbitalProjectionCollisionShapeRuntimeUtility.ResolveBroadPhaseRadius(in instance.Config) > 0f;
     }
 
     /// <summary>
@@ -237,27 +240,6 @@ public partial struct PlayerOrbitalProjectionEnemyContactSystem : ISystem
             CooldownRemainingSeconds = cooldown
         });
         return true;
-    }
-    #endregion
-
-    #region Geometry
-    /// <summary>
-    /// Checks overlap between a projection circle and an enemy body circle in the XZ plane.
-    /// </summary>
-    /// <param name="projectionPosition">Projection world position.</param>
-    /// <param name="projectionRadius">Projection collision radius.</param>
-    /// <param name="enemyPosition">Enemy world position.</param>
-    /// <param name="enemyRadius">Enemy body radius.</param>
-    /// <returns>True when the circles overlap.</returns>
-    private static bool IsOverlapping(float3 projectionPosition,
-                                      float projectionRadius,
-                                      float3 enemyPosition,
-                                      float enemyRadius)
-    {
-        float3 delta = enemyPosition - projectionPosition;
-        delta.y = 0f;
-        float radius = math.max(0f, projectionRadius) + math.max(0f, enemyRadius);
-        return math.lengthsq(delta) <= radius * radius;
     }
     #endregion
 

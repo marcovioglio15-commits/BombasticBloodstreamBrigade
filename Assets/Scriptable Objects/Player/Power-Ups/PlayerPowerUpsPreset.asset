@@ -9283,6 +9283,7 @@ MonoBehaviour:
           fullOrbitConeResponse: 0
           lookFollowDelaySeconds: 0
           collisionRadius: 1
+          adaptCollisionToModel: 0
           damageEnemies: 0
           contactDamage: 0
           damageTickIntervalSeconds: 0
@@ -38097,6 +38098,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38544,6 +38546,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38991,6 +38994,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39015,6 +39019,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39462,6 +39467,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
@@ -39898,6 +39904,7 @@ MonoBehaviour:
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
             collisionRadius: 0.7
+            adaptCollisionToModel: 0
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
@@ -42964,9 +42971,13 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveBulletTime
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - Passive_OrbitalWings
+  - Passive_RearShield
+  - Passive_OrbitalSpear
+  - Passive_OrbitalShield
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

@@ -45,8 +45,11 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
         foreach ((RefRW<PlayerOrbitalProjectionInstance> projection,
-                  RefRO<LocalTransform> projectionTransform)
-                 in SystemAPI.Query<RefRW<PlayerOrbitalProjectionInstance>, RefRO<LocalTransform>>())
+                  RefRO<LocalTransform> projectionTransform,
+                  DynamicBuffer<PlayerOrbitalProjectionCollisionVertexElement> hullVertices)
+                 in SystemAPI.Query<RefRW<PlayerOrbitalProjectionInstance>,
+                                    RefRO<LocalTransform>,
+                                    DynamicBuffer<PlayerOrbitalProjectionCollisionVertexElement>>())
         {
             PlayerOrbitalProjectionInstance instance = projection.ValueRO;
 
@@ -71,10 +74,11 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                     float projectileRadius = BaseProjectileHitRadius * math.max(0.01f, projectileTransform.ValueRO.Scale) +
                                              math.max(0f, projectile.ValueRO.ExplosionRadius);
 
-                    if (!IsOverlapping(projectionTransform.ValueRO.Position,
-                                       instance.Config.CollisionRadius,
-                                       projectileTransform.ValueRO.Position,
-                                       projectileRadius))
+                    if (!PlayerOrbitalProjectionCollisionShapeRuntimeUtility.OverlapsCircle(in instance.Config,
+                                                                                            projectionTransform.ValueRO,
+                                                                                            hullVertices,
+                                                                                            projectileTransform.ValueRO.Position,
+                                                                                            projectileRadius))
                     {
                         continue;
                     }
@@ -108,10 +112,11 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                     if (bomb.ValueRO.PreventMidAirInterception != 0)
                         continue;
 
-                    if (!IsOverlapping(projectionTransform.ValueRO.Position,
-                                       instance.Config.CollisionRadius,
-                                       bombTransform.ValueRO.Position,
-                                       ResolveBombHitRadius(in bomb.ValueRO, in bombTransform.ValueRO)))
+                    if (!PlayerOrbitalProjectionCollisionShapeRuntimeUtility.OverlapsCircle(in instance.Config,
+                                                                                            projectionTransform.ValueRO,
+                                                                                            hullVertices,
+                                                                                            bombTransform.ValueRO.Position,
+                                                                                            ResolveBombHitRadius(in bomb.ValueRO, in bombTransform.ValueRO)))
                     {
                         continue;
                     }
@@ -210,24 +215,6 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                                                                          in instance);
     }
 
-    /// <summary>
-    /// Checks overlap between two circles in the XZ plane.
-    /// </summary>
-    /// <param name="aPosition">First world position.</param>
-    /// <param name="aRadius">First radius.</param>
-    /// <param name="bPosition">Second world position.</param>
-    /// <param name="bRadius">Second radius.</param>
-    /// <returns>True when the two circles overlap.</returns>
-    private static bool IsOverlapping(float3 aPosition,
-                                      float aRadius,
-                                      float3 bPosition,
-                                      float bRadius)
-    {
-        float3 delta = bPosition - aPosition;
-        delta.y = 0f;
-        float radius = math.max(0f, aRadius) + math.max(0f, bRadius);
-        return math.lengthsq(delta) <= radius * radius;
-    }
     #endregion
 
     #endregion

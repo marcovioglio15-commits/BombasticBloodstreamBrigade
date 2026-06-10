@@ -36,6 +36,28 @@ public struct PlayerOrbitalProjectionPrefabElement : IBufferElementData
 }
 
 /// <summary>
+/// Player-owned table of baked XZ convex-hull vertices for prefab-bound orbital projections.
+/// Vertices are stored counter-clockwise in prefab-local space and keyed by the same binding index
+/// used by the prefab binding table, so spawn can copy the matching silhouette onto each instance.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerOrbitalProjectionHullVertexElement : IBufferElementData
+{
+    public int BindingIndex;
+    public float2 LocalPositionXZ;
+}
+
+/// <summary>
+/// Per-projection collision silhouette copied at spawn from the player hull table. Stored
+/// counter-clockwise in prefab-local XZ space; empty when the projection uses the plain radius.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerOrbitalProjectionCollisionVertexElement : IBufferElementData
+{
+    public float2 LocalPositionXZ;
+}
+
+/// <summary>
 /// Permanent runtime loss marker for persistent health-based orbital projections.
 /// </summary>
 [InternalBufferCapacity(0)]

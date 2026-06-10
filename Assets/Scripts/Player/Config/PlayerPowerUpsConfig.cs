@@ -458,6 +458,8 @@ public struct OrbitalProjectionConfig
     public OrbitalProjectionFullOrbitConeResponse FullOrbitConeResponse;
     public float LookFollowDelaySeconds;
     public float CollisionRadius;
+    public byte AdaptCollisionToModel;
+    public float ModelCollisionBoundingRadius;
     public byte DamageEnemies;
     public float ContactDamage;
     public float DamageTickIntervalSeconds;

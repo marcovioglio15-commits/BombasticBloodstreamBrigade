@@ -55,8 +55,12 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
     [Tooltip("Seconds used by Follow Player Look mode to catch up to the current look angle.")]
     [SerializeField] private float lookFollowDelaySeconds = 0.12f;
 
-    [Tooltip("Collision radius used for enemy, projectile, and bomb interception checks.")]
+    [Tooltip("Collision radius used for enemy, projectile, and bomb interception checks. Ignored when Adapt Collision To Model succeeds, but kept as runtime fallback when the prefab has no usable mesh.")]
     [SerializeField] private float collisionRadius = 0.35f;
+
+    [Tooltip("When enabled, the collision area is baked from the projection prefab's mesh silhouette (XZ convex hull) instead of the plain Collision Radius, matching the model shape precisely.")]
+    [SerializeField]
+    private bool adaptCollisionToModel;
 
     [Tooltip("When enabled, enemies touching this projection receive contact damage.")]
     [SerializeField] private bool damageEnemies = true;
@@ -201,6 +205,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
         get
         {
             return collisionRadius;
+        }
+    }
+
+    public bool AdaptCollisionToModel
+    {
+        get
+        {
+            return adaptCollisionToModel;
         }
     }
 

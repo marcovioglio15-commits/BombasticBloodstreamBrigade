@@ -148,6 +148,8 @@ public static class PlayerPowerUpOrbitalProjectionBakeUtility
             FullOrbitConeResponse = projection.FullOrbitConeResponse,
             LookFollowDelaySeconds = math.max(0f, projection.LookFollowDelaySeconds),
             CollisionRadius = math.max(0.01f, projection.CollisionRadius),
+            AdaptCollisionToModel = ResolveAdaptCollisionToModel(authoring, projection, prefabEntity),
+            ModelCollisionBoundingRadius = 0f,
             DamageEnemies = projection.DamageEnemies ? (byte)1 : (byte)0,
             ContactDamage = math.max(0f, projection.ContactDamage),
             DamageTickIntervalSeconds = math.max(0.01f, projection.DamageTickIntervalSeconds),
@@ -159,6 +161,34 @@ public static class PlayerPowerUpOrbitalProjectionBakeUtility
             ProjectileBlockHealthDamage = math.max(0f, projection.ProjectileBlockHealthDamage),
             BombBlockHealthDamage = math.max(0f, projection.BombBlockHealthDamage)
         };
+    }
+
+    /// <summary>
+    /// Resolves the Adapt Collision To Model flag, downgrading it to the plain radius when no
+    /// prefab entity could be baked (the model silhouette cannot exist without a prefab).
+    /// </summary>
+    /// <param name="authoring">Player authoring component used for validation logs.</param>
+    /// <param name="projection">Projection entry being compiled.</param>
+    /// <param name="prefabEntity">Resolved prefab entity, or Entity.Null when missing.</param>
+    /// <returns>Runtime flag enabling the model-silhouette collision path.</returns>
+    private static byte ResolveAdaptCollisionToModel(PlayerAuthoring authoring,
+                                                     PowerUpOrbitalProjectionDefinitionData projection,
+                                                     Entity prefabEntity)
+    {
+        if (!projection.AdaptCollisionToModel)
+            return 0;
+
+        if (prefabEntity != Entity.Null)
+            return 1;
+
+#if UNITY_EDITOR
+        if (authoring != null)
+            Debug.LogWarning(string.Format("[PlayerAuthoringBaker] Orbital projection '{0}' enables Adapt Collision To Model without a Projection Prefab on '{1}'. Falling back to Collision Radius.",
+                                           projection.DisplayName,
+                                           authoring.name),
+                             authoring);
+#endif
+        return 0;
     }
 
     /// <summary>

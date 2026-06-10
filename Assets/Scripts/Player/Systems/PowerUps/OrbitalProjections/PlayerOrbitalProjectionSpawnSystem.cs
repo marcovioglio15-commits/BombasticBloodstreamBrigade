@@ -49,6 +49,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         BufferLookup<PlayerOrbitalProjectionPrefabElement> prefabBindingsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionPrefabElement>(true);
+        BufferLookup<PlayerOrbitalProjectionHullVertexElement> hullVerticesLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionHullVertexElement>(true);
         BufferLookup<PlayerOrbitalProjectionSpawnRequest> spawnRequestLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(true);
         NativeArray<Entity> projectionEntities = projectionQuery.ToEntityArray(Allocator.Temp);
@@ -79,6 +80,9 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
             DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings = prefabBindingsLookup.HasBuffer(playerEntity)
                 ? prefabBindingsLookup[playerEntity]
                 : default;
+            DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVertices = hullVerticesLookup.HasBuffer(playerEntity)
+                ? hullVerticesLookup[playerEntity]
+                : default;
             DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections = lostProjectionLookup.HasBuffer(playerEntity)
                 ? lostProjectionLookup[playerEntity]
                 : default;
@@ -93,6 +97,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                         currentLookAngleDegrees,
                                         equippedPassiveTools,
                                         prefabBindings,
+                                        hullVertices,
                                         lostProjections,
                                         in powerUpsConfig,
                                         in powerUpsState);
@@ -110,6 +115,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                      playerTransform.ValueRO.Position,
                                      currentLookAngleDegrees,
                                      prefabBindings,
+                                     hullVertices,
                                      lostProjections,
                                      spawnRequests);
             }
@@ -136,6 +142,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="currentLookAngleDegrees">Player's current look angle in degrees, propagated for FollowPlayerLook slot alignment.</param>
     /// <param name="equippedPassiveTools">Equipped passive tool buffer.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="hullVertices">Player-owned binding-indexed hull table for model-shaped collision.</param>
     /// <param name="lostProjections">Player-owned permanent loss markers for health-based projections.</param>
     /// <param name="powerUpsConfig">Active slot configuration used for toggle-owned projections.</param>
     /// <param name="powerUpsState">Active slot runtime state used to determine toggle activation.</param>
@@ -149,6 +156,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                     float currentLookAngleDegrees,
                                                     DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                     DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                                    DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVertices,
                                                     DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                     in PlayerPowerUpsConfig powerUpsConfig,
                                                     in PlayerPowerUpsState powerUpsState)
@@ -169,6 +177,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                               passiveTool.PowerUpId,
                                               passiveIndex,
                                               prefabBindings,
+                                              hullVertices,
                                               lostProjections,
                                               equippedPassiveTools,
                                               in powerUpsConfig,
@@ -189,6 +198,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           powerUpsConfig.PrimarySlot.PowerUpId,
                                           -1,
                                           prefabBindings,
+                                          hullVertices,
                                           lostProjections,
                                           equippedPassiveTools,
                                           in powerUpsConfig,
@@ -207,6 +217,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                           powerUpsConfig.SecondarySlot.PowerUpId,
                                           -2,
                                           prefabBindings,
+                                          hullVertices,
                                           lostProjections,
                                           equippedPassiveTools,
                                           in powerUpsConfig,
@@ -237,6 +248,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="powerUpId">Source power-up identifier used for replacement policy.</param>
     /// <param name="sourceInstanceId">Stable source instance id for the current passive or toggle source.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="hullVertices">Player-owned binding-indexed hull table for model-shaped collision.</param>
     /// <param name="lostProjections">Player-owned permanent loss markers for health-based projections.</param>
     /// <param name="equippedPassiveTools">Equipped passive tools used to detect later replacing sources.</param>
     /// <param name="powerUpsConfig">Active slot configuration used to detect replacing toggles.</param>
@@ -253,6 +265,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                       FixedString64Bytes powerUpId,
                                                       int sourceInstanceId,
                                                       DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                                      DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVertices,
                                                       DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                                       DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                                                       in PlayerPowerUpsConfig powerUpsConfig,
@@ -316,6 +329,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                                        powerUpId,
                                                                        sourceInstanceId,
                                                                        prefabBindings,
+                                                                       hullVertices,
                                                                        projectionInstances,
                                                                        projectionConfig,
                                                                        true);
@@ -571,6 +585,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
     /// <param name="playerPosition">Current player world position used as spawn origin.</param>
     /// <param name="currentLookAngleDegrees">Player's current look angle in degrees, propagated for FollowPlayerLook slot alignment.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="hullVertices">Player-owned binding-indexed hull table for model-shaped collision.</param>
     /// <param name="lostProjections">Player-owned permanent loss markers for persistent health-based projections.</param>
     /// <param name="spawnRequests">Mutable spawn request buffer.</param>
     private static void ConsumeSpawnRequests(EntityManager entityManager,
@@ -582,6 +597,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                              float3 playerPosition,
                                              float currentLookAngleDegrees,
                                              DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                             DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVertices,
                                              DynamicBuffer<PlayerOrbitalProjectionLostElement> lostProjections,
                                              DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> spawnRequests)
     {
@@ -625,6 +641,7 @@ public partial struct PlayerOrbitalProjectionSpawnSystem : ISystem
                                                                            request.PowerUpId,
                                                                            request.SourceInstanceId,
                                                                            prefabBindings,
+                                                                           hullVertices,
                                                                            projectionInstances,
                                                                            projectionConfig,
                                                                            request.Persistent != 0);

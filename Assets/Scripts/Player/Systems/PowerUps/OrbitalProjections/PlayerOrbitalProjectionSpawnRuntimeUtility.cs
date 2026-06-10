@@ -71,6 +71,7 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
     /// <param name="powerUpId">Source power-up identifier.</param>
     /// <param name="sourceInstanceId">Source instance id used for persistent matching.</param>
     /// <param name="prefabBindings">Player-owned remappable prefab binding table.</param>
+    /// <param name="hullVertices">Player-owned binding-indexed hull table for model-shaped collision.</param>
     /// <param name="projectionInstances">Live projection snapshot used to slot the new projection.</param>
     /// <param name="projectionConfig">Projection config baked from the module payload.</param>
     /// <param name="persistent">True for passive and toggle-owned projections.</param>
@@ -82,6 +83,7 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
                                        FixedString64Bytes powerUpId,
                                        int sourceInstanceId,
                                        DynamicBuffer<PlayerOrbitalProjectionPrefabElement> prefabBindings,
+                                       DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVertices,
                                        NativeArray<PlayerOrbitalProjectionInstance> projectionInstances,
                                        in OrbitalProjectionConfig projectionConfig,
                                        bool persistent)
@@ -106,6 +108,37 @@ internal static class PlayerOrbitalProjectionSpawnRuntimeUtility
             : projectionConfig.AngleOffsetDegrees;
 
         runtimeProjectionConfig.PrefabEntity = prefabEntity;
+
+        // Copy the baked model silhouette onto this instance and derive its broad-phase radius;
+        // when fewer than three vertices exist the flag downgrades to the plain Collision Radius.
+        DynamicBuffer<PlayerOrbitalProjectionCollisionVertexElement> instanceHull = commandBuffer.AddBuffer<PlayerOrbitalProjectionCollisionVertexElement>(projectionEntity);
+
+        if (runtimeProjectionConfig.AdaptCollisionToModel != 0)
+        {
+            float boundingRadiusSq = 0f;
+
+            if (hullVertices.IsCreated && runtimeProjectionConfig.PrefabBindingIndex >= 0)
+            {
+                for (int vertexIndex = 0; vertexIndex < hullVertices.Length; vertexIndex++)
+                {
+                    PlayerOrbitalProjectionHullVertexElement hullVertex = hullVertices[vertexIndex];
+
+                    if (hullVertex.BindingIndex != runtimeProjectionConfig.PrefabBindingIndex)
+                        continue;
+
+                    instanceHull.Add(new PlayerOrbitalProjectionCollisionVertexElement
+                    {
+                        LocalPositionXZ = hullVertex.LocalPositionXZ
+                    });
+                    boundingRadiusSq = math.max(boundingRadiusSq, math.lengthsq(hullVertex.LocalPositionXZ));
+                }
+            }
+
+            if (instanceHull.Length >= 3)
+                runtimeProjectionConfig.ModelCollisionBoundingRadius = math.sqrt(boundingRadiusSq);
+            else
+                runtimeProjectionConfig.AdaptCollisionToModel = 0;
+        }
 
         if (prefabEntity != Entity.Null && entityManager.HasComponent<LocalTransform>(prefabEntity))
             commandBuffer.SetComponent(projectionEntity, spawnTransform);

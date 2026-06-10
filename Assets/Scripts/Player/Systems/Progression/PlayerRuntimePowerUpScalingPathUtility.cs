@@ -1201,6 +1201,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
             case "blockEnemyBombs":
                 projectionConfig.BlockEnemyBombs = value;
                 break;
+            case "adaptCollisionToModel":
+                projectionConfig.AdaptCollisionToModel = value;
+                break;
             case "hasHealth":
                 projectionConfig.HasHealth = value;
                 break;

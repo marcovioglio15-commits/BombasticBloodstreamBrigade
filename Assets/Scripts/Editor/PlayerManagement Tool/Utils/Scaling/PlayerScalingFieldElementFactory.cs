@@ -22,6 +22,18 @@ public static class PlayerScalingFieldElementFactory
     #region Fields
     private static readonly Dictionary<string, Action> formulaFieldRefreshByKey = new Dictionary<string, Action>(StringComparer.Ordinal);
     private static string activeFormulaFieldKey = string.Empty;
+    private static int contextGeneration;
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    /// Tracks a monotonically increasing context generation so formula elements can skip redundant
+    /// revalidation on attach when the cross-panel selection context did not change while detached.
+    /// </summary>
+    static PlayerScalingFieldElementFactory()
+    {
+        PlayerManagementSelectionContext.ContextChanged += () => contextGeneration++;
+    }
     #endregion
 
     #region Methods
@@ -78,6 +90,8 @@ public static class PlayerScalingFieldElementFactory
         IReadOnlyDictionary<string, PlayerScalableStatType> cachedDisplayTypes = null;
         string cachedHelperText = string.Empty;
         bool formulaMetadataResolved = false;
+        bool helperTextResolved = false;
+        int resolvedContextGeneration = -1;
         VisualElement root = new VisualElement();
         root.style.flexDirection = FlexDirection.Column;
 
@@ -166,18 +180,21 @@ public static class PlayerScalingFieldElementFactory
         // Revalidate against the refreshed master scope whenever the cross-panel selection context
         // changes: side panels are no longer rebuilt on master selection, so a stale metadata cache
         // would otherwise keep false "unknown scalable stat" warnings (or stale helper text) alive
-        // until the section is manually switched. The attach handler also re-syncs immediately,
-        // because sections can be built while detached (window reopen, inactive tabs) and miss
-        // context changes that happened before they joined the live panel hierarchy.
+        // until the section is manually switched. The attach handler re-syncs only when the context
+        // generation actually moved while the element was detached (window reopen, inactive tabs):
+        // plain tab switches and the initial build therefore never pay a redundant revalidation.
         Action contextChangedHandler = () =>
         {
             formulaMetadataResolved = false;
+            helperTextResolved = false;
             RefreshFromSerializedState();
         };
         root.RegisterCallback<AttachToPanelEvent>(evt =>
         {
             PlayerManagementSelectionContext.ContextChanged += contextChangedHandler;
-            contextChangedHandler();
+
+            if (resolvedContextGeneration != contextGeneration)
+                contextChangedHandler();
         });
         root.RegisterCallback<DetachFromPanelEvent>(evt =>
         {
@@ -355,8 +372,15 @@ public static class PlayerScalingFieldElementFactory
             string normalizedFormulaValue = PlayerScalingFormulaEditorUtility.NormalizeFormulaForTarget(formulaValue,
                                                                                                         targetProperty,
                                                                                                         cachedAllowedVariables);
-            availableVariablesLabel.text = cachedHelperText;
-            availableVariablesScrollView.style.display = addScaling && IsActiveFormulaField(fieldKey)
+            bool showAvailableVariables = addScaling && IsActiveFormulaField(fieldKey);
+
+            if (showAvailableVariables)
+            {
+                EnsureHelperTextCache();
+                availableVariablesLabel.text = cachedHelperText;
+            }
+
+            availableVariablesScrollView.style.display = showAvailableVariables
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
 
@@ -399,11 +423,23 @@ public static class PlayerScalingFieldElementFactory
 
             cachedAllowedVariables = ResolveAllowedVariables(allowedVariables, scalingRulesProperty);
             cachedVariableTypes = ResolveAllowedVariableTypes(scalingRulesProperty);
+            resolvedContextGeneration = contextGeneration;
+            formulaMetadataResolved = true;
+        }
+
+        void EnsureHelperTextCache()
+        {
+            if (helperTextResolved)
+                return;
+
+            // Helper text enumerates every scoped variable: building it for all fields up front is
+            // a measurable cost on payload open, so it resolves only for the focused formula field.
+            EnsureFormulaMetadataCache();
             cachedDisplayTypes = ResolveAllowedDisplayTypes(scalingRulesProperty);
             cachedHelperText = PlayerScalingFormulaEditorUtility.BuildHelperText(cachedAllowedVariables,
                                                                                  cachedDisplayTypes,
                                                                                  targetProperty);
-            formulaMetadataResolved = true;
+            helperTextResolved = true;
         }
     }
     #endregion

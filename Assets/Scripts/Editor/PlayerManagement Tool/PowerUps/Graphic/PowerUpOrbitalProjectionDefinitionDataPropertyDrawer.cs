@@ -33,6 +33,8 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         SerializedProperty blockEnemyProjectilesProperty = property.FindPropertyRelative("blockEnemyProjectiles");
         SerializedProperty blockEnemyBombsProperty = property.FindPropertyRelative("blockEnemyBombs");
         SerializedProperty hasHealthProperty = property.FindPropertyRelative("hasHealth");
+        SerializedProperty projectionPrefabProperty = property.FindPropertyRelative("projectionPrefab");
+        SerializedProperty adaptCollisionToModelProperty = property.FindPropertyRelative("adaptCollisionToModel");
         HelpBox warningsBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         Foldout identityFoldout = CreateFoldout("Identity");
         Foldout motionFoldout = CreateFoldout("Motion");
@@ -44,6 +46,8 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         VisualElement orbitConeBoundsContainer = new VisualElement();
         VisualElement fullOrbitConeResponseContainer = new VisualElement();
         VisualElement lookDelayContainer = new VisualElement();
+        VisualElement adaptCollisionContainer = new VisualElement();
+        VisualElement collisionRadiusContainer = new VisualElement();
         VisualElement damageContainer = new VisualElement();
         VisualElement healthValuesContainer = new VisualElement();
         VisualElement projectileHealthContainer = new VisualElement();
@@ -51,7 +55,6 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
 
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(identityFoldout, property.FindPropertyRelative("displayName"), "Display Name");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(identityFoldout, property.FindPropertyRelative("categoryId"), "Category ID", true);
-        SerializedProperty projectionPrefabProperty = property.FindPropertyRelative("projectionPrefab");
 
         if (projectionPrefabProperty != null)
         {
@@ -81,7 +84,10 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         motionFoldout.Add(fullOrbitConeResponseContainer);
         motionFoldout.Add(lookDelayContainer);
 
-        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(effectsFoldout, property.FindPropertyRelative("collisionRadius"), "Collision Radius");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(adaptCollisionContainer, adaptCollisionToModelProperty, "Adapt Collision To Model");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(collisionRadiusContainer, property.FindPropertyRelative("collisionRadius"), "Collision Radius");
+        effectsFoldout.Add(adaptCollisionContainer);
+        effectsFoldout.Add(collisionRadiusContainer);
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(effectsFoldout, damageEnemiesProperty, "Damage Enemies");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(damageContainer, property.FindPropertyRelative("contactDamage"), "Contact Damage");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(damageContainer, property.FindPropertyRelative("damageTickIntervalSeconds"), "Damage Tick Interval Seconds");
@@ -104,151 +110,47 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         root.Add(effectsFoldout);
         root.Add(healthFoldout);
 
-        RefreshVisibility(motionModeProperty,
-                          bounceInsideOrbitConeProperty,
-                          damageEnemiesProperty,
-                          blockEnemyProjectilesProperty,
-                          blockEnemyBombsProperty,
-                          hasHealthProperty,
-                          angleOffsetContainer,
-                          orbitSpeedContainer,
-                          orbitConeModeContainer,
-                          orbitConeBoundsContainer,
-                          fullOrbitConeResponseContainer,
-                          lookDelayContainer,
-                          damageContainer,
-                          healthValuesContainer,
-                          projectileHealthContainer,
-                          bombHealthContainer);
-        RefreshWarnings(warningsBox, property);
+        // Single shared refresh closures keep every Track callback in sync without repeating the
+        // full container argument list at each subscription site.
+        System.Action refreshAllVisibility = () => RefreshVisibility(motionModeProperty,
+                                                                     bounceInsideOrbitConeProperty,
+                                                                     damageEnemiesProperty,
+                                                                     blockEnemyProjectilesProperty,
+                                                                     blockEnemyBombsProperty,
+                                                                     hasHealthProperty,
+                                                                     projectionPrefabProperty,
+                                                                     adaptCollisionToModelProperty,
+                                                                     angleOffsetContainer,
+                                                                     orbitSpeedContainer,
+                                                                     orbitConeModeContainer,
+                                                                     orbitConeBoundsContainer,
+                                                                     fullOrbitConeResponseContainer,
+                                                                     lookDelayContainer,
+                                                                     adaptCollisionContainer,
+                                                                     collisionRadiusContainer,
+                                                                     damageContainer,
+                                                                     healthValuesContainer,
+                                                                     projectileHealthContainer,
+                                                                     bombHealthContainer);
+        System.Action refreshVisibilityAndWarnings = () =>
+        {
+            refreshAllVisibility();
+            RefreshWarnings(warningsBox, property);
+        };
+
+        refreshVisibilityAndWarnings();
         PowerUpOrbitalProjectionConePieChartUtility.UpdatePreview(orbitConePreviewChart,
                                                                   orbitConeCenterAngleDegreesProperty,
                                                                   orbitConeAngleDegreesProperty);
-        Track(root,
-              motionModeProperty,
-              changedProperty =>
-              {
-                  RefreshVisibility(motionModeProperty,
-                                    bounceInsideOrbitConeProperty,
-                                    damageEnemiesProperty,
-                                    blockEnemyProjectilesProperty,
-                                    blockEnemyBombsProperty,
-                                    hasHealthProperty,
-                                    angleOffsetContainer,
-                                    orbitSpeedContainer,
-                                    orbitConeModeContainer,
-                                    orbitConeBoundsContainer,
-                                    fullOrbitConeResponseContainer,
-                                    lookDelayContainer,
-                                    damageContainer,
-                                    healthValuesContainer,
-                                    projectileHealthContainer,
-                                    bombHealthContainer);
-                  RefreshWarnings(warningsBox, property);
-              });
-        Track(root,
-              damageEnemiesProperty,
-              changedProperty =>
-              {
-                  RefreshVisibility(motionModeProperty,
-                                    bounceInsideOrbitConeProperty,
-                                    damageEnemiesProperty,
-                                    blockEnemyProjectilesProperty,
-                                    blockEnemyBombsProperty,
-                                    hasHealthProperty,
-                                    angleOffsetContainer,
-                                    orbitSpeedContainer,
-                                    orbitConeModeContainer,
-                                    orbitConeBoundsContainer,
-                                    fullOrbitConeResponseContainer,
-                                    lookDelayContainer,
-                                    damageContainer,
-                                    healthValuesContainer,
-                                    projectileHealthContainer,
-                                    bombHealthContainer);
-                  RefreshWarnings(warningsBox, property);
-              });
-        Track(root,
-              blockEnemyProjectilesProperty,
-              changedProperty => RefreshVisibility(motionModeProperty,
-                                                   bounceInsideOrbitConeProperty,
-                                                   damageEnemiesProperty,
-                                                   blockEnemyProjectilesProperty,
-                                                   blockEnemyBombsProperty,
-                                                   hasHealthProperty,
-                                                   angleOffsetContainer,
-                                                   orbitSpeedContainer,
-                                                   orbitConeModeContainer,
-                                                   orbitConeBoundsContainer,
-                                                   fullOrbitConeResponseContainer,
-                                                   lookDelayContainer,
-                                                   damageContainer,
-                                                   healthValuesContainer,
-                                                   projectileHealthContainer,
-                                                   bombHealthContainer));
-        Track(root,
-              blockEnemyBombsProperty,
-              changedProperty => RefreshVisibility(motionModeProperty,
-                                                   bounceInsideOrbitConeProperty,
-                                                   damageEnemiesProperty,
-                                                   blockEnemyProjectilesProperty,
-                                                   blockEnemyBombsProperty,
-                                                   hasHealthProperty,
-                                                   angleOffsetContainer,
-                                                   orbitSpeedContainer,
-                                                   orbitConeModeContainer,
-                                                   orbitConeBoundsContainer,
-                                                   fullOrbitConeResponseContainer,
-                                                   lookDelayContainer,
-                                                   damageContainer,
-                                                   healthValuesContainer,
-                                                   projectileHealthContainer,
-                                                   bombHealthContainer));
-        Track(root,
-              hasHealthProperty,
-              changedProperty =>
-              {
-                  RefreshVisibility(motionModeProperty,
-                                    bounceInsideOrbitConeProperty,
-                                    damageEnemiesProperty,
-                                    blockEnemyProjectilesProperty,
-                                    blockEnemyBombsProperty,
-                                    hasHealthProperty,
-                                    angleOffsetContainer,
-                                    orbitSpeedContainer,
-                                    orbitConeModeContainer,
-                                    orbitConeBoundsContainer,
-                                    fullOrbitConeResponseContainer,
-                                    lookDelayContainer,
-                                    damageContainer,
-                                    healthValuesContainer,
-                                    projectileHealthContainer,
-                                    bombHealthContainer);
-                  RefreshWarnings(warningsBox, property);
-              });
+        Track(root, motionModeProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, damageEnemiesProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, blockEnemyProjectilesProperty, changedProperty => refreshAllVisibility());
+        Track(root, blockEnemyBombsProperty, changedProperty => refreshAllVisibility());
+        Track(root, hasHealthProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, bounceInsideOrbitConeProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, projectionPrefabProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, adaptCollisionToModelProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, property.FindPropertyRelative("orbitDistance"), changedProperty => RefreshWarnings(warningsBox, property));
-        Track(root,
-              bounceInsideOrbitConeProperty,
-              changedProperty =>
-              {
-                  RefreshVisibility(motionModeProperty,
-                                    bounceInsideOrbitConeProperty,
-                                    damageEnemiesProperty,
-                                    blockEnemyProjectilesProperty,
-                                    blockEnemyBombsProperty,
-                                    hasHealthProperty,
-                                    angleOffsetContainer,
-                                    orbitSpeedContainer,
-                                    orbitConeModeContainer,
-                                    orbitConeBoundsContainer,
-                                    fullOrbitConeResponseContainer,
-                                    lookDelayContainer,
-                                    damageContainer,
-                                    healthValuesContainer,
-                                    projectileHealthContainer,
-                                    bombHealthContainer);
-                  RefreshWarnings(warningsBox, property);
-              });
         Track(root,
               orbitConeCenterAngleDegreesProperty,
               changedProperty => PowerUpOrbitalProjectionConePieChartUtility.UpdatePreview(orbitConePreviewChart,
@@ -314,12 +216,16 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
     /// <param name="blockEnemyProjectilesProperty">Projectile block toggle property.</param>
     /// <param name="blockEnemyBombsProperty">Bomb block toggle property.</param>
     /// <param name="hasHealthProperty">Projection health toggle property.</param>
+    /// <param name="projectionPrefabProperty">Projection prefab reference property.</param>
+    /// <param name="adaptCollisionToModelProperty">Model-shaped collision toggle property.</param>
     /// <param name="angleOffsetContainer">Angle-offset field container.</param>
     /// <param name="orbitSpeedContainer">Orbit-speed field container.</param>
     /// <param name="orbitConeModeContainer">Cone motion-mode toggle container.</param>
     /// <param name="orbitConeBoundsContainer">Cone bounds field and preview container.</param>
     /// <param name="fullOrbitConeResponseContainer">Full-orbit response field container.</param>
     /// <param name="lookDelayContainer">Look-delay field container.</param>
+    /// <param name="adaptCollisionContainer">Model-shaped collision toggle container.</param>
+    /// <param name="collisionRadiusContainer">Plain collision radius field container.</param>
     /// <param name="damageContainer">Enemy damage field container.</param>
     /// <param name="healthValuesContainer">Common health field container.</param>
     /// <param name="projectileHealthContainer">Projectile health-cost container.</param>
@@ -330,12 +236,16 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
                                           SerializedProperty blockEnemyProjectilesProperty,
                                           SerializedProperty blockEnemyBombsProperty,
                                           SerializedProperty hasHealthProperty,
+                                          SerializedProperty projectionPrefabProperty,
+                                          SerializedProperty adaptCollisionToModelProperty,
                                           VisualElement angleOffsetContainer,
                                           VisualElement orbitSpeedContainer,
                                           VisualElement orbitConeModeContainer,
                                           VisualElement orbitConeBoundsContainer,
                                           VisualElement fullOrbitConeResponseContainer,
                                           VisualElement lookDelayContainer,
+                                          VisualElement adaptCollisionContainer,
+                                          VisualElement collisionRadiusContainer,
                                           VisualElement damageContainer,
                                           VisualElement healthValuesContainer,
                                           VisualElement projectileHealthContainer,
@@ -350,6 +260,8 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         bool hasHealth = hasHealthProperty != null && hasHealthProperty.boolValue;
         bool bounceInsideOrbitCone = bounceInsideOrbitConeProperty != null && bounceInsideOrbitConeProperty.boolValue;
         bool isIndependentOrbit = motionMode == OrbitalProjectionMotionMode.IndependentOrbit;
+        bool hasProjectionPrefab = projectionPrefabProperty != null && projectionPrefabProperty.objectReferenceValue != null;
+        bool adaptCollisionToModel = adaptCollisionToModelProperty != null && adaptCollisionToModelProperty.boolValue;
 
         SetVisible(angleOffsetContainer, !isIndependentOrbit);
         SetVisible(orbitSpeedContainer, isIndependentOrbit);
@@ -357,6 +269,10 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         SetVisible(orbitConeBoundsContainer, isIndependentOrbit && bounceInsideOrbitCone);
         SetVisible(fullOrbitConeResponseContainer, isIndependentOrbit && !bounceInsideOrbitCone);
         SetVisible(lookDelayContainer, motionMode == OrbitalProjectionMotionMode.FollowPlayerLook);
+        // Model-shaped collision needs a prefab to bake a silhouette; the toggle stays visible while
+        // enabled without one so the warning can be acknowledged and the option turned off.
+        SetVisible(adaptCollisionContainer, hasProjectionPrefab || adaptCollisionToModel);
+        SetVisible(collisionRadiusContainer, !(adaptCollisionToModel && hasProjectionPrefab));
         SetVisible(damageContainer, damageEnemies);
         SetVisible(healthValuesContainer, hasHealth);
         SetVisible(projectileHealthContainer, hasHealth && blockEnemyProjectiles);
@@ -375,7 +291,19 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
 
         List<string> warnings = new List<string>();
         AddPositiveWarning(warnings, property.FindPropertyRelative("orbitDistance"), "Orbit Distance should be greater than zero.");
-        AddPositiveWarning(warnings, property.FindPropertyRelative("collisionRadius"), "Collision Radius must be greater than zero.");
+
+        SerializedProperty projectionPrefabProperty = property.FindPropertyRelative("projectionPrefab");
+        SerializedProperty adaptCollisionToModelProperty = property.FindPropertyRelative("adaptCollisionToModel");
+        bool hasProjectionPrefab = projectionPrefabProperty != null && projectionPrefabProperty.objectReferenceValue != null;
+        bool adaptCollisionToModel = adaptCollisionToModelProperty != null && adaptCollisionToModelProperty.boolValue;
+
+        // The plain radius only matters when the model silhouette is not in charge.
+        if (!(adaptCollisionToModel && hasProjectionPrefab))
+            AddPositiveWarning(warnings, property.FindPropertyRelative("collisionRadius"), "Collision Radius must be greater than zero.");
+
+        if (adaptCollisionToModel && !hasProjectionPrefab)
+            warnings.Add("Adapt Collision To Model requires a Projection Prefab; the plain Collision Radius is used as fallback at runtime.");
+
         SerializedProperty motionModeProperty = property.FindPropertyRelative("motionMode");
         SerializedProperty bounceInsideOrbitConeProperty = property.FindPropertyRelative("bounceInsideOrbitCone");
         SerializedProperty orbitConeAngleDegreesProperty = property.FindPropertyRelative("orbitConeAngleDegrees");

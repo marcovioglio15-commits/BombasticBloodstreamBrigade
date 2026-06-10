@@ -845,11 +845,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                     ref hasPowerUpVfxRuntime,
                                     ref powerUpVfxPrefabBindingsBuffer);
             DynamicBuffer<PlayerOrbitalProjectionPrefabElement> orbitalProjectionPrefabBindingsBuffer = AddBuffer<PlayerOrbitalProjectionPrefabElement>(entity);
+            DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> orbitalProjectionHullVerticesBuffer = AddBuffer<PlayerOrbitalProjectionHullVertexElement>(entity);
             AddBuffer<PlayerOrbitalProjectionLostElement>(entity);
             Func<GameObject, Entity> resolveDynamicPowerUpVfxPrefabEntity = (GameObject prefab) =>
                 ResolveDynamicPowerUpVfxPrefabEntity(prefab, powerUpVfxPrefabBindingsBuffer);
             Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = (GameObject prefab) =>
-                ResolveOrbitalProjectionPrefabBindingIndex(prefab, orbitalProjectionPrefabBindingsBuffer);
+                ResolveOrbitalProjectionPrefabBindingIndex(prefab, orbitalProjectionPrefabBindingsBuffer, orbitalProjectionHullVerticesBuffer);
             PlayerPowerUpSlotConfig primaryPowerUpSlotConfig;
             PlayerPowerUpSlotConfig secondaryPowerUpSlotConfig;
             PlayerPowerUpActiveBakeUtility.BuildPowerUpSlots(authoring,
@@ -1127,13 +1128,16 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
     }
 
     /// <summary>
-    /// Registers one orbital projection prefab in a remappable player-owned binding table.
+    /// Registers one orbital projection prefab in a remappable player-owned binding table and bakes
+    /// its XZ collision hull into the parallel hull table on first registration.
     /// </summary>
     /// <param name="prefab">Prefab asset referenced by an orbital projection config.</param>
     /// <param name="bindingsBuffer">Player-owned buffer receiving remappable prefab entities.</param>
+    /// <param name="hullVerticesBuffer">Player-owned buffer receiving binding-indexed hull vertices.</param>
     /// <returns>Stable binding index used by fixed-list projection configs, or -1 when the prefab is missing.</returns>
     private int ResolveOrbitalProjectionPrefabBindingIndex(GameObject prefab,
-                                                           DynamicBuffer<PlayerOrbitalProjectionPrefabElement> bindingsBuffer)
+                                                           DynamicBuffer<PlayerOrbitalProjectionPrefabElement> bindingsBuffer,
+                                                           DynamicBuffer<PlayerOrbitalProjectionHullVertexElement> hullVerticesBuffer)
     {
         Entity prefabEntity = ResolveDynamicPrefabEntity(prefab);
 
@@ -1154,6 +1158,23 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             BindingIndex = newBindingIndex,
             PrefabEntity = prefabEntity
         });
+
+        // Bake the model silhouette once per unique prefab so Adapt Collision To Model projections
+        // can copy it at spawn; prefabs without usable meshes simply contribute no hull entries.
+        List<float2> hullVertices = new List<float2>(PlayerOrbitalProjectionCollisionHullBakeUtility.MaximumHullVertices);
+
+        if (PlayerOrbitalProjectionCollisionHullBakeUtility.TryBuildHull(prefab, hullVertices))
+        {
+            for (int vertexIndex = 0; vertexIndex < hullVertices.Count; vertexIndex++)
+            {
+                hullVerticesBuffer.Add(new PlayerOrbitalProjectionHullVertexElement
+                {
+                    BindingIndex = newBindingIndex,
+                    LocalPositionXZ = hullVertices[vertexIndex]
+                });
+            }
+        }
+
         return newBindingIndex;
     }
     #endregion
