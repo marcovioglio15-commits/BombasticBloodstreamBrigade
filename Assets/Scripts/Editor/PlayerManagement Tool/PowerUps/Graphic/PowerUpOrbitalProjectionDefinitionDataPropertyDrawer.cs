@@ -29,6 +29,8 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         SerializedProperty orbitConeCenterAngleDegreesProperty = property.FindPropertyRelative("orbitConeCenterAngleDegrees");
         SerializedProperty orbitConeAngleDegreesProperty = property.FindPropertyRelative("orbitConeAngleDegrees");
         SerializedProperty fullOrbitConeResponseProperty = property.FindPropertyRelative("fullOrbitConeResponse");
+        SerializedProperty lookFollowDelaySecondsProperty = property.FindPropertyRelative("lookFollowDelaySeconds");
+        SerializedProperty maximumLookFollowSpeedDegreesPerSecondProperty = property.FindPropertyRelative("maximumLookFollowSpeedDegreesPerSecond");
         SerializedProperty damageEnemiesProperty = property.FindPropertyRelative("damageEnemies");
         SerializedProperty blockEnemyProjectilesProperty = property.FindPropertyRelative("blockEnemyProjectiles");
         SerializedProperty blockEnemyBombsProperty = property.FindPropertyRelative("blockEnemyBombs");
@@ -47,6 +49,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         VisualElement orbitConeBoundsContainer = new VisualElement();
         VisualElement fullOrbitConeResponseContainer = new VisualElement();
         VisualElement lookDelayContainer = new VisualElement();
+        VisualElement maximumLookFollowSpeedContainer = new VisualElement();
         VisualElement faceOutwardContainer = new VisualElement();
         VisualElement adaptCollisionContainer = new VisualElement();
         VisualElement collisionRadiusContainer = new VisualElement();
@@ -78,7 +81,10 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         orbitConeBoundsContainer.Add(orbitConePreviewLabel);
         orbitConeBoundsContainer.Add(orbitConePreviewChart);
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(fullOrbitConeResponseContainer, fullOrbitConeResponseProperty, "Full Orbit Cone Response");
-        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(lookDelayContainer, property.FindPropertyRelative("lookFollowDelaySeconds"), "Look Follow Delay Seconds");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(lookDelayContainer, lookFollowDelaySecondsProperty, "Look Follow Delay Seconds");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(maximumLookFollowSpeedContainer,
+                                                             maximumLookFollowSpeedDegreesPerSecondProperty,
+                                                             "Maximum Look Follow Catch-Up Speed Degrees Per Second");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(faceOutwardContainer, faceOrbitOutwardProperty, "Face Orbit Outward");
         motionFoldout.Add(angleOffsetContainer);
         motionFoldout.Add(orbitSpeedContainer);
@@ -86,6 +92,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         motionFoldout.Add(orbitConeBoundsContainer);
         motionFoldout.Add(fullOrbitConeResponseContainer);
         motionFoldout.Add(lookDelayContainer);
+        motionFoldout.Add(maximumLookFollowSpeedContainer);
         motionFoldout.Add(faceOutwardContainer);
 
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(adaptCollisionContainer, adaptCollisionToModelProperty, "Adapt Collision To Model");
@@ -125,12 +132,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
                                                                      projectionPrefabProperty,
                                                                      adaptCollisionToModelProperty,
                                                                      faceOrbitOutwardProperty,
+                                                                     lookFollowDelaySecondsProperty,
                                                                      angleOffsetContainer,
                                                                      orbitSpeedContainer,
                                                                      orbitConeModeContainer,
                                                                      orbitConeBoundsContainer,
                                                                      fullOrbitConeResponseContainer,
                                                                      lookDelayContainer,
+                                                                     maximumLookFollowSpeedContainer,
                                                                      faceOutwardContainer,
                                                                      adaptCollisionContainer,
                                                                      collisionRadiusContainer,
@@ -157,6 +166,8 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         Track(root, projectionPrefabProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, adaptCollisionToModelProperty, changedProperty => refreshVisibilityAndWarnings());
         Track(root, faceOrbitOutwardProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, lookFollowDelaySecondsProperty, changedProperty => refreshVisibilityAndWarnings());
+        Track(root, maximumLookFollowSpeedDegreesPerSecondProperty, changedProperty => RefreshWarnings(warningsBox, property));
         Track(root, property.FindPropertyRelative("orbitDistance"), changedProperty => RefreshWarnings(warningsBox, property));
         Track(root,
               orbitConeCenterAngleDegreesProperty,
@@ -226,12 +237,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
     /// <param name="projectionPrefabProperty">Projection prefab reference property.</param>
     /// <param name="adaptCollisionToModelProperty">Model-shaped collision toggle property.</param>
     /// <param name="faceOrbitOutwardProperty">Outward-facing orientation toggle property.</param>
+    /// <param name="lookFollowDelaySecondsProperty">Follow smoothing delay property.</param>
     /// <param name="angleOffsetContainer">Angle-offset field container.</param>
     /// <param name="orbitSpeedContainer">Orbit-speed field container.</param>
     /// <param name="orbitConeModeContainer">Cone motion-mode toggle container.</param>
     /// <param name="orbitConeBoundsContainer">Cone bounds field and preview container.</param>
     /// <param name="fullOrbitConeResponseContainer">Full-orbit response field container.</param>
     /// <param name="lookDelayContainer">Look-delay field container.</param>
+    /// <param name="maximumLookFollowSpeedContainer">Maximum look-follow speed field container.</param>
     /// <param name="faceOutwardContainer">Outward-facing orientation toggle container.</param>
     /// <param name="adaptCollisionContainer">Model-shaped collision toggle container.</param>
     /// <param name="collisionRadiusContainer">Plain collision radius field container.</param>
@@ -248,12 +261,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
                                           SerializedProperty projectionPrefabProperty,
                                           SerializedProperty adaptCollisionToModelProperty,
                                           SerializedProperty faceOrbitOutwardProperty,
+                                          SerializedProperty lookFollowDelaySecondsProperty,
                                           VisualElement angleOffsetContainer,
                                           VisualElement orbitSpeedContainer,
                                           VisualElement orbitConeModeContainer,
                                           VisualElement orbitConeBoundsContainer,
                                           VisualElement fullOrbitConeResponseContainer,
                                           VisualElement lookDelayContainer,
+                                          VisualElement maximumLookFollowSpeedContainer,
                                           VisualElement faceOutwardContainer,
                                           VisualElement adaptCollisionContainer,
                                           VisualElement collisionRadiusContainer,
@@ -274,13 +289,16 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
         bool hasProjectionPrefab = projectionPrefabProperty != null && projectionPrefabProperty.objectReferenceValue != null;
         bool adaptCollisionToModel = adaptCollisionToModelProperty != null && adaptCollisionToModelProperty.boolValue;
         bool faceOrbitOutward = faceOrbitOutwardProperty != null && faceOrbitOutwardProperty.boolValue;
+        bool hasLookFollowDelay = lookFollowDelaySecondsProperty != null && lookFollowDelaySecondsProperty.floatValue > 0f;
+        bool isFollowPlayerLook = motionMode == OrbitalProjectionMotionMode.FollowPlayerLook;
 
         SetVisible(angleOffsetContainer, !isIndependentOrbit);
         SetVisible(orbitSpeedContainer, isIndependentOrbit);
         SetVisible(orbitConeModeContainer, isIndependentOrbit);
         SetVisible(orbitConeBoundsContainer, isIndependentOrbit && bounceInsideOrbitCone);
         SetVisible(fullOrbitConeResponseContainer, isIndependentOrbit && !bounceInsideOrbitCone);
-        SetVisible(lookDelayContainer, motionMode == OrbitalProjectionMotionMode.FollowPlayerLook);
+        SetVisible(lookDelayContainer, isFollowPlayerLook);
+        SetVisible(maximumLookFollowSpeedContainer, isFollowPlayerLook && hasLookFollowDelay);
         // Prefab-dependent toggles need a prefab to have any visible effect; they stay visible while
         // enabled without one so their warning can be acknowledged and the option turned off.
         SetVisible(faceOutwardContainer, hasProjectionPrefab || faceOrbitOutward);
@@ -323,6 +341,7 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
             warnings.Add("Face Orbit Outward has no visible effect without a Projection Prefab.");
 
         SerializedProperty motionModeProperty = property.FindPropertyRelative("motionMode");
+        SerializedProperty lookFollowDelaySecondsProperty = property.FindPropertyRelative("lookFollowDelaySeconds");
         SerializedProperty bounceInsideOrbitConeProperty = property.FindPropertyRelative("bounceInsideOrbitCone");
         SerializedProperty orbitConeAngleDegreesProperty = property.FindPropertyRelative("orbitConeAngleDegrees");
 
@@ -337,6 +356,16 @@ public sealed class PowerUpOrbitalProjectionDefinitionDataPropertyDrawer : Prope
 
             if (orbitConeAngleDegreesProperty.floatValue > 360f)
                 warnings.Add("Orbit Cone Angle Degrees should not exceed 360 degrees.");
+        }
+
+        if (motionModeProperty != null &&
+            lookFollowDelaySecondsProperty != null &&
+            (OrbitalProjectionMotionMode)motionModeProperty.enumValueIndex == OrbitalProjectionMotionMode.FollowPlayerLook &&
+            lookFollowDelaySecondsProperty.floatValue > 0f)
+        {
+            AddPositiveWarning(warnings,
+                               property.FindPropertyRelative("maximumLookFollowSpeedDegreesPerSecond"),
+                               "Maximum Look Follow Catch-Up Speed Degrees Per Second should be greater than zero; runtime uses the safe 540 degrees per second fallback.");
         }
 
         SerializedProperty damageEnemiesProperty = property.FindPropertyRelative("damageEnemies");

@@ -71,7 +71,7 @@ public struct PlayerOrbitalProjectionLostElement : IBufferElementData
 /// <summary>
 /// Runtime state stored on one orbital projection entity. StableOrderKey assigns deterministic shared-ring
 /// slots without relying on volatile entity indices. FollowLookAngleDegrees stores a continuously unwrapped
-/// player-look target, while FollowAngularVelocityDegrees preserves smooth follow velocity across frames.
+/// player-look target, while FollowAngularVelocityDegrees exposes the resulting visible follow velocity.
 /// </summary>
 public struct PlayerOrbitalProjectionInstance : IComponentData
 {

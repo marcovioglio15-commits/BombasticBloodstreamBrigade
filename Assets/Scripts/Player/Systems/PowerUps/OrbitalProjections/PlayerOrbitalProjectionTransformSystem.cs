@@ -8,10 +8,15 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerOrbitalProjectionSpawnSystem))]
+[UpdateAfter(typeof(PlayerLookRotationSystem))]
+[UpdateAfter(typeof(PlayerMovementApplySystem))]
 public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 {
     #region Constants
     private const float DegreesToRadians = math.PI / 180f;
+    private const float DefaultMaximumLookFollowSpeedDegreesPerSecond = 540f;
+    private const float FollowAlignmentToleranceDegrees = 0.01f;
+    private const float FullCircleDegrees = 360f;
     private const float IndependentOrbitLayoutBlendSeconds = 0.35f;
     private const float MinimumBounceSectorDegrees = 0.01f;
     #endregion
@@ -165,8 +170,9 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
                                              float deltaTime)
     {
         float currentLookAngleDegrees = PlayerOrbitalProjectionStableLayoutUtility.ResolveLookAngleDegrees(in lookState);
-        instance.FollowLookAngleDegrees += ResolveSignedAngleDelta(instance.FollowLookAngleDegrees,
-                                                                  currentLookAngleDegrees);
+        float lookRotationDeltaDegrees = ResolveSignedAngleDelta(instance.FollowLookAngleDegrees,
+                                                                 currentLookAngleDegrees);
+        instance.FollowLookAngleDegrees += lookRotationDeltaDegrees;
         float targetAngle;
 
         // Resolve targets from the continuous look angle rather than the lagging visible angle.
@@ -188,13 +194,13 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
         }
         else
         {
-            float angularVelocityDegrees = instance.FollowAngularVelocityDegrees;
-            instance.FollowAngleDegrees = SmoothDampAngle(instance.FollowAngleDegrees,
-                                                          targetAngle,
-                                                          ref angularVelocityDegrees,
-                                                          followDelay,
-                                                          deltaTime);
-            instance.FollowAngularVelocityDegrees = angularVelocityDegrees;
+            targetAngle = DiscardCompletedFollowTurns(ref instance, targetAngle);
+            AdvanceLocalFollow(ref instance,
+                               targetAngle,
+                               lookRotationDeltaDegrees,
+                               followDelay,
+                               ResolveMaximumLookFollowSpeedDegreesPerSecond(in instance.Config),
+                               deltaTime);
         }
 
         instance.AngleDegrees = instance.FollowAngleDegrees;
@@ -515,39 +521,90 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
 
     #region Angle Helpers
     /// <summary>
-    /// Advances one angle toward a continuously unwrapped target with a critically damped spring,
-    /// mirroring UnityEngine.Mathf.SmoothDamp in Burst-compatible form. Persistent velocity keeps
-    /// follow motion continuous while the target moves rapidly through multiple rotations.
+    /// Removes completed full-turn backlog while preserving the remaining signed lag and physical
+    /// target orientation, preventing long delayed spins without changing catch-up direction.
     /// </summary>
-    /// <param name="currentDegrees">Current angle in degrees.</param>
-    /// <param name="targetDegrees">Target angle already unwrapped near the current angle.</param>
-    /// <param name="angularVelocityDegrees">Persistent angular velocity state, updated in place.</param>
-    /// <param name="smoothTimeSeconds">Approximate time to reach the target.</param>
-    /// <param name="deltaTime">Current frame delta time.</param>
-    /// <returns>New smoothed angle for this frame.</returns>
-    private static float SmoothDampAngle(float currentDegrees,
-                                         float targetDegrees,
-                                         ref float angularVelocityDegrees,
-                                         float smoothTimeSeconds,
-                                         float deltaTime)
+    /// <param name="instance">Projection whose continuous look domain is rebased in place.</param>
+    /// <param name="targetDegrees">Current continuously unwrapped follow target.</param>
+    /// <returns>Physically equivalent target with less than one full turn of signed backlog.</returns>
+    private static float DiscardCompletedFollowTurns(ref PlayerOrbitalProjectionInstance instance,
+                                                     float targetDegrees)
     {
-        float omega = 2f / math.max(0.0001f, smoothTimeSeconds);
-        float x = omega * deltaTime;
-        float exponential = 1f / (1f + x + 0.48f * x * x + 0.235f * x * x * x);
-        float change = currentDegrees - targetDegrees;
-        float temp = (angularVelocityDegrees + omega * change) * deltaTime;
-        float smoothedDegrees = targetDegrees + (change + temp) * exponential;
+        float targetLagDegrees = targetDegrees - instance.FollowAngleDegrees;
 
-        angularVelocityDegrees = (angularVelocityDegrees - omega * temp) * exponential;
+        if (math.abs(targetLagDegrees) < FullCircleDegrees)
+            return targetDegrees;
 
-        // Clamp discretization overshoot so the spring can never oscillate around the target.
-        if (targetDegrees - currentDegrees > 0f == smoothedDegrees > targetDegrees)
+        float discardedDegrees = math.trunc(targetLagDegrees / FullCircleDegrees) * FullCircleDegrees;
+        instance.FollowLookAngleDegrees -= discardedDegrees;
+        return targetDegrees - discardedDegrees;
+    }
+
+    /// <summary>
+    /// Advances visible Follow Player Look motion using uncapped player-turn inheritance plus
+    /// independently limited exponential catch-up. Contradictory catch-up is removed without
+    /// suppressing the player's current rotation, keeping sustained turns and reversals responsive.
+    /// </summary>
+    /// <param name="instance">Projection visible follow state updated in place.</param>
+    /// <param name="targetDegrees">Continuous target with completed full-turn backlog removed.</param>
+    /// <param name="lookRotationDeltaDegrees">Signed player look rotation observed this frame.</param>
+    /// <param name="followDelaySeconds">Authored exponential follow response time.</param>
+    /// <param name="maximumCatchUpSpeedDegreesPerSecond">Maximum autonomous catch-up angular speed.</param>
+    /// <param name="deltaTime">Current frame delta time.</param>
+    private static void AdvanceLocalFollow(ref PlayerOrbitalProjectionInstance instance,
+                                           float targetDegrees,
+                                           float lookRotationDeltaDegrees,
+                                           float followDelaySeconds,
+                                           float maximumCatchUpSpeedDegreesPerSecond,
+                                           float deltaTime)
+    {
+        float remainingDegrees = targetDegrees - instance.FollowAngleDegrees;
+
+        if (math.abs(remainingDegrees) <= FollowAlignmentToleranceDegrees)
         {
-            smoothedDegrees = targetDegrees;
-            angularVelocityDegrees = 0f;
+            instance.FollowAngleDegrees = targetDegrees;
+            instance.FollowAngularVelocityDegrees = 0f;
+            return;
         }
 
-        return smoothedDegrees;
+        float response = 1f - math.exp(-deltaTime / math.max(0.0001f, followDelaySeconds));
+        float maximumCatchUpStepDegrees = math.max(0f, maximumCatchUpSpeedDegreesPerSecond) * deltaTime;
+        float catchUpStepDegrees = math.clamp(remainingDegrees * response,
+                                              -maximumCatchUpStepDegrees,
+                                              maximumCatchUpStepDegrees);
+
+        // Discard contradictory catch-up during active input so it cannot attenuate or reverse the
+        // player's current visible turn response.
+        if (math.abs(lookRotationDeltaDegrees) > FollowAlignmentToleranceDegrees &&
+            catchUpStepDegrees * lookRotationDeltaDegrees < 0f)
+            catchUpStepDegrees = 0f;
+
+        float signedStepDegrees = lookRotationDeltaDegrees + catchUpStepDegrees;
+
+        // Do not overshoot a target that lies along the selected step direction.
+        if (signedStepDegrees * remainingDegrees > 0f &&
+            math.abs(signedStepDegrees) > math.abs(remainingDegrees))
+        {
+            signedStepDegrees = remainingDegrees;
+        }
+
+        instance.FollowAngleDegrees += signedStepDegrees;
+        instance.FollowAngularVelocityDegrees = deltaTime > 0f
+            ? signedStepDegrees / deltaTime
+            : 0f;
+    }
+
+    /// <summary>
+    /// Resolves the authored Follow Player Look catch-up speed cap, using a safe fallback for
+    /// existing presets and formula results that do not provide a positive value.
+    /// </summary>
+    /// <param name="config">Projection runtime configuration containing the authored speed cap.</param>
+    /// <returns>Positive maximum autonomous catch-up speed in degrees per second.</returns>
+    private static float ResolveMaximumLookFollowSpeedDegreesPerSecond(in OrbitalProjectionConfig config)
+    {
+        return config.MaximumLookFollowSpeedDegreesPerSecond > 0f
+            ? config.MaximumLookFollowSpeedDegreesPerSecond
+            : DefaultMaximumLookFollowSpeedDegreesPerSecond;
     }
 
     /// <summary>
@@ -558,8 +615,14 @@ public partial struct PlayerOrbitalProjectionTransformSystem : ISystem
     /// <returns>Signed delta in the -180 to 180 range.</returns>
     private static float ResolveSignedAngleDelta(float currentDegrees, float targetDegrees)
     {
-        float delta = math.fmod(targetDegrees - currentDegrees + 540f, 360f) - 180f;
-        return delta;
+        float deltaDegrees = math.fmod(targetDegrees - currentDegrees, FullCircleDegrees);
+
+        if (deltaDegrees > 180f)
+            deltaDegrees -= FullCircleDegrees;
+        else if (deltaDegrees < -180f)
+            deltaDegrees += FullCircleDegrees;
+
+        return deltaDegrees;
     }
 
     /// <summary>

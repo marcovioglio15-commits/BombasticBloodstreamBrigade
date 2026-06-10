@@ -1101,6 +1101,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
             case "lookFollowDelaySeconds":
                 projectionConfig.LookFollowDelaySeconds = math.max(0f, resolvedValue);
                 break;
+            case "maximumLookFollowSpeedDegreesPerSecond":
+                projectionConfig.MaximumLookFollowSpeedDegreesPerSecond = resolvedValue;
+                break;
             case "collisionRadius":
                 projectionConfig.CollisionRadius = math.max(0.01f, resolvedValue);
                 break;

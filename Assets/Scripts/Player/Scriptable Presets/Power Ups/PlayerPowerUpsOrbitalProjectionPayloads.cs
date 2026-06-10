@@ -53,7 +53,12 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
     private OrbitalProjectionFullOrbitConeResponse fullOrbitConeResponse = OrbitalProjectionFullOrbitConeResponse.IgnoreCones;
 
     [Tooltip("Seconds used by Follow Player Look mode to catch up to the current look angle.")]
-    [SerializeField] private float lookFollowDelaySeconds = 0.12f;
+    [SerializeField]
+    private float lookFollowDelaySeconds = 0.12f;
+
+    [Tooltip("Maximum autonomous catch-up speed used by Follow Player Look mode. Player-driven rotation is inherited immediately and does not consume this limit. Values at or below zero use the safe runtime fallback of 540 degrees per second.")]
+    [SerializeField]
+    private float maximumLookFollowSpeedDegreesPerSecond = 540f;
 
     [Tooltip("When enabled, the projection rotates while orbiting so its forward axis always points outward, away from the player. Also rotates the model collision silhouette when Adapt Collision To Model is active.")]
     [SerializeField]
@@ -201,6 +206,14 @@ public sealed class PowerUpOrbitalProjectionDefinitionData
         get
         {
             return lookFollowDelaySeconds;
+        }
+    }
+
+    public float MaximumLookFollowSpeedDegreesPerSecond
+    {
+        get
+        {
+            return maximumLookFollowSpeedDegreesPerSecond;
         }
     }
 
