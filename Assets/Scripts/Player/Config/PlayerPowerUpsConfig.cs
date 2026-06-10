@@ -63,6 +63,8 @@ public struct PlayerPowerUpSlotConfig
     public BulletTimePowerUpConfig BulletTime;
     public ImpactFramePowerUpConfig ImpactFrame;
     public byte HasImpactFrame;
+    public GhostTrailPowerUpConfig GhostTrail;
+    public byte HasGhostTrail;
     public ShotgunPowerUpConfig Shotgun;
     public ChargeShotPowerUpConfig ChargeShot;
     public PortableHealthPackPowerUpConfig PortableHealthPack;
@@ -208,6 +210,27 @@ public struct ImpactFrameBuildInConfig
     public float ReleaseUnscaledSeconds;
     public ImpactFrameEasingMode EasingMode;
     public ImpactFrameEffectConfig Effect;
+}
+
+/// <summary>
+/// Holds baked runtime configuration for the Ghost Trail activation side effect.
+/// </summary>
+public struct GhostTrailPowerUpConfig
+{
+    public float DurationSeconds;
+    public byte MatchToggleActivationDuration;
+    public float EaseInUnscaledSeconds;
+    public float EaseOutUnscaledSeconds;
+    public ImpactFrameEasingMode EasingMode;
+    public float EmissionIntervalSeconds;
+    public float SnapshotLifetimeSeconds;
+    public GhostTrailCaptureScope CaptureScope;
+    public float MovementDistanceThreshold;
+    public float RotationAngleThresholdDegrees;
+    public int MaximumActiveSnapshots;
+    public float4 TintRgba;
+    public byte ScreenFeedbackEnabled;
+    public ImpactFrameEffectConfig ScreenFeedback;
 }
 
 /// <summary>

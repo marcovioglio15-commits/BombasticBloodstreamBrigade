@@ -279,6 +279,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe GhostTrailCaptureScope from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped enum value.</returns>
+    public static GhostTrailCaptureScope ResolveGhostTrailCaptureScope(float value)
+    {
+        return (GhostTrailCaptureScope)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
     /// Resolves an Impact Frame presentation scope from one numeric formula result.
     /// </summary>
     /// <param name="value">Numeric enum value produced by the unified formula system.</param>

@@ -15,6 +15,9 @@ public static class EnemyVisualFeedbackSmokeTest
     private const string ElasticDirectionProperty = "_ElasticHitDirection";
     private const string ElasticTimingProperty = "_ElasticHitTiming";
     private const string ElasticMotionProperty = "_ElasticHitMotion";
+    private const string FaceFlipbookMaterialPath = "Assets/3D/Materials/M_EnemiesFaces.mat";
+    private const string FaceFlipbookTexturePath = "Assets/3D/Textures/textures-enemiesFaces/T_EnemiesFaces_Flipbook.png";
+    private const string FaceFlipbookShaderName = "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS";
     #endregion
 
     #region Methods
@@ -27,11 +30,23 @@ public static class EnemyVisualFeedbackSmokeTest
     public static void Run()
     {
         ValidateStandardPuddleAssets();
+        ValidateFaceFlipbookAssets();
         ValidateElasticShaders();
         ValidatePresetDefaultsAndBakeConfig();
         ValidateDeathPuddleSpawnRuntime();
         ValidateElasticTriggerPolicy();
         Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
+    }
+
+    /// <summary>
+    /// Executes only the shared enemy-face flipbook asset and shader contract checks from Unity batch mode.
+    /// </summary>
+    [MenuItem("Tools/Enemy Management/Run Enemy Face Flipbook Smoke Test")]
+    public static void RunFaceFlipbook()
+    {
+        ValidateFaceFlipbookAssets();
+        ValidateElasticShader(FaceFlipbookShaderName);
+        Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
     }
     #endregion
 
@@ -75,6 +90,50 @@ public static class EnemyVisualFeedbackSmokeTest
         ValidateElasticShader("Cel Shader/Toon Diffuse ECS Hit Flash");
         ValidateElasticShader("Cel Shader/Toon Outline ECS");
         ValidateElasticShader("Cel Shader/Toon Diffuse Hit Flash");
+        ValidateElasticShader(FaceFlipbookShaderName);
+    }
+
+    /// <summary>
+    /// Validates the shared enemy-face material, source flipbook and shader playback contract used by enemy meshes.
+    /// </summary>
+    private static void ValidateFaceFlipbookAssets()
+    {
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(FaceFlipbookMaterialPath);
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(FaceFlipbookTexturePath);
+
+        if (material == null ||
+            material.shader == null ||
+            !string.Equals(material.shader.name, FaceFlipbookShaderName, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException("The shared enemy-face material is missing or uses the wrong flipbook shader.");
+        }
+
+        if (texture == null ||
+            material.GetTexture("_MainTex") != texture ||
+            texture.width != 8192 ||
+            texture.height != 4096)
+        {
+            throw new InvalidOperationException("The shared enemy-face flipbook texture is missing, downscaled or not assigned to the material.");
+        }
+
+        if (!material.HasProperty("_FaceFlipbookGrid") ||
+            !material.HasProperty("_FaceFlipbookPlayback") ||
+            !material.HasProperty("_FaceFlipbookEnabled") ||
+            !material.HasProperty("_AlphaClipThreshold"))
+        {
+            throw new InvalidOperationException("The shared enemy-face material does not expose the complete flipbook property contract.");
+        }
+
+        Vector4 grid = material.GetVector("_FaceFlipbookGrid");
+        Vector4 playback = material.GetVector("_FaceFlipbookPlayback");
+
+        if (!Mathf.Approximately(grid.x, 4f) ||
+            !Mathf.Approximately(grid.y, 2f) ||
+            !Mathf.Approximately(grid.z, 8f) ||
+            playback.x <= 0f)
+        {
+            throw new InvalidOperationException("The shared enemy-face flipbook must use four columns, two rows, eight frames and positive FPS.");
+        }
     }
 
     /// <summary>

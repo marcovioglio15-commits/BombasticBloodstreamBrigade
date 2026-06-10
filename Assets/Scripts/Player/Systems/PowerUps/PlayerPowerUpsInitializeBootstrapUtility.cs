@@ -121,6 +121,18 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     }
 
     /// <summary>
+    /// Adds PlayerGhostTrailState to entities missing it.
+    /// </summary>
+    /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>
+    /// <param name="missingGhostTrailStateQuery">Query selecting entities without PlayerGhostTrailState.</param>
+    public static void AddMissingGhostTrailState(ref EntityCommandBuffer commandBuffer, in EntityQuery missingGhostTrailStateQuery)
+    {
+        PlayerGhostTrailState initialState = default;
+
+        AddComponentForEntities(ref commandBuffer, in missingGhostTrailStateQuery, initialState);
+    }
+
+    /// <summary>
     /// Adds PlayerImpactFrameBuildInState to entities missing the charge-driven pre-impact state.
     /// </summary>
     /// <param name="commandBuffer">ECB used to enqueue structural changes.</param>

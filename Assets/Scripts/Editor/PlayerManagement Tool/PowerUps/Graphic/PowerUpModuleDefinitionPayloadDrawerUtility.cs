@@ -30,11 +30,13 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="moduleKind">Module kind that selects the UI variant.</param>
     /// <param name="payloadLabel">Optional label used by the generic payload fallback.</param>
     /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
+    /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
                                           string payloadLabel,
-                                          bool showActiveTriggerCharacterTuningOption = false)
+                                          bool showActiveTriggerCharacterTuningOption = false,
+                                          bool showToggleDurationOption = false)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -58,6 +60,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 return;
             case PowerUpModuleKind.ImpactFrame:
                 PowerUpImpactFramePayloadDrawerUtility.BuildImpactFramePayloadUi(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.GhostTrail:
+                PowerUpGhostTrailPayloadDrawerUtility.Build(payloadContainer, payloadProperty, showToggleDurationOption);
                 return;
             case PowerUpModuleKind.Heal:
                 BuildHealPayloadUi(payloadContainer, payloadProperty);

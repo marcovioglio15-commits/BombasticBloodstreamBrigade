@@ -13,6 +13,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
     private EntityQuery missingDashQuery;
     private EntityQuery missingBulletTimeStateQuery;
     private EntityQuery missingImpactFrameStateQuery;
+    private EntityQuery missingGhostTrailStateQuery;
     private EntityQuery missingImpactFrameBuildInStateQuery;
     private EntityQuery missingHealOverTimeStateQuery;
     private EntityQuery missingPassiveExplosionStateQuery;
@@ -80,6 +81,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         missingImpactFrameStateQuery = SystemAPI.QueryBuilder()
             .WithAll<PlayerPowerUpsConfigElement>()
             .WithNone<PlayerImpactFrameState>()
+            .Build();
+
+        missingGhostTrailStateQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerPowerUpsConfigElement>()
+            .WithNone<PlayerGhostTrailState>()
             .Build();
 
         missingImpactFrameBuildInStateQuery = SystemAPI.QueryBuilder()
@@ -277,6 +283,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         bool hasMissingOrbitalProjectionLostBuffer = !missingOrbitalProjectionLostBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingLaserBeamStormTickPulseBuffer = !missingLaserBeamStormTickPulseBufferQuery.IsEmptyIgnoreFilter;
         bool hasMissingImpactFrameState = !missingImpactFrameStateQuery.IsEmptyIgnoreFilter;
+        bool hasMissingGhostTrailState = !missingGhostTrailStateQuery.IsEmptyIgnoreFilter;
         bool hasMissingImpactFrameBuildInState = !missingImpactFrameBuildInStateQuery.IsEmptyIgnoreFilter;
 
         if (!missingFlags.HasAnyMissing &&
@@ -285,6 +292,7 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             !hasMissingOrbitalProjectionLostBuffer &&
             !hasMissingLaserBeamStormTickPulseBuffer &&
             !hasMissingImpactFrameState &&
+            !hasMissingGhostTrailState &&
             !hasMissingImpactFrameBuildInState)
         {
             return;
@@ -327,6 +335,11 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         if (hasMissingImpactFrameState)
         {
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingImpactFrameState(ref commandBuffer, in missingImpactFrameStateQuery);
+        }
+
+        if (hasMissingGhostTrailState)
+        {
+            PlayerPowerUpsInitializeBootstrapUtility.AddMissingGhostTrailState(ref commandBuffer, in missingGhostTrailStateQuery);
         }
 
         if (hasMissingImpactFrameBuildInState)

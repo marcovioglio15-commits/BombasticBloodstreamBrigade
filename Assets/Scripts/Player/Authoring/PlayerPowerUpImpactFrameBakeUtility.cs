@@ -89,7 +89,7 @@ internal static class PlayerPowerUpImpactFrameBakeUtility
     /// </summary>
     /// <param name="effectData">Authored standalone build-in effect payload.</param>
     /// <returns>Runtime effect profile, or default when no payload is available.</returns>
-    private static ImpactFrameEffectConfig BuildEffectConfig(PowerUpImpactFrameEffectData effectData)
+    internal static ImpactFrameEffectConfig BuildEffectConfig(PowerUpImpactFrameEffectData effectData)
     {
         if (effectData == null)
             return default;

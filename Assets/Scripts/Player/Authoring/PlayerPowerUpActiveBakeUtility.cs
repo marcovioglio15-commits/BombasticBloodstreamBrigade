@@ -202,6 +202,8 @@ public static class PlayerPowerUpActiveBakeUtility
         float bulletTimeTransitionTimeSeconds = 0f;
         bool hasImpactFrame = false;
         ImpactFramePowerUpConfig impactFrameConfig = default;
+        bool hasGhostTrail = false;
+        GhostTrailPowerUpConfig ghostTrailConfig = default;
         bool hasHealthPack = false;
         bool hasHealthPackOverTime = false;
         float healthPackHealAmount = 0f;
@@ -442,6 +444,14 @@ public static class PlayerPowerUpActiveBakeUtility
                     }
 
                     break;
+                case PowerUpModuleKind.GhostTrail:
+                    if (PlayerPowerUpGhostTrailBakeUtility.TryBuildConfig(payload.GhostTrail, out GhostTrailPowerUpConfig resolvedGhostTrailConfig))
+                    {
+                        hasGhostTrail = true;
+                        ghostTrailConfig = resolvedGhostTrailConfig;
+                    }
+
+                    break;
                 case PowerUpModuleKind.OrbitalProjections:
                     PowerUpOrbitalProjectionsModuleData orbitalProjectionsData = payload.OrbitalProjections;
 
@@ -494,7 +504,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                      out togglePassiveTool,
                                                                                      resolveOrbitalProjectionPrefabBindingIndex);
 
-            if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning)
+            if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning && !hasGhostTrail)
                 return;
 
             resolvedToolKind = ActiveToolKind.PassiveToggle;
@@ -507,6 +517,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasDash,
                                                                                               hasBulletTime,
                                                                                               hasImpactFrame,
+                                                                                              hasGhostTrail,
                                                                                               hasHealthPack,
                                                                                               hasOrbitalProjections);
 
@@ -613,6 +624,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        bulletTimeTransitionTimeSeconds,
                                                                        hasImpactFrame,
                                                                        in impactFrameConfig,
+                                                                       hasGhostTrail,
+                                                                       in ghostTrailConfig,
                                                                        hasTriggerPress,
                                                                        hasTriggerRelease,
                                                                        hasHoldCharge,

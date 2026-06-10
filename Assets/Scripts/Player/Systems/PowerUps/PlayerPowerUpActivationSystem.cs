@@ -75,6 +75,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<ShootRequest>();
         state.RequireForUpdate<PlayerBulletTimeState>();
         state.RequireForUpdate<PlayerImpactFrameState>();
+        state.RequireForUpdate<PlayerGhostTrailState>();
         state.RequireForUpdate<PlayerHealOverTimeState>();
         state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerLaserBeamState>();
@@ -109,6 +110,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<PlayerBulletTimeState> bulletTimeLookup = SystemAPI.GetComponentLookup<PlayerBulletTimeState>(false);
         ComponentLookup<PlayerImpactFrameState> impactFrameLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameState>(false);
+        ComponentLookup<PlayerGhostTrailState> ghostTrailLookup = SystemAPI.GetComponentLookup<PlayerGhostTrailState>(false);
         ComponentLookup<PlayerHealOverTimeState> healOverTimeLookup = SystemAPI.GetComponentLookup<PlayerHealOverTimeState>(false);
         ComponentLookup<PlayerChargeCharacterTuningState> chargeCharacterTuningStateLookup = SystemAPI.GetComponentLookup<PlayerChargeCharacterTuningState>(false);
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
@@ -180,6 +182,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!impactFrameLookup.HasComponent(entity))
                 continue;
 
+            if (!ghostTrailLookup.HasComponent(entity))
+                continue;
+
             if (!healOverTimeLookup.HasComponent(entity))
                 continue;
 
@@ -228,6 +233,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             LocalTransform localTransform = transformLookup[entity];
             PlayerBulletTimeState bulletTimeState = bulletTimeLookup[entity];
             PlayerImpactFrameState impactFrameState = impactFrameLookup[entity];
+            PlayerGhostTrailState ghostTrailState = ghostTrailLookup[entity];
             PlayerHealOverTimeState healOverTimeState = healOverTimeLookup[entity];
             PlayerChargeCharacterTuningState chargeCharacterTuningState = chargeCharacterTuningStateLookup[entity];
             PlayerProgressionConfig progressionConfig = progressionConfigLookup[entity];
@@ -356,6 +362,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
 
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in primarySlotConfig,
                                                                 in secondarySlotConfig,
+                                                                0,
                                                                 primaryPressed,
                                                                 primaryPressedThisFrame,
                                                                 primaryReleasedThisFrame,
@@ -388,6 +395,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref dashState.ValueRW,
                                                                 ref bulletTimeState,
                                                                 ref impactFrameState,
+                                                                ref ghostTrailState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
@@ -483,6 +491,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
 
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in secondarySlotConfig,
                                                                 in primarySlotConfig,
+                                                                1,
                                                                 secondaryPressed,
                                                                 secondaryPressedThisFrame,
                                                                 secondaryReleasedThisFrame,
@@ -515,6 +524,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref dashState.ValueRW,
                                                                 ref bulletTimeState,
                                                                 ref impactFrameState,
+                                                                ref ghostTrailState,
                                                                 ref healOverTimeState,
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
@@ -628,6 +638,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             laserBeamState.ValueRW = mutableLaserBeamState;
             bulletTimeLookup[entity] = bulletTimeState;
             impactFrameLookup[entity] = impactFrameState;
+            ghostTrailLookup[entity] = ghostTrailState;
             healOverTimeLookup[entity] = healOverTimeState;
             chargeCharacterTuningStateLookup[entity] = chargeCharacterTuningState;
             playerExperienceLookup[entity] = playerExperience;

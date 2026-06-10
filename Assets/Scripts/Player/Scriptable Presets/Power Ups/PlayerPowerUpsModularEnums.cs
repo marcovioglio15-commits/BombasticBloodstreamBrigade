@@ -37,7 +37,8 @@ public enum PowerUpModuleKind
     LaserBeam = 19,
     OrbitalProjections = 20,
     ImpactFrame = 21,
-    SwitchWeapon = 22
+    SwitchWeapon = 22,
+    GhostTrail = 23
 }
 
 public enum PowerUpTriggerEventType
@@ -95,6 +96,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.TimeDilationEnemies:
             case PowerUpModuleKind.Heal:
             case PowerUpModuleKind.ImpactFrame:
+            case PowerUpModuleKind.GhostTrail:
                 return PowerUpModuleStage.Execute;
             case PowerUpModuleKind.CharacterTuning:
             case PowerUpModuleKind.Stackable:
@@ -116,5 +118,16 @@ public static class PowerUpModuleKindUtility
     #endregion
 
     #endregion
+}
+
+/// <summary>
+/// Selects which player-owned visuals are frozen into each Ghost Trail residual image.
+/// </summary>
+[Serializable]
+public enum GhostTrailCaptureScope : byte
+{
+    PlayerOnly = 0,
+    PlayerAndOrbitalProjections = 1,
+    PlayerOrbitalProjectionsAndAttachedObjects = 2
 }
 #endregion

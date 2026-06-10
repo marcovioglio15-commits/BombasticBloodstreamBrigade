@@ -50,6 +50,10 @@ public sealed class PowerUpModuleData
     [Tooltip("Customizable global time slowdown plus screen filter triggered on power-up activation. Used by ImpactFrame modules.")]
     [SerializeField] private PowerUpImpactFrameModuleData impactFrame = new PowerUpImpactFrameModuleData();
 
+    [Header("Execute - Ghost Trail")]
+    [Tooltip("Pooled residual-image trail and optional screen feedback triggered on power-up activation. Used by GhostTrail modules.")]
+    [SerializeField] private PowerUpGhostTrailModuleData ghostTrail = new PowerUpGhostTrailModuleData();
+
     [Header("Execute - Heal")]
     [Tooltip("Healing settings used by Heal modules.")]
     [SerializeField] private PowerUpHealMissingHealthModuleData healMissingHealth = new PowerUpHealMissingHealthModuleData();
@@ -180,6 +184,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpGhostTrailModuleData GhostTrail
+    {
+        get
+        {
+            return ghostTrail;
+        }
+    }
+
     public PowerUpHealMissingHealthModuleData HealMissingHealth
     {
         get
@@ -304,6 +316,9 @@ public sealed class PowerUpModuleData
         if (impactFrame == null)
             impactFrame = new PowerUpImpactFrameModuleData();
 
+        if (ghostTrail == null)
+            ghostTrail = new PowerUpGhostTrailModuleData();
+
         if (healMissingHealth == null)
             healMissingHealth = new PowerUpHealMissingHealthModuleData();
 
@@ -345,6 +360,7 @@ public sealed class PowerUpModuleData
         dash.Validate();
         bulletTime.Validate();
         impactFrame.Validate();
+        ghostTrail.Validate();
         healMissingHealth.Validate();
         deathExplosion.Validate();
         projectileOrbitOverride.Validate();

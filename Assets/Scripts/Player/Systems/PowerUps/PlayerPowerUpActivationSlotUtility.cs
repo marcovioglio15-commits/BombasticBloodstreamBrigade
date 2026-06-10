@@ -12,6 +12,7 @@ public static class PlayerPowerUpActivationSlotUtility
     #region Slot Processing
     public static void ProcessSlotInput(in PlayerPowerUpSlotConfig slotConfig,
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
+                                        byte slotIndex,
                                         bool isPressed,
                                         bool pressedThisFrame,
                                         bool releasedThisFrame,
@@ -44,6 +45,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         ref PlayerDashState dashState,
                                         ref PlayerBulletTimeState bulletTimeState,
                                         ref PlayerImpactFrameState impactFrameState,
+                                        ref PlayerGhostTrailState ghostTrailState,
                                         ref PlayerHealOverTimeState healOverTimeState,
                                         DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
                                         DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
@@ -103,6 +105,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 ref dashState,
                                                                                 ref bulletTimeState,
                                                                                 ref impactFrameState,
+                                                                                ref ghostTrailState,
                                                                                 moveInput,
                                                                                 lastValidMovementDirection,
                                                                                 orbitalProjectionRequests,
@@ -141,7 +144,9 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                    lastValidMovementDirection,
                                                                                    ref dashState,
                                                                                    ref bulletTimeState,
-                                                                                   ref impactFrameState);
+                                                                                   ref impactFrameState,
+                                                                                   ref ghostTrailState,
+                                                                                   slotIndex);
             return;
         }
 
@@ -212,10 +217,14 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                              ref otherSlotMaintenanceTickTimer,
                                                                              ref dashState,
                                                                              ref bulletTimeState,
-                                                                             ref impactFrameState);
+                                                                             ref impactFrameState,
+                                                                             ref ghostTrailState);
 
         if (ShouldTriggerImpactFrameOnActivation(in slotConfig))
             PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
+
+        if (slotConfig.HasGhostTrail != 0)
+            PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState, in slotConfig.GhostTrail, false);
 
         if (slotConfig.ToolKind == ActiveToolKind.PortableHealthPack)
             ExecutePortableHealthPack(in slotConfig,
@@ -334,6 +343,9 @@ public static class PlayerPowerUpActivationSlotUtility
             case ActiveToolKind.ImpactFrame:
                 return slotConfig.HasImpactFrame != 0 &&
                        PlayerImpactFrameRuntimeUtility.CanActivate(in slotConfig.ImpactFrame);
+            case ActiveToolKind.GhostTrail:
+                return slotConfig.HasGhostTrail != 0 &&
+                       PlayerGhostTrailRuntimeUtility.CanActivate(in slotConfig.GhostTrail, false);
             case ActiveToolKind.Shotgun:
                 if (slotConfig.Shotgun.ProjectileCount <= 0)
                     return false;
@@ -381,7 +393,9 @@ public static class PlayerPowerUpActivationSlotUtility
 
                 return true;
             case ActiveToolKind.PassiveToggle:
-                return slotConfig.Toggleable != 0 && slotConfig.TogglePassiveTool.IsDefined != 0;
+                return slotConfig.Toggleable != 0 &&
+                       (slotConfig.TogglePassiveTool.IsDefined != 0 ||
+                        slotConfig.HasGhostTrail != 0);
             default:
                 return false;
         }

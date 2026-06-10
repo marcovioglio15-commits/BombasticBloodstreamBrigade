@@ -23,6 +23,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerBulletTimeState>();
+        state.RequireForUpdate<PlayerGhostTrailState>();
         state.RequireForUpdate<EquippedPassiveToolElement>();
     }
 
@@ -41,12 +42,14 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                   DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                   DynamicBuffer<PlayerPassiveToolsStateElement> passiveToolsStateBuffer,
                   RefRW<PlayerBulletTimeState> bulletTimeState,
+                  RefRW<PlayerGhostTrailState> ghostTrailState,
                   Entity playerEntity)
                  in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>,
                                     RefRW<PlayerPowerUpsState>,
                                     DynamicBuffer<EquippedPassiveToolElement>,
                                     DynamicBuffer<PlayerPassiveToolsStateElement>,
-                                    RefRW<PlayerBulletTimeState>>()
+                                    RefRW<PlayerBulletTimeState>,
+                                    RefRW<PlayerGhostTrailState>>()
                              .WithEntityAccess())
         {
             PlayerPowerUpsConfig powerUpsConfig;
@@ -73,6 +76,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             float toggleBulletTimeTransitionTimeSeconds = 0f;
 
             ProcessTogglePassiveSlot(in powerUpsConfig.PrimarySlot,
+                                     0,
                                      deltaTime,
                                      playerEntity,
                                      ref primaryEnergy,
@@ -88,8 +92,10 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref updatedShield,
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
-                                     ref toggleBulletTimeTransitionTimeSeconds);
+                                     ref toggleBulletTimeTransitionTimeSeconds,
+                                     ref ghostTrailState.ValueRW);
             ProcessTogglePassiveSlot(in powerUpsConfig.SecondarySlot,
+                                     1,
                                      deltaTime,
                                      playerEntity,
                                      ref secondaryEnergy,
@@ -105,7 +111,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref updatedShield,
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
-                                     ref toggleBulletTimeTransitionTimeSeconds);
+                                     ref toggleBulletTimeTransitionTimeSeconds,
+                                     ref ghostTrailState.ValueRW);
             if (healthChanged)
                 healthLookup[playerEntity] = updatedHealth;
 
@@ -153,6 +160,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     /// <param name="updatedShield">Cached mutable shield value reused within the current caller.</param>
     /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
     private static void ProcessTogglePassiveSlot(in PlayerPowerUpSlotConfig slotConfig,
+                                                 byte slotIndex,
                                                  float deltaTime,
                                                  Entity playerEntity,
                                                  ref float slotEnergy,
@@ -168,12 +176,16 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                                  ref PlayerShield updatedShield,
                                                  ref bool shieldChanged,
                                                  ref float toggleBulletTimeSlowPercent,
-                                                 ref float toggleBulletTimeTransitionTimeSeconds)
+                                                 ref float toggleBulletTimeTransitionTimeSeconds,
+                                                 ref PlayerGhostTrailState ghostTrailState)
     {
+        bool wasActive = isActive != 0;
+
         if (slotConfig.IsDefined == 0)
         {
             isActive = 0;
             maintenanceTickTimer = 0f;
+            StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
             return;
         }
 
@@ -181,6 +193,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         {
             isActive = 0;
             maintenanceTickTimer = 0f;
+            StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
             return;
         }
 
@@ -208,6 +221,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                   ref updatedShield,
                                   ref shieldChanged);
 
+        StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
+
         if (isActive == 0 || slotConfig.TogglePassiveTool.IsDefined == 0)
             return;
 
@@ -233,6 +248,26 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         }
 
         PlayerPassiveToolsAggregationUtility.AccumulatePassiveTool(ref passiveToolsState, in togglePassiveTool);
+    }
+
+    /// <summary>
+    /// Stops a matched Ghost Trail timeline when toggle maintenance deactivates its owning slot.
+    /// </summary>
+    /// <param name="slotConfig">Processed toggle slot configuration.</param>
+    /// <param name="slotIndex">Stable primary or secondary slot index.</param>
+    /// <param name="wasActive">True when the slot was active before maintenance processing.</param>
+    /// <param name="isActive">Current slot active flag after maintenance processing.</param>
+    /// <param name="ghostTrailState">Mutable shared Ghost Trail state.</param>
+    private static void StopMatchedGhostTrailIfDeactivated(in PlayerPowerUpSlotConfig slotConfig,
+                                                           byte slotIndex,
+                                                           bool wasActive,
+                                                           byte isActive,
+                                                           ref PlayerGhostTrailState ghostTrailState)
+    {
+        if (!wasActive || isActive != 0 || slotConfig.HasGhostTrail == 0)
+            return;
+
+        PlayerGhostTrailRuntimeUtility.StopMatchedToggle(ref ghostTrailState, slotIndex);
     }
 
     /// <summary>

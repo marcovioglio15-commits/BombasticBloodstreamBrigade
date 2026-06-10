@@ -448,6 +448,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.Dash:
                 case PowerUpModuleKind.TimeDilationEnemies:
                 case PowerUpModuleKind.ImpactFrame:
+                case PowerUpModuleKind.GhostTrail:
                 case PowerUpModuleKind.Heal:
                 case PowerUpModuleKind.LaserBeam:
                 case PowerUpModuleKind.Stackable:
@@ -497,6 +498,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasDash = moduleKinds.Contains(PowerUpModuleKind.Dash);
         bool hasBulletTime = moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies);
         bool hasImpactFrame = moduleKinds.Contains(PowerUpModuleKind.ImpactFrame);
+        bool hasGhostTrail = moduleKinds.Contains(PowerUpModuleKind.GhostTrail);
         bool hasHeal = moduleKinds.Contains(PowerUpModuleKind.Heal);
         bool hasCharacterTuning = moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
         bool hasDeathExplosion = moduleKinds.Contains(PowerUpModuleKind.DeathExplosion);
@@ -532,13 +534,13 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (hasOrbitalProjections)
             primaryExecuteKindCount += 1;
 
-        if (primaryExecuteKindCount == 0 && !hasCharacterTuning && !hasImpactFrame)
+        if (primaryExecuteKindCount == 0 && !hasCharacterTuning && !hasImpactFrame && !hasGhostTrail)
             warningLines.Add("No execute module selected. This active power up compiles as undefined.");
-        else if (primaryExecuteKindCount == 0 && !hasImpactFrame)
+        else if (primaryExecuteKindCount == 0 && !hasImpactFrame && !hasGhostTrail)
             warningLines.Add("No active execute module selected. Only Character Tuning acquisition effects will apply.");
 
         if (primaryExecuteKindCount > 1)
-            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections. ImpactFrame also runs as an activation side effect when paired with another active tool.");
+            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections. ImpactFrame and GhostTrail also run as activation side effects when paired with another active tool.");
 
         if (hasDeathExplosion && !hasSpawnObject)
             warningLines.Add("DeathExplosion is ignored unless SpawnObject is also bound.");
@@ -574,11 +576,12 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasHeal = moduleKinds.Contains(PowerUpModuleKind.Heal);
         bool hasBulletTime = moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies);
         bool hasImpactFrame = moduleKinds.Contains(PowerUpModuleKind.ImpactFrame);
+        bool hasGhostTrail = moduleKinds.Contains(PowerUpModuleKind.GhostTrail);
         bool hasCharacterTuning = moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
-        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam;
+        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail;
         List<string> ignoredActiveModules = new List<string>();
 
         if (!hasPassiveRuntimeConsumer)

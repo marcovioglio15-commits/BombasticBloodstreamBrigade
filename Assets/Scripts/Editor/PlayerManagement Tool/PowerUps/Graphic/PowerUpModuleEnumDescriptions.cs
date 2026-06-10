@@ -29,6 +29,7 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.Dash,
         PowerUpModuleKind.TimeDilationEnemies,
         PowerUpModuleKind.ImpactFrame,
+        PowerUpModuleKind.GhostTrail,
         PowerUpModuleKind.Heal,
         PowerUpModuleKind.SpawnTrailSegment,
         PowerUpModuleKind.AreaTickApplyElement,
@@ -127,6 +128,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Applies bullet-time slow effect to enemies.";
             case PowerUpModuleKind.ImpactFrame:
                 return "Applies a global time slowdown and fullscreen impact filter when an active power-up activation succeeds.";
+            case PowerUpModuleKind.GhostTrail:
+                return "Emits pooled residual images after activation, with optional orbital, attachment, camera and fullscreen feedback.";
             case PowerUpModuleKind.Heal:
                 return "Applies instant or over-time heal payload.";
             case PowerUpModuleKind.SpawnTrailSegment:
@@ -211,6 +214,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.ImpactFrame:
                 relativePropertyPath = "impactFrame";
                 payloadLabel = "Impact Frame Payload";
+                return true;
+            case PowerUpModuleKind.GhostTrail:
+                relativePropertyPath = "ghostTrail";
+                payloadLabel = "Ghost Trail Payload";
                 return true;
             case PowerUpModuleKind.SpawnTrailSegment:
                 relativePropertyPath = "trailSpawn";

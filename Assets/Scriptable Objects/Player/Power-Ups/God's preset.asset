@@ -454,6 +454,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -829,6 +886,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1204,6 +1318,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1579,6 +1750,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -1954,6 +2182,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -2329,6 +2614,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -2704,6 +3046,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3079,6 +3478,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3454,6 +3910,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -3829,6 +4342,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -4204,6 +4774,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -4579,6 +5206,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 1
@@ -4954,6 +5638,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5329,6 +6070,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -5704,6 +6502,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -6079,6 +6934,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -6454,6 +7366,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -6829,6 +7798,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -7204,6 +8230,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -7579,6 +8662,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -7955,6 +9095,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -8330,6 +9527,63 @@ MonoBehaviour:
             screenTearFrequency: 24
             paletteFlashIntensity: 0
             paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
       healMissingHealth:
         applyMode: 0
         healAmount: 30
@@ -8431,6 +9685,439 @@ MonoBehaviour:
         bubbleDriftSpeed: 1.8
       switchWeapon:
         weaponId: Cannon
+      trailSpawn:
+        trailSegmentLifetimeSeconds: 1.5
+        trailSpawnDistance: 0.6
+        trailSpawnIntervalSeconds: 0.1
+        trailRadius: 1.2
+        maxActiveSegmentsPerPlayer: 30
+        trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+      elementalAreaTick:
+        effectData:
+          elementType: 0
+          effectKind: 0
+          procMode: 0
+          reapplyMode: 0
+          procThresholdStacks: 5
+          maximumStacks: 20
+          stackDecayPerSecond: 1
+          consumeStacksOnProc: 0
+          dotDamagePerTick: 4
+          dotTickInterval: 0.5
+          dotDurationSeconds: 2
+          impedimentSlowPercentPerStack: 10
+          impedimentProcSlowPercent: 50
+          impedimentMaxSlowPercent: 100
+          impedimentDurationSeconds: 2
+        stacksPerTick: 1
+        applyIntervalSeconds: 0.2
+      stackable:
+        maxAcquisitions: 2
+  - moduleId: Module_GhostTrail
+    displayName: Ghost Trail
+    moduleKind: 23
+    defaultStage: 4
+    notes: Emits pooled residual images and optional screen feedback after a successful
+      active power-up activation.
+    data:
+      holdCharge:
+        requiredCharge: 500
+        maximumCharge: 500
+        chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
+        decayAfterRelease: 0
+        decayAfterReleasePercentPerSecond: 25
+        passiveChargeGainWhileReleased: 0
+        passiveChargeGainPercentPerSecond: 10
+        laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        slowPlayerWhileCharging: 0
+        maximumPlayerSlowPercent: 35
+        playerSlowCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      triggerEvent:
+        eventType: 0
+      resourceGate:
+        activationResource: 1
+        maintenanceResource: 1
+        maximumEnergy: 100
+        activationCost: 100
+        maintenanceCostPerSecond: 0
+        isToggleable: 0
+        maintenanceTicksPerSecond: 4
+        minimumActivationEnergyPercent: 0
+        chargeType: 0
+        chargePerTrigger: 100
+        cooldownSeconds: 1
+        allowRechargeDuringToggleStartupLock: 0
+      suppressShooting:
+        suppressBaseShootingWhileActive: 1
+        interruptOtherSlotOnEnter: 0
+        interruptOtherSlotChargingOnly: 1
+      projectilePatternCone:
+        projectileCount: 6
+        coneAngleDegrees: 45
+        laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+      characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas: []
+      bomb:
+        bombPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 1.2}
+        spawnOffsetOrientation: 0
+        deploySpeed: 4.5
+        velocityDirection: 0
+        collisionRadius: 0.18
+        bounceOnWalls: 1
+        bounceDamping: 0.65
+        linearDampingPerSecond: 1.2
+        fuseSeconds: 1.25
+        radius: 7
+        enableDamagePayload: 1
+        damage: 120
+        affectAllEnemiesInRadius: 1
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      dash:
+        distance: 6
+        directionMode: 0
+        duration: 0.18
+        speedTransitionInSeconds: 0.06
+        speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
+        grantsInvulnerability: 1
+        invulnerabilityExtraTime: 0.1
+      bulletTime:
+        duration: 3
+        enemySlowPercent: 40
+        transitionTimeSeconds: 0.2
+      impactFrame:
+        durationMode: 0
+        durationFrames: 6
+        referenceFrameRate: 60
+        maximumUnscaledDurationSeconds: 0.12
+        easeInUnscaledSeconds: 0.02
+        easeOutUnscaledSeconds: 0.08
+        easingMode: 2
+        timeSlowdownPercent: 95
+        refreshOnShorterRequest: 0
+        presentationScope: 1
+        cameraFeedback:
+          enabled: 0
+          motionMode: 1
+          axisRightEnabled: 1
+          axisUpEnabled: 1
+          axisForwardEnabled: 0
+          positionalAmplitude: 0.35
+          forwardAmplitude: 0.12
+          rotationalAmplitude: 1.25
+          frequency: 18
+          zoomEnabled: 0
+          zoomFovDelta: -2
+        overlayIntensity: 1
+        filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+        desaturationAmount: 0.65
+        vignetteIntensity: 0.55
+        vignetteSoftness: 0.6
+        vignetteExtent: 0.35
+        vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+        radialVignetteIntensity: 0
+        radialVignetteRadius: 0.55
+        radialVignetteSoftness: 0.12
+        radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+        chromaticAberration: 0.012
+        scanlineIntensity: 0.18
+        scanlineFrequency: 320
+        flashIntensity: 0.35
+        radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+        buildIn:
+          enabled: 0
+          releaseUnscaledSeconds: 0.06
+          easingMode: 2
+          effect:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      healMissingHealth:
+        applyMode: 0
+        healAmount: 30
+        durationSeconds: 2
+        tickIntervalSeconds: 0.2
+        stackPolicy: 0
+      deathExplosion:
+        triggerMode: 0
+        cooldownSeconds: 2
+        radius: 4
+        damage: 20
+        affectAllEnemiesInRadius: 1
+        triggerOffset: {x: 0, y: 0, z: 0}
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      projectileOrbitOverride:
+        pathMode: 0
+        radialEntrySpeed: 12
+        orbitalSpeed: 8
+        orbitRadiusMin: 4
+        orbitRadiusMax: 6
+        orbitPulseFrequency: 0.7
+        orbitEntryRatio: 0.9
+        orbitBlendDuration: 0.3
+        heightOffset: 0
+        goldenAngleDegrees: 137.5
+        spiralStartRadius: 2.5
+        spiralMaximumRadius: 8
+        spiralAngularSpeedDegreesPerSecond: 240
+        spiralGrowthMultiplier: 1
+        spiralTurnsBeforeDespawn: 1.25
+        spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
+      projectileBounceOnWalls:
+        maxBounces: 2
+        speedPercentChangePerBounce: -5
+        minimumSpeedMultiplierAfterBounce: 0.1
+        maximumSpeedMultiplierAfterBounce: 3
+      projectileSplit:
+        triggerMode: 0
+        directionMode: 0
+        splitProjectileCount: 2
+        splitOffsetDegrees: 0
+        customAnglesDegrees:
+        - -20
+        - 20
+        splitDamagePercentFromOriginal: 50
+        splitSizePercentFromOriginal: 75
+        splitSpeedPercentFromOriginal: 85
+        splitLifetimePercentFromOriginal: 65
+      laserBeam:
+        damageMultiplier: 1
+        continuousDamagePerSecondMultiplier: 0.28
+        virtualProjectileSpeedMultiplier: 1
+        damageTickIntervalSeconds: 0.15
+        maximumContinuousActiveSeconds: 2.5
+        cooldownSeconds: 2
+        maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
+        visualPresetId: 0
+        bodyProfile: 2
+        sourceShape: 0
+        terminalCapShape: 1
+        bodyWidthMultiplier: 4.25
+        collisionWidthMultiplier: 1
+        sourceScaleMultiplier: 1.35
+        terminalCapScaleMultiplier: 1.85
+        contactFlareScaleMultiplier: 1.2
+        bodyOpacity: 0.96
+        coreWidthMultiplier: 0.52
+        coreBrightness: 1.45
+        rimBrightness: 1.32
+        flowScrollSpeed: 1.15
+        flowPulseFrequency: 1.6
+        stormTwistSpeed: 14
+        stormTickPostTravelHoldSeconds: 0.6
+        stormIdleIntensity: 0.48
+        stormBurstIntensity: 1.1
+        sourceOffset: 0.08
+        sourceDischargeIntensity: 1.2
+        stormShellWidthMultiplier: 1.12
+        stormShellSeparation: 0.32
+        stormRingFrequency: 5.4
+        stormRingThickness: 0.18
+        stormTickTravelSpeed: 1
+        stormTickDamageLengthTolerance: 0.18
+        terminalCapIntensity: 1.12
+        contactFlareIntensity: 1.28
+        wobbleAmplitude: 0.08
+        bubbleDriftSpeed: 1.8
+      switchWeapon:
+        weaponId: 
       trailSpawn:
         trailSegmentLifetimeSeconds: 1.5
         trailSpawnDistance: 0.6
@@ -8718,6 +10405,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9093,6 +10837,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9468,6 +11269,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -9843,6 +11701,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10219,6 +12134,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10607,6 +12579,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -10982,6 +13011,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -11357,6 +13443,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -11732,6 +13875,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -12111,6 +14311,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -12490,6 +14747,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -12878,6 +15192,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13253,6 +15624,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -13628,6 +16056,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -14016,6 +16501,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -14391,6 +16933,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -14766,6 +17365,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15154,6 +17810,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15529,6 +18242,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -15904,6 +18674,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 1
@@ -16292,6 +19119,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -16667,6 +19551,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -17042,6 +19983,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -17427,6 +20425,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -17802,6 +20857,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -18178,6 +21290,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -18564,6 +21733,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -18937,6 +22163,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -19324,6 +22607,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -19699,6 +23039,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -20087,6 +23484,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -20475,6 +23929,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -20851,6 +24362,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -21239,6 +24807,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -21627,6 +25252,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 30
@@ -22015,6 +25697,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -22399,6 +26138,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -22773,6 +26569,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -23157,6 +27010,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -23531,6 +27441,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -23905,6 +27872,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -24289,6 +28313,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -24663,6 +28744,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -25047,6 +29185,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -25421,6 +29616,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -25805,6 +30057,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -26179,6 +30488,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -26563,6 +30929,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -26937,6 +31360,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -27321,6 +31801,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -27695,6 +32232,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -28080,6 +32674,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -28465,6 +33116,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -28849,6 +33557,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0
@@ -29223,6 +33988,63 @@ MonoBehaviour:
               screenTearFrequency: 24
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         healMissingHealth:
           applyMode: 0
           healAmount: 0

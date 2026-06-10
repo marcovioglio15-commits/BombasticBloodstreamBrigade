@@ -31,7 +31,8 @@ public enum ActiveToolKind
     PortableHealthPack = 6,
     PassiveToggle = 7,
     OrbitalProjections = 8,
-    ImpactFrame = 9
+    ImpactFrame = 9,
+    GhostTrail = 10
 }
 
 /// <summary>

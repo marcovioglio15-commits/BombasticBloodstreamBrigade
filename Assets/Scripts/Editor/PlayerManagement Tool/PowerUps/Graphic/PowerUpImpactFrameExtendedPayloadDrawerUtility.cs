@@ -82,6 +82,46 @@ internal static class PowerUpImpactFrameExtendedPayloadDrawerUtility
         container.RegisterCallback<SerializedPropertyChangeEvent>(_ => refresh());
         refresh();
     }
+
+    /// <summary>
+    /// Draws a reusable Impact Frame effect profile for modules that need optional screen and camera feedback.
+    /// </summary>
+    /// <param name="container">Container receiving the reusable effect hierarchy.</param>
+    /// <param name="effectProperty">Serialized reusable effect profile.</param>
+    /// <param name="label">Visible root foldout label.</param>
+    public static void BuildStandaloneEffect(VisualElement container,
+                                             SerializedProperty effectProperty,
+                                             string label)
+    {
+        if (container == null || effectProperty == null)
+            return;
+
+        Foldout foldout = CreateFoldout(label, false);
+        container.Add(foldout);
+        Foldout scopeAndTime = CreateFoldout("Scope And Time", true);
+        foldout.Add(scopeAndTime);
+        AddEffectField(scopeAndTime, effectProperty, "presentationScope", "Presentation Scope");
+        AddEffectField(scopeAndTime, effectProperty, "timeSlowdownPercent", "Time Slowdown Percent");
+        BuildCameraFeedback(scopeAndTime, effectProperty.FindPropertyRelative("cameraFeedback"));
+        PowerUpImpactFrameScreenEffectsDrawerUtility.Build(foldout, effectProperty, false);
+    }
+
+    /// <summary>
+    /// Appends coherent reusable effect warnings without changing authored values.
+    /// </summary>
+    /// <param name="warnings">Mutable warning list.</param>
+    /// <param name="effectProperty">Serialized reusable effect profile.</param>
+    /// <param name="label">User-facing profile label.</param>
+    public static void AddStandaloneEffectWarnings(List<string> warnings,
+                                                   SerializedProperty effectProperty,
+                                                   string label)
+    {
+        if (warnings == null || effectProperty == null)
+            return;
+
+        AddCameraWarnings(warnings, effectProperty.FindPropertyRelative("cameraFeedback"), label);
+        AddEffectWarnings(warnings, effectProperty, label);
+    }
     #endregion
 
     #region Builders
@@ -394,7 +434,7 @@ internal static class PowerUpImpactFrameScreenEffectsDrawerUtility
         details.Add(stylization);
         details.Add(lightAndColorBursts);
 
-        AddField(coreFilter, effectProperty, "filterTint", "Filter Tint");
+        AddScalableColorField(coreFilter, effectProperty, "filterTint", "Filter Tint");
         AddField(coreFilter, effectProperty, "desaturationAmount", "Desaturation Amount");
 
         Foldout screenBorder = CreateFoldout("Screen Border", false);
@@ -412,7 +452,7 @@ internal static class PowerUpImpactFrameScreenEffectsDrawerUtility
         radialRing.Add(radialDetails);
         AddField(radialDetails, effectProperty, "radialVignetteRadius", "Radius");
         AddField(radialDetails, effectProperty, "radialVignetteSoftness", "Softness");
-        AddField(radialDetails, effectProperty, "radialVignetteTint", "Tint");
+        AddScalableColorField(radialDetails, effectProperty, "radialVignetteTint", "Tint");
 
         AddField(distortionAndMotion, effectProperty, "chromaticAberration", "Chromatic Aberration");
         AddField(distortionAndMotion, effectProperty, "radialDistortion", "Radial Distortion");
@@ -432,7 +472,10 @@ internal static class PowerUpImpactFrameScreenEffectsDrawerUtility
 
         AddField(lightAndColorBursts, effectProperty, "flashIntensity", "Flash Intensity");
         AddField(lightAndColorBursts, effectProperty, "paletteFlashIntensity", "Palette Flash Intensity");
-        VisualElement paletteFlashTint = AddField(lightAndColorBursts, effectProperty, "paletteFlashTint", "Palette Flash Tint");
+        VisualElement paletteFlashTint = AddScalableColorField(lightAndColorBursts,
+                                                               effectProperty,
+                                                               "paletteFlashTint",
+                                                               "Palette Flash Tint");
 
         System.Action refresh = () =>
         {
@@ -503,6 +546,56 @@ internal static class PowerUpImpactFrameScreenEffectsDrawerUtility
             Vector4 value = property.vector4Value;
             colorField.SetValueWithoutNotify(new Color(value.x, value.y, value.z, value.w));
         });
+    }
+
+    /// <summary>
+    /// Adds a color picker backed by a scalable Color and exposes each RGBA channel through the unified formula UI.
+    /// </summary>
+    /// <param name="parent">Container receiving the color picker and channel-scaling foldout.</param>
+    /// <param name="effectProperty">Serialized flat effect profile.</param>
+    /// <param name="relativeName">Immediate scalable Color child name.</param>
+    /// <param name="label">User-facing color-picker label.</param>
+    /// <returns>Root container used for contextual visibility.</returns>
+    private static VisualElement AddScalableColorField(VisualElement parent,
+                                                       SerializedProperty effectProperty,
+                                                       string relativeName,
+                                                       string label)
+    {
+        SerializedProperty colorProperty = effectProperty.FindPropertyRelative(relativeName);
+
+        if (colorProperty == null)
+            return null;
+
+        VisualElement root = new VisualElement();
+        parent.Add(root);
+        ColorField colorField = new ColorField(label);
+        colorField.showAlpha = true;
+        colorField.tooltip = colorProperty.tooltip;
+        colorField.SetValueWithoutNotify(colorProperty.colorValue);
+        root.Add(colorField);
+        Foldout channelScaling = CreateFoldout("Color Channel Scaling", false);
+        root.Add(channelScaling);
+        SetTooltip(AddField(channelScaling, colorProperty, "r", "Red"),
+                   "Red color channel. Supports Add Scaling and is clamped to the 0-1 range at bake/runtime.");
+        SetTooltip(AddField(channelScaling, colorProperty, "g", "Green"),
+                   "Green color channel. Supports Add Scaling and is clamped to the 0-1 range at bake/runtime.");
+        SetTooltip(AddField(channelScaling, colorProperty, "b", "Blue"),
+                   "Blue color channel. Supports Add Scaling and is clamped to the 0-1 range at bake/runtime.");
+        SetTooltip(AddField(channelScaling, colorProperty, "a", "Alpha"),
+                   "Alpha color channel. Supports Add Scaling and is clamped to the 0-1 range at bake/runtime.");
+
+        colorField.RegisterValueChangedCallback(evt =>
+        {
+            colorProperty.serializedObject.Update();
+            colorProperty.colorValue = evt.newValue;
+            colorProperty.serializedObject.ApplyModifiedProperties();
+            PlayerManagementDraftSession.MarkDirty();
+        });
+        colorField.TrackPropertyValue(colorProperty, property =>
+        {
+            colorField.SetValueWithoutNotify(property.colorValue);
+        });
+        return root;
     }
 
     /// <summary>

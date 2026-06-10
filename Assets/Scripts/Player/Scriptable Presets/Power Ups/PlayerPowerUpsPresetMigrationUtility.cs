@@ -91,6 +91,15 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Runs a global time impact and fullscreen filter when an active power-up activation succeeds."));
         }
 
+        if (!validModuleIds.Contains(PlayerPowerUpsPresetDefaultsUtility.ModuleIdGhostTrail))
+        {
+            moduleDefinitions.Add(PlayerPowerUpsPresetDefaultsUtility.CreateModuleDefinition(PlayerPowerUpsPresetDefaultsUtility.ModuleIdGhostTrail,
+                                                                                             "Ghost Trail",
+                                                                                             PowerUpModuleKind.GhostTrail,
+                                                                                             PowerUpModuleStage.Execute,
+                                                                                             "Emits pooled residual images and optional screen feedback after a successful active power-up activation."));
+        }
+
         if (!validModuleIds.Contains(PlayerPowerUpsPresetDefaultsUtility.ModuleIdSwitchWeapon))
         {
             moduleDefinitions.Add(PlayerPowerUpsPresetDefaultsUtility.CreateModuleDefinition(PlayerPowerUpsPresetDefaultsUtility.ModuleIdSwitchWeapon,

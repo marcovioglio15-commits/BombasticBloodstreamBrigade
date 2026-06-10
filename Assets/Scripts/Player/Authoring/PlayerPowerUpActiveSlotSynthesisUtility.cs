@@ -236,6 +236,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                         bool hasDash,
                                                         bool hasBulletTime,
                                                         bool hasImpactFrame,
+                                                        bool hasGhostTrail,
                                                         bool hasHealthPack,
                                                         bool hasOrbitalProjections)
     {
@@ -262,6 +263,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
         if (hasImpactFrame)
             return ActiveToolKind.ImpactFrame;
+
+        if (hasGhostTrail)
+            return ActiveToolKind.GhostTrail;
 
         return ActiveToolKind.Custom;
     }
@@ -330,6 +334,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               float bulletTimeTransitionTimeSeconds,
                                               bool hasImpactFrame,
                                               in ImpactFramePowerUpConfig impactFrameConfig,
+                                              bool hasGhostTrail,
+                                              in GhostTrailPowerUpConfig ghostTrailConfig,
                                               bool hasTriggerPress,
                                               bool hasTriggerRelease,
                                               bool hasHoldCharge,
@@ -461,6 +467,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             },
             ImpactFrame = impactFrameConfig,
             HasImpactFrame = hasImpactFrame ? (byte)1 : (byte)0,
+            GhostTrail = ghostTrailConfig,
+            HasGhostTrail = hasGhostTrail ? (byte)1 : (byte)0,
             Shotgun = new ShotgunPowerUpConfig
             {
                 ProjectileCount = math.max(1, shotgunProjectileCount),

@@ -27,6 +27,7 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
         state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerControllerConfig>();
+        state.RequireForUpdate<PlayerGhostTrailState>();
     }
 
     /// <summary>
@@ -37,9 +38,11 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
     {
         foreach ((RefRO<PlayerInputState> inputState,
                   DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
-                  RefRW<PlayerPowerUpsState> powerUpsState) in SystemAPI.Query<RefRO<PlayerInputState>,
-                                                                               DynamicBuffer<PlayerPowerUpsConfigElement>,
-                                                                               RefRW<PlayerPowerUpsState>>().WithAll<PlayerControllerConfig>())
+                  RefRW<PlayerPowerUpsState> powerUpsState,
+                  RefRW<PlayerGhostTrailState> ghostTrailState) in SystemAPI.Query<RefRO<PlayerInputState>,
+                                                                                  DynamicBuffer<PlayerPowerUpsConfigElement>,
+                                                                                  RefRW<PlayerPowerUpsState>,
+                                                                                  RefRW<PlayerGhostTrailState>>().WithAll<PlayerControllerConfig>())
         {
             bool swapPressed = inputState.ValueRO.SwapPowerUpSlots > InputPressThreshold;
             bool swapPressedThisFrame = swapPressed && powerUpsState.ValueRO.PreviousSwapSlotsPressed == 0;
@@ -57,7 +60,8 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
 
             ApplySlotSwap(ref powerUpsConfig,
                           ref powerUpsState.ValueRW,
-                          in inputState.ValueRO);
+                          in inputState.ValueRO,
+                          ref ghostTrailState.ValueRW);
             PlayerPowerUpsConfigBufferUtility.Write(powerUpsConfigBuffer, in powerUpsConfig);
         }
     }
@@ -80,9 +84,11 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
     /// <param name="powerUpsConfig">Runtime active-slot configuration to mutate.</param>
     /// <param name="powerUpsState">Runtime slot state to mutate.</param>
     /// <param name="inputState">Current input snapshot used to realign pressed-edge tracking after the swap.</param>
+    /// <param name="ghostTrailState">Mutable Ghost Trail state whose matched toggle ownership follows the swapped slot.</param>
     private static void ApplySlotSwap(ref PlayerPowerUpsConfig powerUpsConfig,
                                       ref PlayerPowerUpsState powerUpsState,
-                                      in PlayerInputState inputState)
+                                      in PlayerInputState inputState,
+                                      ref PlayerGhostTrailState ghostTrailState)
     {
         PlayerPowerUpLoadoutRuntimeUtility.SwapActiveSlotRuntimeData(ref powerUpsConfig, ref powerUpsState);
         powerUpsState.PrimaryCharge = 0f;
@@ -92,6 +98,9 @@ public partial struct PlayerPowerUpSlotSwapSystem : ISystem
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = inputState.PowerUpPrimary > InputPressThreshold ? (byte)1 : (byte)0;
         powerUpsState.PreviousSecondaryPressed = inputState.PowerUpSecondary > InputPressThreshold ? (byte)1 : (byte)0;
+
+        if (ghostTrailState.MatchToggleActivationDuration != 0)
+            ghostTrailState.MatchedToggleSlotIndex = ghostTrailState.MatchedToggleSlotIndex == 0 ? (byte)1 : (byte)0;
     }
     #endregion
 

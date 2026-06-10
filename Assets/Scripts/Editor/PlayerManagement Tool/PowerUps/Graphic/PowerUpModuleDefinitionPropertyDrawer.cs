@@ -192,17 +192,20 @@ public sealed class PowerUpModuleDefinitionPropertyDrawer : PropertyDrawer
     /// <param name="moduleKind">Kind that selects the payload drawer variant.</param>
     /// <param name="payloadLabel">Optional label used by the generic fallback drawer.</param>
     /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
+    /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
                                           string payloadLabel,
-                                          bool showActiveTriggerCharacterTuningOption = false)
+                                          bool showActiveTriggerCharacterTuningOption = false,
+                                          bool showToggleDurationOption = false)
     {
         PowerUpModuleDefinitionPayloadDrawerUtility.BuildPayloadEditor(payloadContainer,
                                                                       payloadProperty,
                                                                       moduleKind,
                                                                       payloadLabel,
-                                                                      showActiveTriggerCharacterTuningOption);
+                                                                      showActiveTriggerCharacterTuningOption,
+                                                                      showToggleDurationOption);
     }
 
     /// <summary>

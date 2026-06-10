@@ -263,13 +263,15 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         bool showOverride = useOverrideProperty != null && useOverrideProperty.boolValue;
         overrideContainer.style.display = showOverride ? DisplayStyle.Flex : DisplayStyle.None;
 
+        bool showToggleDurationOption = ShouldShowToggleDurationOption(bindingProperty, moduleKind);
         string rebuildKey = BuildOverridePayloadRebuildKey(showOverride,
                                                            moduleResolved,
                                                            moduleKind,
                                                            useOverrideProperty,
                                                            overridePayloadProperty,
                                                            moduleDefaultPayloadProperty,
-                                                           bindingProperty);
+                                                           bindingProperty,
+                                                           showToggleDurationOption);
         BindingDrawerState resolvedDrawerState = ResolveDrawerState(overrideContainer, drawerState);
 
         if (resolvedDrawerState != null &&
@@ -326,7 +328,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                                  payloadProperty,
                                                                  moduleKind,
                                                                  payloadLabel,
-                                                                 showActiveTriggerCharacterTuningOption);
+                                                                 showActiveTriggerCharacterTuningOption,
+                                                                 showToggleDurationOption);
     }
 
     private static bool TryResolveModuleInfo(SerializedObject serializedObject,
@@ -402,6 +405,60 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
             return false;
 
         return IsNonToggleableActiveWithoutHoldCharge(powerUpProperty);
+    }
+
+    /// <summary>
+    /// Resolves whether Ghost Trail may match the owning toggleable active lifetime.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized Ghost Trail binding currently being drawn.</param>
+    /// <param name="moduleKind">Resolved module kind for the selected binding.</param>
+    /// <returns>True when the binding belongs to an active containing an enabled toggleable Resource Gate.</returns>
+    private static bool ShouldShowToggleDurationOption(SerializedProperty bindingProperty, PowerUpModuleKind moduleKind)
+    {
+        if (moduleKind != PowerUpModuleKind.GhostTrail)
+            return false;
+
+        if (bindingProperty == null || !IsBindingEnabled(bindingProperty))
+            return false;
+
+        if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
+            return false;
+
+        SerializedProperty moduleBindingsProperty = powerUpProperty.FindPropertyRelative("moduleBindings");
+
+        if (moduleBindingsProperty == null || !moduleBindingsProperty.isArray)
+            return false;
+
+        for (int bindingIndex = 0; bindingIndex < moduleBindingsProperty.arraySize; bindingIndex++)
+        {
+            SerializedProperty siblingBindingProperty = moduleBindingsProperty.GetArrayElementAtIndex(bindingIndex);
+
+            if (!IsBindingEnabled(siblingBindingProperty))
+                continue;
+
+            SerializedProperty moduleIdProperty = siblingBindingProperty.FindPropertyRelative("moduleId");
+
+            if (moduleIdProperty == null)
+                continue;
+
+            if (!TryResolveModuleInfo(powerUpProperty.serializedObject,
+                                      moduleIdProperty.stringValue,
+                                      out PowerUpModuleKind siblingModuleKind,
+                                      out PowerUpModuleStage _,
+                                      out string _,
+                                      out SerializedProperty moduleDefaultPayloadProperty))
+            {
+                continue;
+            }
+
+            if (siblingModuleKind == PowerUpModuleKind.GateResource &&
+                ResolveBindingResourceGateToggleable(siblingBindingProperty, moduleDefaultPayloadProperty))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -684,6 +741,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
     /// <param name="overridePayloadProperty">Serialized override payload root.</param>
     /// <param name="moduleDefaultPayloadProperty">Serialized default payload root of the selected module.</param>
     /// <param name="bindingProperty">Serialized binding property represented by this drawer.</param>
+    /// <param name="showToggleDurationOption">True when contextual Ghost Trail toggle lifetime controls are available.</param>
     /// <returns>Stable key used to skip redundant payload rebuilds.</returns>
     private static string BuildOverridePayloadRebuildKey(bool showOverride,
                                                          bool moduleResolved,
@@ -691,20 +749,22 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                          SerializedProperty useOverrideProperty,
                                                          SerializedProperty overridePayloadProperty,
                                                          SerializedProperty moduleDefaultPayloadProperty,
-                                                         SerializedProperty bindingProperty)
+                                                         SerializedProperty bindingProperty,
+                                                         bool showToggleDurationOption)
     {
         string useOverridePath = useOverrideProperty != null ? useOverrideProperty.propertyPath : string.Empty;
         string overridePayloadPath = overridePayloadProperty != null ? overridePayloadProperty.propertyPath : string.Empty;
         string defaultPayloadPath = moduleDefaultPayloadProperty != null ? moduleDefaultPayloadProperty.propertyPath : string.Empty;
         string bindingPath = bindingProperty != null ? bindingProperty.propertyPath : string.Empty;
-        return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}",
+        return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}",
                              showOverride,
                              moduleResolved,
                              (int)moduleKind,
                              useOverridePath,
                              overridePayloadPath,
                              defaultPayloadPath,
-                             bindingPath);
+                             bindingPath,
+                             showToggleDurationOption);
     }
 
     private static string ResolveInitialModuleId(string currentId, List<string> options)

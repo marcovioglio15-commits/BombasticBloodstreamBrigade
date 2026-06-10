@@ -22,6 +22,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdDash = "Module_Dash";
     internal const string ModuleIdTimeDilationEnemies = "Module_TimeDilationEnemies";
     internal const string ModuleIdImpactFrame = "Module_ImpactFrame";
+    internal const string ModuleIdGhostTrail = "Module_GhostTrail";
     internal const string ModuleIdHeal = "Module_Heal";
     internal const string ModuleIdSpawnTrailSegment = "Module_SpawnTrailSegment";
     internal const string ModuleIdAreaTickApplyElement = "Module_AreaTickApplyElement";
@@ -170,6 +171,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdDash, "Dash", PowerUpModuleKind.Dash, PowerUpModuleStage.Execute, "Moves player rapidly with optional invulnerability."));
         definitions.Add(CreateModuleDefinition(ModuleIdTimeDilationEnemies, "Time Dilation Enemies", PowerUpModuleKind.TimeDilationEnemies, PowerUpModuleStage.Execute, "Slows enemy simulation for a short duration."));
         definitions.Add(CreateModuleDefinition(ModuleIdImpactFrame, "Impact Frame", PowerUpModuleKind.ImpactFrame, PowerUpModuleStage.Execute, "Runs a global time impact and fullscreen filter when an active power-up activation succeeds."));
+        definitions.Add(CreateModuleDefinition(ModuleIdGhostTrail, "Ghost Trail", PowerUpModuleKind.GhostTrail, PowerUpModuleStage.Execute, "Emits pooled residual images and optional screen feedback after a successful active power-up activation."));
         definitions.Add(CreateModuleDefinition(ModuleIdHeal, "Heal", PowerUpModuleKind.Heal, PowerUpModuleStage.Execute, "Applies instant heal or heal-over-time."));
         definitions.Add(CreateModuleDefinition(ModuleIdSpawnTrailSegment, "Spawn Trail Segment", PowerUpModuleKind.SpawnTrailSegment, PowerUpModuleStage.Hook, "Spawns trail segments while moving."));
         definitions.Add(CreateModuleDefinition(ModuleIdAreaTickApplyElement, "Area Tick Apply Element", PowerUpModuleKind.AreaTickApplyElement, PowerUpModuleStage.Hook, "Applies elemental stacks in area over time."));
@@ -426,6 +428,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                               24f,
                                               0.25f,
                                               new UnityEngine.Color(1f, 0.9f, 0.45f, 0.7f));
+                break;
+            case PowerUpModuleKind.GhostTrail:
+                payload.GhostTrail.Configure(1.5f, 0.06f, 0.35f, 18);
                 break;
             case PowerUpModuleKind.Stackable:
                 payload.Stackable.Configure(2);

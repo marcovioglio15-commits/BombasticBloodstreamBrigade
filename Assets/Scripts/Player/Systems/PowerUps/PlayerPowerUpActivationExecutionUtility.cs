@@ -81,6 +81,7 @@ public static class PlayerPowerUpActivationExecutionUtility
                 ExecuteBulletTime(in slotConfig, ref bulletTimeState);
                 break;
             case ActiveToolKind.ImpactFrame:
+            case ActiveToolKind.GhostTrail:
                 break;
             case ActiveToolKind.Shotgun:
                 ExecuteShotgun(in slotConfig,

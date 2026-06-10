@@ -48,6 +48,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules and activated on valid release.</param>
+    /// <param name="ghostTrailState">Mutable Ghost Trail state interrupted by hard slot rules and activated on valid release.</param>
     /// <param name="moveInput">Raw movement input used as final fallback for chained Dash modules.</param>
     /// <param name="lastValidMovementDirection">Cached movement direction used as fallback for chained Dash modules.</param>
     /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
@@ -93,6 +94,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                              ref PlayerDashState dashState,
                                              ref PlayerBulletTimeState bulletTimeState,
                                              ref PlayerImpactFrameState impactFrameState,
+                                             ref PlayerGhostTrailState ghostTrailState,
                                              float2 moveInput,
                                              float3 lastValidMovementDirection,
                                              DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
@@ -197,10 +199,14 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                        ref otherSlotMaintenanceTickTimer,
                                        ref dashState,
                                        ref bulletTimeState,
-                                       ref impactFrameState);
+                                       ref impactFrameState,
+                                       ref ghostTrailState);
 
                 if (slotConfig.HasImpactFrame != 0)
                     PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
+
+                if (slotConfig.HasGhostTrail != 0)
+                    PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState, in slotConfig.GhostTrail, false);
 
                 PlayerPowerUpActivationExecutionUtility.ExecuteChargeShot(in slotConfig,
                                                                           in localTransform,
@@ -279,6 +285,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules and activated on toggle-on.</param>
+    /// <param name="ghostTrailState">Mutable Ghost Trail state interrupted by hard slot rules and activated or stopped with the toggle.</param>
+    /// <param name="slotIndex">Owning active slot index used to match Ghost Trail lifetime to this toggle.</param>
     public static void ProcessPassiveToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                 bool pressedThisFrame,
                                                 ref float slotEnergy,
@@ -307,7 +315,9 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                 float3 lastValidMovementDirection,
                                                 ref PlayerDashState dashState,
                                                 ref PlayerBulletTimeState bulletTimeState,
-                                                ref PlayerImpactFrameState impactFrameState)
+                                                ref PlayerImpactFrameState impactFrameState,
+                                                ref PlayerGhostTrailState ghostTrailState,
+                                                byte slotIndex)
     {
         if (isActive != 0)
         {
@@ -320,6 +330,10 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
             isActive = 0;
             maintenanceTickTimer = 0f;
             cooldownRemaining = 0f;
+
+            if (slotConfig.HasGhostTrail != 0)
+                PlayerGhostTrailRuntimeUtility.StopMatchedToggle(ref ghostTrailState, slotIndex);
+
             return;
         }
 
@@ -358,7 +372,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                ref otherSlotMaintenanceTickTimer,
                                ref dashState,
                                ref bulletTimeState,
-                               ref impactFrameState);
+                               ref impactFrameState,
+                               ref ghostTrailState);
 
         isActive = 1;
         maintenanceTickTimer = 0f;
@@ -366,6 +381,9 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
         if (slotConfig.HasImpactFrame != 0)
             PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
+
+        if (slotConfig.HasGhostTrail != 0)
+            PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState, in slotConfig.GhostTrail, true, slotIndex);
 
         PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
                                                                     in lookState,
@@ -392,6 +410,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="dashState">Mutable dash state interrupted by hard slot interruption rules.</param>
     /// <param name="bulletTimeState">Mutable bullet-time state interrupted by hard slot interruption rules.</param>
     /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules.</param>
+    /// <param name="ghostTrailState">Mutable Ghost Trail state interrupted by hard slot interruption rules.</param>
     public static void InterruptOtherSlot(in PlayerPowerUpSlotConfig slotConfig,
                                           ref float otherSlotCharge,
                                           ref float otherSlotCooldownRemaining,
@@ -400,7 +419,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                           ref float otherSlotMaintenanceTickTimer,
                                           ref PlayerDashState dashState,
                                           ref PlayerBulletTimeState bulletTimeState,
-                                          ref PlayerImpactFrameState impactFrameState)
+                                          ref PlayerImpactFrameState impactFrameState,
+                                          ref PlayerGhostTrailState ghostTrailState)
     {
         otherSlotCharge = 0f;
         otherSlotIsCharging = 0;
@@ -428,6 +448,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         dashState.WallBounceIntensity = 0f;
         PlayerBulletTimeRuntimeUtility.Clear(ref bulletTimeState);
         PlayerImpactFrameRuntimeUtility.Clear(ref impactFrameState);
+        PlayerGhostTrailRuntimeUtility.Clear(ref ghostTrailState);
     }
     #endregion
 

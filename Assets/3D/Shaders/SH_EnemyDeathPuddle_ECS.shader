@@ -40,6 +40,7 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
 
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _PuddlePrimaryColor;
@@ -97,6 +98,15 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
                     return progress;
 
                 return progress * progress;
+            }
+
+            float3 ResolveAuthoredPaletteColor(float3 color)
+            {
+                #if defined(UNITY_COLORSPACE_GAMMA)
+                    return color;
+                #else
+                    return SRGBToLinear(color);
+                #endif
             }
 
             Varyings Vert(Attributes input)
@@ -158,10 +168,12 @@ Shader "BombasticBloodstreamBrigade/Enemy Death Puddle ECS"
                                              irregularRadius - borderWidth - edgeFeather,
                                              radius);
                 float band = step(0.48 + internalNoise * 0.08, internalRadius);
-                float3 bodyColor = lerp(primaryColor.rgb,
-                                        secondaryColor.rgb,
+                float3 primaryPaletteColor = ResolveAuthoredPaletteColor(primaryColor.rgb);
+                float3 secondaryPaletteColor = ResolveAuthoredPaletteColor(secondaryColor.rgb);
+                float3 bodyColor = lerp(primaryPaletteColor,
+                                        secondaryPaletteColor,
                                         band * saturate(style.x));
-                float3 borderColor = primaryColor.rgb * 0.12;
+                float3 borderColor = primaryPaletteColor * 0.12;
                 float3 outputColor = lerp(borderColor, bodyColor, innerMask);
                 float highlightWave = waveA * 0.7 - waveB * 0.3;
                 float highlightMask = smoothstep(0.58, 0.96, highlightWave) *
