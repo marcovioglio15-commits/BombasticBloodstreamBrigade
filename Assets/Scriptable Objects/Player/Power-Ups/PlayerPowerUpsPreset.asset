@@ -174,7 +174,7 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
-  secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
+  secondaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
   dropPools:
   - poolId: Milestone
@@ -9282,9 +9282,7 @@ MonoBehaviour:
           orbitConeAngleDegrees: 90
           fullOrbitConeResponse: 0
           lookFollowDelaySeconds: 0
-          faceOrbitOutward: 0
           collisionRadius: 1
-          adaptCollisionToModel: 0
           damageEnemies: 0
           contactDamage: 0
           damageTickIntervalSeconds: 0
@@ -38085,7 +38083,7 @@ MonoBehaviour:
           spawnAnimationSeconds: 0
           despawnAnimationSeconds: 0
           projections:
-          - projectionPrefab: {fileID: 6580205467536590943, guid: 0ff06bb8cf64f1c49b9397624aa28916, type: 3}
+          - projectionPrefab: {fileID: 6580205467536590943, guid: 547f7265abce74b41b20a54b14b65ec2, type: 3}
             displayName: Orbital Spear
             categoryId: 'OrbitalSpear '
             motionMode: 2
@@ -38098,9 +38096,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 1
             collisionRadius: 0.7
-            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38547,9 +38543,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 1
             collisionRadius: 0.7
-            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -38996,9 +38990,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 1
             collisionRadius: 0.7
-            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39022,9 +39014,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 1
             collisionRadius: 0.7
-            adaptCollisionToModel: 1
             damageEnemies: 1
             contactDamage: 1
             damageTickIntervalSeconds: 0.5
@@ -39471,9 +39461,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 1
             collisionRadius: 0.7
-            adaptCollisionToModel: 1
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
@@ -39909,9 +39897,7 @@ MonoBehaviour:
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
             lookFollowDelaySeconds: 0.1
-            faceOrbitOutward: 0
             collisionRadius: 0.7
-            adaptCollisionToModel: 0
             damageEnemies: 0
             contactDamage: 5
             damageTickIntervalSeconds: 1
@@ -42978,11 +42964,11 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveBulletTime
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
-  - Passive_OrbitalWings
   - Passive_RearShield
+  - Passive_OrbitalWings
   - Passive_OrbitalSpear
   - Passive_OrbitalShield
   passiveTools:
