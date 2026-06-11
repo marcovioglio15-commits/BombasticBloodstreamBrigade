@@ -42985,13 +42985,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveBulletTime
+  primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - Passive_RearShield
-  - Passive_OrbitalWings
-  - Passive_OrbitalSpear
-  - Passive_OrbitalShield
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
