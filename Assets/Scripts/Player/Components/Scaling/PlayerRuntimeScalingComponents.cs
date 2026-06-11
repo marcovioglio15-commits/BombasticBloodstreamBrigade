@@ -523,6 +523,20 @@ public struct PlayerRuntimeDeathAnimationScalingElement : IBufferElementData
 }
 
 /// <summary>
+/// Stores one projectile-death VFX scaling entry baked from Visual Preset Add Scaling authoring data.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct PlayerRuntimeProjectileDeathVfxScalingElement : IBufferElementData
+{
+    public FixedString128Bytes PayloadPath;
+    public byte ValueType;
+    public float BaseValue;
+    public byte BaseBooleanValue;
+    public byte IsInteger;
+    public FixedString512Bytes Formula;
+}
+
+/// <summary>
 /// Identifies one scalable weapon visual field stored on the runtime visual bridge configuration. Fields
 /// targeting a specific mountable entry use the baked array index stored by the scaling element.
 /// </summary>

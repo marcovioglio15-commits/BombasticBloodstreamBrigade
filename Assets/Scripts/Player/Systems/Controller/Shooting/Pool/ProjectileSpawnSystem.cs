@@ -77,6 +77,7 @@ public partial struct ProjectileSpawnSystem : ISystem
         ComponentLookup<LocalTransform> projectileTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(false);
         ComponentLookup<Projectile> projectileLookup = SystemAPI.GetComponentLookup<Projectile>(false);
         ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup = SystemAPI.GetComponentLookup<ProjectileRuntimeState>(false);
+        ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(false);
         ComponentLookup<ProjectileOwner> projectileOwnerLookup = SystemAPI.GetComponentLookup<ProjectileOwner>(false);
         ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup = SystemAPI.GetComponentLookup<EnemyProjectileOffscreenWarningConfig>(true);
         ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup = SystemAPI.GetComponentLookup<ProjectileOffscreenWarningState>(false);
@@ -100,6 +101,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                              ref projectileTransformLookup,
                              ref projectileLookup,
                              ref projectileRuntimeLookup,
+                             ref projectileContactStateLookup,
                              ref projectileOwnerLookup,
                              in enemyProjectileOffscreenWarningLookup,
                              ref projectileOffscreenWarningLookup,
@@ -211,6 +213,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       ref ComponentLookup<LocalTransform> projectileTransformLookup,
                                       ref ComponentLookup<Projectile> projectileLookup,
                                       ref ComponentLookup<ProjectileRuntimeState> projectileRuntimeLookup,
+                                      ref ComponentLookup<ProjectileContactState> projectileContactStateLookup,
                                       ref ComponentLookup<ProjectileOwner> projectileOwnerLookup,
                                       in ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup,
                                       ref ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup,
@@ -318,6 +321,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                     TraveledDistance = 0f,
                     ElapsedLifetime = 0f
                 };
+                projectileContactStateLookup[projectileEntity] = default;
                 projectileOwnerLookup[projectileEntity] = new ProjectileOwner
                 {
                     ShooterEntity = shooterEntity

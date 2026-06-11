@@ -246,7 +246,7 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
                 if (particleSystem == null)
                     continue;
 
-                particleSystem.Clear(true);
+                particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
                 particleSystem.Play(true);
             }
         }

@@ -117,6 +117,14 @@ public struct ProjectileRuntimeState : IComponentData
 }
 
 /// <summary>
+/// Tracks whether a pooled projectile has already applied a valid hit during its current activation.
+/// </summary>
+public struct ProjectileContactState : IComponentData
+{
+    public byte HasHitTarget;
+}
+
+/// <summary>
 /// This component holds a reference to the shooter entity that owns a projectile,
 /// which is used to associate projectiles with their source shooter for 
 /// applying player modifiers to projectile behavior 

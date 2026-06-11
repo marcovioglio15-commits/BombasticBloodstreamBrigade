@@ -68,6 +68,8 @@ internal static class PlayerPowerUpManagedVfxInstanceUtility
         instance.FollowMuzzlePose = false;
         instance.DetachWhenFollowTargetInvalid = false;
         instance.KeepAliveWhileFollowTargetValid = false;
+        instance.RestartOldestOnCap = false;
+        instance.ActivationSequence = 0ul;
     }
 
     /// <summary>
@@ -80,7 +82,7 @@ internal static class PlayerPowerUpManagedVfxInstanceUtility
             return;
 
         if (instance.InstanceObject != null)
-            Object.Destroy(instance.InstanceObject);
+            DestroyInstanceObject(instance.InstanceObject);
 
         instance.SourcePrefab = null;
         instance.InstanceObject = null;
@@ -112,6 +114,49 @@ internal static class PlayerPowerUpManagedVfxInstanceUtility
             return false;
 
         return true;
+    }
+
+    /// <summary>
+    /// Destroys one managed VFX object immediately during edit-mode smoke tests and normally during play.
+    /// </summary>
+    /// <param name="instanceObject">Managed VFX GameObject to destroy.</param>
+    private static void DestroyInstanceObject(GameObject instanceObject)
+    {
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            Object.DestroyImmediate(instanceObject);
+            return;
+        }
+#endif
+        Object.Destroy(instanceObject);
+    }
+    #endregion
+
+    #region Prefab Resolution
+    /// <summary>
+    /// Resolves the GameObject prefab mapped to one baked VFX prefab entity.
+    /// </summary>
+    /// <param name="prefabBindings">Player-owned prefab entity to GameObject source bindings.</param>
+    /// <param name="request">Baked VFX request carrying either a prefab entity or direct source prefab.</param>
+    /// <returns>Source GameObject prefab, or null when no binding exists.</returns>
+    public static GameObject ResolveSourcePrefab(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                                 in PlayerPowerUpVfxSpawnRequest request)
+    {
+        if (request.PrefabEntity != Entity.Null)
+        {
+            for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
+            {
+                PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
+
+                if (binding.PrefabEntity != request.PrefabEntity)
+                    continue;
+
+                return binding.Prefab.Value;
+            }
+        }
+
+        return request.SourcePrefab.Value;
     }
     #endregion
 

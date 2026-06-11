@@ -14,6 +14,7 @@ public static class PlayerVisualVfxBakeUtility
     private const float DefaultChargeShotVfxLifetimeSeconds = 1f;
     private const float DefaultProjectileAttachedVfxLifetimeSeconds = 12f;
     private const float MinimumScale = 0.01f;
+    private const float MinimumProjectileDeathVfxLifetimeSeconds = 0.05f;
     private const float MinimumMuzzleFlashLifetimeSeconds = 0.05f;
     #endregion
 
@@ -210,9 +211,87 @@ public static class PlayerVisualVfxBakeUtility
         };
         return true;
     }
+
+    /// <summary>
+    /// Builds projectile-death VFX runtime settings from the resolved visual preset.
+    /// </summary>
+    /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <param name="config">Built ECS config when at least one projectile-death VFX prefab is assigned.</param>
+    /// <returns>True when the preset contains at least one projectile-death VFX prefab.</returns>
+    public static bool TryBuildProjectileDeathVfxConfig(PlayerVisualPreset visualPreset,
+                                                        Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
+                                                        out PlayerProjectileDeathVfxConfig config)
+    {
+        config = default;
+        PlayerProjectileDeathVfxSettings settings = visualPreset != null ? visualPreset.ProjectileDeathVfx : null;
+
+        if (settings == null || !settings.HasAnyPrefab)
+            return false;
+
+        config = new PlayerProjectileDeathVfxConfig
+        {
+            RangeOrLifetime = BuildProjectileDeathVfxEventConfig(settings.RangeOrLifetime,
+                                                                 null,
+                                                                 resolveDynamicVfxPrefabEntity),
+            TerminalWallHit = BuildProjectileDeathVfxEventConfig(settings.TerminalWallHit,
+                                                                 settings.RangeOrLifetime != null ? settings.RangeOrLifetime.VfxPrefab : null,
+                                                                 resolveDynamicVfxPrefabEntity)
+        };
+        return true;
+    }
+
+    /// <summary>
+    /// Builds the immutable projectile-death VFX baseline from the unscaled visual preset.
+    /// </summary>
+    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <returns>Baseline config used by runtime scaling rebuilds.</returns>
+    public static PlayerBaseProjectileDeathVfxConfig BuildBaseProjectileDeathVfxConfig(PlayerVisualPreset visualPreset,
+                                                                                        Func<GameObject, Entity> resolveDynamicVfxPrefabEntity)
+    {
+        TryBuildProjectileDeathVfxConfig(visualPreset,
+                                         resolveDynamicVfxPrefabEntity,
+                                         out PlayerProjectileDeathVfxConfig config);
+        return new PlayerBaseProjectileDeathVfxConfig
+        {
+            Config = config
+        };
+    }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Builds one runtime projectile-death VFX event from authored settings.
+    /// </summary>
+    /// <param name="settings">Authored event settings.</param>
+    /// <param name="fallbackPrefab">Optional fallback prefab used when the event has no direct assignment.</param>
+    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
+    /// <returns>Runtime event config with safe presentation values.</returns>
+    private static PlayerProjectileDeathVfxEventConfig BuildProjectileDeathVfxEventConfig(PlayerProjectileDeathVfxEventSettings settings,
+                                                                                           GameObject fallbackPrefab,
+                                                                                           Func<GameObject, Entity> resolveDynamicVfxPrefabEntity)
+    {
+        if (settings == null)
+            return default;
+
+        GameObject prefab = settings.VfxPrefab != null ? settings.VfxPrefab : fallbackPrefab;
+        Entity prefabEntity = prefab != null && resolveDynamicVfxPrefabEntity != null
+            ? resolveDynamicVfxPrefabEntity(prefab)
+            : Entity.Null;
+        Vector3 spawnOffset = settings.SpawnOffset;
+
+        return new PlayerProjectileDeathVfxEventConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = prefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(MinimumScale, settings.ScaleMultiplier),
+            LifetimeSeconds = math.max(MinimumProjectileDeathVfxLifetimeSeconds, settings.LifetimeSeconds),
+            Enabled = settings.Enabled ? (byte)1 : (byte)0
+        };
+    }
+
     /// <summary>
     /// Resolves invalid serialized level-up VFX trigger values to the every-level-up path.
     /// </summary>

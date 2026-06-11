@@ -60,3 +60,42 @@ public struct PlayerProjectileAttachedVfxConfig : IComponentData
     public float UniformScale;
     public float LifetimeSeconds;
 }
+
+/// <summary>
+/// Runtime settings for one projectile-death VFX event.
+/// </summary>
+public struct PlayerProjectileDeathVfxEventConfig
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float LifetimeSeconds;
+    public byte Enabled;
+}
+
+/// <summary>
+/// Runtime VFX settings used when player projectiles expire without previous enemy hits.
+/// </summary>
+public struct PlayerProjectileDeathVfxConfig : IComponentData
+{
+    public PlayerProjectileDeathVfxEventConfig RangeOrLifetime;
+    public PlayerProjectileDeathVfxEventConfig TerminalWallHit;
+}
+
+/// <summary>
+/// Immutable projectile-death VFX baseline used to rebuild runtime-scaled settings.
+/// </summary>
+public struct PlayerBaseProjectileDeathVfxConfig : IComponentData
+{
+    public PlayerProjectileDeathVfxConfig Config;
+}
+
+/// <summary>
+/// Tracks the shared runtime scaling hash last applied to projectile-death VFX settings.
+/// </summary>
+public struct PlayerProjectileDeathVfxScalingState : IComponentData
+{
+    public uint LastScalableStatsHash;
+    public byte Initialized;
+}

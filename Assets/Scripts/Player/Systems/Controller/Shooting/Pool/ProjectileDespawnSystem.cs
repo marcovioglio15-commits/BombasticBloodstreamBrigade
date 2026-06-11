@@ -43,6 +43,9 @@ public partial struct ProjectileDespawnSystem : ISystem
         ComponentLookup<ProjectileSplitState> projectileSplitStateLookup = SystemAPI.GetComponentLookup<ProjectileSplitState>(false);
         ComponentLookup<ProjectileElementalPayload> projectileElementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(true);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
+        ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
+        ComponentLookup<PlayerProjectileDeathVfxConfig> projectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
 
         foreach ((RefRO<Projectile> projectile,
                   RefRO<ProjectileRuntimeState> runtimeState,
@@ -84,6 +87,13 @@ public partial struct ProjectileDespawnSystem : ISystem
                 }
             }
 
+            ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.RangeOrLifetime,
+                                                        projectileEntity,
+                                                        owner.ValueRO.ShooterEntity,
+                                                        in projectileTransform.ValueRO,
+                                                        in projectileContactStateLookup,
+                                                        in projectileDeathVfxConfigLookup,
+                                                        ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,
                                                 owner.ValueRO.ShooterEntity,

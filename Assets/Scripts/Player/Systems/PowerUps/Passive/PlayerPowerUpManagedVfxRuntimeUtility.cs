@@ -72,7 +72,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                 in PlayerPowerUpVfxSpawnRequest request,
                                 in PlayerPowerUpVfxCapConfig capConfig)
     {
-        GameObject sourcePrefab = ResolveSourcePrefab(prefabBindings, in request);
+        GameObject sourcePrefab = PlayerPowerUpManagedVfxInstanceUtility.ResolveSourcePrefab(prefabBindings, in request);
 
         if (sourcePrefab == null)
             return false;
@@ -105,6 +105,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
         activeInstances.Clear();
         pooledInstances.Clear();
+        PlayerPowerUpManagedVfxCapSelectionUtility.ResetActivationSequence();
     }
 
     /// <summary>
@@ -166,36 +167,11 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     #region Spawn
     /// <summary>
-    /// Resolves the GameObject prefab mapped to one baked VFX prefab entity.
-    /// </summary>
-    /// <param name="prefabBindings">Player-owned prefab entity to GameObject source bindings.</param>
-    /// <param name="request">Baked VFX request that can carry either a player binding entity or a direct source prefab reference.</param>
-    /// <returns>Source GameObject prefab, or null when no binding exists.</returns>
-    private static GameObject ResolveSourcePrefab(DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
-                                                  in PlayerPowerUpVfxSpawnRequest request)
-    {
-        if (request.PrefabEntity != Entity.Null)
-        {
-            for (int bindingIndex = 0; bindingIndex < prefabBindings.Length; bindingIndex++)
-            {
-                PlayerPowerUpVfxPrefabBindingElement binding = prefabBindings[bindingIndex];
-
-                if (binding.PrefabEntity != request.PrefabEntity)
-                    continue;
-
-                return binding.Prefab.Value;
-            }
-        }
-
-        return request.SourcePrefab.Value;
-    }
-
-    /// <summary>
-    /// Checks configured VFX caps and refreshes an attached capped instance when requested.
+    /// Checks configured VFX caps and refreshes or restarts an eligible capped instance when requested.
     /// </summary>
     /// <param name="request">VFX request being evaluated.</param>
     /// <param name="capConfig">Runtime cap settings for this player.</param>
-    /// <param name="refreshedExistingInstance">True when an existing attached instance lifetime was refreshed.</param>
+    /// <param name="refreshedExistingInstance">True when an existing instance was refreshed or restarted.</param>
     /// <returns>True when a new instance can be spawned.</returns>
     private static bool CanSpawnUnderCaps(in PlayerPowerUpVfxSpawnRequest request,
                                           in PlayerPowerUpVfxCapConfig capConfig,
@@ -203,19 +179,52 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     {
         refreshedExistingInstance = false;
 
-        if (request.RefreshKey != 0 && TryRefreshKeyedInstance(in request))
+        PlayerPowerUpManagedVfxInstance keyedInstance = request.RefreshKey != 0
+            ? PlayerPowerUpManagedVfxCapSelectionUtility.FindKeyedInstance(activeInstances, in request)
+            : null;
+
+        if (keyedInstance != null)
         {
+            RefreshInstance(keyedInstance, in request);
             refreshedExistingInstance = true;
             return false;
         }
 
-        if (capConfig.MaxActiveOneShotVfx > 0 && activeInstances.Count >= capConfig.MaxActiveOneShotVfx)
-            return false;
+        if (capConfig.MaxActiveOneShotVfx > 0 &&
+            activeInstances.Count >= capConfig.MaxActiveOneShotVfx)
+        {
+            if (request.RestartOldestOnCap != 0)
+            {
+                PlayerPowerUpManagedVfxInstance oldestRestartableInstance =
+                    PlayerPowerUpManagedVfxCapSelectionUtility.FindOldestMatchingRestartableInstance(activeInstances, in request);
+
+                if (oldestRestartableInstance != null)
+                {
+                    ConfigureInstance(oldestRestartableInstance, in request);
+                    refreshedExistingInstance = true;
+                    return false;
+                }
+
+                oldestRestartableInstance =
+                    PlayerPowerUpManagedVfxCapSelectionUtility.FindOldestRestartableInstance(activeInstances);
+
+                if (oldestRestartableInstance == null)
+                    return false;
+
+                ReleaseActiveInstanceAt(activeInstances.IndexOf(oldestRestartableInstance));
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         if (request.FollowTargetEntity != Entity.Null && capConfig.MaxAttachedSamePrefabPerTarget > 0)
         {
             PlayerPowerUpManagedVfxInstance existingInstance;
-            int attachedCount = CountAttachedInstances(in request, out existingInstance);
+            int attachedCount = PlayerPowerUpManagedVfxCapSelectionUtility.CountAttachedInstances(activeInstances,
+                                                                                                   in request,
+                                                                                                   out existingInstance);
 
             if (attachedCount >= capConfig.MaxAttachedSamePrefabPerTarget)
             {
@@ -235,13 +244,23 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
         if (shouldCheckAreaCellCap)
         {
-            int areaCount = CountAreaInstances(request.PrefabEntity,
-                                               request.SourcePrefab.Value,
-                                               request.Position,
-                                               math.max(MinimumCellSize, capConfig.CellSize));
+            int areaCount = PlayerPowerUpManagedVfxCapSelectionUtility.CountAreaInstances(activeInstances,
+                                                                                           request.PrefabEntity,
+                                                                                           request.SourcePrefab.Value,
+                                                                                           request.Position,
+                                                                                           math.max(MinimumCellSize, capConfig.CellSize),
+                                                                                           out PlayerPowerUpManagedVfxInstance oldestRestartableInstance);
 
             if (areaCount >= capConfig.MaxSamePrefabPerCell)
+            {
+                if (request.RestartOldestOnCap != 0 && oldestRestartableInstance != null)
+                {
+                    ConfigureInstance(oldestRestartableInstance, in request);
+                    refreshedExistingInstance = true;
+                }
+
                 return false;
+            }
         }
 
         return true;
@@ -297,6 +316,8 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
         instance.DetachWhenFollowTargetInvalid = request.DetachWhenFollowTargetInvalid != 0;
         instance.KeepAliveWhileFollowTargetValid = request.KeepAliveWhileFollowTargetValid != 0;
+        instance.RestartOldestOnCap = request.RestartOldestOnCap != 0;
+        instance.ActivationSequence = PlayerPowerUpManagedVfxCapSelectionUtility.ResolveNextActivationSequence();
 
         PlayerPowerUpManagedVfxPresentationUtility.ApplyTransform(instance,
                                                                   request.Position,
@@ -317,6 +338,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
         PlayerPowerUpManagedVfxPresentationUtility.RestartVisualPlayback(instance);
     }
+
     #endregion
 
     #region Update
@@ -543,89 +565,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
 
     #region Caps
     /// <summary>
-    /// Counts active attached instances matching the same prefab and enemy spawn-version key.
-    /// </summary>
-    /// <param name="request">VFX request being evaluated.</param>
-    /// <param name="existingInstance">First matching active instance found during the scan.</param>
-    /// <returns>Number of active matching attached instances.</returns>
-    private static int CountAttachedInstances(in PlayerPowerUpVfxSpawnRequest request,
-                                              out PlayerPowerUpManagedVfxInstance existingInstance)
-    {
-        existingInstance = null;
-
-        if (request.FollowValidationEntity == Entity.Null || request.FollowValidationSpawnVersion == 0u)
-            return 0;
-
-        int count = 0;
-
-        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
-        {
-            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
-
-            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
-                continue;
-
-            if (!instance.HasFollowTarget)
-                continue;
-
-            if (!MatchesRequestedPrefab(instance, in request))
-                continue;
-
-            if (instance.FollowValidationEntity != request.FollowValidationEntity)
-                continue;
-
-            if (instance.FollowValidationSpawnVersion != request.FollowValidationSpawnVersion)
-                continue;
-
-            existingInstance = existingInstance == null ? instance : existingInstance;
-            count++;
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    /// Counts active one-shot instances matching one prefab and area-cap cell.
-    /// </summary>
-    /// <param name="prefabEntity">VFX prefab entity used as the cap key.</param>
-    /// <param name="position">Requested spawn position.</param>
-    /// <param name="cellSize">Sanitized cap cell size.</param>
-    /// <returns>Number of active matching one-shot instances in the same cell.</returns>
-    private static int CountAreaInstances(Entity prefabEntity,
-                                          GameObject sourcePrefab,
-                                          float3 position,
-                                          float cellSize)
-    {
-        int requestedCellX = (int)math.floor(position.x / cellSize);
-        int requestedCellY = (int)math.floor(position.z / cellSize);
-        int count = 0;
-
-        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
-        {
-            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
-
-            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
-                continue;
-
-            if (instance.HasFollowTarget)
-                continue;
-
-            if (!MatchesRequestedPrefab(instance, prefabEntity, sourcePrefab))
-                continue;
-
-            int instanceCellX = (int)math.floor(instance.Position.x / cellSize);
-            int instanceCellY = (int)math.floor(instance.Position.z / cellSize);
-
-            if (instanceCellX != requestedCellX || instanceCellY != requestedCellY)
-                continue;
-
-            count++;
-        }
-
-        return count;
-    }
-
-    /// <summary>
     /// Refreshes an existing attached VFX when cap refresh is enabled.
     /// </summary>
     /// <param name="instance">Existing attached VFX instance.</param>
@@ -634,36 +573,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                                 in PlayerPowerUpVfxSpawnRequest request)
     {
         RefreshInstance(instance, in request);
-    }
-
-    /// <summary>
-    /// Refreshes an existing keyed VFX instance when gameplay wants one continuous effect instead of repeated spawns.
-    /// </summary>
-    /// <param name="request">Request carrying the refresh key and updated presentation settings.</param>
-    /// <returns>True when a matching active instance was found and refreshed.</returns>
-    private static bool TryRefreshKeyedInstance(in PlayerPowerUpVfxSpawnRequest request)
-    {
-        for (int instanceIndex = 0; instanceIndex < activeInstances.Count; instanceIndex++)
-        {
-            PlayerPowerUpManagedVfxInstance instance = activeInstances[instanceIndex];
-
-            if (!PlayerPowerUpManagedVfxInstanceUtility.IsInstanceUsable(instance))
-                continue;
-
-            if (instance.RefreshKey != request.RefreshKey)
-                continue;
-
-            if (!MatchesRequestedPrefab(instance, in request))
-                continue;
-
-            if (instance.FollowTargetEntity != request.FollowTargetEntity)
-                continue;
-
-            RefreshInstance(instance, in request);
-            return true;
-        }
-
-        return false;
     }
 
     /// <summary>
@@ -706,34 +615,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
                                                                                       request.ColorOverrideChildName.ToString());
     }
 
-    /// <summary>
-    /// Checks whether a managed instance matches the prefab identity carried by a request.
-    /// </summary>
-    /// <param name="instance">Active managed VFX instance to inspect.</param>
-    /// <param name="request">Spawn request carrying prefab identity.</param>
-    /// <returns>True when the instance and request reference the same prefab.</returns>
-    private static bool MatchesRequestedPrefab(PlayerPowerUpManagedVfxInstance instance,
-                                               in PlayerPowerUpVfxSpawnRequest request)
-    {
-        return MatchesRequestedPrefab(instance, request.PrefabEntity, request.SourcePrefab.Value);
-    }
-
-    /// <summary>
-    /// Checks whether a managed instance matches a prefab entity or direct source prefab identity.
-    /// </summary>
-    /// <param name="instance">Active managed VFX instance to inspect.</param>
-    /// <param name="prefabEntity">Optional baked prefab entity.</param>
-    /// <param name="sourcePrefab">Optional direct source prefab reference.</param>
-    /// <returns>True when the instance and source identify the same prefab.</returns>
-    private static bool MatchesRequestedPrefab(PlayerPowerUpManagedVfxInstance instance,
-                                               Entity prefabEntity,
-                                               GameObject sourcePrefab)
-    {
-        if (prefabEntity != Entity.Null)
-            return instance.PrefabEntity == prefabEntity;
-
-        return sourcePrefab != null && instance.SourcePrefab == sourcePrefab;
-    }
     #endregion
 
     #region Release

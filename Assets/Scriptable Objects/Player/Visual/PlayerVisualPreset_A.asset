@@ -262,6 +262,19 @@ MonoBehaviour:
   playerProjectileVfxPrefab: {fileID: 3264601393849410126, guid: 4fdbc86243810fa40b6c172f5535dcd8, type: 3}
   playerProjectileVfxSpawnOffset: {x: 0, y: 0, z: -0.35}
   playerProjectileVfxScaleMultiplier: 0.35
+  projectileDeathVfx:
+    rangeOrLifetime:
+      enabled: 1
+      vfxPrefab: {fileID: 6920387491399739184, guid: 2bfbcb9ea0cfc7846bcafeb949eab49e, type: 3}
+      spawnOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: 1
+      lifetimeSeconds: 0.3
+    terminalWallHit:
+      enabled: 1
+      vfxPrefab: {fileID: 6920387491399739184, guid: 2bfbcb9ea0cfc7846bcafeb949eab49e, type: 3}
+      spawnOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: 1
+      lifetimeSeconds: 0.3
   muzzleFlashVfxPrefab: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
   muzzleFlashVfxSpawnOffset: {x: 0, y: 0.15, z: -0.1}
   muzzleFlashVfxScaleMultiplier: 1
@@ -275,4 +288,9 @@ MonoBehaviour:
   pointerVerticalLift: 0.06
   freezePointerWithOrbitalProjectiles: 1
   pointerOrbitalFrozenLength: 0
-  scalingRules: []
+  scalingRules:
+  - statKey: projectileDeathVfx.rangeOrLifetime.enabled
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

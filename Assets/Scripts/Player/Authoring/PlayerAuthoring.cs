@@ -695,6 +695,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
              visualPreset.ShieldIncreaseVfxPrefab != null ||
              visualPreset.ChargeShotVfxPrefab != null ||
              visualPreset.PlayerProjectileVfxPrefab != null ||
+             (visualPreset.ProjectileDeathVfx != null && visualPreset.ProjectileDeathVfx.HasAnyPrefab) ||
              visualPreset.MuzzleFlashVfxPrefab != null))
         {
             EnsurePowerUpVfxRuntime(authoring,
@@ -745,6 +746,21 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                out PlayerProjectileAttachedVfxConfig projectileAttachedVfxConfig))
             {
                 AddComponent(entity, projectileAttachedVfxConfig);
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildProjectileDeathVfxConfig(visualPreset,
+                                                                            resolveVisualVfxPrefabEntity,
+                                                                            out PlayerProjectileDeathVfxConfig projectileDeathVfxConfig))
+            {
+                AddComponent(entity, projectileDeathVfxConfig);
+                AddComponent(entity, PlayerVisualVfxBakeUtility.BuildBaseProjectileDeathVfxConfig(sourceVisualPreset,
+                                                                                                   resolveVisualVfxPrefabEntity));
+                AddComponent(entity, new PlayerProjectileDeathVfxScalingState());
+                DynamicBuffer<PlayerRuntimeProjectileDeathVfxScalingElement> projectileDeathVfxScalingBuffer = AddBuffer<PlayerRuntimeProjectileDeathVfxScalingElement>(entity);
+#if UNITY_EDITOR
+                PlayerRuntimeScalingVisualBakeUtility.PopulateProjectileDeathVfxScalingMetadata(sourceVisualPreset,
+                                                                                                projectileDeathVfxScalingBuffer);
+#endif
             }
 
             if (PlayerVisualVfxBakeUtility.TryBuildMuzzleFlashVfxConfig(visualPreset,

@@ -87,6 +87,9 @@ public static class ProjectilePoolUtility
         if (!entityManager.HasComponent<ProjectileRuntimeState>(projectileEntity))
             entityManager.AddComponentData(projectileEntity, default(ProjectileRuntimeState));
 
+        if (!entityManager.HasComponent<ProjectileContactState>(projectileEntity))
+            entityManager.AddComponentData(projectileEntity, default(ProjectileContactState));
+
         if (!entityManager.HasComponent<ProjectileOwner>(projectileEntity))
             entityManager.AddComponentData(projectileEntity, default(ProjectileOwner));
 

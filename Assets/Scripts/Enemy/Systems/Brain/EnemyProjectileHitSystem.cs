@@ -181,6 +181,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
         BufferLookup<EnemyElementStackElement> elementalStackLookup = SystemAPI.GetBufferLookup<EnemyElementStackElement>(false);
         BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup = SystemAPI.GetBufferLookup<ProjectileHitHistoryElement>(false);
         ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup = SystemAPI.GetComponentLookup<ProjectileBaseScale>(true);
+        ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(false);
         ComponentLookup<EnemyElementalVfxAnchor> elementalVfxAnchorLookup = SystemAPI.GetComponentLookup<EnemyElementalVfxAnchor>(true);
         ComponentLookup<PlayerElementalVfxConfig> elementalVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerElementalVfxConfig>(true);
         ComponentLookup<EnemyHitVfxConfig> enemyHitVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyHitVfxConfig>(true);
@@ -453,6 +454,13 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
             if (!hasValidHit)
                 continue;
+
+            if (projectileContactStateLookup.HasComponent(projectileEntity))
+            {
+                ProjectileContactState contactState = projectileContactStateLookup[projectileEntity];
+                contactState.HasHitTarget = 1;
+                projectileContactStateLookup[projectileEntity] = contactState;
+            }
 
             if (canEnqueueAudioRequests)
                 GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.BulletImpactEnemy, projectileTransform.Position);

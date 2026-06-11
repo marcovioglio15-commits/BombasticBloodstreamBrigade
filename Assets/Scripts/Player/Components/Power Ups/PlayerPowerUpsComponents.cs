@@ -523,6 +523,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public float3 Velocity;
     public int RefreshKey;
     public byte BypassAreaCellCap;
+    public byte RestartOldestOnCap;
     public byte ForceLooping;
     public byte DetachWhenFollowTargetInvalid;
     public byte KeepAliveWhileFollowTargetValid;

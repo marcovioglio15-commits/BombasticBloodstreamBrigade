@@ -36,5 +36,7 @@ internal sealed class PlayerPowerUpManagedVfxInstance
     public bool FollowMuzzlePose;
     public bool DetachWhenFollowTargetInvalid;
     public bool KeepAliveWhileFollowTargetValid;
+    public bool RestartOldestOnCap;
+    public ulong ActivationSequence;
     #endregion
 }
