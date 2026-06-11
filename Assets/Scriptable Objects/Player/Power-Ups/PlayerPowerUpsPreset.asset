@@ -38098,8 +38098,8 @@ MonoBehaviour:
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0.1
-            maximumLookFollowSpeedDegreesPerSecond: 540
+            lookFollowDelaySeconds: 0.15
+            maximumLookFollowSpeedDegreesPerSecond: 600
             faceOrbitOutward: 1
             collisionRadius: 0.7
             adaptCollisionToModel: 1
@@ -38548,8 +38548,8 @@ MonoBehaviour:
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0.1
-            maximumLookFollowSpeedDegreesPerSecond: 540
+            lookFollowDelaySeconds: 0.15
+            maximumLookFollowSpeedDegreesPerSecond: 600
             faceOrbitOutward: 1
             collisionRadius: 0.7
             adaptCollisionToModel: 1
@@ -38998,8 +38998,8 @@ MonoBehaviour:
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0.1
-            maximumLookFollowSpeedDegreesPerSecond: 540
+            lookFollowDelaySeconds: 0.15
+            maximumLookFollowSpeedDegreesPerSecond: 600
             faceOrbitOutward: 1
             collisionRadius: 0.7
             adaptCollisionToModel: 1
@@ -39025,8 +39025,8 @@ MonoBehaviour:
             orbitConeCenterAngleDegrees: 0
             orbitConeAngleDegrees: 90
             fullOrbitConeResponse: 0
-            lookFollowDelaySeconds: 0.1
-            maximumLookFollowSpeedDegreesPerSecond: 540
+            lookFollowDelaySeconds: 0.15
+            maximumLookFollowSpeedDegreesPerSecond: 600
             faceOrbitOutward: 1
             collisionRadius: 0.7
             adaptCollisionToModel: 1
@@ -40015,7 +40015,7 @@ MonoBehaviour:
           stacksPerTick: 0
           applyIntervalSeconds: 0
         stackable:
-          maxAcquisitions: 3
+          maxAcquisitions: 4
     unreplaceable: 0
   - commonData:
       powerUpId: Passive_MultivitaminKids
