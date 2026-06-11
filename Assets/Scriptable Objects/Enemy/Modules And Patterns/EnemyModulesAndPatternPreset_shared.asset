@@ -17273,7 +17273,7 @@ MonoBehaviour:
             bombScaleMultiplier: 1
             preventMidAirInterception: 1
             runtimeBomb:
-              bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
+              bombPrefab: {fileID: 3091458169621715366, guid: 06b8c9c1ab4a5a841906eae34d445191, type: 3}
               explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
               scaleExplosionVfxToDamageRadius: 1
               explosionVfxScaleMultiplier: 3
