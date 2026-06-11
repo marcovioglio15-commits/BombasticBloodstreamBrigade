@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fba8770cc563c014eb59d6e1ec127905
+guid: 681d11aaf046e7e41bb45ac3c67fc78f
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - TT Octosquares Trl
+  - Noctra Drip Solid
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
