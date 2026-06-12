@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -101,17 +102,18 @@ public struct PlayerProjectileDeathVfxScalingState : IComponentData
 }
 
 /// <summary>
-/// Runtime settings for the looping VFX attached to an active player Jetpack.
+/// Runtime settings controlling a designer-authored Jetpack VFX inside the Visual Player hierarchy.
 /// </summary>
 public struct PlayerJetpackVfxConfig : IComponentData
 {
-    public Entity PrefabEntity;
-    public UnityObjectRef<GameObject> SourcePrefab;
-    public float3 SpawnOffset;
-    public float UniformScale;
+    public FixedString128Bytes RuntimeReference;
     public float MovementSpeedThreshold;
     public float RotationSpeedThresholdDegrees;
+    public float SpeedForMaximumScale;
+    public float NormalScaleSpeedPercent;
+    public float ScaleVariationPercent;
     public PlayerJetpackVfxActivationMode ActivationMode;
+    public byte ScaleWithMovementSpeed;
 }
 
 /// <summary>
@@ -132,10 +134,12 @@ public struct PlayerJetpackVfxScalingState : IComponentData
 }
 
 /// <summary>
-/// Stores the previous player rotation required by rotation-based Jetpack VFX activation.
+/// Stores previous rotation plus the desired visibility and authored-scale multiplier consumed by Jetpack VFX presentation.
 /// </summary>
 public struct PlayerJetpackVfxRuntimeState : IComponentData
 {
     public quaternion PreviousRotation;
+    public float DesiredScaleMultiplier;
     public byte Initialized;
+    public byte DesiredVisible;
 }

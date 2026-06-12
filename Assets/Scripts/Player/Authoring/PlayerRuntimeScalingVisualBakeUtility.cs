@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using System;
+using System.Text;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10,7 +11,7 @@ using UnityEditor;
 /// <summary>
 /// Bakes runtime scaling metadata for scalable fields owned by the player visual preset.
 /// </summary>
-internal static class PlayerRuntimeScalingVisualBakeUtility
+public static class PlayerRuntimeScalingVisualBakeUtility
 {
     #region Methods
 
@@ -154,6 +155,27 @@ internal static class PlayerRuntimeScalingVisualBakeUtility
 
             if (!PlayerScalingStatKeyUtility.TryFindPropertyByStatKey(serializedPreset, scalingRule.StatKey, out SerializedProperty property))
                 continue;
+
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                string tokenValue = string.IsNullOrWhiteSpace(property.stringValue)
+                    ? string.Empty
+                    : property.stringValue.Trim();
+
+                if (Encoding.UTF8.GetByteCount(tokenValue) > PlayerWeaponVisualSettings.MaximumReferenceSelectorUtf8Bytes)
+                    continue;
+
+                scalingBuffer.Add(new PlayerRuntimeJetpackVfxScalingElement
+                {
+                    PayloadPath = new FixedString128Bytes(normalizedStatKey.Substring("playerJetpackVfx.".Length)),
+                    ValueType = (byte)PlayerFormulaValueType.Token,
+                    BaseTokenValue = new FixedString128Bytes(tokenValue),
+                    Formula = new FixedString512Bytes(PlayerRuntimeScalingBakeUtility.ResolveStoredFormula(scalingRule.Formula,
+                                                                                                           property,
+                                                                                                           null))
+                });
+                continue;
+            }
 
             if (!PlayerRuntimeScalingBakeUtility.TryResolveScalingBaseMetadata(property,
                                                                               out byte valueType,

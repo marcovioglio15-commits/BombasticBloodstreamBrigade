@@ -547,6 +547,7 @@ public struct PlayerRuntimeJetpackVfxScalingElement : IBufferElementData
     public float BaseValue;
     public byte BaseBooleanValue;
     public byte IsInteger;
+    public FixedString128Bytes BaseTokenValue;
     public FixedString512Bytes Formula;
 }
 

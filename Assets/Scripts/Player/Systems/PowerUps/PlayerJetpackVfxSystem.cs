@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// Queues one keyed looping Jetpack VFX while the configured player activity condition is valid.
+/// Evaluates player activity and publishes the desired visibility and authored-scale multiplier of the Jetpack VFX.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerMovementApplySystem))]
@@ -12,17 +12,17 @@ using Unity.Transforms;
 public partial struct PlayerJetpackVfxSystem : ISystem
 {
     #region Constants
-    private const float LoopRefreshLifetimeSeconds = 0.18f;
-    private const float MinimumScale = 0.01f;
     private const float DeltaTimeEpsilon = 1e-6f;
-    private const int RefreshKeySeed = 1700047;
+    private const float MinimumScaleMultiplier = 0.0001f;
+    private const float ScaleMultiplierChangeEpsilon = 1e-4f;
+    private const float SpeedEpsilon = 1e-5f;
     #endregion
 
     #region Methods
 
     #region Lifecycle
     /// <summary>
-    /// Requires Jetpack VFX settings, activity state, player movement and the shared managed VFX request buffer.
+    /// Requires Jetpack VFX settings, activity state, player movement and transform data.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
@@ -30,11 +30,10 @@ public partial struct PlayerJetpackVfxSystem : ISystem
         state.RequireForUpdate<PlayerJetpackVfxConfig>();
         state.RequireForUpdate<PlayerJetpackVfxRuntimeState>();
         state.RequireForUpdate<PlayerMovementState>();
-        state.RequireForUpdate<PlayerPowerUpVfxSpawnRequest>();
     }
 
     /// <summary>
-    /// Evaluates player movement and rotation activity, then refreshes one stable attached Jetpack VFX instance.
+    /// Evaluates player movement and rotation activity, then updates desired visual visibility and scale only when required.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -44,50 +43,90 @@ public partial struct PlayerJetpackVfxSystem : ISystem
         foreach ((RefRO<PlayerJetpackVfxConfig> jetpackVfxConfig,
                   RefRW<PlayerJetpackVfxRuntimeState> jetpackVfxState,
                   RefRO<PlayerMovementState> movementState,
-                  RefRO<LocalTransform> playerTransform,
-                  DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests,
-                  Entity playerEntity)
+                  RefRO<LocalTransform> playerTransform)
                  in SystemAPI.Query<RefRO<PlayerJetpackVfxConfig>,
                                     RefRW<PlayerJetpackVfxRuntimeState>,
                                     RefRO<PlayerMovementState>,
-                                    RefRO<LocalTransform>,
-                                    DynamicBuffer<PlayerPowerUpVfxSpawnRequest>>().WithEntityAccess())
+                                    RefRO<LocalTransform>>())
         {
             PlayerJetpackVfxConfig config = jetpackVfxConfig.ValueRO;
             PlayerJetpackVfxRuntimeState runtimeState = jetpackVfxState.ValueRO;
             LocalTransform transform = playerTransform.ValueRO;
+            bool stateChanged = false;
             bool usesMovement = UsesMovement(config.ActivationMode);
             bool usesRotation = UsesRotation(config.ActivationMode);
+            float movementSpeedThreshold = math.max(0f, config.MovementSpeedThreshold);
+            float movementSpeedSquared = usesMovement || config.ScaleWithMovementSpeed != 0
+                ? math.lengthsq(movementState.ValueRO.Velocity)
+                : 0f;
             bool isMoving = usesMovement &&
-                            math.lengthsq(movementState.ValueRO.Velocity) >
-                            config.MovementSpeedThreshold * config.MovementSpeedThreshold;
+                            movementSpeedSquared >
+                            movementSpeedThreshold * movementSpeedThreshold;
             bool isRotating = false;
 
             if (usesRotation)
             {
                 isRotating = ResolveIsRotating(transform.Rotation,
                                                deltaTime,
-                                               config.RotationSpeedThresholdDegrees,
+                                               math.max(0f, config.RotationSpeedThresholdDegrees),
                                                ref runtimeState);
-                jetpackVfxState.ValueRW = runtimeState;
+                stateChanged = true;
             }
             else if (runtimeState.Initialized != 0)
             {
                 runtimeState.Initialized = 0;
-                jetpackVfxState.ValueRW = runtimeState;
+                stateChanged = true;
             }
 
-            if (!ShouldDisplay(config.ActivationMode, isMoving, isRotating))
-                continue;
+            byte desiredVisible = config.RuntimeReference.Length > 0 &&
+                                  ShouldDisplay(config.ActivationMode, isMoving, isRotating)
+                ? (byte)1
+                : (byte)0;
 
-            if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
-                continue;
+            if (runtimeState.DesiredVisible != desiredVisible)
+            {
+                runtimeState.DesiredVisible = desiredVisible;
+                stateChanged = true;
+            }
 
-            EnqueueJetpackVfx(playerEntity,
-                              in config,
-                              in transform,
-                              vfxRequests);
+            float desiredScaleMultiplier = ResolveDesiredScaleMultiplier(in config, movementSpeedSquared);
+
+            if (math.abs(runtimeState.DesiredScaleMultiplier - desiredScaleMultiplier) > ScaleMultiplierChangeEpsilon)
+            {
+                runtimeState.DesiredScaleMultiplier = desiredScaleMultiplier;
+                stateChanged = true;
+            }
+
+            if (stateChanged)
+                jetpackVfxState.ValueRW = runtimeState;
         }
+    }
+    #endregion
+
+    #region Scale
+    /// <summary>
+    /// Resolves a multiplier centered on the designer-authored scale at a configured percentage of the custom maximum-size speed.
+    /// </summary>
+    /// <param name="config">Runtime Jetpack VFX behavior settings.</param>
+    /// <param name="movementSpeedSquared">Squared current player movement speed.</param>
+    /// <returns>Positive scale multiplier that can shrink below or grow above the designer-authored scale.</returns>
+    private static float ResolveDesiredScaleMultiplier(in PlayerJetpackVfxConfig config,
+                                                       float movementSpeedSquared)
+    {
+        if (config.ScaleWithMovementSpeed == 0 ||
+            !math.isfinite(movementSpeedSquared) ||
+            movementSpeedSquared < 0f ||
+            !math.isfinite(config.SpeedForMaximumScale) ||
+            config.SpeedForMaximumScale <= SpeedEpsilon ||
+            !math.isfinite(config.NormalScaleSpeedPercent) ||
+            !math.isfinite(config.ScaleVariationPercent) ||
+            config.ScaleVariationPercent <= 0f)
+            return 1f;
+
+        float normalizedSpeed = math.saturate(math.sqrt(movementSpeedSquared) / config.SpeedForMaximumScale);
+        float normalScaleSpeed = math.saturate(config.NormalScaleSpeedPercent * 0.01f);
+        float scaleVariation = math.max(0f, config.ScaleVariationPercent) * 0.01f;
+        return math.max(MinimumScaleMultiplier, 1f + (normalizedSpeed - normalScaleSpeed) * scaleVariation);
     }
     #endregion
 
@@ -168,51 +207,6 @@ public partial struct PlayerJetpackVfxSystem : ISystem
             default:
                 return isMoving;
         }
-    }
-    #endregion
-
-    #region Request Building
-    /// <summary>
-    /// Adds one stable keyed request that follows both the player position and rotation without restarting playback.
-    /// </summary>
-    /// <param name="playerEntity">Player entity followed by the Jetpack VFX.</param>
-    /// <param name="config">Runtime Jetpack VFX settings.</param>
-    /// <param name="playerTransform">Current player transform used for the initial world pose.</param>
-    /// <param name="vfxRequests">Managed VFX request buffer receiving the refresh request.</param>
-    private static void EnqueueJetpackVfx(Entity playerEntity,
-                                          in PlayerJetpackVfxConfig config,
-                                          in LocalTransform playerTransform,
-                                          DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests)
-    {
-        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
-        {
-            PrefabEntity = config.PrefabEntity,
-            SourcePrefab = config.SourcePrefab,
-            Position = playerTransform.Position + math.rotate(playerTransform.Rotation, config.SpawnOffset),
-            Rotation = playerTransform.Rotation,
-            UniformScale = math.max(MinimumScale, config.UniformScale),
-            ParticleSimulationSpeedMultiplier = 1f,
-            LifetimeSeconds = LoopRefreshLifetimeSeconds,
-            FollowTargetEntity = playerEntity,
-            FollowPositionOffset = config.SpawnOffset,
-            FollowValidationEntity = Entity.Null,
-            FollowValidationSpawnVersion = 0u,
-            Velocity = float3.zero,
-            RefreshKey = ResolveRefreshKey(playerEntity),
-            ForceLooping = 1,
-            FollowTargetRotation = 1
-        });
-    }
-
-    /// <summary>
-    /// Builds a stable non-zero refresh key for one player's Jetpack VFX.
-    /// </summary>
-    /// <param name="playerEntity">Player entity owning the Jetpack VFX.</param>
-    /// <returns>Non-zero refresh key scoped to this player.</returns>
-    private static int ResolveRefreshKey(Entity playerEntity)
-    {
-        int refreshKey = RefreshKeySeed + playerEntity.Index * 397 + playerEntity.Version * 31;
-        return refreshKey != 0 ? refreshKey : RefreshKeySeed;
     }
     #endregion
 

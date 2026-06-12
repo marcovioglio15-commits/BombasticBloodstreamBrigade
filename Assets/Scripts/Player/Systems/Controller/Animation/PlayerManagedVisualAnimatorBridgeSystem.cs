@@ -55,6 +55,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         hierarchyTraversalEntities.Clear();
         pendingAnimatorAssignments.Clear();
         pendingRenderVisibilityAssignments.Clear();
+        PlayerManagedVisualBridgeCompanionVfxVisibilityUtility.RestoreAll();
 #if UNITY_EDITOR
         missingPrefabLogCache.Clear();
         missingAnimatorLogCache.Clear();
@@ -179,6 +180,26 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         if (!managedInstance.InstanceObject.activeSelf)
             managedInstance.InstanceObject.SetActive(true);
 
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves the root transform of the runtime-spawned Visual Player instance owned by one player entity.
+    /// </summary>
+    /// <param name="playerEntity">Player entity whose managed Visual Player root should be resolved.</param>
+    /// <param name="rootTransform">Resolved runtime visual root when available.</param>
+    /// <returns>True when a valid runtime Visual Player instance exists.</returns>
+    public static bool TryGetRuntimeBridgeRoot(Entity playerEntity, out Transform rootTransform)
+    {
+        rootTransform = null;
+
+        if (!managedInstances.TryGetValue(playerEntity, out ManagedPlayerVisualInstance managedInstance))
+            return false;
+
+        if (managedInstance == null || managedInstance.InstanceObject == null || managedInstance.RootTransform == null)
+            return false;
+
+        rootTransform = managedInstance.RootTransform;
         return true;
     }
 
@@ -323,6 +344,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         for (int entityIndex = 0; entityIndex < hierarchyTraversalEntities.Count; entityIndex++)
         {
             Entity hierarchyEntity = hierarchyTraversalEntities[entityIndex];
+            PlayerManagedVisualBridgeCompanionVfxVisibilityUtility.SetHidden(entityManager, hierarchyEntity, hidden);
 
             if (!entityManager.HasComponent<MaterialMeshInfo>(hierarchyEntity))
             {
@@ -522,7 +544,11 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
             return;
         }
 
-        Object.Destroy(managedInstance.InstanceObject);
+        if (Application.isPlaying)
+            Object.Destroy(managedInstance.InstanceObject);
+        else
+            Object.DestroyImmediate(managedInstance.InstanceObject);
+
         managedInstance.InstanceObject = null;
         managedInstance.RootTransform = null;
         managedInstance.AnimatorComponent = null;

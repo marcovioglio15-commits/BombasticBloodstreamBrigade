@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -260,54 +262,40 @@ public static class PlayerVisualVfxBakeUtility
     }
 
     /// <summary>
-    /// Builds the optional player-attached Jetpack VFX config from the resolved visual preset.
+    /// Builds runtime visibility and movement-speed scale settings for the designer-authored Jetpack VFX inside the Visual Player.
     /// </summary>
     /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
-    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
-    /// <param name="config">Built ECS config when a Jetpack VFX prefab is assigned.</param>
-    /// <returns>True when the preset contains a Jetpack VFX prefab.</returns>
-    public static bool TryBuildJetpackVfxConfig(PlayerVisualPreset visualPreset,
-                                                Func<GameObject, Entity> resolveDynamicVfxPrefabEntity,
-                                                out PlayerJetpackVfxConfig config)
+    /// <returns>Runtime config containing a safe prefab-relative visual reference, activity thresholds, and scale controls.</returns>
+    public static PlayerJetpackVfxConfig BuildJetpackVfxConfig(PlayerVisualPreset visualPreset)
     {
-        config = default;
         PlayerJetpackVfxSettings settings = visualPreset != null ? visualPreset.PlayerJetpackVfx : null;
 
-        if (settings == null || settings.VfxPrefab == null)
-            return false;
+        if (settings == null)
+            return default;
 
-        GameObject prefab = settings.VfxPrefab;
-        Entity prefabEntity = resolveDynamicVfxPrefabEntity != null ? resolveDynamicVfxPrefabEntity(prefab) : Entity.Null;
-        Vector3 spawnOffset = settings.SpawnOffset;
-
-        config = new PlayerJetpackVfxConfig
+        return new PlayerJetpackVfxConfig
         {
-            PrefabEntity = prefabEntity,
-            SourcePrefab = prefab,
-            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
-            UniformScale = math.max(MinimumScale, settings.ScaleMultiplier),
-            MovementSpeedThreshold = math.max(0f, settings.MovementSpeedThreshold),
-            RotationSpeedThresholdDegrees = math.max(0f, settings.RotationSpeedThresholdDegrees),
-            ActivationMode = ResolveJetpackActivationMode(settings.ActivationMode)
+            RuntimeReference = BuildJetpackRuntimeReference(settings.RuntimeReference),
+            MovementSpeedThreshold = settings.MovementSpeedThreshold,
+            RotationSpeedThresholdDegrees = settings.RotationSpeedThresholdDegrees,
+            SpeedForMaximumScale = settings.SpeedForMaximumScale,
+            NormalScaleSpeedPercent = settings.NormalScaleSpeedPercent,
+            ScaleVariationPercent = settings.ScaleVariationPercent,
+            ActivationMode = ResolveJetpackActivationMode(settings.ActivationMode),
+            ScaleWithMovementSpeed = settings.ScaleWithMovementSpeed ? (byte)1 : (byte)0
         };
-        return true;
     }
 
     /// <summary>
     /// Builds the immutable Jetpack VFX baseline from the unscaled visual preset.
     /// </summary>
     /// <param name="visualPreset">Unscaled source visual preset.</param>
-    /// <param name="resolveDynamicVfxPrefabEntity">Prefab resolver that also registers managed VFX bindings.</param>
     /// <returns>Baseline config used by runtime scaling rebuilds.</returns>
-    public static PlayerBaseJetpackVfxConfig BuildBaseJetpackVfxConfig(PlayerVisualPreset visualPreset,
-                                                                       Func<GameObject, Entity> resolveDynamicVfxPrefabEntity)
+    public static PlayerBaseJetpackVfxConfig BuildBaseJetpackVfxConfig(PlayerVisualPreset visualPreset)
     {
-        TryBuildJetpackVfxConfig(visualPreset,
-                                 resolveDynamicVfxPrefabEntity,
-                                 out PlayerJetpackVfxConfig config);
         return new PlayerBaseJetpackVfxConfig
         {
-            Config = config
+            Config = BuildJetpackVfxConfig(visualPreset)
         };
     }
     #endregion
@@ -413,6 +401,24 @@ public static class PlayerVisualVfxBakeUtility
             default:
                 return PlayerJetpackVfxActivationMode.WhileMoving;
         }
+    }
+
+    /// <summary>
+    /// Builds a safe fixed-string selector for the designer-authored Jetpack VFX object.
+    /// </summary>
+    /// <param name="runtimeReference">Authored prefab-relative path or unique object name.</param>
+    /// <returns>Trimmed selector, or an empty value when the authored reference exceeds runtime capacity.</returns>
+    private static FixedString128Bytes BuildJetpackRuntimeReference(string runtimeReference)
+    {
+        if (string.IsNullOrWhiteSpace(runtimeReference))
+            return default;
+
+        string normalizedReference = runtimeReference.Trim();
+
+        if (Encoding.UTF8.GetByteCount(normalizedReference) > PlayerWeaponVisualSettings.MaximumReferenceSelectorUtf8Bytes)
+            return default;
+
+        return new FixedString128Bytes(normalizedReference);
     }
     #endregion
 

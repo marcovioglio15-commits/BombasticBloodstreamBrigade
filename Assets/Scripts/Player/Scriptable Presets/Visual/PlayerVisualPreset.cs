@@ -230,7 +230,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [SerializeField] private PlayerProjectileDeathVfxSettings projectileDeathVfx = new PlayerProjectileDeathVfxSettings();
 
     [Header("Player Jetpack VFX")]
-    [Tooltip("Optional player-attached looping Jetpack VFX controlled by player movement and rotation activity.")]
+    [Tooltip("Visibility settings for a Jetpack VFX GameObject positioned directly inside the Visual Player hierarchy.")]
     [SerializeField] private PlayerJetpackVfxSettings playerJetpackVfx = new PlayerJetpackVfxSettings();
 
     #region Muzzle Flash VFX
@@ -865,7 +865,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
         healthDamageVignette.Validate(name, "Health Damage Vignette");
         deathAnimation.Validate();
         projectileDeathVfx.Validate(name);
-        playerJetpackVfx.Validate(name);
+        playerJetpackVfx.Validate(runtimeVisualBridgePrefab, name);
     }
     #endregion
 

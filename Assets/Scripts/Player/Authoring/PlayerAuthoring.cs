@@ -590,6 +590,18 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #if UNITY_EDITOR
         PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(sourceVisualPreset, weaponVisualScalingBuffer);
 #endif
+        if (visualPreset != null)
+        {
+            AddComponent(entity, PlayerVisualVfxBakeUtility.BuildJetpackVfxConfig(visualPreset));
+            AddComponent(entity, PlayerVisualVfxBakeUtility.BuildBaseJetpackVfxConfig(sourceVisualPreset));
+            AddComponent(entity, new PlayerJetpackVfxScalingState());
+            AddComponent(entity, new PlayerJetpackVfxRuntimeState());
+            DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> jetpackVfxScalingBuffer = AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(entity);
+#if UNITY_EDITOR
+            PlayerRuntimeScalingVisualBakeUtility.PopulateJetpackVfxScalingMetadata(sourceVisualPreset,
+                                                                                    jetpackVfxScalingBuffer);
+#endif
+        }
 
         // Conditional weapon switches authored in the controller preset are baked into a dedicated ECS table.
         // The dedicated system evaluates the table against the player's scalable stats and writes the winning
@@ -696,7 +708,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
              visualPreset.ChargeShotVfxPrefab != null ||
              visualPreset.PlayerProjectileVfxPrefab != null ||
              (visualPreset.ProjectileDeathVfx != null && visualPreset.ProjectileDeathVfx.HasAnyPrefab) ||
-             (visualPreset.PlayerJetpackVfx != null && visualPreset.PlayerJetpackVfx.VfxPrefab != null) ||
              visualPreset.MuzzleFlashVfxPrefab != null))
         {
             EnsurePowerUpVfxRuntime(authoring,
@@ -761,22 +772,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #if UNITY_EDITOR
                 PlayerRuntimeScalingVisualBakeUtility.PopulateProjectileDeathVfxScalingMetadata(sourceVisualPreset,
                                                                                                 projectileDeathVfxScalingBuffer);
-#endif
-            }
-
-            if (PlayerVisualVfxBakeUtility.TryBuildJetpackVfxConfig(visualPreset,
-                                                                    resolveVisualVfxPrefabEntity,
-                                                                    out PlayerJetpackVfxConfig jetpackVfxConfig))
-            {
-                AddComponent(entity, jetpackVfxConfig);
-                AddComponent(entity, PlayerVisualVfxBakeUtility.BuildBaseJetpackVfxConfig(sourceVisualPreset,
-                                                                                          resolveVisualVfxPrefabEntity));
-                AddComponent(entity, new PlayerJetpackVfxScalingState());
-                AddComponent(entity, new PlayerJetpackVfxRuntimeState());
-                DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> jetpackVfxScalingBuffer = AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(entity);
-#if UNITY_EDITOR
-                PlayerRuntimeScalingVisualBakeUtility.PopulateJetpackVfxScalingMetadata(sourceVisualPreset,
-                                                                                        jetpackVfxScalingBuffer);
 #endif
             }
 

@@ -3,8 +3,7 @@ using Unity.Mathematics;
 
 /// <summary>
 /// This component represents the movement state of a player entity, 
-/// including the desired movement direction, current velocity, 
-/// and digital input states for movement. 
+/// including the desired movement direction, current velocity, and digital input states for movement.
 /// It also includes timing information for input presses and release stabilization, 
 /// allowing for responsive and smooth player movement based on input.
 /// </summary>
