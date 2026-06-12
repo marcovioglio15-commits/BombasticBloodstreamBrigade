@@ -3879,7 +3879,7 @@ MonoBehaviour:
         enableDamagePayload: 1
         damage: 120
         affectAllEnemiesInRadius: 1
-        explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
+        explosionVfxPrefab: {fileID: 6772806930511986391, guid: 530ec3e9a9782ab46bb896d2258bd398, type: 3}
         scaleVfxToRadius: 1
         vfxScaleMultiplier: 2
       dash:
@@ -19967,9 +19967,9 @@ MonoBehaviour:
           enableDamagePayload: 1
           damage: 120
           affectAllEnemiesInRadius: 1
-          explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
+          explosionVfxPrefab: {fileID: 6772806930511986391, guid: 530ec3e9a9782ab46bb896d2258bd398, type: 3}
           scaleVfxToRadius: 1
-          vfxScaleMultiplier: 5
+          vfxScaleMultiplier: 0.1
         dash:
           distance: 6
           directionMode: 0
@@ -42559,8 +42559,9 @@ MonoBehaviour:
           maxAcquisitions: 2
     unreplaceable: 0
   primaryActivePowerUpId: 
-  secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  secondaryActivePowerUpId: ActiveGigaBomb
+  equippedPassivePowerUpIds:
+  - PassiveEnemiesExplodeOnDeath
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
