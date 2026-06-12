@@ -122,7 +122,7 @@ MonoBehaviour:
     finalScaleRatio: 0.08
     evaporationCurve: 0
     sizeMode: 0
-    footprintScaleMultiplier: 0.7
+    footprintScaleMultiplier: 1.5
     fixedWorldSize: {x: 1, y: 1}
     randomSizeVariation: 0.12
     randomRotation: 1

@@ -17274,9 +17274,9 @@ MonoBehaviour:
             preventMidAirInterception: 1
             runtimeBomb:
               bombPrefab: {fileID: 3091458169621715366, guid: 06b8c9c1ab4a5a841906eae34d445191, type: 3}
-              explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
+              explosionVfxPrefab: {fileID: 6772806930511986391, guid: 530ec3e9a9782ab46bb896d2258bd398, type: 3}
               scaleExplosionVfxToDamageRadius: 1
-              explosionVfxScaleMultiplier: 3
+              explosionVfxScaleMultiplier: 0.7
             landingWarning:
               enableLandingWarning: 1
               warningLeadTimeSeconds: 0.75
