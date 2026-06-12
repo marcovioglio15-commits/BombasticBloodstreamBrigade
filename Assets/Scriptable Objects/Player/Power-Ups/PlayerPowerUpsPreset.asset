@@ -173,6 +173,11 @@ MonoBehaviour:
     formula: '[BulletBounces]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: activePowerUps.Array.data[6|powerUpId:ActiveBulletTime].moduleBindings.Array.data[3|moduleId:Module_GhostTrail].overridePayload.ghostTrail.tint.x
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
@@ -25307,7 +25312,7 @@ MonoBehaviour:
           easeOutUnscaledSeconds: 0.18
           easingMode: 1
           emissionIntervalSeconds: 0.1
-          snapshotLifetimeSeconds: 0.35
+          snapshotLifetimeSeconds: 1
           captureScope: 2
           movementDistanceThreshold: 0.04
           rotationAngleThresholdDegrees: 3
