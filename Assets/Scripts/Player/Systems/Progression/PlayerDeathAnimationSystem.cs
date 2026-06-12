@@ -39,7 +39,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
 
     /// <summary>
     /// Resolves the active dying window for the local player entity, updates the animation state, layers the camera
-    /// position/FOV deltas and triggers the despawn VFX + visual bridge hide once the normalized time threshold passes.
+    /// position/FOV deltas and triggers the despawn VFX plus complete player presentation hide once the normalized
+    /// time threshold passes.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -48,6 +49,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
             return;
 
         EntityManager entityManager = state.EntityManager;
+        EntityCommandBuffer commandBuffer = default;
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(true);
@@ -75,6 +77,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
 
             ProcessAnimation(camera,
                              entityManager,
+                             ref commandBuffer,
                              playerEntity,
                              in deathConfig.ValueRO,
                              ref deathState.ValueRW,
@@ -82,6 +85,12 @@ public partial struct PlayerDeathAnimationSystem : ISystem
                              playerPosition,
                              shakePositionOffset,
                              shakeFovDelta);
+        }
+
+        if (commandBuffer.IsCreated)
+        {
+            commandBuffer.Playback(entityManager);
+            commandBuffer.Dispose();
         }
     }
     #endregion
@@ -93,7 +102,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     /// without moving the camera when a fresh idle run starts.
     /// </summary>
     /// <param name="camera">Resolved gameplay camera written by both the shake utility and this system.</param>
-    /// <param name="entityManager">Entity manager used to read the optional managed despawn-VFX prefab reference.</param>
+    /// <param name="entityManager">Entity manager used for the optional managed despawn VFX and projection visibility.</param>
+    /// <param name="commandBuffer">Command buffer receiving orbital projection visibility changes.</param>
     /// <param name="playerEntity">Player entity owning the dying state.</param>
     /// <param name="deathConfig">Resolved death animation config baked from the visual preset.</param>
     /// <param name="deathState">Mutable animation state for feedback-safe layering and one-shot tracking.</param>
@@ -103,6 +113,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     /// <param name="shakeFovDelta">Camera shake FOV delta for this frame, re-layered on top of the zoom.</param>
     private static void ProcessAnimation(Camera camera,
                                           EntityManager entityManager,
+                                          ref EntityCommandBuffer commandBuffer,
                                           Entity playerEntity,
                                           in PlayerDeathAnimationConfig deathConfig,
                                           ref PlayerDeathAnimationState deathState,
@@ -124,14 +135,20 @@ public partial struct PlayerDeathAnimationSystem : ISystem
             if (runOutcomeState.IsFinalized != 0)
                 return;
 
-            ResetAnimationStateForFreshIdle(playerEntity, ref deathState);
+            ResetAnimationStateForFreshIdle(entityManager,
+                                            ref commandBuffer,
+                                            playerEntity,
+                                            ref deathState);
             return;
         }
 
         // Disabled animations skip camera, bridge hide and VFX completely.
         if (deathConfig.Enabled == 0)
         {
-            ResetAnimationStateForFreshIdle(playerEntity, ref deathState);
+            ResetAnimationStateForFreshIdle(entityManager,
+                                            ref commandBuffer,
+                                            playerEntity,
+                                            ref deathState);
             return;
         }
 
@@ -153,6 +170,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
 
         ApplyCameraLayering(camera, in deathConfig, ref deathState, easedCameraTime, playerPosition, shakePositionOffset, shakeFovDelta);
         TrySpawnDespawnVfx(entityManager,
+                           ref commandBuffer,
                            playerEntity,
                            in deathConfig,
                            ref deathState,
@@ -249,14 +267,22 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     /// the VFX handoff. The camera transform is intentionally left untouched so finalized defeats hold the last death
     /// pose until the next run owns the camera again.
     /// </summary>
-    /// <param name="playerEntity">Player entity whose managed bridge may need to be shown again.</param>
+    /// <param name="entityManager">Entity manager used to restore player-owned orbital projection rendering.</param>
+    /// <param name="commandBuffer">Command buffer receiving orbital projection visibility restoration.</param>
+    /// <param name="playerEntity">Player entity whose visual presentation may need to be shown again.</param>
     /// <param name="deathState">Mutable animation state cleared for the next run.</param>
-    private static void ResetAnimationStateForFreshIdle(Entity playerEntity, ref PlayerDeathAnimationState deathState)
+    private static void ResetAnimationStateForFreshIdle(EntityManager entityManager,
+                                                        ref EntityCommandBuffer commandBuffer,
+                                                        Entity playerEntity,
+                                                        ref PlayerDeathAnimationState deathState)
     {
         if (deathState.Active == 0)
         {
             if (deathState.VisualBridgeHidden != 0)
-                RestoreVisualPresentationForEntity(playerEntity, ref deathState);
+                RestoreVisualPresentationForEntity(entityManager,
+                                                   ref commandBuffer,
+                                                   playerEntity,
+                                                   ref deathState);
 
             deathState.CurrentFovDelta = 0f;
             deathState.CurrentPositionOffset = float3.zero;
@@ -269,7 +295,10 @@ public partial struct PlayerDeathAnimationSystem : ISystem
         deathState.VfxSpawned = 0;
 
         if (deathState.VisualBridgeHidden != 0)
-            RestoreVisualPresentationForEntity(playerEntity, ref deathState);
+            RestoreVisualPresentationForEntity(entityManager,
+                                               ref commandBuffer,
+                                               playerEntity,
+                                               ref deathState);
 
         deathState.CurrentFovDelta = 0f;
         deathState.CurrentPositionOffset = float3.zero;
@@ -278,15 +307,25 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     }
 
     /// <summary>
-    /// Re-enables the runtime visual bridge and every player-attached VFX/beam the death animation hid. Used when the
-    /// run-outcome state returns to idle without finalizing so a respawned player keeps its visual presentation intact.
+    /// Re-enables the runtime visual bridge, player-owned orbital projections, and every player-attached VFX/beam the
+    /// death animation hid. Used when the run-outcome state returns to idle without finalizing so a respawned player
+    /// keeps its visual presentation intact.
     /// </summary>
+    /// <param name="entityManager">Entity manager used to restore player-owned orbital projection rendering.</param>
+    /// <param name="commandBuffer">Command buffer receiving orbital projection visibility restoration.</param>
     /// <param name="playerEntity">Player entity whose visual presentation should be restored.</param>
     /// <param name="deathState">Mutable animation state whose visual-bridge-hidden flag must be cleared.</param>
-    private static void RestoreVisualPresentationForEntity(Entity playerEntity, ref PlayerDeathAnimationState deathState)
+    private static void RestoreVisualPresentationForEntity(EntityManager entityManager,
+                                                           ref EntityCommandBuffer commandBuffer,
+                                                           Entity playerEntity,
+                                                           ref PlayerDeathAnimationState deathState)
     {
         PlayerManagedVisualAnimatorBridgeSystem.TryShowRuntimeBridgeInstance(playerEntity);
         PlayerPowerUpManagedVfxRuntimeUtility.ShowPlayerAttachedInstances(playerEntity);
+        PlayerOrbitalProjectionDeathVisibilityRuntimeUtility.SetPlayerOwnedRenderingHidden(entityManager,
+                                                                                           ref commandBuffer,
+                                                                                           playerEntity,
+                                                                                           false);
         deathState.VisualBridgeHidden = 0;
     }
     #endregion
@@ -297,18 +336,20 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     /// the runtime visual bridge on the same frame when the preset asks for it. Both operations are guarded by one-shot
     /// flags so they only fire once per run even though the system runs every frame.
     /// </summary>
-    /// <param name="entityManager">Entity manager used to read the optional managed despawn VFX prefab reference.</param>
+    /// <param name="entityManager">Entity manager used for the optional managed despawn VFX and projection visibility.</param>
+    /// <param name="commandBuffer">Command buffer receiving orbital projection visibility suppression.</param>
     /// <param name="playerEntity">Player entity owning the death animation state.</param>
     /// <param name="deathConfig">Resolved death animation config providing the spawn threshold and VFX tuning.</param>
     /// <param name="deathState">Mutable animation state tracking the one-shot spawn and bridge-hide flags.</param>
     /// <param name="normalizedTime">Animation parametric time in the [0..1] range.</param>
     /// <param name="playerPosition">Resolved player world position used as the spawn anchor.</param>
     private static void TrySpawnDespawnVfx(EntityManager entityManager,
-                                            Entity playerEntity,
-                                            in PlayerDeathAnimationConfig deathConfig,
-                                            ref PlayerDeathAnimationState deathState,
-                                            float normalizedTime,
-                                            float3 playerPosition)
+                                           ref EntityCommandBuffer commandBuffer,
+                                           Entity playerEntity,
+                                           in PlayerDeathAnimationConfig deathConfig,
+                                           ref PlayerDeathAnimationState deathState,
+                                           float normalizedTime,
+                                           float3 playerPosition)
     {
         if (deathState.VfxSpawned != 0)
             return;
@@ -319,16 +360,20 @@ public partial struct PlayerDeathAnimationSystem : ISystem
         // Visual bridge hide can happen even when no VFX is authored, as long as the preset asks for it. Treat it as a
         // sibling one-shot so designers can hide the player rig at the spawn-time threshold regardless of VFX presence.
         // Same frame also hides every player-attached VFX (Charge Shot, Level-Up, Health/Shield Increase, Muzzle Flash
-        // follow-pose, Elemental Trail attached, Laser Beam managed visual) and stops the aiming pointer draw so the
-        // despawn effect plays against a clean stage instead of a halo of floating effects around the invisible rig.
-        // The VFX/beam/pointer suppression is gated by VisualBridgeHidden so it fires once per run even when no managed
-        // bridge instance exists (e.g. Animator companion mode): the toggle is what matters, not whether the bridge
-        // call succeeded.
+        // follow-pose, Elemental Trail attached, Laser Beam managed visual), player-owned orbital projection hierarchy,
+        // and aiming pointer so the despawn effect plays against a clean stage instead of a halo around the invisible
+        // rig. This suppression is gated by VisualBridgeHidden so it fires once per run even when no managed bridge
+        // instance exists (e.g. Animator companion mode): the toggle is what matters, not whether the bridge call
+        // succeeded.
         if (deathConfig.HidePlayerVisualOnVfxSpawn != 0 && deathState.VisualBridgeHidden == 0)
         {
             PlayerManagedVisualAnimatorBridgeSystem.TryHideRuntimeBridgeInstance(playerEntity);
             PlayerPowerUpManagedVfxRuntimeUtility.HidePlayerAttachedInstances(playerEntity);
             PlayerLaserBeamPresentationSystem.TryHideManagedInstance(playerEntity);
+            PlayerOrbitalProjectionDeathVisibilityRuntimeUtility.SetPlayerOwnedRenderingHidden(entityManager,
+                                                                                               ref commandBuffer,
+                                                                                               playerEntity,
+                                                                                               true);
             deathState.VisualBridgeHidden = 1;
         }
 

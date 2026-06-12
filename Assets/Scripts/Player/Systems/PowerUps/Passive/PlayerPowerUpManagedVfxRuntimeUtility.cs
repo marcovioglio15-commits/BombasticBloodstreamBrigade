@@ -22,7 +22,6 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
     #endregion
 
     #region Methods
-
     #region Public Methods
     /// <summary>
     /// Number of currently active managed VFX instances.
@@ -314,6 +313,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.Position = request.Position;
         instance.Rotation = request.Rotation;
         instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
+        instance.FollowTargetRotation = request.FollowTargetRotation != 0;
         instance.DetachWhenFollowTargetInvalid = request.DetachWhenFollowTargetInvalid != 0;
         instance.KeepAliveWhileFollowTargetValid = request.KeepAliveWhileFollowTargetValid != 0;
         instance.RestartOldestOnCap = request.RestartOldestOnCap != 0;
@@ -363,7 +363,7 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
             if (!TryResolveFollowPose(entityManager, instance, out targetPosition, out targetRotation))
                 return false;
 
-            if (instance.FollowMuzzlePose)
+            if (instance.FollowMuzzlePose || instance.FollowTargetRotation)
             {
                 instance.Position = targetPosition + math.rotate(targetRotation, instance.FollowPositionOffset);
                 instance.Rotation = targetRotation;
@@ -467,9 +467,9 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.FollowValidationEntity = Entity.Null;
         instance.FollowValidationSpawnVersion = 0u;
         instance.FollowMuzzlePose = false;
+        instance.FollowTargetRotation = false;
         instance.DetachWhenFollowTargetInvalid = false;
         instance.KeepAliveWhileFollowTargetValid = false;
-
         // Stop emission so the trail fades from the last pose, then keep the instance alive long enough to finish fading.
         float longestTrailTime = PlayerPowerUpManagedVfxPresentationUtility.StopEmissionForDetach(instance);
         instance.RemainingSeconds = math.max(instance.RemainingSeconds, longestTrailTime);
@@ -598,13 +598,14 @@ public static class PlayerPowerUpManagedVfxRuntimeUtility
         instance.Position = request.Position;
         instance.Rotation = request.Rotation;
         instance.FollowMuzzlePose = request.FollowMuzzlePose != 0;
+        instance.FollowTargetRotation = request.FollowTargetRotation != 0;
         instance.DetachWhenFollowTargetInvalid = request.DetachWhenFollowTargetInvalid != 0;
         instance.KeepAliveWhileFollowTargetValid = request.KeepAliveWhileFollowTargetValid != 0;
 
-        PlayerPowerUpManagedVfxPresentationUtility.ApplyTrailRendererSettings(instance,
-                                                                               math.max(MinimumScale, request.UniformScale),
-                                                                               request.TrailRendererWidthOverride,
-                                                                               request.TrailRendererTimeOverrideSeconds);
+        PlayerPowerUpManagedVfxPresentationUtility.ApplyScaleAndTrailSettings(instance,
+                                                                              math.max(MinimumScale, request.UniformScale),
+                                                                              request.TrailRendererWidthOverride,
+                                                                              request.TrailRendererTimeOverrideSeconds);
         PlayerPowerUpManagedVfxPresentationUtility.ApplyParticleSystemRuntimeSettings(instance,
                                                                                       request.ParticleSimulationSpeedMultiplier,
                                                                                       request.ForceLooping != 0,

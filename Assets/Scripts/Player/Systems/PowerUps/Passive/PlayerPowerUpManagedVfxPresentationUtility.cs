@@ -51,8 +51,7 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
                                            secondaryColorOverride,
                                            colorOverrideCount,
                                            colorOverrideChildName);
-        instanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
-        ApplyTrailRendererSettings(instance,
+        ApplyScaleAndTrailSettings(instance,
                                    uniformScale,
                                    trailRendererWidthOverride,
                                    trailRendererTimeOverrideSeconds);
@@ -82,6 +81,25 @@ internal static class PlayerPowerUpManagedVfxPresentationUtility
         Transform instanceTransform = instance.InstanceTransform;
         instanceTransform.position = ToVector3(position);
         instanceTransform.rotation = ToQuaternion(rotation);
+    }
+
+    /// <summary>
+    /// Applies root scale and trail dimensions without restarting active playback.
+    /// </summary>
+    /// <param name="instance">Managed VFX instance receiving refreshed scale settings.</param>
+    /// <param name="uniformScale">Uniform multiplier applied over the authored root scale.</param>
+    /// <param name="trailRendererWidthOverride">Positive world-space trail width override, or zero to preserve authored scaling.</param>
+    /// <param name="trailRendererTimeOverrideSeconds">Positive trail history time override, or zero to preserve authored retention.</param>
+    public static void ApplyScaleAndTrailSettings(PlayerPowerUpManagedVfxInstance instance,
+                                                  float uniformScale,
+                                                  float trailRendererWidthOverride,
+                                                  float trailRendererTimeOverrideSeconds)
+    {
+        instance.InstanceTransform.localScale = ScaleVector(instance.RootBaseLocalScale, uniformScale);
+        ApplyTrailRendererSettings(instance,
+                                   uniformScale,
+                                   trailRendererWidthOverride,
+                                   trailRendererTimeOverrideSeconds);
     }
 
     /// <summary>

@@ -526,6 +526,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                                                      "Muzzle Flash VFX Lifetime",
                                                                      "Lifetime in seconds before the Muzzle Flash VFX instance despawns. Use short values for a brief flash.");
         VisualElement projectileDeathVfxFoldout = PlayerVisualPresetsPanelProjectileDeathVfxSectionUtility.Build(panel);
+        VisualElement playerJetpackVfxFoldout = PlayerVisualPresetsPanelJetpackVfxSectionUtility.Build(panel);
 
         container.Add(powerUpsVfxFoldout);
         container.Add(levelUpVfxFoldout);
@@ -534,6 +535,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         container.Add(chargeShotVfxFoldout);
         container.Add(playerProjectileVfxFoldout);
         container.Add(projectileDeathVfxFoldout);
+        container.Add(playerJetpackVfxFoldout);
         container.Add(muzzleFlashVfxFoldout);
 
         AddPropertyField(panel,

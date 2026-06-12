@@ -229,6 +229,10 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("One-shot VFX settings used when player projectiles expire without a previous enemy hit or terminate on a wall without bouncing.")]
     [SerializeField] private PlayerProjectileDeathVfxSettings projectileDeathVfx = new PlayerProjectileDeathVfxSettings();
 
+    [Header("Player Jetpack VFX")]
+    [Tooltip("Optional player-attached looping Jetpack VFX controlled by player movement and rotation activity.")]
+    [SerializeField] private PlayerJetpackVfxSettings playerJetpackVfx = new PlayerJetpackVfxSettings();
+
     #region Muzzle Flash VFX
     [Tooltip("Optional one-shot VFX prefab spawned at the projectile origin every time the player fires a shot.")]
     [SerializeField] private GameObject muzzleFlashVfxPrefab;
@@ -650,6 +654,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public PlayerJetpackVfxSettings PlayerJetpackVfx
+    {
+        get
+        {
+            return playerJetpackVfx;
+        }
+    }
+
     public GameObject MuzzleFlashVfxPrefab
     {
         get
@@ -841,6 +853,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (projectileDeathVfx == null)
             projectileDeathVfx = new PlayerProjectileDeathVfxSettings();
 
+        if (playerJetpackVfx == null)
+            playerJetpackVfx = new PlayerJetpackVfxSettings();
+
         outline.Validate();
         weaponVisuals.Validate(runtimeVisualBridgePrefab, name);
         laserBeam.Validate();
@@ -850,6 +865,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
         healthDamageVignette.Validate(name, "Health Damage Vignette");
         deathAnimation.Validate();
         projectileDeathVfx.Validate(name);
+        playerJetpackVfx.Validate(name);
     }
     #endregion
 

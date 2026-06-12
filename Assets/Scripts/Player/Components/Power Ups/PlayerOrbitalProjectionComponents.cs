@@ -95,6 +95,16 @@ public struct PlayerOrbitalProjectionInstance : IComponentData
 }
 
 /// <summary>
+/// Tracks render entities suppressed together with their owning player's death animation. The previous rendering
+/// state is preserved so fresh-run restoration never exposes a projection renderer hidden by another presentation
+/// feature before the death-animation handoff.
+/// </summary>
+public struct PlayerOrbitalProjectionDeathVisibilityState : IComponentData
+{
+    public byte WasRenderingDisabled;
+}
+
+/// <summary>
 /// Per-enemy contact cooldown tracked by one orbital projection.
 /// </summary>
 [InternalBufferCapacity(0)]

@@ -99,3 +99,43 @@ public struct PlayerProjectileDeathVfxScalingState : IComponentData
     public uint LastScalableStatsHash;
     public byte Initialized;
 }
+
+/// <summary>
+/// Runtime settings for the looping VFX attached to an active player Jetpack.
+/// </summary>
+public struct PlayerJetpackVfxConfig : IComponentData
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float MovementSpeedThreshold;
+    public float RotationSpeedThresholdDegrees;
+    public PlayerJetpackVfxActivationMode ActivationMode;
+}
+
+/// <summary>
+/// Immutable Jetpack VFX baseline used to rebuild runtime-scaled settings.
+/// </summary>
+public struct PlayerBaseJetpackVfxConfig : IComponentData
+{
+    public PlayerJetpackVfxConfig Config;
+}
+
+/// <summary>
+/// Tracks the shared runtime scaling hash last applied to Jetpack VFX settings.
+/// </summary>
+public struct PlayerJetpackVfxScalingState : IComponentData
+{
+    public uint LastScalableStatsHash;
+    public byte Initialized;
+}
+
+/// <summary>
+/// Stores the previous player rotation required by rotation-based Jetpack VFX activation.
+/// </summary>
+public struct PlayerJetpackVfxRuntimeState : IComponentData
+{
+    public quaternion PreviousRotation;
+    public byte Initialized;
+}

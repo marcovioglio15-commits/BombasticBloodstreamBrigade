@@ -66,6 +66,7 @@ internal static class PlayerPowerUpManagedVfxInstanceUtility
         instance.HasFollowTarget = false;
         instance.HasVelocity = false;
         instance.FollowMuzzlePose = false;
+        instance.FollowTargetRotation = false;
         instance.DetachWhenFollowTargetInvalid = false;
         instance.KeepAliveWhileFollowTargetValid = false;
         instance.RestartOldestOnCap = false;

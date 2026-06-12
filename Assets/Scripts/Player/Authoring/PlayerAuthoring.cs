@@ -696,6 +696,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
              visualPreset.ChargeShotVfxPrefab != null ||
              visualPreset.PlayerProjectileVfxPrefab != null ||
              (visualPreset.ProjectileDeathVfx != null && visualPreset.ProjectileDeathVfx.HasAnyPrefab) ||
+             (visualPreset.PlayerJetpackVfx != null && visualPreset.PlayerJetpackVfx.VfxPrefab != null) ||
              visualPreset.MuzzleFlashVfxPrefab != null))
         {
             EnsurePowerUpVfxRuntime(authoring,
@@ -760,6 +761,22 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #if UNITY_EDITOR
                 PlayerRuntimeScalingVisualBakeUtility.PopulateProjectileDeathVfxScalingMetadata(sourceVisualPreset,
                                                                                                 projectileDeathVfxScalingBuffer);
+#endif
+            }
+
+            if (PlayerVisualVfxBakeUtility.TryBuildJetpackVfxConfig(visualPreset,
+                                                                    resolveVisualVfxPrefabEntity,
+                                                                    out PlayerJetpackVfxConfig jetpackVfxConfig))
+            {
+                AddComponent(entity, jetpackVfxConfig);
+                AddComponent(entity, PlayerVisualVfxBakeUtility.BuildBaseJetpackVfxConfig(sourceVisualPreset,
+                                                                                          resolveVisualVfxPrefabEntity));
+                AddComponent(entity, new PlayerJetpackVfxScalingState());
+                AddComponent(entity, new PlayerJetpackVfxRuntimeState());
+                DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> jetpackVfxScalingBuffer = AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(entity);
+#if UNITY_EDITOR
+                PlayerRuntimeScalingVisualBakeUtility.PopulateJetpackVfxScalingMetadata(sourceVisualPreset,
+                                                                                        jetpackVfxScalingBuffer);
 #endif
             }
 

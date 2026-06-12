@@ -533,6 +533,7 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public byte ColorOverrideCount;
     public FixedString64Bytes ColorOverrideChildName;
     public byte FollowMuzzlePose;
+    public byte FollowTargetRotation;
 }
 
 /// <summary>
