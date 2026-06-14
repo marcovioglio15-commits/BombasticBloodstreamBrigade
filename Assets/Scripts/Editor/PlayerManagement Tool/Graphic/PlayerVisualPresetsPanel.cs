@@ -706,7 +706,8 @@ public sealed class PlayerVisualPresetsPanel
         DamageFeedback = 3,
         PowerUpVfx = 4,
         VisualPointer = 5,
-        DeathAnimation = 6
+        DeathAnimation = 6,
+        HealthBars = 7
     }
 
     internal sealed class VisualSubSectionTabEntry

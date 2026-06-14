@@ -28,10 +28,14 @@
     <type fullname="PlayerAnimationBindingsPreset" preserve="all" />
     <type fullname="PlayerControllerPreset" preserve="all" />
     <type fullname="PlayerDroppedPowerUpContainerView" preserve="all" />
+    <type fullname="PlayerHealthBarsHudView" preserve="all" />
     <type fullname="PlayerLaserBeamVisualRigAuthoring" preserve="all" />
     <type fullname="PlayerMasterPreset" preserve="all" />
     <type fullname="PlayerPowerUpsPreset" preserve="all" />
     <type fullname="PlayerProgressionPreset" preserve="all" />
+    <type fullname="PlayerSyringeBarGraphic" preserve="all" />
+    <type fullname="PlayerSyringeBarLabelPool" preserve="all" />
+    <type fullname="PlayerSyringeBarView" preserve="all" />
     <type fullname="PlayerVisualMuzzleAnchor" preserve="all" />
     <type fullname="PlayerVisualPreset" preserve="all" />
     <type fullname="PlayerWeaponVisualSet" preserve="all" />
@@ -157,6 +161,7 @@
     <type fullname="PlayerDeathAnimationEasing" preserve="nothing" serialized="true" />
     <type fullname="PlayerDeathAnimationSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerGamePhaseDefinition" preserve="nothing" serialized="true" />
+    <type fullname="PlayerHealthBarsVisualSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerHealthStatisticsSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerJetpackVfxSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerLaserBeamVisualPresetDefinition" preserve="nothing" serialized="true" />
@@ -172,6 +177,11 @@
     <type fullname="PlayerProjectileDeathVfxSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerScalableStatDefinition" preserve="nothing" serialized="true" />
     <type fullname="PlayerStatScalingRule" preserve="nothing" serialized="true" />
+    <type fullname="PlayerSyringeChannelSettings" preserve="nothing" serialized="true" />
+    <type fullname="PlayerSyringeFluidSettings" preserve="nothing" serialized="true" />
+    <type fullname="PlayerSyringeMotionSettings" preserve="nothing" serialized="true" />
+    <type fullname="PlayerSyringePaintDripSettings" preserve="nothing" serialized="true" />
+    <type fullname="PlayerSyringePaletteSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerUpperBodyAnimationClipSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerVisualDamageVignetteSettings" preserve="nothing" serialized="true" />
     <type fullname="PlayerVisualOutlineSettings" preserve="nothing" serialized="true" />

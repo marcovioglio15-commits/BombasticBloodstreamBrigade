@@ -1177,34 +1177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19f6ac8c9ec34d06af8f3d47abf8cb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
-  playerHealthFillImage: {fileID: 1174546171}
-  healthBarSmoothingSeconds: 0.5
-  hideHealthBarWhenPlayerMissing: 1
-  healthBarPresentation:
-    enableLiquidShader: 1
-    liquidMaterialTemplate: {fileID: 2100000, guid: 55da0816779075643baf27fa78a3fbfc, type: 2}
-    enablePiston: 1
-    pistonRoot: {fileID: 1174546170}
-    pistonLocalOffsetX: 0
-    pistonLocalOffsetY: 0
-    enableValueDeltaMotion: 1
-    deltaTriggerThreshold: 0.0075
-    deltaMotionStrength: 1.2
-    deltaMotionDecaySeconds: 0.42
-  playerShieldFillImage: {fileID: 1174546169}
-  shieldBarSmoothingSeconds: 0.5
-  hideShieldBarWhenPlayerMissing: 1
-  shieldBarPresentation:
-    enableLiquidShader: 1
-    liquidMaterialTemplate: {fileID: 2100000, guid: ecc13e2c9d4eb504bbf82abf44cacf0e, type: 2}
-    enablePiston: 1
-    pistonRoot: {fileID: 1174546168}
-    pistonLocalOffsetX: 0
-    pistonLocalOffsetY: 0
-    enableValueDeltaMotion: 1
-    deltaTriggerThreshold: 0.0065
-    deltaMotionStrength: 1.15
-    deltaMotionDecaySeconds: 0.38
+  playerHealthBarsView: {fileID: 1174546168}
   playerLevelText: {fileID: 1174546166}
   hideLevelTextWhenPlayerMissing: 1
   playerExperienceFillImage: {fileID: 1174546167}
@@ -1534,20 +1507,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 677397542}
     m_Modifications:
     - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 154355460403744660, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2191069896669885205, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_Pivot.x
@@ -1575,11 +1552,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2191069896669885205, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 300
+      value: 301.71
       objectReference: {fileID: 0}
     - target: {fileID: 2191069896669885205, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 150
+      value: 188.05
       objectReference: {fileID: 0}
     - target: {fileID: 2191069896669885205, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1633,54 +1610,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerBars VerticalBox
       objectReference: {fileID: 0}
-    - target: {fileID: 4647648611489543653, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4647648611489543653, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4647648611489543653, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4647648611489543653, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5398596318826276677, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_margin.x
-      value: -6.9726677
-      objectReference: {fileID: 0}
-    - target: {fileID: 5398596318826276677, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
-    - target: {fileID: 5398596318826276677, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: 3172050056534276195, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
-    - target: {fileID: 5398596318826276677, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6644218008990795433, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6644218008990795433, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6644218008990795433, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6644218008990795433, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1708,38 +1637,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
---- !u!224 &1174546168 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 847127031364314213, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-  m_PrefabInstance: {fileID: 1174546165}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1174546169 stripped
+--- !u!114 &1174546168 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8761032113145335633, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+  m_CorrespondingSourceObject: {fileID: 1712181665942363567, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
   m_PrefabInstance: {fileID: 1174546165}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 3de4dbaf60c505a43886782428d581f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
---- !u!224 &1174546170 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 2722471869194234300, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-  m_PrefabInstance: {fileID: 1174546165}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1174546171 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6032359005509178355, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
-  m_PrefabInstance: {fileID: 1174546165}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthBarsHudView
 --- !u!1 &1291330509
 GameObject:
   m_ObjectHideFlags: 0

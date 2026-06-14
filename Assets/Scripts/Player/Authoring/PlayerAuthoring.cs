@@ -603,6 +603,28 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #endif
         }
 
+        // Keep the large visual payload off the already dense player archetype. The player retains only a stable
+        // reference, while the companion entity owns runtime/base configs and formula metadata.
+        Entity healthBarVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                              false,
+                                                              "Player Health Bar Visual Configuration");
+        AddComponent(entity, new PlayerHealthBarVisualReference
+        {
+            ConfigEntity = healthBarVisualEntity
+        });
+        AddComponent(healthBarVisualEntity, new PlayerHealthBarVisualOwner
+        {
+            PlayerEntity = entity
+        });
+        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildConfig(visualPreset));
+        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(healthBarVisualEntity, new PlayerHealthBarVisualScalingState());
+        DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> healthBarVisualScalingBuffer = AddBuffer<PlayerRuntimeHealthBarVisualScalingElement>(healthBarVisualEntity);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(sourceVisualPreset,
+                                                                                     healthBarVisualScalingBuffer);
+#endif
+
         // Conditional weapon switches authored in the controller preset are baked into a dedicated ECS table.
         // The dedicated system evaluates the table against the player's scalable stats and writes the winning
         // entry into PlayerConditionalWeaponSwitchState so the animator presentation pipeline can override the

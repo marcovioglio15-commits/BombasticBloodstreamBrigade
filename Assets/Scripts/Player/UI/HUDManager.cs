@@ -12,33 +12,9 @@ public sealed class HUDManager : MonoBehaviour
     #region Fields
 
     #region Serialized Fields
-    [Header("Health")]
-    [Tooltip("UI Image used as fillable health bar. Fill method should be Horizontal or Radial.")]
-    [SerializeField] private Image playerHealthFillImage;
-
-    [Tooltip("Seconds used to smooth visual fill transitions. Set 0 for immediate updates.")]
-    [SerializeField] private float healthBarSmoothingSeconds = 0.08f;
-
-    [Tooltip("Hide health bar image when no player entity with PlayerHealth is available.")]
-    [SerializeField] private bool hideHealthBarWhenPlayerMissing = true;
-
-    [Header("Health Visual FX")]
-    [Tooltip("Optional fluid-shader and syringe-plunger presentation settings for the health bar.")]
-    [SerializeField] private HUDLiquidBarPresentationSettings healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
-
-    [Header("Shield")]
-    [Tooltip("UI Image used as fillable shield bar. Fill method should be Horizontal or Radial.")]
-    [SerializeField] private Image playerShieldFillImage;
-
-    [Tooltip("Seconds used to smooth visual shield fill transitions. Set 0 for immediate updates.")]
-    [SerializeField] private float shieldBarSmoothingSeconds = 0.08f;
-
-    [Tooltip("Hide shield bar image when no player entity with PlayerShield is available.")]
-    [SerializeField] private bool hideShieldBarWhenPlayerMissing = true;
-
-    [Header("Shield Visual FX")]
-    [Tooltip("Optional fluid-shader and syringe-plunger presentation settings for the shield bar.")]
-    [SerializeField] private HUDLiquidBarPresentationSettings shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
+    [Header("Health and Shield")]
+    [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, movement, and Player Visual Preset configuration.")]
+    [SerializeField] private PlayerHealthBarsHudView playerHealthBarsView;
 
     [Header("Level & Experience")]
     [Tooltip("UI Text used to display the current player level.")]
@@ -131,16 +107,10 @@ public sealed class HUDManager : MonoBehaviour
     private EntityQuery playerQuery;
     private bool playerQueryInitialized;
     private Entity cachedPlayerEntity;
-    private bool shieldCanvasWarningIssued;
     private int displayedPlayerLevel = -1;
-    private float displayedHealthNormalized = 1f;
-    private float displayedShieldNormalized;
     private float displayedExperienceNormalized;
     private HUDPowerUpOverlaySection powerUpOverlaySection;
-    private HUDLiquidBarRuntime healthBarRuntime;
-    private HUDLiquidBarRuntime shieldBarRuntime;
     private HUDLiquidBarRuntime experienceBarRuntime;
-    private GameObject shieldBarRootObject;
     #endregion
 
     #region Methods
@@ -149,9 +119,11 @@ public sealed class HUDManager : MonoBehaviour
     private void Awake()
     {
         ClampSettings();
-        EnsureCoreBarPresentationSettings();
-        ValidateShieldOverlayBinding();
-        EnsureCoreBarVisualsInitialized();
+        EnsureExperienceBarVisualInitialized();
+
+        if (playerHealthBarsView != null)
+            playerHealthBarsView.Initialize();
+
         powerUpOverlaySection = new HUDPowerUpOverlaySection(primaryPowerUpIconImage,
                                                              secondaryPowerUpIconImage,
                                                              primaryPowerUpSlotRootObject,
@@ -177,15 +149,18 @@ public sealed class HUDManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        DisposeCoreBarVisuals();
+        if (playerHealthBarsView != null)
+            playerHealthBarsView.Dispose();
+
+        if (experienceBarRuntime != null)
+            experienceBarRuntime.Dispose();
+
         milestoneSelectionSection.Dispose();
         powerUpContainerInteractionSection.Dispose();
     }
 
     private void Update()
     {
-        EnsureCoreBarVisualsInitialized();
-
         if (!TryInitializeEcsBindings())
         {
             HandleMissingPlayer();
@@ -199,8 +174,10 @@ public sealed class HUDManager : MonoBehaviour
         }
 
         bool snapCoreBars = ShouldSnapCoreBars(playerEntity);
-        UpdateHealthBar(playerEntity, snapCoreBars);
-        UpdateShieldBar(playerEntity, snapCoreBars);
+
+        if (playerHealthBarsView != null)
+            playerHealthBarsView.UpdateView(entityManager, playerEntity, snapCoreBars);
+
         UpdateLevelAndExperience(playerEntity);
         powerUpOverlaySection.Update(entityManager, playerEntity);
         runTimerSection.Update(entityManager, playerEntity);
@@ -292,63 +269,6 @@ public sealed class HUDManager : MonoBehaviour
     #endregion
 
     #region Bars
-    private void UpdateHealthBar(Entity playerEntity, bool snapImmediately)
-    {
-        if (healthBarRuntime == null)
-            return;
-
-        if (!entityManager.HasComponent<PlayerHealth>(playerEntity))
-        {
-            HandleMissingHealthBar();
-            return;
-        }
-
-        PlayerHealth playerHealth = entityManager.GetComponentData<PlayerHealth>(playerEntity);
-        float targetNormalizedValue = 0f;
-
-        if (playerHealth.Max > 0f)
-            targetNormalizedValue = Mathf.Clamp01(playerHealth.Current / playerHealth.Max);
-
-        UpdateManagedBar(healthBarRuntime,
-                         ref displayedHealthNormalized,
-                         targetNormalizedValue,
-                         snapImmediately,
-                         healthBarSmoothingSeconds);
-    }
-
-    private void UpdateShieldBar(Entity playerEntity, bool snapImmediately)
-    {
-        if (shieldBarRuntime == null)
-            return;
-
-        if (!entityManager.HasComponent<PlayerShield>(playerEntity))
-        {
-            HandleMissingShieldBar();
-            return;
-        }
-
-        PlayerShield playerShield = entityManager.GetComponentData<PlayerShield>(playerEntity);
-
-        if (playerShield.Max <= 0f)
-        {
-            displayedShieldNormalized = 0f;
-            HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
-            shieldBarRuntime.HandleMissing(true, displayedShieldNormalized);
-            return;
-        }
-
-        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, true);
-        float targetNormalizedValue = 0f;
-
-        targetNormalizedValue = Mathf.Clamp01(playerShield.Current / playerShield.Max);
-
-        UpdateManagedBar(shieldBarRuntime,
-                         ref displayedShieldNormalized,
-                         targetNormalizedValue,
-                         snapImmediately,
-                         shieldBarSmoothingSeconds);
-    }
-
     /// <summary>
     /// Updates the player level text and experience progress bar from ECS progression data.
     /// </summary>
@@ -422,17 +342,11 @@ public sealed class HUDManager : MonoBehaviour
     #region Helpers
     private void ClampSettings()
     {
-        if (healthBarSmoothingSeconds < 0f)
-            healthBarSmoothingSeconds = 0f;
-
         if (energyBarSmoothingSeconds < 0f)
             energyBarSmoothingSeconds = 0f;
 
         if (chargeBarSmoothingSeconds < 0f)
             chargeBarSmoothingSeconds = 0f;
-
-        if (shieldBarSmoothingSeconds < 0f)
-            shieldBarSmoothingSeconds = 0f;
 
         if (experienceBarSmoothingSeconds < 0f)
             experienceBarSmoothingSeconds = 0f;
@@ -440,13 +354,7 @@ public sealed class HUDManager : MonoBehaviour
 
     private void ApplyInitialVisualState()
     {
-        EnsureCoreBarVisualsInitialized();
-
-        if (healthBarRuntime != null)
-            healthBarRuntime.ApplyInitialVisualState(displayedHealthNormalized);
-
-        if (shieldBarRuntime != null)
-            shieldBarRuntime.ApplyInitialVisualState(displayedShieldNormalized);
+        EnsureExperienceBarVisualInitialized();
 
         if (experienceBarRuntime != null)
             experienceBarRuntime.ApplyInitialVisualState(displayedExperienceNormalized);
@@ -466,8 +374,9 @@ public sealed class HUDManager : MonoBehaviour
 
     private void HandleMissingPlayer()
     {
-        HandleMissingHealthBar();
-        HandleMissingShieldBar();
+        if (playerHealthBarsView != null)
+            playerHealthBarsView.HandleMissingPlayer();
+
         HandleMissingLevelText();
         HandleMissingExperienceBar();
         powerUpOverlaySection.HandleMissingPlayer();
@@ -476,23 +385,6 @@ public sealed class HUDManager : MonoBehaviour
         milestoneSelectionSection.HandleMissingPlayer();
         powerUpContainerInteractionSection.HandleMissingPlayer();
         damageVignetteSection.HandleMissingPlayer();
-    }
-
-    private void HandleMissingHealthBar()
-    {
-        if (healthBarRuntime == null)
-            return;
-
-        healthBarRuntime.HandleMissing(hideHealthBarWhenPlayerMissing, displayedHealthNormalized);
-    }
-
-    private void HandleMissingShieldBar()
-    {
-        if (shieldBarRuntime == null)
-            return;
-
-        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, !hideShieldBarWhenPlayerMissing);
-        shieldBarRuntime.HandleMissing(hideShieldBarWhenPlayerMissing, displayedShieldNormalized);
     }
 
     /// <summary>
@@ -527,27 +419,6 @@ public sealed class HUDManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Returns the configured shield fill image only when it belongs to a screen-space HUD canvas.
-    /// </summary>
-    /// <param name="shieldFillImage">Resolved shield image safe to update from HUDManager.</param>
-    /// <returns>True when the shield image is available and not bound to a world-space canvas; otherwise false.</returns>
-    private bool TryResolveShieldFillImage(out Image shieldFillImage)
-    {
-        shieldFillImage = playerShieldFillImage;
-
-        if (shieldFillImage == null)
-            return false;
-
-        Canvas owningCanvas = shieldFillImage.canvas;
-
-        if (owningCanvas == null || owningCanvas.renderMode != RenderMode.WorldSpace)
-            return true;
-
-        ValidateShieldOverlayBinding();
-        return false;
-    }
-
-    /// <summary>
     /// Returns whether health and shield bars should snap to their exact runtime values.
     /// </summary>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
@@ -562,74 +433,15 @@ public sealed class HUDManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Warns once when the configured shield image is still assigned to a world-space canvas.
+    /// Builds the legacy experience-bar runtime while health and shield use their dedicated syringe view.
     /// </summary>
-    private void ValidateShieldOverlayBinding()
+    private void EnsureExperienceBarVisualInitialized()
     {
-        if (playerShieldFillImage == null)
-            return;
-
-        Canvas owningCanvas = playerShieldFillImage.canvas;
-
-        if (owningCanvas == null || owningCanvas.renderMode != RenderMode.WorldSpace)
-            return;
-
-        if (shieldCanvasWarningIssued)
-            return;
-
-        shieldCanvasWarningIssued = true;
-        Debug.LogWarning("[HUDManager] Player Shield Fill Image is bound to a World Space canvas. Assign a Screen Space Overlay HUD image instead so the shield is managed by HUDManager as screen UI.",
-                         playerShieldFillImage);
-    }
-
-    /// <summary>
-    /// Ensures the core-bar presentation settings exist even on scenes authored before the liquid-bar extension was added.
-    /// </summary>
-    private void EnsureCoreBarPresentationSettings()
-    {
-        if (healthBarPresentation == null)
-            healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
-
-        if (shieldBarPresentation == null)
-            shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
-
         if (experienceBarPresentation == null)
             experienceBarPresentation = HUDLiquidBarPresentationSettings.CreateExperienceDefaults();
-    }
-
-    /// <summary>
-    /// Builds the reusable runtime visuals for health, shield and experience bars when their bindings become available.
-    /// </summary>
-    private void EnsureCoreBarVisualsInitialized()
-    {
-        EnsureCoreBarPresentationSettings();
-
-        if (healthBarRuntime == null && playerHealthFillImage != null)
-            healthBarRuntime = HUDLiquidBarRuntime.CreateHealth(playerHealthFillImage, healthBarPresentation);
-
-        if (shieldBarRuntime == null && TryResolveShieldFillImage(out Image shieldFillImage))
-        {
-            shieldBarRootObject = HUDBarVisibilityUtility.ResolveRootObject(shieldFillImage);
-            shieldBarRuntime = HUDLiquidBarRuntime.CreateShield(shieldFillImage, shieldBarPresentation);
-        }
 
         if (experienceBarRuntime == null && playerExperienceFillImage != null)
             experienceBarRuntime = HUDLiquidBarRuntime.CreateExperience(playerExperienceFillImage, experienceBarPresentation);
-    }
-
-    /// <summary>
-    /// Releases runtime materials created for the liquid-bar visuals.
-    /// </summary>
-    private void DisposeCoreBarVisuals()
-    {
-        if (healthBarRuntime != null)
-            healthBarRuntime.Dispose();
-
-        if (shieldBarRuntime != null)
-            shieldBarRuntime.Dispose();
-
-        if (experienceBarRuntime != null)
-            experienceBarRuntime.Dispose();
     }
 
     /// <summary>

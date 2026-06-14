@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_UI_PlayerShieldSyringeBar
+  m_Shader: {fileID: 4800000, guid: b230cbde4f136c9499610856969dac45, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties:
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BubbleDensity: 0.35
+    - _BubbleDrift: 0.12
+    - _BubbleMaximumSize: 0.07
+    - _BubbleMinimumSize: 0.025
+    - _BubbleRiseSpeed: 0.18
+    - _BubblesEnabled: 1
+    - _BodyStyle: 0
+    - _ChamberInset: 0.16
+    - _ColorMask: 15
+    - _EndCapNormalized: 0.105
+    - _FillNormalized: 0.72
+    - _FlowEnabled: 1
+    - _FlowSpeed: 0.45
+    - _GraduationInsetNormalized: 0.053
+    - _GraduationEndNormalized: 0.871
+    - _HorizontalSloshEnabled: 1
+    - _HorizontalSloshStrength: 0.16
+    - _MajorDivisionCount: 5
+    - _LabelPlacement: 0
+    - _MinorDivisionsPerMajor: 1
+    - _OutlineThickness: 0.035
+    - _PaintDripDensity: 0.32
+    - _PaintDripIrregularity: 0.8
+    - _PaintDripLength: 0.17
+    - _PaintDripsEnabled: 1
+    - _PaintDripWidth: 0.026
+    - _PlungerWidth: 0.032
+    - _Slosh: 0
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _SurfaceSloshStrength: 0.45
+    - _TerminationStyle: 1
+    - _TerminationOffsetNormalized: 0.024
+    - _UseUIAlphaClip: 0
+    - _ValueImpulse: 0
+    - _Viscosity: 0.72
+    - _WaveAmplitude: 0.035
+    - _WaveFrequency: 3
+    m_Colors:
+    - _BodyColor: {r: 0.28, g: 0.13, b: 0.38, a: 1}
+    - _BodyShadowColor: {r: 0.12, g: 0.055, b: 0.19, a: 1}
+    - _BubbleColor: {r: 0.78, g: 0.58, b: 1, a: 0.72}
+    - _ChamberColor: {r: 0.22, g: 0.14, b: 0.30, a: 0.82}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _GraduationColor: {r: 0.9, g: 0.78, b: 0.32, a: 1}
+    - _LiquidColor: {r: 0.42, g: 0.16, b: 0.68, a: 1}
+    - _LiquidHighlightColor: {r: 0.68, g: 0.36, b: 0.92, a: 1}
+    - _OutlineColor: {r: 0.04, g: 0.025, b: 0.055, a: 1}
+    - _PlungerColor: {r: 0.16, g: 0.15, b: 0.15, a: 1}
+    - _PlungerWindowColor: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
+    - _TerminationOutlineColor: {r: 0.04, g: 0.025, b: 0.055, a: 1}
+    - _TerminationInteriorColor: {r: 0.28, g: 0.13, b: 0.38, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

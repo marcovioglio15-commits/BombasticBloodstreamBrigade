@@ -11,10 +11,11 @@ using UnityEngine;
 public static class GameSceneManagementPlayModeSceneGuard
 {
     #region Constants
-    private const string EnabledPreferenceKey = "NashCore.GameSceneManagement.ForceBootstrapPlayMode";
+    private const string EnabledPreferenceKey = "NashCore.GameSceneManagement.ForceBootstrapPlayMode.V2";
     private const string PendingRestoreKey = "NashCore.GameSceneManagement.PlayModeRestorePending";
     private const string SerializedSetupKey = "NashCore.GameSceneManagement.SerializedPlayModeSceneSetup";
     private const string MenuPath = "Tools/Game/Scene Manager/Force Bootstrap Play Mode";
+    internal const string BypassSessionKey = "NashCore.GameSceneManagement.BypassForcedBootstrapPlayMode";
     #endregion
 
     #region Constructors
@@ -25,6 +26,12 @@ public static class GameSceneManagementPlayModeSceneGuard
     {
         EditorApplication.playModeStateChanged -= HandlePlayModeStateChanged;
         EditorApplication.playModeStateChanged += HandlePlayModeStateChanged;
+
+        if (!EditorApplication.isPlayingOrWillChangePlaymode &&
+            SessionState.GetBool(PendingRestoreKey, false))
+        {
+            EditorApplication.delayCall += RestorePreviousSceneSetup;
+        }
     }
     #endregion
 
@@ -227,7 +234,8 @@ public static class GameSceneManagementPlayModeSceneGuard
     /// <returns>True when Play Mode should open SCN_Bootstrap automatically.</returns>
     private static bool IsEnabled()
     {
-        return EditorPrefs.GetBool(EnabledPreferenceKey, true);
+        return EditorPrefs.GetBool(EnabledPreferenceKey, true) &&
+               !SessionState.GetBool(BypassSessionKey, false);
     }
 
     /// <summary>

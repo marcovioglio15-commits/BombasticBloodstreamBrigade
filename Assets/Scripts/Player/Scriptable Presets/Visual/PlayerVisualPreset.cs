@@ -233,6 +233,10 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Visibility settings for a Jetpack VFX GameObject positioned directly inside the Visual Player hierarchy.")]
     [SerializeField] private PlayerJetpackVfxSettings playerJetpackVfx = new PlayerJetpackVfxSettings();
 
+    [Header("Health Bars")]
+    [Tooltip("ECS-authoritative procedural syringe settings used by the player health and shield HUD views.")]
+    [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
+
     #region Muzzle Flash VFX
     [Tooltip("Optional one-shot VFX prefab spawned at the projectile origin every time the player fires a shot.")]
     [SerializeField] private GameObject muzzleFlashVfxPrefab;
@@ -662,6 +666,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public PlayerHealthBarsVisualSettings HealthBars
+    {
+        get
+        {
+            return healthBars;
+        }
+    }
+
     public GameObject MuzzleFlashVfxPrefab
     {
         get
@@ -856,6 +868,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (playerJetpackVfx == null)
             playerJetpackVfx = new PlayerJetpackVfxSettings();
 
+        if (healthBars == null)
+            healthBars = new PlayerHealthBarsVisualSettings();
+
         outline.Validate();
         weaponVisuals.Validate(runtimeVisualBridgePrefab, name);
         laserBeam.Validate();
@@ -866,6 +881,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
         deathAnimation.Validate();
         projectileDeathVfx.Validate(name);
         playerJetpackVfx.Validate(runtimeVisualBridgePrefab, name);
+        healthBars.Validate(name);
     }
     #endregion
 

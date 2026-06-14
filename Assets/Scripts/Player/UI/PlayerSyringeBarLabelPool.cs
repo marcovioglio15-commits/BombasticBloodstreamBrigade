@@ -1,0 +1,185 @@
+using System.Collections.Generic;
+using TMPro;
+using Unity.Mathematics;
+using UnityEngine;
+
+/// <summary>
+/// Updates a preauthored TextMeshPro label pool only when syringe maximum or visual configuration changes.
+/// </summary>
+[DisallowMultipleComponent]
+public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
+{
+    #region Constants
+    private const float GraduationLabelAnchorY = 0.055f;
+    private const float InsideLabelAnchorY = 0.53f;
+    #endregion
+
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Preauthored numeric graduation labels. Runtime code never creates additional label GameObjects.")]
+    [SerializeField] private List<TMP_Text> labels = new List<TMP_Text>();
+    #endregion
+
+    #endregion
+
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Rebuilds active fixed-unit graduation labels for the current authoritative maximum.
+    /// </summary>
+    /// <param name="maximumValue">Authoritative maximum health or shield value.</param>
+    /// <param name="unitsPerMajorDivision">Fixed value represented by each major graduation interval.</param>
+    /// <param name="labelEveryMajorDivision">Displays one label every N major intervals.</param>
+    /// <param name="maximumLabelCount">Maximum labels allowed by the runtime configuration.</param>
+    /// <param name="chamberPixelWidth">Current scalable chamber width used to prevent label overlap.</param>
+    /// <param name="minimumLabelSpacing">Minimum horizontal pixel spacing maintained between labels.</param>
+    /// <param name="labelPlacement">Selected inside-chamber or graduation-plate layout.</param>
+    /// <param name="fontSize">TextMeshPro font size applied to active labels.</param>
+    /// <param name="labelOffset">Pixel offset relative to each represented graduation tick.</param>
+    /// <param name="labelColor">Direct text color applied to active labels.</param>
+    /// <param name="labelOutlineColor">Direct outline color applied to active labels.</param>
+    /// <param name="labelOutlineWidth">TextMeshPro outline width applied to active labels.</param>
+    /// <param name="font">Resolved font asset, or null to preserve the preauthored font.</param>
+    public void Rebuild(float maximumValue,
+                        float unitsPerMajorDivision,
+                        int labelEveryMajorDivision,
+                        int maximumLabelCount,
+                        float chamberPixelWidth,
+                        float minimumLabelSpacing,
+                        PlayerSyringeLabelPlacement labelPlacement,
+                        float fontSize,
+                        float2 labelOffset,
+                        float4 labelColor,
+                        float4 labelOutlineColor,
+                        float labelOutlineWidth,
+                        TMP_FontAsset font)
+    {
+        int availableCount = math.min(labels.Count, math.max(2, maximumLabelCount));
+
+        if (availableCount <= 0)
+            return;
+
+        float safeMaximum = math.max(0f, maximumValue);
+        float safeUnits = math.max(0.0001f, unitsPerMajorDivision);
+        int maximumIntervalIndex = (int)math.ceil(safeMaximum / safeUnits);
+        int spaceLimitedCount = math.max(2,
+                                         (int)math.floor(math.max(1f, chamberPixelWidth) /
+                                                         math.max(1f, minimumLabelSpacing)) + 1);
+        int effectiveCapacity = math.min(availableCount, spaceLimitedCount);
+        int fittedIntervalStep = maximumIntervalIndex > 0 && effectiveCapacity > 1
+            ? (int)math.ceil(maximumIntervalIndex / (float)(effectiveCapacity - 1))
+            : 1;
+        int intervalStep = math.max(math.max(1, labelEveryMajorDivision), fittedIntervalStep);
+        int labelIndex = 0;
+
+        for (int majorIndex = intervalStep; majorIndex < maximumIntervalIndex && labelIndex < effectiveCapacity - 1; majorIndex += intervalStep)
+        {
+            float representedValue = math.min(safeMaximum, majorIndex * safeUnits);
+            ConfigureLabel(labels[labelIndex],
+                           representedValue,
+                           safeMaximum > 0f ? representedValue / safeMaximum : 0f,
+                           labelPlacement,
+                           fontSize,
+                           labelOffset,
+                           labelColor,
+                           labelOutlineColor,
+                           labelOutlineWidth,
+                           font);
+            labelIndex++;
+        }
+
+        if (labelIndex == 0 || safeMaximum > 0f)
+        {
+            ConfigureLabel(labels[labelIndex],
+                           safeMaximum,
+                           safeMaximum > 0f ? 1f : 0f,
+                           labelPlacement,
+                           fontSize,
+                           labelOffset,
+                           labelColor,
+                           labelOutlineColor,
+                           labelOutlineWidth,
+                           font);
+            labelIndex++;
+        }
+
+        for (int index = labelIndex; index < labels.Count; index++)
+        {
+            if (labels[index] != null)
+                labels[index].gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// Hides all preauthored numeric labels without destroying their GameObjects.
+    /// </summary>
+    public void HideAll()
+    {
+        for (int index = 0; index < labels.Count; index++)
+        {
+            if (labels[index] != null)
+                labels[index].gameObject.SetActive(false);
+        }
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Configures one active numeric label at its normalized graduation position.
+    /// </summary>
+    /// <param name="label">Preauthored TextMeshPro label to configure.</param>
+    /// <param name="representedValue">Authoritative numeric value represented by the label.</param>
+    /// <param name="normalizedPosition">Normalized position along the scalable chamber.</param>
+    /// <param name="labelPlacement">Selected inside-chamber or graduation-plate layout.</param>
+    /// <param name="fontSize">TextMeshPro font size.</param>
+    /// <param name="labelOffset">Pixel offset relative to the represented tick.</param>
+    /// <param name="labelColor">Direct label text color.</param>
+    /// <param name="labelOutlineColor">Direct label outline color.</param>
+    /// <param name="labelOutlineWidth">TextMeshPro outline width.</param>
+    /// <param name="font">Resolved font asset, or null to preserve the preauthored font.</param>
+    private static void ConfigureLabel(TMP_Text label,
+                                       float representedValue,
+                                       float normalizedPosition,
+                                       PlayerSyringeLabelPlacement labelPlacement,
+                                       float fontSize,
+                                       float2 labelOffset,
+                                       float4 labelColor,
+                                       float4 labelOutlineColor,
+                                       float labelOutlineWidth,
+                                       TMP_FontAsset font)
+    {
+        if (label == null)
+            return;
+
+        bool insideChamber = labelPlacement == PlayerSyringeLabelPlacement.InsideChamber;
+        RectTransform labelTransform = label.rectTransform;
+        Vector2 anchor = new Vector2(math.saturate(normalizedPosition),
+                                     insideChamber ? InsideLabelAnchorY : GraduationLabelAnchorY);
+        labelTransform.anchorMin = anchor;
+        labelTransform.anchorMax = anchor;
+        labelTransform.pivot = new Vector2(0.5f, insideChamber ? 0.5f : 0f);
+        labelTransform.sizeDelta = new Vector2(labelTransform.sizeDelta.x, math.max(18f, fontSize + 2f));
+        labelTransform.anchoredPosition = new Vector2(labelOffset.x, labelOffset.y);
+        label.fontSize = math.max(1f, fontSize);
+        label.alignment = insideChamber ? TextAlignmentOptions.Center : TextAlignmentOptions.Bottom;
+        label.color = new Color(labelColor.x, labelColor.y, labelColor.z, labelColor.w);
+        label.outlineColor = new Color(labelOutlineColor.x,
+                                       labelOutlineColor.y,
+                                       labelOutlineColor.z,
+                                       labelOutlineColor.w);
+        label.outlineWidth = math.saturate(labelOutlineWidth);
+        label.text = math.abs(representedValue - math.round(representedValue)) <= 0.001f
+            ? math.round(representedValue).ToString("0")
+            : representedValue.ToString("0.##");
+
+        if (font != null && label.font != font)
+            label.font = font;
+
+        label.gameObject.SetActive(true);
+    }
+    #endregion
+
+    #endregion
+}

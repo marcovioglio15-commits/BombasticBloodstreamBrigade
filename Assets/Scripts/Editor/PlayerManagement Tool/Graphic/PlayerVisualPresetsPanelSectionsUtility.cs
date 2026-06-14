@@ -143,6 +143,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                PlayerVisualPresetsPanel.VisualSubSectionType.DeathAnimation,
                                "Death Animation",
                                BuildDeathAnimationSubSection(panel));
+        AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.HealthBars,
+                               "Health Bars",
+                               PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;

@@ -67,6 +67,9 @@ public static class PlayerScalingFieldElementFactory
             return fallbackField;
         }
 
+        if (targetProperty.propertyType == SerializedPropertyType.Color)
+            return CreateColorField(targetProperty, scalingRulesProperty, labelOverride, allowedVariables);
+
         if (IsVectorProperty(targetProperty))
             return CreateVectorField(targetProperty, scalingRulesProperty, labelOverride, allowedVariables);
 
@@ -494,6 +497,41 @@ public static class PlayerScalingFieldElementFactory
                 return root;
         }
 
+        return root;
+    }
+
+    /// <summary>
+    /// Creates one direct ColorField plus independent scalable numeric controls for its RGBA channels.
+    /// </summary>
+    /// <param name="colorProperty">Serialized color property rendered by the direct field and channel controls.</param>
+    /// <param name="scalingRulesProperty">Serialized Add Scaling rules list.</param>
+    /// <param name="labelOverride">Optional user-facing color label.</param>
+    /// <param name="allowedVariables">Optional formula variable whitelist.</param>
+    /// <returns>Configured color authoring and channel scaling controls.</returns>
+    private static VisualElement CreateColorField(SerializedProperty colorProperty,
+                                                  SerializedProperty scalingRulesProperty,
+                                                  string labelOverride,
+                                                  ISet<string> allowedVariables)
+    {
+        VisualElement root = new VisualElement();
+        root.style.flexDirection = FlexDirection.Column;
+
+        PropertyField colorField = string.IsNullOrWhiteSpace(labelOverride)
+            ? new PropertyField(colorProperty)
+            : new PropertyField(colorProperty, labelOverride);
+        colorField.BindProperty(colorProperty);
+        colorField.RegisterCallback<SerializedPropertyChangeEvent>(evt => PlayerManagementDraftSession.MarkDirty());
+        root.Add(colorField);
+
+        VisualElement channelsContainer = new VisualElement();
+        channelsContainer.style.marginLeft = VectorComponentIndent;
+        root.Add(channelsContainer);
+
+        string baseLabel = string.IsNullOrWhiteSpace(labelOverride) ? colorProperty.displayName : labelOverride;
+        AddVectorComponentField(channelsContainer, colorProperty, "r", baseLabel, scalingRulesProperty, allowedVariables);
+        AddVectorComponentField(channelsContainer, colorProperty, "g", baseLabel, scalingRulesProperty, allowedVariables);
+        AddVectorComponentField(channelsContainer, colorProperty, "b", baseLabel, scalingRulesProperty, allowedVariables);
+        AddVectorComponentField(channelsContainer, colorProperty, "a", baseLabel, scalingRulesProperty, allowedVariables);
         return root;
     }
 
