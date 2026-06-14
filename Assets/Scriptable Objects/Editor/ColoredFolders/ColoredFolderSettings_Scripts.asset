@@ -163,6 +163,79 @@ MonoBehaviour:
   - Assets/Scripts/Player/Components/Controller
   - Assets/Scripts/Player/Systems/Controller/Shooting/Pointer
   - Assets/Scripts/Player/Systems/PowerUps/Active/Impact Frame
+  - Assets/Scripts/Player/UI/MilestoneSelection
+  - Assets/Scripts/Editor/PlayerManagement Tool/PowerUps/Graphic/Tools
+  - Assets/Scripts/Editor/PlayerManagement Tool/Graphic/Master
+  - Assets/Scripts/Player/Systems/PowerUps/Config
+  - Assets/Scripts/Player/Authoring/Visual
+  - Assets/Scripts/Editor/PlayerManagement Tool/Utils/Selectors
+  - Assets/Scripts/Enemy/Systems/Patterns/Coward
+  - Assets/Scripts/Enemy/Authoring/Spawning
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/Brain
+  - Assets/Scripts/Enemy/Authoring/Visual
+  - Assets/Scripts/Enemy/Systems/Patterns/Movement
+  - Assets/Scripts/Player/Systems/PowerUps/Charge
+  - Assets/Scripts/Enemy/Authoring/Core
+  - Assets/Scripts/Player/Authoring/Scaling
+  - Assets/Scripts/Player/UI/Menu
+  - Assets/Scripts/Editor/PlayerManagement Tool/PowerUps/Graphic/Module
+  - Assets/Scripts/Editor/PlayerManagement Tool/Utils/LaserBeam
+  - Assets/Scripts/Player/Systems/Progression/Scaling
+  - Assets/Scripts/Editor/PlayerManagement Tool/PowerUps/Graphic/PayloadDrawers
+  - Assets/Scripts/Player/Systems/Progression/Combo
+  - Assets/Scripts/Player/Systems/PowerUps/WeaponSwitch
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/AdvancedPattern
+  - Assets/Scripts/Enemy/Authoring/Patterns
+  - Assets/Scripts/Player/Systems/PowerUps/Milestone
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/BossPattern
+  - Assets/Scripts/Enemy/Systems/Patterns/Projectiles
+  - Assets/Scripts/Editor/PlayerManagement Tool/Utils/Setup
+  - Assets/Scripts/Editor/PlayerManagement Tool/Graphic/HUD
+  - Assets/Scripts/Player/Systems/PowerUps/Cheat
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/Master
+  - Assets/Scripts/Editor/PlayerManagement Tool/Graphic/Visual
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/Visual
+  - Assets/Scripts/Editor/Core/Vfx
+  - Assets/Scripts/Enemy/Systems/Pool/Spawning
+  - Assets/Scripts/Editor/PlayerManagement Tool/Utils/SmokeTests
+  - Assets/Scripts/Player/Systems/Progression/Milestone
+  - Assets/Scripts/Player/UI/PowerUpContainer
+  - Assets/Scripts/Player/UI/HUD
+  - Assets/Scripts/Editor/GameManagement Tool/Graphic/Scene
+  - Assets/Scripts/Editor/PlayerManagement Tool/PowerUps/Graphic/Tier
+  - Assets/Scripts/Editor/PlayerManagement Tool/Utils/Presets
+  - Assets/Scripts/Enemy/Systems/Patterns/AcidTrail
+  - Assets/Scripts/Player/Systems/Progression/Leveling
+  - Assets/Scripts/Editor/GameManagement Tool/Utils/ProjectSetup
+  - Assets/Scripts/Player/Systems/PowerUps/Container
+  - Assets/Scripts/Enemy/Scriptable Presets/Advanced Pattern/Modules
+  - Assets/Scripts/Player/Scriptable Presets/Power Ups/Preset
+  - Assets/Scripts/Player/Systems/Progression/DeathAnimation
+  - Assets/Scripts/Editor/GameManagement Tool/Utils/Scene
+  - Assets/Scripts/Enemy/Systems/Patterns/Boss
+  - Assets/Scripts/Editor/EnemyManagement Tool/Graphic/Drawers
+  - Assets/Scripts/Player/Authoring/Core
+  - Assets/Scripts/Player/Scriptable Presets/Power Ups/Definitions
+  - Assets/Scripts/Player/Systems/PowerUps/Vfx
+  - Assets/Scripts/Player/Authoring/PowerUps
+  - Assets/Scripts/Enemy/Systems/Patterns/PowerUpStealer
+  - Assets/Scripts/Player/Systems/Progression/RunOutcome
+  - Assets/Scripts/Player/Systems/PowerUps/Activation
+  - Assets/Scripts/Enemy/Systems/Patterns/Bombardier
+  - Assets/Scripts/Editor/Core/Profiling
+  - Assets/Scripts/Enemy/Authoring/OffensiveEngagement
+  - Assets/Scripts/Enemy/Authoring/Boss
+  - Assets/Scripts/Editor/Core/ManagementTool
+  - Assets/Scripts/Player/UI/HealthBars
+  - Assets/Scripts/Player/UI/DevTools
+  - Assets/Scripts/Enemy/Systems/Pool/Lifecycle
+  - Assets/Scripts/Editor/PlayerManagement Tool/PowerUps/Graphic/PresetsPanel
+  - Assets/Scripts/Enemy/Systems/Pool/BossMinion
+  - Assets/Scripts/Editor/GameManagement Tool/Graphic/Master
+  - Assets/Scripts/Player/Scriptable Presets/Power Ups/Modular
+  - Assets/Scripts/Enemy/Scriptable Presets/Advanced Pattern/Boss
+  - Assets/Scripts/Player/Systems/Progression/Elemental
+  - Assets/Scripts/Editor/GameManagement Tool/Graphic/Audio
   folderColors:
   - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
   - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
@@ -314,5 +387,78 @@ MonoBehaviour:
   - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
   - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
   - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
-  folderApplyModes: 010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  - {r: 0.24912083, g: 0.8867924, b: 0.24679601, a: 0}
+  folderApplyModes: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
   autoInheritColors: 1
