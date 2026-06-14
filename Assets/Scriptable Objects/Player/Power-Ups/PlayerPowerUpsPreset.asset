@@ -19954,9 +19954,9 @@ MonoBehaviour:
           formulas: []
         bomb:
           bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
-          spawnOffset: {x: 0, y: 1, z: -1.2}
+          spawnOffset: {x: 0, y: 0.4, z: -1.2}
           spawnOffsetOrientation: 0
-          deploySpeed: 5
+          deploySpeed: 0
           velocityDirection: 0
           collisionRadius: 0.18
           bounceOnWalls: 1
@@ -19965,7 +19965,7 @@ MonoBehaviour:
           fuseSeconds: 1.5
           radius: 25
           enableDamagePayload: 1
-          damage: 120
+          damage: 100
           affectAllEnemiesInRadius: 1
           explosionVfxPrefab: {fileID: 6772806930511986391, guid: 530ec3e9a9782ab46bb896d2258bd398, type: 3}
           scaleVfxToRadius: 1
