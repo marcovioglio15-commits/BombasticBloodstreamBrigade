@@ -119,6 +119,10 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_DVD.asset
       assetGuid: d83ea893f3b670446a6b82587119e832
       preset: {fileID: 11400000, guid: d83ea893f3b670446a6b82587119e832, type: 2}
+    - presetName: PF_EnemySpawner_Testing_Everyone
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Everyone.asset
+      assetGuid: 449d57ba27d64074883dccbb16f59bd5
+      preset: {fileID: 11400000, guid: 449d57ba27d64074883dccbb16f59bd5, type: 2}
     - presetName: PF_EnemySpawner_Testing_Shooters
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing/PF_EnemySpawner_Testing_Shooters.asset
       assetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
