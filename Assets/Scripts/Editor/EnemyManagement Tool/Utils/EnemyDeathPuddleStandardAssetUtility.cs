@@ -31,7 +31,7 @@ public static class EnemyDeathPuddleStandardAssetUtility
         BuildPrefab(material);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("[EnemyDeathPuddleStandardAssetUtility] Standard death puddle assets rebuilt.");
+        //Debug.Log("[EnemyDeathPuddleStandardAssetUtility] Standard death puddle assets rebuilt.");
     }
     #endregion
 

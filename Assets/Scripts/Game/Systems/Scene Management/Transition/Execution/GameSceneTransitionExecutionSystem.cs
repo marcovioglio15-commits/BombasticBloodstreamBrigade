@@ -201,8 +201,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         transitionState.TargetSceneId = targetSceneId;
         transitionState.IsTransitioning = 1;
 
-        if (config.LogTransitions != 0)
-            Debug.Log("[GameSceneManager] Transition started: " + sourceSceneId.ToString() + " -> " + targetSceneId.ToString() + ".");
+        //if (config.LogTransitions != 0)
+            //Debug.Log("[GameSceneManager] Transition started: " + sourceSceneId.ToString() + " -> " + targetSceneId.ToString() + ".");
 
         if (startBehindBlack)
         {

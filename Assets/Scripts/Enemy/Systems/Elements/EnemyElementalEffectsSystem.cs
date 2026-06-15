@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -7,6 +8,7 @@ using Unity.Mathematics;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyProjectileHitSystem))]
+[BurstCompile]
 public partial struct EnemyElementalEffectsSystem : ISystem
 {
     #region Methods
@@ -19,6 +21,7 @@ public partial struct EnemyElementalEffectsSystem : ISystem
         state.RequireForUpdate<EnemyHealth>();
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         float enemyTimeScale = 1f;
@@ -27,6 +30,7 @@ public partial struct EnemyElementalEffectsSystem : ISystem
             enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
 
         float deltaTime = SystemAPI.Time.DeltaTime * enemyTimeScale;
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
 
         if (deltaTime <= 0f)
             return;
@@ -88,7 +92,8 @@ public partial struct EnemyElementalEffectsSystem : ISystem
                                                   enemyEntity,
                                                   in nextHealth,
                                                   float3.zero,
-                                                  false);
+                                                  false,
+                                                  elapsedTime);
 
             if (nextHealth.Current > 0f)
                 continue;

@@ -626,7 +626,7 @@ public static class PlayerInputRuntime
                                        BuildActionStatus(cheatModifierShiftAction),
                                        BuildActionStatus(runtimeGizmoPanelToggleAction),
                                        lookActionUsesMousePointer);
-        Debug.Log(message, asset);
+        //Debug.Log(message, asset);
     }
 
     private static string BuildActionStatus(InputAction action)

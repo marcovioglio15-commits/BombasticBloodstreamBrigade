@@ -43422,9 +43422,10 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveChargeShot
-  secondaryActivePowerUpId: ActiveGigaLaser
-  equippedPassivePowerUpIds: []
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds:
+  - Passive_AllRoundProtection
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

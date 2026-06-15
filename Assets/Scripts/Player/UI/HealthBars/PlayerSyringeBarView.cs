@@ -1,6 +1,7 @@
 using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Drives one preauthored procedural syringe graphic and numeric label pool from ECS-authoritative values.
@@ -135,6 +136,10 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         }
 
         runtimeMaterial.name = (sourceMaterial != null ? sourceMaterial.name : "M_UI_PlayerSyringeBar") + " (Runtime " + name + ")";
+
+        if (!Application.isPlaying)
+            runtimeMaterial.hideFlags = HideFlags.HideAndDontSave;
+
         graphic.material = runtimeMaterial;
     }
 
@@ -145,6 +150,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     {
         if (runtimeMaterial == null)
             return;
+
+        if (graphic != null && graphic.material == runtimeMaterial)
+            graphic.material = materialTemplate;
 
         if (Application.isPlaying)
             Destroy(runtimeMaterial);
@@ -210,23 +218,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         ApplyStaticMaterialProperties();
         RebuildLayout(previousMaximum);
         SetVisible(sharedConfig.Enabled != 0 && channelConfig.Enabled != 0);
-    }
-
-    /// <summary>
-    /// Applies a vertical layout offset relative to the parent health-bar cluster.
-    /// </summary>
-    /// <param name="offset">Vertical anchored-position offset in pixels.</param>
-    public void SetVerticalOffset(float offset)
-    {
-        if (root == null)
-            root = transform as RectTransform;
-
-        if (root == null)
-            return;
-
-        Vector2 anchoredPosition = root.anchoredPosition;
-        anchoredPosition.y = offset;
-        root.anchoredPosition = anchoredPosition;
+        MarkParentLayoutDirty();
     }
     #endregion
 
@@ -410,6 +402,8 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                               math.saturate(sharedConfig.LabelOutlineWidth),
                               activeFont);
         }
+
+        MarkParentLayoutDirty();
     }
     #endregion
 
@@ -507,8 +501,20 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     /// <param name="visible">Requested active state.</param>
     private void SetVisible(bool visible)
     {
-        if (gameObject.activeSelf != visible)
-            gameObject.SetActive(visible);
+        if (gameObject.activeSelf == visible)
+            return;
+
+        gameObject.SetActive(visible);
+        MarkParentLayoutDirty();
+    }
+
+    /// <summary>
+    /// Invalidates the authored parent layout only after this view changes size or visibility.
+    /// </summary>
+    private void MarkParentLayoutDirty()
+    {
+        if (transform.parent is RectTransform parent)
+            LayoutRebuilder.MarkLayoutForRebuild(parent);
     }
     #endregion
 

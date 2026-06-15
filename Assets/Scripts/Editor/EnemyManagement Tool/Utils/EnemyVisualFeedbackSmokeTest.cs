@@ -35,7 +35,7 @@ public static class EnemyVisualFeedbackSmokeTest
         ValidatePresetDefaultsAndBakeConfig();
         ValidateDeathPuddleSpawnRuntime();
         ValidateElasticTriggerPolicy();
-        Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
+        //Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public static class EnemyVisualFeedbackSmokeTest
     {
         ValidateFaceFlipbookAssets();
         ValidateElasticShader(FaceFlipbookShaderName);
-        Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
+        //Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
     }
     #endregion
 

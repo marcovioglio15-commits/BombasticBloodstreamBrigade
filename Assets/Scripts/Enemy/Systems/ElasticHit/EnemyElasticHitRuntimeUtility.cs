@@ -91,6 +91,63 @@ public static class EnemyElasticHitRuntimeUtility
                                                         timing,
                                                         motion);
     }
+
+    /// <summary>
+    /// Burst-safe elastic hit trigger. Writes only ECS state and flags <see cref="EnemyElasticHitState.PendingApply"/>
+    /// instead of touching managed renderers inline, so the calling gameplay system can be Burst-compiled.
+    /// The managed GPU/Animator apply (and the UnityEngine shader trigger time) is deferred to
+    /// <c>EnemyElasticHitPresentationSystem</c> in the same frame, so the visual result is unchanged.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to read config and write presentation state.</param>
+    /// <param name="enemyEntity">Damaged enemy entity.</param>
+    /// <param name="enemyHealth">Enemy health after the accepted damage was applied.</param>
+    /// <param name="impactDirectionWorld">Optional world-space direction from the impact source toward the enemy.</param>
+    /// <param name="hasDirectImpactDirection">True when the damage source provides a meaningful spatial direction.</param>
+    /// <param name="elapsedTime">ECS elapsed time used only for retrigger gating (clock-agnostic; not the shader time).</param>
+    public static void Trigger(EntityManager entityManager,
+                               Entity enemyEntity,
+                               in EnemyHealth enemyHealth,
+                               float3 impactDirectionWorld,
+                               bool hasDirectImpactDirection,
+                               float elapsedTime)
+    {
+        if (enemyHealth.Current <= 0f || !entityManager.Exists(enemyEntity))
+            return;
+
+        if (!entityManager.HasComponent<EnemyElasticHitConfig>(enemyEntity) ||
+            !entityManager.HasComponent<EnemyElasticHitState>(enemyEntity))
+        {
+            return;
+        }
+
+        EnemyElasticHitConfig config = entityManager.GetComponentData<EnemyElasticHitConfig>(enemyEntity);
+
+        if (config.Enabled == 0)
+            return;
+
+        if (!hasDirectImpactDirection && config.TriggerMode == EnemyElasticHitTriggerMode.DirectImpactsOnly)
+            return;
+
+        EnemyElasticHitState elasticState = entityManager.GetComponentData<EnemyElasticHitState>(enemyEntity);
+
+        if (elapsedTime - elasticState.LastTriggerTime < config.MinimumRetriggerInterval)
+            return;
+
+        if (config.RetriggerMode == EnemyElasticHitRetriggerMode.StrongestWins &&
+            elasticState.RemainingSeconds > config.DurationSeconds * 0.5f)
+        {
+            return;
+        }
+
+        elasticState.RemainingSeconds = config.DurationSeconds;
+        elasticState.LastTriggerTime = elapsedTime;
+        elasticState.DirectionWorld = ResolveDirection(impactDirectionWorld,
+                                                       hasDirectImpactDirection,
+                                                       elasticState.DirectionWorld);
+        elasticState.PendingApply = 1;
+        entityManager.SetComponentData(enemyEntity, elasticState);
+        entityManager.SetComponentEnabled<EnemyElasticHitActive>(enemyEntity, true);
+    }
     #endregion
 
     #region Private Methods

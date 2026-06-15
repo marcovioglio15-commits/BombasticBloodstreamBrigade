@@ -6,6 +6,7 @@ using UnityEditor.SceneManagement;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
 /// Validates the preauthored player health/shield syringe hierarchy, technical assets, and target-scene binding.
@@ -32,6 +33,7 @@ public static class PlayerHealthBarsSmokeTest
         ValidateTechnicalAssets();
         ValidateScalingEndToEnd();
         ValidatePrefab();
+        ValidateEditorPreview();
         ValidateLabelDistribution();
         ValidateGraduationAlignmentAndMotionReset();
         ValidateShieldVisibilityPolicy();
@@ -436,6 +438,7 @@ public static class PlayerHealthBarsSmokeTest
             throw new InvalidOperationException("Preauthored health or shield syringe root is missing.");
 
         PlayerHealthBarsHudView hudView = prefab.GetComponent<PlayerHealthBarsHudView>();
+        VerticalLayoutGroup layoutGroup = prefab.GetComponent<VerticalLayoutGroup>();
         PlayerSyringeBarView[] syringeViews = prefab.GetComponentsInChildren<PlayerSyringeBarView>(true);
         PlayerSyringeBarGraphic[] graphics = prefab.GetComponentsInChildren<PlayerSyringeBarGraphic>(true);
         PlayerSyringeBarLabelPool[] labelPools = prefab.GetComponentsInChildren<PlayerSyringeBarLabelPool>(true);
@@ -443,6 +446,22 @@ public static class PlayerHealthBarsSmokeTest
 
         if (hudView == null || syringeViews.Length != 2 || graphics.Length != 2 || labelPools.Length != 2)
             throw new InvalidOperationException("Player bars prefab does not contain the expected one HUD view and two complete syringe views.");
+
+        if (layoutGroup == null || layoutGroup.childForceExpandHeight)
+            throw new InvalidOperationException("Player bars prefab must use one non-expanding VerticalLayoutGroup as the exclusive vertical-position authority.");
+
+        if (prefab.transform.childCount < 3 ||
+            prefab.transform.GetChild(0).name != "PlayerHealthSyringe" ||
+            prefab.transform.GetChild(1).name != "PlayerShieldSyringe" ||
+            prefab.transform.GetChild(2).name != "PlayerExperienceBar")
+        {
+            throw new InvalidOperationException("Player bars prefab children are not ordered Health, Shield, Experience for deterministic vertical layout.");
+        }
+
+        SerializedObject hudObject = new SerializedObject(hudView);
+
+        if (hudObject.FindProperty("editorPreviewPreset").objectReferenceValue == null)
+            throw new InvalidOperationException("Player bars prefab is missing the direct Player Visual Preset reference required by its Edit Mode preview.");
 
         for (int index = 0; index < graphics.Length; index++)
         {
@@ -457,6 +476,45 @@ public static class PlayerHealthBarsSmokeTest
     }
 
     /// <summary>
+    /// Validates that Edit Mode preview geometry, spacing, and shield visibility resolve through the runtime configuration builder.
+    /// </summary>
+    private static void ValidateEditorPreview()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        GameObject instance = UnityEngine.Object.Instantiate(prefab);
+        PlayerHealthBarsHudView hudView = instance.GetComponent<PlayerHealthBarsHudView>();
+        RectTransform healthRoot = instance.transform.Find("PlayerHealthSyringe") as RectTransform;
+        Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
+        VerticalLayoutGroup layoutGroup = instance.GetComponent<VerticalLayoutGroup>();
+        SerializedObject hudObject = new SerializedObject(hudView);
+        PlayerVisualPreset previewPreset = hudObject.FindProperty("editorPreviewPreset").objectReferenceValue as PlayerVisualPreset;
+        PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(previewPreset);
+
+        try
+        {
+            hudView.RefreshEditorPreview();
+
+            if (!Mathf.Approximately(healthRoot.sizeDelta.y, previewConfig.BarHeight) ||
+                healthRoot.sizeDelta.x < previewConfig.MinimumLength ||
+                healthRoot.sizeDelta.x > previewConfig.MaximumLength)
+            {
+                throw new InvalidOperationException("Edit Mode preview did not rebuild health syringe geometry through the selected Player Visual Preset.");
+            }
+
+            if (!Mathf.Approximately(layoutGroup.spacing, previewConfig.VerticalSpacing))
+                throw new InvalidOperationException("Edit Mode preview did not apply Player Visual Preset vertical spacing.");
+
+            if (shieldRoot.gameObject.activeSelf)
+                throw new InvalidOperationException("Edit Mode preview did not apply the zero-maximum shield visibility policy.");
+        }
+        finally
+        {
+            hudView.Dispose();
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
+    }
+
+    /// <summary>
     /// Validates that a zero-maximum shield stays hidden and becomes visible after its authoritative maximum increases.
     /// </summary>
     private static void ValidateShieldVisibilityPolicy()
@@ -465,6 +523,9 @@ public static class PlayerHealthBarsSmokeTest
         GameObject instance = UnityEngine.Object.Instantiate(prefab);
         PlayerHealthBarsHudView hudView = instance.GetComponent<PlayerHealthBarsHudView>();
         Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
+        RectTransform shieldRect = shieldRoot as RectTransform;
+        RectTransform experienceRect = instance.transform.Find("PlayerExperienceBar") as RectTransform;
+        RectTransform layoutRoot = instance.transform as RectTransform;
         World world = new World("PlayerHealthBarsShieldVisibilitySmokeTestWorld");
 
         try
@@ -483,21 +544,42 @@ public static class PlayerHealthBarsSmokeTest
                 ConfigEntity = configEntity
             });
             entityManager.AddComponentData(configEntity, PlayerHealthBarVisualBakeUtility.BuildConfig(null));
+            entityManager.AddComponentData(configEntity, new PlayerHealthBarVisualScalingState
+            {
+                LastScalableStatsHash = 1
+            });
             hudView.Initialize();
             hudView.UpdateView(entityManager, playerEntity, true);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRoot);
 
             if (shieldRoot.gameObject.activeSelf)
                 throw new InvalidOperationException("Shield syringe remained visible while PlayerShield.Max was zero.");
 
+            float experiencePositionWithoutShield = experienceRect.anchoredPosition.y;
             entityManager.SetComponentData(playerEntity, new PlayerShield
             {
                 Current = 20f,
                 Max = 20f
             });
             hudView.UpdateView(entityManager, playerEntity, true);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRoot);
 
             if (!shieldRoot.gameObject.activeSelf)
                 throw new InvalidOperationException("Shield syringe did not become visible after PlayerShield.Max increased.");
+
+            if (experienceRect.anchoredPosition.y >= experiencePositionWithoutShield)
+                throw new InvalidOperationException("Experience bar did not move below the newly visible shield syringe.");
+
+            float shieldPositionBeforeConfigRefresh = shieldRect.anchoredPosition.y;
+            entityManager.SetComponentData(configEntity, new PlayerHealthBarVisualScalingState
+            {
+                LastScalableStatsHash = 2
+            });
+            hudView.UpdateView(entityManager, playerEntity, true);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(layoutRoot);
+
+            if (!Mathf.Approximately(shieldRect.anchoredPosition.y, shieldPositionBeforeConfigRefresh))
+                throw new InvalidOperationException("Shield syringe changed vertical position after a level-up-style visual configuration refresh.");
         }
         finally
         {

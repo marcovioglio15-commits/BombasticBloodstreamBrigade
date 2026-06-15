@@ -357,7 +357,7 @@ MonoBehaviour:
         sloshDamping: 8
         maximumSlosh: 0.6
         tiltEnabled: 1
-        maximumTiltDegrees: 2.5
+        maximumTiltDegrees: 5
         tiltSpring: 16
         tiltDamping: 8
         valueImpulseEnabled: 1
@@ -369,19 +369,19 @@ MonoBehaviour:
       smoothingSeconds: 2
       palette:
         outline: {r: 0.04, g: 0.025, b: 0.055, a: 1}
-        body: {r: 0, g: 0.09019608, b: 1, a: 1}
-        bodyShadow: {r: 0.12, g: 0.055, b: 0.19, a: 1}
-        chamber: {r: 0, g: 0.09019608, b: 1, a: 0.82}
-        liquid: {r: 0, g: 0.09069872, b: 1, a: 1}
-        liquidHighlight: {r: 0, g: 0.12695742, b: 1, a: 1}
-        bubbles: {r: 0, g: 0.1254902, b: 1, a: 0.72}
-        graduation: {r: 0.9, g: 0.78, b: 0.32, a: 1}
+        body: {r: 0.36078432, g: 0.16078432, b: 0.1882353, a: 0.7529412}
+        bodyShadow: {r: 0.16862746, g: 0.07450981, b: 0.105882354, a: 0.5568628}
+        chamber: {r: 0.2784314, g: 0.16078432, b: 0.23921569, a: 0.6156863}
+        liquid: {r: 0.08290317, g: 0.1341382, b: 0.6509434, a: 1}
+        liquidHighlight: {r: 0.2216981, g: 0.31936735, b: 1, a: 1}
+        bubbles: {r: 0.2783019, g: 0.36886793, b: 1, a: 0.72}
+        graduation: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 1}
         label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
-        labelOutline: {r: 0.95, g: 0.78, b: 0.32, a: 0.9}
+        labelOutline: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 0.9}
         plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
         plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
         terminationOutline: {r: 0.04, g: 0.025, b: 0.055, a: 1}
-        terminationInterior: {r: 0.28, g: 0.13, b: 0.38, a: 1}
+        terminationInterior: {r: 0.36, g: 0.16, b: 0.19, a: 1}
       fluid:
         flowEnabled: 1
         flowSpeed: 0.45
@@ -396,7 +396,7 @@ MonoBehaviour:
         bubbleDrift: 0.12
       motion:
         movementReactionEnabled: 1
-        sloshStrength: 0.08
+        sloshStrength: 2
         surfaceSloshStrength: 0.45
         horizontalSloshEnabled: 1
         horizontalSloshStrength: 0.16
@@ -404,7 +404,7 @@ MonoBehaviour:
         sloshDamping: 8
         maximumSlosh: 0.25
         tiltEnabled: 1
-        maximumTiltDegrees: 2.5
+        maximumTiltDegrees: 5
         tiltSpring: 16
         tiltDamping: 8
         valueImpulseEnabled: 1

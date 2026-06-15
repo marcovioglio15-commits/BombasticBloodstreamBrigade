@@ -28,6 +28,10 @@ public struct EnemyElasticHitState : IComponentData
     public float RemainingSeconds;
     public float LastTriggerTime;
     public float3 DirectionWorld;
+
+    // Set by the Burst-safe Trigger overload to request a deferred managed GPU/Animator apply from the
+    // presentation system (which captures the UnityEngine shader trigger time in the same frame). 0 = nothing pending.
+    public byte PendingApply;
 }
 
 /// <summary>

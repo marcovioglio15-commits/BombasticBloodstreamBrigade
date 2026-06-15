@@ -12,6 +12,7 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemySteeringSystem))]
+[BurstCompile]
 public partial struct EnemyProjectileHitSystem : ISystem
 {
     #region Constants
@@ -57,9 +58,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
     /// Resolves projectile overlaps, applies projected damage and payloads, then commits enemy feedback once per frame.
     /// </summary>
     /// <param name="state">Mutable system state used to read and commit projectile hit results.</param>
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
+        float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
         int enemyCount = enemyQuery.CalculateEntityCount();
 
         if (enemyCount <= 0)
@@ -540,7 +543,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                                   enemyEntity,
                                                   in enemyHealth,
                                                   enemyElasticHitDirections[enemyIndex],
-                                                  true);
+                                                  true,
+                                                  elapsedTime);
 
             if (enemyHealth.Current <= 0f)
             {

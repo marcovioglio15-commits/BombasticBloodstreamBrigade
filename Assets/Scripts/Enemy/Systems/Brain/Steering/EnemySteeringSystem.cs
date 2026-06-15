@@ -224,6 +224,7 @@ public partial struct EnemySteeringSystem : ISystem
         NativeArray<float3> navigationVelocityResults = default;
         NativeArray<float3> tacticalVelocityResults = default;
         NativeArray<EnemyNavigationRuntimeState> tacticalRuntimeResults = default;
+        JobHandle steeringJobsHandle = state.Dependency;
 
         if (evaluatedCount > 0)
         {
@@ -287,7 +288,6 @@ public partial struct EnemySteeringSystem : ISystem
             JobHandle approachHandle = approachJob.Schedule(evaluatedCount, 64, state.Dependency);
             JobHandle separationHandle = separationJob.Schedule(evaluatedCount, 64, state.Dependency);
             JobHandle combinedHandle = JobHandle.CombineDependencies(approachHandle, separationHandle);
-            combinedHandle.Complete();
 
             PhysicsWorldSingleton tacticalPhysicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
             int tacticalWallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
@@ -308,10 +308,12 @@ public partial struct EnemySteeringSystem : ISystem
                 tacticalNavigationReady = tacticalNavigationGridState.FlowReady != 0 && tacticalNavigationCells.Length > 0;
             }
 
+            JobHandle navigationHandle = default;
+
             if (tacticalNavigationReady)
             {
-                // Per-enemy navigation raycasts run in parallel Burst instead of a sequential main-thread loop.
-                new EnemyNavigationResolveJob
+                // Per-enemy navigation raycasts run in parallel Burst, independent of approach/separation (all read positions read-only).
+                navigationHandle = new EnemyNavigationResolveJob
                 {
                     EvaluatedEnemyIndices = evaluatedEnemyIndices.AsArray(),
                     Positions = positions,
@@ -324,7 +326,7 @@ public partial struct EnemySteeringSystem : ISystem
                     NavigationGridState = tacticalNavigationGridState,
                     NavigationCells = tacticalNavigationCells.AsNativeArray(),
                     NavigationVelocityResults = navigationVelocityResults
-                }.Schedule(evaluatedCount, 32).Complete();
+                }.Schedule(evaluatedCount, 32, state.Dependency);
             }
 
             EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob tacticalJob = new EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob
@@ -351,7 +353,7 @@ public partial struct EnemySteeringSystem : ISystem
                 Results = tacticalVelocityResults,
                 RuntimeResults = tacticalRuntimeResults
             };
-            tacticalJob.Schedule(evaluatedCount, 64).Complete();
+            steeringJobsHandle = tacticalJob.Schedule(evaluatedCount, 64, JobHandle.CombineDependencies(combinedHandle, navigationHandle));
         }
 
         float deltaTime = SystemAPI.Time.DeltaTime * enemyTimeScale;
@@ -398,7 +400,7 @@ public partial struct EnemySteeringSystem : ISystem
             PhysicsWorld = physicsWorldSingleton,
             WallsLayerMask = wallsLayerMask,
             WallsEnabled = wallsEnabled
-        }.Schedule(enemyCount, 16).Complete();
+        }.Schedule(enemyCount, 16, steeringJobsHandle).Complete();
 
         activeEnemiesQuery.CopyFromComponentDataArray(enemyRuntimeArray);
         activeEnemiesQuery.CopyFromComponentDataArray(enemyKnockbackArray);
