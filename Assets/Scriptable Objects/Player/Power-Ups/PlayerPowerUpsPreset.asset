@@ -149,12 +149,12 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[16|powerUpId:Passive_OrbitalWings].moduleBindings.Array.data[0|moduleId:Module_OrbitalProjections].overridePayload.orbitalProjections.projections.Array.data[0].contactDamage
     addScaling: 1
-    formula: '[Damage]*0.5'
+    formula: '[Damage]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: passivePowerUps.Array.data[16|powerUpId:Passive_OrbitalWings].moduleBindings.Array.data[0|moduleId:Module_OrbitalProjections].overridePayload.orbitalProjections.projections.Array.data[1].contactDamage
     addScaling: 1
-    formula: '[Damage]*0.8'
+    formula: '[Damage]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: activePowerUps.Array.data[2|powerUpId:ActiveGigaLaser].moduleBindings.Array.data[6|moduleId:Module_SwitchWeapon].overridePayload.switchWeapon.weaponId
@@ -19954,14 +19954,14 @@ MonoBehaviour:
           formulas: []
         bomb:
           bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
-          spawnOffset: {x: 0, y: 0.4, z: -1.2}
+          spawnOffset: {x: 0, y: 0.5, z: -1.5}
           spawnOffsetOrientation: 0
           deploySpeed: 0
           velocityDirection: 0
-          collisionRadius: 0.18
-          bounceOnWalls: 1
+          collisionRadius: 0.2
+          bounceOnWalls: 0
           bounceDamping: 0.65
-          linearDampingPerSecond: 1.2
+          linearDampingPerSecond: 0
           fuseSeconds: 1.5
           radius: 25
           enableDamagePayload: 1
@@ -38527,7 +38527,7 @@ MonoBehaviour:
             displayName: Orbital Spear
             categoryId: 'OrbitalSpear '
             motionMode: 2
-            orbitDistance: 2
+            orbitDistance: 1.45
             heightOffset: 1
             angleOffsetDegrees: 0
             orbitSpeedDegreesPerSecond: 120
@@ -39427,7 +39427,7 @@ MonoBehaviour:
             displayName: Orbital Wing
             categoryId: 'OrbitalWing '
             motionMode: 2
-            orbitDistance: 1.5
+            orbitDistance: 1.35
             heightOffset: 1
             angleOffsetDegrees: 85
             orbitSpeedDegreesPerSecond: 120
@@ -39454,7 +39454,7 @@ MonoBehaviour:
             displayName: Orbital Wing
             categoryId: 'OrbitalWing '
             motionMode: 2
-            orbitDistance: 1.5
+            orbitDistance: 1.35
             heightOffset: 1
             angleOffsetDegrees: -85
             orbitSpeedDegreesPerSecond: 120
