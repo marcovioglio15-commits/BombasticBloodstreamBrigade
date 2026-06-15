@@ -5,7 +5,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Transforms;
-using UnityEngine;
 
 /// <summary>
 /// Runs enemy pursuit and separation steering using Burst jobs and LOD-driven update frequency.
@@ -17,6 +16,9 @@ public partial struct EnemySteeringSystem : ISystem
     #region Fields
     private EntityQuery activeEnemiesQuery;
     private EntityQuery playerQuery;
+
+    // Monotonic per-update counter replacing UnityEngine.Time.frameCount so the LOD cadence stays Burst-job friendly.
+    private int lodFrameCounter;
     #endregion
 
     #region Methods
@@ -110,7 +112,7 @@ public partial struct EnemySteeringSystem : ISystem
         float maxSeparationRadius = 0.25f;
         float maxBodyRadius = 0.05f;
         float maxSteeringAggressiveness = EnemySteeringUtility.DefaultSteeringAggressiveness;
-        int frameCount = Time.frameCount;
+        int frameCount = ++lodFrameCounter;
 
         for (int index = 0; index < enemyCount; index++)
             enemyIndexByEntity.TryAdd(enemyEntities[index], index);
@@ -308,25 +310,21 @@ public partial struct EnemySteeringSystem : ISystem
 
             if (tacticalNavigationReady)
             {
-                for (int evaluatedIndex = 0; evaluatedIndex < evaluatedCount; evaluatedIndex++)
+                // Per-enemy navigation raycasts run in parallel Burst instead of a sequential main-thread loop.
+                new EnemyNavigationResolveJob
                 {
-                    int enemyIndex = evaluatedEnemyIndices[evaluatedIndex];
-                    float navigationDesiredSpeed = speedData[enemyIndex].y > 0f ? speedData[enemyIndex].y : speedData[enemyIndex].x;
-                    float navigationCollisionRadius = math.max(0.01f, bodyRadii[enemyIndex] + enemyDataArray[enemyIndex].MinimumWallDistance);
-
-                    if (EnemyNavigationFlowFieldUtility.TryResolveNavigationVelocity(positions[enemyIndex],
-                                                                                    playerPosition,
-                                                                                    navigationCollisionRadius,
-                                                                                    navigationDesiredSpeed,
-                                                                                    in tacticalPhysicsWorldSingleton,
-                                                                                    tacticalWallsLayerMask,
-                                                                                    in tacticalNavigationGridState,
-                                                                                    tacticalNavigationCells,
-                                                                                    out float3 navigationVelocity))
-                    {
-                        navigationVelocityResults[evaluatedIndex] = navigationVelocity;
-                    }
-                }
+                    EvaluatedEnemyIndices = evaluatedEnemyIndices.AsArray(),
+                    Positions = positions,
+                    SpeedData = speedData,
+                    BodyRadii = bodyRadii,
+                    EnemyDataArray = enemyDataArray,
+                    PlayerPosition = playerPosition,
+                    PhysicsWorld = tacticalPhysicsWorldSingleton,
+                    WallsLayerMask = tacticalWallsLayerMask,
+                    NavigationGridState = tacticalNavigationGridState,
+                    NavigationCells = tacticalNavigationCells.AsNativeArray(),
+                    NavigationVelocityResults = navigationVelocityResults
+                }.Schedule(evaluatedCount, 32).Complete();
             }
 
             EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob tacticalJob = new EnemyTacticalNavigationUtility.EnemyTacticalCandidateJob
@@ -365,174 +363,42 @@ public partial struct EnemySteeringSystem : ISystem
 
         bool wallsEnabled = wallsLayerMask != 0;
 
-        for (int enemyIndex = 0; enemyIndex < enemyCount; enemyIndex++)
+        if (!tacticalVelocityResults.IsCreated)
+            tacticalVelocityResults = CollectionHelper.CreateNativeArray<float3>(0, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        if (!tacticalRuntimeResults.IsCreated)
+            tacticalRuntimeResults = CollectionHelper.CreateNativeArray<EnemyNavigationRuntimeState>(0, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        if (!priorityYieldUrgencyResults.IsCreated)
+            priorityYieldUrgencyResults = CollectionHelper.CreateNativeArray<float>(0, frameAllocator, NativeArrayOptions.UninitializedMemory);
+        if (!priorityYieldGapResults.IsCreated)
+            priorityYieldGapResults = CollectionHelper.CreateNativeArray<float>(0, frameAllocator, NativeArrayOptions.UninitializedMemory);
+
+        // Per-enemy wall raycasts + circumnavigation + knockback integration run in parallel Burst (was a main-thread loop).
+        new EnemyMovementIntegrationJob
         {
-            Entity enemyEntity = enemyEntities[enemyIndex];
-
-            if (customPatternMovementFlags[enemyIndex] != 0)
-                continue;
-
-            if (spawnInactivityLockFlags[enemyIndex] != 0)
-            {
-                EnemyRuntimeState lockedRuntimeState = enemyRuntimeArray[enemyIndex];
-                lockedRuntimeState.Velocity = float3.zero;
-                enemyRuntimeArray[enemyIndex] = lockedRuntimeState;
-                continue;
-            }
-
-            EnemyData enemyData = enemyDataArray[enemyIndex];
-            EnemyRuntimeState runtimeState = enemyRuntimeArray[enemyIndex];
-            EnemyKnockbackState knockbackState = enemyKnockbackArray[enemyIndex];
-            LocalTransform enemyTransform = enemyTransforms[enemyIndex];
-            float velocityMaxSpeed = math.max(0f, speedData[enemyIndex].y);
-            float enemySteeringAggressiveness = steeringAggressiveness[enemyIndex];
-
-            int evaluatedIndex = enemyToEvaluatedIndex[enemyIndex];
-
-            if (evaluatedIndex >= 0)
-            {
-                float3 desiredVelocity = tacticalVelocityResults[evaluatedIndex];
-                navigationRuntimeArray[enemyIndex] = tacticalRuntimeResults[evaluatedIndex];
-                float priorityYieldUrgency = math.saturate(priorityYieldUrgencyResults[evaluatedIndex]);
-                float priorityYieldGap = math.saturate(priorityYieldGapResults[evaluatedIndex]);
-
-                if (velocityMaxSpeed > 0f && priorityYieldUrgency > 0f)
-                {
-                    float speedBoost = EnemySteeringUtility.ResolvePriorityYieldSpeedBoost(priorityYieldUrgency, priorityYieldGap, enemySteeringAggressiveness);
-                    velocityMaxSpeed *= 1f + speedBoost;
-                }
-
-                float desiredSpeed = math.length(desiredVelocity);
-
-                if (velocityMaxSpeed > 0f && desiredSpeed > velocityMaxSpeed && desiredSpeed > EnemySteeringUtility.DirectionEpsilon)
-                    desiredVelocity *= velocityMaxSpeed / desiredSpeed;
-
-                float acceleration = math.max(0f, enemyData.Acceleration);
-                float deceleration = math.max(0f, enemyData.Deceleration);
-                float accelerationRate = EnemySteeringUtility.ResolveVelocityChangeRate(runtimeState.Velocity,
-                                                                                       desiredVelocity,
-                                                                                       acceleration,
-                                                                                       deceleration);
-
-                if (priorityYieldUrgency > 0f)
-                {
-                    float accelerationBoost = EnemySteeringUtility.ResolvePriorityYieldAccelerationBoost(priorityYieldUrgency, priorityYieldGap, enemySteeringAggressiveness);
-                    accelerationRate *= 1f + accelerationBoost;
-                }
-
-                float maxVelocityDelta = accelerationRate * deltaTime;
-                float3 velocityDelta = desiredVelocity - runtimeState.Velocity;
-                float velocityDeltaMagnitude = math.length(velocityDelta);
-
-                if (velocityDeltaMagnitude > maxVelocityDelta && velocityDeltaMagnitude > EnemySteeringUtility.DirectionEpsilon)
-                    runtimeState.Velocity += velocityDelta * (maxVelocityDelta / velocityDeltaMagnitude);
-                else
-                    runtimeState.Velocity = desiredVelocity;
-            }
-
-            float velocityMagnitude = math.length(runtimeState.Velocity);
-
-            if (velocityMaxSpeed > 0f && velocityMagnitude > velocityMaxSpeed && velocityMagnitude > EnemySteeringUtility.DirectionEpsilon)
-                runtimeState.Velocity *= velocityMaxSpeed / velocityMagnitude;
-
-            if (shooterMovementLockedFlags[enemyIndex] != 0)
-                runtimeState.Velocity = float3.zero;
-
-            float3 desiredDisplacement = runtimeState.Velocity * deltaTime;
-            float desiredDisplacementSquared = math.lengthsq(desiredDisplacement);
-            float3 position = enemyTransform.Position;
-            float3 resolvedDisplacement = desiredDisplacement;
-            float3 resolvedVelocity = runtimeState.Velocity;
-
-            if (wallsEnabled && desiredDisplacementSquared > EnemySteeringUtility.DirectionEpsilon)
-            {
-                float collisionRadius = math.max(0.01f, enemyData.BodyRadius + math.max(0f, enemyData.MinimumWallDistance));
-                bool hitWall = WorldWallCollisionUtility.TryResolveBlockedDisplacement(physicsWorldSingleton,
-                                                                                       position,
-                                                                                       desiredDisplacement,
-                                                                                       collisionRadius,
-                                                                                       wallsLayerMask,
-                                                                                       out float3 allowedDisplacement,
-                                                                                       out float3 hitNormal);
-
-                resolvedDisplacement = allowedDisplacement;
-
-                if (hitWall)
-                {
-                    resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(runtimeState.Velocity, hitNormal);
-                    float3 recoveryHitNormal = hitNormal;
-
-                    // If direct motion is blocked, try a short wall-circumnavigation displacement before stopping.
-                    if (evaluatedIndex >= 0 &&
-                        EnemyWallSteeringUtility.TryResolveCircumnavigationDisplacement(physicsWorldSingleton,
-                                                                                        enemyEntity.Index,
-                                                                                        enemyTransform.Position,
-                                                                                        playerPosition,
-                                                                                        runtimeState.Velocity,
-                                                                                        desiredDisplacement,
-                                                                                        allowedDisplacement,
-                                                                                        hitNormal,
-                                                                                        collisionRadius,
-                                                                                        wallsLayerMask,
-                                                                                        deltaTime,
-                                                                                        out float3 bypassDisplacement,
-                                                                                        out float3 bypassVelocity,
-                                                                                        out float3 bypassHitNormal))
-                    {
-                        resolvedDisplacement = bypassDisplacement;
-                        resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(bypassVelocity, bypassHitNormal);
-                        recoveryHitNormal = math.lengthsq(bypassHitNormal) > EnemySteeringUtility.DirectionEpsilon
-                            ? bypassHitNormal
-                            : hitNormal;
-                    }
-
-                    if (evaluatedIndex >= 0)
-                        PrimeNavigationWallRecovery(navigationRuntimeArray,
-                                                    tacticalConfigArray,
-                                                    enemyIndex,
-                                                    recoveryHitNormal,
-                                                    resolvedVelocity);
-                }
-            }
-
-            position += resolvedDisplacement;
-            runtimeState.Velocity = resolvedVelocity;
-            float knockbackCollisionRadius = math.max(0.01f, enemyData.BodyRadius + math.max(0f, enemyData.MinimumWallDistance));
-            EnemyKnockbackRuntimeUtility.ApplyDisplacement(ref knockbackState,
-                                                           ref position,
-                                                           knockbackCollisionRadius,
-                                                           in physicsWorldSingleton,
-                                                           wallsLayerMask,
-                                                           wallsEnabled,
-                                                           deltaTime);
-            position.y = enemyTransform.Position.y;
-            enemyTransform.Position = position;
-
-            float rotationSpeedDegreesPerSecond = enemyData.RotationSpeedDegreesPerSecond;
-            bool hasSelfRotation = math.abs(rotationSpeedDegreesPerSecond) > EnemySteeringUtility.RotationSpeedEpsilon;
-
-            if (hasSelfRotation)
-            {
-                float deltaYawRadians = math.radians(rotationSpeedDegreesPerSecond) * deltaTime;
-                quaternion deltaRotation = quaternion.RotateY(deltaYawRadians);
-                enemyTransform.Rotation = math.normalize(math.mul(enemyTransform.Rotation, deltaRotation));
-            }
-            else
-            {
-                EnemyShooterControlState shooterControlState = enemyShooterControlArray[enemyIndex];
-                float3 facingVelocity = EnemyKnockbackRuntimeUtility.ResolveCombinedVelocity(runtimeState.Velocity, in knockbackState);
-                enemyTransform.Rotation = EnemySteeringUtility.ResolveDynamicLookRotation(enemyTransform.Rotation,
-                                                                                          facingVelocity,
-                                                                                          math.max(velocityMaxSpeed, math.length(facingVelocity)),
-                                                                                          in shooterControlState,
-                                                                                          enemySteeringAggressiveness,
-                                                                                          deltaTime);
-            }
-
-            enemyRuntimeArray[enemyIndex] = runtimeState;
-            enemyKnockbackArray[enemyIndex] = knockbackState;
-            enemyTransforms[enemyIndex] = enemyTransform;
-        }
+            EnemyEntities = enemyEntities,
+            EnemyTransforms = enemyTransforms,
+            EnemyDataArray = enemyDataArray,
+            EnemyRuntimeArray = enemyRuntimeArray,
+            EnemyKnockbackArray = enemyKnockbackArray,
+            EnemyShooterControlArray = enemyShooterControlArray,
+            NavigationRuntimeArray = navigationRuntimeArray,
+            TacticalConfigArray = tacticalConfigArray,
+            SpeedData = speedData,
+            SteeringAggressiveness = steeringAggressiveness,
+            CustomPatternMovementFlags = customPatternMovementFlags,
+            SpawnInactivityLockFlags = spawnInactivityLockFlags,
+            ShooterMovementLockedFlags = shooterMovementLockedFlags,
+            EnemyToEvaluatedIndex = enemyToEvaluatedIndex,
+            TacticalVelocityResults = tacticalVelocityResults,
+            TacticalRuntimeResults = tacticalRuntimeResults,
+            PriorityYieldUrgencyResults = priorityYieldUrgencyResults,
+            PriorityYieldGapResults = priorityYieldGapResults,
+            PlayerPosition = playerPosition,
+            DeltaTime = deltaTime,
+            PhysicsWorld = physicsWorldSingleton,
+            WallsLayerMask = wallsLayerMask,
+            WallsEnabled = wallsEnabled
+        }.Schedule(enemyCount, 16).Complete();
 
         activeEnemiesQuery.CopyFromComponentDataArray(enemyRuntimeArray);
         activeEnemiesQuery.CopyFromComponentDataArray(enemyKnockbackArray);
@@ -612,6 +478,250 @@ public partial struct EnemySteeringSystem : ISystem
         runtimeState.PathCommitTimer = math.max(runtimeState.PathCommitTimer, 0.28f);
         runtimeState.StuckTimer = math.max(runtimeState.StuckTimer, math.max(0.05f, config.StuckRecoverySeconds));
         navigationRuntimeArray[enemyIndex] = runtimeState;
+    }
+    #endregion
+
+    #region Jobs
+    /// <summary>
+    /// Resolves per-enemy navigation-aware velocity (wall-aware flow-field follow) in parallel Burst.
+    /// </summary>
+    [BurstCompile]
+    private struct EnemyNavigationResolveJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<int> EvaluatedEnemyIndices;
+        [ReadOnly] public NativeArray<float3> Positions;
+        [ReadOnly] public NativeArray<float2> SpeedData;
+        [ReadOnly] public NativeArray<float> BodyRadii;
+        [ReadOnly] public NativeArray<EnemyData> EnemyDataArray;
+        [ReadOnly] public NativeArray<EnemyNavigationCellElement> NavigationCells;
+        [ReadOnly] public PhysicsWorldSingleton PhysicsWorld;
+        public EnemyNavigationGridState NavigationGridState;
+        public float3 PlayerPosition;
+        public int WallsLayerMask;
+        public NativeArray<float3> NavigationVelocityResults;
+
+        public void Execute(int evaluatedIndex)
+        {
+            int enemyIndex = EvaluatedEnemyIndices[evaluatedIndex];
+            float navigationDesiredSpeed = SpeedData[enemyIndex].y > 0f ? SpeedData[enemyIndex].y : SpeedData[enemyIndex].x;
+            float navigationCollisionRadius = math.max(0.01f, BodyRadii[enemyIndex] + EnemyDataArray[enemyIndex].MinimumWallDistance);
+
+            if (EnemyNavigationFlowFieldUtility.TryResolveNavigationVelocity(Positions[enemyIndex],
+                                                                            PlayerPosition,
+                                                                            navigationCollisionRadius,
+                                                                            navigationDesiredSpeed,
+                                                                            in PhysicsWorld,
+                                                                            WallsLayerMask,
+                                                                            in NavigationGridState,
+                                                                            NavigationCells,
+                                                                            out float3 navigationVelocity))
+            {
+                NavigationVelocityResults[evaluatedIndex] = navigationVelocity;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Integrates per-enemy desired velocity into movement: acceleration, wall raycasts, circumnavigation, knockback and facing.
+    /// Each iteration reads and writes only its own index, so parallel execution is race-free.
+    /// </summary>
+    [BurstCompile]
+    private struct EnemyMovementIntegrationJob : IJobParallelFor
+    {
+        [ReadOnly] public NativeArray<Entity> EnemyEntities;
+        [ReadOnly] public NativeArray<EnemyData> EnemyDataArray;
+        [ReadOnly] public NativeArray<EnemyShooterControlState> EnemyShooterControlArray;
+        [ReadOnly] public NativeArray<EnemyTacticalNavigationConfig> TacticalConfigArray;
+        [ReadOnly] public NativeArray<float2> SpeedData;
+        [ReadOnly] public NativeArray<float> SteeringAggressiveness;
+        [ReadOnly] public NativeArray<byte> CustomPatternMovementFlags;
+        [ReadOnly] public NativeArray<byte> SpawnInactivityLockFlags;
+        [ReadOnly] public NativeArray<byte> ShooterMovementLockedFlags;
+        [ReadOnly] public NativeArray<int> EnemyToEvaluatedIndex;
+        [ReadOnly] public NativeArray<float3> TacticalVelocityResults;
+        [ReadOnly] public NativeArray<EnemyNavigationRuntimeState> TacticalRuntimeResults;
+        [ReadOnly] public NativeArray<float> PriorityYieldUrgencyResults;
+        [ReadOnly] public NativeArray<float> PriorityYieldGapResults;
+        [ReadOnly] public PhysicsWorldSingleton PhysicsWorld;
+
+        public NativeArray<LocalTransform> EnemyTransforms;
+        public NativeArray<EnemyRuntimeState> EnemyRuntimeArray;
+        public NativeArray<EnemyKnockbackState> EnemyKnockbackArray;
+        public NativeArray<EnemyNavigationRuntimeState> NavigationRuntimeArray;
+
+        public float3 PlayerPosition;
+        public float DeltaTime;
+        public int WallsLayerMask;
+        public bool WallsEnabled;
+
+        public void Execute(int enemyIndex)
+        {
+            Entity enemyEntity = EnemyEntities[enemyIndex];
+
+            if (CustomPatternMovementFlags[enemyIndex] != 0)
+                return;
+
+            if (SpawnInactivityLockFlags[enemyIndex] != 0)
+            {
+                EnemyRuntimeState lockedRuntimeState = EnemyRuntimeArray[enemyIndex];
+                lockedRuntimeState.Velocity = float3.zero;
+                EnemyRuntimeArray[enemyIndex] = lockedRuntimeState;
+                return;
+            }
+
+            EnemyData enemyData = EnemyDataArray[enemyIndex];
+            EnemyRuntimeState runtimeState = EnemyRuntimeArray[enemyIndex];
+            EnemyKnockbackState knockbackState = EnemyKnockbackArray[enemyIndex];
+            LocalTransform enemyTransform = EnemyTransforms[enemyIndex];
+            float velocityMaxSpeed = math.max(0f, SpeedData[enemyIndex].y);
+            float enemySteeringAggressiveness = SteeringAggressiveness[enemyIndex];
+
+            int evaluatedIndex = EnemyToEvaluatedIndex[enemyIndex];
+
+            if (evaluatedIndex >= 0)
+            {
+                float3 desiredVelocity = TacticalVelocityResults[evaluatedIndex];
+                NavigationRuntimeArray[enemyIndex] = TacticalRuntimeResults[evaluatedIndex];
+                float priorityYieldUrgency = math.saturate(PriorityYieldUrgencyResults[evaluatedIndex]);
+                float priorityYieldGap = math.saturate(PriorityYieldGapResults[evaluatedIndex]);
+
+                if (velocityMaxSpeed > 0f && priorityYieldUrgency > 0f)
+                {
+                    float speedBoost = EnemySteeringUtility.ResolvePriorityYieldSpeedBoost(priorityYieldUrgency, priorityYieldGap, enemySteeringAggressiveness);
+                    velocityMaxSpeed *= 1f + speedBoost;
+                }
+
+                float desiredSpeed = math.length(desiredVelocity);
+
+                if (velocityMaxSpeed > 0f && desiredSpeed > velocityMaxSpeed && desiredSpeed > EnemySteeringUtility.DirectionEpsilon)
+                    desiredVelocity *= velocityMaxSpeed / desiredSpeed;
+
+                float acceleration = math.max(0f, enemyData.Acceleration);
+                float deceleration = math.max(0f, enemyData.Deceleration);
+                float accelerationRate = EnemySteeringUtility.ResolveVelocityChangeRate(runtimeState.Velocity,
+                                                                                       desiredVelocity,
+                                                                                       acceleration,
+                                                                                       deceleration);
+
+                if (priorityYieldUrgency > 0f)
+                {
+                    float accelerationBoost = EnemySteeringUtility.ResolvePriorityYieldAccelerationBoost(priorityYieldUrgency, priorityYieldGap, enemySteeringAggressiveness);
+                    accelerationRate *= 1f + accelerationBoost;
+                }
+
+                float maxVelocityDelta = accelerationRate * DeltaTime;
+                float3 velocityDelta = desiredVelocity - runtimeState.Velocity;
+                float velocityDeltaMagnitude = math.length(velocityDelta);
+
+                if (velocityDeltaMagnitude > maxVelocityDelta && velocityDeltaMagnitude > EnemySteeringUtility.DirectionEpsilon)
+                    runtimeState.Velocity += velocityDelta * (maxVelocityDelta / velocityDeltaMagnitude);
+                else
+                    runtimeState.Velocity = desiredVelocity;
+            }
+
+            float velocityMagnitude = math.length(runtimeState.Velocity);
+
+            if (velocityMaxSpeed > 0f && velocityMagnitude > velocityMaxSpeed && velocityMagnitude > EnemySteeringUtility.DirectionEpsilon)
+                runtimeState.Velocity *= velocityMaxSpeed / velocityMagnitude;
+
+            if (ShooterMovementLockedFlags[enemyIndex] != 0)
+                runtimeState.Velocity = float3.zero;
+
+            float3 desiredDisplacement = runtimeState.Velocity * DeltaTime;
+            float desiredDisplacementSquared = math.lengthsq(desiredDisplacement);
+            float3 position = enemyTransform.Position;
+            float3 resolvedDisplacement = desiredDisplacement;
+            float3 resolvedVelocity = runtimeState.Velocity;
+
+            if (WallsEnabled && desiredDisplacementSquared > EnemySteeringUtility.DirectionEpsilon)
+            {
+                float collisionRadius = math.max(0.01f, enemyData.BodyRadius + math.max(0f, enemyData.MinimumWallDistance));
+                bool hitWall = WorldWallCollisionUtility.TryResolveBlockedDisplacement(PhysicsWorld,
+                                                                                       position,
+                                                                                       desiredDisplacement,
+                                                                                       collisionRadius,
+                                                                                       WallsLayerMask,
+                                                                                       out float3 allowedDisplacement,
+                                                                                       out float3 hitNormal);
+
+                resolvedDisplacement = allowedDisplacement;
+
+                if (hitWall)
+                {
+                    resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(runtimeState.Velocity, hitNormal);
+                    float3 recoveryHitNormal = hitNormal;
+
+                    // If direct motion is blocked, try a short wall-circumnavigation displacement before stopping.
+                    if (evaluatedIndex >= 0 &&
+                        EnemyWallSteeringUtility.TryResolveCircumnavigationDisplacement(PhysicsWorld,
+                                                                                        enemyEntity.Index,
+                                                                                        enemyTransform.Position,
+                                                                                        PlayerPosition,
+                                                                                        runtimeState.Velocity,
+                                                                                        desiredDisplacement,
+                                                                                        allowedDisplacement,
+                                                                                        hitNormal,
+                                                                                        collisionRadius,
+                                                                                        WallsLayerMask,
+                                                                                        DeltaTime,
+                                                                                        out float3 bypassDisplacement,
+                                                                                        out float3 bypassVelocity,
+                                                                                        out float3 bypassHitNormal))
+                    {
+                        resolvedDisplacement = bypassDisplacement;
+                        resolvedVelocity = WorldWallCollisionUtility.RemoveVelocityIntoSurface(bypassVelocity, bypassHitNormal);
+                        recoveryHitNormal = math.lengthsq(bypassHitNormal) > EnemySteeringUtility.DirectionEpsilon
+                            ? bypassHitNormal
+                            : hitNormal;
+                    }
+
+                    if (evaluatedIndex >= 0)
+                        EnemySteeringSystem.PrimeNavigationWallRecovery(NavigationRuntimeArray,
+                                                                        TacticalConfigArray,
+                                                                        enemyIndex,
+                                                                        recoveryHitNormal,
+                                                                        resolvedVelocity);
+                }
+            }
+
+            position += resolvedDisplacement;
+            runtimeState.Velocity = resolvedVelocity;
+            float knockbackCollisionRadius = math.max(0.01f, enemyData.BodyRadius + math.max(0f, enemyData.MinimumWallDistance));
+            EnemyKnockbackRuntimeUtility.ApplyDisplacement(ref knockbackState,
+                                                           ref position,
+                                                           knockbackCollisionRadius,
+                                                           in PhysicsWorld,
+                                                           WallsLayerMask,
+                                                           WallsEnabled,
+                                                           DeltaTime);
+            position.y = enemyTransform.Position.y;
+            enemyTransform.Position = position;
+
+            float rotationSpeedDegreesPerSecond = enemyData.RotationSpeedDegreesPerSecond;
+            bool hasSelfRotation = math.abs(rotationSpeedDegreesPerSecond) > EnemySteeringUtility.RotationSpeedEpsilon;
+
+            if (hasSelfRotation)
+            {
+                float deltaYawRadians = math.radians(rotationSpeedDegreesPerSecond) * DeltaTime;
+                quaternion deltaRotation = quaternion.RotateY(deltaYawRadians);
+                enemyTransform.Rotation = math.normalize(math.mul(enemyTransform.Rotation, deltaRotation));
+            }
+            else
+            {
+                EnemyShooterControlState shooterControlState = EnemyShooterControlArray[enemyIndex];
+                float3 facingVelocity = EnemyKnockbackRuntimeUtility.ResolveCombinedVelocity(runtimeState.Velocity, in knockbackState);
+                enemyTransform.Rotation = EnemySteeringUtility.ResolveDynamicLookRotation(enemyTransform.Rotation,
+                                                                                          facingVelocity,
+                                                                                          math.max(velocityMaxSpeed, math.length(facingVelocity)),
+                                                                                          in shooterControlState,
+                                                                                          enemySteeringAggressiveness,
+                                                                                          DeltaTime);
+            }
+
+            EnemyRuntimeArray[enemyIndex] = runtimeState;
+            EnemyKnockbackArray[enemyIndex] = knockbackState;
+            EnemyTransforms[enemyIndex] = enemyTransform;
+        }
     }
     #endregion
 

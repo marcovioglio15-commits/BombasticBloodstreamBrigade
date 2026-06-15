@@ -307,6 +307,150 @@ public static class EnemyNavigationFlowFieldUtility
         return true;
     }
 
+    #region Job-Facing NativeArray Overloads
+    // Burst-job-facing overloads that accept the navigation cells as a NativeArray (obtained via DynamicBuffer.AsNativeArray()),
+    // so EnemySteeringSystem can resolve navigation velocity from inside a parallel job. Logic mirrors the DynamicBuffer paths above.
+
+    /// <summary>
+    /// NativeArray overload of <see cref="TryResolveNavigationVelocity(float3, float3, float, float, in PhysicsWorldSingleton, int, in EnemyNavigationGridState, DynamicBuffer{EnemyNavigationCellElement}, out float3)"/> usable inside Burst jobs.
+    /// </summary>
+    public static bool TryResolveNavigationVelocity(float3 currentPosition,
+                                                    float3 targetPosition,
+                                                    float collisionRadius,
+                                                    float desiredSpeed,
+                                                    in PhysicsWorldSingleton physicsWorldSingleton,
+                                                    int wallsLayerMask,
+                                                    in EnemyNavigationGridState navigationGridState,
+                                                    NativeArray<EnemyNavigationCellElement> navigationCells,
+                                                    out float3 desiredVelocity)
+    {
+        desiredVelocity = float3.zero;
+
+        if (navigationGridState.FlowReady == 0)
+            return false;
+
+        if (desiredSpeed <= DirectionEpsilon)
+            return false;
+
+        float3 toTarget = targetPosition - currentPosition;
+        toTarget.y = 0f;
+        float targetDistance = math.length(toTarget);
+
+        if (targetDistance <= DirectionEpsilon)
+            return false;
+
+        float navigationRadius = math.max(math.max(collisionRadius, navigationGridState.AgentRadius), MinimumAgentRadius);
+        bool directPathBlocked = WorldWallCollisionUtility.TryResolveBlockedDisplacement(physicsWorldSingleton,
+                                                                                         currentPosition,
+                                                                                         toTarget,
+                                                                                         navigationRadius,
+                                                                                         wallsLayerMask,
+                                                                                         out float3 allowedDisplacement,
+                                                                                         out float3 _);
+
+        if (!directPathBlocked || math.lengthsq(allowedDisplacement) >= math.lengthsq(toTarget) * 0.95f)
+        {
+            float3 directDirection = toTarget / math.max(targetDistance, DirectionEpsilon);
+            desiredVelocity = directDirection * desiredSpeed;
+            return true;
+        }
+
+        if (!TryResolveBestCellIndex(currentPosition, in navigationGridState, navigationCells, out int cellIndex))
+            return false;
+
+        EnemyNavigationCellElement navigationCell = navigationCells[cellIndex];
+
+        if (navigationCell.Cost == UnreachableCellCost)
+            return false;
+
+        float2 flowDirection = navigationCell.FlowDirection;
+
+        if (math.lengthsq(flowDirection) <= DirectionEpsilon)
+            return false;
+
+        desiredVelocity = new float3(flowDirection.x, 0f, flowDirection.y) * desiredSpeed;
+        return true;
+    }
+
+    /// <summary>
+    /// NativeArray overload of best-walkable-cell resolution usable inside Burst jobs.
+    /// </summary>
+    private static bool TryResolveBestCellIndex(float3 worldPosition,
+                                                in EnemyNavigationGridState navigationGridState,
+                                                NativeArray<EnemyNavigationCellElement> navigationCells,
+                                                out int cellIndex)
+    {
+        cellIndex = InvalidCellIndex;
+
+        if (!TryResolveCellCoordinates(worldPosition, in navigationGridState, out int cellX, out int cellY))
+            return false;
+
+        int directCellIndex = ResolveCellIndex(cellX, cellY, navigationGridState.Width);
+
+        if (navigationCells[directCellIndex].Walkable != 0)
+        {
+            cellIndex = directCellIndex;
+            return true;
+        }
+
+        return TryResolveNearbyWalkableCell(cellX,
+                                            cellY,
+                                            in navigationGridState,
+                                            navigationCells,
+                                            out cellIndex);
+    }
+
+    /// <summary>
+    /// NativeArray overload of nearby-walkable-cell recovery search usable inside Burst jobs.
+    /// </summary>
+    private static bool TryResolveNearbyWalkableCell(int sourceCellX,
+                                                     int sourceCellY,
+                                                     in EnemyNavigationGridState navigationGridState,
+                                                     NativeArray<EnemyNavigationCellElement> navigationCells,
+                                                     out int cellIndex)
+    {
+        cellIndex = InvalidCellIndex;
+        int bestDistanceSquared = int.MaxValue;
+
+        // Search a small local area first to recover from cells near wall boundaries without scanning the whole grid.
+        for (int radius = 1; radius <= SearchRadiusWhenCellBlocked; radius++)
+        {
+            bool foundCandidateAtCurrentRadius = false;
+
+            for (int offsetY = -radius; offsetY <= radius; offsetY++)
+            {
+                for (int offsetX = -radius; offsetX <= radius; offsetX++)
+                {
+                    int candidateX = sourceCellX + offsetX;
+                    int candidateY = sourceCellY + offsetY;
+
+                    if (!IsInsideGrid(candidateX, candidateY, navigationGridState.Width, navigationGridState.Height))
+                        continue;
+
+                    int candidateIndex = ResolveCellIndex(candidateX, candidateY, navigationGridState.Width);
+
+                    if (navigationCells[candidateIndex].Walkable == 0)
+                        continue;
+
+                    int distanceSquared = offsetX * offsetX + offsetY * offsetY;
+
+                    if (distanceSquared >= bestDistanceSquared)
+                        continue;
+
+                    bestDistanceSquared = distanceSquared;
+                    cellIndex = candidateIndex;
+                    foundCandidateAtCurrentRadius = true;
+                }
+            }
+
+            if (foundCandidateAtCurrentRadius)
+                return true;
+        }
+
+        return false;
+    }
+    #endregion
+
     /// <summary>
     /// Resolves one navigation-aware retreat velocity by following the opposite direction of the player-targeting flow field.
     /// </summary>

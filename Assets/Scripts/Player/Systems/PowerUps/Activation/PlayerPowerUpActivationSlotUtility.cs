@@ -224,7 +224,11 @@ public static class PlayerPowerUpActivationSlotUtility
             PlayerImpactFrameRuntimeUtility.Activate(ref impactFrameState, in slotConfig.ImpactFrame);
 
         if (slotConfig.HasGhostTrail != 0)
-            PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState, in slotConfig.GhostTrail, false);
+            PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState,
+                                                    in slotConfig.GhostTrail,
+                                                    false,
+                                                    byte.MaxValue,
+                                                    ResolveMatchedActiveDurationSeconds(in slotConfig));
 
         if (slotConfig.ToolKind == ActiveToolKind.PortableHealthPack)
             ExecutePortableHealthPack(in slotConfig,
@@ -267,6 +271,27 @@ public static class PlayerPowerUpActivationSlotUtility
         cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
     }
 
+    #endregion
+
+    #region Ghost Trail
+    /// <summary>
+    /// Resolves the host active's own finite duration so a Ghost Trail module set to match the activation duration can
+    /// emit on non-toggleable actives (e.g. Dash) that have no toggle on/off lifecycle to bound emission.
+    /// </summary>
+    /// <param name="slotConfig">Active slot configuration being executed.</param>
+    /// <returns>Host active finite duration in seconds, or zero when the tool has no sustained duration to match.</returns>
+    private static float ResolveMatchedActiveDurationSeconds(in PlayerPowerUpSlotConfig slotConfig)
+    {
+        switch (slotConfig.ToolKind)
+        {
+            case ActiveToolKind.Dash:
+                return math.max(0f, slotConfig.Dash.Duration);
+            case ActiveToolKind.BulletTime:
+                return math.max(0f, slotConfig.BulletTime.Duration);
+            default:
+                return 0f;
+        }
+    }
     #endregion
 
     #region Impact Frame

@@ -21,13 +21,17 @@ public static class PlayerGhostTrailRuntimeUtility
     /// </summary>
     /// <param name="config">Runtime Ghost Trail configuration.</param>
     /// <param name="toggleActivation">True when activation belongs to a toggleable Resource Gate.</param>
+    /// <param name="matchedActiveDurationSeconds">Host active's own finite duration, used when a non-toggleable active matches the activation duration.</param>
     /// <returns>True when duration and snapshot settings can produce a trail.</returns>
-    public static bool CanActivate(in GhostTrailPowerUpConfig config, bool toggleActivation)
+    public static bool CanActivate(in GhostTrailPowerUpConfig config,
+                                   bool toggleActivation,
+                                   float matchedActiveDurationSeconds = 0f)
     {
         return config.SnapshotLifetimeSeconds > ComparisonEpsilon &&
                config.MaximumActiveSnapshots > 0 &&
                (config.DurationSeconds > ComparisonEpsilon ||
-                toggleActivation && config.MatchToggleActivationDuration != 0);
+                (config.MatchToggleActivationDuration != 0 &&
+                 (toggleActivation || matchedActiveDurationSeconds > ComparisonEpsilon)));
     }
 
     /// <summary>
@@ -37,25 +41,37 @@ public static class PlayerGhostTrailRuntimeUtility
     /// <param name="config">Resolved slot-level Ghost Trail configuration.</param>
     /// <param name="toggleActivation">True when the owning active power-up remains toggle-active.</param>
     /// <param name="toggleSlotIndex">Owning toggle slot index, or byte.MaxValue for finite activations.</param>
+    /// <param name="matchedActiveDurationSeconds">Host active's own finite duration, used when a non-toggleable active (e.g. Dash) matches the activation duration.</param>
     public static void Activate(ref PlayerGhostTrailState state,
                                 in GhostTrailPowerUpConfig config,
                                 bool toggleActivation,
-                                byte toggleSlotIndex = byte.MaxValue)
+                                byte toggleSlotIndex = byte.MaxValue,
+                                float matchedActiveDurationSeconds = 0f)
     {
-        if (!CanActivate(in config, toggleActivation))
+        if (!CanActivate(in config, toggleActivation, matchedActiveDurationSeconds))
             return;
+
+        // Non-toggleable actives (e.g. Dash) have no toggle on/off lifecycle, so when the trail is authored to match
+        // the activation duration it inherits the host active's own finite duration instead of the unbounded toggle hold.
+        bool matchHostActiveDuration = !toggleActivation &&
+                                       config.MatchToggleActivationDuration != 0 &&
+                                       config.DurationSeconds <= ComparisonEpsilon &&
+                                       matchedActiveDurationSeconds > ComparisonEpsilon;
+        float resolvedDurationSeconds = matchHostActiveDuration
+            ? matchedActiveDurationSeconds
+            : math.max(0f, config.DurationSeconds);
 
         state.IsActive = 1;
         state.Phase = config.EaseInUnscaledSeconds > ComparisonEpsilon ? PhaseEaseIn : PhaseHold;
         state.MatchToggleActivationDuration = toggleActivation && config.MatchToggleActivationDuration != 0 ? (byte)1 : (byte)0;
         state.MatchedToggleSlotIndex = state.MatchToggleActivationDuration != 0 ? toggleSlotIndex : byte.MaxValue;
-        state.RemainingDurationSeconds = state.MatchToggleActivationDuration != 0 ? 0f : math.max(0f, config.DurationSeconds);
+        state.RemainingDurationSeconds = state.MatchToggleActivationDuration != 0 ? 0f : resolvedDurationSeconds;
         state.EaseInUnscaledSeconds = math.max(0f, config.EaseInUnscaledSeconds);
         state.EaseOutUnscaledSeconds = math.max(0f, config.EaseOutUnscaledSeconds);
         state.PhaseElapsedUnscaledSeconds = 0f;
         state.EffectElapsedUnscaledSeconds = 0f;
         state.TotalDurationUnscaledSeconds = math.max(ComparisonEpsilon,
-                                                      config.DurationSeconds +
+                                                      resolvedDurationSeconds +
                                                       state.EaseInUnscaledSeconds +
                                                       state.EaseOutUnscaledSeconds);
         state.CurrentBlend = state.Phase == PhaseEaseIn ? 0f : 1f;

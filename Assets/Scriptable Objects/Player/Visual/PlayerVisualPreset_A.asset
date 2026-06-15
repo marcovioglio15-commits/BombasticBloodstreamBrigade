@@ -315,7 +315,7 @@ MonoBehaviour:
       density: 0.32
       length: 0.17
       width: 0.026
-      irregularity: 0.8
+      irregularity: 0.5059
     health:
       enabled: 1
       hideWhenMaximumUnavailable: 0
@@ -328,9 +328,9 @@ MonoBehaviour:
         liquid: {r: 0.72, g: 0.16, b: 0.2, a: 1}
         liquidHighlight: {r: 0.95, g: 0.34, b: 0.35, a: 1}
         bubbles: {r: 1, g: 0.58, b: 0.56, a: 0.72}
-        graduation: {r: 0.9, g: 0.78, b: 0.32, a: 1}
+        graduation: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 1}
         label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
-        labelOutline: {r: 0.95, g: 0.78, b: 0.32, a: 0.9}
+        labelOutline: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 0.9}
         plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
         plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
         terminationOutline: {r: 0.04, g: 0.025, b: 0.035, a: 1}
@@ -366,15 +366,15 @@ MonoBehaviour:
     shield:
       enabled: 1
       hideWhenMaximumUnavailable: 1
-      smoothingSeconds: 0.08
+      smoothingSeconds: 2
       palette:
         outline: {r: 0.04, g: 0.025, b: 0.055, a: 1}
-        body: {r: 0.28, g: 0.13, b: 0.38, a: 1}
+        body: {r: 0, g: 0.09019608, b: 1, a: 1}
         bodyShadow: {r: 0.12, g: 0.055, b: 0.19, a: 1}
-        chamber: {r: 0.24, g: 0.15, b: 0.33, a: 0.82}
-        liquid: {r: 0.42, g: 0.16, b: 0.68, a: 1}
-        liquidHighlight: {r: 0.68, g: 0.36, b: 0.92, a: 1}
-        bubbles: {r: 0.78, g: 0.58, b: 1, a: 0.72}
+        chamber: {r: 0, g: 0.09019608, b: 1, a: 0.82}
+        liquid: {r: 0, g: 0.09069872, b: 1, a: 1}
+        liquidHighlight: {r: 0, g: 0.12695742, b: 1, a: 1}
+        bubbles: {r: 0, g: 0.1254902, b: 1, a: 0.72}
         graduation: {r: 0.9, g: 0.78, b: 0.32, a: 1}
         label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
         labelOutline: {r: 0.95, g: 0.78, b: 0.32, a: 0.9}

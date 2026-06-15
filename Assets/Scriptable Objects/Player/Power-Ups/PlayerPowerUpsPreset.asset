@@ -18096,7 +18096,7 @@ MonoBehaviour:
       moduleId: Module_ImpactFrame
       stage: 4
       isEnabled: 1
-      useOverridePayload: 0
+      useOverridePayload: 1
       overridePayload:
         holdCharge:
           requiredCharge: 500
@@ -18242,16 +18242,16 @@ MonoBehaviour:
           enemySlowPercent: 40
           transitionTimeSeconds: 0.2
         impactFrame:
-          durationMode: 0
-          durationFrames: 6
+          durationMode: 2
+          durationFrames: 120
           referenceFrameRate: 60
-          maximumUnscaledDurationSeconds: 0.12
-          easeInUnscaledSeconds: 0.02
-          easeOutUnscaledSeconds: 0.08
-          easingMode: 2
+          maximumUnscaledDurationSeconds: 0.2
+          easeInUnscaledSeconds: 0.1
+          easeOutUnscaledSeconds: 0.1
+          easingMode: 1
           timeSlowdownPercent: 95
           refreshOnShorterRequest: 0
-          presentationScope: 1
+          presentationScope: 0
           cameraFeedback:
             enabled: 0
             motionMode: 1
@@ -18265,63 +18265,63 @@ MonoBehaviour:
             zoomEnabled: 0
             zoomFovDelta: -2
           overlayIntensity: 1
-          filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
-          desaturationAmount: 0.65
-          vignetteIntensity: 0.55
-          vignetteSoftness: 0.6
+          filterTint: {r: 0, g: 0, b: 0, a: 0}
+          desaturationAmount: 1
+          vignetteIntensity: 0
+          vignetteSoftness: 1
           vignetteExtent: 0.35
           vignetteTint: {x: 0, y: 0, z: 0, w: 1}
           radialVignetteIntensity: 0
           radialVignetteRadius: 0.55
           radialVignetteSoftness: 0.12
-          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
-          chromaticAberration: 0.012
+          radialVignetteTint: {r: 0.004405493, g: 0.40973026, b: 0.9339623, a: 0.8}
+          chromaticAberration: 0.05
           scanlineIntensity: 0.18
           scanlineFrequency: 320
-          flashIntensity: 0.35
-          radialDistortion: 0.22
-          shockwaveIntensity: 0.35
+          flashIntensity: 0
+          radialDistortion: 1
+          shockwaveIntensity: 1
           shockwaveRadius: 0.65
           shockwaveThickness: 0.12
           zoomPunchIntensity: 0.18
           invertIntensity: 0
           posterizeIntensity: 0
-          posterizeSteps: 6
+          posterizeSteps: 3
           edgeInkIntensity: 0.2
           screenTearIntensity: 0
           screenTearFrequency: 24
           paletteFlashIntensity: 0.25
           paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
           buildIn:
-            enabled: 0
-            releaseUnscaledSeconds: 0.06
-            easingMode: 2
+            enabled: 1
+            releaseUnscaledSeconds: 0.1
+            easingMode: 1
             effect:
-              presentationScope: 1
+              presentationScope: 0
               timeSlowdownPercent: 0
               cameraFeedback:
-                enabled: 0
-                motionMode: 1
-                axisRightEnabled: 1
-                axisUpEnabled: 1
-                axisForwardEnabled: 0
+                enabled: 1
+                motionMode: 0
+                axisRightEnabled: 0
+                axisUpEnabled: 0
+                axisForwardEnabled: 1
                 positionalAmplitude: 0.35
-                forwardAmplitude: 0.12
-                rotationalAmplitude: 1.25
-                frequency: 18
+                forwardAmplitude: 15
+                rotationalAmplitude: 0
+                frequency: 0
                 zoomEnabled: 0
-                zoomFovDelta: -2
-              overlayIntensity: 0
-              filterTint: {r: 1, g: 1, b: 1, a: 1}
+                zoomFovDelta: -10
+              overlayIntensity: 1
+              filterTint: {r: 0.1760413, g: 0.42517477, b: 0.8679245, a: 0}
               desaturationAmount: 0
-              vignetteIntensity: 0
+              vignetteIntensity: 0.8
               vignetteSoftness: 0.6
-              vignetteExtent: 0.35
-              vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+              vignetteExtent: 0.07
+              vignetteTint: {x: 0.1764706, y: 0.42352945, z: 0.86666673, w: 0.84313726}
               radialVignetteIntensity: 0
-              radialVignetteRadius: 0.55
-              radialVignetteSoftness: 0.12
-              radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+              radialVignetteRadius: 1
+              radialVignetteSoftness: 0.05
+              radialVignetteTint: {r: 0.033018887, g: 0.57357216, b: 1, a: 0.7176471}
               chromaticAberration: 0
               scanlineIntensity: 0
               scanlineFrequency: 320
@@ -43422,8 +43422,8 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
-  secondaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveChargeShot
+  secondaryActivePowerUpId: ActiveGigaLaser
   equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:

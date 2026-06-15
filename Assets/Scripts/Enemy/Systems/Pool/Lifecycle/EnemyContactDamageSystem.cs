@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -7,6 +8,7 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyProjectileHitSystem))]
+[BurstCompile]
 public partial struct EnemyContactDamageSystem : ISystem
 {
     #region Fields
@@ -29,6 +31,7 @@ public partial struct EnemyContactDamageSystem : ISystem
         state.RequireForUpdate(playerQuery);
     }
 
+    [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
         EntityManager entityManager = state.EntityManager;
