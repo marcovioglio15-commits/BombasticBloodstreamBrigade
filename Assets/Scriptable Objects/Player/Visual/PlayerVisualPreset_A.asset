@@ -325,16 +325,16 @@ MonoBehaviour:
         body: {r: 0.36, g: 0.16, b: 0.19, a: 0.7529412}
         bodyShadow: {r: 0.17, g: 0.075, b: 0.105, a: 0.5686275}
         chamber: {r: 0.28, g: 0.16, b: 0.24, a: 0.6156863}
-        liquid: {r: 0.72, g: 0.16, b: 0.2, a: 1}
-        liquidHighlight: {r: 0.95, g: 0.34, b: 0.35, a: 1}
-        bubbles: {r: 1, g: 0.58, b: 0.56, a: 0.72}
+        liquid: {r: 0.28307498, g: 0.72156864, b: 0.1607843, a: 1}
+        liquidHighlight: {r: 0.4884091, g: 0.9490196, b: 0.34117645, a: 1}
+        bubbles: {r: 0.63469154, g: 1, b: 0.56078434, a: 0.72}
         graduation: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 1}
         label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
         labelOutline: {r: 0.03529412, g: 0.023529414, b: 0.03529412, a: 0.9}
         plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
         plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
         terminationOutline: {r: 0.04, g: 0.025, b: 0.035, a: 1}
-        terminationInterior: {r: 0.36, g: 0.16, b: 0.19, a: 1}
+        terminationInterior: {r: 0.61960787, g: 0.6392157, b: 0.61960787, a: 0.38}
       fluid:
         flowEnabled: 1
         flowSpeed: 0.45
@@ -354,7 +354,7 @@ MonoBehaviour:
         horizontalSloshEnabled: 1
         horizontalSloshStrength: 0.0119
         sloshSpring: 18
-        sloshDamping: 8
+        sloshDamping: 1
         maximumSlosh: 0.6
         tiltEnabled: 1
         maximumTiltDegrees: 5
@@ -362,7 +362,7 @@ MonoBehaviour:
         tiltDamping: 8
         valueImpulseEnabled: 1
         valueImpulseStrength: 1
-        valueImpulseDecay: 7
+        valueImpulseDecay: 1
     shield:
       enabled: 1
       hideWhenMaximumUnavailable: 1
@@ -381,7 +381,7 @@ MonoBehaviour:
         plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
         plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
         terminationOutline: {r: 0.04, g: 0.025, b: 0.055, a: 1}
-        terminationInterior: {r: 0.36, g: 0.16, b: 0.19, a: 1}
+        terminationInterior: {r: 0.61960787, g: 0.6392157, b: 0.61960787, a: 0.38}
       fluid:
         flowEnabled: 1
         flowSpeed: 0.45
@@ -401,7 +401,7 @@ MonoBehaviour:
         horizontalSloshEnabled: 1
         horizontalSloshStrength: 0.16
         sloshSpring: 18
-        sloshDamping: 8
+        sloshDamping: 1
         maximumSlosh: 0.25
         tiltEnabled: 1
         maximumTiltDegrees: 5
@@ -409,7 +409,7 @@ MonoBehaviour:
         tiltDamping: 8
         valueImpulseEnabled: 1
         valueImpulseStrength: 0.65
-        valueImpulseDecay: 7
+        valueImpulseDecay: 1
   muzzleFlashVfxPrefab: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
   muzzleFlashVfxSpawnOffset: {x: 0, y: 0.15, z: -0.1}
   muzzleFlashVfxScaleMultiplier: 1
