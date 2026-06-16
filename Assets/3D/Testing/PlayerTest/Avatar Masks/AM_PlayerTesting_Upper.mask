@@ -24,7 +24,7 @@ AvatarMask:
   - m_Path: PlayerRig/ROOT
     m_Weight: 0
   - m_Path: PlayerRig/ROOT/spine
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: PlayerRig/ROOT/spine/pelvis.L
     m_Weight: 0
   - m_Path: PlayerRig/ROOT/spine/pelvis.R
