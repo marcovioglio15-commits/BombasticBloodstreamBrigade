@@ -449,6 +449,69 @@ public static class EnemyNavigationFlowFieldUtility
 
         return false;
     }
+
+    /// <summary>
+    /// Detects whether a world position lies outside the walkable navigation area (outside the grid rect, or on a
+    /// blocked cell) and, if so, resolves the nearest walkable cell center to pull the agent back in. Burst-job-safe.
+    /// </summary>
+    /// <param name="currentPosition">Agent world position to test.</param>
+    /// <param name="navigationGridState">Current shared navigation-grid state.</param>
+    /// <param name="navigationCells">Navigation cells as a NativeArray (e.g. buffer.AsNativeArray()).</param>
+    /// <param name="recoveredPosition">Nearest walkable world position when out of bounds; unchanged otherwise.</param>
+    /// <returns>True when the position was out of bounds and a walkable recovery target was resolved.</returns>
+    public static bool TryResolveOutOfBoundsRecovery(float3 currentPosition,
+                                                     in EnemyNavigationGridState navigationGridState,
+                                                     NativeArray<EnemyNavigationCellElement> navigationCells,
+                                                     out float3 recoveredPosition)
+    {
+        recoveredPosition = currentPosition;
+
+        if (navigationGridState.FlowReady == 0 || navigationCells.Length == 0)
+            return false;
+
+        // Reconstruct the static wall bounding box from the padded grid (grid origin/max sit GridPaddingInCells cells
+        // outside the wall AABB; see grid build). Only positions BEYOND the walls are treated as out of bounds, so
+        // enemies that merely brush against interior walls (on clearance-blocked cells) are never falsely teleported.
+        float2 padding = navigationGridState.CellSize * GridPaddingInCells;
+        float2 wallMinimum = navigationGridState.Origin + padding;
+        float2 wallMaximum = navigationGridState.Origin
+                             + new float2(navigationGridState.Width, navigationGridState.Height) * navigationGridState.CellSize
+                             - padding;
+
+        if (wallMaximum.x <= wallMinimum.x || wallMaximum.y <= wallMinimum.y)
+            return false;
+
+        float2 planarPosition = new float2(currentPosition.x, currentPosition.z);
+        bool beyondWalls = planarPosition.x < wallMinimum.x ||
+                           planarPosition.y < wallMinimum.y ||
+                           planarPosition.x > wallMaximum.x ||
+                           planarPosition.y > wallMaximum.y;
+
+        if (!beyondWalls)
+            return false;
+
+        // Escaped beyond the arena: pull back to the nearest walkable cell, searching inward from the clamped edge cell.
+        int rawCellX = (int)math.floor((currentPosition.x - navigationGridState.Origin.x) * navigationGridState.InverseCellSize);
+        int rawCellY = (int)math.floor((currentPosition.z - navigationGridState.Origin.y) * navigationGridState.InverseCellSize);
+        int searchCellX = math.clamp(rawCellX, 0, navigationGridState.Width - 1);
+        int searchCellY = math.clamp(rawCellY, 0, navigationGridState.Height - 1);
+
+        if (TryResolveNearbyWalkableCell(searchCellX, searchCellY, in navigationGridState, navigationCells, out int recoveredCellIndex))
+        {
+            int2 recoveredCoords = ResolveCoordinatesFromIndex(recoveredCellIndex, navigationGridState.Width);
+            float2 recoveredCenter = ResolveCellCenter(navigationGridState.Origin,
+                                                       navigationGridState.CellSize,
+                                                       recoveredCoords.x,
+                                                       recoveredCoords.y);
+            recoveredPosition = new float3(recoveredCenter.x, currentPosition.y, recoveredCenter.y);
+            return true;
+        }
+
+        // Fallback when no nearby walkable cell is found: clamp into the wall bounds so the agent is back inside the arena.
+        float2 clampedPosition = math.clamp(planarPosition, wallMinimum, wallMaximum);
+        recoveredPosition = new float3(clampedPosition.x, currentPosition.y, clampedPosition.y);
+        return true;
+    }
     #endregion
 
     /// <summary>

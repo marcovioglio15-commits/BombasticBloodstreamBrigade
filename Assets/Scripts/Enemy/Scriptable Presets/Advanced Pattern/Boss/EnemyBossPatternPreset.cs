@@ -15,7 +15,7 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     [Tooltip("Unique ID for this boss pattern preset.")]
     [SerializeField] private string presetId;
 
-    [Tooltip("Human-readable boss pattern preset name shown in Enemy Management Tool.")]
+    [Tooltip(" boss pattern preset name shown in Enemy Management Tool.")]
     [SerializeField] private string presetName = "New Boss Pattern Preset";
 
     [Tooltip("Short description of this boss pattern preset.")]

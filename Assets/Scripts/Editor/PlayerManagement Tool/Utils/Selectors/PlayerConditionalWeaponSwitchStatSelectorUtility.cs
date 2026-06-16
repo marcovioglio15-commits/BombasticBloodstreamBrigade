@@ -253,7 +253,7 @@ internal static class PlayerConditionalWeaponSwitchStatSelectorUtility
     /// Maps a scalable stat type to a short label string used in the popup display.
     /// </summary>
     /// <param name="statType">Stat type being labeled.</param>
-    /// <returns>Short human-readable type label.</returns>
+    /// <returns>Short  type label.</returns>
     private static string ResolveStatTypeLabel(PlayerScalableStatType statType)
     {
         switch (statType)

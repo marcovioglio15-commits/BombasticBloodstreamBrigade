@@ -36,7 +36,7 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
 
         TextField nameField = new TextField("Preset Name");
         nameField.isDelayed = true;
-        nameField.tooltip = "Human-readable boss pattern preset name shown in Enemy Management Tool.";
+        nameField.tooltip = " boss pattern preset name shown in Enemy Management Tool.";
         nameField.BindProperty(nameProperty);
         nameField.RegisterValueChangedCallback(evt =>
         {

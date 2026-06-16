@@ -172,7 +172,7 @@ internal static class GameSceneLoadingProgressRuntimeUtility
     /// </summary>
     /// <param name="config">Runtime scene manager config.</param>
     /// <param name="sceneDefinition">Scene definition being displayed.</param>
-    /// <returns>Stable human-readable loading label.</returns>
+    /// <returns>Stable  loading label.</returns>
     public static string ResolveSceneLabel(GameSceneManagerConfig config, GameSceneDefinitionElement sceneDefinition)
     {
         if (config.LoadBackend == GameSceneLoadBackend.Addressables && sceneDefinition.AddressableKey.Length > 0)

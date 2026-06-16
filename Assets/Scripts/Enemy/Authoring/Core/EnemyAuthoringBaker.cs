@@ -1665,7 +1665,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// </summary>
     /// <param name="authoring">Source enemy authoring component used for warning context.</param>
     /// <param name="candidatePrefab">Candidate runtime VFX prefab.</param>
-    /// <param name="contextLabel">Human-readable VFX context used by bake warnings.</param>
+    /// <param name="contextLabel"> VFX context used by bake warnings.</param>
     /// <returns>Resolved prefab entity, or Entity.Null when no valid prefab is authored.</returns>
     private Entity ResolveRuntimeVfxPrefabEntity(EnemyAuthoring authoring,
                                                  GameObject candidatePrefab,
@@ -1899,7 +1899,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <param name="authoring">Source enemy authoring component used for warning context.</param>
     /// <param name="settings">Authored enemy projectile VFX event settings.</param>
     /// <param name="fallbackPrefab">Optional fallback prefab used when the event has no direct assignment.</param>
-    /// <param name="contextLabel">Human-readable VFX context used by bake warnings.</param>
+    /// <param name="contextLabel"> VFX context used by bake warnings.</param>
     /// <returns>Runtime event config with safe presentation values.</returns>
     private EnemyProjectileVfxEventConfig BuildEnemyProjectileVfxEventConfig(EnemyAuthoring authoring,
                                                                              EnemyProjectileVfxEventSettings settings,

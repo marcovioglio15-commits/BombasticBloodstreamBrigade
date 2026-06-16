@@ -164,7 +164,7 @@ public sealed class PlayerPowerUpContainerInteractionSettingsPropertyDrawer : Pr
     /// </summary>
     /// <param name="warningsRoot">UI container receiving warning boxes.</param>
     /// <param name="property">Serialized float property inspected.</param>
-    /// <param name="label">Human-readable field label.</param>
+    /// <param name="label"> field label.</param>
     /// <param name="message">Warning text describing runtime handling.</param>
     private static void AddNonNegativeWarning(VisualElement warningsRoot,
                                               SerializedProperty property,

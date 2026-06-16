@@ -29,7 +29,7 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     [Tooltip("Unique ID for this shared modules and patterns preset.")]
     [SerializeField] private string presetId;
 
-    [Tooltip("Human-readable preset name shown inside Enemy Management Tool.")]
+    [Tooltip(" preset name shown inside Enemy Management Tool.")]
     [SerializeField] private string presetName = "New Enemy Modules And Patterns Preset";
 
     [Tooltip("Short description of this shared modules and patterns preset.")]

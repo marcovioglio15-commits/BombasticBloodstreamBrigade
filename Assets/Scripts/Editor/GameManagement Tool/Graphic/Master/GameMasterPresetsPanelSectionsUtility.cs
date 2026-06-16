@@ -319,7 +319,7 @@ internal static class GameMasterPresetsPanelSectionsUtility
     /// <param name="objectType">Accepted preset asset type.</param>
     /// <param name="tooltip">Object field tooltip.</param>
     /// <param name="panelType">Side panel opened by the row.</param>
-    /// <param name="sectionName">Human-readable section name.</param>
+    /// <param name="sectionName"> section name.</param>
     /// <param name="createCallback">Callback used to create and assign a new preset.</param>
     private static void AddSubPresetControl(GameMasterPresetsPanel panel,
                                             VisualElement section,

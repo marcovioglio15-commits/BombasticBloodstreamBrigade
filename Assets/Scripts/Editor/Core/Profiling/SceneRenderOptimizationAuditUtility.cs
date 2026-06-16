@@ -55,7 +55,7 @@ public static class SceneRenderOptimizationAuditUtility
     /// <summary>
     /// Builds a text report for currently loaded scenes that can be copied from the Unity Console.
     /// </summary>
-    /// <returns>Human-readable render optimization report.</returns>
+    /// <returns> render optimization report.</returns>
     public static string BuildOpenScenesRenderingAuditReport()
     {
         MeshRenderer[] meshRenderers = Resources.FindObjectsOfTypeAll<MeshRenderer>();

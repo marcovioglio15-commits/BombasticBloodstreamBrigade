@@ -628,7 +628,7 @@ public static class PlayerScalableStatTypeUtility
     /// Builds the compact editor-facing label used to describe one scalable-stat type in formula helpers.
     /// </summary>
     /// <param name="statType">Source scalable-stat type.</param>
-    /// <returns>Short human-readable type label.</returns>
+    /// <returns>Short  type label.</returns>
     public static string BuildDisplayLabel(PlayerScalableStatType statType)
     {
         switch (statType)

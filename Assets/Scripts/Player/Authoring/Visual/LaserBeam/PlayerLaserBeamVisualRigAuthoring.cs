@@ -212,7 +212,7 @@ public sealed class PlayerLaserBeamVisualRigAuthoring : MonoBehaviour
     /// Emits one warning when an authored prefab slot is empty.
     /// </summary>
     /// <param name="prefab">Assigned prefab to validate.</param>
-    /// <param name="label">Human-readable slot description.</param>
+    /// <param name="label"> slot description.</param>
     private void ValidatePrefabReference(GameObject prefab, string label)
     {
         if (prefab != null)

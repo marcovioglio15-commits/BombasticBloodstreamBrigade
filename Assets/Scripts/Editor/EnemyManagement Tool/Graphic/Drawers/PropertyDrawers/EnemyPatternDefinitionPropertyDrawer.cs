@@ -45,7 +45,7 @@ public sealed class EnemyPatternDefinitionPropertyDrawer : PropertyDrawer
         AddDelayedTextField(root,
                             displayNameProperty,
                             "Display Name",
-                            "Human-readable label shown in Pattern Assemble and Pattern Loadout.");
+                            " label shown in Pattern Assemble and Pattern Loadout.");
         AddDelayedTextField(root,
                             descriptionProperty,
                             "Description",

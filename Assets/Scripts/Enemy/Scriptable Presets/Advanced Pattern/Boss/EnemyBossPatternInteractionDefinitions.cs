@@ -509,7 +509,7 @@ public sealed class EnemyBossPatternInteractionDefinition
     /// Converts an interaction type into a readable default label.
     /// </summary>
     /// <param name="type">Interaction type to format.</param>
-    /// <returns>Human-readable interaction type label.</returns>
+    /// <returns> interaction type label.</returns>
     public static string FormatInteractionType(EnemyBossPatternInteractionType type)
     {
         switch (type)

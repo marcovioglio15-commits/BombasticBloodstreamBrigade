@@ -233,7 +233,7 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
     /// </summary>
     /// <param name="moduleKind">Module kind value.</param>
     /// <param name="editorMode">Payload visibility mode for the current authoring context.</param>
-    /// <returns>Human-readable module kind description.</returns>
+    /// <returns> module kind description.</returns>
     private static string ResolveModuleKindDescription(EnemyPatternModuleKind moduleKind, EnemyAdvancedPatternPayloadEditorMode editorMode)
     {
         switch (moduleKind)

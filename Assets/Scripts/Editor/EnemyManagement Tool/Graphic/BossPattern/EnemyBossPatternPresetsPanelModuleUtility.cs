@@ -610,7 +610,7 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     /// Converts a catalog section into user-facing text.
     /// </summary>
     /// <param name="section">Catalog section to format.</param>
-    /// <returns>Human-readable section text.</returns>
+    /// <returns> section text.</returns>
     private static string FormatSection(EnemyPatternModuleCatalogSection section)
     {
         switch (section)

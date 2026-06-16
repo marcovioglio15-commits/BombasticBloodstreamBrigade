@@ -222,7 +222,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualWarningsUtility
     /// Adds one warning HelpBox to the supplied container.
     /// </summary>
     /// <param name="container">Destination warning container.</param>
-    /// <param name="message">Human-readable warning message.</param>
+    /// <param name="message"> warning message.</param>
     private static void AddWarning(VisualElement container, string message)
     {
         container.Add(new HelpBox(message, HelpBoxMessageType.Warning));

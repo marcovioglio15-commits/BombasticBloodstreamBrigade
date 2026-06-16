@@ -532,7 +532,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     /// </summary>
     /// <param name="interactionProperty">Serialized interaction property.</param>
     /// <param name="index">Interaction index.</param>
-    /// <returns>Human-readable title.</returns>
+    /// <returns> title.</returns>
     private static string BuildInteractionTitle(SerializedProperty interactionProperty, int index)
     {
         SerializedProperty displayNameProperty = interactionProperty.FindPropertyRelative("displayName");
@@ -562,7 +562,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
     /// Converts an interaction type into user-facing text.
     /// </summary>
     /// <param name="interactionType">Interaction type to format.</param>
-    /// <returns>Human-readable interaction type.</returns>
+    /// <returns> interaction type.</returns>
     private static string FormatInteractionType(EnemyBossPatternInteractionType interactionType)
     {
         return EnemyBossPatternInteractionDefinition.FormatInteractionType(interactionType);

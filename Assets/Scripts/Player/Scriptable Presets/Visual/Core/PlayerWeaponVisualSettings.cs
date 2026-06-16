@@ -269,7 +269,7 @@ public sealed class PlayerWeaponVisualSettings
     /// Base Gun and each mountable entry to keep messages consistent.
     /// </summary>
     /// <param name="selector">Authored prefab-relative path or unique object name.</param>
-    /// <param name="slotLabel">Human-readable label included in the warning text.</param>
+    /// <param name="slotLabel"> label included in the warning text.</param>
     /// <param name="runtimeVisualBridgePrefab">Runtime visual bridge prefab used to resolve the selector.</param>
     /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
     private static void ValidateSelector(string selector,

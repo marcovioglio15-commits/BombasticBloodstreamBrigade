@@ -13,7 +13,7 @@ public sealed class GameSceneDefinition
     [Tooltip("Stable scene ID used by UI commands, transition definitions and trigger volumes.")]
     [SerializeField] private string sceneId;
 
-    [Tooltip("Human-readable scene name shown in tools and used as a fallback load key.")]
+    [Tooltip(" scene name shown in tools and used as a fallback load key.")]
     [SerializeField] private string sceneName;
 
     [Tooltip("Project-relative path to the Unity scene asset.")]

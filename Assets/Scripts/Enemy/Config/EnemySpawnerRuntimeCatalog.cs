@@ -137,7 +137,7 @@ public sealed class EnemySpawnerRuntimeSceneEntry
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Human-readable scene name shown by the runtime spawner tool.")]
+    [Tooltip(" scene name shown by the runtime spawner tool.")]
     [SerializeField] private string sceneName;
 
     [Tooltip("Project-relative Unity scene path used only for diagnostics and editor regeneration.")]
@@ -354,7 +354,7 @@ public sealed class EnemySpawnerRuntimeWavePresetFolderEntry
     [Tooltip("Project-relative folder path containing EnemyWavePreset assets.")]
     [SerializeField] private string folderPath;
 
-    [Tooltip("Human-readable folder label shown in the runtime tool.")]
+    [Tooltip(" folder label shown in the runtime tool.")]
     [SerializeField] private string displayName;
 
     [Tooltip("Wave presets contained in this folder.")]

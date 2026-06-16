@@ -158,7 +158,7 @@ internal static class EnemyAdvancedPatternSharedPresetSectionUtility
                                                                                metadataFoldout,
                                                                                "presetName",
                                                                                "Shared Preset Name",
-                                                                               "Human-readable shared preset name shown in Enemy Management Tool.",
+                                                                               " shared preset name shown in Enemy Management Tool.",
                                                                                false,
                                                                                true);
         EnemyAdvancedPatternSharedPresetEditorUtility.AddSharedPresetTextField(panel,

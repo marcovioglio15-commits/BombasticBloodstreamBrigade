@@ -16,7 +16,7 @@ public readonly struct GameAudioDefaultEventDefinition
     /// </summary>
     /// <param name="eventId">Stable gameplay event identifier.</param>
     /// <param name="eventCode">Production-facing event code shown in the tool.</param>
-    /// <param name="displayName">Human-readable section label.</param>
+    /// <param name="displayName"> section label.</param>
     /// <param name="description">Short explanation of when this event is requested.</param>
     public GameAudioDefaultEventDefinition(GameAudioEventId eventId,
                                            string eventCode,

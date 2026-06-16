@@ -15633,7 +15633,7 @@ MonoBehaviour:
               color: {r: 1, g: 0.35, b: 0.05, a: 1}
           powerUpStealer:
             triggerMode: 0
-            consumeModuleActivationAttemptOnSpawnOnly: 1
+            consumeModuleActivationAttemptOnSpawnOnly: 0
             targetKind: 2
             selectionMode: 2
             activeTargetBiasPercent: 100
