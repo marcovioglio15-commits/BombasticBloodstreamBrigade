@@ -12,7 +12,6 @@ using Unity.Transforms;
 public partial struct EnemyBombardierBombSystem : ISystem
 {
     #region Constants
-    private const float PlayerHitRadius = 0.55f;
     private const float HiddenBombScale = 0.0001f;
     #endregion
 
@@ -241,7 +240,7 @@ public partial struct EnemyBombardierBombSystem : ISystem
 
         float3 delta = bombState.LandingPosition - playerSnapshot.Position;
         delta.y = 0f;
-        float hitRadius = math.max(0f, bombState.DamageRadius) + PlayerHitRadius;
+        float hitRadius = math.max(0f, bombState.DamageRadius) + PlayerHitAreaUtility.HitRadius;
         return math.lengthsq(delta) <= hitRadius * hitRadius;
     }
 

@@ -233,6 +233,11 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("Visibility settings for a Jetpack VFX GameObject positioned directly inside the Visual Player hierarchy.")]
     [SerializeField] private PlayerJetpackVfxSettings playerJetpackVfx = new PlayerJetpackVfxSettings();
 
+    [Header("Ground Shadow")]
+    [Tooltip("World-space hit-box shadow settings rendered under the player without health or shield rings.")]
+    [SerializeField]
+    private PlayerGroundShadowSettings groundShadow = new PlayerGroundShadowSettings();
+
     [Header("Health Bars")]
     [Tooltip("ECS-authoritative procedural syringe settings used by the player health and shield HUD views.")]
     [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
@@ -666,6 +671,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public PlayerGroundShadowSettings GroundShadow
+    {
+        get
+        {
+            return groundShadow;
+        }
+    }
+
     public PlayerHealthBarsVisualSettings HealthBars
     {
         get
@@ -868,6 +881,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (playerJetpackVfx == null)
             playerJetpackVfx = new PlayerJetpackVfxSettings();
 
+        if (groundShadow == null)
+            groundShadow = new PlayerGroundShadowSettings();
+
         if (healthBars == null)
             healthBars = new PlayerHealthBarsVisualSettings();
 
@@ -881,6 +897,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
         deathAnimation.Validate();
         projectileDeathVfx.Validate(name);
         playerJetpackVfx.Validate(runtimeVisualBridgePrefab, name);
+        groundShadow.Validate(name);
         healthBars.Validate(name);
     }
     #endregion

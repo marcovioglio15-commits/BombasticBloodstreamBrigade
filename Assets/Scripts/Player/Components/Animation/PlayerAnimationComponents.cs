@@ -87,13 +87,14 @@ public enum PlayerUpperBodyAnimationActionKind : byte
 }
 
 /// <summary>
-/// Stores the implicit Base Gun shoot clip and the upper-body charge / release clips selected by scalable
-/// power-up payload selectors. Per-weapon shoot clips live on <see cref="PlayerAdditionalWeaponVisualElement"/>
-/// buffer entries so each weapon ID can carry its own clip end-to-end.
+/// Stores the upper-body idle clip, the implicit Base Gun shoot clip, and the charge / release clips selected
+/// by scalable power-up payload selectors. Per-weapon shoot clips live on
+/// <see cref="PlayerAdditionalWeaponVisualElement"/> buffer entries so each weapon ID can carry its own clip end-to-end.
 /// </summary>
 public struct PlayerUpperBodyAnimationClipConfig : IComponentData
 {
     #region Fields
+    public UnityObjectRef<AnimationClip> UpperBodyIdle;
     public UnityObjectRef<AnimationClip> DefaultShoot;
     public UnityObjectRef<AnimationClip> PrimaryCharge;
     public UnityObjectRef<AnimationClip> SecondaryCharge;

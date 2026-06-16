@@ -21,11 +21,14 @@ public sealed class EnemyAuthoring : MonoBehaviour
     private const float DefaultSpawnVfxScaleMultiplier = 1f;
     private const float DefaultDeathVfxLifetimeSeconds = 0.75f;
     private const float DefaultDeathVfxScaleMultiplier = 1f;
+    private const float DefaultBulletVfxLifetimeSeconds = 0.5f;
+    private const float DefaultBulletVfxScaleMultiplier = 1f;
     private const float DefaultSpatialUiRingThickness = 0.08f;
     private const float DefaultSpatialUiRingSpacing = 0.03f;
     private const float DefaultSpatialUiHeightOffset = 0.035f;
     private const float DefaultRingDistanceFromShadow = 0.05f;
     private const bool DefaultHealthRingsEnabled = true;
+    private const float DefaultProjectionMaxDistance = 4f;
     private static readonly Vector2 DefaultPositionOffsetXZ = Vector2.zero;
     private const float DefaultShadowAlpha = 1f;
     private const float DefaultShadowEdgeSoftness = 0.08f;
@@ -800,6 +803,94 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public EnemyProjectileVfxEventSettings BulletHitVfx
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return null;
+
+            return settings.BulletHitVfx;
+        }
+    }
+
+    public GameObject BulletHitVfxPrefab
+    {
+        get
+        {
+            EnemyProjectileVfxEventSettings settings = BulletHitVfx;
+
+            if (settings == null)
+                return null;
+
+            return settings.VfxPrefab;
+        }
+    }
+
+    public Vector3 BulletHitVfxSpawnOffset
+    {
+        get
+        {
+            EnemyProjectileVfxEventSettings settings = BulletHitVfx;
+
+            if (settings == null)
+                return Vector3.zero;
+
+            return settings.SpawnOffset;
+        }
+    }
+
+    public float BulletHitVfxLifetimeSeconds
+    {
+        get
+        {
+            EnemyProjectileVfxEventSettings settings = BulletHitVfx;
+
+            if (settings == null)
+                return DefaultBulletVfxLifetimeSeconds;
+
+            return settings.LifetimeSeconds;
+        }
+    }
+
+    public float BulletHitVfxScaleMultiplier
+    {
+        get
+        {
+            EnemyProjectileVfxEventSettings settings = BulletHitVfx;
+
+            if (settings == null)
+                return DefaultBulletVfxScaleMultiplier;
+
+            return settings.ScaleMultiplier;
+        }
+    }
+
+    public bool BulletHitVfxEnabled
+    {
+        get
+        {
+            EnemyProjectileVfxEventSettings settings = BulletHitVfx;
+
+            return settings != null && settings.Enabled;
+        }
+    }
+
+    public EnemyProjectileDeathVfxSettings BulletDeathVfx
+    {
+        get
+        {
+            EnemyVisualPrefabSettings settings = ResolveVisualPrefabSettings();
+
+            if (settings == null)
+                return null;
+
+            return settings.BulletDeathVfx;
+        }
+    }
+
     public bool UseEnemyBaseColorForDeathDebris
     {
         get
@@ -992,6 +1083,32 @@ public sealed class EnemyAuthoring : MonoBehaviour
                 return DefaultPositionOffsetXZ;
 
             return settings.PositionOffsetXZ;
+        }
+    }
+
+    public GroundShadowProjectionMode GroundShadowProjectionMode
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return GroundShadowProjectionMode.RaisedQuad;
+
+            return settings.ProjectionMode;
+        }
+    }
+
+    public float GroundShadowProjectionMaxDistance
+    {
+        get
+        {
+            EnemyVisualFootprintSettings settings = ResolveFootprintSettings();
+
+            if (settings == null)
+                return DefaultProjectionMaxDistance;
+
+            return settings.ProjectionMaxDistance;
         }
     }
 

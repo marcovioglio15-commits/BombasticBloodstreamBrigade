@@ -12,7 +12,6 @@ public partial struct EnemyProjectileHitPlayerSystem : ISystem
 {
     #region Constants
     private const float BaseProjectileHitRadius = 0.05f;
-    private const float PlayerHitRadius = 0.55f;
     #endregion
 
     #region Fields
@@ -38,7 +37,9 @@ public partial struct EnemyProjectileHitPlayerSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         ComponentLookup<PlayerDashState> dashStateLookup = SystemAPI.GetComponentLookup<PlayerDashState>(true);
         ComponentLookup<PlayerControllerConfig> playerControllerLookup = SystemAPI.GetComponentLookup<PlayerControllerConfig>(true);
+        ComponentLookup<EnemyProjectileHitVfxConfig> enemyProjectileHitVfxLookup = SystemAPI.GetComponentLookup<EnemyProjectileHitVfxConfig>(true);
         BufferLookup<ProjectilePoolElement> projectilePoolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
+        BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         BufferLookup<PlayerElementStackElement> playerElementStackLookup = SystemAPI.GetBufferLookup<PlayerElementStackElement>(false);
         Entity playerEntity = Entity.Null;
         LocalTransform playerTransform = default;
@@ -116,7 +117,7 @@ public partial struct EnemyProjectileHitPlayerSystem : ISystem
             float3 delta = projectileTransform.ValueRO.Position - playerPosition;
             delta.y = 0f;
             float projectileScale = math.max(0.01f, projectileTransform.ValueRO.Scale);
-            float hitRadius = BaseProjectileHitRadius * projectileScale + math.max(0f, projectile.ValueRO.ExplosionRadius) + PlayerHitRadius;
+            float hitRadius = BaseProjectileHitRadius * projectileScale + math.max(0f, projectile.ValueRO.ExplosionRadius) + PlayerHitAreaUtility.HitRadius;
 
             if (math.lengthsq(delta) > hitRadius * hitRadius)
                 continue;
@@ -124,6 +125,10 @@ public partial struct EnemyProjectileHitPlayerSystem : ISystem
             if (canEnqueueAudioRequests)
                 GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.BulletImpactPlayer, projectileTransform.ValueRO.Position);
 
+            ProjectileDeathVfxRuntimeUtility.TryEnqueueEnemyHit(shooterEntity,
+                                                                in projectileTransform.ValueRO,
+                                                                in enemyProjectileHitVfxLookup,
+                                                                ref vfxRequestLookup);
             accumulatedDamage += math.max(0f, projectile.ValueRO.Damage);
 
             int elementalPayloadEntryCount = ProjectileElementalPayloadUtility.GetEntryCount(in elementalPayload.ValueRO);

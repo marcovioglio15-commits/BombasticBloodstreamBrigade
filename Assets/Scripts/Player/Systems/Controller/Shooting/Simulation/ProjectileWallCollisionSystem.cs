@@ -55,6 +55,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
         ComponentLookup<PlayerProjectileDeathVfxConfig> projectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
+        ComponentLookup<EnemyProjectileDeathVfxConfig> enemyProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyProjectileDeathVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
 
         foreach ((RefRW<Projectile> projectile,
@@ -140,6 +141,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                         in projectileTransform.ValueRO,
                                                         in projectileContactStateLookup,
                                                         in projectileDeathVfxConfigLookup,
+                                                        in enemyProjectileDeathVfxConfigLookup,
                                                         ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,

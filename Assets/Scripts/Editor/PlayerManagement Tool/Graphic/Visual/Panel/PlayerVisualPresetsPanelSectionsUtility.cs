@@ -144,6 +144,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                "Death Animation",
                                BuildDeathAnimationSubSection(panel));
         AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.GroundShadow,
+                               "Ground Shadow",
+                               PlayerVisualPresetsPanelGroundShadowSectionUtility.Build(panel));
+        AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.HealthBars,
                                "Health Bars",
                                PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));

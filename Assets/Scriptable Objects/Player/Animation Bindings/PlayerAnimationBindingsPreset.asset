@@ -43,7 +43,8 @@ MonoBehaviour:
   proceduralLeanEnabled: 0
   proceduralLeanSmoothing: 10
   proceduralLeanParameter: ProcLean
-  idleClip: {fileID: -7682889681619475870, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}
+  idleClip: {fileID: -3519482659287562382, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}
+  upperBodyIdleClip: {fileID: -7682889681619475870, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}
   moveForwardClip: {fileID: -6267363079896020788, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}
   moveBackwardClip: {fileID: -3233816583190804532, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}
   moveLeftClip: {fileID: 7336976285641930673, guid: 6e70100d4c83ac24f82af9ccbc995a47, type: 3}

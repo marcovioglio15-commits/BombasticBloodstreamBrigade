@@ -249,7 +249,7 @@ public sealed class EnemyVisualPreset : ScriptableObject
         footprint.Validate();
         offensiveEngagementFeedback.Validate();
         bossPatternChangeFeedback.Validate();
-        prefabs.Validate();
+        prefabs.Validate(name);
         deathPuddle.Validate();
         spawnOverrides.Validate();
         projectileOffscreenWarning.Validate();

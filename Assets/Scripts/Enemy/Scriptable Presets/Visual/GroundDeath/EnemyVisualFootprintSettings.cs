@@ -35,6 +35,12 @@ public sealed class EnemyVisualFootprintSettings
     [Tooltip("Local root-space XZ fine-tune added after the automatic visual-bounds center detection. Contact damage, debug rings, shadow and the indicator use this same resolved center.")]
     [SerializeField] private Vector2 positionOffsetXZ = Vector2.zero;
 
+    [Tooltip("Controls whether the shadow uses the authored raised quad position or ray-projects onto the ground surface below the hit center.")]
+    [SerializeField] private GroundShadowProjectionMode projectionMode = GroundShadowProjectionMode.RaisedQuad;
+
+    [Tooltip("Maximum downward distance in meters used when Projection Mode is Project Onto Ground. If no ground is found within this distance, the raised quad fallback is used.")]
+    [SerializeField] private float projectionMaxDistance = 4f;
+
     [Tooltip("When enabled, the ground footprint renders health and shield rings around the hit-box shadow. Disable this to keep only the shadow while preserving the same hit-footprint center.")]
     [SerializeField] private bool healthRingsEnabled = true;
 
@@ -146,6 +152,22 @@ public sealed class EnemyVisualFootprintSettings
         get
         {
             return positionOffsetXZ;
+        }
+    }
+
+    public GroundShadowProjectionMode ProjectionMode
+    {
+        get
+        {
+            return projectionMode;
+        }
+    }
+
+    public float ProjectionMaxDistance
+    {
+        get
+        {
+            return projectionMaxDistance;
         }
     }
 

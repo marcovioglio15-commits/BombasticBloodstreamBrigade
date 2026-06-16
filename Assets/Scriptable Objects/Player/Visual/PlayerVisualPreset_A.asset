@@ -284,6 +284,16 @@ MonoBehaviour:
     speedForMaximumScale: 10
     normalScaleSpeedPercent: 80
     scaleVariationPercent: 100
+  groundShadow:
+    enabled: 1
+    hitAreaMultiplier: 1
+    positionOffsetXZ: {x: 0, y: 0}
+    heightOffset: 0.5
+    projectionMode: 1
+    projectionMaxDistance: 4
+    shadowColor: {r: 0, g: 0, b: 0, a: 0.5}
+    shadowAlpha: 1
+    shadowEdgeSoftness: 0.08
   healthBars:
     enabled: 1
     hideWhenPlayerMissing: 1

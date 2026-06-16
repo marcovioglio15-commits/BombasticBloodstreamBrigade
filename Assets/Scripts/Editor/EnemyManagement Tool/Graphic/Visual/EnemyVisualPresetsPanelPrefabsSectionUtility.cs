@@ -39,6 +39,8 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
         container.Add(BuildHitVfxFoldout(panel, prefabsProperty));
         container.Add(BuildSpawnVfxFoldout(panel, prefabsProperty));
         container.Add(BuildDeathVfxFoldout(panel, prefabsProperty));
+        container.Add(BuildBulletHitVfxFoldout(panel, prefabsProperty));
+        container.Add(BuildBulletDeathVfxFoldout(panel, prefabsProperty));
         container.Add(EnemyVisualPresetsPanelDeathPuddleSectionUtility.Build(panel,
                                                                              deathPuddleProperty,
                                                                              prefabsProperty));
@@ -164,6 +166,70 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     }
 
     /// <summary>
+    /// Builds enemy bullet-hit VFX controls and hides dependent settings until the event or prefab is authored.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <returns>Foldout containing enemy bullet-hit VFX controls.</returns>
+    private static Foldout BuildBulletHitVfxFoldout(EnemyVisualPresetsPanel panel, SerializedProperty prefabsProperty)
+    {
+        Foldout foldout = CreatePrefabFoldout(prefabsProperty,
+                                              "Bullet Hit VFX",
+                                              "BulletHitVfx",
+                                              "Optional one-shot VFX spawned when enemy-owned projectiles hit the player.");
+        SerializedProperty eventProperty = prefabsProperty.FindPropertyRelative("bulletHitVfx");
+        BuildProjectileVfxEvent(panel,
+                                foldout,
+                                eventProperty,
+                                "Player Hit",
+                                "BulletHit",
+                                "Spawns when an enemy-owned projectile hits the player.",
+                                null);
+        return foldout;
+    }
+
+    /// <summary>
+    /// Builds enemy bullet-death VFX controls for range/lifetime expiry and terminal wall impacts.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="prefabsProperty">Serialized prefab settings block.</param>
+    /// <returns>Foldout containing enemy bullet-death VFX controls.</returns>
+    private static Foldout BuildBulletDeathVfxFoldout(EnemyVisualPresetsPanel panel, SerializedProperty prefabsProperty)
+    {
+        Foldout foldout = CreatePrefabFoldout(prefabsProperty,
+                                              "Bullet Death VFX",
+                                              "BulletDeathVfx",
+                                              "Optional one-shot VFX spawned when enemy-owned projectiles expire by range, lifetime, or terminal wall impact.");
+        SerializedProperty settingsProperty = prefabsProperty.FindPropertyRelative("bulletDeathVfx");
+
+        if (settingsProperty == null)
+        {
+            foldout.Add(new HelpBox("Bullet Death VFX settings are missing.", HelpBoxMessageType.Warning));
+            return foldout;
+        }
+
+        SerializedProperty rangeOrLifetimeProperty = settingsProperty.FindPropertyRelative("rangeOrLifetime");
+        SerializedProperty rangeOrLifetimePrefabProperty = rangeOrLifetimeProperty != null
+            ? rangeOrLifetimeProperty.FindPropertyRelative("vfxPrefab")
+            : null;
+        BuildProjectileVfxEvent(panel,
+                                foldout,
+                                rangeOrLifetimeProperty,
+                                "Range / Lifetime Expiry",
+                                "BulletDeathRangeOrLifetime",
+                                "Spawns when an enemy projectile reaches its range or lifetime without hitting the player.",
+                                null);
+        BuildProjectileVfxEvent(panel,
+                                foldout,
+                                settingsProperty.FindPropertyRelative("terminalWallHit"),
+                                "Terminal Wall Hit",
+                                "BulletDeathTerminalWall",
+                                "Spawns when a wall impact terminates an enemy projectile after all bounces are unavailable. Leave the prefab empty to reuse Range / Lifetime Expiry.",
+                                rangeOrLifetimePrefabProperty);
+        return foldout;
+    }
+
+    /// <summary>
     /// Builds metadata controls used by wave painting and editor previews.
     /// </summary>
     /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
@@ -186,6 +252,145 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     #endregion
 
     #region Field Helpers
+    /// <summary>
+    /// Builds one enemy projectile VFX event editor with conditional prefab details and warnings.
+    /// </summary>
+    /// <param name="panel">Visual preset panel that owns the active serialized preset.</param>
+    /// <param name="parent">Parent container receiving the event foldout.</param>
+    /// <param name="eventProperty">Serialized projectile VFX event property.</param>
+    /// <param name="title">User-facing event title.</param>
+    /// <param name="stateSuffix">Stable foldout-state key suffix.</param>
+    /// <param name="tooltip">Event behavior description.</param>
+    /// <param name="fallbackPrefabProperty">Optional fallback prefab property used when this event has no override.</param>
+    private static void BuildProjectileVfxEvent(EnemyVisualPresetsPanel panel,
+                                                VisualElement parent,
+                                                SerializedProperty eventProperty,
+                                                string title,
+                                                string stateSuffix,
+                                                string tooltip,
+                                                SerializedProperty fallbackPrefabProperty)
+    {
+        Foldout eventFoldout = eventProperty != null
+            ? CreatePrefabFoldout(eventProperty,
+                                  title,
+                                  stateSuffix,
+                                  tooltip)
+            : ManagementToolFoldoutStateUtility.CreateFoldout(title,
+                                                               "NashCore.EnemyManagement.Visual.ProjectileVfx." + stateSuffix,
+                                                               true);
+        eventFoldout.tooltip = tooltip;
+        parent.Add(eventFoldout);
+
+        if (eventProperty == null)
+        {
+            eventFoldout.Add(new HelpBox(title + " settings are missing.", HelpBoxMessageType.Warning));
+            return;
+        }
+
+        SerializedProperty enabledProperty = eventProperty.FindPropertyRelative("enabled");
+        SerializedProperty prefabProperty = eventProperty.FindPropertyRelative("vfxPrefab");
+        SerializedProperty offsetProperty = eventProperty.FindPropertyRelative("spawnOffset");
+        SerializedProperty scaleProperty = eventProperty.FindPropertyRelative("scaleMultiplier");
+        SerializedProperty lifetimeProperty = eventProperty.FindPropertyRelative("lifetimeSeconds");
+        VisualElement eventBody = new VisualElement();
+        VisualElement details = new VisualElement();
+        VisualElement warnings = new VisualElement();
+
+        AddEventPropertyField(panel,
+                              eventFoldout,
+                              enabledProperty,
+                              "Enabled",
+                              tooltip);
+        AddEventPropertyField(panel,
+                              eventBody,
+                              prefabProperty,
+                              fallbackPrefabProperty != null ? "VFX Prefab Override" : "VFX Prefab",
+                              fallbackPrefabProperty != null
+                                  ? "Optional one-shot VFX override for this event. Leave empty to reuse the Range / Lifetime Expiry prefab."
+                                  : "One-shot VFX prefab spawned for this enemy projectile event.");
+        AddEventPropertyField(panel,
+                              details,
+                              offsetProperty,
+                              "Spawn Offset",
+                              "Projectile-local offset applied at the projectile pose. The offset scales with the current projectile size.");
+        AddEventPropertyField(panel,
+                              details,
+                              scaleProperty,
+                              "Scale Multiplier",
+                              "Uniform VFX scale multiplier applied on top of the current projectile size.");
+        AddEventPropertyField(panel,
+                              details,
+                              lifetimeProperty,
+                              "Lifetime Seconds",
+                              "Lifetime in seconds before the spawned one-shot VFX returns to the managed VFX pool.");
+        eventBody.Add(details);
+        eventBody.Add(warnings);
+        eventFoldout.Add(eventBody);
+
+        Refresh();
+        TrackProjectileVfxEventRefresh(eventFoldout, enabledProperty, Refresh);
+        TrackProjectileVfxEventRefresh(eventFoldout, prefabProperty, Refresh);
+        TrackProjectileVfxEventRefresh(eventFoldout, fallbackPrefabProperty, Refresh);
+        TrackProjectileVfxEventRefresh(eventFoldout, offsetProperty, Refresh);
+        TrackProjectileVfxEventRefresh(eventFoldout, scaleProperty, Refresh);
+        TrackProjectileVfxEventRefresh(eventFoldout, lifetimeProperty, Refresh);
+
+        void Refresh()
+        {
+            bool eventEnabled = enabledProperty != null && enabledProperty.boolValue;
+            bool hasPrefab = prefabProperty != null && prefabProperty.objectReferenceValue != null;
+            bool hasFallbackPrefab = fallbackPrefabProperty != null && fallbackPrefabProperty.objectReferenceValue != null;
+            eventBody.style.display = eventEnabled || hasPrefab ? DisplayStyle.Flex : DisplayStyle.None;
+            details.style.display = hasPrefab || eventEnabled && hasFallbackPrefab ? DisplayStyle.Flex : DisplayStyle.None;
+            RefreshProjectileVfxEventWarnings(warnings,
+                                              eventEnabled,
+                                              hasPrefab || hasFallbackPrefab,
+                                              offsetProperty,
+                                              scaleProperty,
+                                              lifetimeProperty);
+        }
+    }
+
+    /// <summary>
+    /// Adds one standard event property field and marks the enemy draft session dirty on edits.
+    /// </summary>
+    /// <param name="panel">Visual preset panel owning the active serialized object.</param>
+    /// <param name="parent">Parent container receiving the field.</param>
+    /// <param name="property">Serialized property to bind.</param>
+    /// <param name="label">User-facing field label.</param>
+    /// <param name="tooltip">Field behavior description.</param>
+    private static void AddEventPropertyField(EnemyVisualPresetsPanel panel,
+                                              VisualElement parent,
+                                              SerializedProperty property,
+                                              string label,
+                                              string tooltip)
+    {
+        if (parent == null || property == null)
+            return;
+
+        PropertyField field = new PropertyField(property, label);
+        field.tooltip = tooltip;
+        field.BindProperty(property);
+        field.RegisterCallback<SerializedPropertyChangeEvent>(evt => MarkPanelDirty(panel));
+        parent.Add(field);
+    }
+
+    /// <summary>
+    /// Registers a property tracker that refreshes one enemy projectile VFX event editor.
+    /// </summary>
+    /// <param name="root">Element owning the property tracker.</param>
+    /// <param name="property">Property whose changes trigger a refresh.</param>
+    /// <param name="refresh">Refresh callback.</param>
+    private static void TrackProjectileVfxEventRefresh(VisualElement root,
+                                                       SerializedProperty property,
+                                                       Action refresh)
+    {
+        if (root == null || property == null || refresh == null)
+            return;
+
+        root.TrackPropertyValue(property, changedProperty => refresh());
+    }
+
     /// <summary>
     /// Builds one optional VFX foldout with prefab-gated timing, offset, lifetime, scale and warning controls.
     /// </summary>
@@ -673,6 +878,54 @@ internal static class EnemyVisualPresetsPanelPrefabsSectionUtility
     #endregion
 
     #region Warnings
+    /// <summary>
+    /// Rebuilds enemy projectile VFX event warnings without mutating serialized data.
+    /// </summary>
+    /// <param name="warnings">Container receiving warning boxes.</param>
+    /// <param name="eventEnabled">Current authored event-enabled value.</param>
+    /// <param name="hasPrefab">True when this event has a direct or fallback VFX prefab.</param>
+    /// <param name="offsetProperty">Serialized offset property.</param>
+    /// <param name="scaleProperty">Serialized scale property.</param>
+    /// <param name="lifetimeProperty">Serialized lifetime property.</param>
+    private static void RefreshProjectileVfxEventWarnings(VisualElement warnings,
+                                                          bool eventEnabled,
+                                                          bool hasPrefab,
+                                                          SerializedProperty offsetProperty,
+                                                          SerializedProperty scaleProperty,
+                                                          SerializedProperty lifetimeProperty)
+    {
+        if (warnings == null)
+            return;
+
+        warnings.Clear();
+
+        if (eventEnabled && !hasPrefab)
+            warnings.Add(new HelpBox("This event is enabled but no VFX prefab is assigned.", HelpBoxMessageType.Warning));
+
+        if (!hasPrefab)
+            return;
+
+        if (offsetProperty != null)
+        {
+            Vector3 offset = offsetProperty.vector3Value;
+
+            if (IsInvalidFloat(offset.x) || IsInvalidFloat(offset.y) || IsInvalidFloat(offset.z))
+                warnings.Add(new HelpBox("Spawn Offset contains an invalid numeric value.", HelpBoxMessageType.Warning));
+        }
+
+        if (scaleProperty != null &&
+            (IsInvalidFloat(scaleProperty.floatValue) || scaleProperty.floatValue <= 0f))
+        {
+            warnings.Add(new HelpBox("Scale Multiplier should be finite and greater than zero.", HelpBoxMessageType.Warning));
+        }
+
+        if (lifetimeProperty != null &&
+            (IsInvalidFloat(lifetimeProperty.floatValue) || lifetimeProperty.floatValue <= 0f))
+        {
+            warnings.Add(new HelpBox("Lifetime Seconds should be finite and greater than zero.", HelpBoxMessageType.Warning));
+        }
+    }
+
     /// <summary>
     /// Adds warnings for authored optional VFX values without mutating serialized data.
     /// </summary>

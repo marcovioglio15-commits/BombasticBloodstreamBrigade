@@ -39,6 +39,7 @@ public static class PlayerAnimationBindingsPresetTransferUtility
     private static readonly string[] ClipPropertyPaths =
     {
         "idleClip",
+        "upperBodyIdleClip",
         "moveForwardClip",
         "moveBackwardClip",
         "moveLeftClip",
@@ -73,6 +74,8 @@ public static class PlayerAnimationBindingsPresetTransferUtility
         {
             case PlayerAnimationClipSlot.Idle:
                 return preset.IdleClip;
+            case PlayerAnimationClipSlot.UpperBodyIdle:
+                return preset.UpperBodyIdleClip;
             case PlayerAnimationClipSlot.MoveForward:
                 return preset.MoveForwardClip;
             case PlayerAnimationClipSlot.MoveBackward:

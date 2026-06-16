@@ -7,7 +7,7 @@ using UnityEngine;
 /// <summary>
 /// Validates the upper-body clip bake contract and the manually sampled Animator state machine. Per-weapon
 /// shooting clips and the implicit default shoot clip now come from the visual preset's mountable weapons
-/// array; only charge and release clips remain on the animation bindings preset.
+/// array; idle, charge, and release clips remain on the animation bindings preset.
 /// </summary>
 internal static class PlayerUpperBodyAnimationSmokeTestUtility
 {
@@ -32,6 +32,7 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
     {
         PlayerAnimationBindingsPreset animationPreset = ScriptableObject.CreateInstance<PlayerAnimationBindingsPreset>();
         PlayerVisualPreset visualPreset = ScriptableObject.CreateInstance<PlayerVisualPreset>();
+        AnimationClip upperBodyIdleClip = new AnimationClip();
         AnimationClip cannonShoot = new AnimationClip();
         AnimationClip chargeClip = new AnimationClip();
         AnimationClip releaseClip = new AnimationClip();
@@ -41,6 +42,7 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
             // Author charge/release clips on the animation bindings preset.
             SerializedObject serializedAnimationPreset = new SerializedObject(animationPreset);
             serializedAnimationPreset.Update();
+            serializedAnimationPreset.FindProperty("upperBodyIdleClip").objectReferenceValue = upperBodyIdleClip;
             serializedAnimationPreset.FindProperty("upperBodyActionClips.primaryChargeClip").objectReferenceValue = chargeClip;
             serializedAnimationPreset.FindProperty("upperBodyActionClips.secondaryReleaseClip").objectReferenceValue = releaseClip;
             serializedAnimationPreset.ApplyModifiedPropertiesWithoutUndo();
@@ -60,12 +62,14 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
             PlayerUpperBodyAnimationClipConfig clipConfig =
                 PlayerControllerConfigBakeUtility.BuildUpperBodyAnimationClipConfig(animationPreset,
                                                                                      visualPreset);
+            AssertClip(upperBodyIdleClip, clipConfig.UpperBodyIdle.Value, "Upper-body idle clip bake");
             AssertClip(cannonShoot, clipConfig.DefaultShoot.Value, "Default shooting clip bake (derived from default entry)");
             AssertClip(chargeClip, clipConfig.PrimaryCharge.Value, "Primary charge clip bake");
             AssertClip(releaseClip, clipConfig.SecondaryRelease.Value, "Secondary release clip bake");
         }
         finally
         {
+            UnityEngine.Object.DestroyImmediate(upperBodyIdleClip);
             UnityEngine.Object.DestroyImmediate(cannonShoot);
             UnityEngine.Object.DestroyImmediate(chargeClip);
             UnityEngine.Object.DestroyImmediate(releaseClip);
@@ -97,6 +101,11 @@ internal static class PlayerUpperBodyAnimationSmokeTestUtility
 
         if (upperBodyStateMachine.defaultState != idleState)
             throw new Exception("ST_Idle must be the default UpperBody state.");
+
+        AnimationClip idleClip = idleState.motion as AnimationClip;
+
+        if (idleClip != animationPreset.UpperBodyIdleClip)
+            throw new Exception("ST_Idle must use the configured upper-body idle clip.");
 
         if (!IsConfiguredUpperBodyActionClip(actionState.motion as AnimationClip,
                                              animationPreset,

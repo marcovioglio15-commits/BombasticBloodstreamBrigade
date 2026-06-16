@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -56,9 +57,25 @@ public partial struct EnemyGroundIndicatorSyncSystem : ISystem
     {
         EntityManager entityManager = state.EntityManager;
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
+        PhysicsWorldSingleton physicsWorldSingleton = default;
+        bool hasPhysicsWorld = SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out physicsWorldSingleton);
+
+        // Skip ground projection while a scene transition is active so the indicators never cast against a
+        // physics world whose collider blob assets are being released by the unloading gameplay subscene.
+        bool sceneTransitionActive = SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
+                                     transitionState.IsTransitioning != 0;
+        bool canProjectOntoGround = hasPhysicsWorld && !sceneTransitionActive;
+        // Exclude the Walls layer so indicators project onto the floor only, never onto adjacent wall colliders.
+        uint groundProbeMask = GroundShadowProjectionUtility.ResolveGroundProbeMask((uint)WorldWallCollisionUtility.ResolveWallsLayerMask());
         ResolveMainCameraTransform(elapsedTime);
         Transform cameraTransform = cachedMainCameraTransform;
-        SyncGroundIndicatorViews(ref state, entityManager, SystemAPI.Time.DeltaTime, cameraTransform);
+        SyncGroundIndicatorViews(ref state,
+                                 entityManager,
+                                 SystemAPI.Time.DeltaTime,
+                                 cameraTransform,
+                                 canProjectOntoGround,
+                                 groundProbeMask,
+                                 in physicsWorldSingleton);
         ReleaseInactiveFallbackViews(entityManager);
     }
 
@@ -153,10 +170,16 @@ public partial struct EnemyGroundIndicatorSyncSystem : ISystem
     /// <param name="entityManager">Entity manager used to resolve managed view components.</param>
     /// <param name="deltaTime">Presentation delta time used for fill smoothing.</param>
     /// <param name="cameraTransform">Active camera transform used to anchor the depleting ring gap.</param>
+    /// <param name="canProjectOntoGround">True when DOTS physics can safely serve ground projection queries this frame.</param>
+    /// <param name="groundProbeMask">Physics category mask restricting which colliders the ground probe may hit.</param>
+    /// <param name="physicsWorldSingleton">Physics world used by projected ground shadows.</param>
     private void SyncGroundIndicatorViews(ref SystemState state,
                                           EntityManager entityManager,
                                           float deltaTime,
-                                          Transform cameraTransform)
+                                          Transform cameraTransform,
+                                          bool canProjectOntoGround,
+                                          uint groundProbeMask,
+                                          in PhysicsWorldSingleton physicsWorldSingleton)
     {
         if (enemyQuery.IsEmptyIgnoreFilter)
             return;
@@ -226,11 +249,23 @@ public partial struct EnemyGroundIndicatorSyncSystem : ISystem
 
             bool hasShieldCapacity = healthState.MaxShield > 0f;
             indicatorView.SyncFootprint(contactRadius, contactRadius, in currentIndicatorConfig, hasShieldCapacity, normalizedShield);
-            indicatorView.SyncWorldPose(enemyPosition,
-                                        enemyRotation,
-                                        currentEnemyTransform.Scale,
-                                        currentEnemyData.RotateHitCenterOffset != 0,
-                                        cameraTransform);
+            bool rotateHitCenterOffset = currentEnemyData.RotateHitCenterOffset != 0;
+            GroundShadowProjectionUtility.ResolvePose(enemyPosition,
+                                                      enemyRotation,
+                                                      currentEnemyTransform.Scale,
+                                                      currentIndicatorConfig.PositionOffsetXZ,
+                                                      rotateHitCenterOffset,
+                                                      currentIndicatorConfig.HeightOffset,
+                                                      currentIndicatorConfig.ProjectionMode,
+                                                      currentIndicatorConfig.ProjectionMaxDistance,
+                                                      canProjectOntoGround,
+                                                      groundProbeMask,
+                                                      in physicsWorldSingleton,
+                                                      out Vector3 indicatorPosition,
+                                                      out Quaternion indicatorRotation);
+            indicatorView.SyncResolvedWorldPose(indicatorPosition,
+                                                indicatorRotation,
+                                                cameraTransform);
             bool enemyVisible = visualRuntimeState.ValueRO.IsVisible != 0;
             indicatorView.SyncVisibilityState(true, enemyVisible);
 

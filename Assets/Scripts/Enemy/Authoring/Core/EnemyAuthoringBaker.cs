@@ -277,6 +277,11 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                deathVfxPrefabEntity,
                                authoring.DeathVfxPrefab);
 
+        TryBakeEnemyProjectileVfxRuntime(authoring,
+                                         entity,
+                                         managedVfxPrefabBindings,
+                                         shouldBakeManagedVfxRuntime);
+
         Entity deathPuddlePrefabEntity = ResolveDeathPuddlePrefabEntity(authoring);
         AddComponent(entity, EnemyVisualFeedbackBakeUtility.BuildDeathPuddleConfig(authoring.DeathPuddleSettings,
                                                                                     deathPuddlePrefabEntity,
@@ -420,6 +425,24 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
+    /// Normalizes authored shadow projection enum values before they are written into ECS.
+    /// </summary>
+    /// <param name="projectionMode">Authoring enum value resolved from the visual preset.</param>
+    /// <returns>Supported projection mode used by runtime ground-shadow presentation.</returns>
+    private static GroundShadowProjectionMode ResolveGroundShadowProjectionMode(GroundShadowProjectionMode projectionMode)
+    {
+        switch (projectionMode)
+        {
+            case GroundShadowProjectionMode.RaisedQuad:
+            case GroundShadowProjectionMode.ProjectOntoGround:
+                return projectionMode;
+
+            default:
+                return GroundShadowProjectionMode.RaisedQuad;
+        }
+    }
+
+    /// <summary>
     /// Resolves whether this enemy needs Bombardier runtime prefab support during bake.
     /// Boss pattern presets may start with an empty active Bombardier list while still owning weapon candidates that are applied later.
     /// </summary>
@@ -444,8 +467,17 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
                                                          EnemyCompiledPatternBakeResult compiledPattern,
                                                          in EnemyPatternConfig patternConfig)
     {
-        if (authoring != null && (authoring.SpawnVfxPrefab != null || authoring.DeathVfxPrefab != null))
-            return true;
+        if (authoring != null)
+        {
+            if (authoring.SpawnVfxPrefab != null || authoring.DeathVfxPrefab != null)
+                return true;
+
+            if (authoring.BulletHitVfxPrefab != null)
+                return true;
+
+            if (authoring.BulletDeathVfx != null && authoring.BulletDeathVfx.HasAnyPrefab)
+                return true;
+        }
 
         if (compiledPattern == null)
             return false;
@@ -998,6 +1030,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             RingArcDegrees = EnemyGroundIndicatorFootprintUtility.ResolveRuntimeRingArcDegrees(authoring.RingArcDegrees),
             HeightOffset = authoring.SpatialUiHeightOffset,
             PositionOffsetXZ = hitCenterOffsetXZ,
+            ProjectionMode = ResolveGroundShadowProjectionMode(authoring.GroundShadowProjectionMode),
+            ProjectionMaxDistance = math.max(0f, authoring.GroundShadowProjectionMaxDistance),
             ShadowAlpha = math.saturate(authoring.ShadowAlpha),
             ShadowEdgeSoftness = math.max(0f, authoring.ShadowEdgeSoftness),
             RingEdgeSoftness = math.max(0f, authoring.RingEdgeSoftness),
@@ -1799,6 +1833,95 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             return;
 
         AppendManagedVfxPrefabBinding(prefabBindings, prefabEntity, sourcePrefab);
+    }
+
+    /// <summary>
+    /// Bakes enemy-owned projectile hit and death VFX configs plus their managed prefab bindings.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for preset and warning context.</param>
+    /// <param name="entity">Enemy entity receiving optional projectile VFX configs.</param>
+    /// <param name="prefabBindings">Shared managed VFX prefab binding buffer, when available.</param>
+    /// <param name="canBakeManagedVfx">True when the shared managed VFX buffers were added to this enemy entity.</param>
+    private void TryBakeEnemyProjectileVfxRuntime(EnemyAuthoring authoring,
+                                                  Entity entity,
+                                                  DynamicBuffer<PlayerPowerUpVfxPrefabBindingElement> prefabBindings,
+                                                  bool canBakeManagedVfx)
+    {
+        if (authoring == null || !canBakeManagedVfx)
+            return;
+
+        EnemyProjectileVfxEventConfig hitConfig = BuildEnemyProjectileVfxEventConfig(authoring,
+                                                                                     authoring.BulletHitVfx,
+                                                                                     null,
+                                                                                     "enemy bullet hit VFX");
+
+        if (hitConfig.PrefabEntity != Entity.Null || hitConfig.SourcePrefab.Value != null)
+        {
+            AddComponent(entity, new EnemyProjectileHitVfxConfig
+            {
+                Hit = hitConfig
+            });
+            AppendManagedVfxPrefabBinding(prefabBindings,
+                                          hitConfig.PrefabEntity,
+                                          hitConfig.SourcePrefab.Value);
+        }
+
+        EnemyProjectileDeathVfxSettings deathSettings = authoring.BulletDeathVfx;
+
+        if (deathSettings == null || !deathSettings.HasAnyPrefab)
+            return;
+
+        EnemyProjectileVfxEventConfig rangeOrLifetimeConfig = BuildEnemyProjectileVfxEventConfig(authoring,
+                                                                                                 deathSettings.RangeOrLifetime,
+                                                                                                 null,
+                                                                                                 "enemy bullet death range/lifetime VFX");
+        GameObject rangeOrLifetimePrefab = rangeOrLifetimeConfig.SourcePrefab.Value;
+        EnemyProjectileVfxEventConfig terminalWallHitConfig = BuildEnemyProjectileVfxEventConfig(authoring,
+                                                                                                 deathSettings.TerminalWallHit,
+                                                                                                 rangeOrLifetimePrefab,
+                                                                                                 "enemy bullet death terminal wall VFX");
+        AddComponent(entity, new EnemyProjectileDeathVfxConfig
+        {
+            RangeOrLifetime = rangeOrLifetimeConfig,
+            TerminalWallHit = terminalWallHitConfig
+        });
+        AppendManagedVfxPrefabBinding(prefabBindings,
+                                      rangeOrLifetimeConfig.PrefabEntity,
+                                      rangeOrLifetimeConfig.SourcePrefab.Value);
+        AppendManagedVfxPrefabBinding(prefabBindings,
+                                      terminalWallHitConfig.PrefabEntity,
+                                      terminalWallHitConfig.SourcePrefab.Value);
+    }
+
+    /// <summary>
+    /// Builds one enemy projectile VFX event config and resolves its prefab into an ECS entity.
+    /// </summary>
+    /// <param name="authoring">Source enemy authoring component used for warning context.</param>
+    /// <param name="settings">Authored enemy projectile VFX event settings.</param>
+    /// <param name="fallbackPrefab">Optional fallback prefab used when the event has no direct assignment.</param>
+    /// <param name="contextLabel">Human-readable VFX context used by bake warnings.</param>
+    /// <returns>Runtime event config with safe presentation values.</returns>
+    private EnemyProjectileVfxEventConfig BuildEnemyProjectileVfxEventConfig(EnemyAuthoring authoring,
+                                                                             EnemyProjectileVfxEventSettings settings,
+                                                                             GameObject fallbackPrefab,
+                                                                             string contextLabel)
+    {
+        if (settings == null)
+            return default;
+
+        GameObject prefab = settings.VfxPrefab != null ? settings.VfxPrefab : fallbackPrefab;
+        Entity prefabEntity = ResolveRuntimeVfxPrefabEntity(authoring, prefab, contextLabel);
+        GameObject sourcePrefab = prefabEntity != Entity.Null ? prefab : null;
+        Vector3 spawnOffset = settings.SpawnOffset;
+        return new EnemyProjectileVfxEventConfig
+        {
+            PrefabEntity = prefabEntity,
+            SourcePrefab = sourcePrefab,
+            SpawnOffset = new float3(spawnOffset.x, spawnOffset.y, spawnOffset.z),
+            UniformScale = math.max(0.01f, settings.ScaleMultiplier),
+            LifetimeSeconds = math.max(0.05f, settings.LifetimeSeconds),
+            Enabled = settings.Enabled ? (byte)1 : (byte)0
+        };
     }
 
     /// <summary>

@@ -202,9 +202,9 @@ public static class PlayerControllerConfigBakeUtility
 
     /// <summary>
     /// Builds the concrete upper-body clip table consumed by scalable power-up animation selectors at
-    /// presentation time. The implicit Base Gun default clip is sourced from the visual preset's default
-    /// mountable entry; charge and release clips come from the animation bindings preset. Per-weapon shoot
-    /// clips live on the runtime additional-weapons buffer.
+    /// presentation time. The upper-body idle and charge/release clips come from the animation bindings preset;
+    /// the implicit Base Gun default clip is sourced from the visual preset's default mountable entry.
+    /// Per-weapon shoot clips live on the runtime additional-weapons buffer.
     /// </summary>
     /// <param name="animationBindingsPreset">Animation bindings preset containing charge and release clips.</param>
     /// <param name="visualPreset">Visual preset whose default mountable entry contributes the default shoot clip.</param>
@@ -219,6 +219,7 @@ public static class PlayerControllerConfigBakeUtility
 
         return new PlayerUpperBodyAnimationClipConfig
         {
+            UpperBodyIdle = animationBindingsPreset.UpperBodyIdleClip,
             DefaultShoot = PlayerWeaponVisualBakeUtility.ResolveDefaultShootClip(visualPreset),
             PrimaryCharge = actionClips != null ? actionClips.PrimaryChargeClip : null,
             SecondaryCharge = actionClips != null ? actionClips.SecondaryChargeClip : null,

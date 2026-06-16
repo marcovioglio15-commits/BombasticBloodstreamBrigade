@@ -25,6 +25,7 @@ public static class PlayerUpperBodyAnimationPresentationUtility
 #if UNITY_EDITOR
     private static readonly HashSet<int> invalidAnimatorWarnings = new HashSet<int>();
     private static readonly HashSet<int> missingClipWarnings = new HashSet<int>();
+    private static readonly HashSet<int> missingIdleOverrideKeyWarnings = new HashSet<int>();
 #endif
     #endregion
 
@@ -40,6 +41,7 @@ public static class PlayerUpperBodyAnimationPresentationUtility
 #if UNITY_EDITOR
         invalidAnimatorWarnings.Clear();
         missingClipWarnings.Clear();
+        missingIdleOverrideKeyWarnings.Clear();
 #endif
     }
 
@@ -356,6 +358,7 @@ public static class PlayerUpperBodyAnimationPresentationUtility
             binding.AnimatorComponent == animator &&
             binding.OverrideController == animator.runtimeAnimatorController)
         {
+            ApplyIdleOverride(binding, clipConfig.UpperBodyIdle.Value);
             return true;
         }
 
@@ -388,16 +391,63 @@ public static class PlayerUpperBodyAnimationPresentationUtility
             return false;
         }
 
+        AnimationClip upperBodyIdleClip = clipConfig.UpperBodyIdle.Value;
+        AnimationClip idleOverrideKey = null;
+
+        if (upperBodyIdleClip != null &&
+            !TryResolveIdleOverrideKey(overrideController, upperBodyIdleClip, out idleOverrideKey))
+            LogMissingIdleOverrideKey(animator);
+
         binding = new PlayerUpperBodyAnimatorBinding
         {
             AnimatorComponent = animator,
             OverrideController = overrideController,
+            IdleOverrideKey = idleOverrideKey,
             ActionOverrideKey = actionOverrideKey,
+            AppliedIdleClip = null,
             AppliedClip = null,
             UpperBodyLayerIndex = upperBodyLayerIndex
         };
+        ApplyIdleOverride(binding, upperBodyIdleClip);
         bindingsByAnimatorId[animatorId] = binding;
         return true;
+    }
+
+    /// <summary>
+    /// Resolves the authored upper-body idle motion so the dedicated idle clip can be overridden independently.
+    /// </summary>
+    /// <param name="overrideController">Animator override controller exposing authored clip keys.</param>
+    /// <param name="upperBodyIdleClip">Configured upper-body idle clip from the active Animation Bindings preset.</param>
+    /// <param name="idleOverrideKey">Resolved original controller clip that represents the upper-body idle state.</param>
+    /// <returns>True when a matching idle override key was found.</returns>
+    private static bool TryResolveIdleOverrideKey(AnimatorOverrideController overrideController,
+                                                  AnimationClip upperBodyIdleClip,
+                                                  out AnimationClip idleOverrideKey)
+    {
+        idleOverrideKey = null;
+
+        if (overrideController == null || upperBodyIdleClip == null)
+            return false;
+
+        List<KeyValuePair<AnimationClip, AnimationClip>> overrides =
+            new List<KeyValuePair<AnimationClip, AnimationClip>>(overrideController.overridesCount);
+        overrideController.GetOverrides(overrides);
+
+        for (int overrideIndex = 0; overrideIndex < overrides.Count; overrideIndex++)
+        {
+            AnimationClip key = overrides[overrideIndex].Key;
+
+            if (key == upperBodyIdleClip)
+            {
+                idleOverrideKey = key;
+                return true;
+            }
+
+            if (idleOverrideKey == null && overrides[overrideIndex].Value == upperBodyIdleClip)
+                idleOverrideKey = key;
+        }
+
+        return idleOverrideKey != null;
     }
 
     /// <summary>
@@ -484,6 +534,24 @@ public static class PlayerUpperBodyAnimationPresentationUtility
 
         binding.OverrideController[binding.ActionOverrideKey] = clip;
         binding.AppliedClip = clip;
+    }
+
+    /// <summary>
+    /// Applies the configured upper-body idle clip once per binding revision when the Animator controller exposes it.
+    /// </summary>
+    /// <param name="binding">Cached Animator override binding.</param>
+    /// <param name="clip">Concrete upper-body idle clip from the active Animation Bindings preset.</param>
+    private static void ApplyIdleOverride(PlayerUpperBodyAnimatorBinding binding, AnimationClip clip)
+    {
+        if (binding == null ||
+            binding.OverrideController == null ||
+            binding.IdleOverrideKey == null ||
+            clip == null ||
+            binding.AppliedIdleClip == clip)
+            return;
+
+        binding.OverrideController[binding.IdleOverrideKey] = clip;
+        binding.AppliedIdleClip = clip;
     }
 
     /// <summary>
@@ -677,6 +745,18 @@ public static class PlayerUpperBodyAnimationPresentationUtility
             Debug.LogWarning(string.Format("[PlayerUpperBodyAnimationPresentationUtility] The selected {0} upper-body clip slot is empty. Assign it in the active Animation Bindings preset.", actionKind), binding.AnimatorComponent);
 #endif
     }
+
+    /// <summary>
+    /// Reports a missing upper-body idle override key once per Animator instance in editor sessions.
+    /// </summary>
+    /// <param name="animator">Animator whose controller cannot expose the configured upper-body idle clip as an override key.</param>
+    private static void LogMissingIdleOverrideKey(Animator animator)
+    {
+#if UNITY_EDITOR
+        if (animator != null && missingIdleOverrideKeyWarnings.Add(animator.GetInstanceID()))
+            Debug.LogWarning("[PlayerUpperBodyAnimationPresentationUtility] UpperBody.ST_Idle could not be bound to the configured upper-body idle clip. Assign the clip as the authored state motion or rebuild the controller from the Animation Bindings preset.", animator);
+#endif
+    }
     #endregion
 
     #region Nested Types
@@ -687,7 +767,9 @@ public static class PlayerUpperBodyAnimationPresentationUtility
     {
         public Animator AnimatorComponent;
         public AnimatorOverrideController OverrideController;
+        public AnimationClip IdleOverrideKey;
         public AnimationClip ActionOverrideKey;
+        public AnimationClip AppliedIdleClip;
         public AnimationClip AppliedClip;
         public int UpperBodyLayerIndex;
     }

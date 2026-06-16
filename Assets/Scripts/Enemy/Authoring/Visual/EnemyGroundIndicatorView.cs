@@ -13,7 +13,6 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     private const float MinimumOuterRadius = 0.01f;
     private const float SmoothingDenominatorEpsilon = 0.0001f;
     private const float CameraAngleFallbackRadians = -1.5707963267948966f;
-    private static readonly Quaternion GroundPlaneRotation = Quaternion.Euler(90f, 0f, 0f);
     private static readonly int HitFootprintPropertyId = Shader.PropertyToID("_HitFootprint");
     private static readonly int RingParamsPropertyId = Shader.PropertyToID("_RingParams");
     private static readonly int FillPropertyId = Shader.PropertyToID("_Fill");
@@ -149,15 +148,31 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
                               bool rotateHitCenterOffset,
                               Transform cameraTransform)
     {
-        Transform selfTransform = transform;
         Vector3 targetPosition = EnemyHitboxCenterUtility.ResolveWorldCenter(enemyPosition,
                                                                              enemyRotation,
                                                                              enemyScale,
                                                                              cachedPositionOffsetXZ,
                                                                              rotateHitCenterOffset,
                                                                              cachedHeightOffset);
+        SyncResolvedWorldPose(targetPosition,
+                              GroundShadowProjectionUtility.ResolveGroundPlaneRotation(),
+                              cameraTransform);
+    }
+
+    /// <summary>
+    /// Synchronizes the indicator to a pose that was already resolved by the ECS presentation system.
+    /// Used by ground-projected shadows so DOTS physics queries stay outside the managed view.
+    /// </summary>
+    /// <param name="targetPosition">World-space indicator position after optional ground projection.</param>
+    /// <param name="targetRotation">World-space indicator rotation after optional ground-normal alignment.</param>
+    /// <param name="cameraTransform">Active camera transform used to update the depleting-edge anchor.</param>
+    public void SyncResolvedWorldPose(Vector3 targetPosition,
+                                      Quaternion targetRotation,
+                                      Transform cameraTransform)
+    {
+        Transform selfTransform = transform;
         selfTransform.position = targetPosition;
-        selfTransform.rotation = GroundPlaneRotation;
+        selfTransform.rotation = targetRotation;
 
         // When the rings are locked to world, the fill anchor stays at the baked angle (camera-independent)
         // so the depleting gap reveals a fixed world-space direction regardless of camera orientation.
@@ -280,7 +295,7 @@ public sealed class EnemyGroundIndicatorView : MonoBehaviour
     /// </summary>
     private void EnsureGroundPlaneOrientation()
     {
-        transform.localRotation = GroundPlaneRotation;
+        transform.localRotation = GroundShadowProjectionUtility.ResolveGroundPlaneRotation();
     }
 
     /// <summary>

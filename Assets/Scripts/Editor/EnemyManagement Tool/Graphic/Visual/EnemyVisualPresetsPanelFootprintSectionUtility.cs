@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -150,6 +151,43 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
                                                                 "positionOffsetXZ",
                                                                 "Position Offset (XZ)",
                                                                 "Local root-space XZ fine-tune added after automatic visual-bounds center detection. Contact damage, debug rings and shadow use this same resolved center.");
+        BuildShadowProjectionControls(panel, container, footprintProperty);
+    }
+
+    /// <summary>
+    /// Builds projection controls and hides the max-distance field until ground projection is active.
+    /// </summary>
+    /// <param name="panel">Owning visual preset panel.</param>
+    /// <param name="container">Container receiving the controls.</param>
+    /// <param name="footprintProperty">Serialized footprint settings property.</param>
+    private static void BuildShadowProjectionControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    {
+        SerializedProperty projectionModeProperty = footprintProperty.FindPropertyRelative("projectionMode");
+
+        if (projectionModeProperty == null)
+            return;
+
+        EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
+                                                                container,
+                                                                footprintProperty,
+                                                                "projectionMode",
+                                                                "Projection Mode",
+                                                                "Controls whether the shadow remains on the authored raised quad or ray-projects onto the ground surface below the hit center.");
+        container.TrackPropertyValue(projectionModeProperty, changedProperty =>
+        {
+            panel.RebuildActiveDetailsSection();
+        });
+
+        if (projectionModeProperty.enumValueIndex != (int)GroundShadowProjectionMode.ProjectOntoGround)
+            return;
+
+        EnemyVisualPresetsPanelSectionsUtility.AddSliderField(panel,
+                                                              container,
+                                                              footprintProperty.FindPropertyRelative("projectionMaxDistance"),
+                                                              "Projection Max Distance",
+                                                              0f,
+                                                              16f,
+                                                              "Maximum downward distance in meters used to find a ground surface for projected shadows. If no hit is found, the raised quad fallback is used.");
     }
 
     /// <summary>
@@ -345,6 +383,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
 
         AddRangeWarning(footprintProperty, container, "shadowAlpha", 0f, 1f, "Shadow Alpha should stay between 0 and 1.");
         AddRangeWarning(footprintProperty, container, "shadowEdgeSoftness", 0f, 1f, "Shadow Edge Softness should stay between 0 and 1.");
+        AddProjectionWarnings(footprintProperty, container);
 
         if (ringWarningsSuppressed)
             return;
@@ -384,6 +423,34 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
 
         if (property != null && (property.floatValue < minimum || property.floatValue > maximum))
             container.Add(new HelpBox(message, HelpBoxMessageType.Warning));
+    }
+
+    /// <summary>
+    /// Adds authored-value warnings for shadow ground projection settings.
+    /// </summary>
+    /// <param name="footprintProperty">Serialized footprint settings.</param>
+    /// <param name="container">Parent element receiving warning boxes.</param>
+    private static void AddProjectionWarnings(SerializedProperty footprintProperty, VisualElement container)
+    {
+        SerializedProperty projectionModeProperty = footprintProperty.FindPropertyRelative("projectionMode");
+
+        if (projectionModeProperty != null &&
+            (projectionModeProperty.enumValueIndex < 0 ||
+             projectionModeProperty.enumValueIndex > (int)GroundShadowProjectionMode.ProjectOntoGround))
+        {
+            container.Add(new HelpBox("Projection Mode has an unsupported value. Runtime bake falls back to Raised Quad.", HelpBoxMessageType.Warning));
+        }
+
+        if (projectionModeProperty == null ||
+            projectionModeProperty.enumValueIndex != (int)GroundShadowProjectionMode.ProjectOntoGround)
+        {
+            return;
+        }
+
+        EnemyVisualPresetsPanelSectionsUtility.AddNegativeValueWarning(footprintProperty,
+                                                                       container,
+                                                                       "projectionMaxDistance",
+                                                                       "Projection Max Distance must be zero or positive.");
     }
     #endregion
 

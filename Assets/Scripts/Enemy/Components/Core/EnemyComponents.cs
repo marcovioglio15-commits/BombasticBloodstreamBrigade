@@ -107,6 +107,8 @@ public struct EnemyGroundIndicatorConfig : IComponentData
     public float RingArcDegrees;
     public float HeightOffset;
     public float2 PositionOffsetXZ;
+    public GroundShadowProjectionMode ProjectionMode;
+    public float ProjectionMaxDistance;
     public float ShadowAlpha;
     public float ShadowEdgeSoftness;
     public float RingEdgeSoftness;
@@ -205,6 +207,36 @@ public struct EnemyDeathVfxConfig : IComponentData
     public float4 SecondaryDebrisColor;
     public byte DebrisColorCount;
     public FixedString64Bytes DebrisParticleChildName;
+}
+
+/// <summary>
+/// Runtime settings for one enemy projectile one-shot VFX event.
+/// </summary>
+public struct EnemyProjectileVfxEventConfig
+{
+    public Entity PrefabEntity;
+    public UnityObjectRef<GameObject> SourcePrefab;
+    public float3 SpawnOffset;
+    public float UniformScale;
+    public float LifetimeSeconds;
+    public byte Enabled;
+}
+
+/// <summary>
+/// Runtime VFX settings used when enemy-owned projectiles hit the player.
+/// </summary>
+public struct EnemyProjectileHitVfxConfig : IComponentData
+{
+    public EnemyProjectileVfxEventConfig Hit;
+}
+
+/// <summary>
+/// Runtime VFX settings used when enemy-owned projectiles expire without previous player hits.
+/// </summary>
+public struct EnemyProjectileDeathVfxConfig : IComponentData
+{
+    public EnemyProjectileVfxEventConfig RangeOrLifetime;
+    public EnemyProjectileVfxEventConfig TerminalWallHit;
 }
 
 

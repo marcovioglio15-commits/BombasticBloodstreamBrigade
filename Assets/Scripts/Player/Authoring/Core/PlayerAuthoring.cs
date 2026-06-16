@@ -603,6 +603,15 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #endif
         }
 
+        AddComponent(entity, PlayerGroundShadowBakeUtility.BuildConfig(visualPreset));
+        AddComponent(entity, PlayerGroundShadowBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(entity, new PlayerGroundShadowScalingState());
+        DynamicBuffer<PlayerRuntimeGroundShadowScalingElement> groundShadowScalingBuffer = AddBuffer<PlayerRuntimeGroundShadowScalingElement>(entity);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulateGroundShadowScalingMetadata(sourceVisualPreset,
+                                                                                  groundShadowScalingBuffer);
+#endif
+
         // Keep the large visual payload off the already dense player archetype. The player retains only a stable
         // reference, while the companion entity owns runtime/base configs and formula metadata.
         Entity healthBarVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
