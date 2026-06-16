@@ -22,8 +22,8 @@ MonoBehaviour:
     directionOffsetDegrees: 0
     movementReference: 1
     values:
-      baseSpeed: 0
-      maxSpeed: 0
+      baseSpeed: 0.1
+      maxSpeed: 0.1
       acceleration: -1
       deceleration: -1
       oppositeDirectionBrakeMultiplier: 2.25
@@ -291,14 +291,14 @@ MonoBehaviour:
     debugInConsole: 0
     debugColor: {r: 1, g: 0.1254902, b: 0.015686275, a: 1}
   - statKey: movementSettings.values.baseSpeed
-    addScaling: 1
+    addScaling: 0
     formula: '[MovementSpeed]'
-    debugInConsole: 1
+    debugInConsole: 0
     debugColor: {r: 0.015686274, g: 0.81909794, b: 1, a: 1}
   - statKey: movementSettings.values.maxSpeed
-    addScaling: 1
+    addScaling: 0
     formula: '[MovementSpeed] + 8'
-    debugInConsole: 1
+    debugInConsole: 0
     debugColor: {r: 0.015686275, g: 0.8196079, b: 1, a: 1}
   - statKey: healthStatistics.maxShield
     addScaling: 1

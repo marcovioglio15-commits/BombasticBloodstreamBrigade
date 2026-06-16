@@ -17,8 +17,8 @@ MonoBehaviour:
   description: 
   version: 1.0.0
   movement:
-    moveSpeed: 3
-    maxSpeed: 3
+    moveSpeed: 0
+    maxSpeed: 0
     acceleration: 8
     deceleration: 8
     inactivityTime: 0
