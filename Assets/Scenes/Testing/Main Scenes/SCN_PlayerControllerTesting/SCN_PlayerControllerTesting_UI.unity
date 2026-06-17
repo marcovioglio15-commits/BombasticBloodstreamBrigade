@@ -1563,7 +1563,7 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0.6
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.9
@@ -1595,7 +1595,7 @@ Material:
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0.03529412, g: 0.023529412, b: 0.03529412, a: 0.9019608}
+    - _OutlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0.9019608}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
@@ -1632,13 +1632,37 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_fontMaterial
       value: 
       objectReference: {fileID: 1754802287}
     - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 813004906847129723, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1754802287}
+    - target: {fileID: 2073397313297080286, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 2191069896669885205, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1728,6 +1752,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2960580666014743494, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2960580666014743494, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 2960580666014743494, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1735,42 +1767,150 @@ PrefabInstance:
       propertyPath: m_ChildAlignment
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3558851588990595828, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 3664622569027514354, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_Name
       value: PlayerBars VerticalBox
+      objectReference: {fileID: 0}
+    - target: {fileID: 3757301343401589100, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.11764706
       objectReference: {fileID: 0}
     - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_fontMaterial
       value: 
       objectReference: {fileID: 1706940370}
     - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4120580654437542443, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1706940370}
+    - target: {fileID: 4432150272445652825, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -40
+      objectReference: {fileID: 0}
+    - target: {fileID: 4432150272445652825, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.11764706
+      objectReference: {fileID: 0}
     - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_fontMaterial
       value: 
       objectReference: {fileID: 1036518638}
     - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 4596552065303251411, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1036518638}
     - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_fontMaterial
       value: 
       objectReference: {fileID: 1811148328}
     - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108332050725299741, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1811148328}
+    - target: {fileID: 6997534854759345191, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 7640981881068525147, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.11764706
+      objectReference: {fileID: 0}
+    - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.11764706
+      objectReference: {fileID: 0}
     - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_fontMaterial
       value: 
       objectReference: {fileID: 1627105219}
     - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 7719838786088959596, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 1627105219}
+    - target: {fileID: 8614794307651773765, guid: f4a9cb325e722d741b9eeac4fbb82147, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2698,7 +2838,7 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0.6
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.9
@@ -2730,7 +2870,7 @@ Material:
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0.03529412, g: 0.023529412, b: 0.03529412, a: 0.9019608}
+    - _OutlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0.9019608}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
@@ -2953,7 +3093,7 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0.6
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.9
@@ -2985,7 +3125,7 @@ Material:
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0.03529412, g: 0.023529412, b: 0.03529412, a: 0.9019608}
+    - _OutlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0.9019608}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
@@ -3274,7 +3414,7 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0.6
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.9
@@ -3306,7 +3446,7 @@ Material:
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0.03529412, g: 0.023529412, b: 0.03529412, a: 0.9019608}
+    - _OutlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0.9019608}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
@@ -3383,7 +3523,7 @@ Material:
     - _OutlineSoftness: 0
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
-    - _OutlineWidth: 0.6
+    - _OutlineWidth: 0.2
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.9
@@ -3415,7 +3555,7 @@ Material:
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
-    - _OutlineColor: {r: 0.03529412, g: 0.023529412, b: 0.03529412, a: 0.9019608}
+    - _OutlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0.9019608}
     - _ReflectFaceColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectOutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}

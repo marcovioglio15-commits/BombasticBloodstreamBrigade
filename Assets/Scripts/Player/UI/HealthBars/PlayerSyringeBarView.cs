@@ -12,6 +12,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     #region Constants
     private const float MaximumReactiveDeltaTime = 1f / 30f;
     private const float MaximumReactiveVelocityMultiplier = 8f;
+    private const float ReferenceDecorationLength = 340f;
     #endregion
 
     #region Shader Properties
@@ -42,6 +43,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int PaintDripLengthId = Shader.PropertyToID("_PaintDripLength");
     private static readonly int PaintDripWidthId = Shader.PropertyToID("_PaintDripWidth");
     private static readonly int PaintDripIrregularityId = Shader.PropertyToID("_PaintDripIrregularity");
+    private static readonly int LengthPixelScaleId = Shader.PropertyToID("_LengthPixelScale");
     private static readonly int MajorDivisionCountId = Shader.PropertyToID("_MajorDivisionCount");
     private static readonly int MinorDivisionsPerMajorId = Shader.PropertyToID("_MinorDivisionsPerMajor");
     private static readonly int FillNormalizedId = Shader.PropertyToID("_FillNormalized");
@@ -297,14 +299,12 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         SetColor(TerminationInteriorColorId, channelConfig.Palette.TerminationInterior);
         runtimeMaterial.SetFloat(OutlineThicknessId, math.max(0f, sharedConfig.OutlineThickness));
         runtimeMaterial.SetFloat(ChamberInsetId, math.clamp(sharedConfig.ChamberInset, 0f, 0.49f));
-        runtimeMaterial.SetFloat(PlungerWidthId, math.max(0f, sharedConfig.PlungerWidth));
         runtimeMaterial.SetFloat(BodyStyleId, (float)sharedConfig.BodyStyle);
         runtimeMaterial.SetFloat(LabelPlacementId, (float)sharedConfig.LabelPlacement);
         runtimeMaterial.SetFloat(TerminationStyleId, (float)sharedConfig.TerminationStyle);
         runtimeMaterial.SetFloat(PaintDripsEnabledId, sharedConfig.PaintDrips.Enabled);
         runtimeMaterial.SetFloat(PaintDripDensityId, math.saturate(sharedConfig.PaintDrips.Density));
         runtimeMaterial.SetFloat(PaintDripLengthId, math.clamp(sharedConfig.PaintDrips.Length, 0f, 0.5f));
-        runtimeMaterial.SetFloat(PaintDripWidthId, math.clamp(sharedConfig.PaintDrips.Width, 0.0001f, 0.25f));
         runtimeMaterial.SetFloat(PaintDripIrregularityId, math.saturate(sharedConfig.PaintDrips.Irregularity));
         runtimeMaterial.SetFloat(MinorDivisionsPerMajorId, math.max(1, sharedConfig.MinorDivisionsPerMajor));
         runtimeMaterial.SetFloat(FlowEnabledId, channelConfig.Fluid.FlowEnabled);
@@ -379,6 +379,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(GraduationEndNormalizedId, math.clamp(1f - resolvedGraduationEndInset / resolvedLength, 0.55f, 0.999f));
         runtimeMaterial.SetFloat(TerminationOffsetNormalizedId, math.clamp(terminationOffset / resolvedLength, 0f, 0.45f));
         runtimeMaterial.SetFloat(MajorDivisionCountId, math.max(0.0001f, intervalCount));
+        runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, 0.2f));
+        runtimeMaterial.SetFloat(PaintDripWidthId, ResolveReferenceScaledNormalized(sharedConfig.PaintDrips.Width, resolvedLength, 0.25f));
+        runtimeMaterial.SetFloat(LengthPixelScaleId, math.clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f));
 
         if (labelsRoot != null)
         {
@@ -404,6 +407,22 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         }
 
         MarkParentLayoutDirty();
+    }
+
+    /// <summary>
+    /// Converts a reference-length normalized visual size into the normalized size needed by the current syringe length.
+    /// </summary>
+    /// <param name="normalizedValue">Authored normalized value tuned against the reference syringe length.</param>
+    /// <param name="resolvedLength">Current resolved syringe length in pixels.</param>
+    /// <param name="maximumValue">Maximum normalized value accepted by the target shader property.</param>
+    /// <returns>Length-compensated normalized value preserving stable pixel size across short and long syringes.</returns>
+    private static float ResolveReferenceScaledNormalized(float normalizedValue, float resolvedLength, float maximumValue)
+    {
+        return math.clamp(math.max(0f, normalizedValue) *
+                          ReferenceDecorationLength /
+                          math.max(1f, resolvedLength),
+                          0f,
+                          maximumValue);
     }
     #endregion
 

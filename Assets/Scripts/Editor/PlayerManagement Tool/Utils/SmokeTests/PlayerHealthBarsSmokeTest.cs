@@ -36,6 +36,7 @@ public static class PlayerHealthBarsSmokeTest
         ValidateEditorPreview();
         ValidateLabelDistribution();
         ValidateGraduationAlignmentAndMotionReset();
+        ValidateShortSyringeDecorationScale();
         ValidateShieldVisibilityPolicy();
         ValidateScene();
         Debug.Log("[PlayerHealthBarsSmokeTest] Passed prefab, scene, shader, material, direct-font, value-track, and preauthored-label validation.");
@@ -510,6 +511,67 @@ public static class PlayerHealthBarsSmokeTest
         finally
         {
             hudView.Dispose();
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
+    }
+
+    /// <summary>
+    /// Validates that short one-division syringes preserve stable pixel-sized decorations.
+    /// </summary>
+    private static void ValidateShortSyringeDecorationScale()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        GameObject instance = UnityEngine.Object.Instantiate(prefab);
+        Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
+        PlayerSyringeBarView view = shieldRoot != null
+            ? shieldRoot.GetComponent<PlayerSyringeBarView>()
+            : null;
+
+        try
+        {
+            if (view == null)
+                throw new InvalidOperationException("Shield syringe view is missing during short-decoration validation.");
+
+            PlayerHealthBarVisualConfig config = PlayerHealthBarVisualBakeUtility.BuildConfig(null);
+            config.MinimumLength = 114f;
+            config.MaximumLength = 200f;
+            config.PaintDrips.Enabled = 1;
+            config.PaintDrips.Width = 0.026f;
+            view.ApplyConfiguration(in config, in config.Shield, null);
+            view.UpdateValue(1f, 1f, 0f, true);
+            PlayerSyringeBarGraphic graphic = shieldRoot.GetComponentInChildren<PlayerSyringeBarGraphic>(true);
+
+            if (graphic == null || graphic.material == null)
+                throw new InvalidOperationException("Short shield syringe graphic is missing its runtime material.");
+
+            float resolvedLength = view.Root.rect.width;
+            float expectedPlungerWidth = Mathf.Clamp(config.PlungerWidth * 340f / resolvedLength, 0f, 0.2f);
+            float expectedPaintDripWidth = Mathf.Clamp(config.PaintDrips.Width * 340f / resolvedLength, 0f, 0.25f);
+            float expectedLengthScale = Mathf.Clamp(resolvedLength / 340f, 0.25f, 4f);
+            float shaderPlungerWidth = graphic.material.GetFloat("_PlungerWidth");
+            float shaderPaintDripWidth = graphic.material.GetFloat("_PaintDripWidth");
+            float shaderLengthScale = graphic.material.GetFloat("_LengthPixelScale");
+
+            if (!Mathf.Approximately(shaderPlungerWidth, expectedPlungerWidth) ||
+                !Mathf.Approximately(shaderPaintDripWidth, expectedPaintDripWidth) ||
+                !Mathf.Approximately(shaderLengthScale, expectedLengthScale) ||
+                shaderPlungerWidth <= config.PlungerWidth ||
+                shaderPaintDripWidth <= config.PaintDrips.Width)
+            {
+                throw new InvalidOperationException(string.Format("Short syringe decoration compensation failed. Plunger={0}/{1}, Drip={2}/{3}, LengthScale={4}/{5}.",
+                                                                  shaderPlungerWidth,
+                                                                  expectedPlungerWidth,
+                                                                  shaderPaintDripWidth,
+                                                                  expectedPaintDripWidth,
+                                                                  shaderLengthScale,
+                                                                  expectedLengthScale));
+            }
+        }
+        finally
+        {
+            if (view != null)
+                view.Dispose();
+
             UnityEngine.Object.DestroyImmediate(instance);
         }
     }

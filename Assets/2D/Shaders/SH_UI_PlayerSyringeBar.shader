@@ -39,6 +39,7 @@ Shader "Custom/UI/PlayerSyringeBar"
         _PaintDripLength("Paint Drip Length", Range(0, 0.5)) = 0.1
         _PaintDripWidth("Paint Drip Width", Range(0.0001, 0.25)) = 0.018
         _PaintDripIrregularity("Paint Drip Irregularity", Range(0, 1)) = 0.65
+        _LengthPixelScale("Resolved Length / Reference Length", Float) = 1
 
         [Header(Runtime Value)]
         _FillNormalized("Normalized Authoritative Fill", Range(0, 1)) = 1
@@ -160,6 +161,7 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _PaintDripLength;
             float _PaintDripWidth;
             float _PaintDripIrregularity;
+            float _LengthPixelScale;
             float _FillNormalized;
             float _Slosh;
             float _ValueImpulse;
@@ -340,7 +342,9 @@ Shader "Custom/UI/PlayerSyringeBar"
             {
                 float normalizedX = saturate((uv.x - bodyStart) / max(0.0001, bodyEnd - bodyStart));
                 float density = saturate(_PaintDripDensity);
-                float cellCount = lerp(7.0, 18.0, density);
+                float cellCount = clamp(lerp(7.0, 18.0, density) * max(0.25, _LengthPixelScale),
+                                        2.0,
+                                        32.0);
                 float scaledX = normalizedX * cellCount;
                 float cellIndex = floor(scaledX);
                 float cellCenterX = bodyStart + (cellIndex + 0.5) * (bodyEnd - bodyStart) / cellCount;
@@ -384,7 +388,8 @@ Shader "Custom/UI/PlayerSyringeBar"
 
             float BubbleMask(float2 chamberUv, float timeValue)
             {
-                float2 gridScale = float2(18.0, 5.0);
+                float lengthScale = max(0.25, _LengthPixelScale);
+                float2 gridScale = float2(max(2.0, 18.0 * lengthScale), 5.0);
                 float2 movingUv = chamberUv * gridScale;
                 movingUv.y -= timeValue * _BubbleRiseSpeed * gridScale.y;
                 movingUv.x += sin((movingUv.y + timeValue) * 0.7) * _BubbleDrift;
@@ -563,7 +568,8 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                               valueTrackX);
                 float liquidSurfaceMask = 1.0 - smoothstep(surface - 0.015, surface + 0.015, chamberUv.y);
                 float liquidMask = chamberInteriorMask * valueTrackMask * liquidHorizontalMask * liquidSurfaceMask;
-                float liquidFacet = step(0.5, frac((valueTrackX - horizontalSlosh) * 7.0 +
+                float liquidFacetCount = max(1.0, 7.0 * max(0.25, _LengthPixelScale));
+                float liquidFacet = step(0.5, frac((valueTrackX - horizontalSlosh) * liquidFacetCount +
                                                    chamberUv.y * 4.0 +
                                                    timeValue * _FlowSpeed * 0.2));
                 float surfaceHighlight = smoothstep(surface - 0.06, surface, chamberUv.y) * liquidMask;
@@ -604,6 +610,10 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float graduationX = valueTrackX;
                 float majorDivisionCount = max(1.0, _MajorDivisionCount);
                 float minorDivisionCount = majorDivisionCount * max(1.0, _MinorDivisionsPerMajor);
+                float inverseLengthScale = 1.0 / max(0.25, _LengthPixelScale);
+                float majorTickWidth = min(0.12, 0.012 * majorDivisionCount * inverseLengthScale);
+                float minorTickWidth = min(0.12, 0.004 * minorDivisionCount * inverseLengthScale);
+                float endpointTickHalfWidth = min(0.04, 0.004 * inverseLengthScale);
                 float minorTickBottom = lerp(chamberBottom + 0.025, 0.255, externalLabels);
                 float minorTickTop = lerp(chamberBottom + 0.095, 0.345, externalLabels);
                 float majorTicks = GraduationTickMask(graduationX,
@@ -611,18 +621,18 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                       majorDivisionCount,
                                                       majorTickBottom,
                                                       majorTickTop,
-                                                      min(0.12, 0.012 * majorDivisionCount));
+                                                      majorTickWidth);
                 majorTicks *= step(0.5 / majorDivisionCount, graduationX);
                 float minorTicks = GraduationTickMask(graduationX,
                                                       uv.y,
                                                       minorDivisionCount,
                                                       minorTickBottom,
                                                       minorTickTop,
-                                                      min(0.12, 0.004 * minorDivisionCount));
+                                                      minorTickWidth);
                 minorTicks *= step(0.5 / minorDivisionCount, graduationX);
                 float endpointTicks = BoxMask(uv,
-                                              float2(graduationEnd - 0.004, majorTickBottom),
-                                              float2(graduationEnd + 0.004, majorTickTop),
+                                              float2(graduationEnd - endpointTickHalfWidth, majorTickBottom),
+                                              float2(graduationEnd + endpointTickHalfWidth, majorTickTop),
                                               softness);
                 float graduationHorizontalMask = valueTrackMask;
                 float ticksSurfaceMask = lerp(chamberMask, graduationPanelMask, externalLabels);
