@@ -114,23 +114,23 @@ MonoBehaviour:
     deathVfxScaleMultiplier: 1
     bulletHitVfx:
       enabled: 1
-      vfxPrefab: {fileID: 8477671424390131711, guid: 00f5e7db8ca16a249ad86456347d04f3, type: 3}
+      vfxPrefab: {fileID: 8477671424390131711, guid: 5af69223841cf0f4f82de20f2c31162b, type: 3}
       spawnOffset: {x: 0, y: 0, z: 0}
       scaleMultiplier: 1
-      lifetimeSeconds: 0.5
+      lifetimeSeconds: 0.35
     bulletDeathVfx:
       rangeOrLifetime:
         enabled: 1
-        vfxPrefab: {fileID: 6920387491399739184, guid: 2bfbcb9ea0cfc7846bcafeb949eab49e, type: 3}
+        vfxPrefab: {fileID: 6920387491399739184, guid: 35b70f2adb460064dbb9e428c44a850e, type: 3}
         spawnOffset: {x: 0, y: 0, z: 0}
         scaleMultiplier: 1
-        lifetimeSeconds: 0.5
+        lifetimeSeconds: 0.3
       terminalWallHit:
         enabled: 1
-        vfxPrefab: {fileID: 6920387491399739184, guid: 2bfbcb9ea0cfc7846bcafeb949eab49e, type: 3}
+        vfxPrefab: {fileID: 6920387491399739184, guid: 35b70f2adb460064dbb9e428c44a850e, type: 3}
         spawnOffset: {x: 0, y: 0, z: 0}
         scaleMultiplier: 1
-        lifetimeSeconds: 0.5
+        lifetimeSeconds: 0.3
     useEnemyBaseColorForDeathDebris: 0
     deathDebrisFallbackColor: {r: 0.654902, g: 0.08235294, b: 0.83137256, a: 1}
     deathDebrisParticleChildName: VFX_Debris

@@ -24484,7 +24484,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6513283037121004192}
   m_Layer: 0
-  m_Name: PF_VFX_BulletHit
+  m_Name: PF_VFX_PlayerBulletHit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
