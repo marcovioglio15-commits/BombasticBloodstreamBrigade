@@ -17,6 +17,7 @@ public static class PlayerAnimationBindingsPresetEditorUtility
     private static readonly PlayerAnimationClipSlot[] SupportedClipSlots =
     {
         PlayerAnimationClipSlot.Idle,
+        PlayerAnimationClipSlot.UpperBodyIdle,
         PlayerAnimationClipSlot.MoveForward,
         PlayerAnimationClipSlot.MoveBackward,
         PlayerAnimationClipSlot.MoveLeft,
@@ -381,12 +382,34 @@ public static class PlayerAnimationBindingsPresetEditorUtility
                     score += 12;
                 break;
             case PlayerAnimationClipSlot.Idle:
+                if (IsUpperBodyIdleClipName(normalized))
+                    return 0;
+
                 if (normalized.Contains("idle"))
                     score += 12;
+                break;
+            case PlayerAnimationClipSlot.UpperBodyIdle:
+                if (normalized.Contains("idle"))
+                    score += 12;
+
+                if (IsUpperBodyIdleClipName(normalized))
+                    score += 16;
                 break;
         }
 
         return score;
+    }
+
+    /// <summary>
+    /// Detects clip-name tokens that identify upper-body or arm-only idle animation variants.
+    /// </summary>
+    /// <param name="normalizedClipName">Lowercase clip name with separators already removed.</param>
+    /// <returns>True when the clip name points to an upper-body idle variant.</returns>
+    private static bool IsUpperBodyIdleClipName(string normalizedClipName)
+    {
+        return !string.IsNullOrWhiteSpace(normalizedClipName) &&
+               (normalizedClipName.Contains("arms") ||
+                normalizedClipName.Contains("upper"));
     }
 
     private static string[] GetSlotKeywords(PlayerAnimationClipSlot slot)
@@ -395,6 +418,8 @@ public static class PlayerAnimationBindingsPresetEditorUtility
         {
             case PlayerAnimationClipSlot.Idle:
                 return new[] { "idle", "stand" };
+            case PlayerAnimationClipSlot.UpperBodyIdle:
+                return new[] { "idle", "arms", "upper" };
             case PlayerAnimationClipSlot.MoveForward:
                 return new[] { "forward", "fwd" };
             case PlayerAnimationClipSlot.MoveBackward:

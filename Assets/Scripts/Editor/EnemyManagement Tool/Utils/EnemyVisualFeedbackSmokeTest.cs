@@ -35,7 +35,7 @@ public static class EnemyVisualFeedbackSmokeTest
         ValidatePresetDefaultsAndBakeConfig();
         ValidateDeathPuddleSpawnRuntime();
         ValidateElasticTriggerPolicy();
-        Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
+        //Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public static class EnemyVisualFeedbackSmokeTest
     {
         ValidateFaceFlipbookAssets();
         ValidateElasticShader(FaceFlipbookShaderName);
-        Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
+        //Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
     }
     #endregion
 
@@ -361,7 +361,7 @@ public static class EnemyVisualFeedbackSmokeTest
     /// </summary>
     /// <param name="entityManager">Entity manager owning the activated puddle.</param>
     /// <param name="puddleEntity">Activated puddle entity being inspected.</param>
-    /// <param name="componentLabel">Human-readable component label used in the failure message.</param>
+    /// <param name="componentLabel"> component label used in the failure message.</param>
     private static void RequireRecoveredComponent<TComponent>(EntityManager entityManager,
                                                               Entity puddleEntity,
                                                               string componentLabel) where TComponent : unmanaged, IComponentData

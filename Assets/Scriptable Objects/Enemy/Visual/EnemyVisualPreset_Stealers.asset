@@ -47,6 +47,8 @@ MonoBehaviour:
     shadowCoverageMode: 0
     spatialUiHeightOffset: -0.2
     positionOffsetXZ: {x: 0, y: 0}
+    projectionMode: 1
+    projectionMaxDistance: 4
     healthRingsEnabled: 1
     ringDistanceFromShadow: 0
     spatialUiRingThickness: 0.1
@@ -110,6 +112,25 @@ MonoBehaviour:
     deathVfxSpawnOffset: {x: 0, y: 0, z: 0}
     deathVfxLifetimeSeconds: 0.75
     deathVfxScaleMultiplier: 1
+    bulletHitVfx:
+      enabled: 0
+      vfxPrefab: {fileID: 0}
+      spawnOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: 1
+      lifetimeSeconds: 0.5
+    bulletDeathVfx:
+      rangeOrLifetime:
+        enabled: 0
+        vfxPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 0}
+        scaleMultiplier: 1
+        lifetimeSeconds: 0.5
+      terminalWallHit:
+        enabled: 0
+        vfxPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 0}
+        scaleMultiplier: 1
+        lifetimeSeconds: 0.5
     useEnemyBaseColorForDeathDebris: 0
     deathDebrisFallbackColor: {r: 0.92941177, g: 0.4627451, b: 0.101960786, a: 1}
     deathDebrisParticleChildName: VFX_Debris

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+/// <summary>
+/// Stores animator setup, parameter names, locomotion clips, and upper-body action clips used by player presentation.
+/// </summary>
 [CreateAssetMenu(fileName = "PlayerAnimationBindingsPreset", menuName = "Player/Animation Bindings Preset", order = 14)]
 public sealed class PlayerAnimationBindingsPreset : ScriptableObject
 {
@@ -190,6 +193,10 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
     [FormerlySerializedAs("m_IdleClip")]
     [SerializeField]
     private AnimationClip idleClip;
+
+    [Tooltip("Upper-body idle clip used by the dedicated UpperBody.ST_Idle state while lower-body locomotion stays on its own idle clip.")]
+    [SerializeField]
+    private AnimationClip upperBodyIdleClip;
 
     [Tooltip("Forward movement clip mapped by tooling for locomotion blend trees.")]
     [FormerlySerializedAs("m_MoveForwardClip")]
@@ -512,6 +519,14 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
         }
     }
 
+    public AnimationClip UpperBodyIdleClip
+    {
+        get
+        {
+            return upperBodyIdleClip;
+        }
+    }
+
     public AnimationClip MoveForwardClip
     {
         get
@@ -598,12 +613,20 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
     #region Methods
 
     #region Clip Slots
+    /// <summary>
+    /// Assigns one editable clip slot from import/remap tooling without exposing serialized field names to callers.
+    /// </summary>
+    /// <param name="slot">Clip slot selected by the animation import or remap workflow.</param>
+    /// <param name="clip">Animation clip assigned to the selected slot.</param>
     public void SetClip(PlayerAnimationClipSlot slot, AnimationClip clip)
     {
         switch (slot)
         {
             case PlayerAnimationClipSlot.Idle:
                 idleClip = clip;
+                return;
+            case PlayerAnimationClipSlot.UpperBodyIdle:
+                upperBodyIdleClip = clip;
                 return;
             case PlayerAnimationClipSlot.MoveForward:
                 moveForwardClip = clip;
@@ -639,6 +662,9 @@ public sealed class PlayerAnimationBindingsPreset : ScriptableObject
     #endregion
 
     #region Unity Methods
+    /// <summary>
+    /// Normalizes required IDs and parameter names after inspector edits so runtime bake receives stable strings.
+    /// </summary>
     private void OnValidate()
     {
         if (string.IsNullOrWhiteSpace(presetId))

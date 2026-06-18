@@ -1,3 +1,6 @@
+/// <summary>
+/// Identifies editable animation clip slots exposed by the Player Management Tool import and remap workflow.
+/// </summary>
 public enum PlayerAnimationClipSlot
 {
     None = 0,
@@ -10,5 +13,6 @@ public enum PlayerAnimationClipSlot
     AimBackward = 7,
     AimLeft = 8,
     AimRight = 9,
+    UpperBodyIdle = 10,
     Dash = 11
 }

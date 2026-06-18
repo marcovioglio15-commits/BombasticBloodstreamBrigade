@@ -20,7 +20,6 @@ public partial struct ProjectileDespawnSystem : ISystem
     /// Configures component requirements for projectile despawn evaluation.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
-
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<Projectile>();
@@ -34,7 +33,6 @@ public partial struct ProjectileDespawnSystem : ISystem
     /// Evaluates active projectiles and returns expired ones to pool, including optional split spawn enqueue.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
-
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<ProjectilePoolElement> poolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
@@ -45,6 +43,7 @@ public partial struct ProjectileDespawnSystem : ISystem
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
         ComponentLookup<PlayerProjectileDeathVfxConfig> projectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
+        ComponentLookup<EnemyProjectileDeathVfxConfig> enemyProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyProjectileDeathVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
 
         foreach ((RefRO<Projectile> projectile,
@@ -58,7 +57,7 @@ public partial struct ProjectileDespawnSystem : ISystem
             bool reachedRange = projectile.ValueRO.MaxRange > 0f && runtimeState.ValueRO.TraveledDistance >= projectile.ValueRO.MaxRange;
             bool reachedLifetime = projectile.ValueRO.MaxLifetime > 0f && runtimeState.ValueRO.ElapsedLifetime >= projectile.ValueRO.MaxLifetime;
 
-            if (reachedRange == false && reachedLifetime == false)
+            if (!reachedRange && !reachedLifetime)
                 continue;
 
             if (projectileSplitStateLookup.HasComponent(projectileEntity))
@@ -93,6 +92,7 @@ public partial struct ProjectileDespawnSystem : ISystem
                                                         in projectileTransform.ValueRO,
                                                         in projectileContactStateLookup,
                                                         in projectileDeathVfxConfigLookup,
+                                                        in enemyProjectileDeathVfxConfigLookup,
                                                         ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,
@@ -117,7 +117,7 @@ public partial struct ProjectileDespawnSystem : ISystem
                                                        float currentScale,
                                                        in ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup)
     {
-        if (projectileBaseScaleLookup.HasComponent(projectileEntity) == false)
+        if (!projectileBaseScaleLookup.HasComponent(projectileEntity))
             return math.max(0.01f, currentScale);
 
         float baseScale = math.max(0.0001f, projectileBaseScaleLookup[projectileEntity].Value);

@@ -27,7 +27,7 @@ public sealed class EnemyAdvancedPatternPreset : ScriptableObject
     [Tooltip("Unique ID for this advanced pattern preset.")]
     [SerializeField] private string presetId;
 
-    [Tooltip("Human-readable name shown in Enemy Management Tool.")]
+    [Tooltip(" name shown in Enemy Management Tool.")]
     [SerializeField] private string presetName = "New Enemy Advanced Pattern Preset";
 
     [Tooltip("Short description of this advanced pattern preset.")]

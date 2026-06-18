@@ -42,7 +42,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID that owns the spawner.</param>
     /// <param name="spawnerGuid">Stable runtime identifier of the spawner.</param>
-    /// <param name="spawnerName">Human-readable spawner name baked into the runtime identity.</param>
+    /// <param name="spawnerName"> spawner name baked into the runtime identity.</param>
     /// <param name="enabled">Runtime-enabled state requested by the player.</param>
     /// <param name="wavePresetGuid">EnemyWavePreset asset GUID requested by the player.</param>
     public static void SetOverride(string sceneGuid,
@@ -68,7 +68,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID that owns the spawner.</param>
     /// <param name="spawnerGuid">Stable runtime identifier of the spawner.</param>
-    /// <param name="spawnerName">Human-readable spawner name baked into the runtime identity.</param>
+    /// <param name="spawnerName"> spawner name baked into the runtime identity.</param>
     /// <returns>True when an override was removed, otherwise false.</returns>
     public static bool RemoveOverride(string sceneGuid, string spawnerGuid, string spawnerName)
     {
@@ -180,7 +180,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// Tries to read one stored spawner override by display name when baked identifiers come from stale Addressables content.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID baked on the spawner entity.</param>
-    /// <param name="spawnerName">Human-readable spawner name baked into the runtime identity.</param>
+    /// <param name="spawnerName"> spawner name baked into the runtime identity.</param>
     /// <param name="overrideValue">Resolved override value when present.</param>
     /// <returns>True when one unambiguous named override exists.</returns>
     public static bool TryGetOverrideBySpawnerName(string sceneGuid,
@@ -245,7 +245,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// Stores the name-based fallback key for one override when the spawner has a stable display name.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID used by the catalog entry.</param>
-    /// <param name="spawnerName">Human-readable spawner name.</param>
+    /// <param name="spawnerName"> spawner name.</param>
     /// <param name="overrideValue">Override payload to store.</param>
     private static void SetNamedOverride(string sceneGuid,
                                          string spawnerName,
@@ -262,7 +262,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// Removes one exact name-based fallback entry.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID used by the catalog entry.</param>
-    /// <param name="spawnerName">Human-readable spawner name.</param>
+    /// <param name="spawnerName"> spawner name.</param>
     /// <returns>True when an entry was removed.</returns>
     private static bool RemoveNamedOverride(string sceneGuid, string spawnerName)
     {
@@ -313,7 +313,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// Tries to find a scene-qualified name fallback entry.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID baked on the spawner entity.</param>
-    /// <param name="spawnerName">Human-readable spawner name baked into the runtime identity.</param>
+    /// <param name="spawnerName"> spawner name baked into the runtime identity.</param>
     /// <param name="overrideValue">Resolved override value when present.</param>
     /// <returns>True when an exact named entry exists.</returns>
     private static bool TryGetExactNamedOverride(string sceneGuid,
@@ -341,7 +341,7 @@ public static class EnemySpawnerRuntimeOverrideStore
     /// <summary>
     /// Tries to find a name fallback only when that name has one stored override.
     /// </summary>
-    /// <param name="spawnerName">Human-readable spawner name baked into the runtime identity.</param>
+    /// <param name="spawnerName"> spawner name baked into the runtime identity.</param>
     /// <param name="overrideValue">Resolved override value when present.</param>
     /// <returns>True when the name resolves to a single stored override.</returns>
     private static bool TryGetUniqueNamedOverride(string spawnerName,
@@ -444,7 +444,7 @@ public readonly struct EnemySpawnerRuntimeNamedOverrideEntry
     /// Creates one immutable name fallback entry.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID.</param>
-    /// <param name="spawnerName">Human-readable spawner name.</param>
+    /// <param name="spawnerName"> spawner name.</param>
     /// <param name="overrideValue">Override payload associated with the spawner name.</param>
     public EnemySpawnerRuntimeNamedOverrideEntry(string sceneGuid,
                                                  string spawnerName,
@@ -461,7 +461,7 @@ public readonly struct EnemySpawnerRuntimeNamedOverrideEntry
     /// Checks whether this entry matches one scene-qualified spawner name.
     /// </summary>
     /// <param name="sceneGuid">Scene or subscene asset GUID.</param>
-    /// <param name="spawnerName">Human-readable spawner name.</param>
+    /// <param name="spawnerName"> spawner name.</param>
     /// <returns>True when both identifiers match.</returns>
     public bool Matches(string sceneGuid, string spawnerName)
     {

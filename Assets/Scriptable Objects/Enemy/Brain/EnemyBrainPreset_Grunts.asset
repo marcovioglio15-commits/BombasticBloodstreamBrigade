@@ -25,7 +25,7 @@ MonoBehaviour:
     rotationSpeedDegreesPerSecond: 0
     priorityTier: 0
     steeringAggressiveness: 0.2
-    minimumWallDistance: 1.2
+    minimumWallDistance: 0.25
     disablePlayerKnockback: 0
   steering:
     separationRadius: 1.1

@@ -427,6 +427,7 @@ public sealed class PlayerAnimationBindingsPresetsPanel
                                                HelpBoxMessageType.Info);
         section.Add(upperBodyInfoBox);
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "idleClip", "Idle"));
+        section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "upperBodyIdleClip", "Upper Body Idle"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "moveForwardClip", "Move Forward"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "moveBackwardClip", "Move Backward"));
         section.Add(PlayerAnimationBindingsPanelUtility.CreatePropertyField(selectedPresetSerializedObject, "moveLeftClip", "Move Left"));
