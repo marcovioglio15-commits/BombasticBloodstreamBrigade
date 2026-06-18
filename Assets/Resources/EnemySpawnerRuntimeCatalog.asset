@@ -22,7 +22,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: b7a74f7fd87798546abeb0f3dae30f83
+      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
     - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
       spawnerGuid: 6900e62466181a3c35bb420f2496adf1
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
@@ -33,6 +33,10 @@ MonoBehaviour:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
     wavePresets:
+    - presetName: PF_EnemySpawner_Wave_Main_01_Easy
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_01_Easy.asset
+      assetGuid: 18b9c538d2c66114d8ab07d990edd337
+      preset: {fileID: 11400000, guid: 18b9c538d2c66114d8ab07d990edd337, type: 2}
     - presetName: PF_EnemySpawner_Wave_Main_Comics_1_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_Comics_1_Easy.asset
       assetGuid: 941e260559d38d746a8ceefdc02d7bcd
