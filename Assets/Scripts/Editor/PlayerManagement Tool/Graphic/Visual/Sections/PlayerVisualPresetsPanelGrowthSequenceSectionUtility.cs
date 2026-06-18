@@ -74,12 +74,17 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 
         for (int scheduleIndex = 0; scheduleIndex < schedules.arraySize; scheduleIndex++)
         {
-            SerializedProperty schedule = schedules.GetArrayElementAtIndex(scheduleIndex);
+            SerializedProperty schedule = schedules.GetArrayElementAtIndex(scheduleIndex).Copy();
             SerializedProperty scheduleId = schedule.FindPropertyRelative("scheduleId");
             Foldout foldout = CreateFoldout(ResolveScheduleTitle(scheduleId, scheduleIndex),
                                             "Schedule." + scheduleIndex);
-            AddPlainField(foldout, scheduleId, "Schedule Id", "Schedule ID selected from Level-up & Progression.");
-            BuildSteps(foldout, schedule.FindPropertyRelative("steps"), scalingRules, scheduleIndex);
+            int capturedScheduleIndex = scheduleIndex;
+            AttachLazyFoldout(foldout,
+                              () =>
+                              {
+                                  AddPlainField(foldout, scheduleId, "Schedule Id", "Schedule ID selected from Level-up & Progression.");
+                                  BuildSteps(foldout, schedule.FindPropertyRelative("steps"), scalingRules, capturedScheduleIndex);
+                              });
             parent.Add(foldout);
         }
     }
@@ -101,37 +106,78 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 
         for (int stepIndex = 0; stepIndex < steps.arraySize; stepIndex++)
         {
-            SerializedProperty step = steps.GetArrayElementAtIndex(stepIndex);
+            SerializedProperty step = steps.GetArrayElementAtIndex(stepIndex).Copy();
             SerializedProperty presentationMode = step.FindPropertyRelative("presentationMode");
             Foldout foldout = CreateFoldout(ResolveStepTitle(step, stepIndex),
                                             string.Format("Schedule.{0}.Step.{1}", scheduleIndex, stepIndex));
-            AddPlainField(foldout, step.FindPropertyRelative("stepIndex"), "Step Index", "Zero-based step index inside the selected schedule.");
-            AddPlainField(foldout, step.FindPropertyRelative("statName"), "Stat Name", "Copied progression stat name used as readable fallback text.");
-            AddField(foldout, step.FindPropertyRelative("textOverride"), scalingRules, "Text Override", "Optional text used when Presentation Mode is Text.", true);
-            AddField(foldout, presentationMode, scalingRules, "Presentation Mode", "Text uses TMP styling. Image uses Next/Normal sprites.");
-
-            VisualElement imageFields = new VisualElement();
-            AddPlainField(imageFields, step.FindPropertyRelative("nextSprite"), "Next Sprite", "Sprite displayed while this is the next growth step.");
-            AddPlainField(imageFields, step.FindPropertyRelative("normalSprite"), "Normal Sprite", "Sprite displayed while this is not the next growth step.");
-            foldout.Add(imageFields);
-
-            VisualElement textFields = new VisualElement();
-            BuildTextState(textFields, step.FindPropertyRelative("nextText"), scalingRules, "Next Text", "NextText");
-            BuildTextState(textFields, step.FindPropertyRelative("normalText"), scalingRules, "Normal Text", "NormalText");
-            foldout.Add(textFields);
-
-            RefreshMode();
-            foldout.TrackPropertyValue(presentationMode, changedProperty => RefreshMode());
+            int capturedStepIndex = stepIndex;
+            AttachLazyFoldout(foldout,
+                              () => BuildStepDetails(foldout,
+                                                     step,
+                                                     presentationMode,
+                                                     scalingRules,
+                                                     capturedStepIndex));
             parent.Add(foldout);
-
-            void RefreshMode()
-            {
-                bool imageMode = presentationMode != null &&
-                                 presentationMode.enumValueIndex == (int)PlayerGrowthSequenceHudPresentationMode.Image;
-                imageFields.style.display = imageMode ? DisplayStyle.Flex : DisplayStyle.None;
-                textFields.style.display = imageMode ? DisplayStyle.None : DisplayStyle.Flex;
-            }
         }
+    }
+
+    /// <summary>
+    /// Builds one growth step editor body after its foldout has been opened.
+    /// </summary>
+    /// <param name="foldout">Step foldout receiving property controls.</param>
+    /// <param name="step">Serialized growth step visual entry.</param>
+    /// <param name="presentationMode">Serialized presentation mode used to toggle text/image fields.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    /// <param name="stepIndex">Step index used in nested foldout state keys.</param>
+    private static void BuildStepDetails(Foldout foldout,
+                                         SerializedProperty step,
+                                         SerializedProperty presentationMode,
+                                         SerializedProperty scalingRules,
+                                         int stepIndex)
+    {
+        if (foldout == null || step == null)
+            return;
+
+        AddPlainField(foldout, step.FindPropertyRelative("stepIndex"), "Step Index", "Zero-based step index inside the selected schedule.");
+        AddPlainField(foldout, step.FindPropertyRelative("statName"), "Stat Name", "Copied progression stat name used as readable fallback text.");
+        AddField(foldout, step.FindPropertyRelative("textOverride"), scalingRules, "Text Override", "Optional text used when Presentation Mode is Text.", true);
+        AddField(foldout, presentationMode, scalingRules, "Presentation Mode", "Text uses TMP styling. Image uses Next/Normal sprites.");
+
+        VisualElement imageFields = new VisualElement();
+        AddPlainField(imageFields, step.FindPropertyRelative("nextSprite"), "Next Sprite", "Sprite displayed while this is the next growth step.");
+        AddPlainField(imageFields, step.FindPropertyRelative("normalSprite"), "Normal Sprite", "Sprite displayed while this is not the next growth step.");
+        foldout.Add(imageFields);
+
+        VisualElement textFields = new VisualElement();
+        BuildTextState(textFields, step.FindPropertyRelative("nextText"), scalingRules, "Next Text", "Step." + stepIndex + ".NextText");
+        BuildTextState(textFields, step.FindPropertyRelative("normalText"), scalingRules, "Normal Text", "Step." + stepIndex + ".NormalText");
+        foldout.Add(textFields);
+
+        RefreshGrowthStepMode(presentationMode, imageFields, textFields);
+        foldout.TrackPropertyValue(presentationMode,
+                                   changedProperty => RefreshGrowthStepMode(presentationMode,
+                                                                            imageFields,
+                                                                            textFields));
+    }
+
+    /// <summary>
+    /// Toggles the text/image editor controls for one growth step based on its presentation mode.
+    /// </summary>
+    /// <param name="presentationMode">Serialized presentation mode property.</param>
+    /// <param name="imageFields">Image-mode field container.</param>
+    /// <param name="textFields">Text-mode field container.</param>
+    private static void RefreshGrowthStepMode(SerializedProperty presentationMode,
+                                              VisualElement imageFields,
+                                              VisualElement textFields)
+    {
+        bool imageMode = presentationMode != null &&
+                         presentationMode.enumValueIndex == (int)PlayerGrowthSequenceHudPresentationMode.Image;
+
+        if (imageFields != null)
+            imageFields.style.display = imageMode ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (textFields != null)
+            textFields.style.display = imageMode ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     /// <summary>
@@ -153,11 +199,37 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 
         Foldout foldout = CreateFoldout(title, stateSuffix);
         AddPlainField(foldout, textState.FindPropertyRelative("fontAsset"), "Font Asset", "Optional TMP font override for this state.");
-        AddField(foldout, textState.FindPropertyRelative("fontSize"), scalingRules, "Font Size", "Font size used by this state. Set 0 to keep the scene label size.");
+        AddField(foldout, textState.FindPropertyRelative("fontSize"), scalingRules, "Font Size", "Fixed font size when Auto Size is disabled, or preferred size clamped inside Auto Size Min/Max when Auto Size is enabled.");
+        SerializedProperty enableAutoSize = textState.FindPropertyRelative("enableAutoSize");
+        AddField(foldout, enableAutoSize, scalingRules, "Enable Auto Size", "Enables TMP auto-size for this text state.");
+        VisualElement autoSizeFields = new VisualElement();
+        AddField(autoSizeFields, textState.FindPropertyRelative("autoSizeMin"), scalingRules, "Auto Size Min", "Minimum TMP font size allowed when auto-size is enabled.");
+        AddField(autoSizeFields, textState.FindPropertyRelative("autoSizeMax"), scalingRules, "Auto Size Max", "Maximum TMP font size allowed when auto-size is enabled.");
+        foldout.Add(autoSizeFields);
         AddField(foldout, textState.FindPropertyRelative("color"), scalingRules, "Color", "Text color used by this state.");
         AddField(foldout, textState.FindPropertyRelative("outlineColor"), scalingRules, "Outline Color", "Text outline color used by this state.");
         AddField(foldout, textState.FindPropertyRelative("outlineWidth"), scalingRules, "Outline Width", "TMP outline width used by this state.");
         parent.Add(foldout);
+
+        RefreshAutoSizeFields(enableAutoSize, autoSizeFields);
+        foldout.TrackPropertyValue(enableAutoSize,
+                                   changedProperty => RefreshAutoSizeFields(enableAutoSize, autoSizeFields));
+    }
+
+    /// <summary>
+    /// Shows auto-size bounds only when the owning text state has TMP auto-size enabled.
+    /// </summary>
+    /// <param name="enableAutoSize">Serialized auto-size toggle.</param>
+    /// <param name="autoSizeFields">Container with auto-size bounds controls.</param>
+    private static void RefreshAutoSizeFields(SerializedProperty enableAutoSize,
+                                              VisualElement autoSizeFields)
+    {
+        if (autoSizeFields == null)
+            return;
+
+        autoSizeFields.style.display = enableAutoSize != null && enableAutoSize.boolValue
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
     }
     #endregion
 
@@ -327,6 +399,17 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
         if (parent == null || property == null)
             return;
 
+        if (property.propertyType == SerializedPropertyType.String)
+        {
+            TextField textField = new TextField(label);
+            textField.isDelayed = true;
+            textField.tooltip = tooltip;
+            textField.BindProperty(property);
+            textField.RegisterValueChangedCallback(evt => PlayerManagementDraftSession.MarkDirty());
+            parent.Add(textField);
+            return;
+        }
+
         PropertyField field = new PropertyField(property, label);
         field.tooltip = tooltip;
         field.BindProperty(property);
@@ -381,8 +464,39 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     private static Foldout CreateFoldout(string title, string stateSuffix)
     {
         return ManagementToolFoldoutStateUtility.CreateFoldout(title,
-                                                                "NashCore.PlayerManagement.Visual.GrowthSequence." + stateSuffix,
-                                                                true);
+                                                                "NashCore.PlayerManagement.Visual.GrowthSequence.Lazy." + stateSuffix,
+                                                                false);
+    }
+
+    /// <summary>
+    /// Builds foldout body controls only when the foldout is opened for the first time.
+    /// </summary>
+    /// <param name="foldout">Foldout that owns the lazy body.</param>
+    /// <param name="buildContent">Content builder invoked at most once.</param>
+    private static void AttachLazyFoldout(Foldout foldout, Action buildContent)
+    {
+        if (foldout == null || buildContent == null)
+            return;
+
+        bool isBuilt = false;
+
+        void EnsureBuilt()
+        {
+            if (isBuilt)
+                return;
+
+            isBuilt = true;
+            buildContent.Invoke();
+        }
+
+        if (foldout.value)
+            EnsureBuilt();
+
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            if (evt.newValue)
+                EnsureBuilt();
+        });
     }
     #endregion
 

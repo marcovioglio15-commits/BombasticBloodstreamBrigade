@@ -36,12 +36,37 @@ public sealed class HUDGrowthSequenceSection
 
     [Tooltip("Name of the growth sequence root used by auto discovery.")]
     [SerializeField] private string growthSequenceContainerName = DefaultContainerName;
+
+    [Tooltip("Creates a small runtime-only slot pool when GrowthSequence Container has no authored TMP or Image slots. Disable this once the HUD prefab carries explicit slots.")]
+    [SerializeField] private bool createFallbackSlotsWhenMissing = true;
+
+    [Tooltip("Number of fallback slots created under GrowthSequence Container when the authored slot pool is missing.")]
+    [SerializeField] private int fallbackSlotCount = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotCount;
+
+    [Tooltip("Width in UI units assigned to each fallback growth sequence slot.")]
+    [SerializeField] private float fallbackSlotWidth = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotWidth;
+
+    [Tooltip("Height in UI units assigned to each fallback growth sequence slot.")]
+    [SerializeField] private float fallbackSlotHeight = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotHeight;
+
+    [Tooltip("Horizontal spacing in UI units between generated fallback slots.")]
+    [SerializeField] private float fallbackSlotSpacing = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotSpacing;
+
+    [Tooltip("TMP font size assigned to generated fallback text slots.")]
+    [SerializeField] private float fallbackFontSize = HUDGrowthSequenceFallbackSlotUtility.DefaultFontSize;
     #endregion
 
     private FixedString64Bytes displayedScheduleId;
     private int displayedNextStepIndex = -1;
     private int displayedVisibleCount = -1;
     private Entity lastConfigEntity;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private bool loggedMissingPlayerReference;
+    private bool loggedMissingConfigEntity;
+    private bool loggedMissingProgressionSchedule;
+    private bool loggedEmptyStepBuffer;
+    private bool loggedEmptySlotPool;
+#endif
     #endregion
 
     #region Methods
@@ -97,6 +122,9 @@ public sealed class HUDGrowthSequenceSection
             !runtimeEntityManager.HasComponent<PlayerProgressionConfig>(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerLevel>(playerEntity))
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogMissingPlayerReference(runtimeEntityManager, playerEntity);
+#endif
             HandleMissingPlayer();
             return;
         }
@@ -108,6 +136,10 @@ public sealed class HUDGrowthSequenceSection
             !runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualConfig>(configEntity) ||
             !runtimeEntityManager.HasBuffer<PlayerGrowthSequenceHudStepVisualElement>(configEntity))
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedMissingConfigEntity,
+                              "[HUDGrowthSequenceSection] Player growth sequence visual config entity is missing or incomplete. Reimport/rebake the player prefab or owner scene so PlayerAuthoringBaker writes the HUD visual config.");
+#endif
             HandleMissingPlayer();
             return;
         }
@@ -132,10 +164,25 @@ public sealed class HUDGrowthSequenceSection
             if (config.HideWhenPlayerMissing != 0)
                 HideAllSlots();
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedMissingProgressionSchedule,
+                              "[HUDGrowthSequenceSection] Active level-up schedule could not be resolved from PlayerProgressionConfig. Growth sequence HUD has no schedule to render.");
+#endif
             return;
         }
 
         DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> steps = runtimeEntityManager.GetBuffer<PlayerGrowthSequenceHudStepVisualElement>(configEntity, true);
+
+        if (steps.Length <= 0)
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedEmptyStepBuffer,
+                              "[HUDGrowthSequenceSection] Growth sequence visual step buffer is empty. Sync Growth Sequence from Level-up & Progression and rebake the player.");
+#endif
+            HideAllSlots();
+            return;
+        }
+
         int slotCount = ResolveSlotCount();
         int maximumVisibleSteps = config.MaximumVisibleSteps > 0
             ? math.min(config.MaximumVisibleSteps, scheduleStepCount)
@@ -144,6 +191,10 @@ public sealed class HUDGrowthSequenceSection
 
         if (visibleCount <= 0)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedEmptySlotPool,
+                              "[HUDGrowthSequenceSection] Growth sequence has runtime data but no UI slots. Assign text/image slots or enable fallback slot creation on HUDManager.");
+#endif
             HideAllSlots();
             return;
         }
@@ -191,8 +242,17 @@ public sealed class HUDGrowthSequenceSection
         if (imageSlots == null || imageSlots.Length <= 0)
             imageSlots = slotRoot.GetComponentsInChildren<Image>(true);
 
-        if ((imageSlots == null || imageSlots.Length <= 0) && textSlots != null && textSlots.Length > 0)
-            imageSlots = BuildImageSlotsFromTextSlots(textSlots);
+        if (ResolveSlotCount() <= 0 && createFallbackSlotsWhenMissing && rootObject != null)
+        {
+            HUDGrowthSequenceFallbackSlotPool fallbackSlotPool = HUDGrowthSequenceFallbackSlotUtility.Create(rootObject.transform,
+                                                                                                            fallbackSlotCount,
+                                                                                                            fallbackSlotWidth,
+                                                                                                            fallbackSlotHeight,
+                                                                                                            fallbackSlotSpacing,
+                                                                                                            fallbackFontSize);
+            textSlots = fallbackSlotPool.TextSlots;
+            imageSlots = fallbackSlotPool.ImageSlots;
+        }
     }
 
     /// <summary>
@@ -219,37 +279,6 @@ public sealed class HUDGrowthSequenceSection
         return null;
     }
 
-    /// <summary>
-    /// Builds image slots on the same preauthored GameObjects used by text slots, avoiding runtime GameObject instantiation.
-    /// </summary>
-    /// <param name="sourceTextSlots">Text slot pool already present in the scene or prefab.</param>
-    /// <returns>Image slot array aligned with the text slot array.</returns>
-    private static Image[] BuildImageSlotsFromTextSlots(TMP_Text[] sourceTextSlots)
-    {
-        if (sourceTextSlots == null || sourceTextSlots.Length <= 0)
-            return Array.Empty<Image>();
-
-        Image[] resolvedImageSlots = new Image[sourceTextSlots.Length];
-
-        for (int slotIndex = 0; slotIndex < sourceTextSlots.Length; slotIndex++)
-        {
-            TMP_Text textSlot = sourceTextSlots[slotIndex];
-
-            if (textSlot == null)
-                continue;
-
-            Image imageSlot = textSlot.GetComponent<Image>();
-
-            if (imageSlot == null)
-                imageSlot = textSlot.gameObject.AddComponent<Image>();
-
-            imageSlot.enabled = false;
-            imageSlot.raycastTarget = false;
-            resolvedImageSlots[slotIndex] = imageSlot;
-        }
-
-        return resolvedImageSlots;
-    }
     #endregion
 
     #region Rendering
@@ -332,13 +361,50 @@ public sealed class HUDGrowthSequenceSection
             textSlot.font = fontAsset;
 
         float fontSize = isNext ? step.NextFontSize : step.NormalFontSize;
+        bool autoSizeEnabled = isNext ? step.NextAutoSizeEnabled != 0 : step.NormalAutoSizeEnabled != 0;
+
+        ApplyTextSizing(textSlot, fontSize, autoSizeEnabled, step, isNext);
+
+        Color textColor = ToColor(isNext ? step.NextColor : step.NormalColor);
+        Color outlineColor = ToColor(isNext ? step.NextOutlineColor : step.NormalOutlineColor);
+        ResolveVisibleTextState(ref textColor, ref outlineColor);
+
+        textSlot.color = textColor;
+        textSlot.outlineColor = outlineColor;
+        textSlot.outlineWidth = math.saturate(isNext ? step.NextOutlineWidth : step.NormalOutlineWidth);
+    }
+
+    /// <summary>
+    /// Applies fixed or TMP auto-size font sizing to one growth sequence text slot.
+    /// </summary>
+    /// <param name="textSlot">TMP label to update.</param>
+    /// <param name="fontSize">Authored preferred font size.</param>
+    /// <param name="autoSizeEnabled">Whether TMP auto-size should be active.</param>
+    /// <param name="step">Runtime growth step visual data.</param>
+    /// <param name="isNext">Whether this step is the next level-up target.</param>
+    private static void ApplyTextSizing(TMP_Text textSlot,
+                                        float fontSize,
+                                        bool autoSizeEnabled,
+                                        PlayerGrowthSequenceHudStepVisualElement step,
+                                        bool isNext)
+    {
+        textSlot.enableAutoSizing = autoSizeEnabled;
+
+        if (!autoSizeEnabled)
+        {
+            if (fontSize > 0f)
+                textSlot.fontSize = fontSize;
+
+            return;
+        }
+
+        float autoSizeMin = math.max(0f, isNext ? step.NextAutoSizeMin : step.NormalAutoSizeMin);
+        float autoSizeMax = math.max(autoSizeMin, isNext ? step.NextAutoSizeMax : step.NormalAutoSizeMax);
+        textSlot.fontSizeMin = autoSizeMin;
+        textSlot.fontSizeMax = autoSizeMax;
 
         if (fontSize > 0f)
-            textSlot.fontSize = fontSize;
-
-        textSlot.color = ToColor(isNext ? step.NextColor : step.NormalColor);
-        textSlot.outlineColor = ToColor(isNext ? step.NextOutlineColor : step.NormalOutlineColor);
-        textSlot.outlineWidth = math.saturate(isNext ? step.NextOutlineWidth : step.NormalOutlineWidth);
+            textSlot.fontSize = math.clamp(fontSize, autoSizeMin, autoSizeMax);
     }
 
     /// <summary>
@@ -502,7 +568,74 @@ public sealed class HUDGrowthSequenceSection
     {
         return new Color(value.x, value.y, value.z, value.w);
     }
+
+    /// <summary>
+    /// Prevents text-mode growth steps from becoming fully invisible when both authored alpha channels are zero.
+    /// </summary>
+    /// <param name="textColor">Mutable TMP face color.</param>
+    /// <param name="outlineColor">Mutable TMP outline color.</param>
+    private static void ResolveVisibleTextState(ref Color textColor, ref Color outlineColor)
+    {
+        if (textColor.a > 0f || outlineColor.a > 0f)
+            return;
+
+        textColor.a = 1f;
+        outlineColor.a = 1f;
+    }
+
     #endregion
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    #region Diagnostics
+    /// <summary>
+    /// Logs the first missing-reference reason for growth sequence runtime binding.
+    /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to inspect the player entity.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    private void LogMissingPlayerReference(EntityManager runtimeEntityManager, Entity playerEntity)
+    {
+        if (loggedMissingPlayerReference)
+            return;
+
+        if (!runtimeEntityManager.Exists(playerEntity))
+            return;
+
+        if (!runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualReference>(playerEntity))
+        {
+            LogDiagnosticOnce(ref loggedMissingPlayerReference,
+                              "[HUDGrowthSequenceSection] Player entity is missing PlayerGrowthSequenceHudVisualReference. The active player bake does not include the new Growth Sequence HUD config yet; reimport/rebake the player prefab or owner scene.");
+            return;
+        }
+
+        if (!runtimeEntityManager.HasComponent<PlayerProgressionConfig>(playerEntity))
+        {
+            LogDiagnosticOnce(ref loggedMissingPlayerReference,
+                              "[HUDGrowthSequenceSection] Player entity is missing PlayerProgressionConfig, so the active growth schedule cannot be resolved.");
+            return;
+        }
+
+        if (!runtimeEntityManager.HasComponent<PlayerLevel>(playerEntity))
+        {
+            LogDiagnosticOnce(ref loggedMissingPlayerReference,
+                              "[HUDGrowthSequenceSection] Player entity is missing PlayerLevel, so the next growth step cannot be resolved.");
+        }
+    }
+
+    /// <summary>
+    /// Logs one diagnostic message once per HUD section instance.
+    /// </summary>
+    /// <param name="logged">Mutable guard flag for this diagnostic.</param>
+    /// <param name="message">Diagnostic message.</param>
+    private static void LogDiagnosticOnce(ref bool logged, string message)
+    {
+        if (logged)
+            return;
+
+        logged = true;
+        Debug.LogWarning(message);
+    }
+    #endregion
+#endif
 
     #endregion
 }

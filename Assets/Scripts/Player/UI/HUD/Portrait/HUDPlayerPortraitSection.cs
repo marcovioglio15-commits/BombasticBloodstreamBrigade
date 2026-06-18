@@ -53,6 +53,12 @@ public sealed class HUDPlayerPortraitSection
     private Sprite fallbackSprite;
     private Sprite lastAppliedSprite;
     private Entity lastConfigEntity;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private bool loggedMissingPlayerReference;
+    private bool loggedMissingConfigEntity;
+    private bool loggedEmptyAnimationBuffer;
+    private bool loggedEmptyFrameBuffer;
+#endif
     #endregion
 
     #region Methods
@@ -105,6 +111,9 @@ public sealed class HUDPlayerPortraitSection
         if (!runtimeEntityManager.Exists(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogMissingPlayerReference(runtimeEntityManager, playerEntity);
+#endif
             HandleMissingPlayer();
             return;
         }
@@ -117,6 +126,10 @@ public sealed class HUDPlayerPortraitSection
             !runtimeEntityManager.HasBuffer<PlayerPortraitHudAnimationElement>(configEntity) ||
             !runtimeEntityManager.HasBuffer<PlayerPortraitHudFrameElement>(configEntity))
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedMissingConfigEntity,
+                              "[HUDPlayerPortraitSection] Player portrait visual config entity is missing or incomplete. Reimport/rebake the player prefab or owner scene so PlayerAuthoringBaker writes the HUD portrait config.");
+#endif
             HandleMissingPlayer();
             return;
         }
@@ -134,9 +147,19 @@ public sealed class HUDPlayerPortraitSection
 
         if (animations.Length <= 0)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            LogDiagnosticOnce(ref loggedEmptyAnimationBuffer,
+                              "[HUDPlayerPortraitSection] Portrait animation buffer is empty. Configure Portrait frames in the active Player Visual Preset and rebake the player.");
+#endif
             SetVisible(config.HideWhenPlayerMissing == 0);
             return;
         }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (frames.Length <= 0)
+            LogDiagnosticOnce(ref loggedEmptyFrameBuffer,
+                              "[HUDPlayerPortraitSection] Portrait frame buffer is empty. The HUD will keep the authored fallback sprite until the active Player Visual Preset is rebaked with frame assets.");
+#endif
 
         if (lastConfigEntity != configEntity)
         {
@@ -613,6 +636,44 @@ public sealed class HUDPlayerPortraitSection
         powerUpSnapshots.Clear();
     }
     #endregion
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    #region Diagnostics
+    /// <summary>
+    /// Logs why the portrait runtime binding cannot use the player entity.
+    /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to inspect the player entity.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    private void LogMissingPlayerReference(EntityManager runtimeEntityManager, Entity playerEntity)
+    {
+        if (loggedMissingPlayerReference)
+            return;
+
+        if (!runtimeEntityManager.Exists(playerEntity))
+            return;
+
+        if (!runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
+        {
+            LogDiagnosticOnce(ref loggedMissingPlayerReference,
+                              "[HUDPlayerPortraitSection] Player entity is missing PlayerPortraitHudVisualReference. The active player bake does not include the new Portrait HUD config yet; reimport/rebake the player prefab or owner scene.");
+        }
+    }
+
+    /// <summary>
+    /// Logs one diagnostic message once per HUD section instance.
+    /// </summary>
+    /// <param name="logged">Mutable guard flag for this diagnostic.</param>
+    /// <param name="message">Diagnostic message.</param>
+    private static void LogDiagnosticOnce(ref bool logged, string message)
+    {
+        if (logged)
+            return;
+
+        logged = true;
+        Debug.LogWarning(message);
+    }
+    #endregion
+#endif
 
     #endregion
 

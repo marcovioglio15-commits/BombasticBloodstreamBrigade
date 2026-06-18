@@ -12,6 +12,13 @@ public sealed class HUDManager : MonoBehaviour
     #region Fields
 
     #region Serialized Fields
+    [Header("Reference Discovery")]
+    [Tooltip("Optional scene root used by HUD sections to auto-discover portrait and growth sequence containers. When empty, the manager resolves CanvasStyled once during Awake.")]
+    [SerializeField] private Transform hudReferenceSearchRoot;
+
+    [Tooltip("Fallback GameObject name used to resolve the HUD reference search root when no explicit root is assigned.")]
+    [SerializeField] private string hudReferenceSearchRootName = "CanvasStyled";
+
     [Header("Health and Shield")]
     [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, movement, and Player Visual Preset configuration.")]
     [SerializeField] private PlayerHealthBarsHudView playerHealthBarsView;
@@ -117,6 +124,7 @@ public sealed class HUDManager : MonoBehaviour
     private Entity cachedPlayerEntity;
     private int displayedPlayerLevel = -1;
     private float displayedExperienceNormalized;
+    private Transform resolvedHudReferenceSearchRoot;
     private HUDPowerUpOverlaySection powerUpOverlaySection;
     private HUDLiquidBarRuntime experienceBarRuntime;
     #endregion
@@ -132,8 +140,9 @@ public sealed class HUDManager : MonoBehaviour
         if (playerHealthBarsView != null)
             playerHealthBarsView.Initialize();
 
-        portraitSection.Initialize(transform);
-        growthSequenceSection.Initialize(transform);
+        Transform hudSearchRoot = ResolveHudReferenceSearchRoot();
+        portraitSection.Initialize(hudSearchRoot);
+        growthSequenceSection.Initialize(hudSearchRoot);
         powerUpOverlaySection = new HUDPowerUpOverlaySection(primaryPowerUpIconImage,
                                                              secondaryPowerUpIconImage,
                                                              primaryPowerUpSlotRootObject,
@@ -352,6 +361,85 @@ public sealed class HUDManager : MonoBehaviour
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves the hierarchy root used by nested HUD sections for one-time reference discovery.
+    /// </summary>
+    /// <returns>Configured root, resolved canvas root, or this manager transform as a final fallback.</returns>
+    private Transform ResolveHudReferenceSearchRoot()
+    {
+        if (resolvedHudReferenceSearchRoot != null)
+            return resolvedHudReferenceSearchRoot;
+
+        if (hudReferenceSearchRoot != null)
+        {
+            resolvedHudReferenceSearchRoot = hudReferenceSearchRoot;
+            return resolvedHudReferenceSearchRoot;
+        }
+
+        Transform namedRoot = ResolveNamedHudReferenceSearchRoot();
+
+        if (namedRoot != null)
+        {
+            resolvedHudReferenceSearchRoot = namedRoot;
+            return resolvedHudReferenceSearchRoot;
+        }
+
+        Canvas parentCanvas = GetComponentInParent<Canvas>(true);
+
+        if (parentCanvas != null)
+        {
+            resolvedHudReferenceSearchRoot = parentCanvas.transform;
+            return resolvedHudReferenceSearchRoot;
+        }
+
+        Canvas sceneCanvas = ResolveSceneCanvasReferenceRoot();
+
+        if (sceneCanvas != null)
+        {
+            resolvedHudReferenceSearchRoot = sceneCanvas.transform;
+            return resolvedHudReferenceSearchRoot;
+        }
+
+        resolvedHudReferenceSearchRoot = transform;
+        return resolvedHudReferenceSearchRoot;
+    }
+
+    /// <summary>
+    /// Resolves the configured HUD root name from active scene objects.
+    /// </summary>
+    /// <returns>Named root transform, or null when no matching object is active.</returns>
+    private Transform ResolveNamedHudReferenceSearchRoot()
+    {
+        if (string.IsNullOrWhiteSpace(hudReferenceSearchRootName))
+            return null;
+
+        GameObject namedRootObject = GameObject.Find(hudReferenceSearchRootName);
+
+        if (namedRootObject == null)
+            return null;
+
+        return namedRootObject.transform;
+    }
+
+    /// <summary>
+    /// Resolves a scene canvas fallback when the HUD manager is authored outside the canvas hierarchy.
+    /// </summary>
+    /// <returns>First active canvas in the scene, or null when none is available.</returns>
+    private static Canvas ResolveSceneCanvasReferenceRoot()
+    {
+        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        for (int canvasIndex = 0; canvasIndex < canvases.Length; canvasIndex++)
+        {
+            Canvas canvas = canvases[canvasIndex];
+
+            if (canvas != null && canvas.gameObject.activeInHierarchy)
+                return canvas;
+        }
+
+        return canvases.Length > 0 ? canvases[0] : null;
+    }
+
     private void ClampSettings()
     {
         if (energyBarSmoothingSeconds < 0f)

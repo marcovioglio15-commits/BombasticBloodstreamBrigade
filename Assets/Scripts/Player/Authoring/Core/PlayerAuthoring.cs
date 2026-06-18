@@ -673,16 +673,16 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         {
             PlayerEntity = entity
         });
-        AddComponent(growthSequenceHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildGrowthSequenceConfig(visualPreset));
-        AddComponent(growthSequenceHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildBaseGrowthSequenceConfig(sourceVisualPreset));
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildGrowthSequenceConfig(visualPreset));
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildBaseGrowthSequenceConfig(sourceVisualPreset));
         AddComponent(growthSequenceHudVisualEntity, new PlayerGrowthSequenceHudVisualScalingState());
         DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> growthSequenceStepBuffer = AddBuffer<PlayerGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
         DynamicBuffer<PlayerBaseGrowthSequenceHudStepVisualElement> baseGrowthSequenceStepBuffer = AddBuffer<PlayerBaseGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
         DynamicBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement> growthSequenceHudScalingBuffer = AddBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement>(growthSequenceHudVisualEntity);
-        PlayerHudPortraitGrowthVisualBakeUtility.PopulateGrowthSequenceBuffer(visualPreset,
+        PlayerHudGrowthSequenceVisualBakeUtility.PopulateGrowthSequenceBuffer(visualPreset,
                                                                               progressionPreset,
                                                                               growthSequenceStepBuffer);
-        PlayerHudPortraitGrowthVisualBakeUtility.PopulateBaseGrowthSequenceBuffer(sourceVisualPreset,
+        PlayerHudGrowthSequenceVisualBakeUtility.PopulateBaseGrowthSequenceBuffer(sourceVisualPreset,
                                                                                   sourceProgressionPreset,
                                                                                   baseGrowthSequenceStepBuffer);
 #if UNITY_EDITOR

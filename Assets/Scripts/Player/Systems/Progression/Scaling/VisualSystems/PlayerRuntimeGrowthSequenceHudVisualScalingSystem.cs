@@ -123,6 +123,12 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
                 NormalFontAsset = step.NormalFontAsset,
                 NextFontSize = step.NextFontSize,
                 NormalFontSize = step.NormalFontSize,
+                NextAutoSizeEnabled = step.NextAutoSizeEnabled,
+                NormalAutoSizeEnabled = step.NormalAutoSizeEnabled,
+                NextAutoSizeMin = step.NextAutoSizeMin,
+                NormalAutoSizeMin = step.NormalAutoSizeMin,
+                NextAutoSizeMax = step.NextAutoSizeMax,
+                NormalAutoSizeMax = step.NormalAutoSizeMax,
                 NextColor = step.NextColor,
                 NormalColor = step.NormalColor,
                 NextOutlineColor = step.NextOutlineColor,
@@ -156,7 +162,7 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
                                                                                               VariableContext,
                                                                                               out bool resolvedBoolean))
                     {
-                        ApplyBooleanValue(payloadPath, resolvedBoolean, ref runtimeConfig);
+                        ApplyBooleanValue(payloadPath, resolvedBoolean, ref runtimeConfig, runtimeSteps);
                     }
                     break;
                 case PlayerFormulaValueType.Number:
@@ -190,7 +196,8 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
     /// <param name="runtimeConfig">Mutable growth-sequence HUD visual configuration.</param>
     private static void ApplyBooleanValue(string payloadPath,
                                           bool resolvedValue,
-                                          ref PlayerGrowthSequenceHudVisualConfig runtimeConfig)
+                                          ref PlayerGrowthSequenceHudVisualConfig runtimeConfig,
+                                          DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> runtimeSteps)
     {
         byte byteValue = resolvedValue ? (byte)1 : (byte)0;
 
@@ -202,6 +209,20 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
             case "hideWhenPlayerMissing":
                 runtimeConfig.HideWhenPlayerMissing = byteValue;
                 return;
+        }
+
+        if (!TryResolveStepTarget(payloadPath, out FixedString64Bytes scheduleId, out int stepIndex, out string stepPath))
+            return;
+
+        for (int runtimeStepIndex = 0; runtimeStepIndex < runtimeSteps.Length; runtimeStepIndex++)
+        {
+            PlayerGrowthSequenceHudStepVisualElement step = runtimeSteps[runtimeStepIndex];
+
+            if (!IsMatchingStep(step, scheduleId, stepIndex))
+                continue;
+
+            ApplyStepBooleanValue(stepPath, byteValue, ref step);
+            runtimeSteps[runtimeStepIndex] = step;
         }
     }
 
@@ -287,6 +308,18 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
             case "normalText.fontSize":
                 step.NormalFontSize = math.max(0f, resolvedValue);
                 return;
+            case "nextText.autoSizeMin":
+                step.NextAutoSizeMin = math.max(0f, resolvedValue);
+                return;
+            case "normalText.autoSizeMin":
+                step.NormalAutoSizeMin = math.max(0f, resolvedValue);
+                return;
+            case "nextText.autoSizeMax":
+                step.NextAutoSizeMax = math.max(0f, resolvedValue);
+                return;
+            case "normalText.autoSizeMax":
+                step.NormalAutoSizeMax = math.max(0f, resolvedValue);
+                return;
             case "nextText.outlineWidth":
                 step.NextOutlineWidth = math.max(0f, resolvedValue);
                 return;
@@ -296,6 +329,27 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
         }
 
         ApplyStepColorValue(stepPath, resolvedValue, ref step);
+    }
+
+    /// <summary>
+    /// Applies a boolean formula result to one growth step.
+    /// </summary>
+    /// <param name="stepPath">Target path relative to the step visual definition.</param>
+    /// <param name="resolvedValue">Formula result converted to byte storage.</param>
+    /// <param name="step">Mutable growth step.</param>
+    private static void ApplyStepBooleanValue(string stepPath,
+                                              byte resolvedValue,
+                                              ref PlayerGrowthSequenceHudStepVisualElement step)
+    {
+        switch (stepPath)
+        {
+            case "nextText.enableAutoSize":
+                step.NextAutoSizeEnabled = resolvedValue;
+                return;
+            case "normalText.enableAutoSize":
+                step.NormalAutoSizeEnabled = resolvedValue;
+                return;
+        }
     }
 
     /// <summary>

@@ -476,12 +476,18 @@ MonoBehaviour:
         nextText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 0, b: 0, a: 0}
           outlineWidth: 0.75
         normalText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 1, b: 1, a: 0}
           outlineWidth: 0.55
@@ -494,12 +500,18 @@ MonoBehaviour:
         nextText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 0, b: 0, a: 0}
           outlineWidth: 0.75
         normalText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 1, b: 1, a: 0}
           outlineWidth: 0.55
@@ -512,12 +524,18 @@ MonoBehaviour:
         nextText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 0, b: 0, a: 0}
           outlineWidth: 0.75
         normalText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 1, b: 1, a: 0}
           outlineWidth: 0.55
@@ -530,12 +548,18 @@ MonoBehaviour:
         nextText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 0, b: 0, a: 0}
           outlineWidth: 0.75
         normalText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 1, b: 1, a: 0}
           outlineWidth: 0.55
@@ -548,12 +572,18 @@ MonoBehaviour:
         nextText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 0, b: 0, a: 0}
           outlineWidth: 0.75
         normalText:
           fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
           fontSize: 35
+          enableAutoSize: 1
+          autoSizeMin: 5
+          autoSizeMax: 36
           color: {r: 0, g: 0, b: 0, a: 0}
           outlineColor: {r: 1, g: 1, b: 1, a: 0}
           outlineWidth: 0.55

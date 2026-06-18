@@ -143,9 +143,6 @@ public sealed class PlayerPortraitHudAnimationDefinition
     /// <param name="requiresFrames">True when this entry cannot fall back to the authored HUD Image sprite.</param>
     public void Validate(string ownerAssetName, string sectionLabel, bool requiresFrames)
     {
-        if (string.IsNullOrWhiteSpace(animationId))
-            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Animation Id is empty.", ownerAssetName, sectionLabel));
-
         if (frames == null)
         {
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: frame list is missing.", ownerAssetName, sectionLabel));

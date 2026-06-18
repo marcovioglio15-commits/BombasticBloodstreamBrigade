@@ -27,6 +27,15 @@ public sealed class PlayerGrowthSequenceHudTextStateSettings
     [Tooltip("Font size used by this growth step state. Set 0 to keep the scene label authored size.")]
     [SerializeField] private float fontSize = 28f;
 
+    [Tooltip("Enables TMP auto-size for this growth step state, using Auto Size Min and Auto Size Max as runtime bounds.")]
+    [SerializeField] private bool enableAutoSize;
+
+    [Tooltip("Minimum TMP font size allowed when auto-size is enabled for this growth step state.")]
+    [SerializeField] private float autoSizeMin = 12f;
+
+    [Tooltip("Maximum TMP font size allowed when auto-size is enabled for this growth step state.")]
+    [SerializeField] private float autoSizeMax = 36f;
+
     [Tooltip("Text color used by this growth step state.")]
     [SerializeField] private Color color = Color.white;
 
@@ -53,6 +62,30 @@ public sealed class PlayerGrowthSequenceHudTextStateSettings
         get
         {
             return fontSize;
+        }
+    }
+
+    public bool EnableAutoSize
+    {
+        get
+        {
+            return enableAutoSize;
+        }
+    }
+
+    public float AutoSizeMin
+    {
+        get
+        {
+            return autoSizeMin;
+        }
+    }
+
+    public float AutoSizeMax
+    {
+        get
+        {
+            return autoSizeMax;
         }
     }
 
@@ -93,6 +126,15 @@ public sealed class PlayerGrowthSequenceHudTextStateSettings
     {
         if (!float.IsFinite(fontSize) || fontSize < 0f)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Font Size should be finite and zero or greater.", ownerAssetName, sectionLabel));
+
+        if (!float.IsFinite(autoSizeMin) || autoSizeMin < 0f)
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Auto Size Min should be finite and zero or greater.", ownerAssetName, sectionLabel));
+
+        if (!float.IsFinite(autoSizeMax) || autoSizeMax < 0f)
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Auto Size Max should be finite and zero or greater.", ownerAssetName, sectionLabel));
+
+        if (enableAutoSize && float.IsFinite(autoSizeMin) && float.IsFinite(autoSizeMax) && autoSizeMin > autoSizeMax)
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Auto Size Min should not be greater than Auto Size Max.", ownerAssetName, sectionLabel));
 
         if (!float.IsFinite(outlineWidth) || outlineWidth < 0f)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Outline Width should be finite and zero or greater.", ownerAssetName, sectionLabel));

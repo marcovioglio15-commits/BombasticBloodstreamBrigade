@@ -118,47 +118,47 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge,
                                "Runtime Bridge",
-                               BuildRuntimeBridgeSubSection(panel));
+                               () => BuildRuntimeBridgeSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.WeaponVisuals,
                                "Weapon Visuals",
-                               BuildWeaponVisualsSubSection(panel));
+                               () => BuildWeaponVisualsSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.Outline,
                                "Outline",
-                               BuildOutlineSubSection(panel));
+                               () => BuildOutlineSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.DamageFeedback,
                                "Damage Feedback",
-                               BuildDamageFeedbackSubSection(panel));
+                               () => BuildDamageFeedbackSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.PowerUpVfx,
                                "VFX",
-                               BuildPowerUpVfxSubSection(panel));
+                               () => BuildPowerUpVfxSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.VisualPointer,
                                "Visual Pointer",
-                               PlayerVisualPresetsPanelPointerSectionUtility.BuildVisualPointerSubSection(panel));
+                               () => PlayerVisualPresetsPanelPointerSectionUtility.BuildVisualPointerSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.DeathAnimation,
                                "Death Animation",
-                               BuildDeathAnimationSubSection(panel));
+                               () => BuildDeathAnimationSubSection(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.GroundShadow,
                                "Ground Shadow",
-                               PlayerVisualPresetsPanelGroundShadowSectionUtility.Build(panel));
+                               () => PlayerVisualPresetsPanelGroundShadowSectionUtility.Build(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.HealthBars,
                                "Health Bars",
-                               PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
+                               () => PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.Portrait,
                                "Portrait",
-                               PlayerVisualPresetsPanelPortraitSectionUtility.Build(panel));
+                               () => PlayerVisualPresetsPanelPortraitSectionUtility.Build(panel));
         AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.GrowthSequence,
                                "Growth Sequence",
-                               PlayerVisualPresetsPanelGrowthSequenceSectionUtility.Build(panel));
+                               () => PlayerVisualPresetsPanelGrowthSequenceSectionUtility.Build(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;
@@ -181,7 +181,13 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         if (!panel.VisualSubSectionTabs.TryGetValue(panel.ActiveVisualSubSection, out tabEntry))
             return;
 
-        if (tabEntry == null || tabEntry.Content == null)
+        if (tabEntry == null)
+            return;
+
+        if (tabEntry.Content == null && tabEntry.ContentFactory != null)
+            tabEntry.Content = tabEntry.ContentFactory.Invoke();
+
+        if (tabEntry.Content == null)
             return;
 
         contentHost.Clear();
@@ -270,12 +276,12 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
     private static void AddVisualSubSectionTab(PlayerVisualPresetsPanel panel,
                                                PlayerVisualPresetsPanel.VisualSubSectionType subSectionType,
                                                string tabLabel,
-                                               VisualElement content)
+                                               Func<VisualElement> contentFactory)
     {
         if (panel == null)
             return;
 
-        if (panel.VisualSubSectionTabBar == null || content == null)
+        if (panel.VisualSubSectionTabBar == null || contentFactory == null)
             return;
 
         VisualElement tabContainer = new VisualElement();
@@ -293,7 +299,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         PlayerVisualPresetsPanel.VisualSubSectionTabEntry tabEntry = new PlayerVisualPresetsPanel.VisualSubSectionTabEntry();
         tabEntry.TabContainer = tabContainer;
         tabEntry.TabButton = tabButton;
-        tabEntry.Content = content;
+        tabEntry.ContentFactory = contentFactory;
         panel.VisualSubSectionTabs[subSectionType] = tabEntry;
     }
 

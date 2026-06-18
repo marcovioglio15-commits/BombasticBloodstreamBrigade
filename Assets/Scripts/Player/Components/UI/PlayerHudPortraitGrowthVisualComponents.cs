@@ -168,6 +168,12 @@ public struct PlayerGrowthSequenceHudStepVisualElement : IBufferElementData
     public UnityObjectRef<TMP_FontAsset> NormalFontAsset;
     public float NextFontSize;
     public float NormalFontSize;
+    public byte NextAutoSizeEnabled;
+    public byte NormalAutoSizeEnabled;
+    public float NextAutoSizeMin;
+    public float NormalAutoSizeMin;
+    public float NextAutoSizeMax;
+    public float NormalAutoSizeMax;
     public float4 NextColor;
     public float4 NormalColor;
     public float4 NextOutlineColor;
@@ -193,6 +199,12 @@ public struct PlayerBaseGrowthSequenceHudStepVisualElement : IBufferElementData
     public UnityObjectRef<TMP_FontAsset> NormalFontAsset;
     public float NextFontSize;
     public float NormalFontSize;
+    public byte NextAutoSizeEnabled;
+    public byte NormalAutoSizeEnabled;
+    public float NextAutoSizeMin;
+    public float NormalAutoSizeMin;
+    public float NextAutoSizeMax;
+    public float NormalAutoSizeMax;
     public float4 NextColor;
     public float4 NormalColor;
     public float4 NextOutlineColor;

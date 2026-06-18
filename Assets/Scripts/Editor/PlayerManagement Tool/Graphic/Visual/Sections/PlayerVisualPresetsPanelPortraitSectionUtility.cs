@@ -79,13 +79,17 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
             return;
 
         Foldout foldout = CreateFoldout(title, stateSuffix);
-        AddPlainField(foldout, animation.FindPropertyRelative("animationId"), "Animation Id", "Stable animation ID used by Add Scaling keys and bake diagnostics.");
-        AddPlainField(foldout, animation.FindPropertyRelative("frames"), "Frames", "Ordered sprites played by this portrait animation.");
-        AddField(foldout, animation.FindPropertyRelative("secondsPerFrame"), scalingRules, "Seconds Per Frame", "Base seconds spent on each frame before playback speed is applied.");
-        AddField(foldout, animation.FindPropertyRelative("playbackSpeedMultiplier"), scalingRules, "Playback Speed", "Runtime multiplier applied to frame timing.");
-        AddField(foldout, animation.FindPropertyRelative("playbackMode"), scalingRules, "Playback Mode", "Loop, Once, or PingPong playback behavior.");
-        AddField(foldout, animation.FindPropertyRelative("priority"), scalingRules, "Priority", "Higher priority portrait animations interrupt lower priority states.");
-        AddField(foldout, animation.FindPropertyRelative("restartWhenReentered"), scalingRules, "Restart When Re-entered", "Restarts this animation from the first frame when the same condition fires again.");
+        AttachLazyFoldout(foldout,
+                          () =>
+                          {
+                              AddPlainField(foldout, animation.FindPropertyRelative("animationId"), "Animation Id", "Stable animation ID used by Add Scaling keys and bake diagnostics.");
+                              AddPlainField(foldout, animation.FindPropertyRelative("frames"), "Frames", "Ordered sprites played by this portrait animation.");
+                              AddField(foldout, animation.FindPropertyRelative("secondsPerFrame"), scalingRules, "Seconds Per Frame", "Base seconds spent on each frame before playback speed is applied.");
+                              AddField(foldout, animation.FindPropertyRelative("playbackSpeedMultiplier"), scalingRules, "Playback Speed", "Runtime multiplier applied to frame timing.");
+                              AddField(foldout, animation.FindPropertyRelative("playbackMode"), scalingRules, "Playback Mode", "Loop, Once, or PingPong playback behavior.");
+                              AddField(foldout, animation.FindPropertyRelative("priority"), scalingRules, "Priority", "Higher priority portrait animations interrupt lower priority states.");
+                              AddField(foldout, animation.FindPropertyRelative("restartWhenReentered"), scalingRules, "Restart When Re-entered", "Restarts this animation from the first frame when the same condition fires again.");
+                          });
         parent.Add(foldout);
     }
 
@@ -346,6 +350,17 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
         if (parent == null || property == null)
             return;
 
+        if (property.propertyType == SerializedPropertyType.String)
+        {
+            TextField textField = new TextField(label);
+            textField.isDelayed = true;
+            textField.tooltip = tooltip;
+            textField.BindProperty(property);
+            textField.RegisterValueChangedCallback(evt => PlayerManagementDraftSession.MarkDirty());
+            parent.Add(textField);
+            return;
+        }
+
         PropertyField field = new PropertyField(property, label);
         field.tooltip = tooltip;
         field.BindProperty(property);
@@ -486,8 +501,39 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     private static Foldout CreateFoldout(string title, string stateSuffix)
     {
         return ManagementToolFoldoutStateUtility.CreateFoldout(title,
-                                                                "NashCore.PlayerManagement.Visual.Portrait." + stateSuffix,
-                                                                true);
+                                                                "NashCore.PlayerManagement.Visual.Portrait.Lazy." + stateSuffix,
+                                                                false);
+    }
+
+    /// <summary>
+    /// Builds a foldout body only when the user opens it, avoiding heavy nested property construction during tab activation.
+    /// </summary>
+    /// <param name="foldout">Foldout that owns the lazy body.</param>
+    /// <param name="buildContent">Content builder invoked at most once.</param>
+    private static void AttachLazyFoldout(Foldout foldout, Action buildContent)
+    {
+        if (foldout == null || buildContent == null)
+            return;
+
+        bool isBuilt = false;
+
+        void EnsureBuilt()
+        {
+            if (isBuilt)
+                return;
+
+            isBuilt = true;
+            buildContent.Invoke();
+        }
+
+        if (foldout.value)
+            EnsureBuilt();
+
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            if (evt.newValue)
+                EnsureBuilt();
+        });
     }
     #endregion
 

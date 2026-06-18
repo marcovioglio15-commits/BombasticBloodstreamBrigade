@@ -723,6 +723,7 @@ public sealed class PlayerVisualPresetsPanel
         public VisualElement TabContainer;
         public Button TabButton;
         public VisualElement Content;
+        public Func<VisualElement> ContentFactory;
     }
     #endregion
 }
