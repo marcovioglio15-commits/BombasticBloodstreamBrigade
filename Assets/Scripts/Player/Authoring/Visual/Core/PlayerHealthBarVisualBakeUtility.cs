@@ -36,6 +36,7 @@ public static class PlayerHealthBarVisualBakeUtility
             GraduationEndPadding = math.max(0f, ResolveFinite(settings.GraduationEndPadding, 0f)),
             LabelFontSize = math.max(1f, ResolveFinite(settings.LabelFontSize, 15f)),
             LabelOutlineWidth = math.clamp(ResolveFinite(settings.LabelOutlineWidth, 0.12f), 0f, 1f),
+            GraduationVerticalOffset = math.clamp(ResolveFinite(settings.GraduationVerticalOffset, 0f), -0.5f, 0.5f),
             BarHeight = math.max(1f, ResolveFinite(settings.BarHeight, 88f)),
             OutlineThickness = math.max(0f, ResolveFinite(settings.OutlineThickness, 0.035f)),
             ChamberInset = math.clamp(ResolveFinite(settings.ChamberInset, 0.16f), 0f, 0.49f),
@@ -141,7 +142,8 @@ public static class PlayerHealthBarVisualBakeUtility
             },
             SmoothingSeconds = math.max(0f, ResolveFinite(resolvedSettings.SmoothingSeconds, 0.08f)),
             Enabled = resolvedSettings.Enabled ? (byte)1 : (byte)0,
-            HideWhenMaximumUnavailable = resolvedSettings.HideWhenMaximumUnavailable ? (byte)1 : (byte)0
+            HideWhenMaximumUnavailable = resolvedSettings.HideWhenMaximumUnavailable ? (byte)1 : (byte)0,
+            SloshAffectsBubblesOnly = resolvedSettings.SloshAffectsBubblesOnly ? (byte)1 : (byte)0
         };
     }
     #endregion

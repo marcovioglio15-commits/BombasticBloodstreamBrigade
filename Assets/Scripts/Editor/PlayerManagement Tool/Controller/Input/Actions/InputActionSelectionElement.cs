@@ -45,6 +45,13 @@ public sealed class InputActionSelectionElement : VisualElement
     private Button m_EditButton;
     #endregion
 
+    #region Events
+    /// <summary>
+    /// Raised when a user selects a different Input Action from the dropdown.
+    /// </summary>
+    public event Action ActionChanged;
+    #endregion
+
     #region Constructors
     /// <summary>
     /// This constructor initializes a new instance of the InputActionSelectionElement class, 
@@ -181,9 +188,24 @@ public sealed class InputActionSelectionElement : VisualElement
                 m_ActionTypeFilter = ActionTypeFilter.Value;
                 m_ControlTypeFilter = "Vector2";
                 break;
+            case SelectionMode.UINavigate:
+                m_ActionTypeFilter = ActionTypeFilter.PassThrough;
+                m_ControlTypeFilter = "Vector2";
+                defaultActionNameFilter = "Navigate";
+                break;
             case SelectionMode.Shooting:
                 m_ActionTypeFilter = ActionTypeFilter.Button;
                 m_ControlTypeFilter = "Button";
+                break;
+            case SelectionMode.UISubmit:
+                m_ActionTypeFilter = ActionTypeFilter.Button;
+                m_ControlTypeFilter = "Button";
+                defaultActionNameFilter = "Submit";
+                break;
+            case SelectionMode.UICancel:
+                m_ActionTypeFilter = ActionTypeFilter.Button;
+                m_ControlTypeFilter = "Button";
+                defaultActionNameFilter = "Cancel";
                 break;
             case SelectionMode.PowerUps:
             case SelectionMode.PowerUpContainers:
@@ -208,7 +230,7 @@ public sealed class InputActionSelectionElement : VisualElement
         if (string.IsNullOrWhiteSpace(m_ControlTypeFilter))
             m_ControlTypeFilter = AnyControlTypeOption;
 
-        if (m_ControlTypeOptions.Contains(m_ControlTypeFilter) == false)
+        if (!m_ControlTypeOptions.Contains(m_ControlTypeFilter))
             m_ControlTypeFilter = AnyControlTypeOption;
 
         if (m_ActionNameField != null)
@@ -230,12 +252,12 @@ public sealed class InputActionSelectionElement : VisualElement
 
         string actionTypeKey = filterStateKeyPrefix + ActionTypeFilterPrefsSuffix;
 
-        if (EditorPrefs.HasKey(actionTypeKey) == false)
+        if (!EditorPrefs.HasKey(actionTypeKey))
             return false;
 
         int actionTypeValue = EditorPrefs.GetInt(actionTypeKey, (int)ActionTypeFilter.Any);
 
-        if (Enum.IsDefined(typeof(ActionTypeFilter), actionTypeValue) == false)
+        if (!Enum.IsDefined(typeof(ActionTypeFilter), actionTypeValue))
             actionTypeValue = (int)ActionTypeFilter.Any;
 
         m_ActionTypeFilter = (ActionTypeFilter)actionTypeValue;
@@ -304,7 +326,7 @@ public sealed class InputActionSelectionElement : VisualElement
                 if (string.IsNullOrWhiteSpace(controlType))
                     continue;
 
-                if (m_ControlTypeOptions.Contains(controlType) == false)
+                if (!m_ControlTypeOptions.Contains(controlType))
                     m_ControlTypeOptions.Add(controlType);
             }
         }
@@ -332,7 +354,7 @@ public sealed class InputActionSelectionElement : VisualElement
                 {
                     InputAction action = actions[actionIndex];
 
-                    if (MatchesFilters(action) == false)
+                    if (!MatchesFilters(action))
                         continue;
 
                     string label = BuildActionLabel(action);
@@ -349,10 +371,10 @@ public sealed class InputActionSelectionElement : VisualElement
         if (action == null)
             return false;
 
-        if (MatchesActionType(action) == false)
+        if (!MatchesActionType(action))
             return false;
 
-        if (MatchesControlType(action) == false)
+        if (!MatchesControlType(action))
             return false;
 
         if (string.IsNullOrWhiteSpace(m_ActionNameFilter))
@@ -429,13 +451,21 @@ public sealed class InputActionSelectionElement : VisualElement
             return;
         }
 
-        if (silent == false)
+        if (!silent)
             Undo.RecordObject(m_PresetSerializedObject.targetObject, "Select Input Action");
 
         m_PresetSerializedObject.Update();
         m_ActionIdProperty.stringValue = option.Action.id.ToString();
         m_PresetSerializedObject.ApplyModifiedProperties();
         SetEditButtonState(true);
+
+        if (!silent)
+        {
+            Action actionChanged = ActionChanged;
+
+            if (actionChanged != null)
+                actionChanged.Invoke();
+        }
     }
 
     private InputAction GetCurrentAction()
@@ -475,7 +505,7 @@ public sealed class InputActionSelectionElement : VisualElement
         if (action.actionMap != null)
             mapName = action.actionMap.name;
 
-        if (string.IsNullOrWhiteSpace(action.expectedControlType) == false)
+        if (!string.IsNullOrWhiteSpace(action.expectedControlType))
             controlType = action.expectedControlType;
 
         return string.Format("{0}/{1} [{2}, {3}]", mapName, action.name, action.type, controlType);
@@ -611,7 +641,10 @@ public sealed class InputActionSelectionElement : VisualElement
         Shooting = 2,
         PowerUps = 3,
         Generic = 4,
-        PowerUpContainers = 5
+        PowerUpContainers = 5,
+        UINavigate = 6,
+        UISubmit = 7,
+        UICancel = 8
     }
 
     private enum ActionTypeFilter

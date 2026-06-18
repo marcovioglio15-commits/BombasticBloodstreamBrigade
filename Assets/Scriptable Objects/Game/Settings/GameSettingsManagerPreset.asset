@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dbd3500f93b45b4939dc9d27f3e82e6, type: 3}
+  m_Name: GameSettingsManagerPreset
+  m_EditorClassIdentifier: Assembly-CSharp::GameSettingsManagerPreset
+  presetId: c082679742844c9ebb21e44f458bc3d9
+  presetName: GameSettingsManagerPreset
+  description: 
+  version: 1.0.0
+  audioSettings:
+    masterBusPath: bus:/
+    sfxBusPath: bus:/SFX
+    musicBusPath: bus:/Music
+    defaultMasterVolume: 1
+    defaultSfxVolume: 1
+    defaultMusicVolume: 1
+    masterPlaysAllPreviews: 1
+    masterVolumePreview:
+      eventPath: event:/MUSIC/mus_past
+      bankName: BankMusic
+    sfxVolumePreview:
+      eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
+      bankName: BankSounds
+    musicVolumePreview:
+      eventPath: event:/MUSIC/mus_past
+      bankName: BankMusic
+  experienceSettings:
+    defaultVisualPointerEnabled: 1
+    defaultFullscreenEnabled: 1
+    defaultFrameRateLimit: 60
+    defaultDamageRumbleMultiplier: 1
+    defaultFireRumbleMultiplier: 1
+    windowedWidth: 1280
+    windowedHeight: 720
+  controllerNavigationSettings:
+    gamepadNavigationMode: 2
+    navigateActionName: c95b2375-e6d9-4b88-9c4c-c5e76515df4b
+    submitActionName: 7607c7b6-cd76-4816-beef-bd0341cfe950
+    cancelActionName: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+    navigateDeadzone: 0.5
+    repeatDelaySeconds: 0.32
+    repeatIntervalSeconds: 0.11

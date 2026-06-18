@@ -108,6 +108,9 @@ public sealed class PlayerSyringeChannelSettings
     [Range(0f, 2f)]
     [SerializeField] private float smoothingSeconds = 0.08f;
 
+    [Tooltip("Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current value while the bubbles carry the movement. Disables the liquid wave and surface-slosh settings.")]
+    [SerializeField] private bool sloshAffectsBubblesOnly;
+
     [Tooltip("Direct color palette used by this syringe channel.")]
     [SerializeField] private PlayerSyringePaletteSettings palette = new PlayerSyringePaletteSettings();
 
@@ -124,6 +127,7 @@ public sealed class PlayerSyringeChannelSettings
     public bool Enabled => enabled;
     public bool HideWhenMaximumUnavailable => hideWhenMaximumUnavailable;
     public float SmoothingSeconds => smoothingSeconds;
+    public bool SloshAffectsBubblesOnly => sloshAffectsBubblesOnly;
     public PlayerSyringePaletteSettings Palette => palette;
     public PlayerSyringeFluidSettings Fluid => fluid;
     public PlayerSyringeMotionSettings Motion => motion;
@@ -216,6 +220,10 @@ public sealed class PlayerSyringeChannelSettings
         {
             LogWarning(ownerAssetName, channelLabel, "Bubble Density should be within 0-1, sizes ordered within 0-0.25, and rise speed and drift within -2 to 2.");
         }
+
+        // Routing slosh to the bubbles only is meaningless without bubbles, so flag the incoherent combination.
+        if (sloshAffectsBubblesOnly && !fluid.BubblesEnabled)
+            LogWarning(ownerAssetName, channelLabel, "Slosh Affects Bubbles Only is enabled while Bubbles are disabled; the liquid will fill flat with no visible slosh.");
 
         if (motion.MovementReactionEnabled &&
             (!IsFinite(motion.SloshStrength) ||
@@ -405,6 +413,10 @@ public sealed class PlayerHealthBarsVisualSettings
     [Range(0f, 1f)]
     [SerializeField] private float labelOutlineWidth = 0.12f;
 
+    [Tooltip("Optional normalized vertical offset applied to the entire graduation - ticks and numeric labels - within the syringe. Positive values move the graduation up.")]
+    [Range(-0.5f, 0.5f)]
+    [SerializeField] private float graduationVerticalOffset;
+
     [Tooltip("Procedural body silhouette shared by the health and shield syringe channels.")]
     [SerializeField] private PlayerSyringeBodyStyle bodyStyle = PlayerSyringeBodyStyle.SimplePaintedContainer;
 
@@ -420,7 +432,7 @@ public sealed class PlayerHealthBarsVisualSettings
     [Range(0f, 0.49f)]
     [SerializeField] private float chamberInset = 0.16f;
 
-    [Tooltip("Normalized width of the plunger head relative to the complete syringe length.")]
+    [Tooltip("Reference-length normalized width of the plunger head. Runtime compensation preserves its pixel footprint across short and long syringes.")]
     [Range(0f, 0.2f)]
     [SerializeField] private float plungerWidth = 0.032f;
 
@@ -465,6 +477,7 @@ public sealed class PlayerHealthBarsVisualSettings
     public float LabelFontSize => labelFontSize;
     public Vector2 LabelOffset => labelOffset;
     public float LabelOutlineWidth => labelOutlineWidth;
+    public float GraduationVerticalOffset => graduationVerticalOffset;
     public PlayerSyringeBodyStyle BodyStyle => bodyStyle;
     public float BarHeight => barHeight;
     public float OutlineThickness => outlineThickness;
@@ -532,6 +545,9 @@ public sealed class PlayerHealthBarsVisualSettings
 
         if (!IsFinite(labelOutlineWidth) || labelOutlineWidth < 0f || labelOutlineWidth > 1f)
             LogWarning(ownerAssetName, "Label Outline Width should be finite and within 0-1.");
+
+        if (!IsFinite(graduationVerticalOffset) || graduationVerticalOffset < -0.5f || graduationVerticalOffset > 0.5f)
+            LogWarning(ownerAssetName, "Graduation Vertical Offset should be finite and within -0.5 to 0.5.");
 
         if (!IsSupportedBodyStyle(bodyStyle))
             LogWarning(ownerAssetName, "Body Style should resolve to Simple Painted Container or Detailed Syringe.");

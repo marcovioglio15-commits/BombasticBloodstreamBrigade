@@ -54,14 +54,7 @@ public static class PlayerInputActionsAssetUtility
             return;
 
         bool changed = false;
-        InputActionMap map = asset.FindActionMap("Player", false);
-
-        if (map == null)
-        {
-            map = new InputActionMap("Player");
-            asset.AddActionMap(map);
-            changed = true;
-        }
+        InputActionMap map = EnsureActionMap(asset, "Player", ref changed);
 
         changed |= EnsureAction(map, "Move", InputActionType.Value, "Vector2", AddDefaultMoveBindings);
         changed |= EnsureAction(map, "Look", InputActionType.Value, "Vector2", AddDefaultLookBindings);
@@ -77,8 +70,33 @@ public static class PlayerInputActionsAssetUtility
         changed |= EnsureAction(map, "CheatModifierControl", InputActionType.Button, "Button", AddDefaultCheatModifierControlBindings);
         changed |= EnsureAction(map, "CheatModifierShift", InputActionType.Button, "Button", AddDefaultCheatModifierShiftBindings);
 
+        InputActionMap uiMap = EnsureActionMap(asset, "UI", ref changed);
+        changed |= EnsureAction(uiMap, "Navigate", InputActionType.PassThrough, "Vector2", AddDefaultUINavigateBindings);
+        changed |= EnsureAction(uiMap, "Submit", InputActionType.Button, "Button", AddDefaultUISubmitBindings);
+        changed |= EnsureAction(uiMap, "Cancel", InputActionType.Button, "Button", AddDefaultUICancelBindings);
+
         if (changed)
             PersistAssetChanges(asset);
+    }
+
+    /// <summary>
+    /// Ensures an action map exists on the provided asset.
+    /// </summary>
+    /// <param name="asset">Input Action Asset receiving the map.</param>
+    /// <param name="mapName">Action map name.</param>
+    /// <param name="changed">Mutable flag raised when a map is created.</param>
+    /// <returns>Existing or created action map.</returns>
+    private static InputActionMap EnsureActionMap(InputActionAsset asset, string mapName, ref bool changed)
+    {
+        InputActionMap map = asset.FindActionMap(mapName, false);
+
+        if (map != null)
+            return map;
+
+        map = new InputActionMap(mapName);
+        asset.AddActionMap(map);
+        changed = true;
+        return map;
     }
 
     /// <summary>
@@ -314,6 +332,61 @@ public static class PlayerInputActionsAssetUtility
         action.AddBinding("<Keyboard>/rightShift");
     }
 
+    /// <summary>
+    /// Adds default direct UI navigation bindings for keyboard and gamepad.
+    /// </summary>
+    /// <param name="action"></param>
+    private static void AddDefaultUINavigateBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Gamepad>/leftStick").WithGroup("Gamepad");
+        action.AddCompositeBinding("2DVector")
+            .With("Up", "<Gamepad>/dpad/up")
+            .With("Down", "<Gamepad>/dpad/down")
+            .With("Left", "<Gamepad>/dpad/left")
+            .With("Right", "<Gamepad>/dpad/right");
+        action.AddCompositeBinding("2DVector")
+            .With("Up", "<Keyboard>/upArrow")
+            .With("Down", "<Keyboard>/downArrow")
+            .With("Left", "<Keyboard>/leftArrow")
+            .With("Right", "<Keyboard>/rightArrow");
+        action.AddCompositeBinding("2DVector")
+            .With("Up", "<Keyboard>/w")
+            .With("Down", "<Keyboard>/s")
+            .With("Left", "<Keyboard>/a")
+            .With("Right", "<Keyboard>/d");
+    }
+
+    /// <summary>
+    /// Adds default direct UI submit bindings for keyboard and gamepad.
+    /// </summary>
+    /// <param name="action"></param>
+    private static void AddDefaultUISubmitBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Keyboard>/enter").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Keyboard>/space").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Gamepad>/buttonSouth").WithGroup("Gamepad");
+    }
+
+    /// <summary>
+    /// Adds default direct UI cancel bindings for keyboard and gamepad.
+    /// </summary>
+    /// <param name="action"></param>
+    private static void AddDefaultUICancelBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Keyboard>/escape").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Gamepad>/buttonEast").WithGroup("Gamepad");
+        action.AddBinding("<Gamepad>/start").WithGroup("Gamepad");
+    }
+
 
 
 
@@ -369,6 +442,15 @@ public static class PlayerInputActionsAssetUtility
         AddDefaultCheatModifierShiftBindings(cheatModifierShift);
 
         asset.AddActionMap(map);
+
+        InputActionMap uiMap = new InputActionMap("UI");
+        InputAction navigate = uiMap.AddAction("Navigate", InputActionType.PassThrough, null, null, null, null, "Vector2");
+        AddDefaultUINavigateBindings(navigate);
+        InputAction submit = uiMap.AddAction("Submit", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultUISubmitBindings(submit);
+        InputAction cancel = uiMap.AddAction("Cancel", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultUICancelBindings(cancel);
+        asset.AddActionMap(uiMap);
 
         return asset;
     }

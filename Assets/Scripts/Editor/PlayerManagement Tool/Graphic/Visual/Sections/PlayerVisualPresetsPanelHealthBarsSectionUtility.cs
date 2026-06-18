@@ -126,7 +126,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         AddField(foldout, settings.FindPropertyRelative("barHeight"), scalingRules, "Bar Height", "Complete procedural syringe height in pixels.");
         AddField(foldout, settings.FindPropertyRelative("outlineThickness"), scalingRules, "Outline Thickness", "Normalized outline thickness relative to complete syringe height.");
         AddField(foldout, settings.FindPropertyRelative("chamberInset"), scalingRules, "Chamber Inset", "Normalized inset separating liquid chamber from outer body.");
-        AddField(foldout, settings.FindPropertyRelative("plungerWidth"), scalingRules, "Plunger Width", "Normalized width of the moving plunger head.");
+        AddField(foldout, settings.FindPropertyRelative("plungerWidth"), scalingRules, "Plunger Width", "Reference-length normalized width of the moving plunger head. Runtime compensation preserves its pixel footprint across short and long syringes.");
         AddField(foldout, settings.FindPropertyRelative("endCapWidth"), scalingRules, "End Cap Width", "Horizontal width of each non-scaling end cap; the simplified right termination starts at the final graduated value.");
         AddField(simplifiedDetails, settings.FindPropertyRelative("terminationOffset"), scalingRules, "Termination Offset", "Horizontal pixel gap between the final graduated value and the simplified right termination.");
         AddField(foldout, settings.FindPropertyRelative("terminationStyle"), scalingRules, "Termination Style", "Procedural silhouette used by the simplified terminal section and detailed syringe end caps.");
@@ -169,6 +169,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         AddField(foldout, settings.FindPropertyRelative("fontAsset"), scalingRules, "Font Asset", "Direct TextMeshPro font asset applied to every numeric graduation label.");
         AddField(foldout, settings.FindPropertyRelative("labelFontSize"), scalingRules, "Label Font Size", "TextMeshPro font size used by numeric graduation labels.");
         AddField(foldout, settings.FindPropertyRelative("labelOffset"), scalingRules, "Label Offset", "Pixel offset applied to every numeric label relative to its major tick.");
+        AddField(foldout, settings.FindPropertyRelative("graduationVerticalOffset"), scalingRules, "Graduation Vertical Offset", "Optional upward offset for the entire graduation - ticks and numeric labels - within the syringe. Positive values move it up.");
         AddField(foldout, settings.FindPropertyRelative("labelOutlineWidth"), scalingRules, "Label Outline Width", "TextMeshPro outline width used to preserve label readability over changing liquid colors.");
         parent.Add(foldout);
     }
@@ -196,7 +197,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         AddField(foldout, enabled, scalingRules, "Enabled", "Enables procedural paint-like drips extending from the body borders.");
         AddField(details, paintDrips.FindPropertyRelative("density"), scalingRules, "Density", "Normalized probability that each procedural border cell produces a drip.");
         AddField(details, paintDrips.FindPropertyRelative("length"), scalingRules, "Length", "Maximum normalized length reached by procedural paint drips.");
-        AddField(details, paintDrips.FindPropertyRelative("width"), scalingRules, "Width", "Normalized horizontal width of each procedural paint drip.");
+        AddField(details, paintDrips.FindPropertyRelative("width"), scalingRules, "Width", "Reference-length normalized horizontal width of each procedural paint drip. Runtime compensation preserves its pixel footprint across short and long syringes.");
         AddField(details, paintDrips.FindPropertyRelative("irregularity"), scalingRules, "Irregularity", "Deterministic variation between neighboring drip lengths and widths.");
         foldout.Add(details);
         parent.Add(foldout);
@@ -234,13 +235,15 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         }
 
         SerializedProperty enabled = channel.FindPropertyRelative("enabled");
+        SerializedProperty sloshBubblesOnly = channel.FindPropertyRelative("sloshAffectsBubblesOnly");
         VisualElement details = new VisualElement();
         AddField(foldout, enabled, scalingRules, "Enabled", "Enables this syringe channel.");
         AddField(details, channel.FindPropertyRelative("hideWhenMaximumUnavailable"), scalingRules, "Hide When Maximum Unavailable", "Hides this syringe when its authoritative maximum is zero or negative.");
         AddField(details, channel.FindPropertyRelative("smoothingSeconds"), scalingRules, "Smoothing Seconds", "Seconds used to move the displayed liquid boundary and plunger toward the authoritative current value. Set zero for immediate movement.");
+        AddField(details, sloshBubblesOnly, scalingRules, "Slosh Affects Bubbles Only", "Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current value and the liquid wave and surface-slosh settings are hidden.");
         BuildPalette(details, channel.FindPropertyRelative("palette"), scalingRules, stateSuffix);
-        BuildFluid(details, channel.FindPropertyRelative("fluid"), scalingRules, stateSuffix);
-        BuildMotion(details, channel.FindPropertyRelative("motion"), scalingRules, stateSuffix);
+        BuildFluid(details, channel.FindPropertyRelative("fluid"), scalingRules, stateSuffix, sloshBubblesOnly);
+        BuildMotion(details, channel.FindPropertyRelative("motion"), scalingRules, stateSuffix, sloshBubblesOnly);
         foldout.Add(details);
         parent.Add(foldout);
 
@@ -295,10 +298,12 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     /// <param name="fluid">Serialized fluid settings.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     /// <param name="stateSuffix">Stable foldout-state suffix.</param>
+    /// <param name="sloshBubblesOnly">Channel slosh-on-bubbles-only toggle that hides the liquid wave settings when enabled.</param>
     private static void BuildFluid(VisualElement parent,
                                    SerializedProperty fluid,
                                    SerializedProperty scalingRules,
-                                   string stateSuffix)
+                                   string stateSuffix,
+                                   SerializedProperty sloshBubblesOnly)
     {
         Foldout foldout = CreateFoldout("Fluid", stateSuffix + ".Fluid");
 
@@ -311,11 +316,13 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         SerializedProperty flowEnabled = fluid.FindPropertyRelative("flowEnabled");
         SerializedProperty bubblesEnabled = fluid.FindPropertyRelative("bubblesEnabled");
         VisualElement flowDetails = new VisualElement();
+        VisualElement waveDetails = new VisualElement();
         VisualElement bubbleDetails = new VisualElement();
         AddField(foldout, flowEnabled, scalingRules, "Flow Enabled", "Enables continuous procedural movement inside the liquid.");
         AddField(flowDetails, fluid.FindPropertyRelative("flowSpeed"), scalingRules, "Flow Speed", "Base horizontal flow speed used by liquid layers.");
-        AddField(flowDetails, fluid.FindPropertyRelative("waveAmplitude"), scalingRules, "Wave Amplitude", "Maximum normalized liquid-surface displacement.");
-        AddField(flowDetails, fluid.FindPropertyRelative("waveFrequency"), scalingRules, "Wave Frequency", "Number of liquid-surface waves along the chamber.");
+        AddField(waveDetails, fluid.FindPropertyRelative("waveAmplitude"), scalingRules, "Wave Amplitude", "Maximum normalized liquid-surface displacement.");
+        AddField(waveDetails, fluid.FindPropertyRelative("waveFrequency"), scalingRules, "Wave Frequency", "Number of liquid-surface waves along the chamber.");
+        flowDetails.Add(waveDetails);
         AddField(flowDetails, fluid.FindPropertyRelative("viscosity"), scalingRules, "Viscosity", "Controls how slowly liquid settles after movement impulses.");
         AddField(foldout, bubblesEnabled, scalingRules, "Bubbles Enabled", "Enables deterministic procedural air bubbles.");
         AddField(bubbleDetails, fluid.FindPropertyRelative("bubbleDensity"), scalingRules, "Bubble Density", "Approximate normalized density of visible bubbles.");
@@ -330,10 +337,16 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         Refresh();
         TrackRefresh(foldout, flowEnabled, Refresh);
         TrackRefresh(foldout, bubblesEnabled, Refresh);
+        TrackRefresh(foldout, sloshBubblesOnly, Refresh);
 
         void Refresh()
         {
-            flowDetails.style.display = flowEnabled != null && flowEnabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+            bool flowOn = flowEnabled != null && flowEnabled.boolValue;
+            flowDetails.style.display = flowOn ? DisplayStyle.Flex : DisplayStyle.None;
+            // The liquid surface is flat while slosh is routed to the bubbles, so the wave controls become irrelevant.
+            waveDetails.style.display = flowOn && (sloshBubblesOnly == null || !sloshBubblesOnly.boolValue)
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
             bubbleDetails.style.display = bubblesEnabled != null && bubblesEnabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
@@ -345,10 +358,12 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     /// <param name="motion">Serialized motion settings.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     /// <param name="stateSuffix">Stable foldout-state suffix.</param>
+    /// <param name="sloshBubblesOnly">Channel slosh-on-bubbles-only toggle that hides the surface-slosh setting when enabled.</param>
     private static void BuildMotion(VisualElement parent,
                                     SerializedProperty motion,
                                     SerializedProperty scalingRules,
-                                    string stateSuffix)
+                                    string stateSuffix,
+                                    SerializedProperty sloshBubblesOnly)
     {
         Foldout foldout = CreateFoldout("Reactive Motion", stateSuffix + ".Motion");
 
@@ -363,12 +378,14 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         SerializedProperty tiltEnabled = motion.FindPropertyRelative("tiltEnabled");
         SerializedProperty valueImpulseEnabled = motion.FindPropertyRelative("valueImpulseEnabled");
         VisualElement movementDetails = new VisualElement();
+        VisualElement surfaceSloshDetails = new VisualElement();
         VisualElement horizontalSloshDetails = new VisualElement();
         VisualElement tiltDetails = new VisualElement();
         VisualElement valueImpulseDetails = new VisualElement();
         AddField(foldout, movementEnabled, scalingRules, "Movement Reaction Enabled", "Enables inertial liquid movement opposite to player acceleration.");
         AddField(movementDetails, motion.FindPropertyRelative("sloshStrength"), scalingRules, "Slosh Strength", "Converts player acceleration into normalized liquid displacement.");
-        AddField(movementDetails, motion.FindPropertyRelative("surfaceSloshStrength"), scalingRules, "Surface Slosh Strength", "Converts normalized slosh displacement into a visible liquid-surface slope.");
+        AddField(surfaceSloshDetails, motion.FindPropertyRelative("surfaceSloshStrength"), scalingRules, "Surface Slosh Strength", "Converts normalized slosh displacement into a visible liquid-surface slope.");
+        movementDetails.Add(surfaceSloshDetails);
         AddField(movementDetails, horizontalSloshEnabled, scalingRules, "Horizontal Slosh Enabled", "Enables horizontal inertial displacement of the liquid boundary and procedural bubbles.");
         AddField(horizontalSloshDetails, motion.FindPropertyRelative("horizontalSloshStrength"), scalingRules, "Horizontal Slosh Strength", "Controls horizontal liquid and bubble displacement along the graduated value track.");
         AddField(movementDetails, motion.FindPropertyRelative("sloshSpring"), scalingRules, "Slosh Spring", "Spring force returning liquid displacement to rest.");
@@ -392,12 +409,17 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         TrackRefresh(foldout, horizontalSloshEnabled, Refresh);
         TrackRefresh(foldout, tiltEnabled, Refresh);
         TrackRefresh(foldout, valueImpulseEnabled, Refresh);
+        TrackRefresh(foldout, sloshBubblesOnly, Refresh);
 
         void Refresh()
         {
-            movementDetails.style.display = movementEnabled != null && movementEnabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
-            horizontalSloshDetails.style.display = movementEnabled != null &&
-                                                   movementEnabled.boolValue &&
+            bool movementOn = movementEnabled != null && movementEnabled.boolValue;
+            movementDetails.style.display = movementOn ? DisplayStyle.Flex : DisplayStyle.None;
+            // The liquid surface stays flat while slosh is routed to the bubbles, so its slope control is hidden.
+            surfaceSloshDetails.style.display = movementOn && (sloshBubblesOnly == null || !sloshBubblesOnly.boolValue)
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            horizontalSloshDetails.style.display = movementOn &&
                                                    horizontalSloshEnabled != null &&
                                                    horizontalSloshEnabled.boolValue
                 ? DisplayStyle.Flex

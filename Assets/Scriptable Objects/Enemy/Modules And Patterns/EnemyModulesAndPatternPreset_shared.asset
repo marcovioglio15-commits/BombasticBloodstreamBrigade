@@ -5971,8 +5971,8 @@ MonoBehaviour:
       activationGates: 0
       maximumActivationSpeed: 0.15
       recentlyDamagedWindowSeconds: 1
-      displayBehaviourEngagementTrigger: 0
-      useEngagementFeedbackOverride: 0
+      displayBehaviourEngagementTrigger: 1
+      useEngagementFeedbackOverride: 1
       engagementFeedbackOverride:
         enableColorBlend: 1
         colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
@@ -5992,7 +5992,7 @@ MonoBehaviour:
         moduleId: Module_Shooter
         isEnabled: 1
         selectionWeight: 1
-        useOverridePayload: 0
+        useOverridePayload: 1
         overridePayload:
           stationary:
             freezeRotation: 1

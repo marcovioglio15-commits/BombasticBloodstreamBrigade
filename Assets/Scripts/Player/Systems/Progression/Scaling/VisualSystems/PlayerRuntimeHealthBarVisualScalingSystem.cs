@@ -212,6 +212,9 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "labelOutlineWidth":
                 runtimeConfig.LabelOutlineWidth = resolvedValue;
                 return;
+            case "graduationVerticalOffset":
+                runtimeConfig.GraduationVerticalOffset = resolvedValue;
+                return;
             case "labelOffset.x":
                 runtimeConfig.LabelOffset.x = resolvedValue;
                 return;
@@ -294,6 +297,9 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
                 break;
             case "hideWhenMaximumUnavailable":
                 channel.HideWhenMaximumUnavailable = resolvedValue;
+                break;
+            case "sloshAffectsBubblesOnly":
+                channel.SloshAffectsBubblesOnly = resolvedValue;
                 break;
             case "fluid.flowEnabled":
                 channel.Fluid.FlowEnabled = resolvedValue;

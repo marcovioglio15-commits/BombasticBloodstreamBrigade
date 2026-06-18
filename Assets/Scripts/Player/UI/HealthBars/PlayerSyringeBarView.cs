@@ -29,6 +29,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int TerminationOutlineColorId = Shader.PropertyToID("_TerminationOutlineColor");
     private static readonly int TerminationInteriorColorId = Shader.PropertyToID("_TerminationInteriorColor");
     private static readonly int OutlineThicknessId = Shader.PropertyToID("_OutlineThickness");
+    private static readonly int OutlineAspectId = Shader.PropertyToID("_OutlineAspect");
+    private static readonly int GraduationVerticalOffsetId = Shader.PropertyToID("_GraduationVerticalOffset");
+    private static readonly int SloshAffectsBubblesOnlyId = Shader.PropertyToID("_SloshAffectsBubblesOnly");
     private static readonly int ChamberInsetId = Shader.PropertyToID("_ChamberInset");
     private static readonly int EndCapNormalizedId = Shader.PropertyToID("_EndCapNormalized");
     private static readonly int GraduationInsetNormalizedId = Shader.PropertyToID("_GraduationInsetNormalized");
@@ -298,6 +301,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         SetColor(TerminationOutlineColorId, channelConfig.Palette.TerminationOutline);
         SetColor(TerminationInteriorColorId, channelConfig.Palette.TerminationInterior);
         runtimeMaterial.SetFloat(OutlineThicknessId, math.max(0f, sharedConfig.OutlineThickness));
+        runtimeMaterial.SetFloat(GraduationVerticalOffsetId, math.clamp(sharedConfig.GraduationVerticalOffset, -0.5f, 0.5f));
         runtimeMaterial.SetFloat(ChamberInsetId, math.clamp(sharedConfig.ChamberInset, 0f, 0.49f));
         runtimeMaterial.SetFloat(BodyStyleId, (float)sharedConfig.BodyStyle);
         runtimeMaterial.SetFloat(LabelPlacementId, (float)sharedConfig.LabelPlacement);
@@ -321,6 +325,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(SurfaceSloshStrengthId, math.max(0f, channelConfig.Motion.SurfaceSloshStrength));
         runtimeMaterial.SetFloat(HorizontalSloshEnabledId, channelConfig.Motion.HorizontalSloshEnabled);
         runtimeMaterial.SetFloat(HorizontalSloshStrengthId, math.max(0f, channelConfig.Motion.HorizontalSloshStrength));
+        runtimeMaterial.SetFloat(SloshAffectsBubblesOnlyId, channelConfig.SloshAffectsBubblesOnly);
     }
 
     /// <summary>
@@ -382,6 +387,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, 0.2f));
         runtimeMaterial.SetFloat(PaintDripWidthId, ResolveReferenceScaledNormalized(sharedConfig.PaintDrips.Width, resolvedLength, 0.25f));
         runtimeMaterial.SetFloat(LengthPixelScaleId, math.clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f));
+        // Aspect (height/length) lets the shader keep the horizontal outline as thick as the vertical one, so both
+        // syringes show an identical outline regardless of their different resolved lengths.
+        runtimeMaterial.SetFloat(OutlineAspectId, math.clamp(math.max(1f, sharedConfig.BarHeight) / resolvedLength, 0.02f, 4f));
 
         if (labelsRoot != null)
         {
@@ -400,6 +408,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                               sharedConfig.LabelPlacement,
                               math.max(1f, sharedConfig.LabelFontSize),
                               sharedConfig.LabelOffset,
+                              math.clamp(sharedConfig.GraduationVerticalOffset, -0.5f, 0.5f),
                               channelConfig.Palette.Label,
                               channelConfig.Palette.LabelOutline,
                               math.saturate(sharedConfig.LabelOutlineWidth),

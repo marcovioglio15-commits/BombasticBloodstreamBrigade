@@ -301,10 +301,15 @@ public sealed class InputAuthoring : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies cursor lock/visibility policy based on the resolved runtime look input mode.
+    /// Applies cursor lock/visibility policy based on the resolved runtime look input mode. Yields entirely while a
+    /// runtime menu overlay (Settings menu or spawner tool) owns the cursor, so its gamepad software pointer keeps the
+    /// OS cursor unlocked and the UI input module stops discarding the VirtualMouse as off-screen.
     /// </summary>
     private static void ApplyCursorPolicy()
     {
+        if (MenuCursorOwnershipState.OverlayOwnsCursor)
+            return;
+
         bool allowMousePointerMode = PlayerInputRuntime.ShouldUseMousePointerLook();
         bool lockCursor = !allowMousePointerMode && !RuntimeGizmoDebugState.PanelVisible;
         SetCursorLock(lockCursor);

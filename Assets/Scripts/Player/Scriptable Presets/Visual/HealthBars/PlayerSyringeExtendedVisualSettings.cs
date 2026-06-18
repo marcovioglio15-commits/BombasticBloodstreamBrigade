@@ -50,7 +50,7 @@ public sealed class PlayerSyringePaintDripSettings
     [Range(0f, 0.5f)]
     [SerializeField] private float length = 0.1f;
 
-    [Tooltip("Normalized horizontal width of each procedural paint drip.")]
+    [Tooltip("Reference-length normalized horizontal width of each procedural paint drip. Runtime compensation preserves its pixel footprint across short and long syringes.")]
     [Range(0.0001f, 0.25f)]
     [SerializeField] private float width = 0.018f;
 

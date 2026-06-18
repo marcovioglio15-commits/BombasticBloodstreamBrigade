@@ -31,6 +31,7 @@ public static class GameAudioFmodRuntimeUtility
     // new request arrives, instead of accumulating overlapping FMOD instances for fast-cadence ticks.
     private static readonly EventInstance[] singleInstanceByEventId = new EventInstance[byte.MaxValue + 1];
     private static readonly bool[] singleInstanceValidByEventId = new bool[byte.MaxValue + 1];
+    private static readonly string[] singleInstanceEventPathByEventId = new string[byte.MaxValue + 1];
 #endif
     private static string backgroundMusicEventPath;
     private static string backgroundMusicBankName;
@@ -99,7 +100,7 @@ public static class GameAudioFmodRuntimeUtility
         {
             // Keep the handle alive for the next steal request; release happens when the next single-instance
             // request lands or when the instance finishes naturally and FMOD invalidates the handle.
-            StoreTrackedSingleInstance(eventId, instance);
+            StoreTrackedSingleInstance(eventId, instance, eventPath);
         }
         else
         {
@@ -188,6 +189,51 @@ public static class GameAudioFmodRuntimeUtility
     }
 
     /// <summary>
+    /// Checks whether the managed background music instance is currently using the requested FMOD event path.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path to compare against the active background music instance.</param>
+    /// <returns>True when that event is already running as background music.</returns>
+    public static bool IsBackgroundMusicEventActive(string eventPath)
+    {
+        if (string.IsNullOrWhiteSpace(eventPath))
+            return false;
+
+        if (!string.Equals(backgroundMusicEventPath, eventPath, System.StringComparison.Ordinal))
+            return false;
+
+#if NASHCORE_FMOD
+        if (!backgroundMusicInstanceValid || !backgroundMusicInstance.isValid())
+            return false;
+
+        RESULT result = backgroundMusicInstance.getPlaybackState(out PLAYBACK_STATE playbackState);
+
+        if (result != RESULT.OK)
+            return false;
+
+        return playbackState != PLAYBACK_STATE.STOPPED && playbackState != PLAYBACK_STATE.STOPPING;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// Checks whether the requested event path is already owned by a managed game-audio instance.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path to search in managed runtime instances.</param>
+    /// <returns>True when background music or a tracked single-instance gameplay event is already using the path.</returns>
+    public static bool IsManagedEventPathActive(string eventPath)
+    {
+        if (IsBackgroundMusicEventActive(eventPath))
+            return true;
+
+#if NASHCORE_FMOD
+        return IsTrackedSingleInstanceEventPathActive(eventPath);
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
     /// Stops the tracked single-instance voice for one gameplay event id, if any is still playing. Safe to call
     /// even when the runtime never produced a tracked instance for the event id.
     /// </summary>
@@ -214,6 +260,7 @@ public static class GameAudioFmodRuntimeUtility
             EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
             singleInstanceValidByEventId[eventIndex] = false;
             singleInstanceByEventId[eventIndex] = default;
+            singleInstanceEventPathByEventId[eventIndex] = string.Empty;
 
             if (!trackedInstance.isValid())
                 continue;
@@ -243,6 +290,7 @@ public static class GameAudioFmodRuntimeUtility
         EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
         singleInstanceValidByEventId[eventIndex] = false;
         singleInstanceByEventId[eventIndex] = default;
+        singleInstanceEventPathByEventId[eventIndex] = string.Empty;
 
         if (!trackedInstance.isValid())
             return;
@@ -257,11 +305,48 @@ public static class GameAudioFmodRuntimeUtility
     /// </summary>
     /// <param name="eventId">Gameplay event id keyed into the tracking store.</param>
     /// <param name="instance">Newly started FMOD instance to track.</param>
-    private static void StoreTrackedSingleInstance(GameAudioEventId eventId, EventInstance instance)
+    /// <param name="eventPath">FMOD event path represented by the tracked instance.</param>
+    private static void StoreTrackedSingleInstance(GameAudioEventId eventId, EventInstance instance, string eventPath)
     {
         int eventIndex = (byte)eventId;
         singleInstanceByEventId[eventIndex] = instance;
         singleInstanceValidByEventId[eventIndex] = true;
+        singleInstanceEventPathByEventId[eventIndex] = eventPath ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Checks tracked single-instance gameplay voices for one active FMOD event path.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path to search.</param>
+    /// <returns>True when a still-playing tracked gameplay instance uses the requested path.</returns>
+    private static bool IsTrackedSingleInstanceEventPathActive(string eventPath)
+    {
+        if (string.IsNullOrWhiteSpace(eventPath))
+            return false;
+
+        for (int eventIndex = 0; eventIndex < singleInstanceValidByEventId.Length; eventIndex++)
+        {
+            if (!singleInstanceValidByEventId[eventIndex])
+                continue;
+
+            if (!string.Equals(singleInstanceEventPathByEventId[eventIndex], eventPath, System.StringComparison.Ordinal))
+                continue;
+
+            EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
+
+            if (!trackedInstance.isValid())
+                continue;
+
+            RESULT result = trackedInstance.getPlaybackState(out PLAYBACK_STATE playbackState);
+
+            if (result != RESULT.OK)
+                continue;
+
+            if (playbackState != PLAYBACK_STATE.STOPPED && playbackState != PLAYBACK_STATE.STOPPING)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

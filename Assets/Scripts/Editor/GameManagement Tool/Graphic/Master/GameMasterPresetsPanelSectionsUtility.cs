@@ -103,6 +103,30 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates, registers and assigns a new Settings Manager preset to the selected master preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    public static void CreateSettingsManagerPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameSettingsManagerPreset newPreset = GameSettingsManagerPresetLibraryUtility.CreatePresetAsset("GameSettingsManagerPreset");
+
+        if (newPreset == null)
+            return;
+
+        GameSettingsManagerPresetLibrary settingsLibrary = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create Settings Manager Preset");
+        Undo.RecordObject(settingsLibrary, "Add Settings Manager Preset");
+        settingsLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(settingsLibrary);
+
+        AssignSubPreset(panel, "settingsManagerPreset", newPreset);
+        panel.OpenSidePanel(GameManagementWindow.PanelType.SettingsManager);
+    }
+
+    /// <summary>
     /// Creates, registers and assigns a new Scene Manager preset to the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel with selected master preset context.</param>
@@ -191,6 +215,15 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.AudioManager,
                             "Audio Manager",
                             panel.CreateAudioManagerPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Settings Manager Preset",
+                            "settingsManagerPreset",
+                            typeof(GameSettingsManagerPreset),
+                            "Settings Manager preset used for runtime Settings menu defaults, audio previews and windowed display.",
+                            GameManagementWindow.PanelType.SettingsManager,
+                            "Settings Manager",
+                            panel.CreateSettingsManagerPreset);
         AddSubPresetControl(panel,
                             section,
                             "Scene Manager Preset",
@@ -297,6 +330,14 @@ internal static class GameMasterPresetsPanelSectionsUtility
         audioButton.style.flexShrink = 0f;
         audioButton.style.minWidth = 144f;
         section.Add(audioButton);
+
+        Button settingsButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.SettingsManager));
+        settingsButton.text = "Open Settings Manager";
+        settingsButton.tooltip = "Open the Settings Manager preset panel.";
+        settingsButton.style.flexShrink = 0f;
+        settingsButton.style.minWidth = 164f;
+        settingsButton.style.marginTop = 4f;
+        section.Add(settingsButton);
 
         Button sceneButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.SceneManager));
         sceneButton.text = "Open Scene Manager";

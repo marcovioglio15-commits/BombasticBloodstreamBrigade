@@ -41,6 +41,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
         }
 
         Button playButton = ResolveButton(menuController, "playButton");
+        Button settingsButton = ResolveButton(menuController, "settingsButton");
         Button quitButton = ResolveButton(menuController, "quitButton");
 
         if (playButton == null || quitButton == null)
@@ -51,11 +52,12 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
 
         Canvas canvas = playButton.GetComponentInParent<Canvas>(true);
         TMP_FontAsset fontAsset = ResolveMenuFont(playButton);
-        Button toolButton = EnsureToolButton(playButton, quitButton, fontAsset);
+        Button previousButton = settingsButton != null ? settingsButton : playButton;
+        Button toolButton = EnsureToolButton(playButton, previousButton, quitButton, fontAsset);
         EnemySpawnerRuntimeToolPanelController toolPanel = EnsureToolPanel(canvas, fontAsset, catalog);
         AssignObject(menuController, "enemySpawnerToolButton", toolButton);
         AssignObject(menuController, "enemySpawnerToolPanel", toolPanel);
-        RefreshButtonNavigation(playButton, toolButton, quitButton);
+        RefreshButtonNavigation(playButton, settingsButton, toolButton, quitButton);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
@@ -67,10 +69,11 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
     /// Creates or refreshes the main-menu button that opens the runtime spawner tool.
     /// </summary>
     /// <param name="playButton">Existing Play button used as visual template.</param>
+    /// <param name="previousButton">Button that should appear directly before the runtime spawner tool button.</param>
     /// <param name="quitButton">Existing Quit button used for sibling placement.</param>
     /// <param name="fontAsset">Font asset copied into new labels.</param>
     /// <returns>Configured tool button.</returns>
-    private static Button EnsureToolButton(Button playButton, Button quitButton, TMP_FontAsset fontAsset)
+    private static Button EnsureToolButton(Button playButton, Button previousButton, Button quitButton, TMP_FontAsset fontAsset)
     {
         Transform parent = playButton.transform.parent;
         Transform existing = parent.Find("EnemySpawnerToolButton");
@@ -79,7 +82,7 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
             : Object.Instantiate(playButton.gameObject, parent);
         buttonObject.name = "EnemySpawnerToolButton";
         buttonObject.SetActive(true);
-        buttonObject.transform.SetSiblingIndex(Mathf.Min(quitButton.transform.GetSiblingIndex(), playButton.transform.GetSiblingIndex() + 1));
+        buttonObject.transform.SetSiblingIndex(Mathf.Min(quitButton.transform.GetSiblingIndex(), previousButton.transform.GetSiblingIndex() + 1));
         Button button = buttonObject.GetComponent<Button>();
         SetButtonLabel(buttonObject, "Spawner Tool", fontAsset);
         return button;
@@ -108,27 +111,38 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
     /// Rebuilds explicit menu navigation after inserting the tool button.
     /// </summary>
     /// <param name="playButton">Play button.</param>
+    /// <param name="settingsButton">Settings button, or null for older scenes that have not been refreshed yet.</param>
     /// <param name="toolButton">Runtime spawner tool button.</param>
     /// <param name="quitButton">Quit button.</param>
-    private static void RefreshButtonNavigation(Button playButton, Button toolButton, Button quitButton)
+    private static void RefreshButtonNavigation(Button playButton, Button settingsButton, Button toolButton, Button quitButton)
     {
-        Navigation playNavigation = playButton.navigation;
-        playNavigation.mode = Navigation.Mode.Explicit;
-        playNavigation.selectOnUp = quitButton;
-        playNavigation.selectOnDown = toolButton;
-        playButton.navigation = playNavigation;
+        if (settingsButton != null)
+        {
+            ConfigureButtonNavigation(playButton, quitButton, settingsButton);
+            ConfigureButtonNavigation(settingsButton, playButton, toolButton);
+            ConfigureButtonNavigation(toolButton, settingsButton, quitButton);
+            ConfigureButtonNavigation(quitButton, toolButton, playButton);
+            return;
+        }
 
-        Navigation toolNavigation = toolButton.navigation;
-        toolNavigation.mode = Navigation.Mode.Explicit;
-        toolNavigation.selectOnUp = playButton;
-        toolNavigation.selectOnDown = quitButton;
-        toolButton.navigation = toolNavigation;
+        ConfigureButtonNavigation(playButton, quitButton, toolButton);
+        ConfigureButtonNavigation(toolButton, playButton, quitButton);
+        ConfigureButtonNavigation(quitButton, toolButton, playButton);
+    }
 
-        Navigation quitNavigation = quitButton.navigation;
-        quitNavigation.mode = Navigation.Mode.Explicit;
-        quitNavigation.selectOnUp = toolButton;
-        quitNavigation.selectOnDown = playButton;
-        quitButton.navigation = quitNavigation;
+    /// <summary>
+    /// Applies explicit vertical navigation to one menu button.
+    /// </summary>
+    /// <param name="button">Button receiving navigation.</param>
+    /// <param name="up">Selectable reached by upward input.</param>
+    /// <param name="down">Selectable reached by downward input.</param>
+    private static void ConfigureButtonNavigation(Button button, Selectable up, Selectable down)
+    {
+        Navigation navigation = button.navigation;
+        navigation.mode = Navigation.Mode.Explicit;
+        navigation.selectOnUp = up;
+        navigation.selectOnDown = down;
+        button.navigation = navigation;
     }
     #endregion
 

@@ -37,6 +37,10 @@ public partial struct PlayerVisualPointerPresentationSystem : ISystem
         state.CompleteDependency();
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
 
+        if (SystemAPI.TryGetSingleton<PlayerUserExperienceSettings>(out PlayerUserExperienceSettings userSettings) &&
+            userSettings.VisualPointerEnabled == 0)
+            return;
+
         Mesh beamMesh = PlayerVisualPointerPresentationUtility.GetOrCreateBeamMesh();
 
         if (beamMesh == null)

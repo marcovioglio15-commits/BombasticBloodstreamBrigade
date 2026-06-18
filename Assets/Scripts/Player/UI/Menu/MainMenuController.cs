@@ -19,12 +19,18 @@ public sealed class MainMenuController : MonoBehaviour
     [Tooltip("Button that opens the runtime enemy spawner override tool.")]
     [SerializeField] private Button enemySpawnerToolButton;
 
+    [Tooltip("Button that opens the runtime Settings menu.")]
+    [SerializeField] private Button settingsButton;
+
     [Tooltip("Button that closes the application.")]
     [SerializeField] private Button quitButton;
 
     [Header("Runtime Tools")]
     [Tooltip("Runtime enemy spawner override panel opened from the main menu.")]
     [SerializeField] private EnemySpawnerRuntimeToolPanelController enemySpawnerToolPanel;
+
+    [Tooltip("Reusable runtime Settings menu opened from the main menu.")]
+    [SerializeField] private SettingsMenuController settingsMenu;
 
     [Header("Navigation")]
     [Tooltip("Optional EventSystem override used to select the default menu button.")]
@@ -34,6 +40,7 @@ public sealed class MainMenuController : MonoBehaviour
     #region Runtime
     private MenuSelectionController selectionController;
     private Selectable selectionBeforeLock;
+    private Selectable fallbackSelectionAfterUnlock;
     private bool navigationLocked;
     #endregion
 
@@ -86,11 +93,17 @@ public sealed class MainMenuController : MonoBehaviour
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.onClick.AddListener(HandleEnemySpawnerToolPressed);
 
+        if (settingsButton != null)
+            settingsButton.onClick.AddListener(HandleSettingsPressed);
+
         if (quitButton != null)
             quitButton.onClick.AddListener(HandleQuitPressed);
 
         if (enemySpawnerToolPanel != null)
             enemySpawnerToolPanel.ToolClosed += HandleToolClosed;
+
+        if (settingsMenu != null)
+            settingsMenu.MenuClosed += HandleSettingsClosed;
     }
 
     /// <summary>
@@ -104,11 +117,17 @@ public sealed class MainMenuController : MonoBehaviour
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.onClick.RemoveListener(HandleEnemySpawnerToolPressed);
 
+        if (settingsButton != null)
+            settingsButton.onClick.RemoveListener(HandleSettingsPressed);
+
         if (quitButton != null)
             quitButton.onClick.RemoveListener(HandleQuitPressed);
 
         if (enemySpawnerToolPanel != null)
             enemySpawnerToolPanel.ToolClosed -= HandleToolClosed;
+
+        if (settingsMenu != null)
+            settingsMenu.MenuClosed -= HandleSettingsClosed;
     }
     #endregion
 
@@ -167,14 +186,40 @@ public sealed class MainMenuController : MonoBehaviour
         }
 
         // Suspend menu navigation before the overlay opens so input cannot leak back to the menu buttons.
+        fallbackSelectionAfterUnlock = enemySpawnerToolButton;
         SetNavigationLocked(true);
         enemySpawnerToolPanel.OpenTool();
+    }
+
+    /// <summary>
+    /// Opens the shared runtime Settings menu from the main menu.
+    /// </summary>
+    private void HandleSettingsPressed()
+    {
+        if (settingsMenu == null)
+        {
+            Debug.LogWarning("[MainMenuController] Settings menu is not assigned.");
+            return;
+        }
+
+        // Suspend menu navigation before the overlay opens so input cannot leak back to the main menu buttons.
+        fallbackSelectionAfterUnlock = settingsButton;
+        SetNavigationLocked(true);
+        settingsMenu.Open(settingsButton);
     }
 
     /// <summary>
     /// Restores main-menu navigation when the spawner tool overlay reports that it has closed.
     /// </summary>
     private void HandleToolClosed()
+    {
+        SetNavigationLocked(false);
+    }
+
+    /// <summary>
+    /// Restores main-menu navigation when the Settings overlay reports that it has closed.
+    /// </summary>
+    private void HandleSettingsClosed()
     {
         SetNavigationLocked(false);
     }
@@ -229,6 +274,9 @@ public sealed class MainMenuController : MonoBehaviour
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.interactable = interactable;
 
+        if (settingsButton != null)
+            settingsButton.interactable = interactable;
+
         if (quitButton != null)
             quitButton.interactable = interactable;
     }
@@ -248,12 +296,13 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void RestoreSelectionAfterUnlock()
     {
-        Selectable restoreTarget = selectionBeforeLock;
+        Selectable restoreTarget = selectionBeforeLock != null ? selectionBeforeLock : fallbackSelectionAfterUnlock;
         selectionBeforeLock = null;
+        fallbackSelectionAfterUnlock = null;
 
         // Fall back to the tool button (then Play) when the previous selection is gone or no longer usable.
         if (restoreTarget == null || !restoreTarget.IsInteractable())
-            restoreTarget = enemySpawnerToolButton != null ? enemySpawnerToolButton : playButton;
+            restoreTarget = ResolveToolOrPlayFallback();
 
         if (restoreTarget == null)
         {
@@ -313,6 +362,15 @@ public sealed class MainMenuController : MonoBehaviour
     private EventSystem ResolveEventSystem()
     {
         return eventSystemOverride != null ? eventSystemOverride : EventSystem.current;
+    }
+
+    /// <summary>
+    /// Resolves the non-settings fallback button used when focus cannot return to its previous selectable.
+    /// </summary>
+    /// <returns>Runtime tool button when available, otherwise Play button.</returns>
+    private Selectable ResolveToolOrPlayFallback()
+    {
+        return enemySpawnerToolButton != null ? enemySpawnerToolButton : playButton;
     }
     #endregion
 

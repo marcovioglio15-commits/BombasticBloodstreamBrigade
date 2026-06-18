@@ -38,6 +38,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// <param name="labelPlacement">Selected inside-chamber or graduation-plate layout.</param>
     /// <param name="fontSize">TextMeshPro font size applied to active labels.</param>
     /// <param name="labelOffset">Pixel offset relative to each represented graduation tick.</param>
+    /// <param name="graduationVerticalOffset">Normalized vertical offset shared with the shader ticks; positive moves labels up.</param>
     /// <param name="labelColor">Direct text color applied to active labels.</param>
     /// <param name="labelOutlineColor">Direct outline color applied to active labels.</param>
     /// <param name="labelOutlineWidth">TextMeshPro outline width applied to active labels.</param>
@@ -51,6 +52,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                         PlayerSyringeLabelPlacement labelPlacement,
                         float fontSize,
                         float2 labelOffset,
+                        float graduationVerticalOffset,
                         float4 labelColor,
                         float4 labelOutlineColor,
                         float labelOutlineWidth,
@@ -83,6 +85,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                            labelPlacement,
                            fontSize,
                            labelOffset,
+                           graduationVerticalOffset,
                            labelColor,
                            labelOutlineColor,
                            labelOutlineWidth,
@@ -98,6 +101,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                            labelPlacement,
                            fontSize,
                            labelOffset,
+                           graduationVerticalOffset,
                            labelColor,
                            labelOutlineColor,
                            labelOutlineWidth,
@@ -135,6 +139,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// <param name="labelPlacement">Selected inside-chamber or graduation-plate layout.</param>
     /// <param name="fontSize">TextMeshPro font size.</param>
     /// <param name="labelOffset">Pixel offset relative to the represented tick.</param>
+    /// <param name="graduationVerticalOffset">Normalized vertical offset shared with the shader ticks; positive moves labels up.</param>
     /// <param name="labelColor">Direct label text color.</param>
     /// <param name="labelOutlineColor">Direct label outline color.</param>
     /// <param name="labelOutlineWidth">TextMeshPro outline width.</param>
@@ -145,6 +150,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                                        PlayerSyringeLabelPlacement labelPlacement,
                                        float fontSize,
                                        float2 labelOffset,
+                                       float graduationVerticalOffset,
                                        float4 labelColor,
                                        float4 labelOutlineColor,
                                        float labelOutlineWidth,
@@ -153,10 +159,11 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
         if (label == null)
             return;
 
+        // The vertical offset matches the shader graduation offset so ticks and numbers move together inside the bar.
         bool insideChamber = labelPlacement == PlayerSyringeLabelPlacement.InsideChamber;
         RectTransform labelTransform = label.rectTransform;
         Vector2 anchor = new Vector2(math.saturate(normalizedPosition),
-                                     insideChamber ? InsideLabelAnchorY : GraduationLabelAnchorY);
+                                     (insideChamber ? InsideLabelAnchorY : GraduationLabelAnchorY) + graduationVerticalOffset);
         labelTransform.anchorMin = anchor;
         labelTransform.anchorMax = anchor;
         labelTransform.pivot = new Vector2(0.5f, insideChamber ? 0.5f : 0f);

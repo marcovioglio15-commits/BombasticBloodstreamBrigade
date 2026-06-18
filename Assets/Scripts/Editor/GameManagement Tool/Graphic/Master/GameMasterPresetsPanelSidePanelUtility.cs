@@ -66,7 +66,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         GameManagementWindow.PanelType intendedActivePanel = panel.ActivePanel;
 
         panel.SuppressStateWrite = true;
-        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null);
+        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null, null);
 
         // Isolate per-panel failures: one panel that throws while constructing must not stop the
         // master tab from displaying.
@@ -75,6 +75,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
         if (intendedActivePanel == GameManagementWindow.PanelType.SceneManager)
             TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.SceneManager);
+
+        if (intendedActivePanel == GameManagementWindow.PanelType.SettingsManager)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.SettingsManager);
 
         if (!panel.SidePanels.ContainsKey(intendedActivePanel))
             intendedActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
@@ -129,6 +132,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             case GameManagementWindow.PanelType.SceneManager:
                 OpenSceneManagerPanel(panel, panelType);
                 break;
+            case GameManagementWindow.PanelType.SettingsManager:
+                OpenSettingsManagerPanel(panel, panelType);
+                break;
             default:
                 return;
         }
@@ -158,6 +164,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
             if (entry.ScenePanel != null)
                 entry.ScenePanel.RefreshFromSessionChange();
+
+            if (entry.SettingsPanel != null)
+                entry.SettingsPanel.RefreshFromSessionChange();
         }
     }
 
@@ -208,7 +217,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameAudioManagerPresetsPanel audioPanel = new GameAudioManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "Audio Manager", audioPanel.Root, panelType);
-        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel, null);
+        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel, null, null);
     }
 
     /// <summary>
@@ -220,7 +229,19 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameSceneManagerPresetsPanel scenePanel = new GameSceneManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "Scene Manager", scenePanel.Root, panelType);
-        AddTab(panel, panelType, "Scene Manager", panelRoot, null, scenePanel);
+        AddTab(panel, panelType, "Scene Manager", panelRoot, null, scenePanel, null);
+    }
+
+    /// <summary>
+    /// Creates and registers the Settings Manager side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
+    private static void OpenSettingsManagerPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
+    {
+        GameSettingsManagerPresetsPanel settingsPanel = new GameSettingsManagerPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel, "Settings Manager", settingsPanel.Root, panelType);
+        AddTab(panel, panelType, "Settings Manager", panelRoot, null, null, settingsPanel);
     }
 
     /// <summary>
@@ -269,12 +290,14 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     /// <param name="content">Content shown when active.</param>
     /// <param name="audioPanel">Optional Audio Manager panel controller.</param>
     /// <param name="scenePanel">Optional Scene Manager panel controller.</param>
+    /// <param name="settingsPanel">Optional Settings Manager panel controller.</param>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
                                VisualElement content,
                                GameAudioManagerPresetsPanel audioPanel,
-                               GameSceneManagerPresetsPanel scenePanel)
+                               GameSceneManagerPresetsPanel scenePanel,
+                               GameSettingsManagerPresetsPanel settingsPanel)
     {
         VisualElement tabContainer = new VisualElement();
         tabContainer.style.flexDirection = FlexDirection.Row;
@@ -294,7 +317,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             TabButton = tabButton,
             Content = content,
             AudioPanel = audioPanel,
-            ScenePanel = scenePanel
+            ScenePanel = scenePanel,
+            SettingsPanel = settingsPanel
         };
     }
 

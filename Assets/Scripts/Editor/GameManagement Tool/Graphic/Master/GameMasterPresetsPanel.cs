@@ -433,6 +433,14 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new Settings Manager preset and assigns it to the selected master preset.
+    /// </summary>
+    internal void CreateSettingsManagerPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateSettingsManagerPreset(this);
+    }
+
+    /// <summary>
     /// Creates a new Scene Manager preset and assigns it to the selected master preset.
     /// </summary>
     internal void CreateSceneManagerPreset()
@@ -544,6 +552,7 @@ public sealed class GameMasterPresetsPanel
         public VisualElement Content;
         public GameAudioManagerPresetsPanel AudioPanel;
         public GameSceneManagerPresetsPanel ScenePanel;
+        public GameSettingsManagerPresetsPanel SettingsPanel;
     }
     #endregion
 }

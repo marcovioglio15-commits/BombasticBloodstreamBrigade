@@ -28,6 +28,7 @@ public static class GameSceneManagementProjectSetupUtility
 
     private const string DefaultMasterPresetPath = "Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset";
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
+    private const string DefaultSettingsPresetPath = "Assets/Scriptable Objects/Game/Settings/GameSettingsManagerPreset.asset";
     private const string BootstrapManagerObjectName = "GameSceneManager";
     private const string FadeCanvasObjectName = "Canvas_SceneTransitionFade";
     private const string FadeSurfaceObjectName = "FadeSurface";
@@ -82,8 +83,9 @@ public static class GameSceneManagementProjectSetupUtility
         EnsureSceneFolders();
         GameSceneTransitionLayerUtility.TryCreateLayer(GameSceneTriggerSettings.DefaultTransitionLayerName);
 
+        GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
-        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset);
+        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset);
         GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
         SynchronizeSceneManagerPreset(scenePreset);
@@ -97,6 +99,26 @@ public static class GameSceneManagementProjectSetupUtility
 
         if (logToConsole)
             Debug.Log("[GameSceneManagementProjectSetupUtility] Default Scene Manager setup completed.");
+    }
+
+    /// <summary>
+    /// Loads or creates the default Settings Manager preset and registers it in the Settings Manager library.
+    /// </summary>
+    /// <returns>Default Settings Manager preset asset.</returns>
+    private static GameSettingsManagerPreset EnsureSettingsManagerPreset()
+    {
+        GameSettingsManagerPreset preset = AssetDatabase.LoadAssetAtPath<GameSettingsManagerPreset>(DefaultSettingsPresetPath);
+
+        if (preset == null)
+            preset = GameSettingsManagerPresetLibraryUtility.CreatePresetAsset("GameSettingsManagerPreset");
+
+        if (preset == null)
+            throw new InvalidOperationException("Unable to create the default GameSettingsManagerPreset asset.");
+
+        GameSettingsManagerPresetLibrary library = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+        library.AddPreset(preset);
+        EditorUtility.SetDirty(library);
+        return preset;
     }
     #endregion
 
@@ -122,11 +144,12 @@ public static class GameSceneManagementProjectSetupUtility
     }
 
     /// <summary>
-    /// Loads or creates the default Game Master preset and links the Scene Manager sub-preset.
+    /// Loads or creates the default Game Master preset and links the Settings and Scene Manager sub-presets.
     /// </summary>
     /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
+    /// <param name="settingsPreset">Settings Manager preset assigned as the master sub-preset.</param>
     /// <returns>Default Game Master preset asset.</returns>
-    private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset)
+    private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset, GameSettingsManagerPreset settingsPreset)
     {
         GameMasterPreset masterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
 
@@ -142,6 +165,7 @@ public static class GameSceneManagementProjectSetupUtility
 
         SerializedObject serializedMaster = new SerializedObject(masterPreset);
         serializedMaster.Update();
+        SetObjectReference(serializedMaster, "settingsManagerPreset", settingsPreset);
         SetObjectReference(serializedMaster, "sceneManagerPreset", scenePreset);
         serializedMaster.ApplyModifiedPropertiesWithoutUndo();
         masterPreset.ValidateValues();

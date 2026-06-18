@@ -21,12 +21,14 @@ Shader "Custom/UI/PlayerSyringeBar"
 
         [Header(Geometry)]
         _OutlineThickness("Normalized Outline Thickness", Range(0, 0.2)) = 0.035
+        _OutlineAspect("Outline Aspect (Height Over Length)", Float) = 1
+        _GraduationVerticalOffset("Graduation Vertical Offset", Range(-0.5, 0.5)) = 0
         _ChamberInset("Normalized Chamber Inset", Range(0, 0.49)) = 0.16
         _EndCapNormalized("Normalized End Cap Width", Range(0, 0.45)) = 0.08
         _GraduationInsetNormalized("Normalized Graduation Start Inset", Range(0, 0.45)) = 0.053
         _GraduationEndNormalized("Normalized Graduation End Position", Range(0.55, 0.999)) = 0.871
         _TerminationOffsetNormalized("Normalized Termination Offset", Range(0, 0.45)) = 0.024
-        _PlungerWidth("Normalized Plunger Width", Range(0, 0.2)) = 0.032
+        _PlungerWidth("Reference-Normalized Plunger Width", Range(0, 0.2)) = 0.032
         _BodyStyle("Body Style", Float) = 0
         _LabelPlacement("Label Placement", Float) = 0
         _TerminationStyle("Termination Style", Float) = 1
@@ -37,7 +39,7 @@ Shader "Custom/UI/PlayerSyringeBar"
         _PaintDripsEnabled("Paint Drips Enabled", Float) = 0
         _PaintDripDensity("Paint Drip Density", Range(0, 1)) = 0.38
         _PaintDripLength("Paint Drip Length", Range(0, 0.5)) = 0.1
-        _PaintDripWidth("Paint Drip Width", Range(0.0001, 0.25)) = 0.018
+        _PaintDripWidth("Reference-Normalized Paint Drip Width", Range(0.0001, 0.25)) = 0.018
         _PaintDripIrregularity("Paint Drip Irregularity", Range(0, 1)) = 0.65
         _LengthPixelScale("Resolved Length / Reference Length", Float) = 1
 
@@ -48,6 +50,7 @@ Shader "Custom/UI/PlayerSyringeBar"
         _SurfaceSloshStrength("Surface Slosh Strength", Range(0, 1)) = 0.45
         _HorizontalSloshEnabled("Horizontal Slosh Enabled", Float) = 1
         _HorizontalSloshStrength("Horizontal Slosh Strength", Range(0, 0.5)) = 0.16
+        _SloshAffectsBubblesOnly("Slosh Affects Bubbles Only", Float) = 0
 
         [Header(Fluid)]
         _FlowEnabled("Flow Enabled", Float) = 1
@@ -145,6 +148,8 @@ Shader "Custom/UI/PlayerSyringeBar"
             fixed4 _TerminationOutlineColor;
             fixed4 _TerminationInteriorColor;
             float _OutlineThickness;
+            float _OutlineAspect;
+            float _GraduationVerticalOffset;
             float _ChamberInset;
             float _EndCapNormalized;
             float _GraduationInsetNormalized;
@@ -168,6 +173,7 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _SurfaceSloshStrength;
             float _HorizontalSloshEnabled;
             float _HorizontalSloshStrength;
+            float _SloshAffectsBubblesOnly;
             float _FlowEnabled;
             float _FlowSpeed;
             float _WaveAmplitude;
@@ -409,6 +415,9 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float softness = 0.0025;
                 float endCap = clamp(_EndCapNormalized, 0.001, 0.45);
                 float outlineThickness = max(0.006, _OutlineThickness * 0.42);
+                // Horizontal outline is aspect-corrected (height/length) so its pixel thickness matches the vertical
+                // outline and stays identical across syringes of different resolved lengths.
+                float outlineThicknessX = outlineThickness * _OutlineAspect;
                 float detailedStyle = step(0.5, round(clamp(_BodyStyle, 0.0, 1.0)));
                 float simplifiedStyle = 1.0 - detailedStyle;
                 float externalLabels = step(0.5, round(clamp(_LabelPlacement, 0.0, 1.0)));
@@ -430,9 +439,12 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                 float2(rectangularBodyEnd, bodyTop),
                                                 bodyBevel,
                                                 softness);
+                // Detailed bodies keep a right-edge inset for their own wall; the simplified body extends its interior
+                // all the way to the termination start so the chamber background reaches the termination with no gap.
+                float bodyInteriorRight = rectangularBodyEnd - outlineThicknessX * detailedStyle;
                 float bodyInteriorMask = BeveledBoxMask(uv,
-                                                        float2(bodyStart + outlineThickness, bodyBottom + outlineThickness),
-                                                        float2(rectangularBodyEnd - outlineThickness, bodyTop - outlineThickness),
+                                                        float2(bodyStart + outlineThicknessX, bodyBottom + outlineThickness),
+                                                        float2(bodyInteriorRight, bodyTop - outlineThickness),
                                                         bodyInteriorBevel,
                                                         softness);
                 float leftStemMask = BoxMask(uv,
@@ -473,7 +485,7 @@ Shader "Custom/UI/PlayerSyringeBar"
 
                 float completeBodyMask = saturate(bodyMask + leftStemMask + leftFlangeMask + tipMask + paintDripMask);
                 float simplifiedRightBodyEdgeMask = BoxMask(uv,
-                                                             float2(simplifiedTerminationStart - outlineThickness * 1.4,
+                                                             float2(simplifiedTerminationStart - outlineThicknessX * 1.4,
                                                                     bodyBottom + outlineThickness),
                                                              float2(simplifiedTerminationStart + softness * 2.0,
                                                                     bodyTop - outlineThickness),
@@ -502,7 +514,7 @@ Shader "Custom/UI/PlayerSyringeBar"
                                             softness);
                 float chamberInteriorMask = chamberMask * bodyInteriorMask;
                 float simplifiedRightChamberEdgeMask = BoxMask(uv,
-                                                                float2(simplifiedTerminationStart - outlineThickness * 1.4,
+                                                                float2(simplifiedTerminationStart - outlineThicknessX * 1.4,
                                                                        chamberBottom),
                                                                 float2(simplifiedTerminationStart + softness * 2.0,
                                                                        chamberTop),
@@ -510,28 +522,28 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float chamberBorderMask = saturate(chamberFrameMask -
                                                    chamberMask -
                                                    simplifiedRightChamberEdgeMask);
-                float majorTickBottom = lerp(chamberBottom + 0.025, 0.205, externalLabels);
-                float majorTickTop = lerp(chamberBottom + 0.15, 0.345, externalLabels);
+                float majorTickBottom = lerp(chamberBottom + 0.025, 0.205, externalLabels) + _GraduationVerticalOffset;
+                float majorTickTop = lerp(chamberBottom + 0.15, 0.345, externalLabels) + _GraduationVerticalOffset;
                 float simplifiedTerminationEnd = 1.0 - softness;
                 float simplifiedTerminationOuterMask = BoxMask(uv,
                                                                 float2(simplifiedTerminationStart, bodyBottom),
                                                                 float2(simplifiedTerminationEnd, bodyTop),
                                                                 softness) * simplifiedStyle;
                 float simplifiedTerminationInteriorMask = BoxMask(uv,
-                                                                   float2(simplifiedTerminationStart + outlineThickness,
+                                                                   float2(simplifiedTerminationStart + outlineThicknessX,
                                                                           bodyBottom + outlineThickness),
-                                                                   float2(simplifiedTerminationEnd - outlineThickness,
+                                                                   float2(simplifiedTerminationEnd - outlineThicknessX,
                                                                           bodyTop - outlineThickness),
                                                                    softness) * simplifiedStyle;
                 float simplifiedTerminationOutlineMask = saturate(simplifiedTerminationOuterMask -
                                                                    simplifiedTerminationInteriorMask);
                 float graduationPanelMask = BoxMask(uv,
-                                                    float2(chamberStart - 0.012, 0.095),
-                                                    float2(chamberEnd + 0.012, 0.315),
+                                                    float2(chamberStart - 0.012, 0.095 + _GraduationVerticalOffset),
+                                                    float2(chamberEnd + 0.012, 0.315 + _GraduationVerticalOffset),
                                                     softness) * externalLabels;
                 float graduationSeparatorMask = BoxMask(uv,
-                                                        float2(chamberStart - 0.012, 0.3),
-                                                        float2(chamberEnd + 0.012, 0.32),
+                                                        float2(chamberStart - 0.012, 0.3 + _GraduationVerticalOffset),
+                                                        float2(chamberEnd + 0.012, 0.32 + _GraduationVerticalOffset),
                                                         softness) * externalLabels;
                 float collarMask = BeveledBoxMask(uv,
                                                   float2(chamberEnd + 0.018, 0.25),
@@ -550,10 +562,21 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                float2(graduationStart, 0.0),
                                                float2(graduationEnd, 1.0),
                                                softness);
+                // Plunger horizontal placement is resolved before the liquid so the fluid can be clamped to its edge.
+                float plungerCenter = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
+                float plungerOuterHalfWidth = _PlungerWidth * lerp(0.75, 0.72, detailedStyle);
+                float plungerInnerHalfWidth = _PlungerWidth * lerp(0.5, 0.36, detailedStyle);
+                float plungerGrooveHalfWidth = _PlungerWidth * lerp(0.1, 0.12, detailedStyle);
+                // The plunger's leading (left) edge expressed in value-track space; the liquid never crosses it.
+                float graduationSpan = max(0.0001, graduationEnd - graduationStart);
+                float plungerStartValueTrack = saturate(saturate(_FillNormalized) - plungerOuterHalfWidth / graduationSpan);
+                float bubblesOnlySlosh = step(0.5, _SloshAffectsBubblesOnly);
                 float slosh = clamp(_Slosh + _ValueImpulse, -1.0, 1.0);
                 float horizontalSlosh = slosh *
                                         max(0.0, _HorizontalSloshStrength) *
                                         step(0.5, _HorizontalSloshEnabled);
+                // Bubble-only mode keeps the slosh on the bubbles but freezes the liquid boundary into a flat fill.
+                float liquidHorizontalSlosh = horizontalSlosh * (1.0 - bubblesOnlySlosh);
                 float timeValue = _Time.y * _FlowEnabled;
                 float wave = sin((valueTrackX * max(0.1, _WaveFrequency) + timeValue * _FlowSpeed) * 6.2831853);
                 float secondaryWave = sin((valueTrackX * max(0.1, _WaveFrequency * 0.47) - timeValue * _FlowSpeed * 0.63) * 6.2831853);
@@ -562,23 +585,22 @@ Shader "Custom/UI/PlayerSyringeBar"
                            (valueTrackX - 0.5) *
                            max(0.0, _SurfaceSloshStrength) *
                            lerp(1.25, 0.75, saturate(_Viscosity));
-                float displacedFill = clamp(_FillNormalized + horizontalSlosh, 0.0, 1.0);
+                // Flatten the surface into a complete fill (slightly past the chamber top) when slosh is routed to the bubbles only.
+                surface = lerp(surface, 1.05, bubblesOnlySlosh);
+                // Clamp the liquid boundary (resting fill plus slosh) so it can never pass the start of the plunger.
+                float displacedFill = clamp(_FillNormalized + liquidHorizontalSlosh, 0.0, plungerStartValueTrack);
                 float liquidHorizontalMask = 1.0 - smoothstep(displacedFill - 0.003,
                                                               displacedFill + 0.003,
                                                               valueTrackX);
                 float liquidSurfaceMask = 1.0 - smoothstep(surface - 0.015, surface + 0.015, chamberUv.y);
                 float liquidMask = chamberInteriorMask * valueTrackMask * liquidHorizontalMask * liquidSurfaceMask;
                 float liquidFacetCount = max(1.0, 7.0 * max(0.25, _LengthPixelScale));
-                float liquidFacet = step(0.5, frac((valueTrackX - horizontalSlosh) * liquidFacetCount +
+                float liquidFacet = step(0.5, frac((valueTrackX - liquidHorizontalSlosh) * liquidFacetCount +
                                                    chamberUv.y * 4.0 +
                                                    timeValue * _FlowSpeed * 0.2));
                 float surfaceHighlight = smoothstep(surface - 0.06, surface, chamberUv.y) * liquidMask;
                 float2 bubbleUv = float2(valueTrackX - horizontalSlosh, chamberUv.y);
                 float bubbleMask = BubbleMask(bubbleUv, _Time.y) * liquidMask * _BubblesEnabled;
-                float plungerCenter = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
-                float plungerOuterHalfWidth = _PlungerWidth * lerp(0.75, 0.72, detailedStyle);
-                float plungerInnerHalfWidth = _PlungerWidth * lerp(0.5, 0.36, detailedStyle);
-                float plungerGrooveHalfWidth = _PlungerWidth * lerp(0.1, 0.12, detailedStyle);
                 float plungerOuterBottom = lerp(bodyBottom + outlineThickness * 0.4,
                                                 chamberBottom - 0.045,
                                                 detailedStyle);
@@ -614,8 +636,8 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float majorTickWidth = min(0.12, 0.012 * majorDivisionCount * inverseLengthScale);
                 float minorTickWidth = min(0.12, 0.004 * minorDivisionCount * inverseLengthScale);
                 float endpointTickHalfWidth = min(0.04, 0.004 * inverseLengthScale);
-                float minorTickBottom = lerp(chamberBottom + 0.025, 0.255, externalLabels);
-                float minorTickTop = lerp(chamberBottom + 0.095, 0.345, externalLabels);
+                float minorTickBottom = lerp(chamberBottom + 0.025, 0.255, externalLabels) + _GraduationVerticalOffset;
+                float minorTickTop = lerp(chamberBottom + 0.095, 0.345, externalLabels) + _GraduationVerticalOffset;
                 float majorTicks = GraduationTickMask(graduationX,
                                                       uv.y,
                                                       majorDivisionCount,

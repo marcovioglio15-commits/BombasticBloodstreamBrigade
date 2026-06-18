@@ -315,6 +315,22 @@ public static class PlayerInputRuntime
 
         return PlayerInputBindingDisplayRuntime.ResolveBindingDisplayString(action, fallback);
     }
+
+    /// <summary>
+    /// Resolves an enabled runtime action by authored action name or path, falling back to a project default action.
+    /// Used by configurable runtime menu navigation so the Settings Manager can choose action names without runtime
+    /// reflection or editor-only asset access.
+    /// </summary>
+    /// <param name="actionName">Configured action name or path.</param>
+    /// <param name="fallbackName">Fallback action name or path.</param>
+    /// <returns>Resolved runtime action, or null when the runtime input asset is not ready.</returns>
+    public static InputAction ResolveRuntimeAction(string actionName, string fallbackName)
+    {
+        if (runtimeAsset == null)
+            return null;
+
+        return ResolveAction(runtimeAsset, actionName, fallbackName);
+    }
     #endregion
 
     #region Methods

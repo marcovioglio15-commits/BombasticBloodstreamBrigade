@@ -46,6 +46,14 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
         bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
         float targetLowFrequency = 0f;
         float targetHighFrequency = 0f;
+        float damageRumbleMultiplier = 1f;
+        float fireRumbleMultiplier = 1f;
+
+        if (SystemAPI.TryGetSingleton<PlayerUserExperienceSettings>(out PlayerUserExperienceSettings userSettings))
+        {
+            damageRumbleMultiplier = math.max(0f, userSettings.DamageRumbleMultiplier);
+            fireRumbleMultiplier = math.max(0f, userSettings.FireRumbleMultiplier);
+        }
 
         // While not silenced, sum the per-channel motor speeds so a simultaneous hit and fire shake mix on the gamepad.
         if (!ShouldSilenceRumble(isSceneTransitioning))
@@ -64,8 +72,8 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
                                         out float fireLowFrequency,
                                         out float fireHighFrequency);
                 // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping shakes would clip.
-                targetLowFrequency = math.saturate(damageLowFrequency + fireLowFrequency);
-                targetHighFrequency = math.saturate(damageHighFrequency + fireHighFrequency);
+                targetLowFrequency = math.saturate(damageLowFrequency * damageRumbleMultiplier + fireLowFrequency * fireRumbleMultiplier);
+                targetHighFrequency = math.saturate(damageHighFrequency * damageRumbleMultiplier + fireHighFrequency * fireRumbleMultiplier);
                 break;
             }
         }

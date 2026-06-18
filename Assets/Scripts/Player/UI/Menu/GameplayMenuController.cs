@@ -24,6 +24,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     [Tooltip("Button that reloads the active gameplay scene from the pause menu.")]
     [SerializeField] private Button pauseRestartButton;
 
+    [Tooltip("Button that opens the runtime Settings menu from the pause menu.")]
+    [SerializeField] private Button pauseSettingsButton;
+
     [Tooltip("Button that returns to the main menu scene from the pause menu.")]
     [SerializeField] private Button pauseMainMenuButton;
 
@@ -46,6 +49,10 @@ public sealed class GameplayMenuController : MonoBehaviour
     [Tooltip("Button that closes the application from the ending menu.")]
     [SerializeField] private Button endingQuitButton;
 
+    [Header("Settings Menu")]
+    [Tooltip("Reusable runtime Settings menu opened from the pause menu.")]
+    [SerializeField] private SettingsMenuController settingsMenu;
+
     [Header("Messages")]
     [Tooltip("Message shown when every authored enemy wave has completed.")]
     [SerializeField] private string victoryMessage = "Victory";
@@ -67,6 +74,7 @@ public sealed class GameplayMenuController : MonoBehaviour
     private InputAction pauseAction;
     private bool pauseMenuVisible;
     private bool endingMenuVisible;
+    private bool settingsMenuVisible;
     private MenuSelectionController selectionController;
     #endregion
 
@@ -114,6 +122,7 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         pauseMenuVisible = false;
         endingMenuVisible = false;
+        settingsMenuVisible = false;
     }
 
     /// <summary>
@@ -168,6 +177,9 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (pauseRestartButton != null)
             pauseRestartButton.onClick.AddListener(HandleRestartPressed);
 
+        if (pauseSettingsButton != null)
+            pauseSettingsButton.onClick.AddListener(HandleSettingsPressed);
+
         if (pauseMainMenuButton != null)
             pauseMainMenuButton.onClick.AddListener(HandleMainMenuPressed);
 
@@ -182,6 +194,9 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         if (endingQuitButton != null)
             endingQuitButton.onClick.AddListener(HandleEndingQuitPressed);
+
+        if (settingsMenu != null)
+            settingsMenu.MenuClosed += HandleSettingsClosed;
     }
 
     /// <summary>
@@ -194,6 +209,9 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         if (pauseRestartButton != null)
             pauseRestartButton.onClick.RemoveListener(HandleRestartPressed);
+
+        if (pauseSettingsButton != null)
+            pauseSettingsButton.onClick.RemoveListener(HandleSettingsPressed);
 
         if (pauseMainMenuButton != null)
             pauseMainMenuButton.onClick.RemoveListener(HandleMainMenuPressed);
@@ -209,6 +227,9 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         if (endingQuitButton != null)
             endingQuitButton.onClick.RemoveListener(HandleEndingQuitPressed);
+
+        if (settingsMenu != null)
+            settingsMenu.MenuClosed -= HandleSettingsClosed;
     }
     #endregion
 
@@ -287,6 +308,14 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <param name="context">Input callback context for the performed cancel action.</param>
     private void HandlePausePerformed(InputAction.CallbackContext context)
     {
+        if (settingsMenuVisible)
+        {
+            if (settingsMenu != null)
+                settingsMenu.CancelAndClose();
+
+            return;
+        }
+
         if (endingMenuVisible)
             return;
 
@@ -405,7 +434,7 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-        SelectDefaultButton(resumeButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
+        SelectDefaultButton(resumeButton, pauseSettingsButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
     }
 
     /// <summary>
@@ -481,6 +510,41 @@ public sealed class GameplayMenuController : MonoBehaviour
     }
 
     /// <summary>
+    /// Opens the shared runtime Settings menu from the pause menu while keeping gameplay paused.
+    /// </summary>
+    private void HandleSettingsPressed()
+    {
+        if (settingsMenu == null)
+        {
+            Debug.LogWarning("[GameplayMenuController] Settings menu is not assigned.");
+            return;
+        }
+
+        settingsMenuVisible = true;
+        SetPauseButtonsInteractable(false);
+
+        if (selectionController != null)
+            selectionController.enabled = false;
+
+        settingsMenu.Open(pauseSettingsButton);
+    }
+
+    /// <summary>
+    /// Restores pause-menu navigation after the Settings overlay closes.
+    /// </summary>
+    private void HandleSettingsClosed()
+    {
+        settingsMenuVisible = false;
+        SetPauseButtonsInteractable(true);
+
+        if (selectionController != null)
+            selectionController.enabled = true;
+
+        if (pauseMenuVisible)
+            SelectDefaultButton(pauseSettingsButton, resumeButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
+    }
+
+    /// <summary>
     /// Returns to the main menu scene from the pause menu.
     /// </summary>
     private void HandleMainMenuPressed()
@@ -520,6 +584,30 @@ public sealed class GameplayMenuController : MonoBehaviour
     {
         Time.timeScale = 1f;
         AppUtils.QuitGame();
+    }
+    #endregion
+
+    #region Pause Menu Helpers
+    /// <summary>
+    /// Sets interactability on every authored pause-menu button while the Settings overlay owns input.
+    /// </summary>
+    /// <param name="interactable">True to enable pause-menu buttons, false to suspend them.</param>
+    private void SetPauseButtonsInteractable(bool interactable)
+    {
+        if (resumeButton != null)
+            resumeButton.interactable = interactable;
+
+        if (pauseSettingsButton != null)
+            pauseSettingsButton.interactable = interactable;
+
+        if (pauseRestartButton != null)
+            pauseRestartButton.interactable = interactable;
+
+        if (pauseMainMenuButton != null)
+            pauseMainMenuButton.interactable = interactable;
+
+        if (pauseQuitButton != null)
+            pauseQuitButton.interactable = interactable;
     }
     #endregion
 

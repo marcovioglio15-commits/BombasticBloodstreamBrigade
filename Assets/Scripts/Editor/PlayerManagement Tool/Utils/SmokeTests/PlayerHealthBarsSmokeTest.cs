@@ -19,6 +19,7 @@ public static class PlayerHealthBarsSmokeTest
     private const string MaterialPath = "Assets/2D/Materials/M_UI_PlayerSyringeBar.mat";
     private const string ShieldMaterialPath = "Assets/2D/Materials/M_UI_PlayerShieldSyringeBar.mat";
     private const string FontPath = "Assets/2D/Fonts/NoctraDrip-Solid SDF.asset";
+    private const float ReferenceDecorationLength = 340f;
     #endregion
 
     #region Methods
@@ -104,6 +105,8 @@ public static class PlayerHealthBarsSmokeTest
             SerializedProperty horizontalSloshEnabled = motion.FindPropertyRelative("horizontalSloshEnabled");
             SerializedProperty surfaceSloshStrength = motion.FindPropertyRelative("surfaceSloshStrength");
             SerializedProperty horizontalSloshStrength = motion.FindPropertyRelative("horizontalSloshStrength");
+            SerializedProperty sloshAffectsBubblesOnly = health.FindPropertyRelative("sloshAffectsBubblesOnly");
+            SerializedProperty graduationVerticalOffset = healthBars.FindPropertyRelative("graduationVerticalOffset");
             SerializedProperty fontAsset = healthBars.FindPropertyRelative("fontAsset");
             TMP_FontAsset expectedFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath);
             fontAsset.objectReferenceValue = expectedFont;
@@ -127,13 +130,15 @@ public static class PlayerHealthBarsSmokeTest
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(plungerWindowColorChannel) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(horizontalSloshEnabled) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(surfaceSloshStrength) ||
-                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(horizontalSloshStrength))
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(horizontalSloshStrength) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(sloshAffectsBubblesOnly) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(graduationVerticalOffset))
             {
                 throw new InvalidOperationException("Health Bars Add Scaling target support is incomplete.");
             }
 
             SerializedProperty scalingRules = presetObject.FindProperty("scalingRules");
-            scalingRules.arraySize = 19;
+            scalingRules.arraySize = 21;
             ConfigureRule(scalingRules.GetArrayElementAtIndex(0), PlayerScalingStatKeyUtility.BuildStatKey(colorChannel), "[this] * 0.5");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(1), PlayerScalingStatKeyUtility.BuildStatKey(healthEnabled), "![this]");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(2), PlayerScalingStatKeyUtility.BuildStatKey(terminationStyle), "[this] + ([Needle] - [this])");
@@ -153,6 +158,8 @@ public static class PlayerHealthBarsSmokeTest
             ConfigureRule(scalingRules.GetArrayElementAtIndex(16), PlayerScalingStatKeyUtility.BuildStatKey(terminationOffset), "[this] + 6");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(17), PlayerScalingStatKeyUtility.BuildStatKey(terminationOutlineColorChannel), "[this] + 0.12");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(18), PlayerScalingStatKeyUtility.BuildStatKey(plungerWindowColorChannel), "[this] - 0.08");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(19), PlayerScalingStatKeyUtility.BuildStatKey(sloshAffectsBubblesOnly), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(20), PlayerScalingStatKeyUtility.BuildStatKey(graduationVerticalOffset), "[this] + 0.1");
             presetObject.ApplyModifiedPropertiesWithoutUndo();
 
             EntityManager entityManager = world.EntityManager;
@@ -196,7 +203,7 @@ public static class PlayerHealthBarsSmokeTest
             DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> metadata = entityManager.AddBuffer<PlayerRuntimeHealthBarVisualScalingElement>(configEntity);
             PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(preset, metadata);
 
-            if (metadata.Length != 19)
+            if (metadata.Length != 21)
                 throw new InvalidOperationException("Health Bars runtime scaling metadata did not include palette, bool, enum, numeric, and nested-block rules.");
 
             StringBuilder metadataDetails = new StringBuilder();
@@ -243,11 +250,13 @@ public static class PlayerHealthBarsSmokeTest
                 runtimeConfig.Health.Motion.HorizontalSloshEnabled != 0 ||
                 !Mathf.Approximately(runtimeConfig.Health.Motion.SurfaceSloshStrength, baseConfig.Health.Motion.SurfaceSloshStrength + 0.1f) ||
                 !Mathf.Approximately(runtimeConfig.Health.Motion.HorizontalSloshStrength, baseConfig.Health.Motion.HorizontalSloshStrength + 0.05f) ||
+                runtimeConfig.Health.SloshAffectsBubblesOnly == 0 ||
+                !Mathf.Approximately(runtimeConfig.GraduationVerticalOffset, baseConfig.GraduationVerticalOffset + 0.1f) ||
                 runtimeConfig.FontAsset.Value != expectedFont ||
                 scalingState.Initialized == 0 ||
                 scalingState.LastScalableStatsHash != 123u)
             {
-                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}.",
+                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}, SloshBubbles={19}, GradOffset={20}.",
                                                                   runtimeConfig.Health.Palette.Liquid.x,
                                                                   baseConfig.Health.Palette.Liquid.x * 0.5f,
                                                                   runtimeConfig.Health.Enabled,
@@ -266,7 +275,9 @@ public static class PlayerHealthBarsSmokeTest
                                                                   runtimeConfig.FontAsset.Value,
                                                                   scalingState.Initialized,
                                                                   scalingState.LastScalableStatsHash,
-                                                                  metadataDetails));
+                                                                  metadataDetails,
+                                                                  runtimeConfig.Health.SloshAffectsBubblesOnly,
+                                                                  runtimeConfig.GraduationVerticalOffset));
             }
         }
         finally
@@ -300,6 +311,7 @@ public static class PlayerHealthBarsSmokeTest
                               PlayerSyringeLabelPlacement.InsideChamber,
                               15f,
                               new Unity.Mathematics.float2(0f, 0f),
+                              0f,
                               new Unity.Mathematics.float4(0f, 0f, 0f, 1f),
                               new Unity.Mathematics.float4(1f, 1f, 1f, 1f),
                               0.1f,
@@ -545,9 +557,9 @@ public static class PlayerHealthBarsSmokeTest
                 throw new InvalidOperationException("Short shield syringe graphic is missing its runtime material.");
 
             float resolvedLength = view.Root.rect.width;
-            float expectedPlungerWidth = Mathf.Clamp(config.PlungerWidth * 340f / resolvedLength, 0f, 0.2f);
-            float expectedPaintDripWidth = Mathf.Clamp(config.PaintDrips.Width * 340f / resolvedLength, 0f, 0.25f);
-            float expectedLengthScale = Mathf.Clamp(resolvedLength / 340f, 0.25f, 4f);
+            float expectedPlungerWidth = Mathf.Clamp(config.PlungerWidth * ReferenceDecorationLength / resolvedLength, 0f, 0.2f);
+            float expectedPaintDripWidth = Mathf.Clamp(config.PaintDrips.Width * ReferenceDecorationLength / resolvedLength, 0f, 0.25f);
+            float expectedLengthScale = Mathf.Clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f);
             float shaderPlungerWidth = graphic.material.GetFloat("_PlungerWidth");
             float shaderPaintDripWidth = graphic.material.GetFloat("_PaintDripWidth");
             float shaderLengthScale = graphic.material.GetFloat("_LengthPixelScale");

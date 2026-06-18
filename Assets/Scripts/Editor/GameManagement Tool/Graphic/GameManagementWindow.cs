@@ -342,7 +342,8 @@ public sealed class GameManagementWindow : EditorWindow
     {
         GameMasterPresets = 0,
         AudioManager = 1,
-        SceneManager = 2
+        SceneManager = 2,
+        SettingsManager = 3
     }
     #endregion
 }

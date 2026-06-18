@@ -266,6 +266,8 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameMasterPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameAudioManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameAudioManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameSettingsManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameSettingsManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
@@ -310,6 +312,7 @@ public static class GameManagementDraftSession
         GameManagementAssetUtility.EnsureFolder(TrackedGameAssetsRoot);
         GameMasterPresetLibraryUtility.GetOrCreateLibrary();
         GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
+        GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
     }
 
@@ -446,6 +449,7 @@ public static class GameManagementDraftSession
     {
         return assetObject is GameMasterPreset ||
                assetObject is GameAudioManagerPreset ||
+               assetObject is GameSettingsManagerPreset ||
                assetObject is GameSceneManagerPreset;
     }
 
@@ -577,6 +581,11 @@ public static class GameManagementDraftSession
         GameAudioManagerPresetLibrary audioLibrary = GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
 
         if (LibraryContainsPath(audioLibrary.Presets, assetPath))
+            return true;
+
+        GameSettingsManagerPresetLibrary settingsLibrary = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+
+        if (LibraryContainsPath(settingsLibrary.Presets, assetPath))
             return true;
 
         GameSceneManagerPresetLibrary sceneLibrary = GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();

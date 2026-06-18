@@ -312,6 +312,7 @@ MonoBehaviour:
     labelFontSize: 18
     labelOffset: {x: 0, y: 0}
     labelOutlineWidth: 0.2
+    graduationVerticalOffset: 0
     bodyStyle: 0
     barHeight: 85
     outlineThickness: 0.05
@@ -330,6 +331,7 @@ MonoBehaviour:
       enabled: 1
       hideWhenMaximumUnavailable: 0
       smoothingSeconds: 2
+      sloshAffectsBubblesOnly: 1
       palette:
         outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
         body: {r: 0.36, g: 0.16, b: 0.19, a: 0.7529412}
@@ -377,6 +379,7 @@ MonoBehaviour:
       enabled: 1
       hideWhenMaximumUnavailable: 1
       smoothingSeconds: 2
+      sloshAffectsBubblesOnly: 1
       palette:
         outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
         body: {r: 0.36078432, g: 0.16078432, b: 0.1882353, a: 0.7529412}

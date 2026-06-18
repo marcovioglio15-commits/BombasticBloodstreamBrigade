@@ -103,6 +103,7 @@ public struct PlayerSyringeChannelConfig
     public float SmoothingSeconds;
     public byte Enabled;
     public byte HideWhenMaximumUnavailable;
+    public byte SloshAffectsBubblesOnly;
 }
 
 /// <summary>
@@ -123,6 +124,7 @@ public struct PlayerHealthBarVisualConfig : IComponentData
     public float GraduationEndPadding;
     public float LabelFontSize;
     public float LabelOutlineWidth;
+    public float GraduationVerticalOffset;
     public float BarHeight;
     public float OutlineThickness;
     public float ChamberInset;
