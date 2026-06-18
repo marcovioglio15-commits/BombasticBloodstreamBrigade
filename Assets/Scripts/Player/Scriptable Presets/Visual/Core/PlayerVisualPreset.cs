@@ -242,6 +242,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("ECS-authoritative procedural syringe settings used by the player health and shield HUD views.")]
     [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
 
+    [Header("Portrait")]
+    [Tooltip("ECS-authoritative HUD portrait animations selected from damage, combo-rank, death and power-up runtime state.")]
+    [SerializeField] private PlayerPortraitHudSettings portrait = new PlayerPortraitHudSettings();
+
+    [Header("Growth Sequence")]
+    [Tooltip("ECS-authoritative HUD growth sequence visuals mapped to the Level-up & Progression schedule steps.")]
+    [SerializeField] private PlayerGrowthSequenceHudSettings growthSequence = new PlayerGrowthSequenceHudSettings();
+
     #region Muzzle Flash VFX
     [Tooltip("Optional one-shot VFX prefab spawned at the projectile origin every time the player fires a shot.")]
     [SerializeField] private GameObject muzzleFlashVfxPrefab;
@@ -687,6 +695,22 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public PlayerPortraitHudSettings Portrait
+    {
+        get
+        {
+            return portrait;
+        }
+    }
+
+    public PlayerGrowthSequenceHudSettings GrowthSequence
+    {
+        get
+        {
+            return growthSequence;
+        }
+    }
+
     public GameObject MuzzleFlashVfxPrefab
     {
         get
@@ -887,6 +911,12 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (healthBars == null)
             healthBars = new PlayerHealthBarsVisualSettings();
 
+        if (portrait == null)
+            portrait = new PlayerPortraitHudSettings();
+
+        if (growthSequence == null)
+            growthSequence = new PlayerGrowthSequenceHudSettings();
+
         outline.Validate();
         weaponVisuals.Validate(runtimeVisualBridgePrefab, name);
         laserBeam.Validate();
@@ -899,6 +929,8 @@ public sealed class PlayerVisualPreset : ScriptableObject
         playerJetpackVfx.Validate(runtimeVisualBridgePrefab, name);
         groundShadow.Validate(name);
         healthBars.Validate(name);
+        portrait.Validate(name);
+        growthSequence.Validate(name);
     }
     #endregion
 

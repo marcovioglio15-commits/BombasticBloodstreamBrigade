@@ -20,10 +20,10 @@ MonoBehaviour:
   - Assets/Scenes/Testing
   - Assets/Scenes/Testing/Main Scenes
   - Assets/Scenes/Testing/SubScenes
-  - Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting
-  - Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting
-  - Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting 1
-  - Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting 1/SCN_PlayerControllerTesting
+  - Assets/Scenes/Testing/Main Scenes/SCN_MainScene
+  - Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene
+  - Assets/Scenes/Testing/Main Scenes/SCN_MainScene 1
+  - Assets/Scenes/Testing/Main Scenes/SCN_MainScene 1/SCN_MainScene
   - Assets/Scenes/Testing/Main Scenes/SCN_UITesting
   - Assets/Scenes/Testing/Main Scenes/SCN_UITesting/SCN_UITesting
   - Assets/Scenes/Testing/Main Scenes/UI

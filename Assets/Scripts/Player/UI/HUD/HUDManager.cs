@@ -16,6 +16,14 @@ public sealed class HUDManager : MonoBehaviour
     [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, movement, and Player Visual Preset configuration.")]
     [SerializeField] private PlayerHealthBarsHudView playerHealthBarsView;
 
+    [Header("Portrait")]
+    [Tooltip("Serialized HUD section that renders the dynamic ECS-driven player portrait.")]
+    [SerializeField] private HUDPlayerPortraitSection portraitSection = new HUDPlayerPortraitSection();
+
+    [Header("Growth Sequence")]
+    [Tooltip("Serialized HUD section that renders the active level-up growth sequence from ECS visual config.")]
+    [SerializeField] private HUDGrowthSequenceSection growthSequenceSection = new HUDGrowthSequenceSection();
+
     [Header("Level & Experience")]
     [Tooltip("UI Text used to display the current player level.")]
     [SerializeField] private TMP_Text playerLevelText;
@@ -124,6 +132,8 @@ public sealed class HUDManager : MonoBehaviour
         if (playerHealthBarsView != null)
             playerHealthBarsView.Initialize();
 
+        portraitSection.Initialize(transform);
+        growthSequenceSection.Initialize(transform);
         powerUpOverlaySection = new HUDPowerUpOverlaySection(primaryPowerUpIconImage,
                                                              secondaryPowerUpIconImage,
                                                              primaryPowerUpSlotRootObject,
@@ -179,6 +189,8 @@ public sealed class HUDManager : MonoBehaviour
             playerHealthBarsView.UpdateView(entityManager, playerEntity, snapCoreBars);
 
         UpdateLevelAndExperience(playerEntity);
+        portraitSection.Update(entityManager, playerEntity);
+        growthSequenceSection.Update(entityManager, playerEntity);
         powerUpOverlaySection.Update(entityManager, playerEntity);
         runTimerSection.Update(entityManager, playerEntity);
         comboCounterSection.Update(entityManager, playerEntity);
@@ -359,12 +371,16 @@ public sealed class HUDManager : MonoBehaviour
         if (experienceBarRuntime != null)
             experienceBarRuntime.ApplyInitialVisualState(displayedExperienceNormalized);
 
+        portraitSection.ApplyInitialVisualState();
+        growthSequenceSection.ApplyInitialVisualState();
         powerUpOverlaySection.ApplyInitialVisualState();
         runTimerSection.ApplyInitialVisualState();
         comboCounterSection.ApplyInitialVisualState();
         damageVignetteSection.ApplyInitialVisualState();
 
         HandleMissingLevelText();
+        portraitSection.HandleMissingPlayer();
+        growthSequenceSection.HandleMissingPlayer();
         runTimerSection.HandleMissingPlayer();
         comboCounterSection.HandleMissingPlayer();
         milestoneSelectionSection.HandleMissingPlayer();
@@ -379,6 +395,8 @@ public sealed class HUDManager : MonoBehaviour
 
         HandleMissingLevelText();
         HandleMissingExperienceBar();
+        portraitSection.HandleMissingPlayer();
+        growthSequenceSection.HandleMissingPlayer();
         powerUpOverlaySection.HandleMissingPlayer();
         runTimerSection.HandleMissingPlayer();
         comboCounterSection.HandleMissingPlayer();

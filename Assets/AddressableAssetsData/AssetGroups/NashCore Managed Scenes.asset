@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: dd817b017456a8c4487f600c644e4ed6
   m_SerializeEntries:
   - m_GUID: 03a9f2c16e797964292116c73c929762
-    m_Address: SCN_PlayerControllerTesting_UI
+    m_Address: SCN_MainScene_UI
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene
@@ -28,7 +28,7 @@ MonoBehaviour:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 99c9720ab356a0642a771bea13969a05
-    m_Address: SCN_PlayerControllerTesting
+    m_Address: SCN_MainScene
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene

@@ -19,7 +19,7 @@ MonoBehaviour:
   bootstrapSceneId: SCN_Bootstrap
   initialSceneId: SCN_MainMenu
   mainMenuSceneId: SCN_MainMenu
-  defaultGameplaySceneId: SCN_PlayerControllerTesting
+  defaultGameplaySceneId: SCN_MainScene
   autoLoadInitialScene: 1
   loadBackend: 1
   logTransitions: 1
@@ -74,31 +74,31 @@ MonoBehaviour:
     roomTags: 
     addressableKey: SCN_MainMenu
     sceneAsset: {fileID: 102900000, guid: 38e3563928683cd45a4636eecc880a51, type: 3}
-  - sceneId: SCN_PlayerControllerTesting
-    sceneName: SCN_PlayerControllerTesting
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity
+  - sceneId: SCN_MainScene
+    sceneName: SCN_MainScene
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
     buildIndex: -1
     sceneKind: 2
     unloadPolicy: 0
-    companionUiSceneId: SCN_PlayerControllerTesting_UI
+    companionUiSceneId: SCN_MainScene_UI
     roomTags: 
-    addressableKey: SCN_PlayerControllerTesting
+    addressableKey: SCN_MainScene
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
-  - sceneId: SCN_PlayerControllerTesting_UI
-    sceneName: SCN_PlayerControllerTesting_UI
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting_UI.unity
+  - sceneId: SCN_MainScene_UI
+    sceneName: SCN_MainScene_UI
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene_UI.unity
     sceneGuid: 03a9f2c16e797964292116c73c929762
     buildIndex: -1
     sceneKind: 3
     unloadPolicy: 0
     companionUiSceneId: 
     roomTags: 
-    addressableKey: SCN_PlayerControllerTesting_UI
+    addressableKey: SCN_MainScene_UI
     sceneAsset: {fileID: 102900000, guid: 03a9f2c16e797964292116c73c929762, type: 3}
   - sceneId: SCN_PlayerPersistent
     sceneName: SUB_Player
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SUB_Player.unity
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SUB_Player.unity
     sceneGuid: da7ade6fe92d5ba4cba3257fa8bbb3b8
     buildIndex: -1
     sceneKind: 7
@@ -110,7 +110,7 @@ MonoBehaviour:
   transitionDefinitions:
   - transitionId: TRN_MainMenu_To_Gameplay
     fromSceneId: SCN_MainMenu
-    toSceneId: SCN_PlayerControllerTesting
+    toSceneId: SCN_MainScene
     priority: 0
     transitionMode: 0
     triggerId: 
@@ -123,7 +123,7 @@ MonoBehaviour:
     allowDuringPause: 1
     allowWhenRunFinalized: 1
   - transitionId: TRN_Gameplay_To_MainMenu
-    fromSceneId: SCN_PlayerControllerTesting
+    fromSceneId: SCN_MainScene
     toSceneId: SCN_MainMenu
     priority: 0
     transitionMode: 0

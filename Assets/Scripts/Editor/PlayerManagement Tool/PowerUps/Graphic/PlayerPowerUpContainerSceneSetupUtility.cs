@@ -21,7 +21,7 @@ public static class PlayerPowerUpContainerSceneSetupUtility
     private const string AnimatorControllerAssetPath = AnimationFolder + "/AC_PlayerPowerUpContainerPrompt.controller";
     private const string PrefabAssetPath = "Assets/Prefabs/Player/PF_PlayerPowerUpContainer.prefab";
     private const string PlayerPrefabAssetPath = "Assets/Prefabs/Player/PF_Player.prefab";
-    private const string ScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity";
+    private const string ScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity";
     private const string OverlayCanvasName = "Canvas_PlayerPowerUpContainerOverlay";
     private const string OverlayRootName = "PowerUpContainerOverlayPanel";
     private const string OverlayCardName = "Card";

@@ -21,7 +21,8 @@ public static class PlayerScalingStatKeyUtility
         "phaseID",
         "rankId",
         "passivePowerUpId",
-        "weaponId"
+        "weaponId",
+        "animationId"
     };
 
     private static readonly string[] StableNestedStringIdPropertyPaths =
@@ -31,7 +32,8 @@ public static class PlayerScalingStatKeyUtility
 
     private static readonly string[] StableIntegerIdPropertyNames =
     {
-        "milestoneLevel"
+        "milestoneLevel",
+        "stepIndex"
     };
     #endregion
 

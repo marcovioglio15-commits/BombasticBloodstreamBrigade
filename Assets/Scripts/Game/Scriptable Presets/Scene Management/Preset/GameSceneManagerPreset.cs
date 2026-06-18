@@ -35,7 +35,7 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     [SerializeField] private string mainMenuSceneId = "SCN_MainMenu";
 
     [Tooltip("Scene ID loaded by the default Play command from the main menu.")]
-    [SerializeField] private string defaultGameplaySceneId = "SCN_PlayerControllerTesting";
+    [SerializeField] private string defaultGameplaySceneId = "SCN_MainScene";
 
     [Tooltip("When enabled, the runtime manager automatically loads Initial Scene Id when no active managed scene is known.")]
     [SerializeField] private bool autoLoadInitialScene = true;

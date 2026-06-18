@@ -15,7 +15,7 @@ public static class PlayerHealthBarsSmokeTest
 {
     #region Constants
     private const string PrefabPath = "Assets/Prefabs/UI/PlayerBars VerticalBox.prefab";
-    private const string ScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting_UI.unity";
+    private const string ScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene_UI.unity";
     private const string MaterialPath = "Assets/2D/Materials/M_UI_PlayerSyringeBar.mat";
     private const string ShieldMaterialPath = "Assets/2D/Materials/M_UI_PlayerShieldSyringeBar.mat";
     private const string FontPath = "Assets/2D/Fonts/NoctraDrip-Solid SDF.asset";

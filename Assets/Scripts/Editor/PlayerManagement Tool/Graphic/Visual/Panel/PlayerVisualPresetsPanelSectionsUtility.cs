@@ -151,6 +151,14 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                PlayerVisualPresetsPanel.VisualSubSectionType.HealthBars,
                                "Health Bars",
                                PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
+        AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.Portrait,
+                               "Portrait",
+                               PlayerVisualPresetsPanelPortraitSectionUtility.Build(panel));
+        AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.GrowthSequence,
+                               "Growth Sequence",
+                               PlayerVisualPresetsPanelGrowthSequenceSectionUtility.Build(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;

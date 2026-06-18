@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: EnemySpawnerRuntimeCatalog
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnerRuntimeCatalog
   scenes:
-  - sceneName: SCN_PlayerControllerTesting
-    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity
+  - sceneName: SCN_MainScene
+    scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
     spawners:
     - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e

@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 /// <summary>
 /// Keeps the runtime spawner catalog synchronized when scene assets, EnemyWavePreset assets or spawner bake scripts change in the editor.
@@ -12,12 +14,14 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
     private const string EnemyConfigScriptDirectory = "Assets/Scripts/Enemy/Config/";
     private const string EnemyEditorScriptDirectory = "Assets/Scripts/Editor/Enemy/";
     private const string EnemySpawnerRuntimeOverrideSystemPath = "Assets/Scripts/Enemy/Systems/Pool/EnemySpawnerRuntimeOverrideSystem.cs";
+    private const int MaxOwnerSceneReimportRetries = 4;
     #endregion
 
     #region Fields
     private static bool refreshQueued;
     private static bool isRefreshing;
     private static bool pendingOwnerSceneReimport;
+    private static int ownerSceneReimportRetryCount;
     #endregion
 
     #region Methods
@@ -47,6 +51,7 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
             return;
 
         pendingOwnerSceneReimport = true;
+        ownerSceneReimportRetryCount = 0;
         QueueCatalogRefresh();
     }
     #endregion
@@ -77,6 +82,7 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
 
         isRefreshing = true;
         bool shouldReimportOwnerScenes = pendingOwnerSceneReimport;
+        bool ownerSceneReimportSucceeded = true;
         pendingOwnerSceneReimport = false;
 
         try
@@ -85,12 +91,77 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
             EnemySpawnerRuntimeCatalog catalog = EnemySpawnerRuntimeCatalogBuildUtility.RebuildCatalogAsset();
 
             if (shouldReimportOwnerScenes)
-                EnemySpawnerRuntimeCatalogOwnerSceneImportUtility.ReimportOwnerScenes(catalog);
+                ownerSceneReimportSucceeded = TryReimportOwnerScenes(catalog);
+
+            if (ownerSceneReimportSucceeded)
+                ownerSceneReimportRetryCount = 0;
         }
         finally
         {
             isRefreshing = false;
         }
+    }
+    #endregion
+
+    #region Retry
+    /// <summary>
+    /// Reimports owner scenes and converts transient Entities cache locks into a bounded delayed retry.
+    /// </summary>
+    /// <param name="catalog">Runtime spawner catalog containing owner scene references.</param>
+    /// <returns>True when the owner-scene import completed without a transient file-lock failure.</returns>
+    private static bool TryReimportOwnerScenes(EnemySpawnerRuntimeCatalog catalog)
+    {
+        try
+        {
+            EnemySpawnerRuntimeCatalogOwnerSceneImportUtility.ReimportOwnerScenes(catalog);
+            return true;
+        }
+        catch (IOException exception)
+        {
+            if (!IsTransientImportLock(exception))
+                throw;
+
+            return QueueOwnerSceneReimportRetry(exception);
+        }
+        catch (UnauthorizedAccessException exception)
+        {
+            return QueueOwnerSceneReimportRetry(exception);
+        }
+    }
+
+    /// <summary>
+    /// Requeues owner-scene reimport after Unity temporarily locks DOTS scene dependency cache files.
+    /// </summary>
+    /// <param name="exception">Transient file-system exception thrown by the Unity Entities importer.</param>
+    /// <returns>False because the current reimport attempt did not complete.</returns>
+    private static bool QueueOwnerSceneReimportRetry(Exception exception)
+    {
+        if (ownerSceneReimportRetryCount >= MaxOwnerSceneReimportRetries)
+        {
+            Debug.LogWarning(string.Format("[EnemySpawnerRuntimeCatalog] Owner scene reimport skipped after {0} retries because Unity kept the Entities scene dependency cache locked. Last error: {1}",
+                                           MaxOwnerSceneReimportRetries,
+                                           exception.Message));
+            return false;
+        }
+
+        ownerSceneReimportRetryCount++;
+        pendingOwnerSceneReimport = true;
+        QueueCatalogRefresh();
+        return false;
+    }
+
+    /// <summary>
+    /// Checks whether an IO failure matches the temporary lock errors produced by Unity scene import artifacts.
+    /// </summary>
+    /// <param name="exception">IO exception thrown by the asset or Entities importer.</param>
+    /// <returns>True when retrying on the next editor delay is safer than surfacing the current attempt.</returns>
+    private static bool IsTransientImportLock(IOException exception)
+    {
+        if (exception == null || string.IsNullOrWhiteSpace(exception.Message))
+            return false;
+
+        return exception.Message.IndexOf("Sharing violation", StringComparison.OrdinalIgnoreCase) >= 0 ||
+               exception.Message.IndexOf("being used by another process", StringComparison.OrdinalIgnoreCase) >= 0;
     }
     #endregion
 

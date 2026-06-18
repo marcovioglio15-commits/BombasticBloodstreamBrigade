@@ -12,7 +12,7 @@ public static class SceneRenderOptimizationAuditUtility
 {
     #region Constants
     private const int MaxLoggedExamplesPerCategory = 24;
-    private const string MainGameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity";
+    private const string MainGameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity";
     private const string EnvironmentPrefabFolder = "Assets/3D/3D prefabs";
     private const string EnvironmentModulesRootName = "Environment_modules";
     #endregion

@@ -687,6 +687,11 @@ public sealed class PlayerVisualPresetsPanel
     {
         PlayerVisualPresetsPanelSectionsUtility.ShowActiveVisualSubSection(this);
     }
+
+    internal void RebuildDetails()
+    {
+        BuildActiveDetailsSection();
+    }
     #endregion
 
     #endregion
@@ -708,7 +713,9 @@ public sealed class PlayerVisualPresetsPanel
         VisualPointer = 5,
         DeathAnimation = 6,
         HealthBars = 7,
-        GroundShadow = 8
+        GroundShadow = 8,
+        Portrait = 9,
+        GrowthSequence = 10
     }
 
     internal sealed class VisualSubSectionTabEntry

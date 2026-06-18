@@ -423,6 +423,140 @@ MonoBehaviour:
         valueImpulseEnabled: 1
         valueImpulseStrength: 1
         valueImpulseDecay: 1
+  portrait:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    idleAnimation:
+      animationId: Idle
+      frames:
+      - {fileID: 21300000, guid: 83885801007554f42a819aa0c716ed0f, type: 3}
+      - {fileID: 21300000, guid: 9ec9dadfd7a7b374d8bce46c1ecf2ab6, type: 3}
+      - {fileID: 21300000, guid: 62bad9c41e3f4f1489d55d6796073472, type: 3}
+      - {fileID: 21300000, guid: 3db0b99557ecb974aa8ca90843c8e01b, type: 3}
+      - {fileID: 21300000, guid: d991446632b496047ab28173c93bd55b, type: 3}
+      secondsPerFrame: 0.12
+      playbackSpeedMultiplier: 1
+      playbackMode: 0
+      priority: 0
+      restartWhenReentered: 1
+    damageAnimation:
+      animationId: DamageTaken
+      frames:
+      - {fileID: 1494215279, guid: bd9ccc4050ac44f4288b4b333ab79523, type: 3}
+      - {fileID: -1330241789, guid: bd9ccc4050ac44f4288b4b333ab79523, type: 3}
+      secondsPerFrame: 0.12
+      playbackSpeedMultiplier: 1
+      playbackMode: 1
+      priority: 0
+      restartWhenReentered: 1
+    deathAnimation:
+      animationId: Death
+      frames:
+      - {fileID: 21300000, guid: 6a0b1d07def993649a48cc9aca31ab30, type: 3}
+      secondsPerFrame: 0.12
+      playbackSpeedMultiplier: 1
+      playbackMode: 0
+      priority: 0
+      restartWhenReentered: 1
+    comboRankAnimations: []
+    powerUpAnimations: []
+  growthSequence:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    maximumVisibleSteps: 5
+    schedules:
+    - scheduleId: ScheduleRookie
+      steps:
+      - stepIndex: 0
+        statName: FireRate
+        textOverride: FRT
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 0, b: 0, a: 0}
+          outlineWidth: 0.75
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 1, b: 1, a: 0}
+          outlineWidth: 0.55
+      - stepIndex: 1
+        statName: ShotRange
+        textOverride: SHR
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 0, b: 0, a: 0}
+          outlineWidth: 0.75
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 1, b: 1, a: 0}
+          outlineWidth: 0.55
+      - stepIndex: 2
+        statName: MovementSpeed
+        textOverride: MVS
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 0, b: 0, a: 0}
+          outlineWidth: 0.75
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 1, b: 1, a: 0}
+          outlineWidth: 0.55
+      - stepIndex: 3
+        statName: Damage
+        textOverride: DMG
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 0, b: 0, a: 0}
+          outlineWidth: 0.75
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 1, b: 1, a: 0}
+          outlineWidth: 0.55
+      - stepIndex: 4
+        statName: Luck
+        textOverride: LCK
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 0, b: 0, a: 0}
+          outlineWidth: 0.75
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 35
+          color: {r: 0, g: 0, b: 0, a: 0}
+          outlineColor: {r: 1, g: 1, b: 1, a: 0}
+          outlineWidth: 0.55
   muzzleFlashVfxPrefab: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
   muzzleFlashVfxSpawnOffset: {x: 0, y: 0.15, z: -0.1}
   muzzleFlashVfxScaleMultiplier: 1

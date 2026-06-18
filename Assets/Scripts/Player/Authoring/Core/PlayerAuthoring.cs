@@ -634,6 +634,62 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                      healthBarVisualScalingBuffer);
 #endif
 
+        Entity portraitHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                                false,
+                                                                "Player Portrait HUD Visual Configuration");
+        AddComponent(entity, new PlayerPortraitHudVisualReference
+        {
+            ConfigEntity = portraitHudVisualEntity
+        });
+        AddComponent(portraitHudVisualEntity, new PlayerPortraitHudVisualOwner
+        {
+            PlayerEntity = entity
+        });
+        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildPortraitConfig(visualPreset));
+        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildBasePortraitConfig(sourceVisualPreset));
+        AddComponent(portraitHudVisualEntity, new PlayerPortraitHudVisualScalingState());
+        DynamicBuffer<PlayerPortraitHudAnimationElement> portraitAnimationBuffer = AddBuffer<PlayerPortraitHudAnimationElement>(portraitHudVisualEntity);
+        DynamicBuffer<PlayerBasePortraitHudAnimationElement> basePortraitAnimationBuffer = AddBuffer<PlayerBasePortraitHudAnimationElement>(portraitHudVisualEntity);
+        DynamicBuffer<PlayerPortraitHudFrameElement> portraitFrameBuffer = AddBuffer<PlayerPortraitHudFrameElement>(portraitHudVisualEntity);
+        DynamicBuffer<PlayerRuntimePortraitHudVisualScalingElement> portraitHudScalingBuffer = AddBuffer<PlayerRuntimePortraitHudVisualScalingElement>(portraitHudVisualEntity);
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulatePortraitBuffers(visualPreset,
+                                                                         portraitAnimationBuffer,
+                                                                         portraitFrameBuffer);
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulateBasePortraitBuffers(sourceVisualPreset,
+                                                                             basePortraitAnimationBuffer);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulatePortraitHudVisualScalingMetadata(sourceVisualPreset,
+                                                                                       portraitHudScalingBuffer);
+#endif
+
+        Entity growthSequenceHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                                      false,
+                                                                      "Player Growth Sequence HUD Visual Configuration");
+        AddComponent(entity, new PlayerGrowthSequenceHudVisualReference
+        {
+            ConfigEntity = growthSequenceHudVisualEntity
+        });
+        AddComponent(growthSequenceHudVisualEntity, new PlayerGrowthSequenceHudVisualOwner
+        {
+            PlayerEntity = entity
+        });
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildGrowthSequenceConfig(visualPreset));
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildBaseGrowthSequenceConfig(sourceVisualPreset));
+        AddComponent(growthSequenceHudVisualEntity, new PlayerGrowthSequenceHudVisualScalingState());
+        DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> growthSequenceStepBuffer = AddBuffer<PlayerGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
+        DynamicBuffer<PlayerBaseGrowthSequenceHudStepVisualElement> baseGrowthSequenceStepBuffer = AddBuffer<PlayerBaseGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
+        DynamicBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement> growthSequenceHudScalingBuffer = AddBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement>(growthSequenceHudVisualEntity);
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulateGrowthSequenceBuffer(visualPreset,
+                                                                              progressionPreset,
+                                                                              growthSequenceStepBuffer);
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulateBaseGrowthSequenceBuffer(sourceVisualPreset,
+                                                                                  sourceProgressionPreset,
+                                                                                  baseGrowthSequenceStepBuffer);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulateGrowthSequenceHudVisualScalingMetadata(sourceVisualPreset,
+                                                                                            growthSequenceHudScalingBuffer);
+#endif
+
         // Conditional weapon switches authored in the controller preset are baked into a dedicated ECS table.
         // The dedicated system evaluates the table against the player's scalable stats and writes the winning
         // entry into PlayerConditionalWeaponSwitchState so the animator presentation pipeline can override the

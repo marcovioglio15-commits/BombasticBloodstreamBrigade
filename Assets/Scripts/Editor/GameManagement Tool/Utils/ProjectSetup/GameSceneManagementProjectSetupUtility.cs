@@ -17,14 +17,14 @@ public static class GameSceneManagementProjectSetupUtility
     #region Constants
     public const string BootstrapSceneId = "SCN_Bootstrap";
     public const string MainMenuSceneId = "SCN_MainMenu";
-    public const string GameplaySceneId = "SCN_PlayerControllerTesting";
-    public const string GameplayUiSceneId = "SCN_PlayerControllerTesting_UI";
+    public const string GameplaySceneId = "SCN_MainScene";
+    public const string GameplayUiSceneId = "SCN_MainScene_UI";
     public const string PersistentPlayerSceneId = "SCN_PlayerPersistent";
     public const string BootstrapScenePath = "Assets/Scenes/Testing/Main Scenes/Bootstrap/SCN_Bootstrap.unity";
     public const string MainMenuScenePath = "Assets/Scenes/Testing/Main Scenes/UI/SCN_MainMenu.unity";
-    public const string GameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting.unity";
-    public const string GameplayUiScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SCN_PlayerControllerTesting_UI.unity";
-    public const string PersistentPlayerScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_PlayerControllerTesting/SUB_Player.unity";
+    public const string GameplayScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity";
+    public const string GameplayUiScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene_UI.unity";
+    public const string PersistentPlayerScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SUB_Player.unity";
 
     private const string DefaultMasterPresetPath = "Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset";
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
