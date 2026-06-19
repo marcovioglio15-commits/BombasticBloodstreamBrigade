@@ -649,7 +649,7 @@ MonoBehaviour:
   SharedLibraryTimeSinceStart: 0
   CurrentVersion: 131859
   HideSetupWizard: 1
-  LastEventReferenceScanVersion: 131858
+  LastEventReferenceScanVersion: 131859
   Platforms:
   - {fileID: -8253885914300135808}
   - {fileID: -8080145573522238432}
