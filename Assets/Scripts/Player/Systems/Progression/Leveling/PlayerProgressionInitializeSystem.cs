@@ -92,9 +92,6 @@ public partial struct PlayerProgressionInitializeSystem : ISystem
             return;
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
-        DynamicBuffer<GameAudioEventRequest> audioRequests = default;
-        bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
-
         if (hasMissingHealth)
             AddMissingHealth(ref commandBuffer);
 
@@ -115,9 +112,6 @@ public partial struct PlayerProgressionInitializeSystem : ISystem
 
         if (hasMissingScalableStatsBuffer)
             AddMissingScalableStatsBuffer(ref commandBuffer);
-
-        if (hasMissingHealth && canEnqueueAudioRequests)
-            GameAudioEventRequestUtility.EnqueueGlobal(audioRequests, GameAudioEventId.PlayerSpawn);
 
         commandBuffer.Playback(state.EntityManager);
         commandBuffer.Dispose();
@@ -149,6 +143,7 @@ public partial struct PlayerProgressionInitializeSystem : ISystem
                 Current = maxHealth,
                 Max = maxHealth
             });
+            commandBuffer.AddComponent<PlayerSpawnAudioPending>(entity);
         }
 
         entities.Dispose();

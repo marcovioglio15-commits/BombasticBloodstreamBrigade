@@ -1,6 +1,6 @@
 using UnityEngine;
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
 using FMOD;
 using FMOD.Studio;
 using FMODUnity;
@@ -25,7 +25,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
     #endregion
 
     #region Fields
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     private static readonly EventInstance[] previewInstances = new EventInstance[PreviewVoiceCapacity];
     private static readonly bool[] previewInstanceValid = new bool[PreviewVoiceCapacity];
     private static readonly string[] previewInstancePaths = new string[PreviewVoiceCapacity];
@@ -68,7 +68,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
             return;
         }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         RESULT result = RuntimeManager.StudioSystem.getBus(busPath, out Bus bus);
 
         if (result != RESULT.OK)
@@ -115,7 +115,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
             return;
         }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         BeginDesired();
         AddDesired(eventPath, bankName, volume);
         ReconcilePreviewVoices(logWarnings);
@@ -143,7 +143,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
                                          float secondVolume,
                                          bool logWarnings)
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         BeginDesired();
         AddDesired(firstEventPath, firstBankName, firstVolume);
         AddDesired(secondEventPath, secondBankName, secondVolume);
@@ -169,7 +169,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
     /// <param name="unscaledDeltaTime">Unscaled time elapsed since the previous tick.</param>
     public static void TickPreviewFades(float unscaledDeltaTime)
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         if (unscaledDeltaTime <= 0f)
             return;
 
@@ -205,7 +205,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
     /// </summary>
     public static void StopPreviewEvent()
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         for (int voiceIndex = 0; voiceIndex < PreviewVoiceCapacity; voiceIndex++)
             BeginVoiceFadeOut(voiceIndex);
 #endif
@@ -217,7 +217,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
     /// </summary>
     public static void StopPreviewImmediate()
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         for (int voiceIndex = 0; voiceIndex < PreviewVoiceCapacity; voiceIndex++)
             ReleaseVoiceImmediate(voiceIndex);
 #endif
@@ -225,7 +225,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
     #endregion
 
     #region Private Methods
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     /// <summary>
     /// Resets the reusable desired-voice buffer before a new preview request is described.
     /// </summary>
@@ -390,6 +390,8 @@ public static class GameAudioSettingsFmodRuntimeUtility
         float targetVolume = Mathf.Max(0f, volume);
         float fadeGain = fadeIn && previewFadeInSeconds > MinFadeSeconds ? 0f : 1f;
         float startVolume = targetVolume * fadeGain;
+        ATTRIBUTES_3D attributes = GameAudioFmodAttributesRuntimeUtility.ResolveListenerCenteredAttributes(Time.unscaledTime);
+        instance.set3DAttributes(attributes);
         instance.setVolume(startVolume);
         result = instance.start();
 
@@ -576,7 +578,7 @@ public static class GameAudioSettingsFmodRuntimeUtility
             return;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        UnityEngine.Debug.Log("[GameAudioSettings] FMOD backend is disabled. Define NASHCORE_FMOD after installing FMOD Unity integration to control: " + target);
+        UnityEngine.Debug.Log("[GameAudioSettings] FMOD backend is disabled. Define NASHCORE_FMOD for player builds after installing FMOD Unity integration to control: " + target);
 #endif
     }
 

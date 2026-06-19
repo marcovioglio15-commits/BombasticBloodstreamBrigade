@@ -286,7 +286,22 @@ MonoBehaviour:
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_DeathCry_01
     volume: 5
     pitch: 1
-    spatialize: 0
+    spatialize: 1
+    minimumDistance: 1
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1
+  - eventId: 26
+    eventCode: MC_SFX_Misc_DeathJingle
+    displayName: Player Death Jingle
+    description: Requested on the first active frame of the player death animation.
+    eventPath: event:/SFX/Weapon/NASH_SfxMC_SFX_Misc_DeatJIngle
+    volume: 1
+    pitch: 1
+    spatialize: 1
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0
@@ -301,7 +316,7 @@ MonoBehaviour:
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Spawn
     volume: 5
     pitch: 1
-    spatialize: 0
+    spatialize: 1
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0
@@ -404,10 +419,10 @@ MonoBehaviour:
     eventCode: MISC_SFX_Explosion_Enemy
     displayName: Enemy Explosion
     description: Reserved for exploding enemy payloads once authored.
-    eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_004
+    eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_001
     volume: 1
     pitch: 1
-    spatialize: 0
+    spatialize: 1
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0

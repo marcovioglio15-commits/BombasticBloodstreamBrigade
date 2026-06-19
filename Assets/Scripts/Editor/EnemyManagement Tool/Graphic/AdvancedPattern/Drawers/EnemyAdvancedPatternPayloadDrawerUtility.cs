@@ -74,6 +74,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         SerializedProperty complessiveExperienceDropMaximumProperty = experienceProperty.FindPropertyRelative("complessiveExperienceDropMaximum");
         SerializedProperty dropsDistributionProperty = experienceProperty.FindPropertyRelative("dropsDistribution");
         SerializedProperty dropRadiusProperty = experienceProperty.FindPropertyRelative("dropRadius");
+        SerializedProperty groundHeightOffsetProperty = experienceProperty.FindPropertyRelative("groundHeightOffset");
         SerializedProperty collectionMovementProperty = experienceProperty.FindPropertyRelative("collectionMovement");
 
         if (dropDefinitionsProperty == null ||
@@ -81,6 +82,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             complessiveExperienceDropMaximumProperty == null ||
             dropsDistributionProperty == null ||
             dropRadiusProperty == null ||
+            groundHeightOffsetProperty == null ||
             collectionMovementProperty == null)
         {
             HelpBox missingExperienceFieldsBox = new HelpBox("Experience drop settings are missing.", HelpBoxMessageType.Warning);
@@ -96,6 +98,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, complessiveExperienceDropMaximumProperty, "Complessive Experience Drop Max");
         EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, dropsDistributionProperty, "Drops Distribution");
         EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, dropRadiusProperty, "Drop Radius");
+        EnemyAdvancedPatternDrawerUtility.AddField(experienceFoldout, groundHeightOffsetProperty, "Ground Height Offset");
 
         Foldout collectionMovementFoldout = CreatePayloadFoldout(collectionMovementProperty, "Collection Movement", "CollectionMovement");
         experienceFoldout.Add(collectionMovementFoldout);
@@ -109,12 +112,19 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         distributionWarningBox.style.marginTop = 4f;
         experienceFoldout.Add(distributionWarningBox);
 
+        HelpBox spawnGeometryWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        spawnGeometryWarningBox.style.marginTop = 4f;
+        experienceFoldout.Add(spawnGeometryWarningBox);
+
         bool isUpdatingDropItemsWarning = false;
+        bool isUpdatingSpawnGeometryWarning = false;
         RefreshDropItemsRangeWarning();
+        RefreshDropItemsSpawnGeometryWarning();
 
         experienceFoldout.RegisterCallback<SerializedPropertyChangeEvent>(changedEvent =>
         {
             RefreshDropItemsRangeWarning();
+            RefreshDropItemsSpawnGeometryWarning();
         });
 
         payloadContainer.TrackPropertyValue(complessiveExperienceDropMinimumProperty, changedProperty =>
@@ -128,6 +138,14 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
         payloadContainer.TrackPropertyValue(dropsDistributionProperty, changedProperty =>
         {
             RefreshDropItemsRangeWarning();
+        });
+        payloadContainer.TrackPropertyValue(dropRadiusProperty, changedProperty =>
+        {
+            RefreshDropItemsSpawnGeometryWarning();
+        });
+        payloadContainer.TrackPropertyValue(groundHeightOffsetProperty, changedProperty =>
+        {
+            RefreshDropItemsSpawnGeometryWarning();
         });
 
         Foldout extraComboPointsFoldout = CreatePayloadFoldout(extraComboPointsProperty, "Extra Combo Points", "ExtraComboPoints");
@@ -184,6 +202,7 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
             payloadContainer.TrackSerializedObjectValue(payloadDataProperty.serializedObject, changedObject =>
             {
                 RefreshDropItemsRangeWarning();
+                RefreshDropItemsSpawnGeometryWarning();
                 EnemyAdvancedPatternPayloadVisibilityUtility.RefreshExtraComboPointsWarning(extraComboPointsProperty, extraComboPointsWarningBox);
             });
         }
@@ -220,6 +239,19 @@ internal static class EnemyAdvancedPatternPayloadDrawerUtility
                                                                                                   dropsDistributionProperty,
                                                                                                   distributionWarningBox);
             isUpdatingDropItemsWarning = false;
+        }
+
+        void RefreshDropItemsSpawnGeometryWarning()
+        {
+            if (isUpdatingSpawnGeometryWarning)
+                return;
+
+            isUpdatingSpawnGeometryWarning = true;
+            EnemyDropItemsSpawnGeometryWarningUtility.Refresh(dropRadiusProperty,
+                                                              groundHeightOffsetProperty,
+                                                              "Experience",
+                                                              spawnGeometryWarningBox);
+            isUpdatingSpawnGeometryWarning = false;
         }
     }
 

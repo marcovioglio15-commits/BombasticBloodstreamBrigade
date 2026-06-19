@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
 using FMODUnity;
 #endif
 
@@ -31,7 +31,7 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
     #endregion
 
     #region Runtime
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     private StudioListener bootstrapStudioListener;
 #endif
     #endregion
@@ -112,7 +112,7 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
         if (bootstrapAudioListener != null)
             bootstrapAudioListener.enabled = shouldEnableFallback;
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         RefreshFmodListenerState(externalCamera);
 #endif
     }
@@ -221,7 +221,7 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
         return cameraData.renderType == CameraRenderType.Base;
     }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     /// <summary>
     /// Keeps an FMOD listener on the active render camera, falling back to the bootstrap camera while loading.
     /// </summary>

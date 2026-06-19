@@ -50,6 +50,7 @@ public struct EnemyExperienceDropModuleElement : IBufferElementData
     public float MaximumTotalExperienceDrop;
     public float Distribution;
     public float DropRadius;
+    public float GroundHeightOffset;
     public float AttractionSpeed;
     public float CollectDistance;
     public float CollectDistancePerPlayerSpeed;
@@ -78,6 +79,7 @@ public struct EnemyRecoveryDropModuleElement : IBufferElementData
 {
     public float DropChance;
     public float DropRadius;
+    public float GroundHeightOffset;
     public float AttractionSpeed;
     public float CollectDistance;
     public float CollectDistancePerPlayerSpeed;

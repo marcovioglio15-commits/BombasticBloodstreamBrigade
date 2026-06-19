@@ -38,6 +38,9 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
         ComponentLookup<PlayerControllerConfig> playerControllerLookup = SystemAPI.GetComponentLookup<PlayerControllerConfig>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
+        ComponentLookup<PlayerProjectileDeathVfxConfig> playerProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
+        ComponentLookup<EnemyProjectileDeathVfxConfig> enemyProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyProjectileDeathVfxConfig>(true);
         BufferLookup<ProjectilePoolElement> projectilePoolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         BufferLookup<PlayerOrbitalProjectionLostElement> lostProjectionLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionLostElement>(false);
@@ -83,6 +86,14 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                         continue;
                     }
 
+                    ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.RangeOrLifetime,
+                                                                projectileEntity,
+                                                                shooterEntity,
+                                                                in projectileTransform.ValueRO,
+                                                                in projectileContactStateLookup,
+                                                                in playerProjectileDeathVfxConfigLookup,
+                                                                in enemyProjectileDeathVfxConfigLookup,
+                                                                ref vfxRequestLookup);
                     DespawnProjectile(entityManager,
                                       projectileEntity,
                                       shooterEntity,

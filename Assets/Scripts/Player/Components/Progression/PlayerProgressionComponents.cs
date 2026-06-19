@@ -55,6 +55,13 @@ public struct PlayerExperienceCollection : IComponentData
 }
 
 /// <summary>
+/// Marks a newly initialized player whose spawn audio must wait for scene transition loading to finish.
+/// </summary>
+public struct PlayerSpawnAudioPending : IComponentData
+{
+}
+
+/// <summary>
 /// Stores one runtime scalable stat value keyed by name.
 /// </summary>
 [InternalBufferCapacity(0)]

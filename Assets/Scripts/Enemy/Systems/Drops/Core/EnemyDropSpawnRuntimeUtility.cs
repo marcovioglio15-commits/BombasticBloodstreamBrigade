@@ -52,6 +52,22 @@ internal static class EnemyDropSpawnRuntimeUtility
 
     #region Spawn Geometry
     /// <summary>
+    /// Applies the authored vertical ground-height offset to the killed enemy position used as the pickup spawn center.
+    /// </summary>
+    /// <param name="deathEventPosition">Killed enemy position emitted by the death-event system.</param>
+    /// <param name="groundHeightOffset">Vertical offset in world units applied before radial spread.</param>
+    /// <returns>Adjusted spawn center position, or the original position when the offset is not finite.</returns>
+    public static float3 ResolveDropGroundAdjustedPosition(float3 deathEventPosition, float groundHeightOffset)
+    {
+        if (!IsFinite(groundHeightOffset))
+            return deathEventPosition;
+
+        float3 adjustedPosition = deathEventPosition;
+        adjustedPosition.y += groundHeightOffset;
+        return adjustedPosition;
+    }
+
+    /// <summary>
     /// Resolves a deterministic radial spawn target around the killed enemy without allocating RNG state.
     /// </summary>
     /// <param name="centerPosition">Killed enemy position used as the spread center.</param>

@@ -53,6 +53,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(true);
+        DynamicBuffer<GameAudioEventRequest> audioRequests = default;
+        bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
         foreach ((RefRO<PlayerDeathAnimationConfig> deathConfig,
                   RefRW<PlayerDeathAnimationState> deathState,
@@ -79,6 +81,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
                              entityManager,
                              ref commandBuffer,
                              playerEntity,
+                             audioRequests,
+                             canEnqueueAudioRequests,
                              in deathConfig.ValueRO,
                              ref deathState.ValueRW,
                              in runOutcomeState.ValueRO,
@@ -105,6 +109,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
     /// <param name="entityManager">Entity manager used for the optional managed despawn VFX and projection visibility.</param>
     /// <param name="commandBuffer">Command buffer receiving orbital projection visibility changes.</param>
     /// <param name="playerEntity">Player entity owning the dying state.</param>
+    /// <param name="audioRequests">Optional shared audio request buffer used to play the death jingle.</param>
+    /// <param name="canEnqueueAudioRequests">True when the audio request buffer is available this frame.</param>
     /// <param name="deathConfig">Resolved death animation config baked from the visual preset.</param>
     /// <param name="deathState">Mutable animation state for feedback-safe layering and one-shot tracking.</param>
     /// <param name="runOutcomeState">Current run outcome state used to detect dying vs. finalized vs. idle.</param>
@@ -115,6 +121,8 @@ public partial struct PlayerDeathAnimationSystem : ISystem
                                           EntityManager entityManager,
                                           ref EntityCommandBuffer commandBuffer,
                                           Entity playerEntity,
+                                          DynamicBuffer<GameAudioEventRequest> audioRequests,
+                                          bool canEnqueueAudioRequests,
                                           in PlayerDeathAnimationConfig deathConfig,
                                           ref PlayerDeathAnimationState deathState,
                                           in PlayerRunOutcomeState runOutcomeState,
@@ -161,6 +169,9 @@ public partial struct PlayerDeathAnimationSystem : ISystem
             deathState.Active = 1;
             deathState.VfxSpawned = 0;
             deathState.VisualBridgeHidden = 0;
+
+            if (canEnqueueAudioRequests)
+                GameAudioEventRequestUtility.EnqueueGlobal(audioRequests, GameAudioEventId.PlayerDeathJingle);
         }
 
         float playbackDuration = math.max(MinimumDurationSeconds, deathConfig.PlaybackDurationSeconds);

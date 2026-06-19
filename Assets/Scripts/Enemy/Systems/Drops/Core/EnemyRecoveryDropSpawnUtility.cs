@@ -131,6 +131,7 @@ internal static class EnemyRecoveryDropSpawnUtility
         }
 
         float dropRadius = math.max(0f, recoveryModule.DropRadius);
+        float groundHeightOffset = recoveryModule.GroundHeightOffset;
         float attractionSpeed = math.max(0f, recoveryModule.AttractionSpeed);
         float collectDistance = math.max(0.01f, recoveryModule.CollectDistance);
         float collectDistancePerPlayerSpeed = math.max(0f, recoveryModule.CollectDistancePerPlayerSpeed);
@@ -139,6 +140,8 @@ internal static class EnemyRecoveryDropSpawnUtility
         int definitionStartIndex = math.max(0, recoveryModule.DefinitionStartIndex);
         int definitionEndIndex = math.min(definitions.Length, definitionStartIndex + definitionCount);
         int spawnedDropIndex = 0;
+        float3 spawnCenterPosition = EnemyDropSpawnRuntimeUtility.ResolveDropGroundAdjustedPosition(killedEvent.Position,
+                                                                                                    groundHeightOffset);
 
         for (int definitionIndex = definitionStartIndex; definitionIndex < definitionEndIndex; definitionIndex++)
         {
@@ -184,7 +187,7 @@ internal static class EnemyRecoveryDropSpawnUtility
                                      dropEntity,
                                      poolEntity,
                                      in definition,
-                                     killedEvent.Position,
+                                     spawnCenterPosition,
                                      moduleIndex,
                                      spawnedDropIndex,
                                      dropRadius,
@@ -206,7 +209,7 @@ internal static class EnemyRecoveryDropSpawnUtility
     /// <param name="dropEntity">Pooled drop entity being activated.</param>
     /// <param name="poolEntity">Pool entity that owns the drop.</param>
     /// <param name="definition">Recovery definition payload selected for this pickup.</param>
-    /// <param name="spawnCenterPosition">Killed enemy position used as the initial drop position.</param>
+    /// <param name="spawnCenterPosition">Ground-adjusted killed enemy position used as the initial drop position.</param>
     /// <param name="moduleIndex">Recovery module index used for deterministic spawn spread.</param>
     /// <param name="dropIndex">Pickup index inside the module.</param>
     /// <param name="dropRadius">Maximum radial spread distance.</param>

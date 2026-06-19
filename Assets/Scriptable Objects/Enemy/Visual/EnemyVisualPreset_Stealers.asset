@@ -147,7 +147,7 @@ MonoBehaviour:
     fixedWorldSize: {x: 1, y: 1}
     randomSizeVariation: 0.12
     randomRotation: 1
-    groundOffset: 0.012
+    groundOffset: -0.1
     edgeIrregularity: 1
     borderWidth: 0.1
     edgeFeather: 0.04

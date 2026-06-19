@@ -1,37 +1,25 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
 using FMOD;
 using FMOD.Studio;
 using FMODUnity;
 #endif
 
 /// <summary>
-/// Dispatches runtime audio events through FMOD when the NASHCORE_FMOD scripting define is enabled.
+/// Dispatches runtime audio events through FMOD in player builds when the NASHCORE_FMOD scripting define is enabled,
+/// and in the Unity Editor when the FMOD integration is present.
 /// </summary>
 public static class GameAudioFmodRuntimeUtility
 {
-    #region Constants
-#if NASHCORE_FMOD
-    private const float BackgroundMusicListenerResolveRetryIntervalSeconds = 0.5f;
-#endif
-    #endregion
-
     #region Fields
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     private static EventInstance backgroundMusicInstance;
     private static bool backgroundMusicInstanceValid;
     private static bool backgroundMusicBankLoaded;
     private static string loadedBackgroundMusicBankName;
     private static string lastBackgroundMusicDiagnosticKey;
-    private static Transform cachedBackgroundMusicListenerTransform;
-    private static float nextBackgroundMusicListenerResolveTime;
-    // Per-event-id last active instance used by single-instance bindings to steal the previous voice when a
-    // new request arrives, instead of accumulating overlapping FMOD instances for fast-cadence ticks.
-    private static readonly EventInstance[] singleInstanceByEventId = new EventInstance[byte.MaxValue + 1];
-    private static readonly bool[] singleInstanceValidByEventId = new bool[byte.MaxValue + 1];
-    private static readonly string[] singleInstanceEventPathByEventId = new string[byte.MaxValue + 1];
 #endif
     private static string backgroundMusicEventPath;
     private static string backgroundMusicBankName;
@@ -74,13 +62,15 @@ public static class GameAudioFmodRuntimeUtility
             return;
         }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         // Single-instance bindings stop and release the previous still-playing instance before creating the
         // new one so the perceived audio stays as one continuous voice instead of stacking copies of the clip.
         if (singleInstance)
-            StopTrackedSingleInstance(eventId);
+            GameAudioFmodSingleInstanceRuntimeUtility.StopTrackedSingleInstance(eventId);
 
         EventInstance instance = RuntimeManager.CreateInstance(eventPath);
+        ATTRIBUTES_3D attributes = GameAudioFmodAttributesRuntimeUtility.ResolveOneShotAttributes(position, hasPosition);
+        instance.set3DAttributes(attributes);
         instance.setVolume(Mathf.Max(0f, volume));
         instance.setPitch(Mathf.Max(0.0001f, pitch));
 
@@ -89,9 +79,6 @@ public static class GameAudioFmodRuntimeUtility
             // Override the authored 3D attenuation bounds so the Audio Manager preset drives near/far balance
             // consistently across every spatialized event, instead of inheriting tight FMOD-authored curves.
             ApplyAttenuationDistances(ref instance, minimumDistance, maximumDistance);
-            Vector3 unityPosition = new Vector3(position.x, position.y, position.z);
-            ATTRIBUTES_3D attributes = RuntimeUtils.To3DAttributes(unityPosition);
-            instance.set3DAttributes(attributes);
         }
 
         instance.start();
@@ -100,7 +87,7 @@ public static class GameAudioFmodRuntimeUtility
         {
             // Keep the handle alive for the next steal request; release happens when the next single-instance
             // request lands or when the instance finishes naturally and FMOD invalidates the handle.
-            StoreTrackedSingleInstance(eventId, instance, eventPath);
+            GameAudioFmodSingleInstanceRuntimeUtility.StoreTrackedSingleInstance(eventId, instance, eventPath);
         }
         else
         {
@@ -145,7 +132,7 @@ public static class GameAudioFmodRuntimeUtility
             return;
         }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         bool pathChanged = !string.Equals(backgroundMusicEventPath, eventPath, System.StringComparison.Ordinal);
         bool bankChanged = !string.Equals(backgroundMusicBankName, bankName, System.StringComparison.Ordinal);
 
@@ -169,7 +156,7 @@ public static class GameAudioFmodRuntimeUtility
     /// </summary>
     public static void StopBackgroundMusic()
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         StopBackgroundMusic(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
 #else
         ClearBackgroundMusicState();
@@ -181,7 +168,7 @@ public static class GameAudioFmodRuntimeUtility
     /// </summary>
     public static void StopBackgroundMusicImmediate()
     {
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         StopBackgroundMusic(FMOD.Studio.STOP_MODE.IMMEDIATE);
 #else
         ClearBackgroundMusicState();
@@ -201,7 +188,7 @@ public static class GameAudioFmodRuntimeUtility
         if (!string.Equals(backgroundMusicEventPath, eventPath, System.StringComparison.Ordinal))
             return false;
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
         if (!backgroundMusicInstanceValid || !backgroundMusicInstance.isValid())
             return false;
 
@@ -226,8 +213,8 @@ public static class GameAudioFmodRuntimeUtility
         if (IsBackgroundMusicEventActive(eventPath))
             return true;
 
-#if NASHCORE_FMOD
-        return IsTrackedSingleInstanceEventPathActive(eventPath);
+#if NASHCORE_FMOD || UNITY_EDITOR
+        return GameAudioFmodSingleInstanceRuntimeUtility.IsTrackedSingleInstanceEventPathActive(eventPath);
 #else
         return false;
 #endif
@@ -240,8 +227,8 @@ public static class GameAudioFmodRuntimeUtility
     /// <param name="eventId">Gameplay event id whose tracked voice should be stopped.</param>
     public static void StopTrackedSingleInstanceById(GameAudioEventId eventId)
     {
-#if NASHCORE_FMOD
-        StopTrackedSingleInstance(eventId);
+#if NASHCORE_FMOD || UNITY_EDITOR
+        GameAudioFmodSingleInstanceRuntimeUtility.StopTrackedSingleInstance(eventId);
 #endif
     }
 
@@ -251,104 +238,14 @@ public static class GameAudioFmodRuntimeUtility
     /// </summary>
     public static void StopAllTrackedSingleInstances()
     {
-#if NASHCORE_FMOD
-        for (int eventIndex = 0; eventIndex < singleInstanceValidByEventId.Length; eventIndex++)
-        {
-            if (!singleInstanceValidByEventId[eventIndex])
-                continue;
-
-            EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
-            singleInstanceValidByEventId[eventIndex] = false;
-            singleInstanceByEventId[eventIndex] = default;
-            singleInstanceEventPathByEventId[eventIndex] = string.Empty;
-
-            if (!trackedInstance.isValid())
-                continue;
-
-            trackedInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-            trackedInstance.release();
-        }
+#if NASHCORE_FMOD || UNITY_EDITOR
+        GameAudioFmodSingleInstanceRuntimeUtility.StopAllTrackedSingleInstances();
 #endif
     }
     #endregion
 
     #region Private Methods
-#if NASHCORE_FMOD
-    /// <summary>
-    /// Stops and releases the previously tracked single-instance voice for one gameplay event id, so a fresh
-    /// request can take over without overlapping the existing playback. Safe to call when no instance was ever
-    /// stored or when the previous one has already been invalidated by FMOD.
-    /// </summary>
-    /// <param name="eventId">Gameplay event id whose tracked instance should be stolen.</param>
-    private static void StopTrackedSingleInstance(GameAudioEventId eventId)
-    {
-        int eventIndex = (byte)eventId;
-
-        if (!singleInstanceValidByEventId[eventIndex])
-            return;
-
-        EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
-        singleInstanceValidByEventId[eventIndex] = false;
-        singleInstanceByEventId[eventIndex] = default;
-        singleInstanceEventPathByEventId[eventIndex] = string.Empty;
-
-        if (!trackedInstance.isValid())
-            return;
-
-        trackedInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-        trackedInstance.release();
-    }
-
-    /// <summary>
-    /// Stores the freshly started instance so the next single-instance request for the same gameplay event id
-    /// can steal it. Replaces any stale handle from a previous request without leaking it.
-    /// </summary>
-    /// <param name="eventId">Gameplay event id keyed into the tracking store.</param>
-    /// <param name="instance">Newly started FMOD instance to track.</param>
-    /// <param name="eventPath">FMOD event path represented by the tracked instance.</param>
-    private static void StoreTrackedSingleInstance(GameAudioEventId eventId, EventInstance instance, string eventPath)
-    {
-        int eventIndex = (byte)eventId;
-        singleInstanceByEventId[eventIndex] = instance;
-        singleInstanceValidByEventId[eventIndex] = true;
-        singleInstanceEventPathByEventId[eventIndex] = eventPath ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Checks tracked single-instance gameplay voices for one active FMOD event path.
-    /// </summary>
-    /// <param name="eventPath">FMOD event path to search.</param>
-    /// <returns>True when a still-playing tracked gameplay instance uses the requested path.</returns>
-    private static bool IsTrackedSingleInstanceEventPathActive(string eventPath)
-    {
-        if (string.IsNullOrWhiteSpace(eventPath))
-            return false;
-
-        for (int eventIndex = 0; eventIndex < singleInstanceValidByEventId.Length; eventIndex++)
-        {
-            if (!singleInstanceValidByEventId[eventIndex])
-                continue;
-
-            if (!string.Equals(singleInstanceEventPathByEventId[eventIndex], eventPath, System.StringComparison.Ordinal))
-                continue;
-
-            EventInstance trackedInstance = singleInstanceByEventId[eventIndex];
-
-            if (!trackedInstance.isValid())
-                continue;
-
-            RESULT result = trackedInstance.getPlaybackState(out PLAYBACK_STATE playbackState);
-
-            if (result != RESULT.OK)
-                continue;
-
-            if (playbackState != PLAYBACK_STATE.STOPPED && playbackState != PLAYBACK_STATE.STOPPING)
-                return true;
-        }
-
-        return false;
-    }
-
+#if NASHCORE_FMOD || UNITY_EDITOR
     /// <summary>
     /// Applies the resolved minimum and maximum attenuation distances to one FMOD event instance, keeping the
     /// authored curve shape but rescaling the near and far bounds to match the Audio Manager preset.
@@ -386,8 +283,7 @@ public static class GameAudioFmodRuntimeUtility
         backgroundMusicInstance.release();
         backgroundMusicInstance = default;
         backgroundMusicInstanceValid = false;
-        cachedBackgroundMusicListenerTransform = null;
-        nextBackgroundMusicListenerResolveTime = 0f;
+        GameAudioFmodAttributesRuntimeUtility.ClearCachedListener();
         ClearBackgroundMusicState();
     }
 #endif
@@ -426,11 +322,11 @@ public static class GameAudioFmodRuntimeUtility
             return;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        UnityEngine.Debug.Log("[GameAudio] FMOD backend is disabled. Define NASHCORE_FMOD after installing FMOD Unity integration to play: " + eventPath);
+        UnityEngine.Debug.Log("[GameAudio] FMOD backend is disabled. Define NASHCORE_FMOD for player builds after installing FMOD Unity integration to play: " + eventPath);
 #endif
     }
 
-#if NASHCORE_FMOD
+#if NASHCORE_FMOD || UNITY_EDITOR
     /// <summary>
     /// Creates and starts the background music instance.
     /// </summary>
@@ -530,64 +426,11 @@ public static class GameAudioFmodRuntimeUtility
         if (!backgroundMusicInstance.isValid())
             return;
 
-        Transform listenerTransform = ResolveBackgroundMusicListenerTransform(Time.unscaledTime);
-        Vector3 listenerPosition = listenerTransform != null
-            ? listenerTransform.position
-            : Vector3.zero;
-        ATTRIBUTES_3D attributes = RuntimeUtils.To3DAttributes(listenerPosition);
+        ATTRIBUTES_3D attributes = GameAudioFmodAttributesRuntimeUtility.ResolveListenerCenteredAttributes(Time.unscaledTime);
         RESULT result = backgroundMusicInstance.set3DAttributes(attributes);
 
         if (result != RESULT.OK)
             LogMusicFmodResultWarning("sync listener anchor", eventPath, result, shouldLog);
-    }
-
-    /// <summary>
-    /// Resolves and caches the transform currently acting as FMOD listener for music anchoring.
-    /// </summary>
-    /// <param name="elapsedTime">Current unscaled Unity time used to rate-limit scene scans.</param>
-    /// <returns>Active listener or camera transform, or null when none is available yet.</returns>
-    private static Transform ResolveBackgroundMusicListenerTransform(float elapsedTime)
-    {
-        if (cachedBackgroundMusicListenerTransform != null)
-            return cachedBackgroundMusicListenerTransform;
-
-        if (elapsedTime < nextBackgroundMusicListenerResolveTime)
-            return null;
-
-        nextBackgroundMusicListenerResolveTime = elapsedTime + BackgroundMusicListenerResolveRetryIntervalSeconds;
-        StudioListener studioListener = Object.FindFirstObjectByType<StudioListener>(FindObjectsInactive.Exclude);
-
-        if (studioListener != null)
-        {
-            cachedBackgroundMusicListenerTransform = studioListener.transform;
-            return cachedBackgroundMusicListenerTransform;
-        }
-
-        Camera mainCamera = Camera.main;
-
-        if (mainCamera != null)
-        {
-            cachedBackgroundMusicListenerTransform = mainCamera.transform;
-            return cachedBackgroundMusicListenerTransform;
-        }
-
-        Camera[] allCameras = Camera.allCameras;
-
-        for (int cameraIndex = 0; cameraIndex < allCameras.Length; cameraIndex++)
-        {
-            Camera candidateCamera = allCameras[cameraIndex];
-
-            if (candidateCamera == null)
-                continue;
-
-            if (!candidateCamera.isActiveAndEnabled)
-                continue;
-
-            cachedBackgroundMusicListenerTransform = candidateCamera.transform;
-            return cachedBackgroundMusicListenerTransform;
-        }
-
-        return null;
     }
 
     /// <summary>
@@ -715,7 +558,7 @@ public static class GameAudioFmodRuntimeUtility
         lastDisabledBackendMusicLogPath = eventPath;
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        UnityEngine.Debug.Log("[GameAudio] FMOD backend is disabled. Define NASHCORE_FMOD after installing FMOD Unity integration to play background music: " + eventPath);
+        UnityEngine.Debug.Log("[GameAudio] FMOD backend is disabled. Define NASHCORE_FMOD for player builds after installing FMOD Unity integration to play background music: " + eventPath);
 #endif
     }
     #endregion

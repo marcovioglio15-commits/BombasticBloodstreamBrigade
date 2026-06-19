@@ -190,6 +190,7 @@ internal static class EnemyBossDropExtractionBakeUtility
                 MaximumTotalExperienceDrop = math.max(math.max(0f, compiledModule.MinimumTotalExperienceDrop), compiledModule.MaximumTotalExperienceDrop),
                 Distribution = math.clamp(compiledModule.Distribution, 0f, 1f),
                 DropRadius = math.max(0f, compiledModule.DropRadius),
+                GroundHeightOffset = EnemyDropItemsBakeUtility.ResolveGroundHeightOffset(compiledModule.GroundHeightOffset),
                 AttractionSpeed = math.max(0f, compiledModule.AttractionSpeed),
                 CollectDistance = math.max(0.01f, compiledModule.CollectDistance),
                 CollectDistancePerPlayerSpeed = math.max(0f, compiledModule.CollectDistancePerPlayerSpeed),
@@ -257,6 +258,7 @@ internal static class EnemyBossDropExtractionBakeUtility
             {
                 DropChance = math.clamp(compiledModule.DropChance, 0f, 1f),
                 DropRadius = math.max(0f, compiledModule.DropRadius),
+                GroundHeightOffset = EnemyDropItemsBakeUtility.ResolveGroundHeightOffset(compiledModule.GroundHeightOffset),
                 AttractionSpeed = math.max(0f, compiledModule.AttractionSpeed),
                 CollectDistance = math.max(0.01f, compiledModule.CollectDistance),
                 CollectDistancePerPlayerSpeed = math.max(0f, compiledModule.CollectDistancePerPlayerSpeed),

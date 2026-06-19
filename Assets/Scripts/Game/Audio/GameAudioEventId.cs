@@ -28,5 +28,6 @@ public enum GameAudioEventId : byte
     PlayerLaserImpact = 22,
     ExplosionBomb = 23,
     ExplosionPassive = 24,
-    ExplosionEnemy = 25
+    ExplosionEnemy = 25,
+    PlayerDeathJingle = 26
 }

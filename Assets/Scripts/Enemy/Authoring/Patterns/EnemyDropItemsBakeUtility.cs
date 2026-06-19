@@ -167,6 +167,19 @@ internal static class EnemyDropItemsBakeUtility
                 return EnemyDropItemsModuleCombineMode.AllModules;
         }
     }
+
+    /// <summary>
+    /// Resolves the vertical drop spawn offset while preserving authored signed values and rejecting non-finite input.
+    /// </summary>
+    /// <param name="groundHeightOffset">Authored vertical offset in world units.</param>
+    /// <returns>Authored offset when finite, otherwise the shared default offset.</returns>
+    public static float ResolveGroundHeightOffset(float groundHeightOffset)
+    {
+        if (!float.IsNaN(groundHeightOffset) && !float.IsInfinity(groundHeightOffset))
+            return groundHeightOffset;
+
+        return EnemyDropItemsSpawnSettingsDefaults.DefaultGroundHeightOffset;
+    }
     #endregion
 
     #region Private Methods
@@ -254,6 +267,7 @@ internal static class EnemyDropItemsBakeUtility
             MaximumTotalExperienceDrop = maximumTotalExperienceDrop,
             Distribution = math.clamp(experiencePayload.DropsDistribution, 0f, 1f),
             DropRadius = math.max(0f, experiencePayload.DropRadius),
+            GroundHeightOffset = ResolveGroundHeightOffset(experiencePayload.GroundHeightOffset),
             AttractionSpeed = collectionMovement != null ? math.max(0f, collectionMovement.MoveSpeed) : 0f,
             CollectDistance = collectionMovement != null ? math.max(0.01f, collectionMovement.CollectDistance) : 0.3f,
             CollectDistancePerPlayerSpeed = collectionMovement != null ? math.max(0f, collectionMovement.CollectDistancePerPlayerSpeed) : 0.05f,
@@ -332,6 +346,7 @@ internal static class EnemyDropItemsBakeUtility
         {
             DropChance = dropChance,
             DropRadius = math.max(0f, recoveryPayload.DropRadius),
+            GroundHeightOffset = ResolveGroundHeightOffset(recoveryPayload.GroundHeightOffset),
             AttractionSpeed = collectionMovement != null ? math.max(0f, collectionMovement.MoveSpeed) : 0f,
             CollectDistance = collectionMovement != null ? math.max(0.01f, collectionMovement.CollectDistance) : 0.3f,
             CollectDistancePerPlayerSpeed = collectionMovement != null ? math.max(0f, collectionMovement.CollectDistancePerPlayerSpeed) : 0.05f,
@@ -510,6 +525,7 @@ public struct EnemyCompiledExperienceDropModule
     public float MaximumTotalExperienceDrop;
     public float Distribution;
     public float DropRadius;
+    public float GroundHeightOffset;
     public float AttractionSpeed;
     public float CollectDistance;
     public float CollectDistancePerPlayerSpeed;
@@ -541,6 +557,7 @@ public struct EnemyCompiledRecoveryDropModule
     #region Fields
     public float DropChance;
     public float DropRadius;
+    public float GroundHeightOffset;
     public float AttractionSpeed;
     public float CollectDistance;
     public float CollectDistancePerPlayerSpeed;

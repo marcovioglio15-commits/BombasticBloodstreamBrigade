@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -24,11 +24,13 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
         SerializedProperty dropDefinitionsProperty = recoveryProperty.FindPropertyRelative("dropDefinitions");
         SerializedProperty dropChancePercentProperty = recoveryProperty.FindPropertyRelative("dropChancePercent");
         SerializedProperty dropRadiusProperty = recoveryProperty.FindPropertyRelative("dropRadius");
+        SerializedProperty groundHeightOffsetProperty = recoveryProperty.FindPropertyRelative("groundHeightOffset");
         SerializedProperty collectionMovementProperty = recoveryProperty.FindPropertyRelative("collectionMovement");
 
         if (dropDefinitionsProperty == null ||
             dropChancePercentProperty == null ||
             dropRadiusProperty == null ||
+            groundHeightOffsetProperty == null ||
             collectionMovementProperty == null)
         {
             recoveryFoldout.Add(new HelpBox("Recovery drop settings are missing.", HelpBoxMessageType.Warning));
@@ -38,13 +40,16 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
         AddRecoveryDefinitionSection(recoveryFoldout, dropDefinitionsProperty);
         AddRecoveryCoreFields(recoveryFoldout,
                               dropChancePercentProperty,
-                              dropRadiusProperty);
+                              dropRadiusProperty,
+                              groundHeightOffsetProperty);
         AddRecoveryMovementSection(recoveryFoldout, collectionMovementProperty);
         AddRecoveryWarningTracking(recoveryProperty,
                                    payloadContainer,
                                    recoveryFoldout,
                                    dropDefinitionsProperty,
-                                   dropChancePercentProperty);
+                                   dropChancePercentProperty,
+                                   dropRadiusProperty,
+                                   groundHeightOffsetProperty);
     }
     #endregion
 
@@ -70,12 +75,15 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// <param name="recoveryFoldout">Recovery root foldout.</param>
     /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
     /// <param name="dropRadiusProperty">Serialized spawn radius.</param>
+    /// <param name="groundHeightOffsetProperty">Serialized vertical spawn offset.</param>
     private static void AddRecoveryCoreFields(Foldout recoveryFoldout,
                                               SerializedProperty dropChancePercentProperty,
-                                              SerializedProperty dropRadiusProperty)
+                                              SerializedProperty dropRadiusProperty,
+                                              SerializedProperty groundHeightOffsetProperty)
     {
         EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, dropChancePercentProperty, "Drop Chance %");
         EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, dropRadiusProperty, "Drop Radius");
+        EnemyAdvancedPatternDrawerUtility.AddField(recoveryFoldout, groundHeightOffsetProperty, "Ground Height Offset");
     }
 
     /// <summary>
@@ -107,17 +115,23 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// <param name="recoveryFoldout">Recovery root foldout.</param>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
     /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
+    /// <param name="dropRadiusProperty">Serialized spawn radius.</param>
+    /// <param name="groundHeightOffsetProperty">Serialized vertical spawn offset.</param>
     private static void AddRecoveryWarningTracking(SerializedProperty recoveryProperty,
                                                    VisualElement payloadContainer,
                                                    Foldout recoveryFoldout,
                                                    SerializedProperty dropDefinitionsProperty,
-                                                   SerializedProperty dropChancePercentProperty)
+                                                   SerializedProperty dropChancePercentProperty,
+                                                   SerializedProperty dropRadiusProperty,
+                                                   SerializedProperty groundHeightOffsetProperty)
     {
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         warningBox.style.marginTop = 4f;
         recoveryFoldout.Add(warningBox);
         RefreshRecoveryDropWarnings(dropDefinitionsProperty,
                                     dropChancePercentProperty,
+                                    dropRadiusProperty,
+                                    groundHeightOffsetProperty,
                                     warningBox);
 
         if (payloadContainer == null)
@@ -126,6 +140,24 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
         payloadContainer.TrackPropertyValue(dropChancePercentProperty, changedProperty =>
         {
             RefreshRecoveryDropWarnings(dropDefinitionsProperty,
+                                        changedProperty,
+                                        dropRadiusProperty,
+                                        groundHeightOffsetProperty,
+                                        warningBox);
+        });
+        payloadContainer.TrackPropertyValue(dropRadiusProperty, changedProperty =>
+        {
+            RefreshRecoveryDropWarnings(dropDefinitionsProperty,
+                                        dropChancePercentProperty,
+                                        changedProperty,
+                                        groundHeightOffsetProperty,
+                                        warningBox);
+        });
+        payloadContainer.TrackPropertyValue(groundHeightOffsetProperty, changedProperty =>
+        {
+            RefreshRecoveryDropWarnings(dropDefinitionsProperty,
+                                        dropChancePercentProperty,
+                                        dropRadiusProperty,
                                         changedProperty,
                                         warningBox);
         });
@@ -136,6 +168,8 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
             {
                 RefreshRecoveryDropWarnings(dropDefinitionsProperty,
                                             dropChancePercentProperty,
+                                            dropRadiusProperty,
+                                            groundHeightOffsetProperty,
                                             warningBox);
             });
         }
@@ -146,16 +180,22 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// </summary>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
     /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
+    /// <param name="dropRadiusProperty">Serialized spawn radius.</param>
+    /// <param name="groundHeightOffsetProperty">Serialized vertical spawn offset.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
     private static void RefreshRecoveryDropWarnings(SerializedProperty dropDefinitionsProperty,
                                                     SerializedProperty dropChancePercentProperty,
+                                                    SerializedProperty dropRadiusProperty,
+                                                    SerializedProperty groundHeightOffsetProperty,
                                                     HelpBox warningBox)
     {
         if (warningBox == null)
             return;
 
         string warningText = ResolveRecoveryDropWarning(dropDefinitionsProperty,
-                                                        dropChancePercentProperty);
+                                                        dropChancePercentProperty,
+                                                        dropRadiusProperty,
+                                                        groundHeightOffsetProperty);
 
         if (string.IsNullOrEmpty(warningText))
         {
@@ -173,20 +213,31 @@ internal static class EnemyRecoveryDropPayloadDrawerUtility
     /// </summary>
     /// <param name="dropDefinitionsProperty">Serialized recovery definitions list.</param>
     /// <param name="dropChancePercentProperty">Serialized module chance percentage.</param>
+    /// <param name="dropRadiusProperty">Serialized spawn radius.</param>
+    /// <param name="groundHeightOffsetProperty">Serialized vertical spawn offset.</param>
     /// <returns>Warning text, or an empty string when the payload is coherent.</returns>
     private static string ResolveRecoveryDropWarning(SerializedProperty dropDefinitionsProperty,
-                                                     SerializedProperty dropChancePercentProperty)
+                                                     SerializedProperty dropChancePercentProperty,
+                                                     SerializedProperty dropRadiusProperty,
+                                                     SerializedProperty groundHeightOffsetProperty)
     {
+        List<string> warnings = new List<string>();
+
         if (dropChancePercentProperty != null && dropChancePercentProperty.floatValue < 0f)
-            return "Drop Chance % is below 0. Runtime treats it as 0%.";
+            warnings.Add("Drop Chance % is below 0. Runtime treats it as 0%.");
 
         if (dropChancePercentProperty != null && dropChancePercentProperty.floatValue > 100f)
-            return "Drop Chance % is above 100. Runtime treats it as 100%.";
+            warnings.Add("Drop Chance % is above 100. Runtime treats it as 100%.");
 
         if (!HasPositiveRecoveryDefinition(dropDefinitionsProperty))
-            return "No valid recovery drop definition is available: assign at least one entry with positive Drop Count and positive Health Restore Amount or Shield Restore Amount.";
+            warnings.Add("No valid recovery drop definition is available: assign at least one entry with positive Drop Count and positive Health Restore Amount or Shield Restore Amount.");
 
-        return string.Empty;
+        EnemyDropItemsSpawnGeometryWarningUtility.AppendWarnings(dropRadiusProperty,
+                                                                 groundHeightOffsetProperty,
+                                                                 "Recovery",
+                                                                 warnings);
+
+        return warnings.Count > 0 ? string.Join("\n", warnings) : string.Empty;
     }
 
     /// <summary>

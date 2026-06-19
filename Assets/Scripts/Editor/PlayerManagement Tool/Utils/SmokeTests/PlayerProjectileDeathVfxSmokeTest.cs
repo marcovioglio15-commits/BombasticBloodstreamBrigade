@@ -28,6 +28,7 @@ public static class PlayerProjectileDeathVfxSmokeTest
         ValidateAuthoringAndBakeScaling();
         ValidateRuntimeScalingRebuild();
         ValidateNaturalExpiryGating();
+        ValidateEnemyOrbitalProjectionBlockVfx();
         ValidateManagedCapRestart();
         Debug.Log("[PlayerProjectileDeathVfxSmokeTest] All projectile-death VFX checks passed.");
     }
@@ -362,6 +363,86 @@ public static class PlayerProjectileDeathVfxSmokeTest
             vfxRequests = entityManager.GetBuffer<PlayerPowerUpVfxSpawnRequest>(playerEntity);
             if (vfxRequests.Length != 0 || pool.Length != 1)
                 throw new Exception("Natural projectile expiry was not suppressed after a previous valid target hit.");
+        }
+        finally
+        {
+            world.Dispose();
+        }
+    }
+    #endregion
+
+    #region Enemy Orbital Blocking
+    /// <summary>
+    /// Validates that enemy projectile-death VFX are queued when a player orbital projection blocks a projectile.
+    /// </summary>
+    private static void ValidateEnemyOrbitalProjectionBlockVfx()
+    {
+        World world = new World("EnemyOrbitalProjectionBlockDeathVfxSmokeTest");
+        EntityManager entityManager = world.EntityManager;
+        Entity vfxPrefabEntity = entityManager.CreateEntity();
+        Entity playerEntity = entityManager.CreateEntity();
+        Entity enemyEntity = entityManager.CreateEntity();
+        Entity projectionEntity = entityManager.CreateEntity(typeof(PlayerOrbitalProjectionInstance),
+                                                              typeof(LocalTransform));
+        Entity projectileEntity = entityManager.CreateEntity(typeof(Projectile),
+                                                              typeof(ProjectileContactState),
+                                                              typeof(ProjectileOwner),
+                                                              typeof(LocalTransform),
+                                                              typeof(ProjectileActive));
+
+        try
+        {
+            entityManager.AddBuffer<PlayerOrbitalProjectionLostElement>(playerEntity);
+            entityManager.AddBuffer<ProjectilePoolElement>(enemyEntity);
+            entityManager.AddBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity);
+            entityManager.AddBuffer<PlayerOrbitalProjectionCollisionVertexElement>(projectionEntity);
+
+            entityManager.AddComponentData(enemyEntity, new EnemyProjectileDeathVfxConfig
+            {
+                RangeOrLifetime = new EnemyProjectileVfxEventConfig
+                {
+                    Enabled = 1,
+                    PrefabEntity = vfxPrefabEntity,
+                    UniformScale = 2f,
+                    LifetimeSeconds = 0.5f
+                }
+            });
+            entityManager.SetComponentData(projectionEntity, new PlayerOrbitalProjectionInstance
+            {
+                OwnerEntity = playerEntity,
+                Phase = PlayerOrbitalProjectionPhase.Active,
+                Config = new OrbitalProjectionConfig
+                {
+                    CollisionRadius = 1f,
+                    BlockEnemyProjectiles = 1
+                }
+            });
+            entityManager.SetComponentData(projectionEntity, LocalTransform.FromPositionRotationScale(float3.zero,
+                                                                                                       quaternion.identity,
+                                                                                                       1f));
+            entityManager.SetComponentData(projectileEntity, new ProjectileOwner
+            {
+                ShooterEntity = enemyEntity
+            });
+            entityManager.SetComponentData(projectileEntity, LocalTransform.FromPositionRotationScale(new float3(0.25f, 0f, 0f),
+                                                                                                       quaternion.identity,
+                                                                                                       1f));
+
+            SystemHandle interceptionSystem = world.GetOrCreateSystem<PlayerOrbitalProjectionInterceptionSystem>();
+            interceptionSystem.Update(world.Unmanaged);
+
+            DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests =
+                entityManager.GetBuffer<PlayerPowerUpVfxSpawnRequest>(enemyEntity);
+            DynamicBuffer<ProjectilePoolElement> projectilePool =
+                entityManager.GetBuffer<ProjectilePoolElement>(enemyEntity);
+
+            if (vfxRequests.Length != 1 ||
+                vfxRequests[0].PrefabEntity != vfxPrefabEntity ||
+                projectilePool.Length != 1 ||
+                entityManager.IsComponentEnabled<ProjectileActive>(projectileEntity))
+            {
+                throw new Exception("Orbital projection projectile blocking did not enqueue enemy bullet-death VFX before parking the projectile.");
+            }
         }
         finally
         {

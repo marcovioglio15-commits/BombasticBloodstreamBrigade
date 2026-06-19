@@ -320,11 +320,14 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
 
         float spawnedExperience = 0f;
         float dropRadius = math.max(0f, experienceModule.DropRadius);
+        float groundHeightOffset = experienceModule.GroundHeightOffset;
         float attractionSpeed = math.max(0f, experienceModule.AttractionSpeed);
         float collectDistance = math.max(0.01f, experienceModule.CollectDistance);
         float collectDistancePerPlayerSpeed = math.max(0f, experienceModule.CollectDistancePerPlayerSpeed);
         float spawnAnimationMinDuration = math.max(0f, experienceModule.SpawnAnimationMinDuration);
         float spawnAnimationMaxDuration = math.max(spawnAnimationMinDuration, experienceModule.SpawnAnimationMaxDuration);
+        float3 spawnCenterPosition = EnemyDropSpawnRuntimeUtility.ResolveDropGroundAdjustedPosition(killedEvent.Position,
+                                                                                                    groundHeightOffset);
 
         for (int stepIndex = 0; stepIndex < EnemyDropSpawnRuntimeUtility.MaxSpawnStepsPerEnemy; stepIndex++)
         {
@@ -364,7 +367,6 @@ public partial struct EnemyExperienceDropSpawnSystem : ISystem
                                                                ref remainingRuntimeDropPoolExpansionBudget))
                 break;
 
-            float3 spawnCenterPosition = killedEvent.Position;
             float3 spawnTargetPosition = EnemyDropSpawnRuntimeUtility.ResolveDropSpawnPosition(spawnCenterPosition,
                                                                                                moduleIndex * EnemyDropSpawnRuntimeUtility.MaxSpawnStepsPerEnemy + stepIndex,
                                                                                                dropRadius);
