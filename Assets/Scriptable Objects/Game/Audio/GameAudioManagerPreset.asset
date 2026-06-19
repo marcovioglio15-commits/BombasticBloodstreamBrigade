@@ -57,7 +57,7 @@ MonoBehaviour:
     displayName: Enemy Projectile Shot
     description: Requested when an enemy shooter module emits projectiles; rate-limited
       by default.
-    eventPath: event:/SFX/sfx_pickup
+    eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
     volume: 1
     pitch: 1
     spatialize: 1
@@ -238,7 +238,7 @@ MonoBehaviour:
     eventCode: MC_SFX_Active_Release
     displayName: Active Release
     description: Requested when a charge-bar active tool is released.
-    eventPath: event:/SFX/Activations/MC_SFX_Active_Release
+    eventPath: 
     volume: 1
     pitch: 1
     spatialize: 0
@@ -284,7 +284,7 @@ MonoBehaviour:
     displayName: Player Death
     description: Requested when the run outcome resolves to defeat.
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_DeathCry_01
-    volume: 1
+    volume: 5
     pitch: 1
     spatialize: 0
     minimumDistance: 1
@@ -299,7 +299,7 @@ MonoBehaviour:
     displayName: Player Spawn
     description: Requested when player progression runtime state is initialized.
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Spawn
-    volume: 1
+    volume: 5
     pitch: 1
     spatialize: 0
     minimumDistance: 1
@@ -314,7 +314,7 @@ MonoBehaviour:
     displayName: Player Victory
     description: Requested when the run outcome resolves to victory.
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_01
-    volume: 1
+    volume: 5
     pitch: 1
     spatialize: 0
     minimumDistance: 1

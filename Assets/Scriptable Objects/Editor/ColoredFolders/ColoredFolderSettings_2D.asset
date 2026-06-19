@@ -31,7 +31,7 @@ MonoBehaviour:
   - Assets/2D/UI/Player/VignetteEffects
   - Assets/2D/Flipbooks
   - Assets/2D/UI/Player/HealthBarNew
-  - Assets/2D/UI/Placeholders
+  - Assets/2D/UI/Player/Portraits
   folderColors:
   - {r: 1, g: 1, b: 0, a: 0}
   - {r: 1, g: 1, b: 0, a: 0}
