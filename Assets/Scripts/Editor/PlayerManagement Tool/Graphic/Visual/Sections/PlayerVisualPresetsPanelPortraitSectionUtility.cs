@@ -79,18 +79,106 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
             return;
 
         Foldout foldout = CreateFoldout(title, stateSuffix);
-        AttachLazyFoldout(foldout,
-                          () =>
-                          {
-                              AddPlainField(foldout, animation.FindPropertyRelative("animationId"), "Animation Id", "Stable animation ID used by Add Scaling keys and bake diagnostics.");
-                              AddPlainField(foldout, animation.FindPropertyRelative("frames"), "Frames", "Ordered sprites played by this portrait animation.");
-                              AddField(foldout, animation.FindPropertyRelative("secondsPerFrame"), scalingRules, "Seconds Per Frame", "Base seconds spent on each frame before playback speed is applied.");
-                              AddField(foldout, animation.FindPropertyRelative("playbackSpeedMultiplier"), scalingRules, "Playback Speed", "Runtime multiplier applied to frame timing.");
-                              AddField(foldout, animation.FindPropertyRelative("playbackMode"), scalingRules, "Playback Mode", "Loop, Once, or PingPong playback behavior.");
-                              AddField(foldout, animation.FindPropertyRelative("priority"), scalingRules, "Priority", "Higher priority portrait animations interrupt lower priority states.");
-                              AddField(foldout, animation.FindPropertyRelative("restartWhenReentered"), scalingRules, "Restart When Re-entered", "Restarts this animation from the first frame when the same condition fires again.");
-                          });
+        PlayerManagementFoldoutStateUtility.AttachLazyFoldout(foldout,
+                                                               () =>
+                                                               {
+                                                                   SerializedProperty frames = animation.FindPropertyRelative("frames");
+                                                                   SerializedProperty playbackMode = animation.FindPropertyRelative("playbackMode");
+                                                                   VisualElement staticFrameFields = new VisualElement();
+                                                                   VisualElement animatedFrameFields = new VisualElement();
+                                                                   VisualElement cycleLimitFields = new VisualElement();
+                                                                   AddPlainField(foldout, animation.FindPropertyRelative("animationId"), "Animation Id", "Stable animation ID used by Add Scaling keys and bake diagnostics.");
+                                                                   AddPlainField(foldout, frames, "Frames", "Ordered sprites played by this portrait animation.");
+                                                                   AddField(staticFrameFields, animation.FindPropertyRelative("staticFrameDurationSeconds"), scalingRules, "Static Frame Duration", "Duration used when this animation has one valid frame and is played as a static timed state.");
+                                                                   AddField(animatedFrameFields, animation.FindPropertyRelative("secondsPerFrame"), scalingRules, "Seconds Per Frame", "Base seconds spent on each frame before playback speed is applied.");
+                                                                   AddField(animatedFrameFields, animation.FindPropertyRelative("playbackSpeedMultiplier"), scalingRules, "Playback Speed", "Runtime multiplier applied to frame timing.");
+                                                                   AddField(animatedFrameFields, playbackMode, scalingRules, "Playback Mode", "Loop, Once, or PingPong playback behavior.");
+                                                                   AddField(cycleLimitFields, animation.FindPropertyRelative("maximumCompletedCycles"), scalingRules, "Maximum Completed Cycles", "Maximum completed loops or ping-pongs. Set 0 for unlimited playback while the animation remains requested.");
+                                                                   animatedFrameFields.Add(cycleLimitFields);
+                                                                   foldout.Add(staticFrameFields);
+                                                                   foldout.Add(animatedFrameFields);
+                                                                   AddField(foldout, animation.FindPropertyRelative("priority"), scalingRules, "Priority", "Higher priority portrait animations interrupt lower priority states.");
+                                                                   AddField(foldout, animation.FindPropertyRelative("restartWhenReentered"), scalingRules, "Restart When Re-entered", "Restarts this animation from the first frame when the same condition fires again.");
+                                                                   RefreshAnimationPlaybackFields(frames, playbackMode, staticFrameFields, animatedFrameFields, cycleLimitFields);
+                                                                   foldout.TrackPropertyValue(frames,
+                                                                                              changedProperty => RefreshAnimationPlaybackFields(frames,
+                                                                                                                                                 playbackMode,
+                                                                                                                                                 staticFrameFields,
+                                                                                                                                                 animatedFrameFields,
+                                                                                                                                                 cycleLimitFields));
+                                                                   foldout.TrackPropertyValue(playbackMode,
+                                                                                              changedProperty => RefreshAnimationPlaybackFields(frames,
+                                                                                                                                                 playbackMode,
+                                                                                                                                                 staticFrameFields,
+                                                                                                                                                 animatedFrameFields,
+                                                                                                                                                 cycleLimitFields));
+                                                               });
         parent.Add(foldout);
+    }
+
+    /// <summary>
+    /// Shows only playback controls that are meaningful for the current frame count and playback mode.
+    /// </summary>
+    /// <param name="frames">Serialized frame list.</param>
+    /// <param name="playbackMode">Serialized playback mode.</param>
+    /// <param name="staticFrameFields">Container for one-frame static playback controls.</param>
+    /// <param name="animatedFrameFields">Container for multi-frame playback controls.</param>
+    /// <param name="cycleLimitFields">Container for Loop/PingPong cycle limit controls.</param>
+    private static void RefreshAnimationPlaybackFields(SerializedProperty frames,
+                                                       SerializedProperty playbackMode,
+                                                       VisualElement staticFrameFields,
+                                                       VisualElement animatedFrameFields,
+                                                       VisualElement cycleLimitFields)
+    {
+        int validFrameCount = CountValidFrames(frames);
+        bool staticFrameMode = validFrameCount == 1;
+        bool animatedFrameMode = validFrameCount > 1;
+
+        if (staticFrameFields != null)
+            staticFrameFields.style.display = staticFrameMode ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (animatedFrameFields != null)
+            animatedFrameFields.style.display = animatedFrameMode ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (cycleLimitFields != null)
+            cycleLimitFields.style.display = animatedFrameMode && IsCycleLimitedMode(playbackMode) ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary>
+    /// Counts assigned sprite frames from a serialized frame array.
+    /// </summary>
+    /// <param name="frames">Serialized frame list.</param>
+    /// <returns>Number of non-null frame references.</returns>
+    private static int CountValidFrames(SerializedProperty frames)
+    {
+        if (frames == null || !frames.isArray)
+            return 0;
+
+        int validFrameCount = 0;
+
+        for (int frameIndex = 0; frameIndex < frames.arraySize; frameIndex++)
+        {
+            SerializedProperty frame = frames.GetArrayElementAtIndex(frameIndex);
+
+            if (frame != null && frame.objectReferenceValue != null)
+                validFrameCount++;
+        }
+
+        return validFrameCount;
+    }
+
+    /// <summary>
+    /// Checks whether the selected playback mode can use a completed-cycle limit.
+    /// </summary>
+    /// <param name="playbackMode">Serialized playback mode.</param>
+    /// <returns>True when Loop or PingPong is selected.</returns>
+    private static bool IsCycleLimitedMode(SerializedProperty playbackMode)
+    {
+        if (playbackMode == null)
+            return false;
+
+        return playbackMode.enumValueIndex == (int)PlayerPortraitHudPlaybackMode.Loop ||
+               playbackMode.enumValueIndex == (int)PlayerPortraitHudPlaybackMode.PingPong;
     }
 
     /// <summary>
@@ -505,36 +593,6 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
                                                                 false);
     }
 
-    /// <summary>
-    /// Builds a foldout body only when the user opens it, avoiding heavy nested property construction during tab activation.
-    /// </summary>
-    /// <param name="foldout">Foldout that owns the lazy body.</param>
-    /// <param name="buildContent">Content builder invoked at most once.</param>
-    private static void AttachLazyFoldout(Foldout foldout, Action buildContent)
-    {
-        if (foldout == null || buildContent == null)
-            return;
-
-        bool isBuilt = false;
-
-        void EnsureBuilt()
-        {
-            if (isBuilt)
-                return;
-
-            isBuilt = true;
-            buildContent.Invoke();
-        }
-
-        if (foldout.value)
-            EnsureBuilt();
-
-        foldout.RegisterValueChangedCallback(evt =>
-        {
-            if (evt.newValue)
-                EnsureBuilt();
-        });
-    }
     #endregion
 
     #endregion

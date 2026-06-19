@@ -45,6 +45,7 @@ public sealed class HUDPlayerPortraitSection
     private int activeAnimationBufferIndex = -1;
     private int activeFrameOffset;
     private int playbackDirection = 1;
+    private int completedCycleCount;
     private float frameTimer;
     private bool activeAnimationCompleted;
     private bool damageObservationInitialized;
@@ -71,7 +72,13 @@ public sealed class HUDPlayerPortraitSection
     public void Initialize(Transform searchRoot)
     {
         if (autoDiscoverReferences)
-            ResolveReferences(searchRoot);
+            HUDPlayerPortraitSectionUtility.ResolveReferences(searchRoot,
+                                                              ref rootObject,
+                                                              ref portraitImage,
+                                                              portraitContainerName,
+                                                              portraitImageName,
+                                                              DefaultContainerName,
+                                                              DefaultPortraitImageName);
 
         fallbackSprite = portraitImage != null ? portraitImage.sprite : null;
         ApplyInitialVisualState();
@@ -112,7 +119,9 @@ public sealed class HUDPlayerPortraitSection
             !runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            LogMissingPlayerReference(runtimeEntityManager, playerEntity);
+            HUDPlayerPortraitSectionUtility.LogMissingPlayerReference(runtimeEntityManager,
+                                                                      playerEntity,
+                                                                      ref loggedMissingPlayerReference);
 #endif
             HandleMissingPlayer();
             return;
@@ -127,8 +136,8 @@ public sealed class HUDPlayerPortraitSection
             !runtimeEntityManager.HasBuffer<PlayerPortraitHudFrameElement>(configEntity))
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            LogDiagnosticOnce(ref loggedMissingConfigEntity,
-                              "[HUDPlayerPortraitSection] Player portrait visual config entity is missing or incomplete. Reimport/rebake the player prefab or owner scene so PlayerAuthoringBaker writes the HUD portrait config.");
+            HUDPlayerPortraitSectionUtility.LogDiagnosticOnce(ref loggedMissingConfigEntity,
+                                                              "[HUDPlayerPortraitSection] Player portrait visual config entity is missing or incomplete. Reimport/rebake the player prefab or owner scene so PlayerAuthoringBaker writes the HUD portrait config.");
 #endif
             HandleMissingPlayer();
             return;
@@ -148,8 +157,8 @@ public sealed class HUDPlayerPortraitSection
         if (animations.Length <= 0)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            LogDiagnosticOnce(ref loggedEmptyAnimationBuffer,
-                              "[HUDPlayerPortraitSection] Portrait animation buffer is empty. Configure Portrait frames in the active Player Visual Preset and rebake the player.");
+            HUDPlayerPortraitSectionUtility.LogDiagnosticOnce(ref loggedEmptyAnimationBuffer,
+                                                              "[HUDPlayerPortraitSection] Portrait animation buffer is empty. Configure Portrait frames in the active Player Visual Preset and rebake the player.");
 #endif
             SetVisible(config.HideWhenPlayerMissing == 0);
             return;
@@ -157,8 +166,8 @@ public sealed class HUDPlayerPortraitSection
 
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (frames.Length <= 0)
-            LogDiagnosticOnce(ref loggedEmptyFrameBuffer,
-                              "[HUDPlayerPortraitSection] Portrait frame buffer is empty. The HUD will keep the authored fallback sprite until the active Player Visual Preset is rebaked with frame assets.");
+            HUDPlayerPortraitSectionUtility.LogDiagnosticOnce(ref loggedEmptyFrameBuffer,
+                                                              "[HUDPlayerPortraitSection] Portrait frame buffer is empty. The HUD will keep the authored fallback sprite until the active Player Visual Preset is rebaked with frame assets.");
 #endif
 
         if (lastConfigEntity != configEntity)
@@ -173,60 +182,6 @@ public sealed class HUDPlayerPortraitSection
         UpdateActiveAnimation(requestedAnimationIndex, animations);
         AdvanceAndApplyFrame(animations, frames);
         SetVisible(true);
-    }
-    #endregion
-
-    #region Reference Discovery
-    /// <summary>
-    /// Finds portrait container and Image references from the HUD hierarchy.
-    /// </summary>
-    /// <param name="searchRoot">HUD hierarchy root used for optional reference discovery.</param>
-    private void ResolveReferences(Transform searchRoot)
-    {
-        if (searchRoot == null)
-            return;
-
-        if (rootObject == null)
-        {
-            Transform container = FindChildByName(searchRoot, string.IsNullOrWhiteSpace(portraitContainerName) ? DefaultContainerName : portraitContainerName);
-
-            if (container != null)
-                rootObject = container.gameObject;
-        }
-
-        if (portraitImage == null)
-        {
-            Transform imageRoot = rootObject != null
-                ? FindChildByName(rootObject.transform, string.IsNullOrWhiteSpace(portraitImageName) ? DefaultPortraitImageName : portraitImageName)
-                : FindChildByName(searchRoot, string.IsNullOrWhiteSpace(portraitImageName) ? DefaultPortraitImageName : portraitImageName);
-
-            if (imageRoot != null)
-                portraitImage = imageRoot.GetComponent<Image>();
-        }
-    }
-
-    /// <summary>
-    /// Finds the first child Transform with a matching name.
-    /// </summary>
-    /// <param name="root">Hierarchy root to scan.</param>
-    /// <param name="targetName">Child object name to match.</param>
-    /// <returns>Matching Transform, or null when not found.</returns>
-    private static Transform FindChildByName(Transform root, string targetName)
-    {
-        if (root == null || string.IsNullOrWhiteSpace(targetName))
-            return null;
-
-        Transform[] children = root.GetComponentsInChildren<Transform>(true);
-
-        for (int childIndex = 0; childIndex < children.Length; childIndex++)
-        {
-            Transform child = children[childIndex];
-
-            if (child != null && string.Equals(child.name, targetName, StringComparison.Ordinal))
-                return child;
-        }
-
-        return null;
     }
     #endregion
 
@@ -471,6 +426,7 @@ public sealed class HUDPlayerPortraitSection
         activeAnimationBufferIndex = requestedAnimationIndex;
         activeFrameOffset = 0;
         playbackDirection = 1;
+        completedCycleCount = 0;
         frameTimer = 0f;
         activeAnimationCompleted = false;
     }
@@ -494,13 +450,22 @@ public sealed class HUDPlayerPortraitSection
             return;
         }
 
-        float secondsPerFrame = Mathf.Max(0.0001f, animation.SecondsPerFrame / Mathf.Max(0.0001f, animation.PlaybackSpeedMultiplier));
-        frameTimer += Time.unscaledDeltaTime;
+        float deltaTime = ResolveAnimationDeltaTime(animation);
 
-        while (frameTimer >= secondsPerFrame)
+        if (animation.FrameCount == 1)
         {
-            frameTimer -= secondsPerFrame;
-            AdvanceFrame(ref animation);
+            AdvanceStaticFrame(animation, deltaTime);
+        }
+        else
+        {
+            float secondsPerFrame = Mathf.Max(0.0001f, animation.SecondsPerFrame / Mathf.Max(0.0001f, animation.PlaybackSpeedMultiplier));
+            frameTimer += Mathf.Max(0f, deltaTime);
+
+            while (frameTimer >= secondsPerFrame && !activeAnimationCompleted)
+            {
+                frameTimer -= secondsPerFrame;
+                AdvanceFrame(ref animation);
+            }
         }
 
         int frameIndex = animation.FrameStartIndex + Mathf.Clamp(activeFrameOffset, 0, animation.FrameCount - 1);
@@ -528,6 +493,22 @@ public sealed class HUDPlayerPortraitSection
     }
 
     /// <summary>
+    /// Advances a single-frame portrait animation as a static timed state.
+    /// </summary>
+    /// <param name="animation">Active single-frame animation.</param>
+    /// <param name="deltaTime">Resolved scaled or unscaled delta time.</param>
+    private void AdvanceStaticFrame(PlayerPortraitHudAnimationElement animation, float deltaTime)
+    {
+        if (activeAnimationCompleted)
+            return;
+
+        frameTimer += Mathf.Max(0f, deltaTime);
+
+        if (frameTimer >= Mathf.Max(0.0001f, animation.StaticFrameDurationSeconds))
+            activeAnimationCompleted = true;
+    }
+
+    /// <summary>
     /// Advances the active frame offset according to the animation playback mode.
     /// </summary>
     /// <param name="animation">Active portrait animation.</param>
@@ -548,20 +529,55 @@ public sealed class HUDPlayerPortraitSection
                 activeFrameOffset += playbackDirection;
 
                 if (activeFrameOffset >= animation.FrameCount - 1)
+                {
+                    activeFrameOffset = animation.FrameCount - 1;
                     playbackDirection = -1;
+                }
                 else if (activeFrameOffset <= 0)
+                {
+                    activeFrameOffset = 0;
+
+                    if (playbackDirection < 0 && TryCompleteBoundedCycle(animation))
+                        return;
+
                     playbackDirection = 1;
+                }
 
                 activeFrameOffset = Mathf.Clamp(activeFrameOffset, 0, animation.FrameCount - 1);
                 return;
             default:
-                activeFrameOffset = (activeFrameOffset + 1) % animation.FrameCount;
+                if (activeFrameOffset >= animation.FrameCount - 1)
+                {
+                    if (TryCompleteBoundedCycle(animation))
+                        return;
+
+                    activeFrameOffset = 0;
+                    return;
+                }
+
+                activeFrameOffset++;
                 return;
         }
     }
 
     /// <summary>
-    /// Checks whether the current one-shot animation should keep playing before returning to idle.
+    /// Registers one completed loop or ping-pong cycle and stops bounded playback at the cycle boundary.
+    /// </summary>
+    /// <param name="animation">Active loop or ping-pong animation.</param>
+    /// <returns>True when the configured maximum cycle count has been reached.</returns>
+    private bool TryCompleteBoundedCycle(PlayerPortraitHudAnimationElement animation)
+    {
+        completedCycleCount++;
+
+        if (animation.MaximumCompletedCycles <= 0 || completedCycleCount < animation.MaximumCompletedCycles)
+            return false;
+
+        activeAnimationCompleted = true;
+        return true;
+    }
+
+    /// <summary>
+    /// Checks whether the current bounded animation should keep playing before returning to the requested state.
     /// </summary>
     /// <param name="animations">Runtime portrait animation buffer.</param>
     /// <param name="requestedAnimationIndex">Newly requested animation index.</param>
@@ -574,13 +590,37 @@ public sealed class HUDPlayerPortraitSection
 
         PlayerPortraitHudAnimationElement activeAnimation = animations[activeAnimationBufferIndex];
 
-        if (activeAnimation.PlaybackMode != PlayerPortraitHudPlaybackMode.Once || activeAnimationCompleted)
+        if (!IsBoundedAnimation(activeAnimation) || activeAnimationCompleted)
             return false;
 
         if (requestedAnimationIndex < 0 || requestedAnimationIndex >= animations.Length)
             return true;
 
         return activeAnimation.Priority > animations[requestedAnimationIndex].Priority;
+    }
+
+    /// <summary>
+    /// Checks whether an animation has a finite completion condition after it has been triggered.
+    /// </summary>
+    /// <param name="animation">Runtime portrait animation entry.</param>
+    /// <returns>True when the animation should be held until it completes.</returns>
+    private static bool IsBoundedAnimation(PlayerPortraitHudAnimationElement animation)
+    {
+        return animation.FrameCount == 1 ||
+               animation.PlaybackMode == PlayerPortraitHudPlaybackMode.Once ||
+               animation.MaximumCompletedCycles > 0;
+    }
+
+    /// <summary>
+    /// Resolves playback delta time, using unscaled time only for the death portrait animation.
+    /// </summary>
+    /// <param name="animation">Runtime portrait animation entry.</param>
+    /// <returns>Delta time used to advance playback this frame.</returns>
+    private static float ResolveAnimationDeltaTime(PlayerPortraitHudAnimationElement animation)
+    {
+        return animation.Role == PlayerPortraitHudAnimationRole.Death
+            ? Time.unscaledDeltaTime
+            : Time.deltaTime;
     }
     #endregion
 
@@ -626,6 +666,7 @@ public sealed class HUDPlayerPortraitSection
         activeAnimationBufferIndex = -1;
         activeFrameOffset = 0;
         playbackDirection = 1;
+        completedCycleCount = 0;
         frameTimer = 0f;
         activeAnimationCompleted = false;
         damageObservationInitialized = false;
@@ -636,44 +677,6 @@ public sealed class HUDPlayerPortraitSection
         powerUpSnapshots.Clear();
     }
     #endregion
-
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-    #region Diagnostics
-    /// <summary>
-    /// Logs why the portrait runtime binding cannot use the player entity.
-    /// </summary>
-    /// <param name="runtimeEntityManager">Entity manager used to inspect the player entity.</param>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    private void LogMissingPlayerReference(EntityManager runtimeEntityManager, Entity playerEntity)
-    {
-        if (loggedMissingPlayerReference)
-            return;
-
-        if (!runtimeEntityManager.Exists(playerEntity))
-            return;
-
-        if (!runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
-        {
-            LogDiagnosticOnce(ref loggedMissingPlayerReference,
-                              "[HUDPlayerPortraitSection] Player entity is missing PlayerPortraitHudVisualReference. The active player bake does not include the new Portrait HUD config yet; reimport/rebake the player prefab or owner scene.");
-        }
-    }
-
-    /// <summary>
-    /// Logs one diagnostic message once per HUD section instance.
-    /// </summary>
-    /// <param name="logged">Mutable guard flag for this diagnostic.</param>
-    /// <param name="message">Diagnostic message.</param>
-    private static void LogDiagnosticOnce(ref bool logged, string message)
-    {
-        if (logged)
-            return;
-
-        logged = true;
-        Debug.LogWarning(message);
-    }
-    #endregion
-#endif
 
     #endregion
 

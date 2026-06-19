@@ -118,8 +118,10 @@ public partial struct PlayerRuntimePortraitHudVisualScalingSystem : ISystem
                 FrameStartIndex = animation.FrameStartIndex,
                 FrameCount = animation.FrameCount,
                 SecondsPerFrame = animation.SecondsPerFrame,
+                StaticFrameDurationSeconds = animation.StaticFrameDurationSeconds,
                 PlaybackSpeedMultiplier = animation.PlaybackSpeedMultiplier,
                 PlaybackMode = animation.PlaybackMode,
+                MaximumCompletedCycles = animation.MaximumCompletedCycles,
                 Priority = animation.Priority,
                 RestartWhenReentered = animation.RestartWhenReentered
             });
@@ -275,6 +277,9 @@ public partial struct PlayerRuntimePortraitHudVisualScalingSystem : ISystem
                 case "secondsPerFrame":
                     animation.SecondsPerFrame = math.max(0.0001f, resolvedValue);
                     break;
+                case "staticFrameDurationSeconds":
+                    animation.StaticFrameDurationSeconds = math.max(0.0001f, resolvedValue);
+                    break;
                 case "playbackSpeedMultiplier":
                     animation.PlaybackSpeedMultiplier = math.max(0.0001f, resolvedValue);
                     break;
@@ -283,6 +288,9 @@ public partial struct PlayerRuntimePortraitHudVisualScalingSystem : ISystem
                     break;
                 case "playbackMode":
                     animation.PlaybackMode = (PlayerPortraitHudPlaybackMode)math.clamp((int)math.round(resolvedValue), 0, 2);
+                    break;
+                case "maximumCompletedCycles":
+                    animation.MaximumCompletedCycles = math.max(0, (int)math.round(resolvedValue));
                     break;
                 default:
                     break;

@@ -2369,11 +2369,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19f6ac8c9ec34d06af8f3d47abf8cb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
+  hudReferenceSearchRoot: {fileID: 677397542}
+  hudReferenceSearchRootName: CanvasStyled
   playerHealthBarsView: {fileID: 1174546168}
   portraitSection:
     isEnabled: 1
-    rootObject: {fileID: 0}
-    portraitImage: {fileID: 0}
+    rootObject: {fileID: 5998807979436900098}
+    portraitImage: {fileID: 5998807979436900097}
     autoDiscoverReferences: 1
     portraitContainerName: PlayerPortraitContainer
     portraitImageName: Portrait
@@ -2384,6 +2386,12 @@ MonoBehaviour:
     imageSlots: []
     autoDiscoverReferences: 1
     growthSequenceContainerName: GrowthSequence Container
+    createFallbackSlotsWhenMissing: 1
+    fallbackSlotCount: 10
+    fallbackSlotWidth: 48
+    fallbackSlotHeight: 28
+    fallbackSlotSpacing: 8
+    fallbackFontSize: 20
   playerLevelText: {fileID: 1174546166}
   hideLevelTextWhenPlayerMissing: 1
   playerExperienceFillImage: {fileID: 1174546167}
@@ -7735,6 +7743,22 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+--- !u!114 &5998807979436900097 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 736682208710704457, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+  m_PrefabInstance: {fileID: 5998807979436900096}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!1 &5998807979436900098 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1451165685435678976, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+  m_PrefabInstance: {fileID: 5998807979436900096}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6021864226817854593
 MonoBehaviour:
   m_ObjectHideFlags: 0

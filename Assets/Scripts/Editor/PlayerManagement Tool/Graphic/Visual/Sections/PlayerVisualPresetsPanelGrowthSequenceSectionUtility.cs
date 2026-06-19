@@ -79,12 +79,12 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
             Foldout foldout = CreateFoldout(ResolveScheduleTitle(scheduleId, scheduleIndex),
                                             "Schedule." + scheduleIndex);
             int capturedScheduleIndex = scheduleIndex;
-            AttachLazyFoldout(foldout,
-                              () =>
-                              {
-                                  AddPlainField(foldout, scheduleId, "Schedule Id", "Schedule ID selected from Level-up & Progression.");
-                                  BuildSteps(foldout, schedule.FindPropertyRelative("steps"), scalingRules, capturedScheduleIndex);
-                              });
+            PlayerManagementFoldoutStateUtility.AttachLazyFoldout(foldout,
+                                                                   () =>
+                                                                   {
+                                                                       AddPlainField(foldout, scheduleId, "Schedule Id", "Schedule ID selected from Level-up & Progression.");
+                                                                       BuildSteps(foldout, schedule.FindPropertyRelative("steps"), scalingRules, capturedScheduleIndex);
+                                                                   });
             parent.Add(foldout);
         }
     }
@@ -111,12 +111,12 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
             Foldout foldout = CreateFoldout(ResolveStepTitle(step, stepIndex),
                                             string.Format("Schedule.{0}.Step.{1}", scheduleIndex, stepIndex));
             int capturedStepIndex = stepIndex;
-            AttachLazyFoldout(foldout,
-                              () => BuildStepDetails(foldout,
-                                                     step,
-                                                     presentationMode,
-                                                     scalingRules,
-                                                     capturedStepIndex));
+            PlayerManagementFoldoutStateUtility.AttachLazyFoldout(foldout,
+                                                                   () => BuildStepDetails(foldout,
+                                                                                          step,
+                                                                                          presentationMode,
+                                                                                          scalingRules,
+                                                                                          capturedStepIndex));
             parent.Add(foldout);
         }
     }
@@ -468,36 +468,6 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
                                                                 false);
     }
 
-    /// <summary>
-    /// Builds foldout body controls only when the foldout is opened for the first time.
-    /// </summary>
-    /// <param name="foldout">Foldout that owns the lazy body.</param>
-    /// <param name="buildContent">Content builder invoked at most once.</param>
-    private static void AttachLazyFoldout(Foldout foldout, Action buildContent)
-    {
-        if (foldout == null || buildContent == null)
-            return;
-
-        bool isBuilt = false;
-
-        void EnsureBuilt()
-        {
-            if (isBuilt)
-                return;
-
-            isBuilt = true;
-            buildContent.Invoke();
-        }
-
-        if (foldout.value)
-            EnsureBuilt();
-
-        foldout.RegisterValueChangedCallback(evt =>
-        {
-            if (evt.newValue)
-                EnsureBuilt();
-        });
-    }
     #endregion
 
     #endregion

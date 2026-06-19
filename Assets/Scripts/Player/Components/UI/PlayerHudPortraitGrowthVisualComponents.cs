@@ -58,8 +58,10 @@ public struct PlayerPortraitHudAnimationElement : IBufferElementData
     public int FrameStartIndex;
     public int FrameCount;
     public float SecondsPerFrame;
+    public float StaticFrameDurationSeconds;
     public float PlaybackSpeedMultiplier;
     public PlayerPortraitHudPlaybackMode PlaybackMode;
+    public int MaximumCompletedCycles;
     public int Priority;
     public byte RestartWhenReentered;
 }
@@ -76,8 +78,10 @@ public struct PlayerBasePortraitHudAnimationElement : IBufferElementData
     public int FrameStartIndex;
     public int FrameCount;
     public float SecondsPerFrame;
+    public float StaticFrameDurationSeconds;
     public float PlaybackSpeedMultiplier;
     public PlayerPortraitHudPlaybackMode PlaybackMode;
+    public int MaximumCompletedCycles;
     public int Priority;
     public byte RestartWhenReentered;
 }

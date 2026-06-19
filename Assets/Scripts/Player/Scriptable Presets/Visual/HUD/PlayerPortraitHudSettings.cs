@@ -42,11 +42,17 @@ public sealed class PlayerPortraitHudAnimationDefinition
     [Tooltip("Seconds spent on each frame before the playback speed multiplier is applied.")]
     [SerializeField] private float secondsPerFrame = 0.12f;
 
+    [Tooltip("Duration used when the animation has exactly one valid frame and is played as a static frame state.")]
+    [SerializeField] private float staticFrameDurationSeconds = 0.35f;
+
     [Tooltip("Runtime multiplier applied to Seconds Per Frame. Values greater than 1 play faster.")]
     [SerializeField] private float playbackSpeedMultiplier = 1f;
 
     [Tooltip("Playback behavior used when the animation reaches its last valid frame.")]
     [SerializeField] private PlayerPortraitHudPlaybackMode playbackMode = PlayerPortraitHudPlaybackMode.Loop;
+
+    [Tooltip("Maximum completed loops or ping-pongs for Loop and PingPong modes. Set 0 for unlimited playback while the animation remains requested.")]
+    [SerializeField] private int maximumCompletedCycles;
 
     [Tooltip("Higher priority animations can interrupt lower priority portrait states.")]
     [SerializeField] private int priority;
@@ -82,6 +88,14 @@ public sealed class PlayerPortraitHudAnimationDefinition
         }
     }
 
+    public float StaticFrameDurationSeconds
+    {
+        get
+        {
+            return staticFrameDurationSeconds;
+        }
+    }
+
     public float PlaybackSpeedMultiplier
     {
         get
@@ -95,6 +109,14 @@ public sealed class PlayerPortraitHudAnimationDefinition
         get
         {
             return playbackMode;
+        }
+    }
+
+    public int MaximumCompletedCycles
+    {
+        get
+        {
+            return maximumCompletedCycles;
         }
     }
 
@@ -165,11 +187,17 @@ public sealed class PlayerPortraitHudAnimationDefinition
         if (!float.IsFinite(secondsPerFrame) || secondsPerFrame <= 0f)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Seconds Per Frame should be finite and greater than zero.", ownerAssetName, sectionLabel));
 
+        if (!float.IsFinite(staticFrameDurationSeconds) || staticFrameDurationSeconds <= 0f)
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Static Frame Duration Seconds should be finite and greater than zero.", ownerAssetName, sectionLabel));
+
         if (!float.IsFinite(playbackSpeedMultiplier) || playbackSpeedMultiplier <= 0f)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Playback Speed Multiplier should be finite and greater than zero.", ownerAssetName, sectionLabel));
 
         if (!Enum.IsDefined(typeof(PlayerPortraitHudPlaybackMode), playbackMode))
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Playback Mode is unsupported.", ownerAssetName, sectionLabel));
+
+        if (maximumCompletedCycles < 0)
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Portrait/{1}: Maximum Completed Cycles should be zero or greater.", ownerAssetName, sectionLabel));
     }
     #endregion
 

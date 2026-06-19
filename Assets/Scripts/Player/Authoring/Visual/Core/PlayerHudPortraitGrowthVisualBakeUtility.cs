@@ -12,6 +12,7 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
 {
     #region Constants
     private const float DefaultSecondsPerFrame = 0.12f;
+    private const float DefaultStaticFrameDurationSeconds = 0.35f;
     private const float DefaultPlaybackSpeedMultiplier = 1f;
     private const uint HashOffsetBasis = 2166136261u;
     private const uint HashPrime = 16777619u;
@@ -226,10 +227,12 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
             FrameStartIndex = frameStartIndex,
             FrameCount = validFrameCount,
             SecondsPerFrame = ResolvePositiveFinite(definition.SecondsPerFrame, DefaultSecondsPerFrame),
+            StaticFrameDurationSeconds = ResolvePositiveFinite(definition.StaticFrameDurationSeconds, DefaultStaticFrameDurationSeconds),
             PlaybackSpeedMultiplier = ResolvePositiveFinite(definition.PlaybackSpeedMultiplier, DefaultPlaybackSpeedMultiplier),
             PlaybackMode = Enum.IsDefined(typeof(PlayerPortraitHudPlaybackMode), definition.PlaybackMode)
                 ? definition.PlaybackMode
                 : PlayerPortraitHudPlaybackMode.Loop,
+            MaximumCompletedCycles = math.max(0, definition.MaximumCompletedCycles),
             Priority = definition.Priority,
             RestartWhenReentered = definition.RestartWhenReentered ? (byte)1 : (byte)0
         });
@@ -363,10 +366,12 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
             FrameStartIndex = frameStartIndex,
             FrameCount = validFrameCount,
             SecondsPerFrame = ResolvePositiveFinite(definition.SecondsPerFrame, DefaultSecondsPerFrame),
+            StaticFrameDurationSeconds = ResolvePositiveFinite(definition.StaticFrameDurationSeconds, DefaultStaticFrameDurationSeconds),
             PlaybackSpeedMultiplier = ResolvePositiveFinite(definition.PlaybackSpeedMultiplier, DefaultPlaybackSpeedMultiplier),
             PlaybackMode = Enum.IsDefined(typeof(PlayerPortraitHudPlaybackMode), definition.PlaybackMode)
                 ? definition.PlaybackMode
                 : PlayerPortraitHudPlaybackMode.Loop,
+            MaximumCompletedCycles = math.max(0, definition.MaximumCompletedCycles),
             Priority = definition.Priority,
             RestartWhenReentered = definition.RestartWhenReentered ? (byte)1 : (byte)0
         });

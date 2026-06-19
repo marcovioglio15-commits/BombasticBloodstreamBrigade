@@ -122,6 +122,46 @@ public static class PlayerManagementFoldoutStateUtility
     {
         ManagementToolFoldoutStateUtility.CaptureFoldoutStates(root);
     }
+
+    /// <summary>
+    /// Builds a foldout body lazily the first time it is opened, including restored open states applied after creation.
+    /// </summary>
+    /// <param name="foldout">Foldout that owns the lazy body.</param>
+    /// <param name="buildContent">Content builder invoked at most once.</param>
+    public static void AttachLazyFoldout(Foldout foldout, Action buildContent)
+    {
+        if (foldout == null || buildContent == null)
+            return;
+
+        bool isBuilt = false;
+
+        void EnsureBuilt()
+        {
+            if (isBuilt)
+                return;
+
+            isBuilt = true;
+            buildContent.Invoke();
+        }
+
+        void EnsureBuiltWhenOpen()
+        {
+            if (foldout.value)
+                EnsureBuilt();
+        }
+
+        EnsureBuiltWhenOpen();
+        foldout.RegisterValueChangedCallback(evt =>
+        {
+            if (evt.newValue)
+                EnsureBuilt();
+        });
+        foldout.RegisterCallback<AttachToPanelEvent>(evt =>
+        {
+            foldout.schedule.Execute(EnsureBuiltWhenOpen).StartingIn(0);
+        });
+        foldout.schedule.Execute(EnsureBuiltWhenOpen).StartingIn(0);
+    }
     #endregion
 
     #endregion
