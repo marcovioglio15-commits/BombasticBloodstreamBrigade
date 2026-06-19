@@ -1,4 +1,5 @@
 using Unity.Entities;
+using Unity.Mathematics;
 
 #region Root Blob
 /// <summary>
@@ -10,7 +11,16 @@ public struct PlayerProgressionConfigBlob
     public float ExperiencePickupRadius;
     public float BaseExperiencePickupRadius;
     public float MilestoneTimeScaleResumeDurationSeconds;
+    public float MilestoneSkipHoldConfirmationSeconds;
+    public float BaseMilestoneSkipHoldConfirmationSeconds;
+    public float4 MilestoneSkipHoldFillColor;
+    public float4 BaseMilestoneSkipHoldFillColor;
     public BlobString ExperiencePickupRadiusScalingFormula;
+    public BlobString MilestoneSkipHoldConfirmationSecondsScalingFormula;
+    public BlobString MilestoneSkipHoldFillColorRScalingFormula;
+    public BlobString MilestoneSkipHoldFillColorGScalingFormula;
+    public BlobString MilestoneSkipHoldFillColorBScalingFormula;
+    public BlobString MilestoneSkipHoldFillColorAScalingFormula;
     public BlobArray<PlayerGamePhaseBlob> GamePhases;
     public BlobArray<PlayerScalableStatBlob> ScalableStats;
     public BlobArray<PlayerLevelUpScheduleBlob> Schedules;

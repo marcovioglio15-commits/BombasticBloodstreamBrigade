@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -312,10 +313,15 @@ public static class HUDMilestoneSelectionOptionUtility
     /// <param name="activeOfferCount">Number of rolled offers currently shown to the player.</param>
 
     public static void ApplySelectionVisuals(IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews,
-                                             int selectedOfferIndex,
+                                             Button skipButton,
+                                             int selectedIndex,
                                              int activeOfferCount)
     {
-        ApplyOptionViewSelection(optionViews, selectedOfferIndex, activeOfferCount);
+        ApplyOptionViewSelection(optionViews, selectedIndex, activeOfferCount);
+        ApplySkipButtonSelection(skipButton,
+                                 HUDMilestoneSelectionNavigationUtility.IsSkipSelectionIndex(selectedIndex,
+                                                                                             activeOfferCount,
+                                                                                             skipButton != null));
     }
 
     /// <summary>
@@ -335,7 +341,10 @@ public static class HUDMilestoneSelectionOptionUtility
         if (skipButtonObject.activeSelf != isVisible)
             skipButtonObject.SetActive(isVisible);
 
-        skipButton.interactable = isVisible && allowInteraction;
+        bool shouldBeInteractable = isVisible && allowInteraction;
+
+        if (skipButton.interactable != shouldBeInteractable)
+            skipButton.interactable = shouldBeInteractable;
     }
 
     /// <summary>
@@ -349,7 +358,44 @@ public static class HUDMilestoneSelectionOptionUtility
         if (skipButton == null)
             return;
 
-        skipButton.interactable = interactable && skipButton.gameObject.activeSelf;
+        bool shouldBeInteractable = interactable && skipButton.gameObject.activeSelf;
+
+        if (skipButton.interactable != shouldBeInteractable)
+            skipButton.interactable = shouldBeInteractable;
+    }
+
+    /// <summary>
+    /// Applies EventSystem selection to the skip button so its authored selected transition is visible.
+    /// </summary>
+    /// <param name="skipButton">Optional skip button configured for the panel.</param>
+    /// <param name="selected">True when custom navigation currently points at Skip.</param>
+    private static void ApplySkipButtonSelection(Button skipButton, bool selected)
+    {
+        if (skipButton == null)
+            return;
+
+        EventSystem currentEventSystem = EventSystem.current;
+
+        if (selected)
+        {
+            if (currentEventSystem != null && currentEventSystem.currentSelectedGameObject == skipButton.gameObject)
+                return;
+
+            skipButton.Select();
+
+            if (currentEventSystem != null && currentEventSystem.currentSelectedGameObject != skipButton.gameObject)
+                currentEventSystem.SetSelectedGameObject(skipButton.gameObject);
+
+            return;
+        }
+
+        if (currentEventSystem == null)
+            return;
+
+        if (currentEventSystem.currentSelectedGameObject != skipButton.gameObject)
+            return;
+
+        currentEventSystem.SetSelectedGameObject(null);
     }
     #endregion
 

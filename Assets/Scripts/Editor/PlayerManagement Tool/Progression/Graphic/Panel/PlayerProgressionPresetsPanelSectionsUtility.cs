@@ -146,6 +146,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         VisualElement milestonesContainer = panel.CreateSectionContainer("Milestones");
         SerializedProperty gamePhasesDefinitionProperty = panel.presetSerializedObject.FindProperty("gamePhasesDefinition");
         SerializedProperty experiencePickupRadiusProperty = panel.presetSerializedObject.FindProperty("experiencePickupRadius");
+        SerializedProperty milestoneSkipHoldConfirmationProperty = panel.presetSerializedObject.FindProperty("milestoneSkipHoldConfirmationSeconds");
+        SerializedProperty milestoneSkipHoldFillColorProperty = panel.presetSerializedObject.FindProperty("milestoneSkipHoldFillColor");
         SerializedProperty scalingRulesProperty = panel.presetSerializedObject.FindProperty("scalingRules");
 
         if (gamePhasesDefinitionProperty == null || experiencePickupRadiusProperty == null)
@@ -159,6 +161,19 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         Label infoLabel = new Label("Define game phases, linear growth, and milestone spikes used by runtime level-up.");
         infoLabel.style.marginBottom = 4f;
         milestonesContainer.Add(infoLabel);
+
+        VisualElement runtimeWarningsRoot = new VisualElement();
+        runtimeWarningsRoot.style.marginBottom = 4f;
+        milestonesContainer.Add(runtimeWarningsRoot);
+        RefreshMilestoneRuntimeWarnings(runtimeWarningsRoot,
+                                        milestoneSkipHoldConfirmationProperty,
+                                        milestoneSkipHoldFillColorProperty);
+        milestonesContainer.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            RefreshMilestoneRuntimeWarnings(runtimeWarningsRoot,
+                                            milestoneSkipHoldConfirmationProperty,
+                                            milestoneSkipHoldFillColorProperty);
+        });
 
         SerializedProperty iterator = panel.presetSerializedObject.GetIterator();
         bool enterChildren = true;
@@ -359,6 +374,77 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         }
 
         return "<None>";
+    }
+
+    /// <summary>
+    /// Refreshes warnings for milestone runtime presentation fields that are sanitized only at runtime.
+    /// </summary>
+    /// <param name="warningsRoot">Container receiving generated warning boxes.</param>
+    /// <param name="skipHoldConfirmationProperty">Serialized skip hold confirmation duration.</param>
+    /// <param name="skipHoldFillColorProperty">Serialized skip hold fill color.</param>
+    private static void RefreshMilestoneRuntimeWarnings(VisualElement warningsRoot,
+                                                        SerializedProperty skipHoldConfirmationProperty,
+                                                        SerializedProperty skipHoldFillColorProperty)
+    {
+        if (warningsRoot == null)
+            return;
+
+        warningsRoot.Clear();
+
+        if (skipHoldConfirmationProperty != null)
+        {
+            float holdSeconds = skipHoldConfirmationProperty.floatValue;
+
+            if (float.IsNaN(holdSeconds) || float.IsInfinity(holdSeconds))
+                AddWarning(warningsRoot, "Milestone Skip Hold Confirmation Seconds is not finite. Runtime falls back to a safe value without changing the asset.");
+            else if (holdSeconds < 0f)
+                AddWarning(warningsRoot, "Milestone Skip Hold Confirmation Seconds is negative. Runtime treats it as instant confirmation without changing the asset.");
+        }
+
+        if (skipHoldFillColorProperty == null)
+            return;
+
+        Color fillColor = skipHoldFillColorProperty.colorValue;
+
+        if (fillColor.a <= 0f)
+            AddWarning(warningsRoot, "Milestone Skip Hold Fill Color alpha is zero or negative, so the hold fill will be invisible.");
+
+        if (IsColorOutsideUnitRange(fillColor))
+            AddWarning(warningsRoot, "Milestone Skip Hold Fill Color contains channels outside 0..1. Runtime clamps presentation channels without changing the asset.");
+    }
+
+    /// <summary>
+    /// Adds one warning box to the target container.
+    /// </summary>
+    /// <param name="warningsRoot">Container receiving the warning.</param>
+    /// <param name="warningText">Warning message shown in the tool.</param>
+    private static void AddWarning(VisualElement warningsRoot, string warningText)
+    {
+        if (warningsRoot == null || string.IsNullOrWhiteSpace(warningText))
+            return;
+
+        HelpBox warningBox = new HelpBox(warningText, HelpBoxMessageType.Warning);
+        warningBox.style.marginBottom = 2f;
+        warningsRoot.Add(warningBox);
+    }
+
+    /// <summary>
+    /// Checks whether any color channel is outside the normalized presentation range.
+    /// </summary>
+    /// <param name="color">Color value inspected by the tool.</param>
+    /// <returns>True when any channel is outside 0..1; otherwise false.</returns>
+    private static bool IsColorOutsideUnitRange(Color color)
+    {
+        if (color.r < 0f || color.r > 1f)
+            return true;
+
+        if (color.g < 0f || color.g > 1f)
+            return true;
+
+        if (color.b < 0f || color.b > 1f)
+            return true;
+
+        return color.a < 0f || color.a > 1f;
     }
 
     private static void RefreshScalableStatsWarnings(VisualElement warningsRoot,

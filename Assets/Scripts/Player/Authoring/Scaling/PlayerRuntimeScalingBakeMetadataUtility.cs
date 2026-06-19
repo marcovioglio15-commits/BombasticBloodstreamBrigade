@@ -199,6 +199,69 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
     }
 
     /// <summary>
+    /// Resolves raw milestone skip hold confirmation scaling metadata from the source progression preset.
+    /// </summary>
+    /// <param name="sourcePreset">Unscaled source progression preset.</param>
+    /// <param name="baseValue">Raw hold duration stored on the source preset.</param>
+    /// <param name="formula">Enabled Add Scaling formula when present.</param>
+    /// <returns>True when metadata was resolved from the source preset; otherwise false.</returns>
+    public static bool TryResolveMilestoneSkipHoldConfirmationScalingData(PlayerProgressionPreset sourcePreset,
+                                                                         out float baseValue,
+                                                                         out string formula)
+    {
+        baseValue = 0f;
+        formula = string.Empty;
+
+        if (sourcePreset == null)
+            return false;
+
+        baseValue = sourcePreset.MilestoneSkipHoldConfirmationSeconds;
+        formula = ResolveFormula(sourcePreset, "milestoneSkipHoldConfirmationSeconds");
+        return true;
+    }
+
+    /// <summary>
+    /// Resolves raw milestone skip hold fill color channel scaling metadata from the source progression preset.
+    /// </summary>
+    /// <param name="sourcePreset">Unscaled source progression preset.</param>
+    /// <param name="channelName">Unity color channel name: r, g, b, or a.</param>
+    /// <param name="baseValue">Raw channel value stored on the source preset.</param>
+    /// <param name="formula">Enabled Add Scaling formula when present.</param>
+    /// <returns>True when metadata was resolved from the source preset; otherwise false.</returns>
+    public static bool TryResolveMilestoneSkipHoldFillColorChannelScalingData(PlayerProgressionPreset sourcePreset,
+                                                                              string channelName,
+                                                                              out float baseValue,
+                                                                              out string formula)
+    {
+        baseValue = 0f;
+        formula = string.Empty;
+
+        if (sourcePreset == null || string.IsNullOrWhiteSpace(channelName))
+            return false;
+
+#if UNITY_EDITOR
+        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
+        SerializedProperty colorProperty = serializedPreset.FindProperty("milestoneSkipHoldFillColor");
+
+        if (colorProperty == null)
+            return false;
+
+        SerializedProperty channelProperty = colorProperty.FindPropertyRelative(channelName);
+
+        if (channelProperty == null)
+            return false;
+
+        baseValue = channelProperty.floatValue;
+        formula = ResolveFormula(serializedPreset,
+                                 sourcePreset.ScalingRules,
+                                 channelProperty);
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
     /// Resolves raw dropped-container interaction lock scaling metadata from the source progression preset.
     /// </summary>
     /// <param name="sourcePreset">Unscaled source progression preset.</param>

@@ -136,6 +136,9 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (!TryResolvePlayerEntity(out Entity playerEntity))
             return;
 
+        if (GameplayMenuEcsBindingUtility.IsMilestoneSelectionActive(entityManager, playerEntity))
+            SuppressPauseMenuForMilestoneSelection();
+
         if (!entityManager.HasComponent<PlayerRunOutcomeState>(playerEntity))
             return;
 
@@ -308,6 +311,12 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <param name="context">Input callback context for the performed cancel action.</param>
     private void HandlePausePerformed(InputAction.CallbackContext context)
     {
+        if (IsMilestoneSelectionActive())
+        {
+            SuppressPauseMenuForMilestoneSelection();
+            return;
+        }
+
         if (settingsMenuVisible)
         {
             if (settingsMenu != null)
@@ -339,40 +348,11 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <returns>True when ECS bindings are ready, otherwise false.</returns>
     private bool TryInitializeEcsBindings()
     {
-        World currentWorld = World.DefaultGameObjectInjectionWorld;
-
-        if (currentWorld == null || !currentWorld.IsCreated)
-        {
-            defaultWorld = null;
-            cachedPlayerEntity = Entity.Null;
-            playerQueryInitialized = false;
-            return false;
-        }
-
-        if (!ReferenceEquals(defaultWorld, currentWorld))
-        {
-            defaultWorld = currentWorld;
-            cachedPlayerEntity = Entity.Null;
-            playerQueryInitialized = false;
-        }
-
-        entityManager = defaultWorld.EntityManager;
-
-        if (playerQueryInitialized)
-            return true;
-
-        EntityQueryDesc playerQueryDescription = new EntityQueryDesc
-        {
-            All = new ComponentType[]
-            {
-                ComponentType.ReadOnly<PlayerControllerConfig>(),
-                ComponentType.ReadOnly<PlayerRunOutcomeState>()
-            }
-        };
-
-        playerQuery = entityManager.CreateEntityQuery(playerQueryDescription);
-        playerQueryInitialized = true;
-        return true;
+        return GameplayMenuEcsBindingUtility.TryInitializeBindings(ref defaultWorld,
+                                                                   ref entityManager,
+                                                                   ref playerQuery,
+                                                                   ref playerQueryInitialized,
+                                                                   ref cachedPlayerEntity);
     }
 
     /// <summary>
@@ -382,41 +362,25 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <returns>True when exactly one valid player entity exists, otherwise false.</returns>
     private bool TryResolvePlayerEntity(out Entity playerEntity)
     {
-        if (cachedPlayerEntity != Entity.Null &&
-            entityManager.Exists(cachedPlayerEntity) &&
-            entityManager.HasComponent<PlayerControllerConfig>(cachedPlayerEntity) &&
-            entityManager.HasComponent<PlayerRunOutcomeState>(cachedPlayerEntity))
-        {
-            playerEntity = cachedPlayerEntity;
-            return true;
-        }
+        return GameplayMenuEcsBindingUtility.TryResolvePlayerEntity(entityManager,
+                                                                    playerQuery,
+                                                                    ref cachedPlayerEntity,
+                                                                    out playerEntity);
+    }
 
-        if (playerQuery.IsEmptyIgnoreFilter)
-        {
-            playerEntity = Entity.Null;
-            cachedPlayerEntity = Entity.Null;
+    /// <summary>
+    /// Resolves whether the cached player is currently blocked by an active milestone selection.
+    /// </summary>
+    /// <returns>True when milestone selection owns gameplay input; otherwise false.</returns>
+    private bool IsMilestoneSelectionActive()
+    {
+        if (!TryInitializeEcsBindings())
             return false;
-        }
 
-        if (playerQuery.CalculateEntityCount() != 1)
-        {
-            playerEntity = Entity.Null;
-            cachedPlayerEntity = Entity.Null;
+        if (!TryResolvePlayerEntity(out Entity playerEntity))
             return false;
-        }
 
-        Entity resolvedPlayerEntity = playerQuery.GetSingletonEntity();
-
-        if (!entityManager.Exists(resolvedPlayerEntity))
-        {
-            playerEntity = Entity.Null;
-            cachedPlayerEntity = Entity.Null;
-            return false;
-        }
-
-        cachedPlayerEntity = resolvedPlayerEntity;
-        playerEntity = resolvedPlayerEntity;
-        return true;
+        return GameplayMenuEcsBindingUtility.IsMilestoneSelectionActive(entityManager, playerEntity);
     }
     #endregion
 
@@ -426,6 +390,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void ShowPauseMenu()
     {
+        if (IsMilestoneSelectionActive())
+            return;
+
         pauseMenuVisible = true;
         Time.timeScale = 0f;
 
@@ -489,6 +456,23 @@ public sealed class GameplayMenuController : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
         SelectDefaultButton(endingPlayAgainButton, endingMainMenuButton, endingQuitButton);
+    }
+
+    /// <summary>
+    /// Closes pause-owned UI immediately when milestone selection owns the gameplay overlay.
+    /// </summary>
+    private void SuppressPauseMenuForMilestoneSelection()
+    {
+        GameplayMenuEcsBindingUtility.SuppressPauseMenuForMilestoneSelection(pauseMenuRoot,
+                                                                             settingsMenu,
+                                                                             selectionController,
+                                                                             resumeButton,
+                                                                             pauseSettingsButton,
+                                                                             pauseRestartButton,
+                                                                             pauseMainMenuButton,
+                                                                             pauseQuitButton,
+                                                                             ref pauseMenuVisible,
+                                                                             ref settingsMenuVisible);
     }
     #endregion
 
@@ -594,20 +578,12 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <param name="interactable">True to enable pause-menu buttons, false to suspend them.</param>
     private void SetPauseButtonsInteractable(bool interactable)
     {
-        if (resumeButton != null)
-            resumeButton.interactable = interactable;
-
-        if (pauseSettingsButton != null)
-            pauseSettingsButton.interactable = interactable;
-
-        if (pauseRestartButton != null)
-            pauseRestartButton.interactable = interactable;
-
-        if (pauseMainMenuButton != null)
-            pauseMainMenuButton.interactable = interactable;
-
-        if (pauseQuitButton != null)
-            pauseQuitButton.interactable = interactable;
+        GameplayMenuEcsBindingUtility.SetPauseButtonsInteractable(resumeButton,
+                                                                  pauseSettingsButton,
+                                                                  pauseRestartButton,
+                                                                  pauseMainMenuButton,
+                                                                  pauseQuitButton,
+                                                                  interactable);
     }
     #endregion
 

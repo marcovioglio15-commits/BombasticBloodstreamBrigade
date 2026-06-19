@@ -23,6 +23,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
         SerializedProperty headerTextProperty = property.FindPropertyRelative("headerText");
         SerializedProperty hideOptionTitleNumbersProperty = property.FindPropertyRelative("hideOptionTitleNumbers");
         SerializedProperty skipButtonProperty = property.FindPropertyRelative("skipButton");
+        SerializedProperty skipHoldFillImageProperty = property.FindPropertyRelative("skipHoldFillImage");
+        SerializedProperty skipHoldFillImageNameProperty = property.FindPropertyRelative("skipHoldFillImageName");
+        SerializedProperty configureSkipHoldFillImageProperty = property.FindPropertyRelative("configureSkipHoldFillImage");
         SerializedProperty autoDiscoverOptionViewsProperty = property.FindPropertyRelative("autoDiscoverOptionViewsFromPanelRoot");
         SerializedProperty navigationInputDeadzoneProperty = property.FindPropertyRelative("navigationInputDeadzone");
         SerializedProperty navigationRepeatCooldownSecondsProperty = property.FindPropertyRelative("navigationRepeatCooldownSeconds");
@@ -36,6 +39,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
                                         headerTextProperty,
                                         hideOptionTitleNumbersProperty,
                                         skipButtonProperty,
+                                        skipHoldFillImageProperty,
+                                        skipHoldFillImageNameProperty,
+                                        configureSkipHoldFillImageProperty,
                                         autoDiscoverOptionViewsProperty,
                                         navigationInputDeadzoneProperty,
                                         navigationRepeatCooldownSecondsProperty,
@@ -56,12 +62,21 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
         PropertyField panelRootField = CreateBoundField(panelRootProperty, "Panel Root");
         PropertyField headerTextField = CreateBoundField(headerTextProperty, "Header Text");
         PropertyField skipButtonField = CreateBoundField(skipButtonProperty, "Skip Button");
+        PropertyField skipHoldFillImageField = CreateBoundField(skipHoldFillImageProperty, "Skip Hold Fill Image");
+        PropertyField skipHoldFillImageNameField = CreateBoundField(skipHoldFillImageNameProperty, "Skip Hold Fill Image Name");
+        PropertyField configureSkipHoldFillImageField = CreateBoundField(configureSkipHoldFillImageProperty, "Configure Skip Hold Fill Image");
         root.Add(panelRootField);
         root.Add(headerTextField);
         root.Add(skipButtonField);
+        root.Add(skipHoldFillImageField);
+        root.Add(skipHoldFillImageNameField);
+        root.Add(configureSkipHoldFillImageField);
 
         HelpBox requiredReferencesWarningBox = new HelpBox("Panel Root and Header Text should be assigned. Skip Button is strongly recommended because Cancel/skip input depends on it.", HelpBoxMessageType.Warning);
         root.Add(requiredReferencesWarningBox);
+
+        HelpBox skipFillInfoBox = new HelpBox("Skip hold fill is resolved in this order: explicit Skip Hold Fill Image, child with Skip Hold Fill Image Name, generated fallback child under Skip Button.", HelpBoxMessageType.Info);
+        root.Add(skipFillInfoBox);
 
         PropertyField autoDiscoverOptionViewsField = CreateBoundField(autoDiscoverOptionViewsProperty, "Auto Discover Option Views");
         root.Add(autoDiscoverOptionViewsField);
@@ -122,6 +137,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// <param name="headerTextProperty">Serialized header text property.</param>
     /// <param name="hideOptionTitleNumbersProperty">Serialized option-title numbering toggle property.</param>
     /// <param name="skipButtonProperty">Serialized skip button property.</param>
+    /// <param name="skipHoldFillImageProperty">Serialized skip hold fill image property.</param>
+    /// <param name="skipHoldFillImageNameProperty">Serialized skip hold fill image name property.</param>
+    /// <param name="configureSkipHoldFillImageProperty">Serialized skip hold fill image configuration toggle.</param>
     /// <param name="autoDiscoverOptionViewsProperty">Serialized auto-discovery toggle property.</param>
     /// <param name="navigationInputDeadzoneProperty">Serialized navigation deadzone property.</param>
     /// <param name="navigationRepeatCooldownSecondsProperty">Serialized navigation repeat cooldown property.</param>
@@ -135,6 +153,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
                                                    SerializedProperty headerTextProperty,
                                                    SerializedProperty hideOptionTitleNumbersProperty,
                                                    SerializedProperty skipButtonProperty,
+                                                   SerializedProperty skipHoldFillImageProperty,
+                                                   SerializedProperty skipHoldFillImageNameProperty,
+                                                   SerializedProperty configureSkipHoldFillImageProperty,
                                                    SerializedProperty autoDiscoverOptionViewsProperty,
                                                    SerializedProperty navigationInputDeadzoneProperty,
                                                    SerializedProperty navigationRepeatCooldownSecondsProperty,
@@ -145,6 +166,9 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
                                                    SerializedProperty lockButtonsAfterSelectionClickProperty)
     {
         if (panelRootProperty == null || headerTextProperty == null || skipButtonProperty == null)
+            return false;
+
+        if (skipHoldFillImageProperty == null || skipHoldFillImageNameProperty == null || configureSkipHoldFillImageProperty == null)
             return false;
 
         if (hideOptionTitleNumbersProperty == null)

@@ -4,11 +4,10 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Forwards pointer enter and exit events from one menu button to a shared MenuSelectionController.
-/// None.
 /// </summary>
 [RequireComponent(typeof(Selectable))]
 [DisallowMultipleComponent]
-public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDeselectHandler
 {
     #region Fields
 
@@ -28,6 +27,9 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
     #region Methods
 
     #region Unity Methods
+    /// <summary>
+    /// Caches the required selectable and resolves the shared menu selection controller.
+    /// </summary>
     private void Awake()
     {
         // Cache the required runtime references once.
@@ -35,12 +37,18 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
         ResolveSelectionController();
     }
 
+    /// <summary>
+    /// Re-resolves the selection controller when the relay is re-enabled after hierarchy changes.
+    /// </summary>
     private void OnEnable()
     {
         // Re-resolve the controller in case the hierarchy changed.
         ResolveSelectionController();
     }
 
+    /// <summary>
+    /// Releases hover ownership if this selectable is disabled while the pointer owns it.
+    /// </summary>
     private void OnDisable()
     {
         // Release hover ownership cleanly when the button gets disabled mid-hover.
@@ -77,12 +85,24 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour, IPointerEnterHandl
 
         selectionController.RegisterPointerExit(selectable);
     }
+
+    /// <summary>
+    /// Reports focus loss so the shared menu controller can recover from pointer clicks outside buttons.
+    /// </summary>
+    /// <param name="eventData">Deselection event reported by the Unity EventSystem.</param>
+    public void OnDeselect(BaseEventData eventData)
+    {
+        // Ignore missing selection infrastructure.
+        if (selectionController == null || selectable == null)
+            return;
+
+        selectionController.RegisterSelectableDeselected(selectable);
+    }
     #endregion
 
     #region Helpers
     /// <summary>
     /// Resolves the shared MenuSelectionController used by this button.
-    /// None.
     /// </summary>
     private void ResolveSelectionController()
     {

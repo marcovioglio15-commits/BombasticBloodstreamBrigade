@@ -8,6 +8,14 @@ public sealed class PlayerProgressionPreset : ScriptableObject
 {
     #region Fields
 
+    #region Constants
+    public const float DefaultMilestoneSkipHoldConfirmationSeconds = 0.5f;
+    private const float DefaultMilestoneSkipHoldFillRed = 0.95f;
+    private const float DefaultMilestoneSkipHoldFillGreen = 0.74f;
+    private const float DefaultMilestoneSkipHoldFillBlue = 0.15f;
+    private const float DefaultMilestoneSkipHoldFillAlpha = 0.55f;
+    #endregion
+
     #region Serialized Fields
     [Header("Metadata")]
     [Tooltip("Unique ID for this progression preset, used for stable references.")]
@@ -63,6 +71,12 @@ public sealed class PlayerProgressionPreset : ScriptableObject
     [Tooltip("Seconds used to restore Time.timeScale from 0 back to 1 after a milestone power-up selection closes.")]
     [SerializeField] private float milestoneTimeScaleResumeDurationSeconds = 0.2f;
 
+    [Tooltip("Unscaled seconds the player must hold the skip confirmation input before a milestone selection is skipped. Values below zero are reported by the tool and treated as instant confirmation at runtime.")]
+    [SerializeField] private float milestoneSkipHoldConfirmationSeconds = DefaultMilestoneSkipHoldConfirmationSeconds;
+
+    [Tooltip("Color used by the milestone skip button hold-confirmation fill. The runtime clamps individual channels for presentation without mutating the authored value.")]
+    [SerializeField] private Color milestoneSkipHoldFillColor = DefaultMilestoneSkipHoldFillColor;
+
     [Tooltip("Settings used to drop replaced active power ups as interactable world containers.")]
     [SerializeField] private PlayerPowerUpContainerInteractionSettings powerUpContainerSettings = new PlayerPowerUpContainerInteractionSettings();
 
@@ -72,6 +86,19 @@ public sealed class PlayerProgressionPreset : ScriptableObject
     [SerializeField] private LegacyPlayerProgressionBaseStats legacyBaseStats = new LegacyPlayerProgressionBaseStats();
     #endregion
 
+    #endregion
+
+    #region Static Properties
+    public static Color DefaultMilestoneSkipHoldFillColor
+    {
+        get
+        {
+            return new Color(DefaultMilestoneSkipHoldFillRed,
+                             DefaultMilestoneSkipHoldFillGreen,
+                             DefaultMilestoneSkipHoldFillBlue,
+                             DefaultMilestoneSkipHoldFillAlpha);
+        }
+    }
     #endregion
 
     #region Properties
@@ -176,6 +203,22 @@ public sealed class PlayerProgressionPreset : ScriptableObject
         get
         {
             return milestoneTimeScaleResumeDurationSeconds;
+        }
+    }
+
+    public float MilestoneSkipHoldConfirmationSeconds
+    {
+        get
+        {
+            return milestoneSkipHoldConfirmationSeconds;
+        }
+    }
+
+    public Color MilestoneSkipHoldFillColor
+    {
+        get
+        {
+            return milestoneSkipHoldFillColor;
         }
     }
 

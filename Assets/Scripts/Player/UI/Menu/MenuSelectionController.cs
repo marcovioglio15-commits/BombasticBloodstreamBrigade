@@ -6,7 +6,6 @@ using UnityEngine.UI;
 /// <summary>
 /// Centralizes default menu selection and pointer-hover takeover for authored UI menus.
 /// It keeps keyboard/controller navigation stable while letting hovered buttons temporarily own submit input.
-/// None.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class MenuSelectionController : MonoBehaviour
@@ -24,6 +23,7 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     #region Runtime
     private Coroutine deferredSelectionCoroutine;
+    private Coroutine deferredSelectionRecoveryCoroutine;
     private Selectable hoveredSelectable;
     private GameObject selectionBeforeHover;
     #endregion
@@ -51,18 +51,27 @@ public sealed class MenuSelectionController : MonoBehaviour
     #region Methods
 
     #region Unity Methods
+    /// <summary>
+    /// Queues the fallback menu selection whenever the menu becomes active.
+    /// </summary>
     private void OnEnable()
     {
         // Reapply the fallback selection whenever the menu becomes active.
         QueueDeferredDefaultSelection();
     }
 
+    /// <summary>
+    /// Queues a second startup selection pass after all scene objects have finished enabling.
+    /// </summary>
     private void Start()
     {
         // Run one second selection pass after all scene objects finished enabling.
         QueueDeferredDefaultSelection();
     }
 
+    /// <summary>
+    /// Clears pending selection restores and hover state when the menu is disabled.
+    /// </summary>
     private void OnDisable()
     {
         // Clear transient hover state when the menu is hidden or destroyed.
@@ -70,10 +79,14 @@ public sealed class MenuSelectionController : MonoBehaviour
         selectionBeforeHover = null;
 
         if (deferredSelectionCoroutine == null)
+        {
+            StopDeferredSelectionRecovery();
             return;
+        }
 
         StopCoroutine(deferredSelectionCoroutine);
         deferredSelectionCoroutine = null;
+        StopDeferredSelectionRecovery();
     }
     #endregion
 
@@ -144,12 +157,23 @@ public sealed class MenuSelectionController : MonoBehaviour
         hoveredSelectable = null;
         RestoreSelectionAfterHover();
     }
+
+    /// <summary>
+    /// Queues focus recovery when a selected menu button is deselected by a pointer click outside selectable controls.
+    /// </summary>
+    /// <param name="selectable">Selectable that just lost EventSystem focus.</param>
+    public void RegisterSelectableDeselected(Selectable selectable)
+    {
+        if (selectable == null)
+            return;
+
+        QueueDeferredSelectionRecovery();
+    }
     #endregion
 
     #region Selection Helpers
     /// <summary>
     /// Queues one end-of-frame fallback selection pass so menu highlight is restored reliably after activation.
-    /// None.
     /// </summary>
     private void QueueDeferredDefaultSelection()
     {
@@ -163,8 +187,21 @@ public sealed class MenuSelectionController : MonoBehaviour
     }
 
     /// <summary>
+    /// Queues one end-of-frame focus recovery pass after a selectable reports deselection.
+    /// </summary>
+    private void QueueDeferredSelectionRecovery()
+    {
+        if (!gameObject.activeInHierarchy)
+            return;
+
+        if (deferredSelectionRecoveryCoroutine != null)
+            StopCoroutine(deferredSelectionRecoveryCoroutine);
+
+        deferredSelectionRecoveryCoroutine = StartCoroutine(DeferredSelectionRecoveryCoroutine());
+    }
+
+    /// <summary>
     /// Applies the fallback selection on the next frame after layout and EventSystem startup have settled.
-    /// None.
     /// </summary>
     /// <returns>Enumerator used by Unity coroutine scheduling.</returns>
     private IEnumerator DeferredDefaultSelectionCoroutine()
@@ -181,8 +218,31 @@ public sealed class MenuSelectionController : MonoBehaviour
     }
 
     /// <summary>
+    /// Restores fallback focus on the next frame only when no other selectable took focus.
+    /// </summary>
+    /// <returns>Enumerator used by Unity coroutine scheduling.</returns>
+    private IEnumerator DeferredSelectionRecoveryCoroutine()
+    {
+        // Wait one frame so legitimate selection changes can complete before recovering focus.
+        yield return null;
+        deferredSelectionRecoveryCoroutine = null;
+
+        if (hoveredSelectable != null)
+            yield break;
+
+        EventSystem resolvedEventSystem = ResolveEventSystem();
+
+        if (resolvedEventSystem == null)
+            yield break;
+
+        if (resolvedEventSystem.currentSelectedGameObject != null)
+            yield break;
+
+        SelectSelectable(defaultSelectable, rememberAsDefault : false);
+    }
+
+    /// <summary>
     /// Restores either the pre-hover selection or the configured fallback selectable after hover ends.
-    /// None.
     /// </summary>
     private void RestoreSelectionAfterHover()
     {
@@ -198,6 +258,18 @@ public sealed class MenuSelectionController : MonoBehaviour
 
         // Fall back to the configured default selection when no previous button can be restored.
         SelectSelectable(defaultSelectable, rememberAsDefault : false);
+    }
+
+    /// <summary>
+    /// Stops a queued focus-recovery coroutine when the menu is disabled or default selection is reset.
+    /// </summary>
+    private void StopDeferredSelectionRecovery()
+    {
+        if (deferredSelectionRecoveryCoroutine == null)
+            return;
+
+        StopCoroutine(deferredSelectionRecoveryCoroutine);
+        deferredSelectionRecoveryCoroutine = null;
     }
 
     /// <summary>
@@ -220,7 +292,6 @@ public sealed class MenuSelectionController : MonoBehaviour
 
     /// <summary>
     /// Resolves the usable EventSystem instance for this menu.
-    /// None.
     /// </summary>
     /// <returns>EventSystem used by this menu, or null when none is available.</returns>
     private EventSystem ResolveEventSystem()

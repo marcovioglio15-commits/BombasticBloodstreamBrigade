@@ -31,6 +31,25 @@ internal static class PlayerProgressionBlobBakeUtility
         float experiencePickupRadius = preset != null ? math.max(0f, preset.ExperiencePickupRadius) : 0f;
         float baseExperiencePickupRadius = sourcePreset != null ? math.max(0f, sourcePreset.ExperiencePickupRadius) : experiencePickupRadius;
         string experiencePickupRadiusScalingFormula = string.Empty;
+        float milestoneSkipHoldConfirmationSeconds = ResolveNonNegativeFinite(preset != null
+            ? preset.MilestoneSkipHoldConfirmationSeconds
+            : PlayerProgressionPreset.DefaultMilestoneSkipHoldConfirmationSeconds,
+            PlayerProgressionPreset.DefaultMilestoneSkipHoldConfirmationSeconds);
+        float baseMilestoneSkipHoldConfirmationSeconds = ResolveNonNegativeFinite(sourcePreset != null
+            ? sourcePreset.MilestoneSkipHoldConfirmationSeconds
+            : milestoneSkipHoldConfirmationSeconds,
+            milestoneSkipHoldConfirmationSeconds);
+        string milestoneSkipHoldConfirmationScalingFormula = string.Empty;
+        float4 milestoneSkipHoldFillColor = ResolveColorVector(preset != null
+            ? preset.MilestoneSkipHoldFillColor
+            : PlayerProgressionPreset.DefaultMilestoneSkipHoldFillColor);
+        float4 baseMilestoneSkipHoldFillColor = ResolveColorVector(sourcePreset != null
+            ? sourcePreset.MilestoneSkipHoldFillColor
+            : preset != null ? preset.MilestoneSkipHoldFillColor : PlayerProgressionPreset.DefaultMilestoneSkipHoldFillColor);
+        string milestoneSkipHoldFillColorRScalingFormula = string.Empty;
+        string milestoneSkipHoldFillColorGScalingFormula = string.Empty;
+        string milestoneSkipHoldFillColorBScalingFormula = string.Empty;
+        string milestoneSkipHoldFillColorAScalingFormula = string.Empty;
 
         if (PlayerRuntimeScalingBakeMetadataUtility.TryResolveExperiencePickupRadiusScalingData(sourcePreset,
                                                                                                 out float resolvedBaseExperiencePickupRadius,
@@ -40,13 +59,53 @@ internal static class PlayerProgressionBlobBakeUtility
             experiencePickupRadiusScalingFormula = resolvedExperiencePickupRadiusScalingFormula;
         }
 
+        if (PlayerRuntimeScalingBakeMetadataUtility.TryResolveMilestoneSkipHoldConfirmationScalingData(sourcePreset,
+                                                                                                      out float resolvedBaseMilestoneSkipHoldConfirmationSeconds,
+                                                                                                      out string resolvedMilestoneSkipHoldConfirmationScalingFormula))
+        {
+            baseMilestoneSkipHoldConfirmationSeconds = ResolveNonNegativeFinite(resolvedBaseMilestoneSkipHoldConfirmationSeconds,
+                                                                                baseMilestoneSkipHoldConfirmationSeconds);
+            milestoneSkipHoldConfirmationScalingFormula = resolvedMilestoneSkipHoldConfirmationScalingFormula;
+        }
+
+        ResolveMilestoneSkipHoldColorChannelScalingData(sourcePreset,
+                                                        "r",
+                                                        ref baseMilestoneSkipHoldFillColor.x,
+                                                        ref milestoneSkipHoldFillColorRScalingFormula);
+        ResolveMilestoneSkipHoldColorChannelScalingData(sourcePreset,
+                                                        "g",
+                                                        ref baseMilestoneSkipHoldFillColor.y,
+                                                        ref milestoneSkipHoldFillColorGScalingFormula);
+        ResolveMilestoneSkipHoldColorChannelScalingData(sourcePreset,
+                                                        "b",
+                                                        ref baseMilestoneSkipHoldFillColor.z,
+                                                        ref milestoneSkipHoldFillColorBScalingFormula);
+        ResolveMilestoneSkipHoldColorChannelScalingData(sourcePreset,
+                                                        "a",
+                                                        ref baseMilestoneSkipHoldFillColor.w,
+                                                        ref milestoneSkipHoldFillColorAScalingFormula);
+
         root.LevelCap = levelCap;
         root.ExperiencePickupRadius = experiencePickupRadius;
         root.BaseExperiencePickupRadius = baseExperiencePickupRadius;
         root.MilestoneTimeScaleResumeDurationSeconds = preset != null ? math.max(0f, preset.MilestoneTimeScaleResumeDurationSeconds) : 0f;
+        root.MilestoneSkipHoldConfirmationSeconds = milestoneSkipHoldConfirmationSeconds;
+        root.BaseMilestoneSkipHoldConfirmationSeconds = baseMilestoneSkipHoldConfirmationSeconds;
+        root.MilestoneSkipHoldFillColor = milestoneSkipHoldFillColor;
+        root.BaseMilestoneSkipHoldFillColor = baseMilestoneSkipHoldFillColor;
         root.EquippedScheduleIndex = -1;
         builder.AllocateString(ref root.ExperiencePickupRadiusScalingFormula,
                                string.IsNullOrWhiteSpace(experiencePickupRadiusScalingFormula) ? string.Empty : experiencePickupRadiusScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipHoldConfirmationSecondsScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipHoldConfirmationScalingFormula) ? string.Empty : milestoneSkipHoldConfirmationScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipHoldFillColorRScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorRScalingFormula) ? string.Empty : milestoneSkipHoldFillColorRScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipHoldFillColorGScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorGScalingFormula) ? string.Empty : milestoneSkipHoldFillColorGScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipHoldFillColorBScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorBScalingFormula) ? string.Empty : milestoneSkipHoldFillColorBScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipHoldFillColorAScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorAScalingFormula) ? string.Empty : milestoneSkipHoldFillColorAScalingFormula);
 
         BakeProgressionGamePhases(builder,
                                   ref root,
@@ -64,6 +123,70 @@ internal static class PlayerProgressionBlobBakeUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Resolves one finite non-negative value used by the progression blob without mutating the source preset.
+    /// </summary>
+    /// <param name="value">Authored value to sanitize for runtime storage.</param>
+    /// <param name="fallbackValue">Fallback used when the authored value is not finite.</param>
+    /// <returns>Finite non-negative value safe for runtime consumption.</returns>
+    private static float ResolveNonNegativeFinite(float value, float fallbackValue)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value))
+            return math.max(0f, fallbackValue);
+
+        return math.max(0f, value);
+    }
+
+    /// <summary>
+    /// Converts an authored color to a runtime-safe float4 used by blob data.
+    /// </summary>
+    /// <param name="color">Authored color value.</param>
+    /// <returns>Color channels clamped to the presentation-safe 0..1 range.</returns>
+    private static float4 ResolveColorVector(Color color)
+    {
+        return new float4(ResolveColorChannel(color.r),
+                          ResolveColorChannel(color.g),
+                          ResolveColorChannel(color.b),
+                          ResolveColorChannel(color.a));
+    }
+
+    /// <summary>
+    /// Converts one authored color channel to a finite clamped value for runtime presentation.
+    /// </summary>
+    /// <param name="value">Raw color channel.</param>
+    /// <returns>Finite channel value in the 0..1 range.</returns>
+    private static float ResolveColorChannel(float value)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value))
+            return 0f;
+
+        return math.saturate(value);
+    }
+
+    /// <summary>
+    /// Resolves the source base value and formula for one milestone skip hold fill color channel.
+    /// </summary>
+    /// <param name="sourcePreset">Unscaled progression preset used as formula baseline.</param>
+    /// <param name="channelName">Unity color channel name: r, g, b, or a.</param>
+    /// <param name="baseChannelValue">Mutable base color channel value.</param>
+    /// <param name="scalingFormula">Mutable formula string for the channel.</param>
+    private static void ResolveMilestoneSkipHoldColorChannelScalingData(PlayerProgressionPreset sourcePreset,
+                                                                        string channelName,
+                                                                        ref float baseChannelValue,
+                                                                        ref string scalingFormula)
+    {
+        if (!PlayerRuntimeScalingBakeMetadataUtility.TryResolveMilestoneSkipHoldFillColorChannelScalingData(sourcePreset,
+                                                                                                           channelName,
+                                                                                                           out float resolvedBaseChannelValue,
+                                                                                                           out string resolvedScalingFormula))
+        {
+            return;
+        }
+
+        baseChannelValue = ResolveColorChannel(resolvedBaseChannelValue);
+        scalingFormula = resolvedScalingFormula;
+    }
+
     /// <summary>
     /// Bakes game phases, milestone requirements, milestone offer rolls, and skip compensations.
     /// </summary>
