@@ -310,23 +310,23 @@ MonoBehaviour:
     labelPlacement: 0
     fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
     labelFontSize: 18
-    labelOffset: {x: 0, y: 0}
+    labelOffset: {x: 0, y: -2}
     labelOutlineWidth: 0.2
-    graduationVerticalOffset: 0
+    graduationVerticalOffset: -0.04
     bodyStyle: 0
     barHeight: 85
     outlineThickness: 0.05
     chamberInset: 0.15
-    plungerWidth: 0.05
+    plungerWidth: 0.08
     endCapWidth: 20
     terminationOffset: 10
     terminationStyle: 1
     paintDrips:
       enabled: 1
-      density: 0.32
-      length: 0.17
-      width: 0.026
-      irregularity: 0.5059
+      density: 0.3
+      length: 0.15
+      width: 0.025
+      irregularity: 0.5
     health:
       enabled: 1
       hideWhenMaximumUnavailable: 0
@@ -470,7 +470,7 @@ MonoBehaviour:
       steps:
       - stepIndex: 0
         statName: FireRate
-        textOverride: FRT
+        textOverride: ROF
         presentationMode: 0
         nextSprite: {fileID: 0}
         normalSprite: {fileID: 0}

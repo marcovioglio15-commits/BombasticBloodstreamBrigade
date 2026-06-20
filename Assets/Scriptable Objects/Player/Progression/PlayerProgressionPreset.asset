@@ -21,7 +21,7 @@ MonoBehaviour:
     statType: 1
     defaultValue: 10
     minimumValue: 1
-    maximumValue: 1000
+    maximumValue: 10
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: Shield
