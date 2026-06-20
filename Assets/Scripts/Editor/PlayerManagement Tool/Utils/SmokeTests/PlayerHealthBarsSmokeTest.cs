@@ -19,6 +19,8 @@ public static class PlayerHealthBarsSmokeTest
     private const string MaterialPath = "Assets/2D/Materials/M_UI_PlayerSyringeBar.mat";
     private const string ShieldMaterialPath = "Assets/2D/Materials/M_UI_PlayerShieldSyringeBar.mat";
     private const string FontPath = "Assets/2D/Fonts/NoctraDrip-Solid SDF.asset";
+    private const string VisualPresetPath = "Assets/Scriptable Objects/Player/Visual/PlayerVisualPreset_A.asset";
+    private const int TransparentRenderQueue = 3000;
     private const float ReferenceDecorationLength = 340f;
     #endregion
 
@@ -35,7 +37,8 @@ public static class PlayerHealthBarsSmokeTest
         ValidateScalingEndToEnd();
         ValidatePrefab();
         ValidateEditorPreview();
-        ValidateLabelDistribution();
+        PlayerHealthBarsLabelDistributionSmokeTestUtility.Validate();
+        ValidateLabelRenderQueueOrdering();
         ValidateGraduationAlignmentAndMotionReset();
         ValidateShortSyringeDecorationScale();
         ValidateShieldVisibilityPolicy();
@@ -288,83 +291,6 @@ public static class PlayerHealthBarsSmokeTest
     }
 
     /// <summary>
-    /// Validates that constrained label pools distribute values across the complete syringe range.
-    /// </summary>
-    private static void ValidateLabelDistribution()
-    {
-        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
-        GameObject instance = UnityEngine.Object.Instantiate(prefab);
-
-        try
-        {
-            PlayerSyringeBarLabelPool labelPool = instance.GetComponentInChildren<PlayerSyringeBarLabelPool>(true);
-
-            if (labelPool == null)
-                throw new InvalidOperationException("Preauthored syringe label pool is missing.");
-
-            labelPool.Rebuild(5f,
-                              1f,
-                              1,
-                              PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity,
-                              260f,
-                              46f,
-                              PlayerSyringeLabelPlacement.InsideChamber,
-                              15f,
-                              new Unity.Mathematics.float2(0f, 0f),
-                              0f,
-                              new Unity.Mathematics.float4(0f, 0f, 0f, 1f),
-                              new Unity.Mathematics.float4(1f, 1f, 1f, 1f),
-                              0.1f,
-                              null);
-            TMP_Text[] labels = labelPool.GetComponentsInChildren<TMP_Text>(true);
-            bool foundMaximum = false;
-            bool foundOne = false;
-            bool foundTwo = false;
-            bool foundThree = false;
-            bool foundFour = false;
-            bool foundZero = false;
-            bool anchorsAligned = true;
-            int activeCount = 0;
-
-            for (int index = 0; index < labels.Length; index++)
-            {
-                if (!labels[index].gameObject.activeSelf)
-                    continue;
-
-                activeCount++;
-                foundMaximum |= string.Equals(labels[index].text, "5", StringComparison.Ordinal);
-                foundOne |= string.Equals(labels[index].text, "1", StringComparison.Ordinal);
-                foundTwo |= string.Equals(labels[index].text, "2", StringComparison.Ordinal);
-                foundThree |= string.Equals(labels[index].text, "3", StringComparison.Ordinal);
-                foundFour |= string.Equals(labels[index].text, "4", StringComparison.Ordinal);
-                foundZero |= string.Equals(labels[index].text, "0", StringComparison.Ordinal);
-
-                if (!int.TryParse(labels[index].text, out int representedValue) ||
-                    !Mathf.Approximately(labels[index].rectTransform.anchorMin.x, representedValue / 5f))
-                {
-                    anchorsAligned = false;
-                }
-            }
-
-            if (activeCount != 5 ||
-                !foundMaximum ||
-                !foundOne ||
-                !foundTwo ||
-                !foundThree ||
-                !foundFour ||
-                foundZero ||
-                !anchorsAligned)
-            {
-                throw new InvalidOperationException("Fixed-unit label pool did not preserve every aligned 1-5 graduation label or incorrectly displayed zero.");
-            }
-        }
-        finally
-        {
-            UnityEngine.Object.DestroyImmediate(instance);
-        }
-    }
-
-    /// <summary>
     /// Validates exact simplified-style label-to-tick alignment and reactive-motion reset behavior.
     /// </summary>
     private static void ValidateGraduationAlignmentAndMotionReset()
@@ -528,6 +454,65 @@ public static class PlayerHealthBarsSmokeTest
     }
 
     /// <summary>
+    /// Validates that shield labels render after the procedural syringe even when the portrait UI rotates the bar root in 3D.
+    /// </summary>
+    private static void ValidateLabelRenderQueueOrdering()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
+        PlayerVisualPreset visualPreset = AssetDatabase.LoadAssetAtPath<PlayerVisualPreset>(VisualPresetPath);
+        GameObject instance = UnityEngine.Object.Instantiate(prefab);
+        Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
+        PlayerSyringeBarView shieldView = shieldRoot != null
+            ? shieldRoot.GetComponent<PlayerSyringeBarView>()
+            : null;
+        PlayerSyringeBarGraphic shieldGraphic = shieldRoot != null
+            ? shieldRoot.GetComponentInChildren<PlayerSyringeBarGraphic>(true)
+            : null;
+
+        try
+        {
+            if (visualPreset == null || shieldView == null || shieldGraphic == null)
+                throw new InvalidOperationException("Shield syringe render-queue validation is missing its preset, view, or graphic.");
+
+            PlayerHealthBarVisualConfig config = PlayerHealthBarVisualBakeUtility.BuildConfig(visualPreset);
+            TMP_FontAsset font = config.FontAsset.Value;
+            shieldView.ApplyConfiguration(in config, in config.Shield, font);
+            shieldView.UpdateValue(5f, 10f, 0f, true);
+            Canvas.ForceUpdateCanvases();
+
+            int syringeQueue = ResolveMaterialRenderQueue(shieldGraphic.material);
+            TMP_Text[] labels = shieldRoot.GetComponentsInChildren<TMP_Text>(true);
+            int activeCount = 0;
+
+            for (int index = 0; index < labels.Length; index++)
+            {
+                if (!labels[index].gameObject.activeSelf)
+                    continue;
+
+                activeCount++;
+                Material labelMaterial = labels[index].fontSharedMaterial;
+
+                if (labelMaterial == null || ResolveMaterialRenderQueue(labelMaterial) <= syringeQueue)
+                {
+                    throw new InvalidOperationException(string.Format("Shield label '{0}' is not forced above the syringe graphic render queue.",
+                                                                      labels[index].name));
+                }
+            }
+
+            if (activeCount != 10)
+                throw new InvalidOperationException(string.Format("Shield render-queue validation expected 10 active labels but found {0}.",
+                                                                  activeCount));
+        }
+        finally
+        {
+            if (shieldView != null)
+                shieldView.Dispose();
+
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
+    }
+
+    /// <summary>
     /// Validates that short one-division syringes preserve stable pixel-sized decorations.
     /// </summary>
     private static void ValidateShortSyringeDecorationScale()
@@ -586,6 +571,25 @@ public static class PlayerHealthBarsSmokeTest
 
             UnityEngine.Object.DestroyImmediate(instance);
         }
+    }
+
+    /// <summary>
+    /// Resolves the effective transparent render queue used by a UI material.
+    /// </summary>
+    /// <param name="material">Material rendered by a UGUI graphic or TMP label.</param>
+    /// <returns>Explicit material queue, shader queue, or Unity transparent queue fallback.</returns>
+    private static int ResolveMaterialRenderQueue(Material material)
+    {
+        if (material == null)
+            return TransparentRenderQueue;
+
+        if (material.renderQueue >= 0)
+            return material.renderQueue;
+
+        if (material.shader != null)
+            return material.shader.renderQueue;
+
+        return TransparentRenderQueue;
     }
 
     /// <summary>

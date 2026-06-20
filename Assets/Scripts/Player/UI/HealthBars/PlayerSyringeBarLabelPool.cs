@@ -12,6 +12,14 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     #region Constants
     private const float GraduationLabelAnchorY = 0.055f;
     private const float InsideLabelAnchorY = 0.53f;
+    private const int TransparentRenderQueue = 3000;
+    private const int LabelRenderQueueOffset = 1;
+    #endregion
+
+    #region Shader Properties
+    private static readonly int FaceColorId = Shader.PropertyToID("_FaceColor");
+    private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
+    private static readonly int OutlineWidthId = Shader.PropertyToID("_OutlineWidth");
     #endregion
 
     #region Fields
@@ -21,6 +29,10 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     [SerializeField] private List<TMP_Text> labels = new List<TMP_Text>();
     #endregion
 
+    private readonly List<TMP_Text> resolvedLabels = new List<TMP_Text>(PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity);
+    private RectTransform boundOwnerRoot;
+    private Material runtimeLabelMaterial;
+    private TMP_FontAsset runtimeLabelMaterialFont;
     #endregion
 
     #region Methods
@@ -29,6 +41,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// <summary>
     /// Rebuilds active fixed-unit graduation labels for the current authoritative maximum.
     /// </summary>
+    /// <param name="ownerRoot">RectTransform that owns the preauthored labels for this syringe instance.</param>
     /// <param name="maximumValue">Authoritative maximum health or shield value.</param>
     /// <param name="unitsPerMajorDivision">Fixed value represented by each major graduation interval.</param>
     /// <param name="labelEveryMajorDivision">Displays one label every N major intervals.</param>
@@ -43,7 +56,8 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// <param name="labelOutlineColor">Direct outline color applied to active labels.</param>
     /// <param name="labelOutlineWidth">TextMeshPro outline width applied to active labels.</param>
     /// <param name="font">Resolved font asset, or null to preserve the preauthored font.</param>
-    public void Rebuild(float maximumValue,
+    public void Rebuild(RectTransform ownerRoot,
+                        float maximumValue,
                         float unitsPerMajorDivision,
                         int labelEveryMajorDivision,
                         int maximumLabelCount,
@@ -58,7 +72,9 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                         float labelOutlineWidth,
                         TMP_FontAsset font)
     {
-        int availableCount = math.min(labels.Count, math.max(2, maximumLabelCount));
+        ResolveLabels(ownerRoot);
+
+        int availableCount = math.min(resolvedLabels.Count, math.max(2, maximumLabelCount));
 
         if (availableCount <= 0)
             return;
@@ -70,16 +86,21 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                                          (int)math.floor(math.max(1f, chamberPixelWidth) /
                                                          math.max(1f, minimumLabelSpacing)) + 1);
         int effectiveCapacity = math.min(availableCount, spaceLimitedCount);
-        int fittedIntervalStep = maximumIntervalIndex > 0 && effectiveCapacity > 1
-            ? (int)math.ceil(maximumIntervalIndex / (float)(effectiveCapacity - 1))
+        int requestedIntervalStep = math.max(1, labelEveryMajorDivision);
+        int requestedLabelCount = maximumIntervalIndex > 0
+            ? (int)math.ceil(maximumIntervalIndex / (float)requestedIntervalStep)
             : 1;
-        int intervalStep = math.max(math.max(1, labelEveryMajorDivision), fittedIntervalStep);
+        int fittedIntervalStep = maximumIntervalIndex > 0 && requestedLabelCount > effectiveCapacity
+            ? (int)math.ceil(maximumIntervalIndex / (float)effectiveCapacity)
+            : 1;
+        int intervalStep = math.max(requestedIntervalStep, fittedIntervalStep);
         int labelIndex = 0;
+        Material labelMaterial = ResolveLabelMaterial(font, labelOutlineColor, labelOutlineWidth);
 
         for (int majorIndex = intervalStep; majorIndex < maximumIntervalIndex && labelIndex < effectiveCapacity - 1; majorIndex += intervalStep)
         {
             float representedValue = math.min(safeMaximum, majorIndex * safeUnits);
-            ConfigureLabel(labels[labelIndex],
+            ConfigureLabel(resolvedLabels[labelIndex],
                            representedValue,
                            safeMaximum > 0f ? representedValue / safeMaximum : 0f,
                            labelPlacement,
@@ -89,13 +110,14 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                            labelColor,
                            labelOutlineColor,
                            labelOutlineWidth,
-                           font);
+                           font,
+                           labelMaterial);
             labelIndex++;
         }
 
         if (labelIndex == 0 || safeMaximum > 0f)
         {
-            ConfigureLabel(labels[labelIndex],
+            ConfigureLabel(resolvedLabels[labelIndex],
                            safeMaximum,
                            safeMaximum > 0f ? 1f : 0f,
                            labelPlacement,
@@ -105,15 +127,12 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                            labelColor,
                            labelOutlineColor,
                            labelOutlineWidth,
-                           font);
+                           font,
+                           labelMaterial);
             labelIndex++;
         }
 
-        for (int index = labelIndex; index < labels.Count; index++)
-        {
-            if (labels[index] != null)
-                labels[index].gameObject.SetActive(false);
-        }
+        HideLabelsFromIndex(labelIndex);
     }
 
     /// <summary>
@@ -121,10 +140,75 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// </summary>
     public void HideAll()
     {
+        ResolveLabels(boundOwnerRoot);
+        HideLabelsFromIndex(0);
+    }
+
+    /// <summary>
+    /// Releases the shared runtime TMP material owned by this preauthored label pool.
+    /// </summary>
+    public void DisposeRuntimeResources()
+    {
+        ReleaseRuntimeLabelMaterial();
+    }
+    #endregion
+
+    #region Lifecycle
+    /// <summary>
+    /// Releases editor/runtime material instances when the preauthored pool is destroyed.
+    /// </summary>
+    private void OnDestroy()
+    {
+        ReleaseRuntimeLabelMaterial();
+    }
+    #endregion
+
+    #region Label Resolution
+    /// <summary>
+    /// Resolves the label set owned by this syringe root, falling back to the serialized pool only when no owner root exists.
+    /// </summary>
+    /// <param name="ownerRoot">RectTransform that owns the preauthored labels for this syringe instance.</param>
+    private void ResolveLabels(RectTransform ownerRoot)
+    {
+        boundOwnerRoot = ownerRoot;
+        resolvedLabels.Clear();
+
+        if (ownerRoot != null)
+        {
+            ownerRoot.GetComponentsInChildren(true, resolvedLabels);
+            RemoveNullLabels();
+            return;
+        }
+
         for (int index = 0; index < labels.Count; index++)
         {
             if (labels[index] != null)
-                labels[index].gameObject.SetActive(false);
+                resolvedLabels.Add(labels[index]);
+        }
+    }
+
+    /// <summary>
+    /// Removes invalid entries left by prefab edits or missing object references.
+    /// </summary>
+    private void RemoveNullLabels()
+    {
+        for (int index = resolvedLabels.Count - 1; index >= 0; index--)
+        {
+            if (resolvedLabels[index] == null)
+                resolvedLabels.RemoveAt(index);
+        }
+    }
+
+    /// <summary>
+    /// Hides resolved labels after the last active index.
+    /// </summary>
+    /// <param name="startIndex">First resolved label index to hide.</param>
+    private void HideLabelsFromIndex(int startIndex)
+    {
+        for (int index = math.max(0, startIndex); index < resolvedLabels.Count; index++)
+        {
+            if (resolvedLabels[index] != null)
+                resolvedLabels[index].gameObject.SetActive(false);
         }
     }
     #endregion
@@ -144,6 +228,7 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
     /// <param name="labelOutlineColor">Direct label outline color.</param>
     /// <param name="labelOutlineWidth">TextMeshPro outline width.</param>
     /// <param name="font">Resolved font asset, or null to preserve the preauthored font.</param>
+    /// <param name="labelMaterial">Shared runtime label material with a render queue above the syringe graphic.</param>
     private static void ConfigureLabel(TMP_Text label,
                                        float representedValue,
                                        float normalizedPosition,
@@ -154,7 +239,8 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
                                        float4 labelColor,
                                        float4 labelOutlineColor,
                                        float labelOutlineWidth,
-                                       TMP_FontAsset font)
+                                       TMP_FontAsset font,
+                                       Material labelMaterial)
     {
         if (label == null)
             return;
@@ -164,6 +250,8 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
         RectTransform labelTransform = label.rectTransform;
         Vector2 anchor = new Vector2(math.saturate(normalizedPosition),
                                      (insideChamber ? InsideLabelAnchorY : GraduationLabelAnchorY) + graduationVerticalOffset);
+        ApplyFont(label, font);
+        ApplyTextRenderingSettings(label);
         labelTransform.anchorMin = anchor;
         labelTransform.anchorMax = anchor;
         labelTransform.pivot = new Vector2(0.5f, insideChamber ? 0.5f : 0f);
@@ -180,11 +268,161 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
         label.text = math.abs(representedValue - math.round(representedValue)) <= 0.001f
             ? math.round(representedValue).ToString("0")
             : representedValue.ToString("0.##");
-
-        if (font != null && label.font != font)
-            label.font = font;
+        ApplyLabelMaterial(label, labelMaterial);
 
         label.gameObject.SetActive(true);
+        RefreshLabelMesh(label);
+    }
+
+    /// <summary>
+    /// Applies the runtime font so preauthored labels cannot keep stale TMP font state.
+    /// </summary>
+    /// <param name="label">Preauthored TextMeshPro label being configured.</param>
+    /// <param name="font">Resolved font asset, or null to preserve the preauthored font.</param>
+    private static void ApplyFont(TMP_Text label, TMP_FontAsset font)
+    {
+        if (font == null)
+            return;
+
+        if (label.font != font)
+            label.font = font;
+    }
+
+    /// <summary>
+    /// Assigns the shared runtime TMP material after text style changes so labels render after the procedural syringe.
+    /// </summary>
+    /// <param name="label">Preauthored TextMeshPro label being configured.</param>
+    /// <param name="labelMaterial">Runtime label material configured for the current pool, or null to keep existing material state.</param>
+    private static void ApplyLabelMaterial(TMP_Text label, Material labelMaterial)
+    {
+        if (labelMaterial == null)
+            return;
+
+        if (label.fontSharedMaterial != labelMaterial)
+            label.fontSharedMaterial = labelMaterial;
+    }
+
+    /// <summary>
+    /// Normalizes reusable label text settings that may differ across preauthored pool entries.
+    /// </summary>
+    /// <param name="label">Preauthored TextMeshPro label being configured.</param>
+    private static void ApplyTextRenderingSettings(TMP_Text label)
+    {
+        label.enableAutoSizing = false;
+        label.enableVertexGradient = false;
+        label.extraPadding = true;
+        label.overflowMode = TextOverflowModes.Overflow;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
+        label.raycastTarget = false;
+    }
+
+    /// <summary>
+    /// Forces TextMeshPro to rebuild geometry after font, material, outline, and text changes.
+    /// </summary>
+    /// <param name="label">Preauthored TextMeshPro label being configured.</param>
+    private static void RefreshLabelMesh(TMP_Text label)
+    {
+        label.UpdateMeshPadding();
+        label.SetMaterialDirty();
+        label.SetVerticesDirty();
+        label.ForceMeshUpdate(true);
+    }
+    #endregion
+
+    #region Material
+    /// <summary>
+    /// Resolves a shared TMP material whose render queue is above the procedural syringe material.
+    /// </summary>
+    /// <param name="font">Runtime font asset resolved from the active Player Visual Preset.</param>
+    /// <param name="labelOutlineColor">Direct outline color applied by the current syringe channel.</param>
+    /// <param name="labelOutlineWidth">Direct outline width applied by the current syringe channel.</param>
+    /// <returns>Shared runtime label material, or null when no font material is available.</returns>
+    private Material ResolveLabelMaterial(TMP_FontAsset font, float4 labelOutlineColor, float labelOutlineWidth)
+    {
+        if (font == null || font.material == null)
+            return null;
+
+        if (runtimeLabelMaterial == null || runtimeLabelMaterialFont != font)
+            RecreateRuntimeLabelMaterial(font);
+
+        if (runtimeLabelMaterial == null)
+            return null;
+
+        runtimeLabelMaterial.renderQueue = ResolveLabelRenderQueue(font.material);
+
+        if (runtimeLabelMaterial.HasProperty(FaceColorId))
+            runtimeLabelMaterial.SetColor(FaceColorId, Color.white);
+
+        if (runtimeLabelMaterial.HasProperty(OutlineColorId))
+        {
+            runtimeLabelMaterial.SetColor(OutlineColorId,
+                                          new Color(labelOutlineColor.x,
+                                                    labelOutlineColor.y,
+                                                    labelOutlineColor.z,
+                                                    labelOutlineColor.w));
+        }
+
+        if (runtimeLabelMaterial.HasProperty(OutlineWidthId))
+            runtimeLabelMaterial.SetFloat(OutlineWidthId, math.saturate(labelOutlineWidth));
+
+        return runtimeLabelMaterial;
+    }
+
+    /// <summary>
+    /// Recreates the pool-owned runtime TMP material when the active preset font changes.
+    /// </summary>
+    /// <param name="font">Runtime font asset resolved from the active Player Visual Preset.</param>
+    private void RecreateRuntimeLabelMaterial(TMP_FontAsset font)
+    {
+        ReleaseRuntimeLabelMaterial();
+
+        if (font == null || font.material == null)
+            return;
+
+        runtimeLabelMaterial = new Material(font.material);
+        runtimeLabelMaterial.name = font.material.name + " (Runtime Syringe Labels " + name + ")";
+        runtimeLabelMaterial.renderQueue = ResolveLabelRenderQueue(font.material);
+        runtimeLabelMaterialFont = font;
+
+        if (!Application.isPlaying)
+            runtimeLabelMaterial.hideFlags = HideFlags.HideAndDontSave;
+    }
+
+    /// <summary>
+    /// Releases the pool-owned runtime TMP material without touching shared font assets.
+    /// </summary>
+    private void ReleaseRuntimeLabelMaterial()
+    {
+        if (runtimeLabelMaterial == null)
+            return;
+
+        if (Application.isPlaying)
+            Destroy(runtimeLabelMaterial);
+        else
+            DestroyImmediate(runtimeLabelMaterial);
+
+        runtimeLabelMaterial = null;
+        runtimeLabelMaterialFont = null;
+    }
+
+    /// <summary>
+    /// Resolves the render queue used to force labels after same-canvas procedural syringe graphics.
+    /// </summary>
+    /// <param name="sourceMaterial">Font material used as the source for the runtime label material.</param>
+    /// <returns>Transparent queue plus a small offset, preserving explicit higher source queues.</returns>
+    private static int ResolveLabelRenderQueue(Material sourceMaterial)
+    {
+        int sourceQueue = TransparentRenderQueue;
+
+        if (sourceMaterial != null)
+        {
+            if (sourceMaterial.renderQueue >= 0)
+                sourceQueue = sourceMaterial.renderQueue;
+            else if (sourceMaterial.shader != null)
+                sourceQueue = sourceMaterial.shader.renderQueue;
+        }
+
+        return math.max(sourceQueue, TransparentRenderQueue) + LabelRenderQueueOffset;
     }
     #endregion
 

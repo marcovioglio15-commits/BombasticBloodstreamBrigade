@@ -153,6 +153,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     /// </summary>
     public void Dispose()
     {
+        if (labelPool != null)
+            labelPool.DisposeRuntimeResources();
+
         if (runtimeMaterial == null)
             return;
 
@@ -395,11 +398,13 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         {
             labelsRoot.offsetMin = new Vector2(resolvedGraduationStartInset, labelsRoot.offsetMin.y);
             labelsRoot.offsetMax = new Vector2(-resolvedGraduationEndInset, labelsRoot.offsetMax.y);
+            labelsRoot.SetAsLastSibling();
         }
 
         if (labelPool != null)
         {
-            labelPool.Rebuild(maximumValue,
+            labelPool.Rebuild(labelsRoot,
+                              maximumValue,
                               safeUnits,
                               math.max(1, sharedConfig.LabelEveryMajorDivision),
                               math.clamp(sharedConfig.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
