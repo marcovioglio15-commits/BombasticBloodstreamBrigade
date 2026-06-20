@@ -297,7 +297,7 @@ MonoBehaviour:
   healthBars:
     enabled: 1
     hideWhenPlayerMissing: 1
-    verticalSpacing: 12
+    verticalSpacing: 0
     unitsPerMajorDivision: 1
     pixelsPerMajorDivision: 40
     minimumLength: 80
