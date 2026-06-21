@@ -19,14 +19,14 @@ MonoBehaviour:
   scalableStats:
   - statName: Health
     statType: 1
-    defaultValue: 10
+    defaultValue: 3
     minimumValue: 1
-    maximumValue: 1000
+    maximumValue: 10
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: Shield
     statType: 1
-    defaultValue: 10
+    defaultValue: 0
     minimumValue: 0
     maximumValue: 10
     defaultBooleanValue: 0

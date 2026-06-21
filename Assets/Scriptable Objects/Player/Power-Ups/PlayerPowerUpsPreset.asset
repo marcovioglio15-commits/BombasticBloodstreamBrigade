@@ -43422,8 +43422,8 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveChargeShot
-  secondaryActivePowerUpId: ActiveBulletTime
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
