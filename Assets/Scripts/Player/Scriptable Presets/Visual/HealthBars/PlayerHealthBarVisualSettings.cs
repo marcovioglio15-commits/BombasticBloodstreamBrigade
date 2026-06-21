@@ -3,344 +3,6 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// Stores optional movement and value-change reactions used by one player syringe.
-/// </summary>
-[Serializable]
-public sealed class PlayerSyringeMotionSettings
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Enables inertial liquid movement opposite to player acceleration.")]
-    [SerializeField] private bool movementReactionEnabled = true;
-
-    [Tooltip("Converts player horizontal acceleration into normalized liquid displacement.")]
-    [Range(0f, 4f)]
-    [SerializeField] private float sloshStrength = 0.08f;
-
-    [Tooltip("Converts normalized slosh displacement into a visible liquid-surface slope.")]
-    [Range(0f, 1f)]
-    [SerializeField] private float surfaceSloshStrength = 0.45f;
-
-    [Tooltip("Enables horizontal inertial displacement of the liquid boundary and procedural bubbles.")]
-    [SerializeField] private bool horizontalSloshEnabled = true;
-
-    [Tooltip("Converts normalized slosh displacement into horizontal liquid and bubble travel along the graduated value track.")]
-    [Range(0f, 0.5f)]
-    [SerializeField] private float horizontalSloshStrength = 0.16f;
-
-    [Tooltip("Spring force returning liquid displacement to rest.")]
-    [Range(0f, 100f)]
-    [SerializeField] private float sloshSpring = 18f;
-
-    [Tooltip("Damping applied while liquid displacement returns to rest.")]
-    [Range(0f, 50f)]
-    [SerializeField] private float sloshDamping = 8f;
-
-    [Tooltip("Maximum normalized inertial liquid displacement.")]
-    [Range(0f, 1f)]
-    [SerializeField] private float maximumSlosh = 0.25f;
-
-    [Tooltip("Enables a small Z-axis syringe inclination driven by player movement.")]
-    [SerializeField] private bool tiltEnabled = true;
-
-    [Tooltip("Maximum absolute Z-axis inclination in degrees.")]
-    [Range(0f, 20f)]
-    [SerializeField] private float maximumTiltDegrees = 2.5f;
-
-    [Tooltip("Spring force returning syringe inclination to rest.")]
-    [Range(0f, 100f)]
-    [SerializeField] private float tiltSpring = 16f;
-
-    [Tooltip("Damping applied while syringe inclination returns to rest.")]
-    [Range(0f, 50f)]
-    [SerializeField] private float tiltDamping = 8f;
-
-    [Tooltip("Enables a liquid impulse when the represented current value changes.")]
-    [SerializeField] private bool valueImpulseEnabled = true;
-
-    [Tooltip("Converts normalized value delta into an additional liquid impulse.")]
-    [Range(0f, 4f)]
-    [SerializeField] private float valueImpulseStrength = 0.65f;
-
-    [Tooltip("Exponential decay speed of value-change impulses.")]
-    [Range(0f, 50f)]
-    [SerializeField] private float valueImpulseDecay = 7f;
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public bool MovementReactionEnabled => movementReactionEnabled;
-    public float SloshStrength => sloshStrength;
-    public float SurfaceSloshStrength => surfaceSloshStrength;
-    public bool HorizontalSloshEnabled => horizontalSloshEnabled;
-    public float HorizontalSloshStrength => horizontalSloshStrength;
-    public float SloshSpring => sloshSpring;
-    public float SloshDamping => sloshDamping;
-    public float MaximumSlosh => maximumSlosh;
-    public bool TiltEnabled => tiltEnabled;
-    public float MaximumTiltDegrees => maximumTiltDegrees;
-    public float TiltSpring => tiltSpring;
-    public float TiltDamping => tiltDamping;
-    public bool ValueImpulseEnabled => valueImpulseEnabled;
-    public float ValueImpulseStrength => valueImpulseStrength;
-    public float ValueImpulseDecay => valueImpulseDecay;
-    #endregion
-}
-
-/// <summary>
-/// Stores presentation settings specific to one health or shield syringe.
-/// </summary>
-[Serializable]
-public sealed class PlayerSyringeChannelSettings
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Enables this syringe channel.")]
-    [SerializeField] private bool enabled = true;
-
-    [Tooltip("Hides this syringe when its authoritative maximum value is zero or negative.")]
-    [SerializeField] private bool hideWhenMaximumUnavailable;
-
-    [Tooltip("Seconds used to move the displayed liquid boundary and plunger toward the authoritative current value. Set zero for immediate movement.")]
-    [Range(0f, 2f)]
-    [SerializeField] private float smoothingSeconds = 0.08f;
-
-    [Tooltip("Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current value while the bubbles carry the movement. Disables the liquid wave and surface-slosh settings.")]
-    [SerializeField] private bool sloshAffectsBubblesOnly;
-
-    [Tooltip("Direct color palette used by this syringe channel.")]
-    [SerializeField] private PlayerSyringePaletteSettings palette = new PlayerSyringePaletteSettings();
-
-    [Tooltip("Procedural liquid flow and bubble settings used by this syringe channel.")]
-    [SerializeField] private PlayerSyringeFluidSettings fluid = new PlayerSyringeFluidSettings();
-
-    [Tooltip("Optional movement and value-change reaction settings used by this syringe channel.")]
-    [SerializeField] private PlayerSyringeMotionSettings motion = new PlayerSyringeMotionSettings();
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public bool Enabled => enabled;
-    public bool HideWhenMaximumUnavailable => hideWhenMaximumUnavailable;
-    public float SmoothingSeconds => smoothingSeconds;
-    public bool SloshAffectsBubblesOnly => sloshAffectsBubblesOnly;
-    public PlayerSyringePaletteSettings Palette => palette;
-    public PlayerSyringeFluidSettings Fluid => fluid;
-    public PlayerSyringeMotionSettings Motion => motion;
-    #endregion
-
-    #region Methods
-
-    #region Construction
-    /// <summary>
-    /// Creates a channel that remains visible when its authoritative maximum is unavailable.
-    /// </summary>
-    public PlayerSyringeChannelSettings()
-    {
-    }
-
-    /// <summary>
-    /// Creates a channel with an explicit unavailable-maximum visibility policy.
-    /// </summary>
-    /// <param name="hideWhenMaximumUnavailable">True when the channel should stay hidden until its authoritative maximum becomes positive.</param>
-    public PlayerSyringeChannelSettings(bool hideWhenMaximumUnavailable)
-    {
-        this.hideWhenMaximumUnavailable = hideWhenMaximumUnavailable;
-    }
-
-    /// <summary>
-    /// Creates a channel with explicit unavailable-maximum visibility and palette policies.
-    /// </summary>
-    /// <param name="hideWhenMaximumUnavailable">True when the channel should stay hidden until its authoritative maximum becomes positive.</param>
-    /// <param name="useShieldPalette">True when the channel should use the default shield-oriented direct palette.</param>
-    public PlayerSyringeChannelSettings(bool hideWhenMaximumUnavailable, bool useShieldPalette)
-    {
-        this.hideWhenMaximumUnavailable = hideWhenMaximumUnavailable;
-        palette = new PlayerSyringePaletteSettings(useShieldPalette);
-    }
-    #endregion
-
-    #region Validation
-    /// <summary>
-    /// Reports invalid channel values without mutating serialized authoring data.
-    /// </summary>
-    /// <param name="ownerAssetName">Visual preset asset name used by warning messages.</param>
-    /// <param name="channelLabel">User-facing channel label used by warning messages.</param>
-    public void Validate(string ownerAssetName, string channelLabel)
-    {
-        if (palette == null || fluid == null || motion == null)
-        {
-            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Health Bars/{1}: one or more settings blocks are missing.",
-                                           ownerAssetName,
-                                           channelLabel));
-            return;
-        }
-
-        if (!IsFinite(smoothingSeconds) || smoothingSeconds < 0f || smoothingSeconds > 2f)
-            LogWarning(ownerAssetName, channelLabel, "Smoothing Seconds should be finite and within 0-2.");
-
-        if (!IsPaletteFinite(palette))
-            LogWarning(ownerAssetName, channelLabel, "All direct palette color channels should be finite.");
-
-        if (!IsFinite(fluid.FlowSpeed) || fluid.FlowSpeed < -4f || fluid.FlowSpeed > 4f)
-            LogWarning(ownerAssetName, channelLabel, "Flow Speed should be finite and within -4 to 4.");
-
-        if (!IsFinite(fluid.WaveAmplitude) ||
-            !IsFinite(fluid.WaveFrequency) ||
-             !IsFinite(fluid.Viscosity) ||
-             fluid.WaveAmplitude < 0f ||
-             fluid.WaveAmplitude > 0.25f ||
-             fluid.WaveFrequency < 0f ||
-             fluid.WaveFrequency > 20f ||
-             fluid.Viscosity < 0f ||
-            fluid.Viscosity > 1f)
-        {
-            LogWarning(ownerAssetName, channelLabel, "Wave Amplitude should be within 0-0.25, Frequency within 0-20, and Viscosity within 0-1.");
-        }
-
-        if (fluid.BubblesEnabled &&
-            (!IsFinite(fluid.BubbleDensity) ||
-             !IsFinite(fluid.BubbleMinimumSize) ||
-             !IsFinite(fluid.BubbleMaximumSize) ||
-             !IsFinite(fluid.BubbleRiseSpeed) ||
-             !IsFinite(fluid.BubbleDrift) ||
-             fluid.BubbleDensity < 0f ||
-             fluid.BubbleDensity > 1f ||
-             fluid.BubbleMinimumSize < 0f ||
-             fluid.BubbleMaximumSize < fluid.BubbleMinimumSize ||
-             fluid.BubbleMaximumSize > 0.25f ||
-             fluid.BubbleRiseSpeed < -2f ||
-             fluid.BubbleRiseSpeed > 2f ||
-             fluid.BubbleDrift < -2f ||
-             fluid.BubbleDrift > 2f))
-        {
-            LogWarning(ownerAssetName, channelLabel, "Bubble Density should be within 0-1, sizes ordered within 0-0.25, and rise speed and drift within -2 to 2.");
-        }
-
-        // Routing slosh to the bubbles only is meaningless without bubbles, so flag the incoherent combination.
-        if (sloshAffectsBubblesOnly && !fluid.BubblesEnabled)
-            LogWarning(ownerAssetName, channelLabel, "Slosh Affects Bubbles Only is enabled while Bubbles are disabled; the liquid will fill flat with no visible slosh.");
-
-        if (motion.MovementReactionEnabled &&
-            (!IsFinite(motion.SloshStrength) ||
-             !IsFinite(motion.SurfaceSloshStrength) ||
-             !IsFinite(motion.HorizontalSloshStrength) ||
-             !IsFinite(motion.SloshSpring) ||
-             !IsFinite(motion.SloshDamping) ||
-             !IsFinite(motion.MaximumSlosh) ||
-             motion.SloshStrength < 0f ||
-             motion.SloshStrength > 4f ||
-             motion.SurfaceSloshStrength < 0f ||
-             motion.SurfaceSloshStrength > 1f ||
-             motion.HorizontalSloshStrength < 0f ||
-             motion.HorizontalSloshStrength > 0.5f ||
-             motion.SloshSpring < 0f ||
-             motion.SloshSpring > 100f ||
-             motion.SloshDamping < 0f ||
-             motion.SloshDamping > 50f ||
-             motion.MaximumSlosh < 0f ||
-             motion.MaximumSlosh > 1f))
-        {
-            LogWarning(ownerAssetName, channelLabel, "Slosh response should be within 0-4, surface strength and maximum displacement within 0-1, horizontal strength within 0-0.5, spring within 0-100, and damping within 0-50.");
-        }
-
-        if (motion.TiltEnabled &&
-            (!IsFinite(motion.MaximumTiltDegrees) ||
-             !IsFinite(motion.TiltSpring) ||
-             !IsFinite(motion.TiltDamping) ||
-             motion.MaximumTiltDegrees < 0f ||
-             motion.MaximumTiltDegrees > 20f ||
-             motion.TiltSpring < 0f ||
-             motion.TiltSpring > 100f ||
-             motion.TiltDamping < 0f ||
-             motion.TiltDamping > 50f))
-        {
-            LogWarning(ownerAssetName, channelLabel, "Tilt limit should be within 0-20 degrees, spring within 0-100, and damping within 0-50.");
-        }
-
-        if (motion.ValueImpulseEnabled &&
-            (!IsFinite(motion.ValueImpulseStrength) ||
-             !IsFinite(motion.ValueImpulseDecay) ||
-             motion.ValueImpulseStrength < 0f ||
-             motion.ValueImpulseStrength > 4f ||
-             motion.ValueImpulseDecay < 0f ||
-             motion.ValueImpulseDecay > 50f))
-        {
-            LogWarning(ownerAssetName, channelLabel, "Value Impulse Strength should be within 0-4 and Value Impulse Decay within 0-50.");
-        }
-    }
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Writes one channel-specific preset warning.
-    /// </summary>
-    /// <param name="ownerAssetName">Visual preset asset name.</param>
-    /// <param name="channelLabel">User-facing channel label.</param>
-    /// <param name="message">Warning message.</param>
-    private static void LogWarning(string ownerAssetName, string channelLabel, string message)
-    {
-        Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Health Bars/{1}: {2}",
-                                       ownerAssetName,
-                                       channelLabel,
-                                       message));
-    }
-
-    /// <summary>
-    /// Checks whether every direct palette color channel is finite.
-    /// </summary>
-    /// <param name="palette">Palette to inspect.</param>
-    /// <returns>True when all RGBA channels are finite.</returns>
-    private static bool IsPaletteFinite(PlayerSyringePaletteSettings palette)
-    {
-        return IsFinite(palette.Outline) &&
-               IsFinite(palette.Body) &&
-               IsFinite(palette.BodyShadow) &&
-               IsFinite(palette.Chamber) &&
-               IsFinite(palette.Liquid) &&
-               IsFinite(palette.LiquidHighlight) &&
-               IsFinite(palette.Bubbles) &&
-               IsFinite(palette.Graduation) &&
-               IsFinite(palette.Label) &&
-               IsFinite(palette.LabelOutline) &&
-               IsFinite(palette.Plunger) &&
-               IsFinite(palette.PlungerWindow) &&
-               IsFinite(palette.TerminationOutline) &&
-               IsFinite(palette.TerminationInterior);
-    }
-
-    /// <summary>
-    /// Checks whether every channel of one direct color is finite.
-    /// </summary>
-    /// <param name="value">Color to inspect.</param>
-    /// <returns>True when all RGBA channels are finite.</returns>
-    private static bool IsFinite(Color value)
-    {
-        return IsFinite(value.r) &&
-               IsFinite(value.g) &&
-               IsFinite(value.b) &&
-               IsFinite(value.a);
-    }
-
-    /// <summary>
-    /// Checks whether one floating-point value is finite.
-    /// </summary>
-    /// <param name="value">Value to inspect.</param>
-    /// <returns>True when the value is neither NaN nor infinity.</returns>
-    private static bool IsFinite(float value)
-    {
-        return !float.IsNaN(value) && !float.IsInfinity(value);
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
 /// Stores scalable authoring data shared by the player health and shield syringe HUD views.
 /// </summary>
 [Serializable]
@@ -370,6 +32,13 @@ public sealed class PlayerHealthBarsVisualSettings
     [Tooltip("Horizontal pixels assigned to every full major graduation interval.")]
     [Range(8f, 256f)]
     [SerializeField] private float pixelsPerMajorDivision = 52f;
+
+    [Tooltip("Selects whether graduations use fixed value units, uniformly distributed labels, or stay completely hidden.")]
+    [SerializeField] private PlayerSyringeGraduationMode graduationMode = PlayerSyringeGraduationMode.FixedUnits;
+
+    [Tooltip("Total numeric labels shown in Uniform Labels mode. Labels are distributed evenly from zero to the represented maximum.")]
+    [Range(0, AuthoredLabelPoolCapacity)]
+    [SerializeField] private int uniformLabelCount = 5;
 
     [Tooltip("Minimum complete syringe width in pixels.")]
     [Range(64f, 2048f)]
@@ -465,6 +134,8 @@ public sealed class PlayerHealthBarsVisualSettings
     public float VerticalSpacing => verticalSpacing;
     public float UnitsPerMajorDivision => unitsPerMajorDivision;
     public float PixelsPerMajorDivision => pixelsPerMajorDivision;
+    public PlayerSyringeGraduationMode GraduationMode => graduationMode;
+    public int UniformLabelCount => uniformLabelCount;
     public float MinimumLength => minimumLength;
     public float MaximumLength => maximumLength;
     public int MinorDivisionsPerMajor => minorDivisionsPerMajor;
@@ -493,6 +164,69 @@ public sealed class PlayerHealthBarsVisualSettings
 
     #region Methods
 
+    #region Construction
+    /// <summary>
+    /// Creates the default player health and shield syringe settings.
+    /// </summary>
+    public PlayerHealthBarsVisualSettings()
+    {
+    }
+
+    /// <summary>
+    /// Creates single-syringe defaults used by active power-up energy HUD widgets.
+    /// </summary>
+    /// <param name="energyOnly">True when only the Health channel should be used as the active-energy syringe channel.</param>
+    public PlayerHealthBarsVisualSettings(bool energyOnly)
+    {
+        if (!energyOnly)
+            return;
+
+        verticalSpacing = 0f;
+        unitsPerMajorDivision = 1f;
+        pixelsPerMajorDivision = 46f;
+        graduationMode = PlayerSyringeGraduationMode.UniformLabels;
+        uniformLabelCount = 5;
+        minimumLength = 260f;
+        maximumLength = 620f;
+        labelMinimumSpacing = 40f;
+        barHeight = 78f;
+        endCapWidth = 30f;
+        terminationOffset = 4f;
+        health = new PlayerSyringeChannelSettings(true,
+                                                  true,
+                                                  PlayerSyringePalettePreset.ActiveEnergy);
+        shield = new PlayerSyringeChannelSettings(false,
+                                                  true,
+                                                  PlayerSyringePalettePreset.ActiveEnergy);
+    }
+
+    /// <summary>
+    /// Creates two-channel syringe defaults initialized with explicit built-in palettes.
+    /// </summary>
+    /// <param name="healthPalettePreset">Palette profile used by the first channel.</param>
+    /// <param name="shieldPalettePreset">Palette profile used by the second channel.</param>
+    public PlayerHealthBarsVisualSettings(PlayerSyringePalettePreset healthPalettePreset,
+                                          PlayerSyringePalettePreset shieldPalettePreset)
+    {
+        unitsPerMajorDivision = 25f;
+        pixelsPerMajorDivision = 18f;
+        graduationMode = PlayerSyringeGraduationMode.FixedUnits;
+        uniformLabelCount = 5;
+        minimumLength = 420f;
+        maximumLength = 960f;
+        labelMinimumSpacing = 48f;
+        barHeight = 76f;
+        endCapWidth = 30f;
+        terminationOffset = 6f;
+        health = new PlayerSyringeChannelSettings(true,
+                                                  true,
+                                                  healthPalettePreset);
+        shield = new PlayerSyringeChannelSettings(true,
+                                                  true,
+                                                  shieldPalettePreset);
+    }
+    #endregion
+
     #region Validation
     /// <summary>
     /// Reports invalid health-bar authoring values without snapping or mutating them.
@@ -508,6 +242,15 @@ public sealed class PlayerHealthBarsVisualSettings
 
         if (!IsFinite(pixelsPerMajorDivision) || pixelsPerMajorDivision < 8f || pixelsPerMajorDivision > 256f)
             LogWarning(ownerAssetName, "Pixels Per Major Division should be finite and within 8-256.");
+
+        if (!IsSupportedGraduationMode(graduationMode))
+            LogWarning(ownerAssetName, "Graduation Mode should resolve to Fixed Units, Uniform Labels, or Hidden.");
+
+        if (uniformLabelCount < 0 || uniformLabelCount > AuthoredLabelPoolCapacity)
+        {
+            LogWarning(ownerAssetName, string.Format("Uniform Label Count should be between 0 and the preauthored pool capacity of {0}.",
+                                                     AuthoredLabelPoolCapacity));
+        }
 
         if (!IsFinite(minimumLength) ||
             !IsFinite(maximumLength) ||
@@ -626,6 +369,24 @@ public sealed class PlayerHealthBarsVisualSettings
         {
             case PlayerSyringeBodyStyle.SimplePaintedContainer:
             case PlayerSyringeBodyStyle.DetailedSyringe:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks whether one authored graduation mode maps to a supported runtime distribution.
+    /// </summary>
+    /// <param name="value">Graduation mode to inspect.</param>
+    /// <returns>True when the mode is supported by the syringe view and shader.</returns>
+    private static bool IsSupportedGraduationMode(PlayerSyringeGraduationMode value)
+    {
+        switch (value)
+        {
+            case PlayerSyringeGraduationMode.FixedUnits:
+            case PlayerSyringeGraduationMode.UniformLabels:
+            case PlayerSyringeGraduationMode.Hidden:
                 return true;
             default:
                 return false;

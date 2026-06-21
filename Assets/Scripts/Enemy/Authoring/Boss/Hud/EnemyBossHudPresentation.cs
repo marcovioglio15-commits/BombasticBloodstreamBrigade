@@ -28,24 +28,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     [Tooltip("Text label that displays the active boss name.")]
     [SerializeField] private TMP_Text bossNameText;
 
-    [Tooltip("Fill image used for the active boss health percentage.")]
-    [SerializeField] private Image healthFillImage;
+    [Tooltip("Preauthored procedural syringe view representing boss health.")]
+    [SerializeField] private PlayerSyringeBarView healthSyringeBar;
 
-    [Tooltip("Background image behind the boss health fill.")]
-    [SerializeField] private Image healthBackgroundImage;
-
-    [Tooltip("Fill image used for the active boss shield percentage.")]
-    [SerializeField] private Image shieldFillImage;
-
-    [Tooltip("Background image behind the boss shield fill.")]
-    [SerializeField] private Image shieldBackgroundImage;
-
-    [Header("Bar Presentation")]
-    [Tooltip("Liquid shader and piston behavior used by the mirrored boss health syringe bar.")]
-    [SerializeField] private HUDLiquidBarPresentationSettings healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
-
-    [Tooltip("Liquid shader and piston behavior used by the mirrored boss shield syringe bar.")]
-    [SerializeField] private HUDLiquidBarPresentationSettings shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
+    [Tooltip("Preauthored procedural syringe view representing boss shield.")]
+    [SerializeField] private PlayerSyringeBarView shieldSyringeBar;
 
     [Tooltip("Rect transform moved along screen borders when the boss is outside camera view.")]
     [SerializeField] private RectTransform offscreenIndicatorRoot;
@@ -78,13 +65,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private float nextCameraResolveTime;
     private float displayedHealthNormalized = 1f;
     private float displayedShieldNormalized;
-    private HUDLiquidBarRuntime healthBarRuntime;
-    private HUDLiquidBarRuntime shieldBarRuntime;
-    private GameObject shieldBarRootObject;
     private bool ecsInitialized;
     private bool visibilityInitialized;
     private string displayedBossName;
     private EnemyBossHudAggregateBaseline aggregateBaseline;
+    private Entity cachedBarConfigBossEntity = Entity.Null;
     #endregion
 
     #region Methods
@@ -96,17 +81,17 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void Awake()
     {
         ValidateReferences();
-        EnsureBossBarVisualsInitialized();
+        InitializeBossSyringeViews();
         ApplyVisibility(!hideWhenNoBoss);
         ApplyInitialBarVisualState();
     }
 
     /// <summary>
-    /// Releases runtime material instances created by the liquid boss bars.
+    /// Releases runtime material instances created by the boss syringe bars.
     /// </summary>
     private void OnDestroy()
     {
-        DisposeBossBarVisuals();
+        DisposeBossSyringeViews();
     }
 
     /// <summary>
@@ -115,7 +100,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void OnValidate()
     {
         ValidateReferences();
-        EnsureBossBarPresentationSettings();
 
         if (healthSmoothingSeconds < 0f)
             healthSmoothingSeconds = 0f;
@@ -129,8 +113,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        EnsureBossBarVisualsInitialized();
-
         if (!TryInitializeEcsBindings())
         {
             HandleMissingBoss();
@@ -236,7 +218,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         }
         else
         {
-            HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
+            if (shieldSyringeBar != null)
+                shieldSyringeBar.HandleMissing(true);
         }
 
         if (showOffscreenIndicator)
@@ -266,10 +249,18 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     {
         EnemyBossHudConfig hudConfig = bossSnapshot.PrimaryConfig;
         SyncBossName(ResolveBossDisplayName(in bossSnapshot));
-        EnemyBossHudPresentationUtility.ApplyImageColor(healthFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthFillColor));
-        EnemyBossHudPresentationUtility.ApplyImageColor(healthBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.HealthBackgroundColor));
-        EnemyBossHudPresentationUtility.ApplyImageColor(shieldFillImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldFillColor));
-        EnemyBossHudPresentationUtility.ApplyImageColor(shieldBackgroundImage, EnemyBossHudPresentationUtility.ToColor(hudConfig.ShieldBackgroundColor));
+
+        if (cachedBarConfigBossEntity == bossSnapshot.PrimaryEntity)
+            return;
+
+        cachedBarConfigBossEntity = bossSnapshot.PrimaryEntity;
+        TMP_FontAsset font = hudConfig.BarsVisualConfig.FontAsset.Value;
+
+        if (healthSyringeBar != null)
+            healthSyringeBar.ApplyConfiguration(in hudConfig.BarsVisualConfig, in hudConfig.BarsVisualConfig.Health, font);
+
+        if (shieldSyringeBar != null)
+            shieldSyringeBar.ApplyConfiguration(in hudConfig.BarsVisualConfig, in hudConfig.BarsVisualConfig.Shield, font);
     }
 
     /// <summary>
@@ -317,13 +308,16 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             displayedShieldNormalized = Mathf.MoveTowards(displayedShieldNormalized, targetShieldNormalized, deltaTime / Mathf.Max(Epsilon, healthSmoothingSeconds));
         }
 
-        ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, targetHealthNormalized);
-        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, hasShield);
+        if (healthSyringeBar != null)
+            healthSyringeBar.UpdateValue(displayedHealthNormalized * stableMaxHealth, stableMaxHealth, 0f, true);
+
+        if (shieldSyringeBar == null)
+            return;
 
         if (hasShield)
-            ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, targetShieldNormalized);
+            shieldSyringeBar.UpdateValue(displayedShieldNormalized * stableMaxShield, stableMaxShield, 0f, true);
         else
-            ApplyBarFill(shieldBarRuntime, shieldFillImage, 0f, 0f);
+            shieldSyringeBar.HandleMissing(true);
     }
 
     /// <summary>
@@ -332,8 +326,15 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private void HandleMissingBoss()
     {
         cachedBossEntity = Entity.Null;
+        cachedBarConfigBossEntity = Entity.Null;
         aggregateBaseline.Reset();
-        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
+
+        if (healthSyringeBar != null)
+            healthSyringeBar.HandleMissing(true);
+
+        if (shieldSyringeBar != null)
+            shieldSyringeBar.HandleMissing(true);
+
         EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
 
         if (hideWhenNoBoss)
@@ -358,53 +359,17 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         if (bossNameText == null)
             bossNameText = GetComponentInChildren<TMP_Text>(true);
 
-        if (healthFillImage == null)
-            healthFillImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "HealthFill");
+        if (healthSyringeBar == null)
+            healthSyringeBar = EnemyBossHudPresentationUtility.ResolveComponent<PlayerSyringeBarView>(transform, "BossHealthSyringe");
 
-        if (healthBackgroundImage == null)
-            healthBackgroundImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "HealthBackground");
+        if (shieldSyringeBar == null)
+            shieldSyringeBar = EnemyBossHudPresentationUtility.ResolveComponent<PlayerSyringeBarView>(transform, "BossShieldSyringe");
 
-        if (shieldFillImage == null)
-            shieldFillImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "ShieldFill");
-
-        if (shieldBackgroundImage == null)
-            shieldBackgroundImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "ShieldBackground");
-
-        shieldBarRootObject = HUDBarVisibilityUtility.ResolveRootObject(shieldBackgroundImage, shieldFillImage);
         EnemyBossHudOffscreenIndicatorUtility.ResolveReferences(transform,
                                                                ref offscreenIndicatorRoot,
                                                                ref offscreenIndicatorImage,
                                                                ref indicatorParentRect,
                                                                ref rootCanvas);
-
-        EnemyBossHudPresentationUtility.ConfigureFillImage(healthFillImage);
-        EnemyBossHudPresentationUtility.ConfigureFillImage(shieldFillImage);
-    }
-
-    /// <summary>
-    /// Ensures boss bar presentation settings exist on scenes authored before this HUD mirrored the player bars.
-    /// </summary>
-    private void EnsureBossBarPresentationSettings()
-    {
-        if (healthBarPresentation == null)
-            healthBarPresentation = HUDLiquidBarPresentationSettings.CreateHealthDefaults();
-
-        if (shieldBarPresentation == null)
-            shieldBarPresentation = HUDLiquidBarPresentationSettings.CreateShieldDefaults();
-    }
-
-    /// <summary>
-    /// Builds reusable liquid-bar runtimes once the prefab image bindings are available.
-    /// </summary>
-    private void EnsureBossBarVisualsInitialized()
-    {
-        EnsureBossBarPresentationSettings();
-
-        if (healthBarRuntime == null && healthFillImage != null)
-            healthBarRuntime = HUDLiquidBarRuntime.CreateHealth(healthFillImage, healthBarPresentation);
-
-        if (shieldBarRuntime == null && shieldFillImage != null)
-            shieldBarRuntime = HUDLiquidBarRuntime.CreateShield(shieldFillImage, shieldBarPresentation);
     }
 
     /// <summary>
@@ -414,21 +379,36 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     {
         displayedHealthNormalized = 1f;
         displayedShieldNormalized = 0f;
-        HUDBarVisibilityUtility.SetVisible(shieldBarRootObject, false);
-        ApplyBarFill(healthBarRuntime, healthFillImage, displayedHealthNormalized, displayedHealthNormalized);
-        ApplyBarFill(shieldBarRuntime, shieldFillImage, displayedShieldNormalized, displayedShieldNormalized);
+
+        if (healthSyringeBar != null)
+            healthSyringeBar.HandleMissing(false);
+
+        if (shieldSyringeBar != null)
+            shieldSyringeBar.HandleMissing(true);
     }
 
     /// <summary>
-    /// Releases runtime liquid materials created for boss health and shield bars.
+    /// Initializes preauthored boss syringe views without creating UI GameObjects.
     /// </summary>
-    private void DisposeBossBarVisuals()
+    private void InitializeBossSyringeViews()
     {
-        if (healthBarRuntime != null)
-            healthBarRuntime.Dispose();
+        if (healthSyringeBar != null)
+            healthSyringeBar.Initialize();
 
-        if (shieldBarRuntime != null)
-            shieldBarRuntime.Dispose();
+        if (shieldSyringeBar != null)
+            shieldSyringeBar.Initialize();
+    }
+
+    /// <summary>
+    /// Releases persistent material instances owned by boss syringe views.
+    /// </summary>
+    private void DisposeBossSyringeViews()
+    {
+        if (healthSyringeBar != null)
+            healthSyringeBar.Dispose();
+
+        if (shieldSyringeBar != null)
+            shieldSyringeBar.Dispose();
     }
 
     /// <summary>
@@ -463,30 +443,6 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
             return resolvedName;
 
         return string.Format("{0} x{1}", resolvedName, bossSnapshot.BossCount);
-    }
-
-    /// <summary>
-    /// Applies one boss bar value through the liquid runtime when available, falling back to a direct fill amount.
-    /// </summary>
-    /// <param name="barRuntime">Optional liquid-bar runtime that drives shader and piston state.</param>
-    /// <param name="fallbackFillImage">Fill image used when the runtime has not been created yet.</param>
-    /// <param name="displayedNormalizedValue">Smoothed normalized value shown by the bar.</param>
-    /// <param name="targetNormalizedValue">Raw normalized target used for liquid delta motion.</param>
-    private void ApplyBarFill(HUDLiquidBarRuntime barRuntime,
-                              Image fallbackFillImage,
-                              float displayedNormalizedValue,
-                              float targetNormalizedValue)
-    {
-        if (barRuntime != null && barRuntime.IsBound)
-        {
-            barRuntime.Apply(displayedNormalizedValue, targetNormalizedValue);
-            return;
-        }
-
-        if (fallbackFillImage == null)
-            return;
-
-        fallbackFillImage.fillAmount = Mathf.Clamp01(displayedNormalizedValue);
     }
 
     /// <summary>

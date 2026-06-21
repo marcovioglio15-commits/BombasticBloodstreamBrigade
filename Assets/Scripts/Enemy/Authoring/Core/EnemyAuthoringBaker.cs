@@ -786,11 +786,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         else if (visualPreset != null && !string.IsNullOrWhiteSpace(visualPreset.PresetName))
             displayName = visualPreset.PresetName;
 
-        Color healthFillColor = bossUi != null ? bossUi.HealthFillColor : new Color(0.9f, 0.12f, 0.08f, 1f);
-        Color healthBackgroundColor = bossUi != null ? bossUi.HealthBackgroundColor : Color.white;
-        Color shieldFillColor = bossUi != null ? bossUi.ShieldFillColor : new Color(0.2f, 0.85f, 1f, 1f);
-        Color shieldBackgroundColor = bossUi != null ? bossUi.ShieldBackgroundColor : Color.white;
         Color offscreenIndicatorColor = bossUi != null ? bossUi.OffscreenIndicatorColor : new Color(1f, 0.2f, 0.1f, 0.95f);
+        PlayerHealthBarsVisualSettings bossSyringeSettings = bossUi != null && bossUi.SyringeBars != null
+            ? bossUi.SyringeBars
+            : new PlayerHealthBarsVisualSettings(PlayerSyringePalettePreset.BossHealth,
+                                                 PlayerSyringePalettePreset.BossShield);
+        PlayerHealthBarVisualConfig bossBarsVisualConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(bossSyringeSettings);
 
         return new EnemyBossHudConfig
         {
@@ -798,10 +799,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             ShowHealthBar = bossUi == null || bossUi.ShowHealthBar ? (byte)1 : (byte)0,
             ShowOffscreenIndicator = bossUi == null || bossUi.ShowOffscreenIndicator ? (byte)1 : (byte)0,
             DisplayName = new Unity.Collections.FixedString64Bytes(displayName),
-            HealthFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthFillColor),
-            HealthBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(healthBackgroundColor),
-            ShieldFillColor = DamageFlashRuntimeUtility.ToLinearFloat4(shieldFillColor),
-            ShieldBackgroundColor = DamageFlashRuntimeUtility.ToLinearFloat4(shieldBackgroundColor),
+            BarsVisualConfig = bossBarsVisualConfig,
             OffscreenIndicatorColor = DamageFlashRuntimeUtility.ToLinearFloat4(offscreenIndicatorColor),
             OffscreenIndicatorSizePixels = bossUi != null ? math.max(1f, bossUi.OffscreenIndicatorSizePixels) : 56f,
             EdgePaddingPixels = bossUi != null ? math.max(0f, bossUi.EdgePaddingPixels) : 30f

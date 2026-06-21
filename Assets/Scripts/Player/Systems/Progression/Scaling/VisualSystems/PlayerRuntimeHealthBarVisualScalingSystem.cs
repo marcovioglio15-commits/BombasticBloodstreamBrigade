@@ -84,7 +84,7 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
                                                            in characterTuningLookup,
                                                            EffectiveScalableStats,
                                                            VariableContext);
-            ApplyScaling(scalingLookup[configEntity], ref runtimeConfig.ValueRW);
+            ApplyScaling(scalingLookup[configEntity], ref runtimeConfig.ValueRW, VariableContext);
             visualScalingState.ValueRW.Initialized = 1;
             visualScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.LastScalableStatsHash;
         }
@@ -97,36 +97,50 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
     /// </summary>
     /// <param name="scalingBuffer">Runtime scaling metadata.</param>
     /// <param name="runtimeConfig">Mutable runtime player health-bar visual configuration.</param>
-    private static void ApplyScaling(DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> scalingBuffer,
-                                     ref PlayerHealthBarVisualConfig runtimeConfig)
+    public static void ApplyScaling(DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> scalingBuffer,
+                                    ref PlayerHealthBarVisualConfig runtimeConfig,
+                                    Dictionary<string, PlayerFormulaValue> variableContext)
     {
         for (int scalingIndex = 0; scalingIndex < scalingBuffer.Length; scalingIndex++)
         {
             PlayerRuntimeHealthBarVisualScalingElement scalingElement = scalingBuffer[scalingIndex];
-            string payloadPath = scalingElement.PayloadPath.ToString();
+            ApplyScalingElement(scalingElement, ref runtimeConfig, variableContext);
+        }
+    }
 
-            switch ((PlayerFormulaValueType)scalingElement.ValueType)
-            {
-                case PlayerFormulaValueType.Boolean:
-                    if (PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
-                                                                                              scalingElement.BaseBooleanValue != 0,
-                                                                                              VariableContext,
-                                                                                              out bool resolvedBoolean))
-                    {
-                        ApplyBooleanValue(payloadPath, resolvedBoolean, ref runtimeConfig);
-                    }
-                    break;
-                case PlayerFormulaValueType.Number:
-                    if (PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(scalingElement.Formula.ToString(),
-                                                                                              scalingElement.BaseValue,
-                                                                                              scalingElement.IsInteger != 0,
-                                                                                              VariableContext,
-                                                                                              out float resolvedValue))
-                    {
-                        ApplyNumericValue(payloadPath, resolvedValue, ref runtimeConfig);
-                    }
-                    break;
-            }
+    /// <summary>
+    /// Applies one health-bar visual formula to a mutable syringe configuration.
+    /// </summary>
+    /// <param name="scalingElement">Runtime scaling metadata element.</param>
+    /// <param name="runtimeConfig">Mutable runtime player health-bar visual configuration.</param>
+    /// <param name="variableContext">Resolved formula variables for the current player entity.</param>
+    public static void ApplyScalingElement(PlayerRuntimeHealthBarVisualScalingElement scalingElement,
+                                           ref PlayerHealthBarVisualConfig runtimeConfig,
+                                           Dictionary<string, PlayerFormulaValue> variableContext)
+    {
+        string payloadPath = scalingElement.PayloadPath.ToString();
+
+        switch ((PlayerFormulaValueType)scalingElement.ValueType)
+        {
+            case PlayerFormulaValueType.Boolean:
+                if (PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
+                                                                                          scalingElement.BaseBooleanValue != 0,
+                                                                                          variableContext,
+                                                                                          out bool resolvedBoolean))
+                {
+                    ApplyBooleanValue(payloadPath, resolvedBoolean, ref runtimeConfig);
+                }
+                break;
+            case PlayerFormulaValueType.Number:
+                if (PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(scalingElement.Formula.ToString(),
+                                                                                          scalingElement.BaseValue,
+                                                                                          scalingElement.IsInteger != 0,
+                                                                                          variableContext,
+                                                                                          out float resolvedValue))
+                {
+                    ApplyNumericValue(payloadPath, resolvedValue, ref runtimeConfig);
+                }
+                break;
         }
     }
 
@@ -206,6 +220,9 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "maximumLabelCount":
                 runtimeConfig.MaximumLabelCount = (int)math.round(resolvedValue);
                 return;
+            case "uniformLabelCount":
+                runtimeConfig.UniformLabelCount = (int)math.round(resolvedValue);
+                return;
             case "labelFontSize":
                 runtimeConfig.LabelFontSize = resolvedValue;
                 return;
@@ -248,6 +265,11 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
                 runtimeConfig.LabelPlacement = (PlayerSyringeLabelPlacement)math.clamp((int)math.round(resolvedValue),
                                                                                        (int)PlayerSyringeLabelPlacement.InsideChamber,
                                                                                        (int)PlayerSyringeLabelPlacement.GraduationPlate);
+                return;
+            case "graduationMode":
+                runtimeConfig.GraduationMode = (PlayerSyringeGraduationMode)math.clamp((int)math.round(resolvedValue),
+                                                                                       (int)PlayerSyringeGraduationMode.FixedUnits,
+                                                                                       (int)PlayerSyringeGraduationMode.Hidden);
                 return;
             case "terminationStyle":
                 runtimeConfig.TerminationStyle = (PlayerSyringeTerminationStyle)math.clamp((int)math.round(resolvedValue),

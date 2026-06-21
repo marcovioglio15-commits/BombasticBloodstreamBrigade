@@ -634,6 +634,26 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                      healthBarVisualScalingBuffer);
 #endif
 
+        Entity activePowerUpHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                                     false,
+                                                                     "Player Active Power-Up HUD Visual Configuration");
+        AddComponent(entity, new PlayerActivePowerUpHudVisualReference
+        {
+            ConfigEntity = activePowerUpHudVisualEntity
+        });
+        AddComponent(activePowerUpHudVisualEntity, new PlayerActivePowerUpHudVisualOwner
+        {
+            PlayerEntity = entity
+        });
+        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(visualPreset));
+        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(activePowerUpHudVisualEntity, new PlayerActivePowerUpHudVisualScalingState());
+        DynamicBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement> activePowerUpHudVisualScalingBuffer = AddBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement>(activePowerUpHudVisualEntity);
+#if UNITY_EDITOR
+        PlayerRuntimeScalingVisualBakeUtility.PopulateActivePowerUpHudVisualScalingMetadata(sourceVisualPreset,
+                                                                                           activePowerUpHudVisualScalingBuffer);
+#endif
+
         Entity portraitHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
                                                                 false,
                                                                 "Player Portrait HUD Visual Configuration");

@@ -714,8 +714,9 @@ public sealed class PlayerVisualPresetsPanel
         DeathAnimation = 6,
         HealthBars = 7,
         GroundShadow = 8,
-        Portrait = 9,
-        GrowthSequence = 10
+        ActivePowerUpHud = 9,
+        Portrait = 10,
+        GrowthSequence = 11
     }
 
     internal sealed class VisualSubSectionTabEntry

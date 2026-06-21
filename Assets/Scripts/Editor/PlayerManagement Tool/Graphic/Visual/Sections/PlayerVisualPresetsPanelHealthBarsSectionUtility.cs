@@ -52,6 +52,8 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         TrackRefresh(root, enabled, Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("unitsPerMajorDivision"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("pixelsPerMajorDivision"), Refresh);
+        TrackRefresh(root, settings.FindPropertyRelative("graduationMode"), Refresh);
+        TrackRefresh(root, settings.FindPropertyRelative("uniformLabelCount"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("minimumLength"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("maximumLength"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("maximumLabelCount"), Refresh);
@@ -156,22 +158,47 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
                                         SerializedProperty scalingRules)
     {
         Foldout foldout = CreateFoldout("Graduation and Numeric Labels", "GeometryGraduation.Graduation");
-        AddField(foldout, settings.FindPropertyRelative("unitsPerMajorDivision"), scalingRules, "Units Per Major Division", "Authoritative value represented by every full major graduation interval.");
+        SerializedProperty graduationMode = settings.FindPropertyRelative("graduationMode");
+        VisualElement fixedDetails = new VisualElement();
+        VisualElement uniformDetails = new VisualElement();
+        VisualElement visibleGraduationDetails = new VisualElement();
+        AddField(foldout, graduationMode, scalingRules, "Graduation Mode", "Chooses fixed value units, uniformly distributed labels, or a completely hidden graduation.");
         AddField(foldout, settings.FindPropertyRelative("pixelsPerMajorDivision"), scalingRules, "Pixels Per Major Division", "Horizontal pixels assigned to every full major graduation interval.");
         AddField(foldout, settings.FindPropertyRelative("minimumLength"), scalingRules, "Minimum Length", "Minimum complete syringe width in pixels.");
         AddField(foldout, settings.FindPropertyRelative("maximumLength"), scalingRules, "Maximum Length", "Maximum complete syringe width before growth is capped.");
-        AddField(foldout, settings.FindPropertyRelative("minorDivisionsPerMajor"), scalingRules, "Minor Divisions Per Major", "Number of smaller intervals drawn inside every major interval.");
-        AddField(foldout, settings.FindPropertyRelative("labelPlacement"), scalingRules, "Label Placement", "Places ticks and numeric labels directly inside the chamber or on the external graduation plate.");
-        AddField(foldout, settings.FindPropertyRelative("labelEveryMajorDivision"), scalingRules, "Label Every Major Division", "Displays one numeric label every N major intervals when sufficient horizontal space is available.");
-        AddField(foldout, settings.FindPropertyRelative("maximumLabelCount"), scalingRules, "Maximum Label Count", "Maximum number of preauthored numeric labels activated per syringe.");
-        AddField(foldout, settings.FindPropertyRelative("labelMinimumSpacing"), scalingRules, "Label Minimum Spacing", "Minimum horizontal pixel spacing maintained by automatically distributed labels.");
+        AddField(fixedDetails, settings.FindPropertyRelative("unitsPerMajorDivision"), scalingRules, "Units Per Major Division", "Authoritative value represented by every full major graduation interval in Fixed Units mode.");
+        AddField(fixedDetails, settings.FindPropertyRelative("labelEveryMajorDivision"), scalingRules, "Label Every Major Division", "Displays one numeric label every N fixed major intervals when sufficient horizontal space is available.");
+        AddField(uniformDetails, settings.FindPropertyRelative("uniformLabelCount"), scalingRules, "Uniform Label Count", "Total labels distributed evenly from zero to the represented maximum in Uniform Labels mode.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("minorDivisionsPerMajor"), scalingRules, "Minor Divisions Per Major", "Number of smaller intervals drawn inside every visible major interval.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("labelPlacement"), scalingRules, "Label Placement", "Places ticks and numeric labels directly inside the chamber or on the external graduation plate.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("maximumLabelCount"), scalingRules, "Maximum Label Count", "Maximum number of preauthored numeric labels activated per syringe.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("labelMinimumSpacing"), scalingRules, "Label Minimum Spacing", "Minimum horizontal pixel spacing maintained by automatically distributed labels.");
         AddField(foldout, settings.FindPropertyRelative("graduationEndPadding"), scalingRules, "Graduation Start Padding", "Adds space before the first graduated value without adding matching space after the final value.");
-        AddField(foldout, settings.FindPropertyRelative("fontAsset"), scalingRules, "Font Asset", "Direct TextMeshPro font asset applied to every numeric graduation label.");
-        AddField(foldout, settings.FindPropertyRelative("labelFontSize"), scalingRules, "Label Font Size", "TextMeshPro font size used by numeric graduation labels.");
-        AddField(foldout, settings.FindPropertyRelative("labelOffset"), scalingRules, "Label Offset", "Pixel offset applied to every numeric label relative to its major tick.");
-        AddField(foldout, settings.FindPropertyRelative("graduationVerticalOffset"), scalingRules, "Graduation Vertical Offset", "Optional upward offset for the entire graduation - ticks and numeric labels - within the syringe. Positive values move it up.");
-        AddField(foldout, settings.FindPropertyRelative("labelOutlineWidth"), scalingRules, "Label Outline Width", "TextMeshPro outline width used to preserve label readability over changing liquid colors.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("fontAsset"), scalingRules, "Font Asset", "Direct TextMeshPro font asset applied to every numeric graduation label.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("labelFontSize"), scalingRules, "Label Font Size", "TextMeshPro font size used by numeric graduation labels.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("labelOffset"), scalingRules, "Label Offset", "Pixel offset applied to every numeric label relative to its major tick.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("graduationVerticalOffset"), scalingRules, "Graduation Vertical Offset", "Optional upward offset for the entire graduation - ticks and numeric labels - within the syringe. Positive values move it up.");
+        AddField(visibleGraduationDetails, settings.FindPropertyRelative("labelOutlineWidth"), scalingRules, "Label Outline Width", "TextMeshPro outline width used to preserve label readability over changing liquid colors.");
+        foldout.Add(fixedDetails);
+        foldout.Add(uniformDetails);
+        foldout.Add(visibleGraduationDetails);
         parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, graduationMode, Refresh);
+
+        void Refresh()
+        {
+            int mode = graduationMode != null ? graduationMode.enumValueIndex : (int)PlayerSyringeGraduationMode.FixedUnits;
+            bool visibleGraduation = mode != (int)PlayerSyringeGraduationMode.Hidden;
+            fixedDetails.style.display = mode == (int)PlayerSyringeGraduationMode.FixedUnits
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            uniformDetails.style.display = mode == (int)PlayerSyringeGraduationMode.UniformLabels
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            visibleGraduationDetails.style.display = visibleGraduation ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
 
     /// <summary>
@@ -497,6 +524,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         warnings.Clear();
         SerializedProperty units = settings.FindPropertyRelative("unitsPerMajorDivision");
         SerializedProperty pixels = settings.FindPropertyRelative("pixelsPerMajorDivision");
+        SerializedProperty uniformLabelCount = settings.FindPropertyRelative("uniformLabelCount");
         SerializedProperty minimumLength = settings.FindPropertyRelative("minimumLength");
         SerializedProperty maximumLength = settings.FindPropertyRelative("maximumLength");
         SerializedProperty maximumLabelCount = settings.FindPropertyRelative("maximumLabelCount");
@@ -511,6 +539,15 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 
         if (pixels != null && (!IsFinite(pixels.floatValue) || pixels.floatValue < 8f || pixels.floatValue > 256f))
             warnings.Add(new HelpBox("Pixels Per Major Division should be finite and within 8-256.", HelpBoxMessageType.Warning));
+
+        if (uniformLabelCount != null &&
+            (uniformLabelCount.intValue < 0 ||
+             uniformLabelCount.intValue > PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity))
+        {
+            warnings.Add(new HelpBox(string.Format("Uniform Label Count exceeds the preauthored supported range 0-{0}.",
+                                                   PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+                                     HelpBoxMessageType.Warning));
+        }
 
         if (minimumLength != null &&
             maximumLength != null &&

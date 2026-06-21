@@ -20,6 +20,16 @@ public enum PlayerSyringeLabelPlacement : byte
 }
 
 /// <summary>
+/// Selects how syringe graduations and numeric labels are generated.
+/// </summary>
+public enum PlayerSyringeGraduationMode : byte
+{
+    FixedUnits = 0,
+    UniformLabels = 1,
+    Hidden = 2
+}
+
+/// <summary>
 /// Selects the procedural shape used by both syringe end caps.
 /// </summary>
 public enum PlayerSyringeTerminationStyle : byte

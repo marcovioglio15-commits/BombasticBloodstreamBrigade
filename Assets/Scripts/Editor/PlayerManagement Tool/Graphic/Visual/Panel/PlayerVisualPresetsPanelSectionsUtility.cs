@@ -152,6 +152,10 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                "Health Bars",
                                () => PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
         AddVisualSubSectionTab(panel,
+                               PlayerVisualPresetsPanel.VisualSubSectionType.ActivePowerUpHud,
+                               "Active HUD",
+                               () => PlayerVisualPresetsPanelActivePowerUpHudSectionUtility.Build(panel));
+        AddVisualSubSectionTab(panel,
                                PlayerVisualPresetsPanel.VisualSubSectionType.Portrait,
                                "Portrait",
                                () => PlayerVisualPresetsPanelPortraitSectionUtility.Build(panel));

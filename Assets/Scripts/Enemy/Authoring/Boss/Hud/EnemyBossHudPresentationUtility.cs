@@ -87,6 +87,36 @@ internal static class EnemyBossHudPresentationUtility
 
         return null;
     }
+
+    /// <summary>
+    /// Finds a child component by GameObject name.
+    /// </summary>
+    /// <param name="root">Root transform whose children are searched.</param>
+    /// <param name="childName">Child GameObject name.</param>
+    /// <typeparam name="T">Component type to resolve on the named GameObject.</typeparam>
+    /// <returns>Matching component, or null when missing.</returns>
+    public static T ResolveComponent<T>(Transform root, string childName) where T : Component
+    {
+        if (root == null)
+            return null;
+
+        Transform[] childTransforms = root.GetComponentsInChildren<Transform>(true);
+
+        for (int index = 0; index < childTransforms.Length; index++)
+        {
+            Transform childTransform = childTransforms[index];
+
+            if (childTransform == null)
+                continue;
+
+            if (!string.Equals(childTransform.name, childName, System.StringComparison.Ordinal))
+                continue;
+
+            return childTransform.GetComponent<T>();
+        }
+
+        return null;
+    }
     #endregion
 
     #endregion

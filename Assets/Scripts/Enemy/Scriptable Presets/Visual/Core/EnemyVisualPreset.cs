@@ -253,7 +253,7 @@ public sealed class EnemyVisualPreset : ScriptableObject
         deathPuddle.Validate();
         spawnOverrides.Validate();
         projectileOffscreenWarning.Validate();
-        bossUi.Validate();
+        bossUi.Validate(name);
     }
     #endregion
 

@@ -242,6 +242,10 @@ public sealed class PlayerVisualPreset : ScriptableObject
     [Tooltip("ECS-authoritative procedural syringe settings used by the player health and shield HUD views.")]
     [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
 
+    [Header("Active Power-Up HUD")]
+    [Tooltip("ECS-authoritative active power-up HUD settings for icon cooldown, energy syringes, requirement markers, and charge semirings.")]
+    [SerializeField] private PlayerActivePowerUpHudVisualSettings activePowerUpHud = new PlayerActivePowerUpHudVisualSettings();
+
     [Header("Portrait")]
     [Tooltip("ECS-authoritative HUD portrait animations selected from damage, combo-rank, death and power-up runtime state.")]
     [SerializeField] private PlayerPortraitHudSettings portrait = new PlayerPortraitHudSettings();
@@ -695,6 +699,14 @@ public sealed class PlayerVisualPreset : ScriptableObject
         }
     }
 
+    public PlayerActivePowerUpHudVisualSettings ActivePowerUpHud
+    {
+        get
+        {
+            return activePowerUpHud;
+        }
+    }
+
     public PlayerPortraitHudSettings Portrait
     {
         get
@@ -911,6 +923,9 @@ public sealed class PlayerVisualPreset : ScriptableObject
         if (healthBars == null)
             healthBars = new PlayerHealthBarsVisualSettings();
 
+        if (activePowerUpHud == null)
+            activePowerUpHud = new PlayerActivePowerUpHudVisualSettings();
+
         if (portrait == null)
             portrait = new PlayerPortraitHudSettings();
 
@@ -929,6 +944,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
         playerJetpackVfx.Validate(runtimeVisualBridgePrefab, name);
         groundShadow.Validate(name);
         healthBars.Validate(name);
+        activePowerUpHud.Validate(name);
         portrait.Validate(name);
         growthSequence.Validate(name);
     }

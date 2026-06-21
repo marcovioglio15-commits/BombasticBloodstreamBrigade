@@ -449,10 +449,8 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         {
             AddSectionLabel(container, "Mirrored Boss Bars");
             AddPropertyField(panel, container, bossUiProperty, "bossDisplayName", "Boss Display Name", "Optional boss name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.");
-            AddPropertyField(panel, container, bossUiProperty, "healthFillColor", "Health Fill Color", "Screen-space health fill color used by the mirrored boss health syringe bar.");
-            AddPropertyField(panel, container, bossUiProperty, "healthBackgroundColor", "Health Background Tint", "Sprite tint used behind the mirrored boss health syringe bar. Keep white to preserve the player bar background silhouette.");
-            AddPropertyField(panel, container, bossUiProperty, "shieldFillColor", "Shield Fill Color", "Screen-space shield fill color used by the mirrored boss shield syringe bar.");
-            AddPropertyField(panel, container, bossUiProperty, "shieldBackgroundColor", "Shield Background Tint", "Sprite tint used behind the mirrored boss shield syringe bar. Keep white to preserve the player bar background silhouette.");
+            AddSectionLabel(container, "Boss Syringe Bars");
+            AddPropertyField(panel, container, bossUiProperty, "syringeBars", "Syringe Bars", "Procedural syringe settings used by the mirrored boss health and shield bars. Health drives boss health; Shield drives boss shield.");
         }
 
         if (showOffscreenIndicator)

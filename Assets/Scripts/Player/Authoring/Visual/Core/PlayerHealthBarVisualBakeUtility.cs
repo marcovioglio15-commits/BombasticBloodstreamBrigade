@@ -19,33 +19,45 @@ public static class PlayerHealthBarVisualBakeUtility
         PlayerHealthBarsVisualSettings settings = visualPreset != null && visualPreset.HealthBars != null
             ? visualPreset.HealthBars
             : new PlayerHealthBarsVisualSettings();
-        PlayerSyringePaintDripSettings paintDrips = settings.PaintDrips ?? new PlayerSyringePaintDripSettings();
+        return BuildConfig(settings);
+    }
+
+    /// <summary>
+    /// Builds the runtime syringe visual configuration from a resolved settings block.
+    /// </summary>
+    /// <param name="settings">Scaled syringe settings used by the caller-specific HUD view.</param>
+    /// <returns>Safe runtime syringe visual configuration.</returns>
+    public static PlayerHealthBarVisualConfig BuildConfig(PlayerHealthBarsVisualSettings settings)
+    {
+        PlayerHealthBarsVisualSettings resolvedSettings = settings ?? new PlayerHealthBarsVisualSettings();
+        PlayerSyringePaintDripSettings paintDrips = resolvedSettings.PaintDrips ?? new PlayerSyringePaintDripSettings();
 
         return new PlayerHealthBarVisualConfig
         {
-            Health = BuildChannel(settings.Health),
-            Shield = BuildChannel(settings.Shield),
-            FontAsset = settings.FontAsset,
-            LabelOffset = new float2(settings.LabelOffset.x, settings.LabelOffset.y),
-            VerticalSpacing = ResolveFinite(settings.VerticalSpacing, 12f),
-            UnitsPerMajorDivision = math.max(0.0001f, ResolveFinite(settings.UnitsPerMajorDivision, 1f)),
-            PixelsPerMajorDivision = math.max(0.0001f, ResolveFinite(settings.PixelsPerMajorDivision, 52f)),
-            MinimumLength = math.max(1f, ResolveFinite(settings.MinimumLength, 340f)),
-            MaximumLength = math.max(1f, ResolveFinite(settings.MaximumLength, 760f)),
-            LabelMinimumSpacing = math.max(1f, ResolveFinite(settings.LabelMinimumSpacing, 46f)),
-            GraduationEndPadding = math.max(0f, ResolveFinite(settings.GraduationEndPadding, 0f)),
-            LabelFontSize = math.max(1f, ResolveFinite(settings.LabelFontSize, 15f)),
-            LabelOutlineWidth = math.clamp(ResolveFinite(settings.LabelOutlineWidth, 0.12f), 0f, 1f),
-            GraduationVerticalOffset = math.clamp(ResolveFinite(settings.GraduationVerticalOffset, 0f), -0.5f, 0.5f),
-            BarHeight = math.max(1f, ResolveFinite(settings.BarHeight, 88f)),
-            OutlineThickness = math.max(0f, ResolveFinite(settings.OutlineThickness, 0.035f)),
-            ChamberInset = math.clamp(ResolveFinite(settings.ChamberInset, 0.16f), 0f, 0.49f),
-            PlungerWidth = math.max(0f, ResolveFinite(settings.PlungerWidth, 0.032f)),
-            EndCapWidth = math.max(0f, ResolveFinite(settings.EndCapWidth, 36f)),
-            TerminationOffset = math.max(0f, ResolveFinite(settings.TerminationOffset, 8f)),
-            MinorDivisionsPerMajor = math.max(1, settings.MinorDivisionsPerMajor),
-            LabelEveryMajorDivision = math.max(1, settings.LabelEveryMajorDivision),
-            MaximumLabelCount = math.clamp(settings.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+            Health = BuildChannel(resolvedSettings.Health),
+            Shield = BuildChannel(resolvedSettings.Shield),
+            FontAsset = resolvedSettings.FontAsset,
+            LabelOffset = new float2(resolvedSettings.LabelOffset.x, resolvedSettings.LabelOffset.y),
+            VerticalSpacing = ResolveFinite(resolvedSettings.VerticalSpacing, 12f),
+            UnitsPerMajorDivision = math.max(0.0001f, ResolveFinite(resolvedSettings.UnitsPerMajorDivision, 1f)),
+            PixelsPerMajorDivision = math.max(0.0001f, ResolveFinite(resolvedSettings.PixelsPerMajorDivision, 52f)),
+            MinimumLength = math.max(1f, ResolveFinite(resolvedSettings.MinimumLength, 340f)),
+            MaximumLength = math.max(1f, ResolveFinite(resolvedSettings.MaximumLength, 760f)),
+            LabelMinimumSpacing = math.max(1f, ResolveFinite(resolvedSettings.LabelMinimumSpacing, 46f)),
+            GraduationEndPadding = math.max(0f, ResolveFinite(resolvedSettings.GraduationEndPadding, 0f)),
+            LabelFontSize = math.max(1f, ResolveFinite(resolvedSettings.LabelFontSize, 15f)),
+            LabelOutlineWidth = math.clamp(ResolveFinite(resolvedSettings.LabelOutlineWidth, 0.12f), 0f, 1f),
+            GraduationVerticalOffset = math.clamp(ResolveFinite(resolvedSettings.GraduationVerticalOffset, 0f), -0.5f, 0.5f),
+            BarHeight = math.max(1f, ResolveFinite(resolvedSettings.BarHeight, 88f)),
+            OutlineThickness = math.max(0f, ResolveFinite(resolvedSettings.OutlineThickness, 0.035f)),
+            ChamberInset = math.clamp(ResolveFinite(resolvedSettings.ChamberInset, 0.16f), 0f, 0.49f),
+            PlungerWidth = math.max(0f, ResolveFinite(resolvedSettings.PlungerWidth, 0.032f)),
+            EndCapWidth = math.max(0f, ResolveFinite(resolvedSettings.EndCapWidth, 36f)),
+            TerminationOffset = math.max(0f, ResolveFinite(resolvedSettings.TerminationOffset, 8f)),
+            MinorDivisionsPerMajor = math.max(1, resolvedSettings.MinorDivisionsPerMajor),
+            LabelEveryMajorDivision = math.max(1, resolvedSettings.LabelEveryMajorDivision),
+            MaximumLabelCount = math.clamp(resolvedSettings.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+            UniformLabelCount = math.clamp(resolvedSettings.UniformLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
             PaintDrips = new PlayerSyringePaintDripConfig
             {
                 Density = math.saturate(ResolveFinite(paintDrips.Density, 0.38f)),
@@ -54,11 +66,12 @@ public static class PlayerHealthBarVisualBakeUtility
                 Irregularity = math.saturate(ResolveFinite(paintDrips.Irregularity, 0.65f)),
                 Enabled = paintDrips.Enabled ? (byte)1 : (byte)0
             },
-            BodyStyle = ResolveBodyStyle(settings.BodyStyle),
-            LabelPlacement = ResolveLabelPlacement(settings.LabelPlacement),
-            TerminationStyle = ResolveTerminationStyle(settings.TerminationStyle),
-            Enabled = settings.Enabled ? (byte)1 : (byte)0,
-            HideWhenPlayerMissing = settings.HideWhenPlayerMissing ? (byte)1 : (byte)0
+            BodyStyle = ResolveBodyStyle(resolvedSettings.BodyStyle),
+            LabelPlacement = ResolveLabelPlacement(resolvedSettings.LabelPlacement),
+            GraduationMode = ResolveGraduationMode(resolvedSettings.GraduationMode),
+            TerminationStyle = ResolveTerminationStyle(resolvedSettings.TerminationStyle),
+            Enabled = resolvedSettings.Enabled ? (byte)1 : (byte)0,
+            HideWhenPlayerMissing = resolvedSettings.HideWhenPlayerMissing ? (byte)1 : (byte)0
         };
     }
 
@@ -180,6 +193,24 @@ public static class PlayerHealthBarVisualBakeUtility
                 return value;
             default:
                 return PlayerSyringeLabelPlacement.InsideChamber;
+        }
+    }
+
+    /// <summary>
+    /// Resolves one authored graduation mode to a supported runtime distribution.
+    /// </summary>
+    /// <param name="value">Authored graduation mode.</param>
+    /// <returns>Supported runtime graduation mode.</returns>
+    private static PlayerSyringeGraduationMode ResolveGraduationMode(PlayerSyringeGraduationMode value)
+    {
+        switch (value)
+        {
+            case PlayerSyringeGraduationMode.FixedUnits:
+            case PlayerSyringeGraduationMode.UniformLabels:
+            case PlayerSyringeGraduationMode.Hidden:
+                return value;
+            default:
+                return PlayerSyringeGraduationMode.FixedUnits;
         }
     }
 

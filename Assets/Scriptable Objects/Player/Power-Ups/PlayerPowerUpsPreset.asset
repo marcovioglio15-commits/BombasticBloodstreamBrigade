@@ -43423,7 +43423,7 @@ MonoBehaviour:
           maxAcquisitions: 2
     unreplaceable: 0
   primaryActivePowerUpId: ActiveChargeShot
-  secondaryActivePowerUpId: 
+  secondaryActivePowerUpId: ActiveBulletTime
   equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:

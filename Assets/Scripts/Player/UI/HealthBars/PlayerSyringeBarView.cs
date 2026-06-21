@@ -40,7 +40,14 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int PlungerWidthId = Shader.PropertyToID("_PlungerWidth");
     private static readonly int BodyStyleId = Shader.PropertyToID("_BodyStyle");
     private static readonly int LabelPlacementId = Shader.PropertyToID("_LabelPlacement");
+    private static readonly int GraduationVisibleId = Shader.PropertyToID("_GraduationVisible");
     private static readonly int TerminationStyleId = Shader.PropertyToID("_TerminationStyle");
+    private static readonly int RequirementMarkerEnabledId = Shader.PropertyToID("_RequirementMarkerEnabled");
+    private static readonly int RequirementMarkerPositionId = Shader.PropertyToID("_RequirementMarkerPosition");
+    private static readonly int RequirementMarkerColorId = Shader.PropertyToID("_RequirementMarkerColor");
+    private static readonly int RequirementMarkerWidthId = Shader.PropertyToID("_RequirementMarkerWidth");
+    private static readonly int RequirementMarkerHeightId = Shader.PropertyToID("_RequirementMarkerHeight");
+    private static readonly int RequirementMarkerVerticalOffsetId = Shader.PropertyToID("_RequirementMarkerVerticalOffset");
     private static readonly int PaintDripsEnabledId = Shader.PropertyToID("_PaintDripsEnabled");
     private static readonly int PaintDripDensityId = Shader.PropertyToID("_PaintDripDensity");
     private static readonly int PaintDripLengthId = Shader.PropertyToID("_PaintDripLength");
@@ -232,6 +239,35 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
 
     #region Runtime Updates
     /// <summary>
+    /// Sets the optional activation-requirement marker rendered by the procedural syringe shader.
+    /// </summary>
+    /// <param name="enabled">True when the marker should be visible.</param>
+    /// <param name="normalizedPosition">Activation requirement normalized against the same maximum value represented by the syringe.</param>
+    /// <param name="markerColor">Direct marker color applied to the procedural triangle.</param>
+    /// <param name="referenceWidth">Reference-length normalized marker width; runtime shader compensation preserves its pixel footprint across syringe lengths.</param>
+    /// <param name="height">Normalized marker height within the syringe UV space.</param>
+    /// <param name="verticalOffset">Normalized offset from the chamber top. Positive values move the marker upward.</param>
+    public void SetRequirementMarker(bool enabled,
+                                     float normalizedPosition,
+                                     Color markerColor,
+                                     float referenceWidth,
+                                     float height,
+                                     float verticalOffset)
+    {
+        Initialize();
+
+        if (runtimeMaterial == null)
+            return;
+
+        runtimeMaterial.SetFloat(RequirementMarkerEnabledId, enabled ? 1f : 0f);
+        runtimeMaterial.SetFloat(RequirementMarkerPositionId, math.saturate(normalizedPosition));
+        runtimeMaterial.SetColor(RequirementMarkerColorId, markerColor);
+        runtimeMaterial.SetFloat(RequirementMarkerWidthId, math.clamp(referenceWidth, 0.001f, 0.1f));
+        runtimeMaterial.SetFloat(RequirementMarkerHeightId, math.clamp(height, 0.001f, 0.5f));
+        runtimeMaterial.SetFloat(RequirementMarkerVerticalOffsetId, math.clamp(verticalOffset, -0.5f, 0.5f));
+    }
+
+    /// <summary>
     /// Updates fill, dynamic length, labels, and optional movement reactions from authoritative runtime values.
     /// </summary>
     /// <param name="currentValue">Authoritative current health or shield value.</param>
@@ -309,6 +345,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(BodyStyleId, (float)sharedConfig.BodyStyle);
         runtimeMaterial.SetFloat(LabelPlacementId, (float)sharedConfig.LabelPlacement);
         runtimeMaterial.SetFloat(TerminationStyleId, (float)sharedConfig.TerminationStyle);
+        runtimeMaterial.SetFloat(RequirementMarkerEnabledId, 0f);
         runtimeMaterial.SetFloat(PaintDripsEnabledId, sharedConfig.PaintDrips.Enabled);
         runtimeMaterial.SetFloat(PaintDripDensityId, math.saturate(sharedConfig.PaintDrips.Density));
         runtimeMaterial.SetFloat(PaintDripLengthId, math.clamp(sharedConfig.PaintDrips.Length, 0f, 0.5f));
@@ -354,8 +391,15 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         if (root == null || runtimeMaterial == null || !math.isfinite(maximumValue))
             return;
 
+        PlayerSyringeGraduationMode graduationMode = ResolveGraduationMode(sharedConfig.GraduationMode);
+        int uniformLabelCount = math.clamp(sharedConfig.UniformLabelCount,
+                                           0,
+                                           PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity);
         float safeUnits = math.max(0.0001f, sharedConfig.UnitsPerMajorDivision);
-        float intervalCount = math.max(0f, maximumValue / safeUnits);
+        float layoutIntervalCount = ResolveLayoutIntervalCount(maximumValue,
+                                                               safeUnits,
+                                                               graduationMode,
+                                                               uniformLabelCount);
         float minimumLength = math.max(1f, sharedConfig.MinimumLength);
         float maximumLength = math.max(minimumLength, sharedConfig.MaximumLength);
         float graduationStartInset = math.max(0f, sharedConfig.EndCapWidth) +
@@ -372,7 +416,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         }
 
         float targetLength = graduationStartInset +
-                             intervalCount * math.max(0.0001f, sharedConfig.PixelsPerMajorDivision);
+                             layoutIntervalCount * math.max(0.0001f, sharedConfig.PixelsPerMajorDivision);
         targetLength += graduationEndInset;
         float resolvedLength = math.clamp(targetLength, minimumLength, maximumLength);
         float resolvedGraduationStartInset = math.min(graduationStartInset, resolvedLength * 0.45f);
@@ -386,7 +430,8 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(GraduationInsetNormalizedId, math.clamp(resolvedGraduationStartInset / resolvedLength, 0.001f, 0.45f));
         runtimeMaterial.SetFloat(GraduationEndNormalizedId, math.clamp(1f - resolvedGraduationEndInset / resolvedLength, 0.55f, 0.999f));
         runtimeMaterial.SetFloat(TerminationOffsetNormalizedId, math.clamp(terminationOffset / resolvedLength, 0f, 0.45f));
-        runtimeMaterial.SetFloat(MajorDivisionCountId, math.max(0.0001f, intervalCount));
+        runtimeMaterial.SetFloat(GraduationVisibleId, graduationMode == PlayerSyringeGraduationMode.Hidden ? 0f : 1f);
+        runtimeMaterial.SetFloat(MajorDivisionCountId, math.max(0.0001f, layoutIntervalCount));
         runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, 0.2f));
         runtimeMaterial.SetFloat(PaintDripWidthId, ResolveReferenceScaledNormalized(sharedConfig.PaintDrips.Width, resolvedLength, 0.25f));
         runtimeMaterial.SetFloat(LengthPixelScaleId, math.clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f));
@@ -406,8 +451,10 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
             labelPool.Rebuild(labelsRoot,
                               maximumValue,
                               safeUnits,
+                              graduationMode,
+                              uniformLabelCount,
                               math.max(1, sharedConfig.LabelEveryMajorDivision),
-                              math.clamp(sharedConfig.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+                              math.clamp(sharedConfig.MaximumLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
                               graduationPixelWidth,
                               math.max(1f, sharedConfig.LabelMinimumSpacing),
                               sharedConfig.LabelPlacement,
@@ -417,7 +464,8 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                               channelConfig.Palette.Label,
                               channelConfig.Palette.LabelOutline,
                               math.saturate(sharedConfig.LabelOutlineWidth),
-                              activeFont);
+                              activeFont,
+                              ShouldCounterMirrorLabels());
         }
 
         MarkParentLayoutDirty();
@@ -437,6 +485,60 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                           math.max(1f, resolvedLength),
                           0f,
                           maximumValue);
+    }
+
+    /// <summary>
+    /// Resolves the number of value-track intervals that should drive syringe length and tick spacing.
+    /// </summary>
+    /// <param name="maximumValue">Authoritative maximum represented by this syringe.</param>
+    /// <param name="safeUnitsPerMajorDivision">Positive value represented by a fixed major interval.</param>
+    /// <param name="graduationMode">Runtime graduation distribution mode.</param>
+    /// <param name="uniformLabelCount">Requested uniform label count.</param>
+    /// <returns>Non-negative interval count used by layout and shader tick distribution.</returns>
+    private static float ResolveLayoutIntervalCount(float maximumValue,
+                                                    float safeUnitsPerMajorDivision,
+                                                    PlayerSyringeGraduationMode graduationMode,
+                                                    int uniformLabelCount)
+    {
+        switch (graduationMode)
+        {
+            case PlayerSyringeGraduationMode.UniformLabels:
+                return math.max(1f, uniformLabelCount > 1 ? uniformLabelCount - 1 : 1);
+            default:
+                return math.max(0f, maximumValue / safeUnitsPerMajorDivision);
+        }
+    }
+
+    /// <summary>
+    /// Resolves unsupported runtime graduation enum values back to the authored fixed-unit behavior.
+    /// </summary>
+    /// <param name="graduationMode">Runtime value that may have been changed by formulas.</param>
+    /// <returns>Supported graduation mode.</returns>
+    private static PlayerSyringeGraduationMode ResolveGraduationMode(PlayerSyringeGraduationMode graduationMode)
+    {
+        switch (graduationMode)
+        {
+            case PlayerSyringeGraduationMode.FixedUnits:
+            case PlayerSyringeGraduationMode.UniformLabels:
+            case PlayerSyringeGraduationMode.Hidden:
+                return graduationMode;
+            default:
+                return PlayerSyringeGraduationMode.FixedUnits;
+        }
+    }
+
+    /// <summary>
+    /// Detects mirrored parent layout so TextMeshPro labels can counter-scale and stay readable.
+    /// </summary>
+    /// <returns>True when the owner hierarchy has a negative horizontal scale.</returns>
+    private bool ShouldCounterMirrorLabels()
+    {
+        Transform ownerTransform = labelsRoot != null ? labelsRoot : transform;
+
+        if (ownerTransform == null)
+            return false;
+
+        return ownerTransform.lossyScale.x < 0f;
     }
     #endregion
 

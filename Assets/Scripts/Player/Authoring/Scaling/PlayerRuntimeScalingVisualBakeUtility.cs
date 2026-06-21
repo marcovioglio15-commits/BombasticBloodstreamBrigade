@@ -317,6 +317,65 @@ public static class PlayerRuntimeScalingVisualBakeUtility
     }
 
     /// <summary>
+    /// Populates active power-up HUD visual scaling metadata from the source visual preset Add Scaling rules.
+    /// </summary>
+    /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>
+    /// <param name="scalingBuffer">Destination runtime active power-up HUD visual scaling buffer.</param>
+    public static void PopulateActivePowerUpHudVisualScalingMetadata(PlayerVisualPreset sourcePreset,
+                                                                     DynamicBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement> scalingBuffer)
+    {
+        scalingBuffer.Clear();
+
+        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+            return;
+
+        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
+
+        for (int ruleIndex = 0; ruleIndex < sourcePreset.ScalingRules.Count; ruleIndex++)
+        {
+            PlayerStatScalingRule scalingRule = sourcePreset.ScalingRules[ruleIndex];
+
+            if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
+                continue;
+
+            string normalizedStatKey = PlayerScalingStatKeyUtility.NormalizeStatKey(scalingRule.StatKey);
+
+            if (!normalizedStatKey.StartsWith("activePowerUpHud.", StringComparison.Ordinal))
+                continue;
+
+            if (!PlayerScalingStatKeyUtility.TryFindPropertyByStatKey(serializedPreset,
+                                                                       scalingRule.StatKey,
+                                                                       out SerializedProperty property))
+            {
+                continue;
+            }
+
+            if (!PlayerRuntimeScalingBakeUtility.TryResolveScalingBaseMetadata(property,
+                                                                               out byte valueType,
+                                                                               out float baseValue,
+                                                                               out byte baseBooleanValue,
+                                                                               out byte isInteger,
+                                                                               out FixedString64Bytes baseTokenValue))
+            {
+                continue;
+            }
+
+            scalingBuffer.Add(new PlayerRuntimeActivePowerUpHudVisualScalingElement
+            {
+                PayloadPath = new FixedString128Bytes(normalizedStatKey.Substring("activePowerUpHud.".Length)),
+                ValueType = valueType,
+                BaseValue = baseValue,
+                BaseBooleanValue = baseBooleanValue,
+                IsInteger = isInteger,
+                BaseTokenValue = baseTokenValue,
+                Formula = new FixedString512Bytes(PlayerRuntimeScalingBakeUtility.ResolveStoredFormula(scalingRule.Formula,
+                                                                                                        property,
+                                                                                                        null))
+            });
+        }
+    }
+
+    /// <summary>
     /// Populates player portrait HUD scaling metadata from the source visual preset Add Scaling rules.
     /// </summary>
     /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>

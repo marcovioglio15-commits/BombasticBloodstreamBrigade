@@ -134,9 +134,11 @@ public struct PlayerHealthBarVisualConfig : IComponentData
     public int MinorDivisionsPerMajor;
     public int LabelEveryMajorDivision;
     public int MaximumLabelCount;
+    public int UniformLabelCount;
     public PlayerSyringePaintDripConfig PaintDrips;
     public PlayerSyringeBodyStyle BodyStyle;
     public PlayerSyringeLabelPlacement LabelPlacement;
+    public PlayerSyringeGraduationMode GraduationMode;
     public PlayerSyringeTerminationStyle TerminationStyle;
     public byte Enabled;
     public byte HideWhenPlayerMissing;

@@ -20,10 +20,7 @@ public struct EnemyBossHudConfig : IComponentData
     public byte ShowHealthBar;
     public byte ShowOffscreenIndicator;
     public FixedString64Bytes DisplayName;
-    public float4 HealthFillColor;
-    public float4 HealthBackgroundColor;
-    public float4 ShieldFillColor;
-    public float4 ShieldBackgroundColor;
+    public PlayerHealthBarVisualConfig BarsVisualConfig;
     public float4 OffscreenIndicatorColor;
     public float OffscreenIndicatorSizePixels;
     public float EdgePaddingPixels;

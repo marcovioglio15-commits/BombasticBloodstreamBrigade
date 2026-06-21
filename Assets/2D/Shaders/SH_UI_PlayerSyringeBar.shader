@@ -31,9 +31,18 @@ Shader "Custom/UI/PlayerSyringeBar"
         _PlungerWidth("Reference-Normalized Plunger Width", Range(0, 0.2)) = 0.032
         _BodyStyle("Body Style", Float) = 0
         _LabelPlacement("Label Placement", Float) = 0
+        _GraduationVisible("Graduation Visible", Float) = 1
         _TerminationStyle("Termination Style", Float) = 1
         _MajorDivisionCount("Major Graduation Interval Count", Float) = 5
         _MinorDivisionsPerMajor("Minor Divisions Per Major Interval", Float) = 1
+
+        [Header(Requirement Marker)]
+        _RequirementMarkerEnabled("Requirement Marker Enabled", Float) = 0
+        _RequirementMarkerPosition("Requirement Marker Position", Range(0, 1)) = 0
+        _RequirementMarkerColor("Requirement Marker Color", Color) = (1, 0.05, 0.04, 1)
+        _RequirementMarkerWidth("Reference-Normalized Requirement Marker Width", Range(0.001, 0.1)) = 0.018
+        _RequirementMarkerHeight("Requirement Marker Height", Range(0.001, 0.5)) = 0.12
+        _RequirementMarkerVerticalOffset("Requirement Marker Vertical Offset", Range(-0.5, 0.5)) = 0.03
 
         [Header(Paint Drips)]
         _PaintDripsEnabled("Paint Drips Enabled", Float) = 0
@@ -158,9 +167,16 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _PlungerWidth;
             float _BodyStyle;
             float _LabelPlacement;
+            float _GraduationVisible;
             float _TerminationStyle;
             float _MajorDivisionCount;
             float _MinorDivisionsPerMajor;
+            float _RequirementMarkerEnabled;
+            float _RequirementMarkerPosition;
+            fixed4 _RequirementMarkerColor;
+            float _RequirementMarkerWidth;
+            float _RequirementMarkerHeight;
+            float _RequirementMarkerVerticalOffset;
             float _PaintDripsEnabled;
             float _PaintDripDensity;
             float _PaintDripLength;
@@ -420,7 +436,8 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float outlineThicknessX = outlineThickness * _OutlineAspect;
                 float detailedStyle = step(0.5, round(clamp(_BodyStyle, 0.0, 1.0)));
                 float simplifiedStyle = 1.0 - detailedStyle;
-                float externalLabels = step(0.5, round(clamp(_LabelPlacement, 0.0, 1.0)));
+                float graduationVisible = step(0.5, _GraduationVisible);
+                float externalLabels = step(0.5, round(clamp(_LabelPlacement, 0.0, 1.0))) * graduationVisible;
                 float bodyStart = lerp(endCap * 0.34, endCap * 0.82, detailedStyle);
                 float bodyEnd = lerp(1.0 - endCap * 0.34, 1.0 - endCap * 0.72, detailedStyle);
                 float bodyBottom = lerp(0.12, 0.045, detailedStyle);
@@ -562,14 +579,16 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                float2(graduationStart, 0.0),
                                                float2(graduationEnd, 1.0),
                                                softness);
-                // Plunger horizontal placement is resolved before the liquid so the fluid can be clamped to its edge.
-                float plungerCenter = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
                 float plungerOuterHalfWidth = _PlungerWidth * lerp(0.75, 0.72, detailedStyle);
                 float plungerInnerHalfWidth = _PlungerWidth * lerp(0.5, 0.36, detailedStyle);
                 float plungerGrooveHalfWidth = _PlungerWidth * lerp(0.1, 0.12, detailedStyle);
-                // The plunger's leading (left) edge expressed in value-track space; the liquid never crosses it.
+                // The plunger's left edge represents the value; this keeps the full authored width visible at zero.
                 float graduationSpan = max(0.0001, graduationEnd - graduationStart);
-                float plungerStartValueTrack = saturate(saturate(_FillNormalized) - plungerOuterHalfWidth / graduationSpan);
+                float plungerLeadingEdge = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
+                float plungerCenter = clamp(plungerLeadingEdge + plungerOuterHalfWidth,
+                                            graduationStart + plungerOuterHalfWidth,
+                                            graduationEnd + plungerOuterHalfWidth);
+                float plungerStartValueTrack = saturate(_FillNormalized);
                 float bubblesOnlySlosh = step(0.5, _SloshAffectsBubblesOnly);
                 float slosh = clamp(_Slosh + _ValueImpulse, -1.0, 1.0);
                 float horizontalSlosh = slosh *
@@ -662,7 +681,29 @@ Shader "Custom/UI/PlayerSyringeBar"
                                           graduationHorizontalMask *
                                           saturate(majorTicks + minorTicks * 0.72);
                 float endpointTicksMask = ticksSurfaceMask * endpointTicks;
-                float ticksMask = saturate(repeatedTicksMask + endpointTicksMask);
+                float ticksMask = saturate(repeatedTicksMask + endpointTicksMask) * graduationVisible;
+                float requirementMarkerMask = 0.0;
+
+                if (_RequirementMarkerEnabled > 0.5)
+                {
+                    float markerCenter = lerp(graduationStart, graduationEnd, saturate(_RequirementMarkerPosition));
+                    float markerTop = chamberTop + _RequirementMarkerVerticalOffset;
+                    float markerHeight = max(0.001, _RequirementMarkerHeight);
+                    float markerProgress = saturate((markerTop - uv.y) / markerHeight);
+                    float markerHalfWidth = max(0.0001,
+                                                _RequirementMarkerWidth *
+                                                inverseLengthScale *
+                                                (1.0 - markerProgress));
+                    float markerHorizontal = smoothstep(markerHalfWidth + softness,
+                                                        max(0.0, markerHalfWidth - softness),
+                                                        abs(uv.x - markerCenter));
+                    float markerVertical = smoothstep(-softness, softness, markerTop - uv.y) *
+                                           (1.0 - smoothstep(markerHeight - softness,
+                                                             markerHeight + softness,
+                                                             markerTop - uv.y));
+                    requirementMarkerMask = markerHorizontal * markerVertical * valueTrackMask;
+                }
+
                 float topTrimMask = BoxMask(uv,
                                             float2(bodyStart + 0.015, 0.88),
                                             float2(bodyEnd - 0.015, 0.915),
@@ -706,6 +747,8 @@ Shader "Custom/UI/PlayerSyringeBar"
                 finalAlpha = max(finalAlpha, plungerWindowMask * _PlungerWindowColor.a);
                 finalColor = lerp(finalColor, _GraduationColor.rgb, ticksMask * _GraduationColor.a);
                 finalAlpha = max(finalAlpha, ticksMask * _GraduationColor.a);
+                finalColor = lerp(finalColor, _RequirementMarkerColor.rgb, requirementMarkerMask * _RequirementMarkerColor.a);
+                finalAlpha = max(finalAlpha, requirementMarkerMask * _RequirementMarkerColor.a);
                 finalColor = lerp(finalColor, _GraduationColor.rgb, trimMask * _GraduationColor.a);
                 finalAlpha = max(finalAlpha, trimMask * _GraduationColor.a);
                 finalAlpha *= input.color.a;

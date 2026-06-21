@@ -2,6 +2,18 @@ using System;
 using UnityEngine;
 
 /// <summary>
+/// Selects one built-in syringe palette used only to initialize newly authored settings.
+/// </summary>
+public enum PlayerSyringePalettePreset : byte
+{
+    Health = 0,
+    Shield = 1,
+    ActiveEnergy = 2,
+    BossHealth = 3,
+    BossShield = 4
+}
+
+/// <summary>
 /// Stores direct colors used by one procedural player syringe.
 /// </summary>
 [Serializable]
@@ -88,9 +100,49 @@ public sealed class PlayerSyringePaletteSettings
     /// <param name="useShieldPalette">True when the palette should use shield-oriented purple defaults.</param>
     public PlayerSyringePaletteSettings(bool useShieldPalette)
     {
-        if (!useShieldPalette)
-            return;
+        if (useShieldPalette)
+            ApplyPreset(PlayerSyringePalettePreset.Shield);
+    }
 
+    /// <summary>
+    /// Creates a direct palette initialized from one built-in authoring profile.
+    /// </summary>
+    /// <param name="preset">Profile used to initialize direct colors.</param>
+    public PlayerSyringePaletteSettings(PlayerSyringePalettePreset preset)
+    {
+        ApplyPreset(preset);
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Applies one direct-color profile without mutating unrelated serialized setting blocks.
+    /// </summary>
+    /// <param name="preset">Profile used to initialize direct colors.</param>
+    private void ApplyPreset(PlayerSyringePalettePreset preset)
+    {
+        switch (preset)
+        {
+            case PlayerSyringePalettePreset.Shield:
+                ApplyShieldPreset();
+                return;
+            case PlayerSyringePalettePreset.ActiveEnergy:
+                ApplyActiveEnergyPreset();
+                return;
+            case PlayerSyringePalettePreset.BossHealth:
+                ApplyBossHealthPreset();
+                return;
+            case PlayerSyringePalettePreset.BossShield:
+                ApplyBossShieldPreset();
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Applies the purple shield palette used by player shield syringes.
+    /// </summary>
+    private void ApplyShieldPreset()
+    {
         outline = new Color(0.04f, 0.025f, 0.055f, 1f);
         body = new Color(0.28f, 0.13f, 0.38f, 1f);
         bodyShadow = new Color(0.12f, 0.055f, 0.19f, 1f);
@@ -100,6 +152,57 @@ public sealed class PlayerSyringePaletteSettings
         bubbles = new Color(0.78f, 0.58f, 1f, 0.72f);
         terminationOutline = outline;
         terminationInterior = new Color(0.28f, 0.13f, 0.38f, 1f);
+    }
+
+    /// <summary>
+    /// Applies the green active-energy palette used by power-up HUD syringes.
+    /// </summary>
+    private void ApplyActiveEnergyPreset()
+    {
+        outline = new Color(0.05f, 0.065f, 0.04f, 1f);
+        body = new Color(0.28f, 0.31f, 0.17f, 1f);
+        bodyShadow = new Color(0.12f, 0.14f, 0.075f, 1f);
+        chamber = new Color(0.12f, 0.2f, 0.11f, 0.82f);
+        liquid = new Color(0.52f, 1f, 0.02f, 1f);
+        liquidHighlight = new Color(0.78f, 1f, 0.12f, 1f);
+        bubbles = new Color(0.92f, 1f, 0.62f, 0.7f);
+        graduation = new Color(0.96f, 0.82f, 0.22f, 1f);
+        label = new Color(0.035f, 0.025f, 0.035f, 1f);
+        labelOutline = new Color(0.96f, 0.82f, 0.22f, 0.9f);
+        terminationOutline = outline;
+        terminationInterior = new Color(0.24f, 0.28f, 0.13f, 1f);
+    }
+
+    /// <summary>
+    /// Applies a deeper red boss-health palette distinct from the player HUD defaults.
+    /// </summary>
+    private void ApplyBossHealthPreset()
+    {
+        outline = new Color(0.035f, 0.02f, 0.025f, 1f);
+        body = new Color(0.3f, 0.11f, 0.12f, 1f);
+        bodyShadow = new Color(0.12f, 0.045f, 0.05f, 1f);
+        chamber = new Color(0.24f, 0.09f, 0.11f, 0.82f);
+        liquid = new Color(0.8f, 0.08f, 0.08f, 1f);
+        liquidHighlight = new Color(1f, 0.28f, 0.22f, 1f);
+        bubbles = new Color(1f, 0.55f, 0.5f, 0.68f);
+        terminationOutline = outline;
+        terminationInterior = body;
+    }
+
+    /// <summary>
+    /// Applies a cold boss-shield palette distinct from the player shield defaults.
+    /// </summary>
+    private void ApplyBossShieldPreset()
+    {
+        outline = new Color(0.025f, 0.045f, 0.055f, 1f);
+        body = new Color(0.12f, 0.28f, 0.34f, 1f);
+        bodyShadow = new Color(0.055f, 0.12f, 0.16f, 1f);
+        chamber = new Color(0.08f, 0.18f, 0.24f, 0.82f);
+        liquid = new Color(0.12f, 0.78f, 1f, 1f);
+        liquidHighlight = new Color(0.48f, 0.94f, 1f, 1f);
+        bubbles = new Color(0.72f, 1f, 1f, 0.72f);
+        terminationOutline = outline;
+        terminationInterior = body;
     }
     #endregion
 

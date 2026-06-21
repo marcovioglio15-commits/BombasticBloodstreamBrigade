@@ -52,6 +52,12 @@ public sealed class HUDManager : MonoBehaviour
     [SerializeField] private HUDLiquidBarPresentationSettings experienceBarPresentation = HUDLiquidBarPresentationSettings.CreateExperienceDefaults();
 
     [Header("Power Ups - Energy")]
+    [Tooltip("Primary redesigned active power-up slot view. Uses icon cooldown, energy syringe, requirement marker, and charge semiring when assigned.")]
+    [SerializeField] private PlayerActivePowerUpSlotHudView primaryPowerUpSlotView;
+
+    [Tooltip("Secondary redesigned active power-up slot view. Uses icon cooldown, energy syringe, requirement marker, and charge semiring when assigned.")]
+    [SerializeField] private PlayerActivePowerUpSlotHudView secondaryPowerUpSlotView;
+
     [Tooltip("Primary slot energy fill image. Displayed only when the primary slot has an energy module.")]
     [SerializeField] private Image primaryEnergyFillImage;
 
@@ -145,6 +151,8 @@ public sealed class HUDManager : MonoBehaviour
         growthSequenceSection.Initialize(hudSearchRoot);
         powerUpOverlaySection = new HUDPowerUpOverlaySection(primaryPowerUpIconImage,
                                                              secondaryPowerUpIconImage,
+                                                             primaryPowerUpSlotView,
+                                                             secondaryPowerUpSlotView,
                                                              primaryPowerUpSlotRootObject,
                                                              secondaryPowerUpSlotRootObject,
                                                              primaryEnergyFillImage,
@@ -173,6 +181,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (experienceBarRuntime != null)
             experienceBarRuntime.Dispose();
+
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.Dispose();
 
         milestoneSelectionSection.Dispose();
         powerUpContainerInteractionSection.Dispose();
