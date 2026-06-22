@@ -6569,6 +6569,11 @@ MonoBehaviour:
   healthSmoothingSeconds: 0.08
   bossResolveIntervalSeconds: 0.25
   hideWhenNoBoss: 1
+  editorPreviewVisualPreset: {fileID: 11400000, guid: b9f2f692163109b4b9e1baaee524b5eb, type: 2}
+  editorPreviewHealthValue: 100
+  editorPreviewHealthMaximum: 100
+  editorPreviewShieldValue: 0
+  editorPreviewShieldMaximum: 0
 --- !u!1 &8494646131800593661
 GameObject:
   m_ObjectHideFlags: 0

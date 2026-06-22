@@ -11,6 +11,15 @@ public enum PlayerPowerUpIconCooldownFillDirection : byte
 }
 
 /// <summary>
+/// Selects the direction used by active power-up charge semirings to reveal the filled arc.
+/// </summary>
+public enum PlayerPowerUpChargeRingFillDirection : byte
+{
+    TopToBottom = 0,
+    BottomToTop = 1
+}
+
+/// <summary>
 /// Stores the activation-energy marker drawn over an active power-up energy syringe.
 /// </summary>
 [Serializable]
@@ -135,6 +144,9 @@ public sealed class PlayerPowerUpChargeRingVisualSettings
     [Tooltip("Direct color used by the semiring outline.")]
     [SerializeField] private Color outlineColor = new Color(0.035f, 0.03f, 0.025f, 1f);
 
+    [Tooltip("Direction used by the charge semiring to reveal the filled arc along its authored angle range.")]
+    [SerializeField] private PlayerPowerUpChargeRingFillDirection fillDirection = PlayerPowerUpChargeRingFillDirection.TopToBottom;
+
     [Tooltip("Normalized semiring band thickness relative to the widget half-size.")]
     [Range(0.02f, 0.6f)]
     [SerializeField] private float thickness = 0.18f;
@@ -159,6 +171,7 @@ public sealed class PlayerPowerUpChargeRingVisualSettings
     public Color BackgroundColor => backgroundColor;
     public Color FillColor => fillColor;
     public Color OutlineColor => outlineColor;
+    public PlayerPowerUpChargeRingFillDirection FillDirection => fillDirection;
     public float Thickness => thickness;
     public float OutlineThickness => outlineThickness;
     public float StartAngleDegrees => startAngleDegrees;
@@ -179,6 +192,12 @@ public sealed class PlayerPowerUpChargeRingVisualSettings
 
         if (!IsFinite(backgroundColor) || !IsFinite(fillColor) || !IsFinite(outlineColor))
             LogWarning(ownerAssetName, "All color channels should be finite.");
+
+        if (fillDirection != PlayerPowerUpChargeRingFillDirection.TopToBottom &&
+            fillDirection != PlayerPowerUpChargeRingFillDirection.BottomToTop)
+        {
+            LogWarning(ownerAssetName, "Fill Direction should resolve to Top To Bottom or Bottom To Top.");
+        }
 
         if (!IsFinite(thickness) || thickness < 0.02f || thickness > 0.6f)
             LogWarning(ownerAssetName, "Thickness should be finite and within 0.02-0.6.");
@@ -365,7 +384,7 @@ public sealed class PlayerActivePowerUpHudVisualSettings
     [Range(0f, 2f)]
     [SerializeField] private float chargeSmoothingSeconds = 0.05f;
 
-    [Tooltip("Single-channel syringe settings used by active power-up energy bars. The Health channel is treated as Energy.")]
+    [Tooltip("Single-channel syringe settings used by active power-up energy bars.")]
     [SerializeField] private PlayerHealthBarsVisualSettings energySyringe = new PlayerHealthBarsVisualSettings(true);
 
     [Tooltip("Triangle marker settings used to show energy activation requirements.")]

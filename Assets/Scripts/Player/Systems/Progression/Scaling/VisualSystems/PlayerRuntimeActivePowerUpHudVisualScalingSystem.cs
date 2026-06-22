@@ -221,6 +221,11 @@ public partial struct PlayerRuntimeActivePowerUpHudVisualScalingSystem : ISystem
             case "chargeRing.arcDegrees":
                 runtimeConfig.ChargeRing.ArcDegrees = resolvedValue;
                 return;
+            case "chargeRing.fillDirection":
+                runtimeConfig.ChargeRing.FillDirection = (PlayerPowerUpChargeRingFillDirection)math.clamp((int)math.round(resolvedValue),
+                                                                                                           (int)PlayerPowerUpChargeRingFillDirection.TopToBottom,
+                                                                                                           (int)PlayerPowerUpChargeRingFillDirection.BottomToTop);
+                return;
             case "iconCooldown.desaturationStrength":
                 runtimeConfig.IconCooldown.DesaturationStrength = resolvedValue;
                 return;

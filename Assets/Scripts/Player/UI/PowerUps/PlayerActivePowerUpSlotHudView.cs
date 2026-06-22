@@ -2,9 +2,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 /// <summary>
 /// Groups the preauthored active power-up icon, energy syringe, charge semiring, and cooldown reveal views for one slot.
 /// </summary>
+[ExecuteAlways]
 [DisallowMultipleComponent]
 public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
 {
@@ -22,10 +27,43 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
 
     [Tooltip("Optional icon material view that desaturates and reveals color during cooldown locks.")]
     [SerializeField] private PlayerPowerUpIconCooldownView iconCooldown;
+
+    #if UNITY_EDITOR
+    [Header("Editor Preview")]
+    [Tooltip("Player Visual Preset used to render this active slot outside Play Mode through the same configuration builder used at runtime.")]
+    [SerializeField] private PlayerVisualPreset editorPreviewPreset;
+
+    [Tooltip("Current energy shown only by the Edit Mode preview.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewEnergyValue = 5f;
+
+    [Tooltip("Maximum energy shown only by the Edit Mode preview and used to resolve syringe length and graduations.")]
+    [Min(0.0001f)]
+    [SerializeField] private float editorPreviewEnergyMaximum = 5f;
+
+    [Tooltip("Energy requirement shown only by the Edit Mode preview marker.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewActivationRequirement = 3f;
+
+    [Tooltip("Shows the activation requirement marker in Edit Mode preview.")]
+    [SerializeField] private bool editorPreviewShowRequirementMarker = true;
+
+    [Tooltip("Normalized charge shown only by the Edit Mode preview semiring.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float editorPreviewChargeNormalized = 0.6f;
+
+    [Tooltip("Normalized cooldown reveal shown only by the Edit Mode preview icon material.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float editorPreviewCooldownProgress = 1f;
+    #endif
     #endregion
 
     private PlayerActivePowerUpHudVisualConfig cachedConfig;
     private bool configured;
+
+    #if UNITY_EDITOR
+    private bool editorPreviewQueued;
+    #endif
     #endregion
 
     #region Properties
@@ -58,6 +96,43 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
     #region Methods
 
     #region Lifecycle
+    #if UNITY_EDITOR
+    /// <summary>
+    /// Queues an Edit Mode preview refresh and subscribes to referenced preset changes.
+    /// </summary>
+    private void OnEnable()
+    {
+        if (Application.isPlaying)
+            return;
+
+        EditorApplication.projectChanged -= HandleEditorProjectChanged;
+        EditorApplication.projectChanged += HandleEditorProjectChanged;
+        QueueEditorPreview();
+    }
+
+    /// <summary>
+    /// Releases Edit Mode preview materials and editor callbacks.
+    /// </summary>
+    private void OnDisable()
+    {
+        EditorApplication.projectChanged -= HandleEditorProjectChanged;
+        EditorApplication.delayCall -= ApplyQueuedEditorPreview;
+        editorPreviewQueued = false;
+
+        if (!Application.isPlaying)
+            Dispose();
+    }
+
+    /// <summary>
+    /// Queues a preview rebuild after inspector edits.
+    /// </summary>
+    private void OnValidate()
+    {
+        if (!Application.isPlaying)
+            QueueEditorPreview();
+    }
+    #endif
+
     /// <summary>
     /// Initializes all preauthored child views without creating UI GameObjects.
     /// </summary>
@@ -201,6 +276,68 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
             chargeRing.HandleMissing(hideCharge);
     }
     #endregion
+
+    #if UNITY_EDITOR
+    #region Editor Preview
+    /// <summary>
+    /// Rebuilds the Edit Mode active-slot preview through the runtime bake utility and preauthored views.
+    /// </summary>
+    public void RefreshEditorPreview()
+    {
+        if (Application.isPlaying || !isActiveAndEnabled || editorPreviewPreset == null)
+            return;
+
+        PlayerActivePowerUpHudVisualConfig previewConfig = PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(editorPreviewPreset);
+        float safeMaximum = Mathf.Max(0.0001f, editorPreviewEnergyMaximum);
+        float requirementNormalized = Mathf.Clamp01(editorPreviewActivationRequirement / safeMaximum);
+        ApplyConfiguration(in previewConfig);
+        UpdateEnergy(editorPreviewEnergyValue,
+                     safeMaximum,
+                     0f,
+                     requirementNormalized,
+                     editorPreviewShowRequirementMarker,
+                     true);
+        UpdateCharge(editorPreviewChargeNormalized);
+        UpdateCooldown(editorPreviewCooldownProgress);
+        EditorApplication.QueuePlayerLoopUpdate();
+        SceneView.RepaintAll();
+    }
+
+    /// <summary>
+    /// Schedules one coalesced preview rebuild after inspector or project asset changes.
+    /// </summary>
+    private void QueueEditorPreview()
+    {
+        if (editorPreviewQueued || Application.isPlaying)
+            return;
+
+        editorPreviewQueued = true;
+        EditorApplication.delayCall += ApplyQueuedEditorPreview;
+    }
+
+    /// <summary>
+    /// Applies the queued preview only while this scene or prefab-stage instance remains valid.
+    /// </summary>
+    private void ApplyQueuedEditorPreview()
+    {
+        EditorApplication.delayCall -= ApplyQueuedEditorPreview;
+        editorPreviewQueued = false;
+
+        if (this == null)
+            return;
+
+        RefreshEditorPreview();
+    }
+
+    /// <summary>
+    /// Queues a preview rebuild after any referenced project asset is imported or modified.
+    /// </summary>
+    private void HandleEditorProjectChanged()
+    {
+        QueueEditorPreview();
+    }
+    #endregion
+    #endif
 
     #region Helpers
     /// <summary>

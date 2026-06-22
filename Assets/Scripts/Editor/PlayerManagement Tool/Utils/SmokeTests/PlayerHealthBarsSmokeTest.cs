@@ -17,8 +17,8 @@ public static class PlayerHealthBarsSmokeTest
     private const string ShieldMaterialPath = "Assets/2D/Materials/M_UI_PlayerShieldSyringeBar.mat";
     private const string FontPath = "Assets/2D/Fonts/NoctraDrip-Solid SDF.asset";
     private const string VisualPresetPath = "Assets/Scriptable Objects/Player/Visual/PlayerVisualPreset_A.asset";
+    private const string MasterPresetPath = "Assets/Scriptable Objects/Player/Master Presets/PlayerMasterPreset_A.asset";
     private const int TransparentRenderQueue = 3000;
-    private const float ReferenceDecorationLength = 340f;
     #endregion
 
     #region Methods
@@ -37,7 +37,8 @@ public static class PlayerHealthBarsSmokeTest
         PlayerHealthBarsLabelDistributionSmokeTestUtility.Validate();
         ValidateLabelRenderQueueOrdering();
         ValidateGraduationAlignmentAndMotionReset();
-        ValidateShortSyringeDecorationScale();
+        PlayerHealthBarsDecorationScaleSmokeTestUtility.Validate();
+        ValidateFirstRuntimeValueSnap();
         PlayerHealthBarsRuntimeSmokeTestUtility.ValidateShieldVisibilityPolicy();
         PlayerHealthBarsRuntimeSmokeTestUtility.ValidateScene();
         Debug.Log("[PlayerHealthBarsSmokeTest] Passed prefab, scene, shader, material, direct-font, value-track, and preauthored-label validation.");
@@ -96,6 +97,9 @@ public static class PlayerHealthBarsSmokeTest
             SerializedProperty labelMinimumSpacing = healthBars.FindPropertyRelative("labelMinimumSpacing");
             SerializedProperty graduationEndPadding = healthBars.FindPropertyRelative("graduationEndPadding");
             SerializedProperty terminationOffset = healthBars.FindPropertyRelative("terminationOffset");
+            SerializedProperty clampPlungerStartInsideBody = healthBars.FindPropertyRelative("clampPlungerStartInsideBody");
+            SerializedProperty clampPlungerEndInsideBody = healthBars.FindPropertyRelative("clampPlungerEndInsideBody");
+            SerializedProperty stopLiquidAtPlunger = healthBars.FindPropertyRelative("stopLiquidAtPlunger");
             SerializedProperty labelOutlineWidth = healthBars.FindPropertyRelative("labelOutlineWidth");
             SerializedProperty paintDripsEnabled = healthBars.FindPropertyRelative("paintDrips").FindPropertyRelative("enabled");
             SerializedProperty paintDripLength = healthBars.FindPropertyRelative("paintDrips").FindPropertyRelative("length");
@@ -124,6 +128,9 @@ public static class PlayerHealthBarsSmokeTest
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(labelMinimumSpacing) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(graduationEndPadding) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(terminationOffset) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(clampPlungerStartInsideBody) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(clampPlungerEndInsideBody) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(stopLiquidAtPlunger) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(labelOutlineWidth) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(paintDripsEnabled) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(paintDripLength) ||
@@ -142,7 +149,7 @@ public static class PlayerHealthBarsSmokeTest
             }
 
             SerializedProperty scalingRules = presetObject.FindProperty("scalingRules");
-            scalingRules.arraySize = 23;
+            scalingRules.arraySize = 26;
             ConfigureRule(scalingRules.GetArrayElementAtIndex(0), PlayerScalingStatKeyUtility.BuildStatKey(colorChannel), "[this] * 0.5");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(1), PlayerScalingStatKeyUtility.BuildStatKey(healthEnabled), "![this]");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(2), PlayerScalingStatKeyUtility.BuildStatKey(terminationStyle), "[this] + ([Needle] - [this])");
@@ -166,6 +173,9 @@ public static class PlayerHealthBarsSmokeTest
             ConfigureRule(scalingRules.GetArrayElementAtIndex(20), PlayerScalingStatKeyUtility.BuildStatKey(graduationVerticalOffset), "[this] + 0.1");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(21), PlayerScalingStatKeyUtility.BuildStatKey(graduationMode), "[this] + ([UniformLabels] - [this])");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(22), PlayerScalingStatKeyUtility.BuildStatKey(uniformLabelCount), "[this] + 2");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(23), PlayerScalingStatKeyUtility.BuildStatKey(clampPlungerStartInsideBody), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(24), PlayerScalingStatKeyUtility.BuildStatKey(clampPlungerEndInsideBody), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(25), PlayerScalingStatKeyUtility.BuildStatKey(stopLiquidAtPlunger), "![this]");
             presetObject.ApplyModifiedPropertiesWithoutUndo();
 
             EntityManager entityManager = world.EntityManager;
@@ -209,7 +219,7 @@ public static class PlayerHealthBarsSmokeTest
             DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> metadata = entityManager.AddBuffer<PlayerRuntimeHealthBarVisualScalingElement>(configEntity);
             PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(preset, metadata);
 
-            if (metadata.Length != 23)
+            if (metadata.Length != 26)
                 throw new InvalidOperationException("Health Bars runtime scaling metadata did not include palette, bool, enum, numeric, and nested-block rules.");
 
             StringBuilder metadataDetails = new StringBuilder();
@@ -259,12 +269,15 @@ public static class PlayerHealthBarsSmokeTest
                 !Mathf.Approximately(runtimeConfig.Health.Motion.SurfaceSloshStrength, baseConfig.Health.Motion.SurfaceSloshStrength + 0.1f) ||
                 !Mathf.Approximately(runtimeConfig.Health.Motion.HorizontalSloshStrength, baseConfig.Health.Motion.HorizontalSloshStrength + 0.05f) ||
                 runtimeConfig.Health.SloshAffectsBubblesOnly == 0 ||
+                runtimeConfig.ClampPlungerStartInsideBody != 0 ||
+                runtimeConfig.ClampPlungerEndInsideBody == 0 ||
+                runtimeConfig.StopLiquidAtPlunger != 0 ||
                 !Mathf.Approximately(runtimeConfig.GraduationVerticalOffset, baseConfig.GraduationVerticalOffset + 0.1f) ||
                 runtimeConfig.FontAsset.Value != expectedFont ||
                 scalingState.Initialized == 0 ||
                 scalingState.LastScalableStatsHash != 123u)
             {
-                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}, SloshBubbles={19}, GradOffset={20}, GraduationMode={21}, UniformLabels={22}.",
+                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}, SloshBubbles={19}, GradOffset={20}, GraduationMode={21}, UniformLabels={22}, ClampStart={23}, ClampEnd={24}, StopLiquid={25}.",
                                                                   runtimeConfig.Health.Palette.Liquid.x,
                                                                   baseConfig.Health.Palette.Liquid.x * 0.5f,
                                                                   runtimeConfig.Health.Enabled,
@@ -287,7 +300,10 @@ public static class PlayerHealthBarsSmokeTest
                                                                   runtimeConfig.Health.SloshAffectsBubblesOnly,
                                                                   runtimeConfig.GraduationVerticalOffset,
                                                                   runtimeConfig.GraduationMode,
-                                                                  runtimeConfig.UniformLabelCount));
+                                                                  runtimeConfig.UniformLabelCount,
+                                                                  runtimeConfig.ClampPlungerStartInsideBody,
+                                                                  runtimeConfig.ClampPlungerEndInsideBody,
+                                                                  runtimeConfig.StopLiquidAtPlunger));
             }
         }
         finally
@@ -405,6 +421,10 @@ public static class PlayerHealthBarsSmokeTest
         }
 
         SerializedObject hudObject = new SerializedObject(hudView);
+        PlayerMasterPreset expectedMasterPreset = AssetDatabase.LoadAssetAtPath<PlayerMasterPreset>(MasterPresetPath);
+
+        if (hudObject.FindProperty("editorPreviewMasterPreset").objectReferenceValue != expectedMasterPreset)
+            throw new InvalidOperationException("Player bars prefab is missing the direct Player Master Preset reference required for runtime-equivalent Edit Mode health length.");
 
         if (hudObject.FindProperty("editorPreviewPreset").objectReferenceValue == null)
             throw new InvalidOperationException("Player bars prefab is missing the direct Player Visual Preset reference required by its Edit Mode preview.");
@@ -433,16 +453,29 @@ public static class PlayerHealthBarsSmokeTest
         Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
         VerticalLayoutGroup layoutGroup = instance.GetComponent<VerticalLayoutGroup>();
         SerializedObject hudObject = new SerializedObject(hudView);
-        PlayerVisualPreset previewPreset = hudObject.FindProperty("editorPreviewPreset").objectReferenceValue as PlayerVisualPreset;
+        PlayerMasterPreset masterPreset = hudObject.FindProperty("editorPreviewMasterPreset").objectReferenceValue as PlayerMasterPreset;
+        PlayerVisualPreset previewPreset = masterPreset != null && masterPreset.VisualPreset != null
+            ? masterPreset.VisualPreset
+            : hudObject.FindProperty("editorPreviewPreset").objectReferenceValue as PlayerVisualPreset;
         PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(previewPreset);
+        PlayerControllerPreset controllerPreset = masterPreset != null
+            ? masterPreset.ControllerPreset
+            : null;
+        float expectedHealthMaximum = controllerPreset != null && controllerPreset.HealthStatistics != null
+            ? Mathf.Max(1f,
+                        PlayerSyringeBarPreviewLengthTestUtility.ResolveExpectedScaledControllerValue(masterPreset,
+                                                                                                      controllerPreset,
+                                                                                                      "healthStatistics.maxHealth",
+                                                                                                      controllerPreset.HealthStatistics.MaxHealth))
+            : Mathf.Max(0.0001f, hudObject.FindProperty("editorPreviewHealthMaximum").floatValue);
+        float expectedHealthLength = PlayerSyringeBarPreviewLengthTestUtility.ResolveExpectedLength(previewConfig, expectedHealthMaximum);
 
         try
         {
             hudView.RefreshEditorPreview();
 
             if (!Mathf.Approximately(healthRoot.sizeDelta.y, previewConfig.BarHeight) ||
-                healthRoot.sizeDelta.x < previewConfig.MinimumLength ||
-                healthRoot.sizeDelta.x > previewConfig.MaximumLength)
+                !Mathf.Approximately(healthRoot.sizeDelta.x, expectedHealthLength))
             {
                 throw new InvalidOperationException("Edit Mode preview did not rebuild health syringe geometry through the selected Player Visual Preset.");
             }
@@ -520,112 +553,56 @@ public static class PlayerHealthBarsSmokeTest
     }
 
     /// <summary>
-    /// Validates that short one-division syringes preserve stable pixel-sized decorations.
+    /// Validates that the first runtime value initializes immediately even when smoothing is enabled.
     /// </summary>
-    private static void ValidateShortSyringeDecorationScale()
+    private static void ValidateFirstRuntimeValueSnap()
     {
         GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
         GameObject instance = UnityEngine.Object.Instantiate(prefab);
         Transform healthRoot = instance.transform.Find("PlayerHealthSyringe");
-        Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
-        PlayerSyringeBarView healthView = healthRoot != null
+        PlayerSyringeBarView view = healthRoot != null
             ? healthRoot.GetComponent<PlayerSyringeBarView>()
-            : null;
-        PlayerSyringeBarView view = shieldRoot != null
-            ? shieldRoot.GetComponent<PlayerSyringeBarView>()
             : null;
 
         try
         {
             if (view == null)
-                throw new InvalidOperationException("Shield syringe view is missing during short-decoration validation.");
-
-            if (healthView == null)
-                throw new InvalidOperationException("Health syringe view is missing during short-decoration validation.");
+                throw new InvalidOperationException("Health syringe view is missing during first runtime value validation.");
 
             PlayerHealthBarVisualConfig config = PlayerHealthBarVisualBakeUtility.BuildConfig((PlayerVisualPreset)null);
-            config.MinimumLength = 114f;
-            config.MaximumLength = 200f;
-            config.PaintDrips.Enabled = 1;
-            config.PaintDrips.Width = 0.026f;
-            view.ApplyConfiguration(in config, in config.Shield, null);
-            view.UpdateValue(1f, 1f, 0f, true);
-            PlayerSyringeBarGraphic graphic = shieldRoot.GetComponentInChildren<PlayerSyringeBarGraphic>(true);
+            config.Health.SmoothingSeconds = 0.35f;
+            view.ApplyConfiguration(in config, in config.Health, null);
+            view.UpdateValue(5f, 5f, 0f, false);
+            PlayerSyringeBarGraphic graphic = healthRoot.GetComponentInChildren<PlayerSyringeBarGraphic>(true);
 
             if (graphic == null || graphic.material == null)
-                throw new InvalidOperationException("Short shield syringe graphic is missing its runtime material.");
+                throw new InvalidOperationException("First runtime value validation is missing the health syringe runtime material.");
 
-            float resolvedLength = view.Root.rect.width;
-            float expectedPlungerWidth = Mathf.Clamp(config.PlungerWidth * ReferenceDecorationLength / resolvedLength, 0f, 0.2f);
-            float expectedPaintDripWidth = Mathf.Clamp(config.PaintDrips.Width * ReferenceDecorationLength / resolvedLength, 0f, 0.25f);
-            float expectedLengthScale = Mathf.Clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f);
-            float shaderPlungerWidth = graphic.material.GetFloat("_PlungerWidth");
-            float shaderPaintDripWidth = graphic.material.GetFloat("_PaintDripWidth");
-            float shaderLengthScale = graphic.material.GetFloat("_LengthPixelScale");
+            float shaderFill = graphic.material.GetFloat("_FillNormalized");
 
-            if (!Mathf.Approximately(shaderPlungerWidth, expectedPlungerWidth) ||
-                !Mathf.Approximately(shaderPaintDripWidth, expectedPaintDripWidth) ||
-                !Mathf.Approximately(shaderLengthScale, expectedLengthScale) ||
-                shaderPlungerWidth <= config.PlungerWidth ||
-                shaderPaintDripWidth <= config.PaintDrips.Width)
+            if (!Mathf.Approximately(shaderFill, 1f))
             {
-                throw new InvalidOperationException(string.Format("Short syringe decoration compensation failed. Plunger={0}/{1}, Drip={2}/{3}, LengthScale={4}/{5}.",
-                                                                  shaderPlungerWidth,
-                                                                  expectedPlungerWidth,
-                                                                  shaderPaintDripWidth,
-                                                                  expectedPaintDripWidth,
-                                                                  shaderLengthScale,
-                                                                  expectedLengthScale));
+                throw new InvalidOperationException(string.Format("First runtime health syringe value did not initialize immediately with smoothing enabled. Fill={0}.",
+                                                                  shaderFill));
             }
 
-            view.UpdateValue(0f, 5f, 0f, true);
-            ValidateZeroFillPlungerCompensation(view, shieldRoot, config.PlungerWidth, "shield");
-            healthView.ApplyConfiguration(in config, in config.Health, null);
-            healthView.UpdateValue(0f, 1f, 0f, true);
-            ValidateZeroFillPlungerCompensation(healthView, healthRoot, config.PlungerWidth, "health");
+            view.HandleMissing(true);
+            view.HandleMissing(false);
+            view.UpdateValue(2f, 5f, 0f, false);
+            shaderFill = graphic.material.GetFloat("_FillNormalized");
+
+            if (!Mathf.Approximately(shaderFill, 0.4f))
+            {
+                throw new InvalidOperationException(string.Format("Health syringe value did not reinitialize after visibility was restored. Fill={0}.",
+                                                                  shaderFill));
+            }
         }
         finally
         {
-            if (healthView != null)
-                healthView.Dispose();
-
             if (view != null)
                 view.Dispose();
 
             UnityEngine.Object.DestroyImmediate(instance);
-        }
-    }
-
-    /// <summary>
-    /// Validates that a zero-fill syringe keeps the authored plunger width compensation.
-    /// </summary>
-    /// <param name="view">Syringe view under test.</param>
-    /// <param name="viewRoot">View root used to resolve the runtime material.</param>
-    /// <param name="basePlungerWidth">Reference-length normalized plunger width.</param>
-    /// <param name="channelLabel">Channel label used by error messages.</param>
-    private static void ValidateZeroFillPlungerCompensation(PlayerSyringeBarView view,
-                                                            Transform viewRoot,
-                                                            float basePlungerWidth,
-                                                            string channelLabel)
-    {
-        PlayerSyringeBarGraphic graphic = viewRoot.GetComponentInChildren<PlayerSyringeBarGraphic>(true);
-
-        if (graphic == null || graphic.material == null)
-            throw new InvalidOperationException("Zero-fill " + channelLabel + " syringe graphic is missing its runtime material.");
-
-        float resolvedLength = view.Root.rect.width;
-        float expectedPlungerWidth = Mathf.Clamp(basePlungerWidth * ReferenceDecorationLength / resolvedLength, 0f, 0.2f);
-        float shaderPlungerWidth = graphic.material.GetFloat("_PlungerWidth");
-        float shaderFill = graphic.material.GetFloat("_FillNormalized");
-
-        if (!Mathf.Approximately(shaderPlungerWidth, expectedPlungerWidth) ||
-            !Mathf.Approximately(shaderFill, 0f))
-        {
-            throw new InvalidOperationException(string.Format("Zero-fill {0} syringe plunger compensation failed. Width={1}/{2}, Fill={3}.",
-                                                              channelLabel,
-                                                              shaderPlungerWidth,
-                                                              expectedPlungerWidth,
-                                                              shaderFill));
         }
     }
 

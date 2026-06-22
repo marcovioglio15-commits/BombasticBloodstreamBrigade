@@ -17,6 +17,7 @@ public sealed class PlayerPowerUpChargeRingView : MonoBehaviour
     private static readonly int OutlineThicknessId = Shader.PropertyToID("_OutlineThickness");
     private static readonly int StartAngleDegreesId = Shader.PropertyToID("_StartAngleDegrees");
     private static readonly int ArcDegreesId = Shader.PropertyToID("_ArcDegrees");
+    private static readonly int FillDirectionId = Shader.PropertyToID("_FillDirection");
     #endregion
 
     #region Fields
@@ -108,6 +109,7 @@ public sealed class PlayerPowerUpChargeRingView : MonoBehaviour
         runtimeMaterial.SetFloat(OutlineThicknessId, math.clamp(config.OutlineThickness, 0f, 0.2f));
         runtimeMaterial.SetFloat(StartAngleDegreesId, math.clamp(config.StartAngleDegrees, -360f, 360f));
         runtimeMaterial.SetFloat(ArcDegreesId, math.clamp(config.ArcDegrees, 10f, 360f));
+        runtimeMaterial.SetFloat(FillDirectionId, (float)ResolveFillDirection(config.FillDirection));
         SetVisible(config.Enabled != 0);
     }
     #endregion
@@ -136,6 +138,23 @@ public sealed class PlayerPowerUpChargeRingView : MonoBehaviour
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves unsupported runtime fill-direction enum values back to the authored default.
+    /// </summary>
+    /// <param name="fillDirection">Runtime fill direction that may have been changed by formulas.</param>
+    /// <returns>Supported shader fill-direction index.</returns>
+    private static PlayerPowerUpChargeRingFillDirection ResolveFillDirection(PlayerPowerUpChargeRingFillDirection fillDirection)
+    {
+        switch (fillDirection)
+        {
+            case PlayerPowerUpChargeRingFillDirection.TopToBottom:
+            case PlayerPowerUpChargeRingFillDirection.BottomToTop:
+                return fillDirection;
+            default:
+                return PlayerPowerUpChargeRingFillDirection.TopToBottom;
+        }
+    }
+
     /// <summary>
     /// Writes one unmanaged direct color to the runtime material.
     /// </summary>

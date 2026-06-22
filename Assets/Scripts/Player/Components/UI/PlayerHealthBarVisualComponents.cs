@@ -142,6 +142,9 @@ public struct PlayerHealthBarVisualConfig : IComponentData
     public PlayerSyringeTerminationStyle TerminationStyle;
     public byte Enabled;
     public byte HideWhenPlayerMissing;
+    public byte ClampPlungerStartInsideBody;
+    public byte ClampPlungerEndInsideBody;
+    public byte StopLiquidAtPlunger;
 }
 
 /// <summary>

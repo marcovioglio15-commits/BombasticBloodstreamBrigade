@@ -31,6 +31,7 @@ Material:
     m_Floats:
     - _ArcDegrees: 140
     - _ColorMask: 15
+    - _FillDirection: 0
     - _FillNormalized: 0
     - _OutlineThickness: 0.035
     - _StartAngleDegrees: 110

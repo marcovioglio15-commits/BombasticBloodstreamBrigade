@@ -12,6 +12,7 @@ Shader "Custom/UI/PowerUpChargeSemiRing"
         _OutlineThickness("Outline Thickness", Range(0, 0.2)) = 0.035
         _StartAngleDegrees("Start Angle Degrees", Range(-360, 360)) = 110
         _ArcDegrees("Arc Degrees", Range(10, 360)) = 140
+        _FillDirection("Fill Direction", Range(0, 1)) = 0
         _StencilComp("Stencil Comparison", Float) = 8
         _Stencil("Stencil ID", Float) = 0
         _StencilOp("Stencil Operation", Float) = 0
@@ -89,6 +90,7 @@ Shader "Custom/UI/PowerUpChargeSemiRing"
             float _OutlineThickness;
             float _StartAngleDegrees;
             float _ArcDegrees;
+            float _FillDirection;
 
             v2f Vert(appdata_t input)
             {
@@ -117,7 +119,8 @@ Shader "Custom/UI/PowerUpChargeSemiRing"
                                                 smoothstep(1.0 - outline - 0.01, 1.0 - outline, radius));
                 outlineMask = saturate(outlineMask);
                 float fillAngle = arc * saturate(_FillNormalized);
-                float fillMask = ringMask * (1.0 - smoothstep(fillAngle - 0.75, fillAngle + 0.75, normalizedAngle));
+                float fillDistance = lerp(normalizedAngle, arc - normalizedAngle, step(0.5, _FillDirection));
+                float fillMask = ringMask * (1.0 - smoothstep(fillAngle - 0.75, fillAngle + 0.75, fillDistance));
                 float3 color = _BackgroundColor.rgb;
                 float alpha = ringMask * _BackgroundColor.a;
                 color = lerp(color, _FillColor.rgb, fillMask * _FillColor.a);

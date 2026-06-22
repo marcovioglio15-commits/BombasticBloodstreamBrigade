@@ -320,6 +320,9 @@ MonoBehaviour:
     outlineThickness: 0.05
     chamberInset: 0.15
     plungerWidth: 0.08
+    clampPlungerStartInsideBody: 1
+    clampPlungerEndInsideBody: 0
+    stopLiquidAtPlunger: 1
     endCapWidth: 20
     terminationOffset: 10
     terminationStyle: 1
@@ -457,6 +460,9 @@ MonoBehaviour:
       outlineThickness: 0.035
       chamberInset: 0.16
       plungerWidth: 0.032
+      clampPlungerStartInsideBody: 1
+      clampPlungerEndInsideBody: 0
+      stopLiquidAtPlunger: 1
       endCapWidth: 30
       terminationOffset: 4
       terminationStyle: 1
@@ -507,7 +513,7 @@ MonoBehaviour:
           sloshSpring: 18
           sloshDamping: 8
           maximumSlosh: 0.25
-          tiltEnabled: 1
+          tiltEnabled: 0
           maximumTiltDegrees: 2.5
           tiltSpring: 16
           tiltDamping: 8
@@ -573,13 +579,14 @@ MonoBehaviour:
       backgroundColor: {r: 0.08, g: 0.075, b: 0.055, a: 0.78}
       fillColor: {r: 1, g: 0.86, b: 0.02, a: 1}
       outlineColor: {r: 0.035, g: 0.03, b: 0.025, a: 1}
+      fillDirection: 1
       thickness: 0.18
       outlineThickness: 0.035
       startAngleDegrees: 110
       arcDegrees: 140
     iconCooldown:
       enabled: 1
-      fillDirection: 0
+      fillDirection: 1
       desaturationStrength: 0.95
       lockedTint: {r: 0.38, g: 0.38, b: 0.38, a: 0.92}
       revealFeather: 0.025

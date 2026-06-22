@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
     #region Constants
     private const string PowerUpSlotPrefabPath = "Assets/Prefabs/UI/PF_UI_PowerUpsSlot.prefab";
     private const string BossHudPrefabPath = "Assets/Prefabs/UI/PF_BossHUD.prefab";
+    private const string BossVisualPresetPath = "Assets/Scriptable Objects/Enemy/Visual/EnemyVisualPreset_BOSS.asset";
     private const string MainUiScenePath = "Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene_UI.unity";
     private const string ChargeRingMaterialPath = "Assets/2D/Materials/M_UI_PowerUpChargeSemiRing.mat";
     private const string CooldownIconMaterialPath = "Assets/2D/Materials/M_UI_PowerUpCooldownIcon.mat";
@@ -93,6 +95,8 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
         ValidateSerializedReference(slotView, "energySyringe", energySyringe);
         ValidateSerializedReference(slotView, "chargeRing", chargeRing);
         ValidateSerializedReference(slotView, "iconCooldown", cooldownView);
+        ValidatePreviewPreset(slotView);
+        ValidateActiveSlotEditorPreview(prefab);
         ValidateNoMissingScripts(prefab.transform);
     }
 
@@ -117,7 +121,69 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
 
         ValidateSerializedReference(presentation, "healthSyringeBar", healthSyringe);
         ValidateSerializedReference(presentation, "shieldSyringeBar", shieldSyringe);
+        ValidateBossEditorPreview(prefab);
         ValidateNoMissingScripts(prefab.transform);
+    }
+
+    /// <summary>
+    /// Validates that the boss HUD Edit Mode preview rebuilds through the selected Enemy Visual Preset.
+    /// </summary>
+    /// <param name="prefab">Boss HUD prefab asset.</param>
+    private static void ValidateBossEditorPreview(GameObject prefab)
+    {
+        GameObject instance = UnityEngine.Object.Instantiate(prefab);
+        EnemyBossHudPresentation presentation = instance.GetComponent<EnemyBossHudPresentation>();
+        PlayerSyringeBarView healthSyringe = FindComponentByName<PlayerSyringeBarView>(instance.transform,
+                                                                                       "BossHealthSyringe");
+        PlayerSyringeBarView shieldSyringe = FindComponentByName<PlayerSyringeBarView>(instance.transform,
+                                                                                       "BossShieldSyringe");
+        PlayerSyringeBarGraphic healthGraphic = healthSyringe != null
+            ? healthSyringe.GetComponentInChildren<PlayerSyringeBarGraphic>(true)
+            : null;
+        SerializedObject presentationObject = new SerializedObject(presentation);
+        EnemyVisualPreset expectedVisualPreset = AssetDatabase.LoadAssetAtPath<EnemyVisualPreset>(BossVisualPresetPath);
+        EnemyVisualPreset previewVisualPreset = presentationObject.FindProperty("editorPreviewVisualPreset").objectReferenceValue as EnemyVisualPreset;
+
+        try
+        {
+            if (previewVisualPreset != expectedVisualPreset)
+                throw new InvalidOperationException("Boss HUD prefab is missing the direct Enemy Visual Preset reference required by its Edit Mode preview.");
+
+            PlayerHealthBarsVisualSettings syringeSettings = previewVisualPreset.BossUi.SyringeBars;
+            PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(syringeSettings);
+            float previewMaximum = Mathf.Max(0.0001f, presentationObject.FindProperty("editorPreviewHealthMaximum").floatValue);
+            float expectedLength = PlayerSyringeBarPreviewLengthTestUtility.ResolveExpectedLength(previewConfig, previewMaximum);
+
+            presentation.RefreshEditorPreview();
+
+            if (healthSyringe == null ||
+                !Mathf.Approximately(healthSyringe.Root.sizeDelta.y, previewConfig.BarHeight) ||
+                !Mathf.Approximately(healthSyringe.Root.sizeDelta.x, expectedLength))
+            {
+                throw new InvalidOperationException("Boss HUD Edit Mode preview did not rebuild health syringe geometry through the selected Enemy Visual Preset.");
+            }
+
+            if (healthGraphic == null ||
+                healthGraphic.material == null ||
+                !healthGraphic.material.HasProperty("_LiquidColor") ||
+                !IsColorApproximately(healthGraphic.material.GetColor("_LiquidColor"), previewConfig.Health.Palette.Liquid))
+            {
+                throw new InvalidOperationException("Boss HUD Edit Mode preview did not apply the boss syringe material palette.");
+            }
+
+            if (shieldSyringe != null && shieldSyringe.gameObject.activeSelf)
+                throw new InvalidOperationException("Boss HUD Edit Mode preview did not hide the zero-maximum shield syringe.");
+        }
+        finally
+        {
+            if (healthSyringe != null)
+                healthSyringe.Dispose();
+
+            if (shieldSyringe != null)
+                shieldSyringe.Dispose();
+
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
     }
     #endregion
 
@@ -140,6 +206,7 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             SerializedObject hudObject = new SerializedObject(hudManager);
             ValidateHudSlotReference(hudObject, "primaryPowerUpSlotView");
             ValidateHudSlotReference(hudObject, "secondaryPowerUpSlotView");
+            ValidateSceneSlotReferences(hudObject);
             ValidateNoMissingScripts(hudManager.transform.root);
         }
         finally
@@ -163,10 +230,242 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
 
         if (slotView == null || !slotView.HasAnyVisuals)
             throw new InvalidOperationException("HUDManager is missing redesigned slot view binding: " + propertyName);
+
+        ValidatePreviewPreset(slotView);
+    }
+    #endregion
+
+    #region Scene Slot References
+    /// <summary>
+    /// Validates that scene active slots keep self-contained references without enforcing designer-authored placement.
+    /// </summary>
+    /// <param name="hudObject">Serialized HUDManager object containing slot view references.</param>
+    private static void ValidateSceneSlotReferences(SerializedObject hudObject)
+    {
+        ValidateSlotReferencesBelongToSlot(ResolveSlotView(hudObject, "primaryPowerUpSlotView"),
+                                           "Primary Active Slot");
+        ValidateSlotReferencesBelongToSlot(ResolveSlotView(hudObject, "secondaryPowerUpSlotView"),
+                                           "Secondary Active Slot");
+    }
+
+    /// <summary>
+    /// Validates one scene slot view references children from its own hierarchy.
+    /// </summary>
+    /// <param name="slotView">Scene slot view inspected for child bindings.</param>
+    /// <param name="slotLabel">User-facing slot label used by exception messages.</param>
+    private static void ValidateSlotReferencesBelongToSlot(PlayerActivePowerUpSlotHudView slotView,
+                                                           string slotLabel)
+    {
+        if (slotView == null)
+            return;
+
+        SerializedObject slotObject = new SerializedObject(slotView);
+        ValidateChildReference(slotView, slotObject, "iconImage", slotLabel);
+        ValidateChildReference(slotView, slotObject, "energySyringe", slotLabel);
+        ValidateChildReference(slotView, slotObject, "chargeRing", slotLabel);
+        ValidateChildReference(slotView, slotObject, "iconCooldown", slotLabel);
+    }
+
+    /// <summary>
+    /// Validates one serialized scene-slot reference and its hierarchy ownership.
+    /// </summary>
+    /// <param name="slotView">Slot view owning the serialized reference.</param>
+    /// <param name="slotObject">Serialized slot view object.</param>
+    /// <param name="propertyName">Serialized object-reference property name.</param>
+    /// <param name="slotLabel">User-facing slot label used by exception messages.</param>
+    private static void ValidateChildReference(PlayerActivePowerUpSlotHudView slotView,
+                                               SerializedObject slotObject,
+                                               string propertyName,
+                                               string slotLabel)
+    {
+        SerializedProperty property = slotObject.FindProperty(propertyName);
+        Component component = property != null ? property.objectReferenceValue as Component : null;
+
+        if (component == null)
+            throw new InvalidOperationException(slotLabel + " is missing active HUD reference: " + propertyName);
+
+        if (!component.transform.IsChildOf(slotView.transform) && component.transform != slotView.transform)
+            throw new InvalidOperationException(slotLabel + " references a component outside its own hierarchy: " + propertyName);
+    }
+    #endregion
+
+    #region Editor Preview
+    /// <summary>
+    /// Validates that the active slot Edit Mode preview rebuilds through the Player Visual Preset.
+    /// </summary>
+    /// <param name="prefab">Active power-up slot prefab asset.</param>
+    private static void ValidateActiveSlotEditorPreview(GameObject prefab)
+    {
+        GameObject instance = UnityEngine.Object.Instantiate(prefab);
+        PlayerActivePowerUpSlotHudView slotView = instance.GetComponent<PlayerActivePowerUpSlotHudView>();
+        PlayerSyringeBarView energySyringe = FindComponentByName<PlayerSyringeBarView>(instance.transform,
+                                                                                       "ActiveEnergySyringe");
+        PlayerPowerUpChargeRingGraphic chargeRingGraphic = FindComponentByName<PlayerPowerUpChargeRingGraphic>(instance.transform,
+                                                                                                               "ActiveChargeSemiRing");
+        SerializedObject serializedObject = new SerializedObject(slotView);
+        PlayerVisualPreset previewPreset = serializedObject.FindProperty("editorPreviewPreset").objectReferenceValue as PlayerVisualPreset;
+        PlayerActivePowerUpHudVisualConfig previewConfig = PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(previewPreset);
+
+        try
+        {
+            ValidateChargeRingFillDirection(previewPreset, previewConfig);
+            ValidateEnergySyringePlungerBehavior(previewPreset, previewConfig);
+            slotView.RefreshEditorPreview();
+
+            if (energySyringe == null ||
+                !Mathf.Approximately(energySyringe.Root.sizeDelta.y, previewConfig.EnergySyringe.BarHeight) ||
+                energySyringe.Root.sizeDelta.x < previewConfig.EnergySyringe.MinimumLength ||
+                energySyringe.Root.sizeDelta.x > previewConfig.EnergySyringe.MaximumLength)
+            {
+                throw new InvalidOperationException("Active slot Edit Mode preview did not rebuild the energy syringe through the selected Player Visual Preset.");
+            }
+
+            if (chargeRingGraphic == null ||
+                chargeRingGraphic.material == null ||
+                !Mathf.Approximately(chargeRingGraphic.material.GetFloat("_FillDirection"), (float)previewConfig.ChargeRing.FillDirection))
+            {
+                throw new InvalidOperationException("Active slot Edit Mode preview did not apply charge semiring Fill Direction to the runtime material.");
+            }
+        }
+        finally
+        {
+            if (slotView != null)
+                slotView.Dispose();
+
+            UnityEngine.Object.DestroyImmediate(instance);
+        }
     }
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Validates that charge semiring fill direction is exposed as a scalable enum and reaches the baked config.
+    /// </summary>
+    /// <param name="previewPreset">Player Visual Preset used by the active slot editor preview.</param>
+    /// <param name="previewConfig">Baked active power-up HUD config resolved from the preview preset.</param>
+    private static void ValidateChargeRingFillDirection(PlayerVisualPreset previewPreset,
+                                                        PlayerActivePowerUpHudVisualConfig previewConfig)
+    {
+        SerializedObject presetObject = new SerializedObject(previewPreset);
+        SerializedProperty fillDirection = presetObject.FindProperty("activePowerUpHud")
+                                                       .FindPropertyRelative("chargeRing")
+                                                       .FindPropertyRelative("fillDirection");
+
+        if (fillDirection == null)
+            throw new InvalidOperationException("Active Power-Up HUD Charge Ring Fill Direction is missing from the Player Visual Preset.");
+
+        string statKey = PlayerScalingStatKeyUtility.BuildStatKey(fillDirection);
+
+        if (statKey != "activePowerUpHud.chargeRing.fillDirection")
+            throw new InvalidOperationException("Active Power-Up HUD Charge Ring Fill Direction has an invalid scaling path: " + statKey);
+
+        if (previewConfig.ChargeRing.FillDirection != (PlayerPowerUpChargeRingFillDirection)fillDirection.enumValueIndex)
+            throw new InvalidOperationException("Active Power-Up HUD Charge Ring Fill Direction did not bake into the runtime config.");
+    }
+
+    /// <summary>
+    /// Validates that energy-syringe plunger behavior toggles are scalable and baked into runtime config.
+    /// </summary>
+    /// <param name="previewPreset">Player Visual Preset used by the active slot editor preview.</param>
+    /// <param name="previewConfig">Baked active power-up HUD config resolved from the preview preset.</param>
+    private static void ValidateEnergySyringePlungerBehavior(PlayerVisualPreset previewPreset,
+                                                             PlayerActivePowerUpHudVisualConfig previewConfig)
+    {
+        SerializedObject presetObject = new SerializedObject(previewPreset);
+        SerializedProperty activePowerUpHud = presetObject.FindProperty("activePowerUpHud");
+
+        if (activePowerUpHud == null)
+            throw new InvalidOperationException("Active Power-Up HUD settings are missing from the Player Visual Preset.");
+
+        SerializedProperty energySyringe = activePowerUpHud.FindPropertyRelative("energySyringe");
+
+        if (energySyringe == null)
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe settings are missing from the Player Visual Preset.");
+
+        SerializedProperty clampPlungerStartInsideBody = energySyringe.FindPropertyRelative("clampPlungerStartInsideBody");
+        SerializedProperty clampPlungerEndInsideBody = energySyringe.FindPropertyRelative("clampPlungerEndInsideBody");
+        SerializedProperty stopLiquidAtPlunger = energySyringe.FindPropertyRelative("stopLiquidAtPlunger");
+
+        ValidateEnergySyringeBooleanPath(clampPlungerStartInsideBody,
+                                         "activePowerUpHud.energySyringe.clampPlungerStartInsideBody",
+                                         previewConfig.EnergySyringe.ClampPlungerStartInsideBody,
+                                         "Clamp Plunger At Start");
+        ValidateEnergySyringeBooleanPath(clampPlungerEndInsideBody,
+                                         "activePowerUpHud.energySyringe.clampPlungerEndInsideBody",
+                                         previewConfig.EnergySyringe.ClampPlungerEndInsideBody,
+                                         "Clamp Plunger At End");
+        ValidateEnergySyringeBooleanPath(stopLiquidAtPlunger,
+                                         "activePowerUpHud.energySyringe.stopLiquidAtPlunger",
+                                         previewConfig.EnergySyringe.StopLiquidAtPlunger,
+                                         "Stop Liquid At Plunger");
+    }
+
+    /// <summary>
+    /// Validates one active energy-syringe boolean path against Add Scaling and baked config output.
+    /// </summary>
+    /// <param name="property">Serialized boolean field inspected in the Player Visual Preset.</param>
+    /// <param name="expectedStatKey">Expected unified scaling stat key.</param>
+    /// <param name="bakedValue">Baked runtime byte value.</param>
+    /// <param name="label">User-facing setting name used by diagnostics.</param>
+    private static void ValidateEnergySyringeBooleanPath(SerializedProperty property,
+                                                         string expectedStatKey,
+                                                         byte bakedValue,
+                                                         string label)
+    {
+        if (property == null)
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " is missing from the Player Visual Preset.");
+
+        if (!PlayerScalingFormulaEditorUtility.SupportsScalingTarget(property))
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " is not exposed as an Add Scaling target.");
+
+        string statKey = PlayerScalingStatKeyUtility.BuildStatKey(property);
+
+        if (statKey != expectedStatKey)
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " has an invalid scaling path: " + statKey);
+
+        if ((property.boolValue && bakedValue == 0) || (!property.boolValue && bakedValue != 0))
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " did not bake into the runtime config.");
+    }
+
+    /// <summary>
+    /// Compares a Unity color with an unmanaged color using a small preview-material tolerance.
+    /// </summary>
+    /// <param name="actual">Color read from the preview material.</param>
+    /// <param name="expected">Expected unmanaged color from the baked config.</param>
+    /// <returns>True when the two colors are visually equivalent for preview validation.</returns>
+    private static bool IsColorApproximately(Color actual, float4 expected)
+    {
+        return Mathf.Abs(actual.r - expected.x) <= 0.001f &&
+               Mathf.Abs(actual.g - expected.y) <= 0.001f &&
+               Mathf.Abs(actual.b - expected.z) <= 0.001f &&
+               Mathf.Abs(actual.a - expected.w) <= 0.001f;
+    }
+
+    /// <summary>
+    /// Resolves one active slot view from a serialized HUDManager object.
+    /// </summary>
+    /// <param name="hudObject">Serialized HUDManager object.</param>
+    /// <param name="propertyName">Serialized slot-view property name.</param>
+    /// <returns>Resolved slot view, or null when missing.</returns>
+    private static PlayerActivePowerUpSlotHudView ResolveSlotView(SerializedObject hudObject, string propertyName)
+    {
+        SerializedProperty property = hudObject.FindProperty(propertyName);
+        return property != null ? property.objectReferenceValue as PlayerActivePowerUpSlotHudView : null;
+    }
+
+    /// <summary>
+    /// Validates that one active slot view has an Edit Mode preview preset assigned.
+    /// </summary>
+    /// <param name="slotView">Slot view whose serialized preview reference is inspected.</param>
+    private static void ValidatePreviewPreset(PlayerActivePowerUpSlotHudView slotView)
+    {
+        SerializedObject serializedObject = new SerializedObject(slotView);
+        SerializedProperty property = serializedObject.FindProperty("editorPreviewPreset");
+
+        if (property == null || property.objectReferenceValue == null)
+            throw new InvalidOperationException("Active power-up slot is missing its Edit Mode preview preset: " + slotView.name);
+    }
+
     /// <summary>
     /// Validates that one private serialized reference points to the expected object.
     /// </summary>

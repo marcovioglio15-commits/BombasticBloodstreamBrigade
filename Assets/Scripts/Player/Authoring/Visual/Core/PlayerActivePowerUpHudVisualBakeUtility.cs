@@ -43,6 +43,7 @@ public static class PlayerActivePowerUpHudVisualBakeUtility
                 OutlineThickness = math.clamp(ResolveFinite(chargeRing.OutlineThickness, 0.035f), 0f, 0.2f),
                 StartAngleDegrees = math.clamp(ResolveFinite(chargeRing.StartAngleDegrees, 110f), -360f, 360f),
                 ArcDegrees = math.clamp(ResolveFinite(chargeRing.ArcDegrees, 140f), 10f, 360f),
+                FillDirection = ResolveChargeRingFillDirection(chargeRing.FillDirection),
                 Enabled = chargeRing.Enabled ? (byte)1 : (byte)0
             },
             IconCooldown = new PlayerPowerUpIconCooldownVisualConfig
@@ -76,6 +77,23 @@ public static class PlayerActivePowerUpHudVisualBakeUtility
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves one authored charge-ring fill direction to a supported runtime value.
+    /// </summary>
+    /// <param name="value">Authored charge-ring fill direction.</param>
+    /// <returns>Supported charge-ring fill direction.</returns>
+    private static PlayerPowerUpChargeRingFillDirection ResolveChargeRingFillDirection(PlayerPowerUpChargeRingFillDirection value)
+    {
+        switch (value)
+        {
+            case PlayerPowerUpChargeRingFillDirection.TopToBottom:
+            case PlayerPowerUpChargeRingFillDirection.BottomToTop:
+                return value;
+            default:
+                return PlayerPowerUpChargeRingFillDirection.TopToBottom;
+        }
+    }
+
     /// <summary>
     /// Resolves one authored cooldown fill direction to a supported runtime value.
     /// </summary>

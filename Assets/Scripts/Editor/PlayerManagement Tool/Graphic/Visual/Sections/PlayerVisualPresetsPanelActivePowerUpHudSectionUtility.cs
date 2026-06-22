@@ -42,10 +42,12 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
         VisualElement warnings = new VisualElement();
         AddField(root, enabled, scalingRules, "Enabled", "Enables the redesigned active power-up HUD widgets.");
         BuildGeneral(details, settings, scalingRules);
-        BuildNestedSettings(details, settings.FindPropertyRelative("energySyringe"), scalingRules, "Energy Syringe", "EnergySyringe");
-        BuildNestedSettings(details, settings.FindPropertyRelative("requirementMarker"), scalingRules, "Activation Requirement Marker", "RequirementMarker");
-        BuildNestedSettings(details, settings.FindPropertyRelative("chargeRing"), scalingRules, "Charge Semiring", "ChargeRing");
-        BuildNestedSettings(details, settings.FindPropertyRelative("iconCooldown"), scalingRules, "Icon Cooldown", "IconCooldown");
+        PlayerVisualPresetsPanelActivePowerUpHudEnergySyringeSectionUtility.Build(details,
+                                                                                  settings.FindPropertyRelative("energySyringe"),
+                                                                                  scalingRules);
+        BuildRequirementMarker(details, settings.FindPropertyRelative("requirementMarker"), scalingRules);
+        BuildChargeRing(details, settings.FindPropertyRelative("chargeRing"), scalingRules);
+        BuildIconCooldown(details, settings.FindPropertyRelative("iconCooldown"), scalingRules);
         root.Add(details);
         root.Add(warnings);
 
@@ -54,9 +56,6 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
         TrackRefresh(root, settings.FindPropertyRelative("hideWhenPlayerMissing"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("hideEnergyWhenModuleMissing"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("hideChargeWhenModuleMissing"), Refresh);
-        TrackRefresh(root, settings.FindPropertyRelative("requirementMarker").FindPropertyRelative("enabled"), Refresh);
-        TrackRefresh(root, settings.FindPropertyRelative("chargeRing").FindPropertyRelative("enabled"), Refresh);
-        TrackRefresh(root, settings.FindPropertyRelative("iconCooldown").FindPropertyRelative("enabled"), Refresh);
         return root;
 
         void Refresh()
@@ -86,108 +85,126 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
     }
 
     /// <summary>
-    /// Builds a nested settings block recursively so every leaf field keeps Add Scaling support.
+    /// Builds activation requirement marker controls, showing marker tuning only when markers are enabled.
     /// </summary>
     /// <param name="parent">Parent container receiving the foldout.</param>
-    /// <param name="settings">Serialized settings root to expose.</param>
+    /// <param name="settings">Serialized requirement-marker settings.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    /// <param name="title">User-facing foldout title.</param>
-    /// <param name="stateSuffix">Stable foldout-state suffix.</param>
-    private static void BuildNestedSettings(VisualElement parent,
-                                            SerializedProperty settings,
-                                            SerializedProperty scalingRules,
-                                            string title,
-                                            string stateSuffix)
+    private static void BuildRequirementMarker(VisualElement parent,
+                                               SerializedProperty settings,
+                                               SerializedProperty scalingRules)
     {
-        Foldout foldout = CreateFoldout(title, stateSuffix);
+        Foldout foldout = CreateFoldout("Activation Requirement Marker", "RequirementMarker");
 
         if (settings == null)
         {
-            foldout.Add(new HelpBox(title + " settings are missing.", HelpBoxMessageType.Warning));
+            foldout.Add(new HelpBox("Activation Requirement Marker settings are missing.", HelpBoxMessageType.Warning));
             parent.Add(foldout);
             return;
         }
 
-        AddRecursiveFields(foldout, settings, scalingRules, stateSuffix);
+        SerializedProperty enabled = settings.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Shows a triangle marker on the energy syringe when the active power-up has an energy activation requirement.");
+        AddField(details, settings.FindPropertyRelative("color"), scalingRules, "Color", "Direct color applied to the activation-requirement triangle marker.");
+        AddField(details, settings.FindPropertyRelative("width"), scalingRules, "Width", "Reference-length normalized width of the marker. Runtime compensation keeps its pixel footprint stable across syringe lengths.");
+        AddField(details, settings.FindPropertyRelative("height"), scalingRules, "Height", "Normalized marker height in the syringe shader UV space.");
+        AddField(details, settings.FindPropertyRelative("verticalOffset"), scalingRules, "Vertical Offset", "Normalized marker offset from the chamber top. Positive values move the marker upward.");
+        foldout.Add(details);
         parent.Add(foldout);
-    }
-    #endregion
 
-    #region Recursive Fields
-    /// <summary>
-    /// Adds leaf fields or nested foldouts for every visible serialized child.
-    /// </summary>
-    /// <param name="parent">Parent container receiving fields.</param>
-    /// <param name="rootProperty">Serialized root property whose children should be exposed.</param>
-    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    /// <param name="stateSuffix">Stable foldout-state suffix.</param>
-    private static void AddRecursiveFields(VisualElement parent,
-                                           SerializedProperty rootProperty,
-                                           SerializedProperty scalingRules,
-                                           string stateSuffix)
-    {
-        SerializedProperty iterator = rootProperty.Copy();
-        SerializedProperty endProperty = rootProperty.GetEndProperty();
-        bool enterChildren = true;
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
 
-        while (iterator.NextVisible(enterChildren) && !SerializedProperty.EqualContents(iterator, endProperty))
+        void Refresh()
         {
-            SerializedProperty child = iterator.Copy();
-
-            if (child.depth != rootProperty.depth + 1)
-            {
-                enterChildren = false;
-                continue;
-            }
-
-            if (ShouldCreateNestedFoldout(child))
-                AddNestedFoldout(parent, child, scalingRules, stateSuffix);
-            else
-                AddField(parent, child, scalingRules, ObjectNames.NicifyVariableName(child.name), child.tooltip);
-
-            enterChildren = false;
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
         }
     }
 
     /// <summary>
-    /// Adds one nested foldout and recursively exposes its leaf fields.
+    /// Builds charge semiring controls, showing shader tuning only when the semiring is enabled.
     /// </summary>
-    /// <param name="parent">Parent container receiving the nested foldout.</param>
-    /// <param name="property">Serialized nested property.</param>
+    /// <param name="parent">Parent container receiving the foldout.</param>
+    /// <param name="settings">Serialized charge-ring settings.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    /// <param name="stateSuffix">Stable foldout-state suffix.</param>
-    private static void AddNestedFoldout(VisualElement parent,
-                                         SerializedProperty property,
-                                         SerializedProperty scalingRules,
-                                         string stateSuffix)
+    private static void BuildChargeRing(VisualElement parent,
+                                        SerializedProperty settings,
+                                        SerializedProperty scalingRules)
     {
-        string title = ObjectNames.NicifyVariableName(property.name);
-        Foldout foldout = CreateFoldout(title, stateSuffix + "." + property.name);
-        AddRecursiveFields(foldout, property, scalingRules, stateSuffix + "." + property.name);
+        Foldout foldout = CreateFoldout("Charge Semiring", "ChargeRing");
+
+        if (settings == null)
+        {
+            foldout.Add(new HelpBox("Charge Semiring settings are missing.", HelpBoxMessageType.Warning));
+            parent.Add(foldout);
+            return;
+        }
+
+        SerializedProperty enabled = settings.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Shows the charge progress as a procedural semiring around the active power-up icon.");
+        AddField(details, settings.FindPropertyRelative("backgroundColor"), scalingRules, "Background Color", "Direct color used by the unfilled semiring track.");
+        AddField(details, settings.FindPropertyRelative("fillColor"), scalingRules, "Fill Color", "Direct color used by the filled semiring arc.");
+        AddField(details, settings.FindPropertyRelative("outlineColor"), scalingRules, "Outline Color", "Direct color used by the semiring outline.");
+        AddField(details, settings.FindPropertyRelative("fillDirection"), scalingRules, "Fill Direction", "Direction used by the charge semiring to grow along its authored arc.");
+        AddField(details, settings.FindPropertyRelative("thickness"), scalingRules, "Thickness", "Normalized semiring band thickness relative to the widget half-size.");
+        AddField(details, settings.FindPropertyRelative("outlineThickness"), scalingRules, "Outline Thickness", "Normalized outline thickness around both edges of the semiring.");
+        AddField(details, settings.FindPropertyRelative("startAngleDegrees"), scalingRules, "Start Angle Degrees", "Start angle in degrees for the semiring. Zero points right and positive values rotate counter-clockwise.");
+        AddField(details, settings.FindPropertyRelative("arcDegrees"), scalingRules, "Arc Degrees", "Total arc length in degrees covered by the charge semiring.");
+        foldout.Add(details);
         parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
 
     /// <summary>
-    /// Returns whether the property should become a nested foldout instead of one direct field.
+    /// Builds icon cooldown reveal controls, showing reveal tuning only when cooldown visuals are enabled.
     /// </summary>
-    /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property is a custom serializable block.</returns>
-    private static bool ShouldCreateNestedFoldout(SerializedProperty property)
+    /// <param name="parent">Parent container receiving the foldout.</param>
+    /// <param name="settings">Serialized icon-cooldown settings.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    private static void BuildIconCooldown(VisualElement parent,
+                                          SerializedProperty settings,
+                                          SerializedProperty scalingRules)
     {
-        if (property == null)
-            return false;
+        Foldout foldout = CreateFoldout("Icon Cooldown", "IconCooldown");
 
-        if (property.propertyType != SerializedPropertyType.Generic)
-            return false;
+        if (settings == null)
+        {
+            foldout.Add(new HelpBox("Icon Cooldown settings are missing.", HelpBoxMessageType.Warning));
+            parent.Add(foldout);
+            return;
+        }
 
-        if (!property.hasVisibleChildren)
-            return false;
+        SerializedProperty enabled = settings.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Desaturates the active power-up icon while cooldown or toggle reactivation lock is still running.");
+        AddField(details, settings.FindPropertyRelative("fillDirection"), scalingRules, "Fill Direction", "Direction used by the icon to reveal original colors while cooldown expires.");
+        AddField(details, settings.FindPropertyRelative("desaturationStrength"), scalingRules, "Desaturation Strength", "Strength of grayscale conversion while the icon is locked by cooldown.");
+        AddField(details, settings.FindPropertyRelative("lockedTint"), scalingRules, "Locked Tint", "Tint multiplied over the desaturated locked portion of the icon.");
+        AddField(details, settings.FindPropertyRelative("revealFeather"), scalingRules, "Reveal Feather", "Softness of the transition between locked grayscale and revealed original colors.");
+        foldout.Add(details);
+        parent.Add(foldout);
 
-        return !property.isArray;
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
     #endregion
 
     #region Field Construction
+
     /// <summary>
     /// Adds one unified Add Scaling field with direct authoring and an explanatory tooltip.
     /// </summary>

@@ -164,6 +164,15 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "hideWhenPlayerMissing":
                 runtimeConfig.HideWhenPlayerMissing = byteValue;
                 return;
+            case "clampPlungerStartInsideBody":
+                runtimeConfig.ClampPlungerStartInsideBody = byteValue;
+                return;
+            case "clampPlungerEndInsideBody":
+                runtimeConfig.ClampPlungerEndInsideBody = byteValue;
+                return;
+            case "stopLiquidAtPlunger":
+                runtimeConfig.StopLiquidAtPlunger = byteValue;
+                return;
             case "paintDrips.enabled":
                 runtimeConfig.PaintDrips.Enabled = byteValue;
                 return;

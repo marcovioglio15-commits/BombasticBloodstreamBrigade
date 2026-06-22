@@ -28,7 +28,10 @@ Shader "Custom/UI/PlayerSyringeBar"
         _GraduationInsetNormalized("Normalized Graduation Start Inset", Range(0, 0.45)) = 0.053
         _GraduationEndNormalized("Normalized Graduation End Position", Range(0.55, 0.999)) = 0.871
         _TerminationOffsetNormalized("Normalized Termination Offset", Range(0, 0.45)) = 0.024
-        _PlungerWidth("Reference-Normalized Plunger Width", Range(0, 0.2)) = 0.032
+        _PlungerWidth("Length-Compensated Plunger Width", Range(0, 0.45)) = 0.032
+        _ClampPlungerStartInsideBody("Clamp Plunger At Start Inside Body", Float) = 1
+        _ClampPlungerEndInsideBody("Clamp Plunger At End Inside Body", Float) = 0
+        _StopLiquidAtPlunger("Stop Liquid At Plunger", Float) = 1
         _BodyStyle("Body Style", Float) = 0
         _LabelPlacement("Label Placement", Float) = 0
         _GraduationVisible("Graduation Visible", Float) = 1
@@ -165,6 +168,9 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _GraduationEndNormalized;
             float _TerminationOffsetNormalized;
             float _PlungerWidth;
+            float _ClampPlungerStartInsideBody;
+            float _ClampPlungerEndInsideBody;
+            float _StopLiquidAtPlunger;
             float _BodyStyle;
             float _LabelPlacement;
             float _GraduationVisible;
@@ -582,13 +588,24 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float plungerOuterHalfWidth = _PlungerWidth * lerp(0.75, 0.72, detailedStyle);
                 float plungerInnerHalfWidth = _PlungerWidth * lerp(0.5, 0.36, detailedStyle);
                 float plungerGrooveHalfWidth = _PlungerWidth * lerp(0.1, 0.12, detailedStyle);
-                // The plunger's left edge represents the value; this keeps the full authored width visible at zero.
                 float graduationSpan = max(0.0001, graduationEnd - graduationStart);
-                float plungerLeadingEdge = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
-                float plungerCenter = clamp(plungerLeadingEdge + plungerOuterHalfWidth,
-                                            graduationStart + plungerOuterHalfWidth,
-                                            graduationEnd + plungerOuterHalfWidth);
-                float plungerStartValueTrack = saturate(_FillNormalized);
+                float plungerMinimumCenter = bodyStart + outlineThicknessX + plungerOuterHalfWidth;
+                float plungerMaximumCenter = max(plungerMinimumCenter,
+                                                 rectangularBodyEnd - outlineThicknessX - plungerOuterHalfWidth);
+                // The plunger center represents the value; start/end clamps can be controlled independently.
+                float plungerValuePosition = lerp(graduationStart, graduationEnd, saturate(_FillNormalized));
+                float plungerStartClampedCenter = max(plungerValuePosition, plungerMinimumCenter);
+                float plungerAfterStartClamp = lerp(plungerValuePosition,
+                                                    plungerStartClampedCenter,
+                                                    step(0.5, _ClampPlungerStartInsideBody));
+                float plungerEndClampedCenter = min(plungerAfterStartClamp, plungerMaximumCenter);
+                float plungerCenter = lerp(plungerAfterStartClamp,
+                                           plungerEndClampedCenter,
+                                           step(0.5, _ClampPlungerEndInsideBody));
+                float plungerStopValueTrack = saturate((max(graduationStart,
+                                                            plungerCenter - plungerOuterHalfWidth) -
+                                                        graduationStart) /
+                                                       graduationSpan);
                 float bubblesOnlySlosh = step(0.5, _SloshAffectsBubblesOnly);
                 float slosh = clamp(_Slosh + _ValueImpulse, -1.0, 1.0);
                 float horizontalSlosh = slosh *
@@ -606,8 +623,11 @@ Shader "Custom/UI/PlayerSyringeBar"
                            lerp(1.25, 0.75, saturate(_Viscosity));
                 // Flatten the surface into a complete fill (slightly past the chamber top) when slosh is routed to the bubbles only.
                 surface = lerp(surface, 1.05, bubblesOnlySlosh);
-                // Clamp the liquid boundary (resting fill plus slosh) so it can never pass the start of the plunger.
-                float displacedFill = clamp(_FillNormalized + liquidHorizontalSlosh, 0.0, plungerStartValueTrack);
+                // Clamp the liquid boundary (resting fill plus slosh) so it can never pass under the plunger.
+                float liquidFillLimit = lerp(saturate(_FillNormalized),
+                                             min(saturate(_FillNormalized), plungerStopValueTrack),
+                                             step(0.5, _StopLiquidAtPlunger));
+                float displacedFill = clamp(_FillNormalized + liquidHorizontalSlosh, 0.0, liquidFillLimit);
                 float liquidHorizontalMask = 1.0 - smoothstep(displacedFill - 0.003,
                                                               displacedFill + 0.003,
                                                               valueTrackX);

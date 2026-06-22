@@ -42,6 +42,7 @@ public struct PlayerPowerUpChargeRingVisualConfig
     public float OutlineThickness;
     public float StartAngleDegrees;
     public float ArcDegrees;
+    public PlayerPowerUpChargeRingFillDirection FillDirection;
     public byte Enabled;
 }
 

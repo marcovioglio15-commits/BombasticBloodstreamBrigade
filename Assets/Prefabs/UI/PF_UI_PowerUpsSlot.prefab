@@ -1527,6 +1527,13 @@ MonoBehaviour:
   energySyringe: {fileID: 4519731133240641337}
   chargeRing: {fileID: 6607955644076483030}
   iconCooldown: {fileID: 659953500536445473}
+  editorPreviewPreset: {fileID: 11400000, guid: 3d67950319294a109127fbf43e4bf9f6, type: 2}
+  editorPreviewEnergyValue: 5
+  editorPreviewEnergyMaximum: 5
+  editorPreviewActivationRequirement: 3
+  editorPreviewShowRequirementMarker: 1
+  editorPreviewChargeNormalized: 0.6
+  editorPreviewCooldownProgress: 1
 --- !u!1 &3088244276301759592
 GameObject:
   m_ObjectHideFlags: 0

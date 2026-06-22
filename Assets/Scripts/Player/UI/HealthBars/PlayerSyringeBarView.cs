@@ -13,6 +13,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private const float MaximumReactiveDeltaTime = 1f / 30f;
     private const float MaximumReactiveVelocityMultiplier = 8f;
     private const float ReferenceDecorationLength = 340f;
+    private const float MaximumRuntimePlungerWidth = 0.45f;
     #endregion
 
     #region Shader Properties
@@ -38,6 +39,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int GraduationEndNormalizedId = Shader.PropertyToID("_GraduationEndNormalized");
     private static readonly int TerminationOffsetNormalizedId = Shader.PropertyToID("_TerminationOffsetNormalized");
     private static readonly int PlungerWidthId = Shader.PropertyToID("_PlungerWidth");
+    private static readonly int ClampPlungerStartInsideBodyId = Shader.PropertyToID("_ClampPlungerStartInsideBody");
+    private static readonly int ClampPlungerEndInsideBodyId = Shader.PropertyToID("_ClampPlungerEndInsideBody");
+    private static readonly int StopLiquidAtPlungerId = Shader.PropertyToID("_StopLiquidAtPlunger");
     private static readonly int BodyStyleId = Shader.PropertyToID("_BodyStyle");
     private static readonly int LabelPlacementId = Shader.PropertyToID("_LabelPlacement");
     private static readonly int GraduationVisibleId = Shader.PropertyToID("_GraduationVisible");
@@ -111,6 +115,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private float valueImpulse;
     private bool configured;
     private bool motionInitialized;
+    private bool valueInitialized;
     #endregion
 
     #region Properties
@@ -232,7 +237,12 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
 
         ApplyStaticMaterialProperties();
         RebuildLayout(previousMaximum);
-        SetVisible(sharedConfig.Enabled != 0 && channelConfig.Enabled != 0);
+        bool visible = sharedConfig.Enabled != 0 && channelConfig.Enabled != 0;
+
+        if (!visible)
+            valueInitialized = false;
+
+        SetVisible(visible);
         MarkParentLayoutDirty();
     }
     #endregion
@@ -285,7 +295,10 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         SetVisible(!shouldHide);
 
         if (shouldHide)
+        {
+            valueInitialized = false;
             return;
+        }
 
         if (!Mathf.Approximately(previousMaximum, maximumValue))
             RebuildLayout(maximumValue);
@@ -293,12 +306,17 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         targetNormalized = maximumValue > 0f ? math.saturate(currentValue / maximumValue) : 0f;
         float deltaTime = Time.unscaledDeltaTime;
 
-        if (snapImmediately || channelConfig.SmoothingSeconds <= 0f)
+        if (!valueInitialized || snapImmediately || channelConfig.SmoothingSeconds <= 0f)
+        {
             displayedNormalized = targetNormalized;
+            valueInitialized = true;
+        }
         else
+        {
             displayedNormalized = Mathf.MoveTowards(displayedNormalized,
                                                      targetNormalized,
                                                      deltaTime / math.max(0.0001f, channelConfig.SmoothingSeconds));
+        }
 
         UpdateValueImpulse(deltaTime);
         UpdateReactiveMotion(velocityX, deltaTime);
@@ -314,7 +332,12 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     /// <param name="hideWhenMissing">True when the complete view should be hidden.</param>
     public void HandleMissing(bool hideWhenMissing)
     {
-        SetVisible(!hideWhenMissing && sharedConfig.Enabled != 0 && channelConfig.Enabled != 0);
+        bool visible = !hideWhenMissing && sharedConfig.Enabled != 0 && channelConfig.Enabled != 0;
+
+        if (!visible)
+            valueInitialized = false;
+
+        SetVisible(visible);
     }
     #endregion
 
@@ -342,6 +365,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(OutlineThicknessId, math.max(0f, sharedConfig.OutlineThickness));
         runtimeMaterial.SetFloat(GraduationVerticalOffsetId, math.clamp(sharedConfig.GraduationVerticalOffset, -0.5f, 0.5f));
         runtimeMaterial.SetFloat(ChamberInsetId, math.clamp(sharedConfig.ChamberInset, 0f, 0.49f));
+        runtimeMaterial.SetFloat(ClampPlungerStartInsideBodyId, sharedConfig.ClampPlungerStartInsideBody);
+        runtimeMaterial.SetFloat(ClampPlungerEndInsideBodyId, sharedConfig.ClampPlungerEndInsideBody);
+        runtimeMaterial.SetFloat(StopLiquidAtPlungerId, sharedConfig.StopLiquidAtPlunger);
         runtimeMaterial.SetFloat(BodyStyleId, (float)sharedConfig.BodyStyle);
         runtimeMaterial.SetFloat(LabelPlacementId, (float)sharedConfig.LabelPlacement);
         runtimeMaterial.SetFloat(TerminationStyleId, (float)sharedConfig.TerminationStyle);
@@ -432,7 +458,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         runtimeMaterial.SetFloat(TerminationOffsetNormalizedId, math.clamp(terminationOffset / resolvedLength, 0f, 0.45f));
         runtimeMaterial.SetFloat(GraduationVisibleId, graduationMode == PlayerSyringeGraduationMode.Hidden ? 0f : 1f);
         runtimeMaterial.SetFloat(MajorDivisionCountId, math.max(0.0001f, layoutIntervalCount));
-        runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, 0.2f));
+        runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, MaximumRuntimePlungerWidth));
         runtimeMaterial.SetFloat(PaintDripWidthId, ResolveReferenceScaledNormalized(sharedConfig.PaintDrips.Width, resolvedLength, 0.25f));
         runtimeMaterial.SetFloat(LengthPixelScaleId, math.clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f));
         // Aspect (height/length) lets the shader keep the horizontal outline as thick as the vertical one, so both

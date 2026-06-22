@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 #endif
 
@@ -25,6 +26,12 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
     #if UNITY_EDITOR
     [Header("Editor Preview")]
+    [Tooltip("Optional Player Master Preset used to resolve the same Visual Preset, health, and shield defaults shown at runtime. When assigned, it overrides the standalone preview values below.")]
+    [SerializeField] private PlayerMasterPreset editorPreviewMasterPreset;
+
+    [Tooltip("Optional Player Controller Preset used to resolve the same health and shield defaults shown at runtime. This is used when the master preset is not assigned or has no controller preset.")]
+    [SerializeField] private PlayerControllerPreset editorPreviewControllerPreset;
+
     [Tooltip("Player Visual Preset used to render the health and shield syringes outside Play Mode through the same configuration builder used at runtime.")]
     [SerializeField] private PlayerVisualPreset editorPreviewPreset;
 
@@ -56,6 +63,7 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
     #if UNITY_EDITOR
     private bool editorPreviewQueued;
+    private static readonly Dictionary<string, PlayerFormulaValue> editorPreviewFormulaContext = new Dictionary<string, PlayerFormulaValue>(System.StringComparer.OrdinalIgnoreCase);
     #endif
     #endregion
 
@@ -328,27 +336,168 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     /// </summary>
     public void RefreshEditorPreview()
     {
-        if (Application.isPlaying || !isActiveAndEnabled || editorPreviewPreset == null)
+        PlayerVisualPreset previewPreset = ResolveEditorPreviewVisualPreset();
+
+        if (Application.isPlaying || !isActiveAndEnabled || previewPreset == null)
             return;
 
-        PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(editorPreviewPreset);
+        ResolveEditorPreviewValues(out float healthValue,
+                                   out float healthMaximum,
+                                   out float shieldValue,
+                                   out float shieldMaximum);
+
+        PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(previewPreset);
         TMP_FontAsset font = previewConfig.FontAsset.Value;
 
         if (healthBar != null)
         {
             healthBar.ApplyConfiguration(in previewConfig, in previewConfig.Health, font);
-            healthBar.UpdateValue(editorPreviewHealthValue, editorPreviewHealthMaximum, 0f, true);
+            healthBar.UpdateValue(healthValue, healthMaximum, 0f, true);
         }
 
         if (shieldBar != null)
         {
             shieldBar.ApplyConfiguration(in previewConfig, in previewConfig.Shield, font);
-            shieldBar.UpdateValue(editorPreviewShieldValue, editorPreviewShieldMaximum, 0f, true);
+
+            if (shieldMaximum > 0f)
+                shieldBar.UpdateValue(shieldValue, shieldMaximum, 0f, true);
+            else
+                shieldBar.HandleMissing(true);
         }
 
         ApplyLayoutConfiguration(previewConfig.VerticalSpacing, true);
         EditorApplication.QueuePlayerLoopUpdate();
         SceneView.RepaintAll();
+    }
+
+    /// <summary>
+    /// Resolves the visual preset that should drive Edit Mode preview, preferring the selected master preset so editor geometry matches the runtime player.
+    /// </summary>
+    /// <returns>Player visual preset used by the preview, or null when no source is available.</returns>
+    private PlayerVisualPreset ResolveEditorPreviewVisualPreset()
+    {
+        if (editorPreviewMasterPreset != null && editorPreviewMasterPreset.VisualPreset != null)
+            return editorPreviewMasterPreset.VisualPreset;
+
+        return editorPreviewPreset;
+    }
+
+    /// <summary>
+    /// Resolves health and shield values used only by Edit Mode preview.
+    /// </summary>
+    /// <param name="healthValue">Current health value shown by the preview.</param>
+    /// <param name="healthMaximum">Maximum health value used to rebuild syringe length and labels.</param>
+    /// <param name="shieldValue">Current shield value shown by the preview.</param>
+    /// <param name="shieldMaximum">Maximum shield value used to rebuild syringe length and labels.</param>
+    private void ResolveEditorPreviewValues(out float healthValue,
+                                            out float healthMaximum,
+                                            out float shieldValue,
+                                            out float shieldMaximum)
+    {
+        PlayerControllerPreset controllerPreset = ResolveEditorPreviewControllerPreset();
+
+        if (controllerPreset != null && controllerPreset.HealthStatistics != null)
+        {
+            healthMaximum = Mathf.Max(1f,
+                                      ResolveEditorPreviewScaledValue(controllerPreset,
+                                                                      "healthStatistics.maxHealth",
+                                                                      controllerPreset.HealthStatistics.MaxHealth));
+            shieldMaximum = Mathf.Max(0f,
+                                      ResolveEditorPreviewScaledValue(controllerPreset,
+                                                                      "healthStatistics.maxShield",
+                                                                      controllerPreset.HealthStatistics.MaxShield));
+            healthValue = healthMaximum;
+            shieldValue = shieldMaximum;
+            return;
+        }
+
+        healthMaximum = Mathf.Max(0.0001f, editorPreviewHealthMaximum);
+        shieldMaximum = Mathf.Max(0f, editorPreviewShieldMaximum);
+        healthValue = Mathf.Max(0f, editorPreviewHealthValue);
+        shieldValue = Mathf.Max(0f, editorPreviewShieldValue);
+    }
+
+    /// <summary>
+    /// Resolves the controller preset used by the Edit Mode preview without scanning scenes or creating runtime entities.
+    /// </summary>
+    /// <returns>Controller preset supplying runtime-equivalent health and shield defaults, or null when manual preview values should be used.</returns>
+    private PlayerControllerPreset ResolveEditorPreviewControllerPreset()
+    {
+        if (editorPreviewControllerPreset != null)
+            return editorPreviewControllerPreset;
+
+        if (editorPreviewMasterPreset != null)
+            return editorPreviewMasterPreset.ControllerPreset;
+
+        return null;
+    }
+
+    /// <summary>
+    /// Resolves one controller preview value through the same default scalable-stat formulas used by runtime initialization.
+    /// </summary>
+    /// <param name="controllerPreset">Controller preset containing the Add Scaling rules.</param>
+    /// <param name="targetStatKey">Normalized controller stat key to resolve.</param>
+    /// <param name="baseValue">Unscaled controller value used as [this] and fallback.</param>
+    /// <returns>Formula-resolved preview value, or the base value when no matching rule succeeds.</returns>
+    private float ResolveEditorPreviewScaledValue(PlayerControllerPreset controllerPreset,
+                                                  string targetStatKey,
+                                                  float baseValue)
+    {
+        IReadOnlyList<PlayerStatScalingRule> scalingRules = controllerPreset.ScalingRules;
+
+        if (scalingRules == null || scalingRules.Count <= 0)
+            return baseValue;
+
+        RebuildEditorPreviewFormulaContext();
+        string normalizedTargetStatKey = PlayerScalingStatKeyUtility.NormalizeStatKey(targetStatKey);
+
+        for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
+        {
+            PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
+
+            if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
+                continue;
+
+            string normalizedRuleStatKey = PlayerScalingStatKeyUtility.NormalizeStatKey(scalingRule.StatKey);
+
+            if (!string.Equals(normalizedRuleStatKey, normalizedTargetStatKey, System.StringComparison.Ordinal))
+                continue;
+
+            if (PlayerStatFormulaEngine.TryEvaluate(scalingRule.Formula,
+                                                    baseValue,
+                                                    editorPreviewFormulaContext,
+                                                    out float resolvedValue,
+                                                    out string _))
+                return resolvedValue;
+        }
+
+        return baseValue;
+    }
+
+    /// <summary>
+    /// Rebuilds the Edit Mode preview formula context from the selected master preset progression defaults.
+    /// </summary>
+    private void RebuildEditorPreviewFormulaContext()
+    {
+        editorPreviewFormulaContext.Clear();
+
+        if (editorPreviewMasterPreset == null || editorPreviewMasterPreset.ProgressionPreset == null)
+            return;
+
+        IReadOnlyList<PlayerScalableStatDefinition> scalableStats = editorPreviewMasterPreset.ProgressionPreset.ScalableStats;
+
+        if (scalableStats == null)
+            return;
+
+        for (int statIndex = 0; statIndex < scalableStats.Count; statIndex++)
+        {
+            PlayerScalableStatDefinition scalableStat = scalableStats[statIndex];
+
+            if (scalableStat == null || string.IsNullOrWhiteSpace(scalableStat.StatName))
+                continue;
+
+            editorPreviewFormulaContext[scalableStat.StatName] = scalableStat.ResolveRuntimeDefaultFormulaValue();
+        }
     }
 
     /// <summary>

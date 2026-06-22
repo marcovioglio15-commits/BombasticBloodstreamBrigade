@@ -105,6 +105,15 @@ public sealed class PlayerHealthBarsVisualSettings
     [Range(0f, 0.2f)]
     [SerializeField] private float plungerWidth = 0.032f;
 
+    [Tooltip("Keeps the plunger head inside the syringe body when the represented value is at the first graduated position.")]
+    [SerializeField] private bool clampPlungerStartInsideBody = true;
+
+    [Tooltip("Keeps the plunger head inside the syringe body when the represented value is at the final graduated position.")]
+    [SerializeField] private bool clampPlungerEndInsideBody;
+
+    [Tooltip("Stops the liquid boundary at the plunger's leading edge so the fluid never renders underneath the plunger head.")]
+    [SerializeField] private bool stopLiquidAtPlunger = true;
+
     [Tooltip("Horizontal width of each non-scaling end cap; the simplified right termination starts at the final graduated value.")]
     [Range(0f, 256f)]
     [SerializeField] private float endCapWidth = 36f;
@@ -154,6 +163,9 @@ public sealed class PlayerHealthBarsVisualSettings
     public float OutlineThickness => outlineThickness;
     public float ChamberInset => chamberInset;
     public float PlungerWidth => plungerWidth;
+    public bool ClampPlungerStartInsideBody => clampPlungerStartInsideBody;
+    public bool ClampPlungerEndInsideBody => clampPlungerEndInsideBody;
+    public bool StopLiquidAtPlunger => stopLiquidAtPlunger;
     public float EndCapWidth => endCapWidth;
     public float TerminationOffset => terminationOffset;
     public PlayerSyringeTerminationStyle TerminationStyle => terminationStyle;

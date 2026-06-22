@@ -4,9 +4,14 @@ using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 /// <summary>
 /// Drives the screen-space boss HUD from ECS boss health, transform and visual preset data.
 /// </summary>
+[ExecuteAlways]
 [DisallowMultipleComponent]
 public sealed class EnemyBossHudPresentation : MonoBehaviour
 {
@@ -52,6 +57,28 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
     [Tooltip("Hide the whole boss HUD when no active boss entity is available.")]
     [SerializeField] private bool hideWhenNoBoss = true;
+
+    #if UNITY_EDITOR
+    [Header("Editor Preview")]
+    [Tooltip("Enemy Visual Preset used to render the boss syringe bars outside Play Mode through the same configuration builder used by the boss baker.")]
+    [SerializeField] private EnemyVisualPreset editorPreviewVisualPreset;
+
+    [Tooltip("Current boss health shown only by the Edit Mode preview.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewHealthValue = 100f;
+
+    [Tooltip("Maximum boss health shown only by the Edit Mode preview and used to resolve syringe length and graduations.")]
+    [Min(0.0001f)]
+    [SerializeField] private float editorPreviewHealthMaximum = 100f;
+
+    [Tooltip("Current boss shield shown only by the Edit Mode preview.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewShieldValue;
+
+    [Tooltip("Maximum boss shield shown only by the Edit Mode preview. A zero value hides the shield when the selected preset enables that policy.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewShieldMaximum;
+    #endif
     #endregion
 
     private World defaultWorld;
@@ -70,6 +97,10 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     private string displayedBossName;
     private EnemyBossHudAggregateBaseline aggregateBaseline;
     private Entity cachedBarConfigBossEntity = Entity.Null;
+
+    #if UNITY_EDITOR
+    private bool editorPreviewQueued;
+    #endif
     #endregion
 
     #region Methods
@@ -82,9 +113,46 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     {
         ValidateReferences();
         InitializeBossSyringeViews();
+
+        #if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            QueueEditorPreview();
+            return;
+        }
+        #endif
+
         ApplyVisibility(!hideWhenNoBoss);
         ApplyInitialBarVisualState();
     }
+
+    #if UNITY_EDITOR
+    /// <summary>
+    /// Queues an Edit Mode preview refresh and subscribes to referenced enemy preset changes.
+    /// </summary>
+    private void OnEnable()
+    {
+        if (Application.isPlaying)
+            return;
+
+        EditorApplication.projectChanged -= HandleEditorProjectChanged;
+        EditorApplication.projectChanged += HandleEditorProjectChanged;
+        QueueEditorPreview();
+    }
+
+    /// <summary>
+    /// Releases Edit Mode preview materials and editor callbacks without touching Play Mode ownership.
+    /// </summary>
+    private void OnDisable()
+    {
+        EditorApplication.projectChanged -= HandleEditorProjectChanged;
+        EditorApplication.delayCall -= ApplyQueuedEditorPreview;
+        editorPreviewQueued = false;
+
+        if (!Application.isPlaying)
+            DisposeBossSyringeViews();
+    }
+    #endif
 
     /// <summary>
     /// Releases runtime material instances created by the boss syringe bars.
@@ -106,6 +174,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         if (bossResolveIntervalSeconds < 0.05f)
             bossResolveIntervalSeconds = 0.05f;
+
+        #if UNITY_EDITOR
+        if (!Application.isPlaying)
+            QueueEditorPreview();
+        #endif
     }
 
     /// <summary>
@@ -113,6 +186,11 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     /// </summary>
     private void Update()
     {
+        #if UNITY_EDITOR
+        if (!Application.isPlaying)
+            return;
+        #endif
+
         if (!TryInitializeEcsBindings())
         {
             HandleMissingBoss();
@@ -134,6 +212,72 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         SyncBossHud(in bossSnapshot, Time.unscaledDeltaTime);
     }
     #endregion
+
+    #if UNITY_EDITOR
+    #region Editor Preview
+    /// <summary>
+    /// Rebuilds the Edit Mode boss syringe preview through the same visual settings path used by enemy baking.
+    /// </summary>
+    public void RefreshEditorPreview()
+    {
+        if (Application.isPlaying || !isActiveAndEnabled)
+            return;
+
+        ValidateReferences();
+        InitializeBossSyringeViews();
+
+        EnemyBossVisualUiSettings bossUi = editorPreviewVisualPreset != null ? editorPreviewVisualPreset.BossUi : null;
+        bool showBars = EnemyBossHudEditorPreviewUtility.ShouldShowBars(bossUi);
+
+        ApplyVisibility(true);
+        ApplyHealthBarVisibility(showBars);
+        EnemyBossHudEditorPreviewUtility.Refresh(editorPreviewVisualPreset,
+                                                 bossUi,
+                                                 healthSyringeBar,
+                                                 shieldSyringeBar,
+                                                 offscreenIndicatorRoot,
+                                                 bossNameText,
+                                                 editorPreviewHealthValue,
+                                                 editorPreviewHealthMaximum,
+                                                 editorPreviewShieldValue,
+                                                 editorPreviewShieldMaximum);
+    }
+
+    /// <summary>
+    /// Schedules one coalesced preview rebuild after an inspector or project asset change.
+    /// </summary>
+    private void QueueEditorPreview()
+    {
+        if (editorPreviewQueued || Application.isPlaying)
+            return;
+
+        editorPreviewQueued = true;
+        EditorApplication.delayCall += ApplyQueuedEditorPreview;
+    }
+
+    /// <summary>
+    /// Applies the queued preview only while this scene or prefab-stage instance remains valid.
+    /// </summary>
+    private void ApplyQueuedEditorPreview()
+    {
+        EditorApplication.delayCall -= ApplyQueuedEditorPreview;
+        editorPreviewQueued = false;
+
+        if (this == null)
+            return;
+
+        RefreshEditorPreview();
+    }
+
+    /// <summary>
+    /// Queues a preview rebuild after any referenced project asset is imported or modified.
+    /// </summary>
+    private void HandleEditorProjectChanged()
+    {
+        QueueEditorPreview();
+    }
+    #endregion
+    #endif
 
     #region ECS
     /// <summary>

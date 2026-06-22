@@ -71,7 +71,10 @@ public static class PlayerHealthBarVisualBakeUtility
             GraduationMode = ResolveGraduationMode(resolvedSettings.GraduationMode),
             TerminationStyle = ResolveTerminationStyle(resolvedSettings.TerminationStyle),
             Enabled = resolvedSettings.Enabled ? (byte)1 : (byte)0,
-            HideWhenPlayerMissing = resolvedSettings.HideWhenPlayerMissing ? (byte)1 : (byte)0
+            HideWhenPlayerMissing = resolvedSettings.HideWhenPlayerMissing ? (byte)1 : (byte)0,
+            ClampPlungerStartInsideBody = resolvedSettings.ClampPlungerStartInsideBody ? (byte)1 : (byte)0,
+            ClampPlungerEndInsideBody = resolvedSettings.ClampPlungerEndInsideBody ? (byte)1 : (byte)0,
+            StopLiquidAtPlunger = resolvedSettings.StopLiquidAtPlunger ? (byte)1 : (byte)0
         };
     }
 
