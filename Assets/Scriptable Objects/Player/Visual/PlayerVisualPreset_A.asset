@@ -38,7 +38,7 @@ MonoBehaviour:
     outlineThickness: 5
     outlineColor: {r: 0, g: 0, b: 0, a: 1}
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
-  damageFlashDurationSeconds: 0.6
+  damageFlashDurationSeconds: 0.8
   damageFlashMaximumBlend: 10
   shieldDamageVignette:
     sprite: {fileID: 21300000, guid: 0148305d60e820946807162d30836940, type: 3}
@@ -609,7 +609,7 @@ MonoBehaviour:
       frames:
       - {fileID: 21300000, guid: d47b46e58d4fdc74c8e31af96fcb1dc0, type: 3}
       secondsPerFrame: 0.12
-      staticFrameDurationSeconds: 0.5
+      staticFrameDurationSeconds: 0.8
       playbackSpeedMultiplier: 1
       playbackMode: 1
       maximumCompletedCycles: 0
