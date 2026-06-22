@@ -205,6 +205,9 @@ MonoBehaviour:
       outlineThickness: 0.035
       chamberInset: 0.16
       plungerWidth: 0.032
+      clampPlungerStartInsideBody: 1
+      clampPlungerEndInsideBody: 0
+      stopLiquidAtPlunger: 1
       endCapWidth: 30
       terminationOffset: 6
       terminationStyle: 1

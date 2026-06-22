@@ -335,7 +335,7 @@ MonoBehaviour:
     health:
       enabled: 1
       hideWhenMaximumUnavailable: 0
-      smoothingSeconds: 2
+      smoothingSeconds: 1
       sloshAffectsBubblesOnly: 1
       palette:
         outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
@@ -383,7 +383,7 @@ MonoBehaviour:
     shield:
       enabled: 1
       hideWhenMaximumUnavailable: 1
-      smoothingSeconds: 2
+      smoothingSeconds: 1
       sloshAffectsBubblesOnly: 1
       palette:
         outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}

@@ -43422,10 +43422,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveGigaLaser
-  secondaryActivePowerUpId: ActiveBulletTime
-  equippedPassivePowerUpIds:
-  - Passive_MultivitaminAdults
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
