@@ -13921,6 +13921,18 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 3172050056534276195, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+    - target: {fileID: 4312586117191139972, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4312586117191139972, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4312586117191139972, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4469851821413307505, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
       value: 0
