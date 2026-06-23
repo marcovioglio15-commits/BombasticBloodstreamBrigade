@@ -110,6 +110,43 @@ public static class ProjectileKinematicsUtility
 
     #region Displacement
     /// <summary>
+    /// Resolves the frame delta time for a projectile, applying enemy Bullet Time only to enemy-owned shots.
+    /// Player projectiles keep the unscaled controller delta so active power-ups never slow the player weapon stream.
+    /// </summary>
+    /// <param name="owner">Projectile owner used to identify the shooter entity.</param>
+    /// <param name="enemyDataLookup">Read-only lookup that marks live enemy shooter entities.</param>
+    /// <param name="deltaTime">Unscaled frame delta time from the owning system.</param>
+    /// <param name="enemyTimeScale">Current enemy global time scale resolved from Bullet Time.</param>
+    /// <returns>Delta time to use for this projectile simulation step.</returns>
+    public static float ResolveOwnerScaledDeltaTime(in ProjectileOwner owner,
+                                                    in ComponentLookup<EnemyData> enemyDataLookup,
+                                                    float deltaTime,
+                                                    float enemyTimeScale)
+    {
+        float safeDeltaTime = math.max(0f, deltaTime);
+
+        if (!IsEnemyOwnedProjectile(owner.ShooterEntity, in enemyDataLookup))
+            return safeDeltaTime;
+
+        return safeDeltaTime * math.clamp(enemyTimeScale, 0f, 1f);
+    }
+
+    /// <summary>
+    /// Checks whether the projectile shooter is an enemy entity that should inherit enemy global time scaling.
+    /// </summary>
+    /// <param name="shooterEntity">Shooter entity stored on the projectile owner.</param>
+    /// <param name="enemyDataLookup">Read-only lookup that marks entities baked as enemies.</param>
+    /// <returns>True when the projectile belongs to an enemy shooter.</returns>
+    public static bool IsEnemyOwnedProjectile(Entity shooterEntity,
+                                             in ComponentLookup<EnemyData> enemyDataLookup)
+    {
+        if (!IsEntityUsable(shooterEntity))
+            return false;
+
+        return enemyDataLookup.HasComponent(shooterEntity);
+    }
+
+    /// <summary>
     /// Resolves the world-space displacement applied by one linear simulation frame.
     /// </summary>
     /// <param name="projectile">Projectile data containing propulsion velocity and inheritance settings.</param>

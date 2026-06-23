@@ -141,6 +141,65 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     }
 
     /// <summary>
+    /// Resolves whether any offensive engagement warning window is currently active, including billboard-only configs.
+    /// </summary>
+    /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <returns>True when at least one offensive engagement timing window is currently active.</returns>
+    public static bool HasActiveEngagementWindow(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
+                                                 DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                                 DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
+                                                 bool hasBossSlotRuntimes,
+                                                 DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
+                                                 in EnemyPatternConfig patternConfig,
+                                                 in EnemyPatternRuntimeState patternRuntimeState)
+    {
+        int configCount = configs.Length;
+
+        for (int configIndex = 0; configIndex < configCount; configIndex++)
+        {
+            EnemyOffensiveEngagementConfigElement config = configs[configIndex];
+
+            if (config.EnableColorBlend != 0 &&
+                TryEvaluateWindow(config.TimingMode,
+                                  config.Source,
+                                  config.ColorBlendLeadTimeSeconds,
+                                  shooterRuntime,
+                                  bombardierRuntime,
+                                  hasBossSlotRuntimes,
+                                  bossSlotRuntimes,
+                                  patternConfig,
+                                  patternRuntimeState,
+                                  out EnemyOffensiveEngagementWindow colorWindow))
+            {
+                return true;
+            }
+
+            if (config.EnableBillboard != 0 &&
+                TryEvaluateWindow(config.TimingMode,
+                                  config.Source,
+                                  config.BillboardLeadTimeSeconds,
+                                  shooterRuntime,
+                                  bombardierRuntime,
+                                  hasBossSlotRuntimes,
+                                  bossSlotRuntimes,
+                                  patternConfig,
+                                  patternRuntimeState,
+                                  out EnemyOffensiveEngagementWindow billboardWindow))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Resolves the displayed offensive engagement blend for the current frame, preserving fade-out continuity after the active warning loses priority.
     /// </summary>
     /// <param name="currentBlend">Blend value applied during the previous frame.</param>

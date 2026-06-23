@@ -23,6 +23,35 @@ MonoBehaviour:
     enableDistanceCulling: 1
     maxVisibleDistance: 55
     visibleDistanceHysteresis: 6
+  faceFlipbook:
+    enabled: 0
+    idle:
+      enabled: 1
+      atlas: {fileID: 0}
+      columns: 4
+      rows: 2
+      frameCount: 8
+      framesPerSecond: 8
+      startFrame: 0
+      durationSeconds: 0
+    attack:
+      enabled: 1
+      atlas: {fileID: 0}
+      columns: 4
+      rows: 1
+      frameCount: 4
+      framesPerSecond: 10
+      startFrame: 0
+      durationSeconds: 0.18
+    damage:
+      enabled: 1
+      atlas: {fileID: 0}
+      columns: 4
+      rows: 1
+      frameCount: 4
+      framesPerSecond: 12
+      startFrame: 0
+      durationSeconds: 0.14
   damageFeedback:
     flashColor: {r: 0.8666667, g: 0.57254905, b: 0.16862746, a: 1}
     flashDurationSeconds: 0.3

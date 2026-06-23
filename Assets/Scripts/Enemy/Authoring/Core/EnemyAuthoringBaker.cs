@@ -319,6 +319,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             OffensiveEngagementBlend = 0f,
             OffensiveEngagementFadeOutSeconds = 0f
         });
+        AddComponent(entity, EnemyVisualFeedbackBakeUtility.BuildFaceFlipbookConfig(authoring.FaceFlipbookSettings));
+        AddComponent(entity, CreateDefaultFaceFlipbookState());
         BakeDamageFlashRenderTargets(authoring, entity);
 
         AddComponent(entity, new EnemyVisualRuntimeState
@@ -508,6 +510,26 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             LockedTargetPosition = float3.zero,
             HasLockedTargetPosition = 0,
             RandomState = 0u
+        };
+    }
+
+    /// <summary>
+    /// Creates a clean face flipbook runtime state for freshly baked and pooled enemies.
+    /// </summary>
+    /// <returns>Default face flipbook runtime state.</returns>
+    private static EnemyFaceFlipbookStateData CreateDefaultFaceFlipbookState()
+    {
+        return new EnemyFaceFlipbookStateData
+        {
+            CurrentState = EnemyFaceFlipbookState.Idle,
+            AttackRemainingSeconds = 0f,
+            DamageRemainingSeconds = 0f,
+            IdlePlaybackPhaseSeconds = 0f,
+            AttackPlaybackPhaseSeconds = 0f,
+            DamagePlaybackPhaseSeconds = 0f,
+            LastObservedDamageLifetimeSeconds = 0f,
+            HasObservedDamage = 0,
+            WasEngagementActive = 0
         };
     }
 

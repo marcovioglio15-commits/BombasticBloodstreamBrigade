@@ -1333,6 +1333,14 @@ public sealed class EnemyAuthoring : MonoBehaviour
         }
     }
 
+    public EnemyVisualFaceFlipbookSettings FaceFlipbookSettings
+    {
+        get
+        {
+            return EnemyAuthoringPresetResolverUtility.ResolveFaceFlipbookSettings(masterPreset, visualPreset);
+        }
+    }
+
     public EnemyOffensiveEngagementFeedbackSettings OffensiveEngagementFeedbackSettings
     {
         get

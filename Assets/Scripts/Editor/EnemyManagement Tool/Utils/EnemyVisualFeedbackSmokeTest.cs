@@ -16,7 +16,9 @@ public static class EnemyVisualFeedbackSmokeTest
     private const string ElasticTimingProperty = "_ElasticHitTiming";
     private const string ElasticMotionProperty = "_ElasticHitMotion";
     private const string FaceFlipbookMaterialPath = "Assets/3D/Materials/M_EnemiesFaces.mat";
-    private const string FaceFlipbookTexturePath = "Assets/3D/Textures/textures-enemiesFaces/T_EnemiesFaces_Flipbook.png";
+    private const string FaceFlipbookIdleTexturePath = "Assets/3D/Textures/textures-enemiesFaces/T_EnemiesFaces_Flipbook_02.png";
+    private const string FaceFlipbookAttackTexturePath = "Assets/3D/Textures/textures-enemiesFaces/T_EnemiesFaces_Flipbook_Attack.png";
+    private const string FaceFlipbookDamageTexturePath = "Assets/3D/Textures/textures-enemiesFaces/T_EnemiesFaces_Flipbook_Damage.png";
     private const string FaceFlipbookShaderName = "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS";
     #endregion
 
@@ -46,7 +48,7 @@ public static class EnemyVisualFeedbackSmokeTest
     {
         ValidateFaceFlipbookAssets();
         ValidateElasticShader(FaceFlipbookShaderName);
-        //Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
+        Debug.Log("[EnemyVisualFeedbackSmokeTest] Enemy face flipbook checks passed.");
     }
     #endregion
 
@@ -99,7 +101,9 @@ public static class EnemyVisualFeedbackSmokeTest
     private static void ValidateFaceFlipbookAssets()
     {
         Material material = AssetDatabase.LoadAssetAtPath<Material>(FaceFlipbookMaterialPath);
-        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(FaceFlipbookTexturePath);
+        Texture2D idleTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(FaceFlipbookIdleTexturePath);
+        Texture2D attackTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(FaceFlipbookAttackTexturePath);
+        Texture2D damageTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(FaceFlipbookDamageTexturePath);
 
         if (material == null ||
             material.shader == null ||
@@ -108,15 +112,27 @@ public static class EnemyVisualFeedbackSmokeTest
             throw new InvalidOperationException("The shared enemy-face material is missing or uses the wrong flipbook shader.");
         }
 
-        if (texture == null ||
-            material.GetTexture("_MainTex") != texture ||
-            texture.width != 8192 ||
-            texture.height != 4096)
+        if (idleTexture == null ||
+            attackTexture == null ||
+            damageTexture == null ||
+            material.GetTexture("_MainTex") != idleTexture ||
+            material.GetTexture("_FaceAttackTex") != attackTexture ||
+            material.GetTexture("_FaceDamageTex") != damageTexture ||
+            idleTexture.width != 2048 ||
+            idleTexture.height != 1024 ||
+            attackTexture.width != 2048 ||
+            attackTexture.height != 512 ||
+            damageTexture.width != 2048 ||
+            damageTexture.height != 512)
         {
-            throw new InvalidOperationException("The shared enemy-face flipbook texture is missing, downscaled or not assigned to the material.");
+            throw new InvalidOperationException("The shared enemy-face flipbook textures are missing, downscaled or not assigned to the material.");
         }
 
         if (!material.HasProperty("_FaceFlipbookGrid") ||
+            !material.HasProperty("_FaceIdleGrid") ||
+            !material.HasProperty("_FaceAttackGrid") ||
+            !material.HasProperty("_FaceDamageGrid") ||
+            !material.HasProperty("_FaceFlipbookState") ||
             !material.HasProperty("_FaceFlipbookPlayback") ||
             !material.HasProperty("_FaceFlipbookEnabled") ||
             !material.HasProperty("_AlphaClipThreshold"))
@@ -124,15 +140,23 @@ public static class EnemyVisualFeedbackSmokeTest
             throw new InvalidOperationException("The shared enemy-face material does not expose the complete flipbook property contract.");
         }
 
-        Vector4 grid = material.GetVector("_FaceFlipbookGrid");
+        Vector4 idleGrid = material.GetVector("_FaceIdleGrid");
+        Vector4 attackGrid = material.GetVector("_FaceAttackGrid");
+        Vector4 damageGrid = material.GetVector("_FaceDamageGrid");
         Vector4 playback = material.GetVector("_FaceFlipbookPlayback");
 
-        if (!Mathf.Approximately(grid.x, 4f) ||
-            !Mathf.Approximately(grid.y, 2f) ||
-            !Mathf.Approximately(grid.z, 8f) ||
+        if (!Mathf.Approximately(idleGrid.x, 4f) ||
+            !Mathf.Approximately(idleGrid.y, 2f) ||
+            !Mathf.Approximately(idleGrid.z, 8f) ||
+            !Mathf.Approximately(attackGrid.x, 4f) ||
+            !Mathf.Approximately(attackGrid.y, 1f) ||
+            !Mathf.Approximately(attackGrid.z, 4f) ||
+            !Mathf.Approximately(damageGrid.x, 4f) ||
+            !Mathf.Approximately(damageGrid.y, 1f) ||
+            !Mathf.Approximately(damageGrid.z, 4f) ||
             playback.x <= 0f)
         {
-            throw new InvalidOperationException("The shared enemy-face flipbook must use four columns, two rows, eight frames and positive FPS.");
+            throw new InvalidOperationException("The shared enemy-face flipbook grids or playback defaults are invalid.");
         }
     }
 
@@ -175,7 +199,7 @@ public static class EnemyVisualFeedbackSmokeTest
         {
             preset.ValidateValues();
 
-            if (preset.DeathPuddle == null || preset.ElasticHit == null)
+            if (preset.DeathPuddle == null || preset.ElasticHit == null || preset.FaceFlipbook == null)
                 throw new InvalidOperationException("Enemy visual preset feedback settings are not initialized.");
 
             EnemyDeathDebrisColorPalette palette = new EnemyDeathDebrisColorPalette
@@ -187,6 +211,7 @@ public static class EnemyVisualFeedbackSmokeTest
                                                                                                          Entity.Null,
                                                                                                          in palette);
             EnemyElasticHitConfig elasticConfig = EnemyVisualFeedbackBakeUtility.BuildElasticHitConfig(preset.ElasticHit);
+            EnemyFaceFlipbookConfig faceConfig = EnemyVisualFeedbackBakeUtility.BuildFaceFlipbookConfig(preset.FaceFlipbook);
 
             if (!math.isfinite(puddleConfig.LifetimeSeconds) ||
                 !math.isfinite(puddleConfig.FlowSpeed) ||
@@ -194,7 +219,16 @@ public static class EnemyVisualFeedbackSmokeTest
                 !math.isfinite(puddleConfig.SurfaceDistortion) ||
                 !math.isfinite(puddleConfig.HighlightStrength) ||
                 !math.isfinite(elasticConfig.DurationSeconds) ||
-                elasticConfig.Enabled == 0)
+                elasticConfig.Enabled == 0 ||
+                faceConfig.Enabled == 0 ||
+                faceConfig.IdleEnabled == 0 ||
+                faceConfig.AttackEnabled == 0 ||
+                faceConfig.DamageEnabled == 0 ||
+                !math.all(faceConfig.IdleGrid.xyz == new float3(4f, 2f, 8f)) ||
+                !math.all(faceConfig.AttackGrid.xyz == new float3(4f, 1f, 4f)) ||
+                !math.all(faceConfig.DamageGrid.xyz == new float3(4f, 1f, 4f)) ||
+                faceConfig.AttackDurationSeconds <= 0f ||
+                faceConfig.DamageDurationSeconds <= 0f)
             {
                 throw new InvalidOperationException("Default enemy visual feedback configs are invalid.");
             }

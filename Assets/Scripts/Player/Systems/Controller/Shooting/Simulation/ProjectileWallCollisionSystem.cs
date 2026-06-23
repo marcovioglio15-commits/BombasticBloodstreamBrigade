@@ -44,10 +44,16 @@ public partial struct ProjectileWallCollisionSystem : ISystem
             return;
 
         float deltaTime = SystemAPI.Time.DeltaTime;
+        float enemyTimeScale = 1f;
+
+        if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
+            enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
+
         CollisionFilter wallsCollisionFilter = WorldWallCollisionUtility.BuildWallsCollisionFilter(wallsLayerMask);
         BufferLookup<ProjectilePoolElement> poolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
         BufferLookup<ShootRequest> shootRequestLookup = SystemAPI.GetBufferLookup<ShootRequest>(false);
         ComponentLookup<PlayerMovementState> movementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true);
+        ComponentLookup<EnemyData> enemyDataLookup = SystemAPI.GetComponentLookup<EnemyData>(true);
         ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup = SystemAPI.GetComponentLookup<ProjectileBaseScale>(true);
         ComponentLookup<ProjectileBounceState> projectileBounceStateLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(false);
         ComponentLookup<ProjectileSplitState> projectileSplitStateLookup = SystemAPI.GetComponentLookup<ProjectileSplitState>(false);
@@ -67,12 +73,17 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                        .WithEntityAccess())
         {
             Projectile projectileData = projectile.ValueRO;
+            ProjectileOwner projectileOwner = owner.ValueRO;
+            float projectileDeltaTime = ProjectileKinematicsUtility.ResolveOwnerScaledDeltaTime(in projectileOwner,
+                                                                                                in enemyDataLookup,
+                                                                                                deltaTime,
+                                                                                                enemyTimeScale);
             float3 displacement = perfectCircleState.ValueRO.Enabled != 0
-                ? projectileData.Velocity * deltaTime
+                ? projectileData.Velocity * projectileDeltaTime
                 : ProjectileKinematicsUtility.ResolveLinearDisplacement(in projectileData,
-                                                                        in owner.ValueRO,
+                                                                        in projectileOwner,
                                                                         in movementStateLookup,
-                                                                        deltaTime);
+                                                                        projectileDeltaTime);
 
             if (math.lengthsq(displacement) <= MovementEpsilon)
                 continue;
@@ -128,7 +139,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                                    in projectileTransform.ValueRO,
                                                                    currentScaleMultiplier,
                                                                    in projectileElementalPayload,
-                                                                   in owner.ValueRO,
+                                                                   in projectileOwner,
                                                                    ref shootRequestLookup);
                     projectileSplitState.CanSplit = 0;
                     projectileSplitStateLookup[projectileEntity] = projectileSplitState;
@@ -137,7 +148,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
 
             ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.TerminalWallHit,
                                                         projectileEntity,
-                                                        owner.ValueRO.ShooterEntity,
+                                                        projectileOwner.ShooterEntity,
                                                         in projectileTransform.ValueRO,
                                                         in projectileContactStateLookup,
                                                         in projectileDeathVfxConfigLookup,
@@ -145,7 +156,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                         ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,
-                                                owner.ValueRO.ShooterEntity,
+                                                projectileOwner.ShooterEntity,
                                                 ref parkedTransform,
                                                 ref poolLookup,
                                                 ref projectileActiveLookup);

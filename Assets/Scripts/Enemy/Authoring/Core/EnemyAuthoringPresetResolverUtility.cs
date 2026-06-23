@@ -110,6 +110,22 @@ public static class EnemyAuthoringPresetResolverUtility
         return resolvedVisualPreset.Prefabs;
     }
 
+    /// <summary>
+    /// Resolves face flipbook settings from the active visual preset.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override the visual preset.</param>
+    /// <param name="fallbackVisualPreset">Fallback visual preset assigned directly on the authoring component.</param>
+    /// <returns>Face flipbook settings, or null when no visual preset is available.</returns>
+    public static EnemyVisualFaceFlipbookSettings ResolveFaceFlipbookSettings(EnemyMasterPreset masterPreset, EnemyVisualPreset fallbackVisualPreset)
+    {
+        EnemyVisualPreset resolvedVisualPreset = ResolveVisualPreset(masterPreset, fallbackVisualPreset);
+
+        if (resolvedVisualPreset == null)
+            return null;
+
+        return resolvedVisualPreset.FaceFlipbook;
+    }
+
     public static EnemyVisualOutlineSettings ResolveOutlineSettings(EnemyMasterPreset masterPreset, EnemyVisualPreset fallbackVisualPreset)
     {
         EnemyVisualPreset resolvedVisualPreset = ResolveVisualPreset(masterPreset, fallbackVisualPreset);

@@ -119,6 +119,10 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                "Visibility",
                                BuildVisibilitySubSection(panel));
         AddVisualSubSectionTab(panel,
+                               EnemyVisualPresetsPanel.VisualSubSectionType.FaceFlipbook,
+                               "Face Flipbook",
+                               EnemyVisualPresetsPanelFaceFlipbookSectionUtility.BuildFaceFlipbookSubSection(panel));
+        AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.Outline,
                                "Outline",
                                BuildOutlineSubSection(panel));

@@ -13,6 +13,7 @@ public partial struct EnemyBombardierBombSystem : ISystem
 {
     #region Constants
     private const float HiddenBombScale = 0.0001f;
+    private const float TimeScaleEpsilon = 0.0001f;
     #endregion
 
     #region Fields
@@ -43,9 +44,16 @@ public partial struct EnemyBombardierBombSystem : ISystem
     {
         EntityManager entityManager = state.EntityManager;
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        float unscaledDeltaTime = SystemAPI.Time.DeltaTime;
+        float enemyTimeScale = 1f;
+
+        if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
+            enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
+
+        float deltaTime = unscaledDeltaTime * enemyTimeScale;
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
+        ComponentLookup<EnemyBombardierWarningState> warningStateLookup = SystemAPI.GetComponentLookup<EnemyBombardierWarningState>(false);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         PlayerDamageSnapshot playerSnapshot = ResolvePlayerSnapshot(ref state);
         float accumulatedDamage = 0f;
@@ -70,6 +78,12 @@ public partial struct EnemyBombardierBombSystem : ISystem
             }
 
             AdvanceBombState(ref bombState, ref bombTransform.ValueRW, deltaTime);
+            SynchronizeBombardierWarning(bombEntity,
+                                         ref bombState,
+                                         ref warningStateLookup,
+                                         elapsedTime,
+                                         unscaledDeltaTime,
+                                         enemyTimeScale);
 
             if (ShouldExplode(in bombState))
             {
@@ -165,6 +179,113 @@ public partial struct EnemyBombardierBombSystem : ISystem
             return false;
 
         return bombState.ExplosionDelayElapsedSeconds >= math.max(0f, bombState.ImpactExplosionDelaySeconds);
+    }
+
+    /// <summary>
+    /// Keeps the landing warning timing aligned with Bullet-Time-scaled bomb flight and delayed explosion cleanup.
+    /// </summary>
+    /// <param name="bombEntity">Bomb entity that may own an enabled landing warning state.</param>
+    /// <param name="bombState">Mutable bomb simulation state whose cleanup timing is synchronized.</param>
+    /// <param name="warningStateLookup">Writable lookup used to update the paired warning state.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <param name="unscaledDeltaTime">Unscaled frame delta time used to hold warnings while time is frozen.</param>
+    /// <param name="enemyTimeScale">Enemy global time scale applied to bomb simulation.</param>
+    private static void SynchronizeBombardierWarning(Entity bombEntity,
+                                                     ref EnemyBombardierBomb bombState,
+                                                     ref ComponentLookup<EnemyBombardierWarningState> warningStateLookup,
+                                                     float elapsedTime,
+                                                     float unscaledDeltaTime,
+                                                     float enemyTimeScale)
+    {
+        if (!warningStateLookup.HasComponent(bombEntity))
+            return;
+
+        if (!warningStateLookup.IsComponentEnabled(bombEntity))
+            return;
+
+        EnemyBombardierWarningState warningState = warningStateLookup[bombEntity];
+
+        if (bombState.HasExploded != 0)
+        {
+            bombState.WarningFadeOutEndTime = math.max(bombState.WarningFadeOutEndTime, warningState.FadeOutEndTime);
+            return;
+        }
+
+        if (enemyTimeScale <= TimeScaleEpsilon && bombState.HasImpacted == 0)
+        {
+            float shiftSeconds = math.max(0f, unscaledDeltaTime);
+            warningState.WarningStartTime += shiftSeconds;
+            warningState.ImpactTime += shiftSeconds;
+            warningState.FadeOutEndTime += shiftSeconds;
+            bombState.WarningFadeOutEndTime += shiftSeconds;
+            warningStateLookup[bombEntity] = warningState;
+            return;
+        }
+
+        float predictedImpactTime = ResolveBombardierWarningImpactTime(in bombState,
+                                                                       elapsedTime,
+                                                                       enemyTimeScale);
+        float predictedExplosionTime = ResolveBombardierExplosionTime(in bombState,
+                                                                      predictedImpactTime,
+                                                                      elapsedTime,
+                                                                      enemyTimeScale);
+        warningState.ImpactTime = predictedImpactTime;
+        warningState.FadeOutEndTime = predictedImpactTime + math.max(0f, warningState.FadeOutSeconds);
+
+        if (elapsedTime < warningState.WarningStartTime)
+        {
+            float configuredLeadSeconds = math.max(0f, warningState.LeadTimeSeconds);
+            warningState.WarningStartTime = math.max(elapsedTime, predictedImpactTime - configuredLeadSeconds);
+            warningState.LeadTimeSeconds = math.max(0f, predictedImpactTime - warningState.WarningStartTime);
+        }
+        else
+        {
+            warningState.LeadTimeSeconds = math.max(0f, predictedImpactTime - warningState.WarningStartTime);
+        }
+
+        bombState.WarningFadeOutEndTime = predictedExplosionTime + math.max(0f, warningState.FadeOutSeconds);
+        warningStateLookup[bombEntity] = warningState;
+    }
+
+    /// <summary>
+    /// Predicts the world time at which the scaled bomb flight will reach the landing point.
+    /// </summary>
+    /// <param name="bombState">Bomb simulation state containing flight progress.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <param name="enemyTimeScale">Enemy global time scale applied to bomb simulation.</param>
+    /// <returns>Predicted impact world time.</returns>
+    private static float ResolveBombardierWarningImpactTime(in EnemyBombardierBomb bombState,
+                                                            float elapsedTime,
+                                                            float enemyTimeScale)
+    {
+        if (bombState.HasImpacted != 0)
+            return elapsedTime;
+
+        float remainingFlightSeconds = math.max(0f, bombState.FlightDurationSeconds - bombState.ElapsedSeconds);
+        return elapsedTime + remainingFlightSeconds / math.max(TimeScaleEpsilon, enemyTimeScale);
+    }
+
+    /// <summary>
+    /// Predicts the world time at which the scaled post-impact delay will complete.
+    /// </summary>
+    /// <param name="bombState">Bomb simulation state containing impact delay progress.</param>
+    /// <param name="predictedImpactTime">Predicted world time of the landing impact.</param>
+    /// <param name="elapsedTime">Current world elapsed time.</param>
+    /// <param name="enemyTimeScale">Enemy global time scale applied to bomb simulation.</param>
+    /// <returns>Predicted explosion world time.</returns>
+    private static float ResolveBombardierExplosionTime(in EnemyBombardierBomb bombState,
+                                                        float predictedImpactTime,
+                                                        float elapsedTime,
+                                                        float enemyTimeScale)
+    {
+        float remainingDelaySeconds = math.max(0f,
+                                               bombState.ImpactExplosionDelaySeconds -
+                                               bombState.ExplosionDelayElapsedSeconds);
+
+        if (bombState.HasImpacted == 0)
+            return predictedImpactTime + remainingDelaySeconds / math.max(TimeScaleEpsilon, enemyTimeScale);
+
+        return elapsedTime + remainingDelaySeconds / math.max(TimeScaleEpsilon, enemyTimeScale);
     }
     #endregion
 

@@ -28,6 +28,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [Tooltip("Visibility settings block.")]
     [SerializeField] private EnemyVisualVisibilitySettings visibility = new EnemyVisualVisibilitySettings();
 
+    [Tooltip("Shader-driven face flipbook settings block for idle, attack and damage facial states.")]
+    [SerializeField] private EnemyVisualFaceFlipbookSettings faceFlipbook = new EnemyVisualFaceFlipbookSettings();
+
     [Tooltip("Damage feedback settings block.")]
     [SerializeField] private EnemyVisualDamageFeedbackSettings damageFeedback = new EnemyVisualDamageFeedbackSettings();
 
@@ -111,6 +114,14 @@ public sealed class EnemyVisualPreset : ScriptableObject
         get
         {
             return prefabs;
+        }
+    }
+
+    public EnemyVisualFaceFlipbookSettings FaceFlipbook
+    {
+        get
+        {
+            return faceFlipbook;
         }
     }
 
@@ -209,6 +220,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
         if (visibility == null)
             visibility = new EnemyVisualVisibilitySettings();
 
+        if (faceFlipbook == null)
+            faceFlipbook = new EnemyVisualFaceFlipbookSettings();
+
         if (damageFeedback == null)
             damageFeedback = new EnemyVisualDamageFeedbackSettings();
 
@@ -243,6 +257,7 @@ public sealed class EnemyVisualPreset : ScriptableObject
             bossUi = new EnemyBossVisualUiSettings();
 
         visibility.Validate();
+        faceFlipbook.Validate(name);
         damageFeedback.Validate();
         elasticHit.Validate();
         outline.Validate();

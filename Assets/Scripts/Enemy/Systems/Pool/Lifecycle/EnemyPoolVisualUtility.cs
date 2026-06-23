@@ -64,6 +64,12 @@ public static class EnemyPoolVisualUtility
         if (!entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
             entityManager.AddComponentData(enemyEntity, CreateDefaultVisualFlashPresentationState());
 
+        if (!entityManager.HasComponent<EnemyFaceFlipbookConfig>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, CreateDefaultFaceFlipbookConfig());
+
+        if (!entityManager.HasComponent<EnemyFaceFlipbookStateData>(enemyEntity))
+            entityManager.AddComponentData(enemyEntity, CreateDefaultFaceFlipbookState());
+
         if (!entityManager.HasComponent<EnemyElasticHitConfig>(enemyEntity))
             entityManager.AddComponentData(enemyEntity, default(EnemyElasticHitConfig));
 
@@ -165,7 +171,11 @@ public static class EnemyPoolVisualUtility
         if (entityManager.HasComponent<EnemyBossPatternChangeFeedbackState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultBossPatternChangeFeedbackState());
 
+        if (entityManager.HasComponent<EnemyFaceFlipbookStateData>(enemyEntity))
+            entityManager.SetComponentData(enemyEntity, CreateDefaultFaceFlipbookState());
+
         EnemyDamageFlashRenderUtility.ResetGpuFlash(entityManager, enemyEntity);
+        EnemyFaceFlipbookRenderUtility.ResetGpuFace(entityManager, enemyEntity);
         EnemyElasticHitRenderUtility.ResetGpuElasticHit(entityManager, enemyEntity);
 
         if (entityManager.HasComponent<EnemyElasticHitState>(enemyEntity))
@@ -228,6 +238,55 @@ public static class EnemyPoolVisualUtility
             DisplayedBlend = 0f,
             DisplayedColor = float4.zero,
             FadeOutSeconds = 0f
+        };
+    }
+
+    /// <summary>
+    /// Creates a conservative default face flipbook config for recovered pooled enemies.
+    /// </summary>
+    /// <returns>Default face flipbook config matching the shared enemy-face material contract.</returns>
+    private static EnemyFaceFlipbookConfig CreateDefaultFaceFlipbookConfig()
+    {
+        return new EnemyFaceFlipbookConfig
+        {
+            Enabled = 1,
+            IdleEnabled = 1,
+            AttackEnabled = 1,
+            DamageEnabled = 1,
+            IdleGrid = new float4(4f, 2f, 8f, 0f),
+            AttackGrid = new float4(4f, 1f, 4f, 0f),
+            DamageGrid = new float4(4f, 1f, 4f, 0f),
+            IdleFramesPerSecond = 8f,
+            AttackFramesPerSecond = 10f,
+            DamageFramesPerSecond = 12f,
+            IdleStartFrame = 0f,
+            AttackStartFrame = 0f,
+            DamageStartFrame = 0f,
+            AttackDurationSeconds = 0.18f,
+            DamageDurationSeconds = 0.14f,
+            IdleAtlas = default,
+            AttackAtlas = default,
+            DamageAtlas = default
+        };
+    }
+
+    /// <summary>
+    /// Creates a cleared face flipbook runtime state for pooled enemy activation and recycle.
+    /// </summary>
+    /// <returns>Default face flipbook runtime state.</returns>
+    private static EnemyFaceFlipbookStateData CreateDefaultFaceFlipbookState()
+    {
+        return new EnemyFaceFlipbookStateData
+        {
+            CurrentState = EnemyFaceFlipbookState.Idle,
+            AttackRemainingSeconds = 0f,
+            DamageRemainingSeconds = 0f,
+            IdlePlaybackPhaseSeconds = 0f,
+            AttackPlaybackPhaseSeconds = 0f,
+            DamagePlaybackPhaseSeconds = 0f,
+            LastObservedDamageLifetimeSeconds = 0f,
+            HasObservedDamage = 0,
+            WasEngagementActive = 0
         };
     }
 

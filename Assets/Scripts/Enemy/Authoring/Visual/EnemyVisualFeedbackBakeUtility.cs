@@ -83,6 +83,43 @@ public static class EnemyVisualFeedbackBakeUtility
             AnchorToGround = settings.AnchorToGround ? (byte)1 : (byte)0
         };
     }
+
+    /// <summary>
+    /// Builds runtime-safe face flipbook config from authored visual preset settings.
+    /// </summary>
+    /// <param name="settings">Authored face flipbook settings, or null when the feature is unavailable.</param>
+    /// <returns>Runtime-safe face flipbook config.</returns>
+    public static EnemyFaceFlipbookConfig BuildFaceFlipbookConfig(EnemyVisualFaceFlipbookSettings settings)
+    {
+        if (settings == null)
+            return default;
+
+        EnemyFaceFlipbookStateSettings idle = settings.Idle;
+        EnemyFaceFlipbookStateSettings attack = settings.Attack;
+        EnemyFaceFlipbookStateSettings damage = settings.Damage;
+
+        return new EnemyFaceFlipbookConfig
+        {
+            Enabled = settings.Enabled ? (byte)1 : (byte)0,
+            IdleEnabled = IsStateEnabled(idle) ? (byte)1 : (byte)0,
+            AttackEnabled = IsStateEnabled(attack) ? (byte)1 : (byte)0,
+            DamageEnabled = IsStateEnabled(damage) ? (byte)1 : (byte)0,
+            IdleGrid = BuildFaceGrid(idle, 4, 2, 8),
+            AttackGrid = BuildFaceGrid(attack, 4, 1, 4),
+            DamageGrid = BuildFaceGrid(damage, 4, 1, 4),
+            IdleFramesPerSecond = ResolvePositiveFinite(idle != null ? idle.FramesPerSecond : 8f, 8f),
+            AttackFramesPerSecond = ResolvePositiveFinite(attack != null ? attack.FramesPerSecond : 10f, 10f),
+            DamageFramesPerSecond = ResolvePositiveFinite(damage != null ? damage.FramesPerSecond : 12f, 12f),
+            IdleStartFrame = ResolveNonNegativeFinite(idle != null ? idle.StartFrame : 0f),
+            AttackStartFrame = ResolveNonNegativeFinite(attack != null ? attack.StartFrame : 0f),
+            DamageStartFrame = ResolveNonNegativeFinite(damage != null ? damage.StartFrame : 0f),
+            AttackDurationSeconds = ResolvePositiveFinite(attack != null ? attack.DurationSeconds : 0.18f, 0.18f),
+            DamageDurationSeconds = ResolvePositiveFinite(damage != null ? damage.DurationSeconds : 0.14f, 0.14f),
+            IdleAtlas = idle != null ? idle.Atlas : null,
+            AttackAtlas = attack != null ? attack.Atlas : null,
+            DamageAtlas = damage != null ? damage.Atlas : null
+        };
+    }
     #endregion
 
     #region Private Methods
@@ -107,6 +144,77 @@ public static class EnemyVisualFeedbackBakeUtility
     {
         float resolvedValue = ResolveFinite(value, fallback);
         return resolvedValue > 0f ? resolvedValue : math.max(MinimumDurationSeconds, fallback);
+    }
+
+    /// <summary>
+    /// Checks whether one face state is present and enabled.
+    /// </summary>
+    /// <param name="settings">State settings to inspect.</param>
+    /// <returns>True when the state can be used at runtime.</returns>
+    private static bool IsStateEnabled(EnemyFaceFlipbookStateSettings settings)
+    {
+        return settings != null && settings.Enabled;
+    }
+
+    /// <summary>
+    /// Builds a shader grid vector with safe fallback values.
+    /// </summary>
+    /// <param name="settings">State settings supplying authored grid values.</param>
+    /// <param name="defaultColumns">Fallback column count.</param>
+    /// <param name="defaultRows">Fallback row count.</param>
+    /// <param name="defaultFrameCount">Fallback frame count.</param>
+    /// <returns>Grid vector storing columns, rows, frame count and reserved data.</returns>
+    private static float4 BuildFaceGrid(EnemyFaceFlipbookStateSettings settings,
+                                        int defaultColumns,
+                                        int defaultRows,
+                                        int defaultFrameCount)
+    {
+        int columns = ResolvePositiveInt(settings != null ? settings.Columns : defaultColumns, defaultColumns);
+        int rows = ResolvePositiveInt(settings != null ? settings.Rows : defaultRows, defaultRows);
+        int availableFrames = math.max(1, columns * rows);
+        int frameCount = ResolvePositiveInt(settings != null ? settings.FrameCount : defaultFrameCount, defaultFrameCount);
+        return new float4(columns, rows, math.clamp(frameCount, 1, availableFrames), 0f);
+    }
+
+    /// <summary>
+    /// Resolves a positive integer fallback for invalid authored values.
+    /// </summary>
+    /// <param name="value">Authored integer value.</param>
+    /// <param name="fallback">Fallback used when the value is not positive.</param>
+    /// <returns>Positive integer suitable for ECS runtime.</returns>
+    private static int ResolvePositiveInt(int value, int fallback)
+    {
+        if (value > 0)
+            return value;
+
+        return math.max(1, fallback);
+    }
+
+    /// <summary>
+    /// Resolves a finite positive float fallback for runtime config fields.
+    /// </summary>
+    /// <param name="value">Authored float value.</param>
+    /// <param name="fallback">Fallback used when the value is invalid.</param>
+    /// <returns>Positive finite float suitable for ECS runtime.</returns>
+    private static float ResolvePositiveFinite(float value, float fallback)
+    {
+        float resolvedValue = ResolveFinite(value, fallback);
+
+        if (resolvedValue > 0f)
+            return resolvedValue;
+
+        return math.max(MinimumDurationSeconds, fallback);
+    }
+
+    /// <summary>
+    /// Resolves a finite zero-or-positive float for runtime config fields.
+    /// </summary>
+    /// <param name="value">Authored float value.</param>
+    /// <returns>Zero-or-positive finite value suitable for ECS runtime.</returns>
+    private static float ResolveNonNegativeFinite(float value)
+    {
+        float resolvedValue = ResolveFinite(value, 0f);
+        return math.max(0f, resolvedValue);
     }
 
     /// <summary>

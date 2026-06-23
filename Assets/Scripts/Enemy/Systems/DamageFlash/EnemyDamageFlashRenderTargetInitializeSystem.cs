@@ -30,6 +30,7 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
     {
         state.RequireForUpdate<DamageFlashConfig>();
         state.RequireForUpdate<OutlineVisualConfig>();
+        state.RequireForUpdate<EnemyFaceFlipbookConfig>();
         state.RequireForUpdate<DamageFlashRenderTargetElement>();
     }
 
@@ -46,9 +47,13 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
         {
             foreach ((RefRO<DamageFlashConfig> damageFlashConfig,
                       RefRO<OutlineVisualConfig> outlineVisualConfig,
+                      RefRO<EnemyFaceFlipbookConfig> faceFlipbookConfig,
                       DynamicBuffer<DamageFlashRenderTargetElement> renderTargets,
                       Entity enemyEntity)
-                     in SystemAPI.Query<RefRO<DamageFlashConfig>, RefRO<OutlineVisualConfig>, DynamicBuffer<DamageFlashRenderTargetElement>>()
+                     in SystemAPI.Query<RefRO<DamageFlashConfig>,
+                                        RefRO<OutlineVisualConfig>,
+                                        RefRO<EnemyFaceFlipbookConfig>,
+                                        DynamicBuffer<DamageFlashRenderTargetElement>>()
                                  .WithNone<EnemyDamageFlashRenderTargetsInitialized>()
                                  .WithEntityAccess())
             {
@@ -79,6 +84,10 @@ public partial struct EnemyDamageFlashRenderTargetInitializeSystem : ISystem
                     EnemyElasticHitRenderUtility.EnsureGpuComponents(entityManager,
                                                                      entityCommandBuffer,
                                                                      renderTarget.Value);
+                    EnemyFaceFlipbookRenderUtility.EnsureGpuFaceComponents(entityManager,
+                                                                           entityCommandBuffer,
+                                                                           renderTarget.Value,
+                                                                           in faceFlipbookConfig.ValueRO);
                 }
 
                 entityCommandBuffer.AddComponent<EnemyDamageFlashRenderTargetsInitialized>(enemyEntity);

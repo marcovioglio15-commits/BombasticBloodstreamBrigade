@@ -43422,7 +43422,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveBulletTime
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:

@@ -2,10 +2,16 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
 {
     Properties
     {
-        [MainTexture] _MainTex("Face Flipbook Atlas - Frames Ordered Left-To-Right Then Top-To-Bottom", 2D) = "white" {}
+        [MainTexture] _MainTex("Idle Face Flipbook Atlas - Frames Ordered Left-To-Right Then Top-To-Bottom", 2D) = "white" {}
+        _FaceAttackTex("Attack Face Flipbook Atlas - Frames Ordered Left-To-Right Then Top-To-Bottom", 2D) = "white" {}
+        _FaceDamageTex("Damage Face Flipbook Atlas - Frames Ordered Left-To-Right Then Top-To-Bottom", 2D) = "white" {}
         [MainColor] _BaseColor("Per-Instance Face Tint Multiplied By The Atlas", Color) = (1,1,1,1)
         [Toggle] _FaceFlipbookEnabled("Enable Face Flipbook Playback", Float) = 1
-        _FaceFlipbookGrid("Face Flipbook Grid - Columns, Rows, Frame Count, Reserved", Vector) = (4,2,8,0)
+        [HideInInspector] _FaceFlipbookGrid("Legacy Face Flipbook Grid - Columns, Rows, Frame Count, Reserved", Vector) = (4,2,8,0)
+        _FaceFlipbookState("Runtime Face State - Idle 0, Attack 1, Damage 2", Float) = 0
+        _FaceIdleGrid("Idle Face Grid - Columns, Rows, Frame Count, Reserved", Vector) = (4,2,8,0)
+        _FaceAttackGrid("Attack Face Grid - Columns, Rows, Frame Count, Reserved", Vector) = (4,1,4,0)
+        _FaceDamageGrid("Damage Face Grid - Columns, Rows, Frame Count, Reserved", Vector) = (4,1,4,0)
         _FaceFlipbookPlayback("Face Flipbook Playback - FPS, Phase Seconds, Start Frame, Reserved", Vector) = (10,0,0,0)
         _FaceFlipbookEdgeInsetPixels("Face Flipbook Cell Edge Inset In Atlas Pixels", Range(0,8)) = 0.5
         _AlphaClipThreshold("Transparent Background Alpha Clip Threshold", Range(0,1)) = 0.01
@@ -59,9 +65,15 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
                 float4 _MainTex_TexelSize;
+                float4 _FaceAttackTex_TexelSize;
+                float4 _FaceDamageTex_TexelSize;
                 float4 _BaseColor;
                 float _FaceFlipbookEnabled;
                 float4 _FaceFlipbookGrid;
+                float _FaceFlipbookState;
+                float4 _FaceIdleGrid;
+                float4 _FaceAttackGrid;
+                float4 _FaceDamageGrid;
                 float4 _FaceFlipbookPlayback;
                 float _FaceFlipbookEdgeInsetPixels;
                 float _AlphaClipThreshold;
@@ -81,12 +93,18 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
+            TEXTURE2D(_FaceAttackTex);
+            TEXTURE2D(_FaceDamageTex);
 
             #if defined(DOTS_INSTANCING_ON)
             UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _ComputeMeshIndex)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _BaseColor)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _FaceFlipbookEnabled)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _FaceFlipbookState)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _FaceIdleGrid)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _FaceAttackGrid)
+                UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _FaceDamageGrid)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _FaceFlipbookPlayback)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float4, _HitFlashColor)
                 UNITY_DOTS_INSTANCED_PROP_OVERRIDE_SUPPORTED(float, _HitFlashBlend)
@@ -132,32 +150,66 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
                 return (value - minimumValue) / (maximumValue - minimumValue);
             }
 
-            float2 ResolveFaceFlipbookUv(float2 sourceUv)
+            float ResolveFaceState()
+            {
+                return clamp(floor(UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceFlipbookState, float) + 0.5), 0.0, 2.0);
+            }
+
+            float4 ResolveFaceGrid(float faceState)
+            {
+                float isDamage = step(1.5, faceState);
+                float isAttack = step(0.5, faceState) * (1.0 - isDamage);
+                float4 idleGrid = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceIdleGrid, float4);
+                float4 attackGrid = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceAttackGrid, float4);
+                float4 damageGrid = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceDamageGrid, float4);
+                return lerp(lerp(idleGrid, attackGrid, isAttack), damageGrid, isDamage);
+            }
+
+            float4 ResolveFaceTexelSize(float faceState)
+            {
+                float isDamage = step(1.5, faceState);
+                float isAttack = step(0.5, faceState) * (1.0 - isDamage);
+                return lerp(lerp(_MainTex_TexelSize, _FaceAttackTex_TexelSize, isAttack), _FaceDamageTex_TexelSize, isDamage);
+            }
+
+            float2 ResolveFaceFlipbookUv(float2 sourceUv, float faceState)
             {
                 float enabled = saturate(UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceFlipbookEnabled, float));
 
                 if (enabled < 0.5)
                     return sourceUv;
 
-                float columns = max(1.0, floor(_FaceFlipbookGrid.x + 0.5));
-                float rows = max(1.0, floor(_FaceFlipbookGrid.y + 0.5));
+                float4 grid = ResolveFaceGrid(faceState);
+                float columns = max(1.0, floor(grid.x + 0.5));
+                float rows = max(1.0, floor(grid.y + 0.5));
                 float availableFrameCount = columns * rows;
-                float frameCount = clamp(floor(_FaceFlipbookGrid.z + 0.5), 1.0, availableFrameCount);
+                float frameCount = clamp(floor(grid.z + 0.5), 1.0, availableFrameCount);
                 float4 playback = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_FaceFlipbookPlayback, float4);
                 float framesPerSecond = max(0.0, playback.x);
-                float phaseSeconds = max(0.0, playback.y);
+                float phaseSeconds = playback.y;
                 float startFrame = fmod(max(0.0, floor(playback.z + 0.5)), frameCount);
-                float frameIndex = fmod(floor((_Time.y + phaseSeconds) * framesPerSecond) + startFrame, frameCount);
+                float playbackSeconds = max(0.0, _Time.y + phaseSeconds);
+                float frameIndex = fmod(floor(playbackSeconds * framesPerSecond) + startFrame, frameCount);
                 float columnIndex = fmod(frameIndex, columns);
                 float rowFromTop = floor(frameIndex / columns);
                 float rowFromBottom = rows - 1.0 - rowFromTop;
                 float2 gridSize = float2(columns, rows);
                 float2 cellSize = rcp(gridSize);
                 float2 cellOrigin = float2(columnIndex, rowFromBottom) * cellSize;
-                float2 edgeInset = _MainTex_TexelSize.xy * max(0.0, _FaceFlipbookEdgeInsetPixels);
+                float2 edgeInset = ResolveFaceTexelSize(faceState).xy * max(0.0, _FaceFlipbookEdgeInsetPixels);
                 return lerp(cellOrigin + edgeInset,
                             cellOrigin + cellSize - edgeInset,
                             saturate(sourceUv));
+            }
+
+            half4 SampleFaceAtlas(float faceState, float2 flipbookUv)
+            {
+                half4 idleSample = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, flipbookUv);
+                half4 attackSample = SAMPLE_TEXTURE2D(_FaceAttackTex, sampler_MainTex, flipbookUv);
+                half4 damageSample = SAMPLE_TEXTURE2D(_FaceDamageTex, sampler_MainTex, flipbookUv);
+                half isDamage = step(1.5, faceState);
+                half isAttack = step(0.5, faceState) * (1.0 - isDamage);
+                return lerp(lerp(idleSample, attackSample, isAttack), damageSample, isDamage);
             }
 
             Varyings ToonPassVertex(Attributes inputValue)
@@ -202,8 +254,9 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
                 UNITY_SETUP_INSTANCE_ID(inputValue);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(inputValue);
 
-                float2 flipbookUv = ResolveFaceFlipbookUv(inputValue.uv);
-                half4 albedoSample = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, flipbookUv);
+                float faceState = ResolveFaceState();
+                float2 flipbookUv = ResolveFaceFlipbookUv(inputValue.uv, faceState);
+                half4 albedoSample = SampleFaceAtlas(faceState, flipbookUv);
                 clip(albedoSample.a - saturate(_AlphaClipThreshold));
                 float4 baseColor = UNITY_ACCESS_HYBRID_INSTANCED_PROP(_BaseColor, float4);
                 half4 albedo = half4(albedoSample.rgb * baseColor.rgb, albedoSample.a * baseColor.a);

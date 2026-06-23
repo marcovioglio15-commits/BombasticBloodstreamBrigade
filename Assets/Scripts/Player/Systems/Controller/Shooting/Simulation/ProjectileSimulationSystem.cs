@@ -41,6 +41,10 @@ public partial struct ProjectileSimulationSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
+        float enemyTimeScale = 1f;
+
+        if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
+            enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
 
         // Create the projectile simulation job,
         // passing in delta time and component lookups.
@@ -48,7 +52,9 @@ public partial struct ProjectileSimulationSystem : ISystem
         {
             DeltaTime = SystemAPI.Time.DeltaTime,
             GlobalTime = (float)SystemAPI.Time.ElapsedTime,
+            EnemyTimeScale = enemyTimeScale,
             MovementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true),
+            EnemyDataLookup = SystemAPI.GetComponentLookup<EnemyData>(true),
             PassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true),
             PlayerWorldTransformLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true),
             BounceStateLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(true)
@@ -81,7 +87,9 @@ public partial struct ProjectileSimulationSystem : ISystem
         #region Fields
         public float DeltaTime;
         public float GlobalTime;
+        public float EnemyTimeScale;
         [ReadOnly] public ComponentLookup<PlayerMovementState> MovementStateLookup;
+        [ReadOnly] public ComponentLookup<EnemyData> EnemyDataLookup;
         [ReadOnly] public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsLookup;
         [ReadOnly] public ComponentLookup<LocalToWorld> PlayerWorldTransformLookup;
         [ReadOnly] public ComponentLookup<ProjectileBounceState> BounceStateLookup;
@@ -96,6 +104,11 @@ public partial struct ProjectileSimulationSystem : ISystem
                              ref ProjectilePerfectCircleState perfectCircleState,
                              in ProjectileOwner owner)
         {
+            float projectileDeltaTime = ProjectileKinematicsUtility.ResolveOwnerScaledDeltaTime(in owner,
+                                                                                                in EnemyDataLookup,
+                                                                                                DeltaTime,
+                                                                                                EnemyTimeScale);
+
             // If the projectile has the perfect circle behavior enabled
             // and the shooter has the perfect circle passive tool,
             // then attempt to simulate the perfect circle behavior for this projectile
@@ -104,7 +117,8 @@ public partial struct ProjectileSimulationSystem : ISystem
                                          ref runtimeState,
                                          ref projectile,
                                          ref perfectCircleState,
-                                         in owner))
+                                         in owner,
+                                         projectileDeltaTime))
             {
                 return;
             }
@@ -114,14 +128,14 @@ public partial struct ProjectileSimulationSystem : ISystem
             float3 displacement = ProjectileKinematicsUtility.ResolveLinearDisplacement(in projectile,
                                                                                         in owner,
                                                                                         in MovementStateLookup,
-                                                                                        DeltaTime);
+                                                                                        projectileDeltaTime);
             projectileTransform.Position += displacement;
-            runtimeState.TraveledDistance += ProjectileKinematicsUtility.ResolveLinearRangeStepDistance(in projectile, DeltaTime);
-            runtimeState.ElapsedLifetime += DeltaTime;
+            runtimeState.TraveledDistance += ProjectileKinematicsUtility.ResolveLinearRangeStepDistance(in projectile, projectileDeltaTime);
+            runtimeState.ElapsedLifetime += projectileDeltaTime;
 
             // Bouncing projectiles change direction on wall impact; ease the facing toward the new velocity so the attached VFX turns smoothly instead of snapping.
             if (BounceStateLookup.HasComponent(projectileEntity))
-                EaseFacingTowardDirection(ref projectileTransform, projectile.Velocity, DeltaTime);
+                EaseFacingTowardDirection(ref projectileTransform, projectile.Velocity, projectileDeltaTime);
         }
         #endregion
 
@@ -130,7 +144,8 @@ public partial struct ProjectileSimulationSystem : ISystem
                                               ref ProjectileRuntimeState runtimeState,
                                               ref Projectile projectile,
                                               ref ProjectilePerfectCircleState perfectCircleState,
-                                              in ProjectileOwner owner)
+                                              in ProjectileOwner owner,
+                                              float projectileDeltaTime)
         {
             if (perfectCircleState.Enabled == 0)
                 return false;
@@ -158,14 +173,15 @@ public partial struct ProjectileSimulationSystem : ISystem
                                                                                                 shooterPosition,
                                                                                                 perfectCircleInheritedVelocity,
                                                                                                 projectileTransform.Position,
-                                                                                                DeltaTime,
+                                                                                                projectileDeltaTime,
                                                                                                 GlobalTime,
                                                                                                 1f,
                                                                                                 in perfectCircleConfig);
             ApplyResolvedStep(ref projectileTransform,
                               ref runtimeState,
                               ref projectile,
-                              targetPosition);
+                              targetPosition,
+                              projectileDeltaTime);
             return true;
         }
         #endregion
@@ -181,22 +197,24 @@ public partial struct ProjectileSimulationSystem : ISystem
         /// <param name="runtimeState">Projectile runtime state that tracks range and lifetime.</param>
         /// <param name="projectile">Projectile data that stores the authoritative frame velocity.</param>
         /// <param name="targetPosition">Final position reached by the projectile in the current frame.</param>
+        /// <param name="deltaTime">Owner-scaled delta time consumed by the resolved step.</param>
         private void ApplyResolvedStep(ref LocalTransform projectileTransform,
                                        ref ProjectileRuntimeState runtimeState,
                                        ref Projectile projectile,
-                                       float3 targetPosition)
+                                       float3 targetPosition,
+                                       float deltaTime)
         {
             float3 displacement = targetPosition - projectileTransform.Position;
             projectileTransform.Position = targetPosition;
             runtimeState.TraveledDistance += math.length(displacement);
-            runtimeState.ElapsedLifetime += DeltaTime;
+            runtimeState.ElapsedLifetime += deltaTime;
 
             // Ease facing toward the curved travel direction so the radial-to-orbit turn is smooth instead of snapping.
-            EaseFacingTowardDirection(ref projectileTransform, displacement, DeltaTime);
+            EaseFacingTowardDirection(ref projectileTransform, displacement, deltaTime);
 
-            if (DeltaTime > 1e-6f)
+            if (deltaTime > 1e-6f)
             {
-                projectile.Velocity = displacement / DeltaTime;
+                projectile.Velocity = displacement / deltaTime;
                 return;
             }
 
