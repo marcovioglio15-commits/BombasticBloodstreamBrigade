@@ -29,34 +29,34 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _BodyDepth: 1.65
+    - _BodyDepth: 2.5
     - _ColorMask: 15
     - _FillNormalized: 1
     - _FlowSpeed: 0
-    - _GlowStrength: 1.05
+    - _GlowStrength: 1.5
     - _MovementBlend: 0
     - _MovementDirection: 1
-    - _PosterizeBlend: 0.34
-    - _PosterizeSteps: 5
-    - _SheenSpeed: 0.9
-    - _SheenStrength: 0.35
-    - _SheenVisibility: 0.12
-    - _SheenWidth: 0.14
+    - _PosterizeBlend: 0.15
+    - _PosterizeSteps: 2
+    - _SheenSpeed: 5
+    - _SheenStrength: 1
+    - _SheenVisibility: 0.2
+    - _SheenWidth: 0.2
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
-    - _StrataStrength: 1.25
-    - _SubsurfaceStrength: 1.1
+    - _StrataStrength: 0
+    - _SubsurfaceStrength: 1.5
     - _UseUIAlphaClip: 0
-    - _Viscosity: 0.68
-    - _WaveAmplitude: 0.12
-    - _WaveFrequency: 4
+    - _Viscosity: 0.85
+    - _WaveAmplitude: 0
+    - _WaveFrequency: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _GlowColor: {r: 0.08, g: 1, b: 0.72, a: 1}
-    - _HighlightColor: {r: 0.68, g: 1, b: 0.86, a: 1}
-    - _LiquidTint: {r: 0.22, g: 1.14, b: 0.86, a: 1}
+    - _GlowColor: {r: 0, g: 0.8235294, b: 1, a: 1}
+    - _HighlightColor: {r: 0.078431375, g: 0.7058824, b: 0.98039216, a: 1}
+    - _LiquidTint: {r: 0, g: 0.19607843, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
