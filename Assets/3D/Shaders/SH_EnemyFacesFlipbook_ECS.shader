@@ -281,5 +281,5 @@ Shader "BombasticBloodstreamBrigade/Enemy Faces Flipbook ECS"
         }
     }
 
-    FallBack "BombasticBloodstreamBrigade/Enemy Faces Flipbook WebGL"
+    FallBack Off
 }

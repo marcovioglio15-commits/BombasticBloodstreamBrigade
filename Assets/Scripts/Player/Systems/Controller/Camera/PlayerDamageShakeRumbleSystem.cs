@@ -1,10 +1,6 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine.InputSystem;
-#if UNITY_WEBGL && !UNITY_EDITOR
-using System.Runtime.InteropServices;
-using UnityEngine;
-#endif
 
 /// <summary>
 /// Drives a connected gamepad's rumble from both shake channels (damage and fire) already evolved by
@@ -310,11 +306,7 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
         if (targetAtRest && alreadyResting && !deviceChanged)
             return;
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-        WebGlGamepadRumbleRuntimeUtility.SetMotorSpeeds(lowFrequency, highFrequency);
-#else
         gamepad.SetMotorSpeeds(lowFrequency, highFrequency);
-#endif
         lastAppliedLowFrequency = lowFrequency;
         lastAppliedHighFrequency = highFrequency;
         hasAppliedMotorSpeeds = 1;
@@ -345,86 +337,10 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     /// </summary>
     private static void ResetAllConnectedGamepadHaptics()
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        WebGlGamepadRumbleRuntimeUtility.Reset();
-#else
         for (int index = 0; index < Gamepad.all.Count; index++)
             Gamepad.all[index].ResetHaptics();
-#endif
     }
     #endregion
 
     #endregion
 }
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-/// <summary>
-/// Bridges the ECS rumble mixer to the browser Gamepad API because Unity Input System does not expose WebGL rumble.
-/// </summary>
-internal static class WebGlGamepadRumbleRuntimeUtility
-{
-    #region Constants
-    private const float RefreshIntervalSeconds = 0.05f;
-    private const int EffectDurationMilliseconds = 100;
-    #endregion
-
-    #region Fields
-    private static float nextRefreshTime;
-    private static bool effectActive;
-    #endregion
-
-    #region Native Methods
-    [DllImport("__Internal")]
-    private static extern void BombasticWebGLGamepadSetRumble(float lowFrequency,
-                                                              float highFrequency,
-                                                              int durationMilliseconds);
-
-    [DllImport("__Internal")]
-    private static extern void BombasticWebGLGamepadResetRumble();
-    #endregion
-
-    #region Methods
-    /// <summary>
-    /// Refreshes a short browser haptic effect while rumble is active and stops it immediately when both motors rest.
-    /// </summary>
-    /// <param name="lowFrequency">Heavy motor intensity in the normalized 0..1 range.</param>
-    /// <param name="highFrequency">Light motor intensity in the normalized 0..1 range.</param>
-    public static void SetMotorSpeeds(float lowFrequency, float highFrequency)
-    {
-        float clampedLowFrequency = Mathf.Clamp01(lowFrequency);
-        float clampedHighFrequency = Mathf.Clamp01(highFrequency);
-        bool targetActive = clampedLowFrequency > 0f || clampedHighFrequency > 0f;
-
-        if (!targetActive)
-        {
-            Reset();
-            return;
-        }
-
-        float currentTime = Time.unscaledTime;
-
-        if (effectActive && currentTime < nextRefreshTime)
-            return;
-
-        BombasticWebGLGamepadSetRumble(clampedLowFrequency,
-                                      clampedHighFrequency,
-                                      EffectDurationMilliseconds);
-        nextRefreshTime = currentTime + RefreshIntervalSeconds;
-        effectActive = true;
-    }
-
-    /// <summary>
-    /// Stops every browser gamepad actuator that may have received a previous effect.
-    /// </summary>
-    public static void Reset()
-    {
-        if (!effectActive)
-            return;
-
-        BombasticWebGLGamepadResetRumble();
-        nextRefreshTime = 0f;
-        effectActive = false;
-    }
-    #endregion
-}
-#endif

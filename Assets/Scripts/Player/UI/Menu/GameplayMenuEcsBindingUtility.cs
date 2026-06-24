@@ -214,7 +214,8 @@ internal static class GameplayMenuEcsBindingUtility
         if (!hadPauseUiOpen)
             return;
 
-        BrowserCursorRuntimeUtility.Apply(false, true);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     #endregion
 

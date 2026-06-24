@@ -37,7 +37,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
@@ -49,7 +48,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
@@ -97,7 +95,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
 
             v2f vert(appdata inputValue)
             {
-                UNITY_SETUP_INSTANCE_ID(inputValue);
                 v2f outputValue;
                 float3 positionOS = inputValue.vertex.xyz;
                 float3 normalOS = inputValue.normal;
@@ -171,7 +168,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             CGPROGRAM
             #pragma vertex OutlineVertex
             #pragma fragment OutlineFragment
-            #pragma multi_compile_instancing
 
             #include "UnityCG.cginc"
             #include "Assets/3D/Shaders/Includes/SH_EnemyElasticHitDeformation.hlsl"
@@ -180,7 +176,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
             {
                 float4 vertex : POSITION;
                 float3 normal : NORMAL;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct OutlineVaryings
@@ -196,7 +191,6 @@ Shader "Cel Shader/Toon Diffuse Hit Flash"
 
             OutlineVaryings OutlineVertex(OutlineAppData inputValue)
             {
-                UNITY_SETUP_INSTANCE_ID(inputValue);
                 OutlineVaryings outputValue;
                 float3 positionOS = inputValue.vertex.xyz;
                 float3 normalOS = inputValue.normal;

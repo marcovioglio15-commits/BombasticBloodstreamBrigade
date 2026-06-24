@@ -140,5 +140,5 @@ Shader "Cel Shader/Toon Outline ECS"
         }
     }
 
-    FallBack "Cel Shader/Toon Outline"
+    FallBack Off
 }

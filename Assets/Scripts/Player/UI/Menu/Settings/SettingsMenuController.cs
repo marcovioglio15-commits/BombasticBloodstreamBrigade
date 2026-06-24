@@ -204,21 +204,9 @@ public sealed class SettingsMenuController : MonoBehaviour
         RefreshRuntimeConfig();
         savedSettings = GameUserSettingsRuntimeUtility.LoadAndApply(in runtimeOptions);
         draftSettings = savedSettings;
-        ApplyWebGlRestrictions();
 
         if (panelRoot != null)
             panelRoot.SetActive(false);
-    }
-
-    /// <summary>
-    /// Removes browser-owned display controls from the WebGL settings menu.
-    /// </summary>
-    private void ApplyWebGlRestrictions()
-    {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        if (fullscreenToggle != null)
-            fullscreenToggle.gameObject.SetActive(false);
-#endif
     }
 
     /// <summary>
@@ -641,7 +629,6 @@ public sealed class SettingsMenuController : MonoBehaviour
                                                           new GameAudioSettingsPreviewEvent(musicPreviewEventPath, musicPreviewBankName),
                                                           masterPreviewPlaysAllOthers);
     }
-
     #endregion
 
     #region Preview

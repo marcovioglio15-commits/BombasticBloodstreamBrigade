@@ -290,18 +290,14 @@ public sealed class InputAuthoring : MonoBehaviour
 
     private static void SetCursorLock(bool isLocked)
     {
-        bool desiredVisibility = !isLocked;
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-        CursorLockMode desiredLockState = CursorLockMode.None;
-#else
         CursorLockMode desiredLockState = isLocked ? CursorLockMode.Locked : CursorLockMode.None;
-#endif
+        bool desiredVisibility = !isLocked;
 
         if (Cursor.lockState == desiredLockState && Cursor.visible == desiredVisibility)
             return;
 
-        BrowserCursorRuntimeUtility.Apply(desiredVisibility, isLocked);
+        Cursor.lockState = desiredLockState;
+        Cursor.visible = !isLocked;
     }
 
     /// <summary>

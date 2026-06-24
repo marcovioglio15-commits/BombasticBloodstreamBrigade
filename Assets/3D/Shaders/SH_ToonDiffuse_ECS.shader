@@ -280,5 +280,5 @@ Shader "Cel Shader/Toon Diffuse ECS"
         }
     }
 
-    FallBack "Cel Shader/Toon Diffuse"
+    FallBack Off
 }

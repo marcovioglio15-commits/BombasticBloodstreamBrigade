@@ -18,7 +18,8 @@ public static class MenuPointerVisibilityUtility
     {
         // A controller hides and locks the OS cursor; mouse and keyboard users keep a normal pointer.
         bool gamepadPresent = Gamepad.all.Count > 0;
-        BrowserCursorRuntimeUtility.Apply(!gamepadPresent, gamepadPresent);
+        Cursor.visible = !gamepadPresent;
+        Cursor.lockState = gamepadPresent ? CursorLockMode.Locked : CursorLockMode.None;
         return gamepadPresent;
     }
     #endregion

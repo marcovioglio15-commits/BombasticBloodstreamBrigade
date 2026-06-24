@@ -306,7 +306,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: FMODUnity::FMODUnity.PlatformWebGL
   identifier: 46fbfdf3fc43db0458918377fd40293e
   parentIdentifier: default
-  active: 1
+  active: 0
   Properties:
     LiveUpdate:
       Value: 0
@@ -327,8 +327,8 @@ MonoBehaviour:
       Value: 0
       HasValue: 0
     SampleRate:
-      Value: 48000
-      HasValue: 1
+      Value: 0
+      HasValue: 0
     BuildDirectory:
       Value: 
       HasValue: 0
@@ -336,17 +336,17 @@ MonoBehaviour:
       Value: 0
       HasValue: 0
     VirtualChannelCount:
-      Value: 128
-      HasValue: 1
+      Value: 0
+      HasValue: 0
     RealChannelCount:
-      Value: 32
-      HasValue: 1
+      Value: 0
+      HasValue: 0
     DSPBufferLength:
-      Value: 4096
-      HasValue: 1
+      Value: 0
+      HasValue: 0
     DSPBufferCount:
-      Value: 4
-      HasValue: 1
+      Value: 0
+      HasValue: 0
     Plugins:
       Value: []
       HasValue: 0
@@ -356,7 +356,7 @@ MonoBehaviour:
     CallbackHandler:
       Value: {fileID: 0}
       HasValue: 0
-  OutputTypeName: WEBAUDIO
+  OutputTypeName: 
   threadAffinities:
     Value: []
     HasValue: 0
@@ -615,7 +615,7 @@ MonoBehaviour:
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
   AutomaticEventLoading: 1
-  BankLoadType: 1
+  BankLoadType: 0
   AutomaticSampleLoading: 0
   EncryptionKey: 
   ImportType: 0
@@ -636,9 +636,7 @@ MonoBehaviour:
   - BankSounds
   Banks:
   - BankMusic
-  BanksToLoad:
-  - BankSounds.strings
-  - BankSounds
+  BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
   AndroidUseOBB: 0

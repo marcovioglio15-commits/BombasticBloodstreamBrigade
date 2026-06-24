@@ -89,7 +89,6 @@ public sealed class GameplayMenuController : MonoBehaviour
     private void Awake()
     {
         selectionController = GetComponent<MenuSelectionController>();
-        ApplyWebGlPauseMenuRestrictions();
         ApplyInitialVisualState();
     }
 
@@ -105,7 +104,8 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (!GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning())
             Time.timeScale = 1f;
 
-        BrowserCursorRuntimeUtility.Apply(false, true);
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     /// <summary>
@@ -399,7 +399,8 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (pauseMenuRoot != null)
             pauseMenuRoot.SetActive(true);
 
-        BrowserCursorRuntimeUtility.Apply(true, false);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         SelectDefaultButton(resumeButton, pauseSettingsButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
     }
 
@@ -416,7 +417,8 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (!endingMenuVisible)
         {
             Time.timeScale = 1f;
-            BrowserCursorRuntimeUtility.Apply(false, true);
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 
@@ -451,7 +453,8 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (endingMenuRoot != null)
             endingMenuRoot.SetActive(true);
 
-        BrowserCursorRuntimeUtility.Apply(true, false);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         SelectDefaultButton(endingPlayAgainButton, endingMainMenuButton, endingQuitButton);
     }
 
@@ -581,39 +584,6 @@ public sealed class GameplayMenuController : MonoBehaviour
                                                                   pauseMainMenuButton,
                                                                   pauseQuitButton,
                                                                   interactable);
-    }
-
-    /// <summary>
-    /// Removes the in-game Settings entry from WebGL pause menus while preserving it in the main menu and on all
-    /// other platforms. Clearing the runtime reference also excludes the hidden button from callback and focus flow.
-    /// </summary>
-    private void ApplyWebGlPauseMenuRestrictions()
-    {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        if (pauseSettingsButton == null)
-            return;
-
-        BypassPauseSettingsNavigation();
-        pauseSettingsButton.gameObject.SetActive(false);
-        pauseSettingsButton = null;
-#endif
-    }
-
-    /// <summary>
-    /// Reconnects the explicit pause-menu navigation graph around the Settings button before WebGL hides it.
-    /// </summary>
-    private void BypassPauseSettingsNavigation()
-    {
-        if (resumeButton != null && pauseRestartButton != null)
-        {
-            Navigation resumeNavigation = resumeButton.navigation;
-            resumeNavigation.selectOnDown = pauseRestartButton;
-            resumeButton.navigation = resumeNavigation;
-
-            Navigation restartNavigation = pauseRestartButton.navigation;
-            restartNavigation.selectOnUp = resumeButton;
-            pauseRestartButton.navigation = restartNavigation;
-        }
     }
     #endregion
 

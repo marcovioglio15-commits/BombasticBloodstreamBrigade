@@ -24,7 +24,6 @@ Shader "Cel Shader/Toon Outline"
 
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma multi_compile_instancing
 
 			#include "UnityCG.cginc"
 
@@ -37,7 +36,6 @@ Shader "Cel Shader/Toon Outline"
 			{
 				float4 vertex : POSITION;
 				float3 normal : NORMAL;
-				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct v2f
@@ -47,7 +45,6 @@ Shader "Cel Shader/Toon Outline"
 
 			v2f vert(appdata v)
 			{
-				UNITY_SETUP_INSTANCE_ID(v);
 				float outlineThickness = _OutlineThickness / 250; // diving OutlineThickness value to have more precise control over the slider in inspector.
 				
 				v2f o;

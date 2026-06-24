@@ -156,10 +156,6 @@ public static class GameUserSettingsRuntimeUtility
     {
         ApplyFrameRateLock(settings.FrameRateLimit);
 
-#if UNITY_WEBGL && !UNITY_EDITOR
-        // Browser fullscreen must be requested from a direct user gesture in the HTML host.
-        return;
-#else
         if (settings.FullscreenEnabled != 0)
         {
             Screen.fullScreen = true;
@@ -169,7 +165,6 @@ public static class GameUserSettingsRuntimeUtility
         int width = ResolvePositiveDimension(windowedDisplay.Width, 1280);
         int height = ResolvePositiveDimension(windowedDisplay.Height, 720);
         Screen.SetResolution(width, height, false);
-#endif
     }
 
     /// <summary>
