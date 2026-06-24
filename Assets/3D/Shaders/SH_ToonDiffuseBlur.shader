@@ -98,6 +98,7 @@ Shader "Cel Shader/Toon Diffuse Blur"
             #pragma target 3.0
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
@@ -108,6 +109,7 @@ Shader "Cel Shader/Toon Diffuse Blur"
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             // Added 16/03/2026: World position is carried to the fragment stage so the shader can
@@ -423,6 +425,7 @@ Shader "Cel Shader/Toon Diffuse Blur"
 
             v2f vert(appdata input)
             {
+                UNITY_SETUP_INSTANCE_ID(input);
                 v2f output;
                 output.vertex = UnityObjectToClipPos(input.vertex);
                 output.uv = TRANSFORM_TEX(input.uv, _MainTex);

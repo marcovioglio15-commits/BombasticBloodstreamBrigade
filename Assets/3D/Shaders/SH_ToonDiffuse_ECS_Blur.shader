@@ -538,5 +538,5 @@ Shader "Cel Shader/Toon Diffuse ECS Blur"
         }
     }
 
-    FallBack Off
+    FallBack "Cel Shader/Toon Diffuse Blur"
 }

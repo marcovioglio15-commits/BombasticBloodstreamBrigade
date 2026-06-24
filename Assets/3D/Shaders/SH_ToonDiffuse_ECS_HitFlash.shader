@@ -206,5 +206,5 @@ Shader "Cel Shader/Toon Diffuse ECS Hit Flash"
         }
     }
 
-    FallBack Off
+    FallBack "Cel Shader/Toon Diffuse Hit Flash"
 }

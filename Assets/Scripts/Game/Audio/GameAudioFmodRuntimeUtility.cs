@@ -5,6 +5,7 @@ using UnityEngine;
 using FMOD;
 using FMOD.Studio;
 using FMODUnity;
+using System.Collections.Generic;
 #endif
 
 /// <summary>
@@ -13,13 +14,34 @@ using FMODUnity;
 /// </summary>
 public static class GameAudioFmodRuntimeUtility
 {
+    #region Constants
+    private const string MasterBusPath = "bus:/";
+    private const float WebGlReloadFadeOutSeconds = 0.12f;
+    private const float WebGlReloadFadeInSeconds = 0.35f;
+    private const float WebGlReloadVolumeEpsilon = 0.0005f;
+    private const float WebGlGuardedOneShotFallbackSeconds = 10f;
+    private const float WebGlGuardedOneShotTailSeconds = 0.75f;
+    #endregion
+
     #region Fields
 #if NASHCORE_FMOD || UNITY_EDITOR
     private static EventInstance backgroundMusicInstance;
     private static bool backgroundMusicInstanceValid;
     private static bool backgroundMusicBankLoaded;
+    private static bool backgroundMusicBankLoadRequested;
     private static string loadedBackgroundMusicBankName;
     private static string lastBackgroundMusicDiagnosticKey;
+    private static readonly Dictionary<string, EventDescription> cachedEventDescriptionsByPath = new Dictionary<string, EventDescription>(32);
+    private static readonly HashSet<string> preloadedEventPaths = new HashSet<string>();
+    private static string lastEventDiagnosticKey;
+    private static Bus webGlReloadMasterBus;
+    private static bool webGlReloadMasterBusValid;
+    private static bool webGlReloadFadeEngaged;
+    private static float webGlReloadRestoreVolume = 1f;
+    private static float webGlReloadAppliedVolume = 1f;
+#if UNITY_WEBGL && !UNITY_EDITOR
+    private static readonly List<WebGlGuardedOneShot> webGlGuardedOneShots = new List<WebGlGuardedOneShot>(16);
+#endif
 #endif
     private static string backgroundMusicEventPath;
     private static string backgroundMusicBankName;
@@ -68,7 +90,9 @@ public static class GameAudioFmodRuntimeUtility
         if (singleInstance)
             GameAudioFmodSingleInstanceRuntimeUtility.StopTrackedSingleInstance(eventId);
 
-        EventInstance instance = RuntimeManager.CreateInstance(eventPath);
+        if (!TryCreateEventInstance(eventPath, logMissingEventPath, out EventInstance instance))
+            return;
+
         ATTRIBUTES_3D attributes = GameAudioFmodAttributesRuntimeUtility.ResolveOneShotAttributes(position, hasPosition);
         instance.set3DAttributes(attributes);
         instance.setVolume(Mathf.Max(0f, volume));
@@ -89,12 +113,103 @@ public static class GameAudioFmodRuntimeUtility
             // request lands or when the instance finishes naturally and FMOD invalidates the handle.
             GameAudioFmodSingleInstanceRuntimeUtility.StoreTrackedSingleInstance(eventId, instance, eventPath);
         }
+#if UNITY_WEBGL && !UNITY_EDITOR
+        else if (ShouldGuardWebGlOneShot(eventId))
+        {
+            TrackWebGlGuardedOneShot(instance, eventPath, logMissingEventPath);
+        }
+#endif
         else
         {
             instance.release();
         }
 #else
         LogFmodDisabled(eventPath, logMissingEventPath);
+#endif
+    }
+
+    /// <summary>
+    /// Resolves and preloads one FMOD event path ahead of the first audible request. On WebGL this moves the
+    /// event lookup and sample-data request out of gameplay spike frames such as scene entry or restart.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path resolved from the Audio Manager preset.</param>
+    /// <param name="logMissingEventPath">True when missing paths should be reported in development contexts.</param>
+    public static void PrepareEventPath(string eventPath, bool logMissingEventPath)
+    {
+        if (string.IsNullOrWhiteSpace(eventPath))
+        {
+            LogMissingPath(logMissingEventPath);
+            return;
+        }
+
+#if NASHCORE_FMOD || UNITY_EDITOR
+        TryResolveEventDescription(eventPath, logMissingEventPath, true, out EventDescription eventDescription);
+#else
+        LogFmodDisabled(eventPath, logMissingEventPath);
+#endif
+    }
+
+    /// <summary>
+    /// Fades the FMOD master bus out while a WebGL gameplay restart is active, then restores its previous volume
+    /// after the scene transition completes. The cached restore value preserves the user's master-volume setting.
+    /// </summary>
+    /// <param name="restartTransitionActive">True while the active scene is being restarted.</param>
+    /// <param name="deltaSeconds">Unscaled frame delta used by the fade.</param>
+    /// <param name="logWarnings">True when FMOD bus lookup failures should be logged.</param>
+    public static void UpdateWebGlReloadTransitionFade(bool restartTransitionActive,
+                                                       float deltaSeconds,
+                                                       bool logWarnings)
+    {
+#if NASHCORE_FMOD || UNITY_EDITOR
+        if (!restartTransitionActive && !webGlReloadFadeEngaged)
+            return;
+
+        if (!TryResolveWebGlReloadMasterBus(logWarnings))
+            return;
+
+        if (restartTransitionActive && !webGlReloadFadeEngaged)
+        {
+            RESULT getVolumeResult = webGlReloadMasterBus.getVolume(out float currentVolume, out float finalVolume);
+
+            if (getVolumeResult != RESULT.OK)
+            {
+                LogEventFmodResultWarning("read WebGL reload master bus volume",
+                                          MasterBusPath,
+                                          getVolumeResult,
+                                          logWarnings);
+                return;
+            }
+
+            webGlReloadRestoreVolume = Mathf.Clamp01(currentVolume);
+            webGlReloadAppliedVolume = webGlReloadRestoreVolume;
+            webGlReloadFadeEngaged = true;
+        }
+
+        float targetVolume = restartTransitionActive ? 0f : webGlReloadRestoreVolume;
+        float fadeSeconds = restartTransitionActive ? WebGlReloadFadeOutSeconds : WebGlReloadFadeInSeconds;
+        float volumeRange = Mathf.Max(WebGlReloadVolumeEpsilon, webGlReloadRestoreVolume);
+        float maximumDelta = fadeSeconds > WebGlReloadVolumeEpsilon
+            ? volumeRange * Mathf.Max(0f, deltaSeconds) / fadeSeconds
+            : volumeRange;
+        webGlReloadAppliedVolume = Mathf.MoveTowards(webGlReloadAppliedVolume, targetVolume, maximumDelta);
+        RESULT setVolumeResult = webGlReloadMasterBus.setVolume(webGlReloadAppliedVolume);
+
+        if (setVolumeResult != RESULT.OK)
+        {
+            LogEventFmodResultWarning("set WebGL reload master bus volume",
+                                      MasterBusPath,
+                                      setVolumeResult,
+                                      logWarnings);
+            webGlReloadMasterBusValid = false;
+            return;
+        }
+
+        if (!restartTransitionActive &&
+            Mathf.Abs(webGlReloadAppliedVolume - webGlReloadRestoreVolume) <= WebGlReloadVolumeEpsilon)
+        {
+            webGlReloadAppliedVolume = webGlReloadRestoreVolume;
+            webGlReloadFadeEngaged = false;
+        }
 #endif
     }
 
@@ -242,10 +357,158 @@ public static class GameAudioFmodRuntimeUtility
         GameAudioFmodSingleInstanceRuntimeUtility.StopAllTrackedSingleInstances();
 #endif
     }
+
+    /// <summary>
+    /// Releases completed guarded WebGL one-shots and force-stops any browser voice that outlives its authored
+    /// event duration. This specifically protects long explosion samples from stale WebAudio nodes.
+    /// </summary>
+    /// <param name="logWarnings">True when FMOD failures should be reported in development contexts.</param>
+    public static void UpdateWebGlGuardedOneShots(bool logWarnings)
+    {
+#if NASHCORE_FMOD && UNITY_WEBGL && !UNITY_EDITOR
+        float currentTime = Time.realtimeSinceStartup;
+
+        for (int index = webGlGuardedOneShots.Count - 1; index >= 0; index--)
+        {
+            WebGlGuardedOneShot guardedOneShot = webGlGuardedOneShots[index];
+            EventInstance instance = guardedOneShot.Instance;
+
+            if (!instance.isValid())
+            {
+                webGlGuardedOneShots.RemoveAt(index);
+                continue;
+            }
+
+            RESULT playbackResult = instance.getPlaybackState(out PLAYBACK_STATE playbackState);
+
+            if (playbackResult == RESULT.OK && playbackState == PLAYBACK_STATE.STOPPED)
+            {
+                instance.release();
+                webGlGuardedOneShots.RemoveAt(index);
+                continue;
+            }
+
+            if (currentTime < guardedOneShot.ForceStopTime)
+                continue;
+
+            RESULT stopResult = instance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+
+            if (stopResult != RESULT.OK && stopResult != RESULT.ERR_INVALID_HANDLE)
+                LogEventFmodResultWarning("force-stop guarded WebGL one-shot",
+                                          guardedOneShot.EventPath,
+                                          stopResult,
+                                          logWarnings);
+
+            instance.release();
+            webGlGuardedOneShots.RemoveAt(index);
+        }
+#endif
+    }
+
+    /// <summary>
+    /// Stops and releases every guarded WebGL one-shot during world teardown.
+    /// </summary>
+    public static void StopAllWebGlGuardedOneShots()
+    {
+#if NASHCORE_FMOD && UNITY_WEBGL && !UNITY_EDITOR
+        for (int index = webGlGuardedOneShots.Count - 1; index >= 0; index--)
+        {
+            EventInstance instance = webGlGuardedOneShots[index].Instance;
+
+            if (!instance.isValid())
+                continue;
+
+            instance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            instance.release();
+        }
+
+        webGlGuardedOneShots.Clear();
+#endif
+    }
     #endregion
 
     #region Private Methods
 #if NASHCORE_FMOD || UNITY_EDITOR
+#if UNITY_WEBGL && !UNITY_EDITOR
+    /// <summary>
+    /// Resolves whether a one-shot needs managed lifetime enforcement on WebGL.
+    /// </summary>
+    /// <param name="eventId">Gameplay audio event id.</param>
+    /// <returns>True for browser-sensitive long explosion events.</returns>
+    private static bool ShouldGuardWebGlOneShot(GameAudioEventId eventId)
+    {
+        return eventId == GameAudioEventId.ExplosionBomb;
+    }
+
+    /// <summary>
+    /// Keeps one WebGL event instance alive until it stops naturally or reaches its authored-duration watchdog.
+    /// </summary>
+    /// <param name="instance">Started FMOD event instance.</param>
+    /// <param name="eventPath">FMOD event path used for diagnostics.</param>
+    /// <param name="shouldLog">True when FMOD failures should be logged.</param>
+    private static void TrackWebGlGuardedOneShot(EventInstance instance,
+                                                 string eventPath,
+                                                 bool shouldLog)
+    {
+        float watchdogSeconds = WebGlGuardedOneShotFallbackSeconds;
+        RESULT descriptionResult = instance.getDescription(out EventDescription eventDescription);
+
+        if (descriptionResult == RESULT.OK)
+        {
+            RESULT lengthResult = eventDescription.getLength(out int lengthMilliseconds);
+
+            if (lengthResult == RESULT.OK && lengthMilliseconds > 0)
+                watchdogSeconds = lengthMilliseconds * 0.001f + WebGlGuardedOneShotTailSeconds;
+            else if (lengthResult != RESULT.OK)
+                LogEventFmodResultWarning("read guarded WebGL one-shot length",
+                                          eventPath,
+                                          lengthResult,
+                                          shouldLog);
+        }
+        else
+        {
+            LogEventFmodResultWarning("resolve guarded WebGL one-shot description",
+                                      eventPath,
+                                      descriptionResult,
+                                      shouldLog);
+        }
+
+        webGlGuardedOneShots.Add(new WebGlGuardedOneShot
+        {
+            Instance = instance,
+            EventPath = eventPath,
+            ForceStopTime = Time.realtimeSinceStartup + Mathf.Max(WebGlGuardedOneShotTailSeconds, watchdogSeconds)
+        });
+    }
+#endif
+
+    /// <summary>
+    /// Resolves and caches the FMOD master bus used by the WebGL reload transition fade.
+    /// </summary>
+    /// <param name="shouldLog">True when lookup failures should be logged.</param>
+    /// <returns>True when a valid master bus is available.</returns>
+    private static bool TryResolveWebGlReloadMasterBus(bool shouldLog)
+    {
+        if (webGlReloadMasterBusValid && webGlReloadMasterBus.isValid())
+            return true;
+
+        RESULT result = RuntimeManager.StudioSystem.getBus(MasterBusPath, out webGlReloadMasterBus);
+
+        if (result != RESULT.OK)
+        {
+            LogEventFmodResultWarning("resolve WebGL reload master bus",
+                                      MasterBusPath,
+                                      result,
+                                      shouldLog);
+            webGlReloadMasterBus = default;
+            webGlReloadMasterBusValid = false;
+            return false;
+        }
+
+        webGlReloadMasterBusValid = true;
+        return true;
+    }
+
     /// <summary>
     /// Applies the resolved minimum and maximum attenuation distances to one FMOD event instance, keeping the
     /// authored curve shape but rescaling the near and far bounds to match the Audio Manager preset.
@@ -398,8 +661,19 @@ public static class GameAudioFmodRuntimeUtility
             return true;
 
         if (backgroundMusicBankLoaded &&
-            string.Equals(loadedBackgroundMusicBankName, bankName, System.StringComparison.Ordinal))
+            string.Equals(loadedBackgroundMusicBankName, bankName, System.StringComparison.Ordinal) &&
+            RuntimeManager.HasBankLoaded(bankName))
             return true;
+
+        if (backgroundMusicBankLoadRequested &&
+            string.Equals(loadedBackgroundMusicBankName, bankName, System.StringComparison.Ordinal))
+        {
+            if (!RuntimeManager.HasBankLoaded(bankName))
+                return false;
+
+            backgroundMusicBankLoaded = true;
+            return true;
+        }
 
         try
         {
@@ -411,9 +685,10 @@ public static class GameAudioFmodRuntimeUtility
             return false;
         }
 
-        backgroundMusicBankLoaded = true;
+        backgroundMusicBankLoadRequested = true;
         loadedBackgroundMusicBankName = bankName;
-        return true;
+        backgroundMusicBankLoaded = RuntimeManager.HasBankLoaded(bankName);
+        return backgroundMusicBankLoaded;
     }
 
     /// <summary>
@@ -444,13 +719,124 @@ public static class GameAudioFmodRuntimeUtility
                                                        bool shouldLog,
                                                        out EventDescription eventDescription)
     {
-        RESULT result = RuntimeManager.StudioSystem.getEvent(eventPath, out eventDescription);
+        return TryResolveEventDescription(eventPath, shouldLog, true, out eventDescription);
+    }
+
+    /// <summary>
+    /// Creates one event instance from a cached event description, preloading sample data before the first start.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path to instantiate.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
+    /// <param name="instance">Created FMOD event instance when successful.</param>
+    /// <returns>True when the event instance was created.</returns>
+    private static bool TryCreateEventInstance(string eventPath, bool shouldLog, out EventInstance instance)
+    {
+        if (!TryResolveEventDescription(eventPath, shouldLog, true, out EventDescription eventDescription))
+        {
+            instance = default;
+            return false;
+        }
+
+        RESULT result = eventDescription.createInstance(out instance);
 
         if (result == RESULT.OK)
             return true;
 
-        LogMusicFmodResultWarning("resolve event", eventPath, result, shouldLog);
+        LogEventFmodResultWarning("create instance", eventPath, result, shouldLog);
+        instance = default;
         return false;
+    }
+
+    /// <summary>
+    /// Resolves and caches one FMOD event description by path, optionally requesting its sample data.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
+    /// <param name="preloadSampleData">True when sample data should be loaded after resolution.</param>
+    /// <param name="eventDescription">Resolved event description.</param>
+    /// <returns>True when FMOD resolved the event path.</returns>
+    private static bool TryResolveEventDescription(string eventPath,
+                                                   bool shouldLog,
+                                                   bool preloadSampleData,
+                                                   out EventDescription eventDescription)
+    {
+        if (cachedEventDescriptionsByPath.TryGetValue(eventPath, out eventDescription))
+        {
+            if (eventDescription.isValid())
+            {
+                if (preloadSampleData)
+                    TryLoadSampleData(eventPath, ref eventDescription, shouldLog);
+
+                return true;
+            }
+
+            cachedEventDescriptionsByPath.Remove(eventPath);
+            preloadedEventPaths.Remove(eventPath);
+        }
+
+        RESULT result = RuntimeManager.StudioSystem.getEvent(eventPath, out eventDescription);
+
+        if (result != RESULT.OK)
+        {
+            LogEventFmodResultWarning("resolve event", eventPath, result, shouldLog);
+            return false;
+        }
+
+        cachedEventDescriptionsByPath[eventPath] = eventDescription;
+
+        if (preloadSampleData)
+            TryLoadSampleData(eventPath, ref eventDescription, shouldLog);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Requests sample-data loading once for each event path so the first audible instance does less work.
+    /// </summary>
+    /// <param name="eventPath">FMOD event path.</param>
+    /// <param name="eventDescription">Resolved event description.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
+    private static void TryLoadSampleData(string eventPath, ref EventDescription eventDescription, bool shouldLog)
+    {
+        if (preloadedEventPaths.Contains(eventPath))
+            return;
+
+        RESULT result = eventDescription.loadSampleData();
+
+        if (result == RESULT.OK || result == RESULT.ERR_EVENT_ALREADY_LOADED)
+        {
+            preloadedEventPaths.Add(eventPath);
+            return;
+        }
+
+        LogEventFmodResultWarning("load sample data", eventPath, result, shouldLog);
+    }
+
+    /// <summary>
+    /// Logs one FMOD event-preparation warning per failed operation and path.
+    /// </summary>
+    /// <param name="operation">Operation being attempted.</param>
+    /// <param name="target">FMOD event path involved in the operation.</param>
+    /// <param name="result">FMOD result code returned by the API.</param>
+    /// <param name="shouldLog">True when diagnostics are enabled.</param>
+    private static void LogEventFmodResultWarning(string operation,
+                                                  string target,
+                                                  RESULT result,
+                                                  bool shouldLog)
+    {
+        if (!shouldLog)
+            return;
+
+        string diagnosticKey = operation + "|" + target + "|" + result;
+
+        if (string.Equals(lastEventDiagnosticKey, diagnosticKey, System.StringComparison.Ordinal))
+            return;
+
+        lastEventDiagnosticKey = diagnosticKey;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        UnityEngine.Debug.LogWarning("[GameAudio] FMOD event failed to " + operation + " for '" + target + "'. FMOD result: " + result + ".");
+#endif
     }
 
     /// <summary>
@@ -562,6 +948,17 @@ public static class GameAudioFmodRuntimeUtility
 #endif
     }
     #endregion
+
+#if NASHCORE_FMOD && UNITY_WEBGL && !UNITY_EDITOR
+    #region Nested Types
+    private struct WebGlGuardedOneShot
+    {
+        public EventInstance Instance;
+        public string EventPath;
+        public float ForceStopTime;
+    }
+    #endregion
+#endif
 
     #endregion
 }

@@ -43422,7 +43422,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     unreplaceable: 0
-  primaryActivePowerUpId: ActiveBulletTime
+  primaryActivePowerUpId:
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:
@@ -44423,7 +44423,7 @@ MonoBehaviour:
       enemySlowPercent: 40
       transitionTimeSeconds: 0.2
   primaryActiveToolId: Dash
-  secondaryActiveToolId: Bullet Time
+  secondaryActiveToolId:
   equippedPassiveToolIds:
   - BIG SHOT
   - Splitting Projectiles

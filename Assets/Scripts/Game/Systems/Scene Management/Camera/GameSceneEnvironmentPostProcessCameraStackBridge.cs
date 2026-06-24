@@ -273,7 +273,12 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
     private void ConfigureBaseCamera(Camera resolvedBaseCamera, UniversalAdditionalCameraData baseCameraData)
     {
         baseCameraData.renderType = CameraRenderType.Base;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        baseCameraData.renderPostProcessing = false;
+        resolvedBaseCamera.allowHDR = false;
+#else
         baseCameraData.renderPostProcessing = enableEnvironmentPostProcessing;
+#endif
         resolvedBaseCamera.cullingMask = environmentCullingMask.value;
 
         ValidateEnvironmentMask();
@@ -296,8 +301,12 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
         gameplayCameraData.renderType = CameraRenderType.Overlay;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+        gameplayCameraData.renderPostProcessing = false;
+#else
         if (disableGameplayPostProcessing)
             gameplayCameraData.renderPostProcessing = false;
+#endif
 
         ValidateGameplayMask(resolvedGameplayCamera.cullingMask);
         ValidateGameplayDepthMode(gameplayCameraData);

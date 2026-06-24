@@ -39,6 +39,7 @@ Shader "Cel Shader/Toon Diffuse"
 
 			#pragma vertex vert
 			#pragma fragment frag
+			#pragma multi_compile_instancing
 
 			#pragma multi_compile_fog
 
@@ -52,6 +53,7 @@ Shader "Cel Shader/Toon Diffuse"
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;
 				float3 normal : NORMAL;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct v2f
@@ -98,6 +100,7 @@ Shader "Cel Shader/Toon Diffuse"
 
 			v2f vert(appdata v)
 			{
+				UNITY_SETUP_INSTANCE_ID(v);
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
